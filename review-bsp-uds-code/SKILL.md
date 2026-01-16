@@ -154,7 +154,52 @@ Task cycle is 10ms, so timeout count = 5.
 ## Review Output Format
 
 Provide findings as PR comments with:
-1. **File and line reference**
-2. **Issue severity**: Bug, Warning, or Suggestion
-3. **Description** of the problem
-4. **Fix** recommendation with code example
+1. **File and line reference** - Include clickable markdown links (e.g., `[uds_core.c#L520](source/fvt_cdd/common/uds/core/uds_core.c#L520)`)
+2. **Issue severity** - Use emoji indicators:
+   - 🔴 **Bug** - Critical issues that can cause crashes, security vulnerabilities, or data corruption
+   - 🟡 **Warning** - Issues that may cause incorrect behavior or violate ISO 14229
+   - 🟢 **Suggestion** - Code quality improvements
+3. **Description** of the problem with explanation of why it's problematic
+4. **Current Code** - Show the problematic code snippet
+5. **Fix** - Provide corrected code example that can be directly applied
+
+### Example Finding Format
+
+```markdown
+#### Buffer Over-read in `handle_did_init_event`
+
+**File:** [uds_core.c#L520-L527](source/fvt_cdd/common/uds/core/uds_core.c#L520-L527)  
+**Severity:** 🔴 Bug
+
+**Description:** The code reads 4 bytes (DID + length) but only validates 2 bytes before reading, causing a potential buffer over-read.
+
+**Current Code:**
+\`\`\`c
+if (len < offset + 2)
+{
+    return E_NOT_OK;
+}
+uint16_t did = request[offset] << 8 | request[offset + 1];
+offset += 2;
+uint16_t length = request[offset] << 8 | request[offset + 1];  // Buffer over-read!
+\`\`\`
+
+**Fix:**
+\`\`\`c
+if (len < offset + 4)  // Check all 4 bytes (DID + length)
+{
+    return E_NOT_OK;
+}
+uint16_t did = request[offset] << 8 | request[offset + 1];
+offset += 2;
+uint16_t length = request[offset] << 8 | request[offset + 1];
+\`\`\`
+```
+
+### Summary Table
+
+Always conclude the review with a summary table:
+
+| # | Issue | Severity | Line | Fix |
+|---|-------|----------|------|-----|
+| 1 | Brief description | 🔴/🟡/🟢 | L### | One-line fix summary |
