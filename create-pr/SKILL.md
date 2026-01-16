@@ -6,43 +6,38 @@ allowed-tools: Bash(git:*), Bash(gh:*), Read, Grep, Glob
 
 # Create Pull Request
 
-Creates GitHub PRs with titles that pass n8n's `check-pr-title` CI validation.
+Creates GitHub PRs with titles that pass the `check-pr-title` CI validation.
 
 ## PR Title Format
 
 ```
-<type>(<scope>): <summary>
+<JIRA-ID>: <summary>
 ```
 
-### Types (required)
+### JIRA-ID
 
-| Type       | Description                                      | Changelog |
-|------------|--------------------------------------------------|-----------|
-| `feat`     | New feature                                      | Yes       |
-| `fix`      | Bug fix                                          | Yes       |
-| `perf`     | Performance improvement                          | Yes       |
-| `test`     | Adding/correcting tests                          | No        |
-| `docs`     | Documentation only                               | No        |
-| `refactor` | Code change (no bug fix or feature)              | No        |
-| `build`    | Build system or dependencies                     | No        |
-| `ci`       | CI configuration                                 | No        |
-| `chore`    | Routine tasks, maintenance                       | No        |
+The JIRA-ID is extracted from the current branch name. Branch names follow the format:
+```
+XXXX-nnnn-description-of-work
+```
 
-### Scopes (optional but recommended)
+Where:
+- `XXXX` = 3 or 4 uppercase English characters (project key)
+- `nnnn` = 4-digit issue number
 
-- `API` - Public API changes
-- `benchmark` - Benchmark CLI changes
-- `core` - Core/backend/private API
-- `editor` - Editor UI changes
-- `* Node` - Specific node (e.g., `Slack Node`, `GitHub Node`)
+**Examples:**
+| Branch Name | JIRA-ID |
+|-------------|---------|
+| `B1XF-3916-optimize-m-core-init-process` | `B1XF-3916` |
+| `FDC-1234-add-new-feature` | `FDC-1234` |
+| `BSP-5678-fix-memory-leak` | `BSP-5678` |
 
 ### Summary Rules
 
 - Use imperative present tense: "Add" not "Added"
 - Capitalize first letter
 - No period at the end
-- No ticket IDs (e.g., N8N-1234)
-- Add `(no-changelog)` suffix to exclude from changelog
+- Be concise but descriptive
 
 ## Steps
 
@@ -50,105 +45,112 @@ Creates GitHub PRs with titles that pass n8n's `check-pr-title` CI validation.
    ```bash
    git status
    git diff --stat
-   git log origin/master..HEAD --oneline
+   git log origin/main..HEAD --oneline
    ```
 
-2. **Analyze changes** to determine:
-   - Type: What kind of change is this?
-   - Scope: Which package/area is affected?
+2. **Extract JIRA-ID from branch name**:
+   ```bash
+   BRANCH=$(git rev-parse --abbrev-ref HEAD)
+   JIRA_ID=$(echo "$BRANCH" | grep -oE '^[A-Z]{3,4}-[0-9]{4}')
+   echo "JIRA-ID: $JIRA_ID"
+   ```
+
+3. **Analyze changes** to determine:
    - Summary: What does the change do?
 
-3. **Push branch if needed**:
+4. **Push branch if needed**:
    ```bash
    git push -u origin HEAD
    ```
 
-4. **Create PR** using gh CLI with the template from `.github/pull_request_template.md`:
+5. **Create PR** using gh CLI:
    ```bash
-   gh pr create --draft --title "<type>(<scope>): <summary>" --body "$(cat <<'EOF'
-   ## Summary
+   BRANCH=$(git rev-parse --abbrev-ref HEAD)
+   JIRA_ID=$(echo "$BRANCH" | grep -oE '^[A-Z]{3,4}-[0-9]{4}')
+   gh pr create --draft --title "${JIRA_ID}: <summary>" --body "$(cat <<'EOF'
+   ## Description
 
    <Describe what the PR does and how to test. Photos and videos are recommended.>
 
-   ## Related Linear tickets, Github issues, and Community forum posts
+   Fixes # <JIRA-ID>
 
-   <!-- Link to Linear ticket: https://linear.app/n8n/issue/[TICKET-ID] -->
-   <!-- Use "closes #<issue-number>", "fixes #<issue-number>", or "resolves #<issue-number>" to automatically close issues -->
+   ## Type of change
 
-   ## Review / Merge checklist
+   - [ ] Bug fix
+   - [ ] New feature
+   - [ ] Improvement
+   - [ ] Breaking change
 
-   - [ ] PR title and summary are descriptive. ([conventions](../blob/master/.github/pull_request_title_conventions.md))
-   - [ ] [Docs updated](https://github.com/n8n-io/n8n-docs) or follow-up ticket created.
-   - [ ] Tests included.
-   - [ ] PR Labeled with `release/backport` (if the PR is an urgent fix that needs to be backported)
+   ## How Has This Been Tested?
+
+   - [ ] Unit tests
+   - [ ] Integration tests
+   - [ ] Manual testing
+
+   ## Checklist:
+
+   - [ ] My code follows the style guidelines of this project
+   - [ ] I have performed a self-review of my own code
+   - [ ] I have commented my code, particularly in hard-to-understand areas
+   - [ ] I have made corresponding changes to the documentation
+   - [ ] New and existing unit tests pass locally with my changes
+   - [ ] I have checked my code and corrected any misspellings
    EOF
    )"
    ```
 
 ## PR Body Guidelines
 
-Based on `.github/pull_request_template.md`:
-
-### Summary Section
+### Description Section
 - Describe what the PR does
 - Explain how to test the changes
 - Include screenshots/videos for UI changes
+- Reference the JIRA ticket with `Fixes # <JIRA-ID>`
 
-### Related Links Section
-- Link to Linear ticket: `https://linear.app/n8n/issue/[TICKET-ID]`
-- Link to GitHub issues using keywords to auto-close:
-  - `closes #123` / `fixes #123` / `resolves #123`
-- Link to Community forum posts if applicable
+### Type of Change
+Select the appropriate type:
+- Bug fix - Fixes an issue
+- New feature - Adds new functionality
+- Improvement - Enhances existing functionality
+- Breaking change - Changes that break backward compatibility
+
+### Testing Section
+Describe how the changes were tested
 
 ### Checklist
-All items should be addressed before merging:
-- PR title follows conventions
-- Docs updated or follow-up ticket created
-- Tests included (bugs need regression tests, features need coverage)
-- `release/backport` label added if urgent fix needs backporting
+All items should be addressed before merging
 
 ## Examples
 
-### Feature in editor
+### Optimization change
 ```
-feat(editor): Add workflow performance metrics display
-```
-
-### Bug fix in core
-```
-fix(core): Resolve memory leak in execution engine
+B1XF-3916: Optimize M-core initialization process
 ```
 
-### Node-specific change
+### Bug fix
 ```
-fix(Slack Node): Handle rate limiting in message send
-```
-
-### Breaking change (add exclamation mark before colon)
-```
-feat(API)!: Remove deprecated v1 endpoints
+FDC-1234: Fix memory leak in UDS handler
 ```
 
-### No changelog entry
+### New feature
 ```
-refactor(core): Simplify error handling (no-changelog)
+BSP-5678: Add DTC status reporting API
 ```
 
-### No scope (affects multiple areas)
+### Refactoring
 ```
-chore: Update dependencies to latest versions
+B1XF-2345: Refactor DID configuration structure
 ```
 
 ## Validation
 
 The PR title must match this pattern:
 ```
-^(feat|fix|perf|test|docs|refactor|build|ci|chore|revert)(\([a-zA-Z0-9 ]+( Node)?\))?!?: [A-Z].+[^.]$
+^[A-Z]{3,4}-[0-9]{4}: [A-Z].+[^.]$
 ```
 
 Key validation rules:
-- Type must be one of the allowed types
-- Scope is optional but must be in parentheses if present
-- Exclamation mark for breaking changes goes before the colon
+- JIRA-ID must be 3-4 uppercase letters followed by hyphen and 4 digits
+- Colon and space after JIRA-ID
 - Summary must start with capital letter
 - Summary must not end with a period
