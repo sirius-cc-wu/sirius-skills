@@ -12,10 +12,10 @@ This skill manages the transition between Specification, Planning, and Implement
 2. **Lifecycle Gatekeeping**:
    - If no `spec.md` exists: Redirect to `specify`.
    - If `spec.md` is complete but no `plan.md` exists: Redirect to `plan`.
-   - If both exist: Facilitate the `implement` loop.
+   - If both exist: Delegate to the `implement` skill to execute the plan.
 3. **State Management**:
    - Update the status in `specs/README.md` after each major milestone.
-   - **CRITICAL**: During the implementation loop, ensure that checkboxes in the active `plan.md` are marked as completed (`[x]`) immediately after the corresponding work is verified.
+   - **CRITICAL**: Ensure the `implement` skill marks checkboxes in the active `plan.md` as completed (`[x]`) immediately after work is verified.
 
 ## Tooling
 Always use `scripts/manage_specs.py` for registry updates to ensure cross-platform compatibility. The script supports automatic ID generation or extraction from the branch name.

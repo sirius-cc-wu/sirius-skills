@@ -21,7 +21,6 @@ Before finalize the `plan.md`, check:
 - Are file paths resolved according to the project structure?
 
 ## Execution Mandate
-The `plan.md` is a live tracking document. Agents must:
-1. Reference the `plan.md` at the start of every implementation session.
-2. Mark steps as completed (`[x]`) in `plan.md` as they are finished and verified.
-3. Keep the user informed of progress by referencing the plan's milestones.
+The `plan.md` is a live tracking document designed for the `implement` skill. The plan must:
+1. Ensure steps are atomic enough for a single `implement` cycle.
+2. Be maintained by the `implement` skill (marking `[x]` upon completion).
