@@ -16,6 +16,6 @@ To maintain precision and reduce cognitive load, follow these rules:
 4. **Iterate**: Integrate the user's answer into the draft before moving to the next ambiguity group.
 
 ## Workflow
-1. Use `.github/skills/conductor/scripts/manage_specs.py` to initialize the track.
+1. Use the `conductor` skill to initialize the track.
 2. Apply Sequential Questioning to define boundaries, inputs, and expected outcomes.
 3. Output the final `spec.md` in the designated `specs/<ID>-<name>/` folder.
