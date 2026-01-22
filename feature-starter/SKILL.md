@@ -25,19 +25,17 @@ Determine the branch name from your spec file (e.g., `007-refactor-uds-file-tran
 Execute the bundled script to create the branch, commit changes, and setup the worktree.
 
 ```bash
-bash .github/skills/feature-starter/scripts/start_feature.sh <branch-name> "<commit-message>"
+bash <path-to-feature-starter>/scripts/start_feature.sh <branch-name> "<commit-message>"
 ```
 
 **Example:**
 ```bash
-bash .github/skills/feature-starter/scripts/start_feature.sh 007-refactor-uds-file-transfer-server "docs: add spec for uds file transfer refactor"
+bash <path-to-feature-starter>/scripts/start_feature.sh 007-refactor-uds-file-transfer-server "docs: add spec for uds file transfer refactor"
 ```
 
 ### 3. Add Worktree to Workspace
 After the script completes, add the new worktree directory to your current VS Code workspace.
 1.  Go to **File** > **Add Folder to Workspace...**
-2.  Select the new directory (usually `../<branch-name>`).
-3.  This allows you to edit files in the feature branch while keeping the main workspace open for reference
 2.  Select the new directory (usually `../<branch-name>`).
 3.  This allows you to edit files in the feature branch while keeping the main workspace open for reference.
 
