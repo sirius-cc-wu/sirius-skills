@@ -1,27 +1,28 @@
 ---
 name: conductor
-description: High-level orchestrator for the design-driven lifecycle. Use this when starting a new specification, planning, or implementation.
+description: Hybrid orchestrator: spec-driven for protocol/interface artifacts, design-driven for architecture and implementation.
 ---
 
 # Conductor Skill (Orchestrator)
 
-This skill manages the transition between Specification, Planning, and Implementation.
+This skill manages a hybrid lifecycle: treat protocol/interface artifacts as spec-driven (SDD) and treat architecture, prototyping and implementation details as design-driven (DDD). It coordinates handoffs between specification, planning, and implementation tracks and enforces guardrails for interface conformance.
 
-## Responsibilities
-1. **Discovery**: Look at `specs/README.md` to identify the active track.
-2. **Lifecycle Gatekeeping**:
-   - If no `spec.md` exists: Redirect to `specify`.
-   - If `spec.md` is complete but no `plan.md` exists: Redirect to `plan`.
-   - If both exist: Delegate to the `implement` skill to execute the plan.
-3. **State Management**:
-   - Update the status in `specs/README.md` after each major milestone.
-   - **CRITICAL**: Ensure the `implement` skill marks checkboxes in the active `plan.md` as completed (`[x]`) immediately after work is verified.
+## Lifecycle Coordination
+- **Phase 1: Specification (SDD)**: If no `spec.md` exists and the track is interface-critical: Redirect to `specify` (SDD) to produce a formal `spec.md` including `Interface Spec` and `Acceptance Tests` sections. For non-interface-critical tracks, `design.md` (DDD) is acceptable.
+- **Phase 1b: Design (DDD)**: If a `design.md` exists but no `spec.md`, redirect to `design` for iterative architecture and prototyping. A `design.md` is encouraged for all tracks.
+- **Phase 2: Planning**: If `spec.md` exists but no `plan.md`: Redirect to `plan`. `plan.md` MUST map TDD steps to spec items for interface-critical tracks.
+- **Phase 3: Implementation**: If required spec/design and `plan.md` exist and validation passes: Hand off to `implement` for the execution loop.
+
+## Key Responsibilities
+1. **Discovery**: Scan `specs/README.md` to identify the active track and whether it is interface-critical.
+2. **Registry Management**: Update track status in `specs/README.md` using `scripts/manage_specs.py` (use `add`, `validate-spec`, `validate-design`, `status`).
+3. **Guardrails**: Ensure `implement` only starts once required validations pass (for interface-critical tracks `validate-spec` must pass) and the `plan.md` is approved and contains verifiable TDD steps.
 
 ## Tooling
-Always use `scripts/manage_specs.py` for registry updates to ensure cross-platform compatibility. The script supports automatic ID generation or extraction from the branch name.
+Always use `scripts/manage_specs.py` for registry updates and validation to ensure cross-platform compatibility. The script automatically extracts the **Track ID** from the current branch name (e.g., `123-feature` or `feature/123-name`) to use as the track ID when adding or validating tracks. If no ID is found, it will fallback to a timestamp for personal projects.
 
 ```bash
-# Auto-detect ID from branch name or generate timestamp:
+# When on a branch with an ID or simple feature name:
 python3 <path-to-conductor>/scripts/manage_specs.py add "feature-name"
 
 # To specify an ID manually:

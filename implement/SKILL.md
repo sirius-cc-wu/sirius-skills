@@ -1,52 +1,31 @@
 ---
 name: implement
-description: Guide for executing a technical implementation plan iteratively, following TDD practices and updating the plan status.
+description: Code implementation expert. Follows the Design-Driven Development lifecycle to execute implementation plans.
 ---
 
-# Implementation Skill
+# Code Implementation Skill
 
-This skill guides the execution of a `plan.md` created by the `plan` skill. It focuses on iterative, test-driven development (TDD) to ensure high-quality code delivery.
+This skill governs the execution phase of the Design-Driven Development lifecycle. It ensures that code matches the `spec.md` and fulfills the atomic steps in `plan.md`.
 
-## Core Philosophy
+## Mandatory TDD Implementation Loop
 
--   **Atomic Execution**: Focus on one plan item at a time.
--   **Test-Driven**: Write tests before implementation whenever possible (Red-Green-Refactor).
--   **Continuous Verification**: Verify functionality after every step.
--   **Living Document**: The `plan.md` reflects the current state of reality.
+For every task in the implementation phase, follow these steps:
 
-## Workflow
+1. **State Synchronization**:
+   - Read the current `specs/<ID>-<name>/plan.md`.
+   - Identify the next available task (`[ ]`).
+   - Sync the `manage_todo_list` tool with the current step.
 
-### 1. Select & Analyze
-1.  Read the active `plan.md`.
-2.  Find the first unchecked item (`- [ ]`). This is your **Current Task**.
-3.  Read the relevant context (files, previous steps, `spec.md` if needed).
+2. **The Red-Green-Refactor Cycle**:
+   - **Step A: Red (Fail)**: Write or update a test case capturing the requirement. Verify it fails.
+   - **Step B: Green (Pass)**: Write minimal code required to pass the test. Follow project coding standards (no panics, explicit results).
+   - **Step C: Refactor & Verify**: Optimize and run all tests to ensure no regressions.
+   - **Step D: Atomic Commit**: Commit the change using the `commit` skill.
 
-### 2. Implementation Loop (The "Current Task")
+3. **Checklist Maintenance**:
+   - Mark the task as completed (`[x]`) in `plan.md` IMMEDIATELY after verification.
 
-#### A. Test (Red)
-If the task involves logic or behavior changes:
-1.  Create or modify a test case that replicates the requirement.
-2.  Run the test to confirm it fails (or fails to compile if new types are needed).
-
-#### B. Implement (Green)
-1.  Write the minimal code necessary to satisfy the test or requirements.
-2.  **Constraint**: Do not implement future steps yet.
-
-#### C. Verify
-1.  Run the tests.
-2.  Run the build/check command (e.g., `cargo check`, `npm run lint`).
-3.  Fix any errors.
-
-#### D. Refactor
-1.  Review the code for cleanliness, naming, and duplication.
-2.  Ensure existing tests still pass.
-
-### 3. Update Status
-1.  **IMMEDIATELY** mark the task as completed in `plan.md`: change `- [ ]` to `- [x]`.
-2.  Commit the changes (code + plan update) using the `commit` skill standards.
-
-## Handling Blockers
-If a step cannot be completed as planned:
-1.  **Diverge**: Propose a modification to the plan.
-2.  **Report**: Explain why the original plan was insufficient or incorrect.
-3.  **Refine**: Update `plan.md` with new sub-steps if the task was too large.
+## Integration with the Lifecycle
+- **Conductor**: `implement` is triggered only when `conductor` confirms a valid plan is ready.
+- **Commit**: Uses `commit` to ensure project-standard Git messages.
+- **Completion**: Once the plan is fully checked, report back to `conductor` for final track closure.
