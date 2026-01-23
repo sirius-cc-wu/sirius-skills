@@ -13,6 +13,12 @@ This skill supports the creation of specifications in three primary formats:
 - **Use Case**: Details interactions between users and a system to achieve a specific goal.
 - **Behavior-Driven Development (BDD)**: Defines features through examples using a Gherkin-like syntax (Given, When, Then).
 
+## Specification Templates
+This skill uses markdown templates to ensure a consistent structure for each specification format. The templates are located in the `templates/` directory:
+- `user_story.md`
+- `use_case.md`
+- `bdd.md`
+
 ## Protocol: Sequential Questioning
 
 To maintain precision and reduce cognitive load, follow these rules:
@@ -24,5 +30,6 @@ To maintain precision and reduce cognitive load, follow these rules:
 ## Workflow
 1. Prompt the user to choose a specification format (User Story, Use Case, or BDD).
 2. Use the `spec-driver` skill to initialize the track.
-3. Apply Sequential Questioning to define boundaries, inputs, and expected outcomes based on the chosen format.
-4. Output the final `spec.md` in the designated `specs/<ID>-<name>/` folder.
+3. **Copy the corresponding template** from the `templates/` directory to the `specs/<ID>-<name>/spec.md` file.
+4. Apply Sequential Questioning to fill in the template with the defined boundaries, inputs, and expected outcomes.
+5. Output the final `spec.md` in the designated `specs/<ID>-<name>/` folder.
