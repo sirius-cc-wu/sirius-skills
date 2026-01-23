@@ -1,9 +1,9 @@
 ---
-name: feature-starter
+name: create-feature-worktree
 description: Automates the process of starting a new feature by committing staged changes (specs) to a new branch and creating a separate worktree.
 ---
 
-# Feature Starter Skill
+# Create Feature Worktree Skill
 
 This skill helps you initialize a new feature development environment properly.
 
