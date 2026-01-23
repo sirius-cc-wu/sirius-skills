@@ -41,12 +41,6 @@ def add_track(id, name):
             ),
             os.path.join(path, "spec.md"),
         ),
-        (
-            os.path.join(
-                ".github", "skills", "design", "templates", "TEMPLATE_design.md"
-            ),
-            os.path.join(path, "design.md"),
-        ),
     ]
     for src, dst in templates:
         try:
@@ -132,31 +126,14 @@ def validate_spec(track_dir):
     return 1
 
 
-def validate_design(track_dir):
-    design_path = os.path.join(track_dir, "design.md")
-    if not os.path.exists(design_path):
-        print("design.md not found", file=sys.stderr)
-        return 2
-    text = open(design_path, "r").read()
-    ok_overview = "overview" in text.lower() or "## Overview" in text
-    if ok_overview:
-        print("design.md: basic validation passed")
-        return 0
-    print("design.md missing 'Overview' section", file=sys.stderr)
-    return 1
-
-
 def status(track_dir):
     if not track_dir or not os.path.exists(track_dir):
         print("Track not found")
         return 2
     print(f"Track: {track_dir}")
     spec = os.path.exists(os.path.join(track_dir, "spec.md"))
-    design = os.path.exists(os.path.join(track_dir, "design.md"))
     print(f"  spec.md: {'present' if spec else 'missing'}")
-    print(f"  design.md: {'present' if design else 'missing'}")
     spec_ret = validate_spec(track_dir) if spec else None
-    design_ret = validate_design(track_dir) if design else None
     return 0
 
 
@@ -169,7 +146,6 @@ if __name__ == "__main__":
     add_p.add_argument("id", nargs="?", default=None)
     add_p.add_argument("name")
     subparsers.add_parser("validate-spec")
-    subparsers.add_parser("validate-design")
     subparsers.add_parser("status")
     # allow optional track id argument for validations/status
     parser.add_argument("track_id", nargs="?", default=None)
@@ -195,13 +171,6 @@ if __name__ == "__main__":
             print("Track not found for validation", file=sys.stderr)
             sys.exit(2)
         rc = validate_spec(track_dir)
-        sys.exit(rc)
-    elif args.command == "validate-design":
-        track_dir = find_track_dir(args.track_id)
-        if not track_dir:
-            print("Track not found for validation", file=sys.stderr)
-            sys.exit(2)
-        rc = validate_design(track_dir)
         sys.exit(rc)
     elif args.command == "status":
         track_dir = find_track_dir(args.track_id)
