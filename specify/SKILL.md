@@ -7,6 +7,12 @@ description: Brainstorming and requirement specification expert.
 
 Use this skill to transform vague ideas into concrete `spec.md` files.
 
+## Supported Specification Formats
+This skill supports the creation of specifications in three primary formats:
+- **User Story**: Describes a feature from an end-user perspective, focusing on "who," "what," and "why."
+- **Use Case**: Details interactions between users and a system to achieve a specific goal.
+- **Behavior-Driven Development (BDD)**: Defines features through examples using a Gherkin-like syntax (Given, When, Then).
+
 ## Protocol: Sequential Questioning
 
 To maintain precision and reduce cognitive load, follow these rules:
@@ -16,6 +22,7 @@ To maintain precision and reduce cognitive load, follow these rules:
 4. **Iterate**: Integrate the user's answer into the draft before moving to the next ambiguity group.
 
 ## Workflow
-1. Use the `spec-driver` skill to initialize the track.
-2. Apply Sequential Questioning to define boundaries, inputs, and expected outcomes.
-3. Output the final `spec.md` in the designated `specs/<ID>-<name>/` folder.
+1. Prompt the user to choose a specification format (User Story, Use Case, or BDD).
+2. Use the `spec-driver` skill to initialize the track.
+3. Apply Sequential Questioning to define boundaries, inputs, and expected outcomes based on the chosen format.
+4. Output the final `spec.md` in the designated `specs/<ID>-<name>/` folder.
