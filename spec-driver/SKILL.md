@@ -1,9 +1,9 @@
 ---
-name: conductor
+name: spec-driver
 description: Orchestrator: spec-driven for all aspects of development.
 ---
 
-# Conductor Skill (Orchestrator)
+# Spec-Driver Skill (Orchestrator)
 
 This skill manages a spec-driven (SDD) lifecycle for all aspects of development. It coordinates handoffs between specification, planning, and implementation tracks and enforces guardrails for specification conformance.
 
@@ -22,8 +22,8 @@ Always use `scripts/manage_specs.py` for registry updates and validation to ensu
 
 ```bash
 # When on a branch with an ID or simple feature name:
-python3 <path-to-conductor>/scripts/manage_specs.py add "feature-name"
+python3 <path-to-spec-driver>/scripts/manage_specs.py add "feature-name"
 
 # To specify an ID manually:
-python3 <path-to-conductor>/scripts/manage_specs.py add "ID" "feature-name"
+python3 <path-to-spec-driver>/scripts/manage_specs.py add "ID" "feature-name"
 ```
