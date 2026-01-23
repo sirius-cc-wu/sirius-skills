@@ -8,6 +8,21 @@
 ## User Scenarios & Testing *(mandatory)*
 
 <!--
+  This section supports multiple story formats. Choose the one that best fits your needs.
+-->
+
+### Story Types
+
+You can use any of the following formats for your user stories.
+
+- **Standard User Story**: `As a [user role], I want to [goal] so that [benefit].`
+- **Job Story**: `When [situation], I want to [motivation] so I can [expected outcome].`
+- **Team Story**: `We want to [action] so that [reason].`
+- **Technical Story**: `[Action] the [result] [by|for|of|to] a(n) [object].`
+
+---
+
+<!--
   IMPORTANT: User stories should be PRIORITIZED as user journeys ordered by importance.
   Each user story/journey must be INDEPENDENTLY TESTABLE - meaning if you implement just ONE of them,
   you should still have a viable MVP (Minimum Viable Product) that delivers value.
@@ -22,7 +37,12 @@
 
 ### User Story 1 - [Brief Title] (Priority: P1)
 
-[Describe this user journey in plain language]
+**Story Type**: [Choose: Standard, Job, Team, or Technical]
+
+**Story**:
+```
+[Write your story here using the chosen format]
+```
 
 **Why this priority**: [Explain the value and why it has this priority level]
 
@@ -37,7 +57,12 @@
 
 ### User Story 2 - [Brief Title] (Priority: P2)
 
-[Describe this user journey in plain language]
+**Story Type**: [Choose: Standard, Job, Team, or Technical]
+
+**Story**:
+```
+[Write your story here using the chosen format]
+```
 
 **Why this priority**: [Explain the value and why it has this priority level]
 
@@ -51,7 +76,12 @@
 
 ### User Story 3 - [Brief Title] (Priority: P3)
 
-[Describe this user journey in plain language]
+**Story Type**: [Choose: Standard, Job, Team, or Technical]
+
+**Story**:
+```
+[Write your story here using the chosen format]
+```
 
 **Why this priority**: [Explain the value and why it has this priority level]
 
