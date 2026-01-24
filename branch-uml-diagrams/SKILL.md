@@ -2,7 +2,6 @@
 name: branch-uml-diagrams
 description: Finds important changes in the current branch against its merge-base with main, and creates before and after PlantUML files in the relevant spec folders, guided by the spec-driver skill for finding spec files. It also checks the syntax of the generated PlantUML files.
 ---
-
 # Branch UML Diagram Generator
 
 This skill analyzes the current branch, identifies significant code changes against the merge-base with the `main` branch, and generates PlantUML diagrams to visualize the architecture before and after the modifications. It uses the spec-driver skill's guidance to locate the appropriate specification file.
@@ -20,7 +19,7 @@ git rev-parse --abbrev-ref HEAD > current_branch.txt
 
 Then, get the diff between the merge-base and the current branch (`HEAD`):
 ```bash
-git diff $(git merge-base main HEAD)..HEAD --color "never" > branch.diff
+git diff --color=never $(git merge-base main HEAD)..HEAD > branch.diff
 ```
 
 This will give you the raw diff to analyze.
