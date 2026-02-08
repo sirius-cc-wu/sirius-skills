@@ -28,17 +28,33 @@ Follow these standards for all commit messages:
 - **Body (Optional but Recommended):** A bulleted list of specific changes or a brief explanation of *why* the changes were made.
 - **Character Encoding (CRITICAL):**
     - **NEVER** use emoji characters.
-    - **ALWAYS escape backticks (`) with a backslash (\)`** if they include inline code, filenames, or any other content that uses backticks.
-    - Example: `Update \`src/lib.rs\` to fix a bug.`
+    - **ALWAYS escape literal backticks as \`** in commit message text (for inline code, filenames, and similar content).
+    - Example message text: `Update \`src/lib.rs\` to fix a bug.`
+- **Shell Safety (CRITICAL):**
+    - **PREFER `git commit -F <file>`** for multi-line messages.
+    - **AVOID** `git commit -m "..."` when the body may contain backticks, because shells can evaluate raw backticks in double-quoted strings.
+    - If `-m` must be used, use single-quoted arguments and keep backticks escaped as `\`` in message content.
 
 ### 4. Executing the Commit
-Run the `git commit` command with the crafted message.
+Use a message file and `git commit -F` as the default, safest approach.
 
 ```bash
-git commit -m "Summary line
+cat > /tmp/commit-msg.txt <<'EOF'
+[scope]: Summary line
 
 - Detailed bullet point 1
-- Detailed bullet point 2 with escaped backticks: \`code_snippet\`"
+- Detailed bullet point 2 with escaped backticks: \`code_snippet\`
+EOF
+
+git commit -F /tmp/commit-msg.txt
+rm -f /tmp/commit-msg.txt
+```
+
+Fallback only when needed:
+
+```bash
+# Use single quotes with -m to avoid command substitution.
+git commit -m '[scope]: Summary line' -m '- Detail with escaped backticks: \`code_snippet\`'
 ```
 
 ## Examples
