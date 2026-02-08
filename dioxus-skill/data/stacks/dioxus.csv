@@ -1,0 +1,9 @@
+No,Category,Guideline,Description,Do,Don't,Code Good,Code Bad,Severity,Docs URL
+1,Setup,Use CLI for installation,Install components (e.g. Button) via Dioxus CLI,dx components add component-name,Manual copy-paste,dx components add button,Copy component code manually,High,https://github.com/DioxusLabs/components
+2,Setup,Include CSS,Ensure dx-components.css is linked,Link /assets/dx-components.css in root,Skip CSS inclusion,assets/dx-components.css in head,Missing css link,High,https://github.com/DioxusLabs/components
+3,Components,Use component variants,Use props for variants (e.g. Button variants),Pass variants via props,Hardcoded classes,Button { variant: ButtonVariant::Destructive },Button { class: "bg-red-500" },Medium,https://github.com/DioxusLabs/components
+4,Components,Spread attributes,Allow extending components with attributes,Spread ...props.attributes,Block external attributes,button { ..props.attributes },button { },Medium,https://github.com/DioxusLabs/components
+5,Structure,Components folder,Components are placed in components/ folder,Keep generated components in components/,Move components randomly,src/components/button.rs,src/button.rs,Low,https://github.com/DioxusLabs/components
+6,Theming,Use CSS variables,Colors defined in CSS variables,Use var(--name) for colors,Hardcoded hex values,color: var(--primary),color: #000000,Medium,https://github.com/DioxusLabs/components
+7,Advanced,Use primitives for custom UI,Use dioxus-primitives for unstyled accessible components,Use dioxus-primitives crate,Reimplement accessiblity from scratch,use dioxus_primitives::...,impl Element for ...,Medium,https://github.com/DioxusLabs/components
+8,Development,Run preview,Use dx serve to preview components,dx serve -p preview --desktop,Blind coding,dx serve -p preview,cargo run,Low,https://github.com/DioxusLabs/components
