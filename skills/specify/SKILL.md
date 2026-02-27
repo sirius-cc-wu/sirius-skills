@@ -59,7 +59,7 @@ To maintain precision and reduce cognitive load, follow these rules:
 4. **Iterate**: Integrate the user's answer into the draft before moving to the next ambiguity group.
 
 ## Workflow
-1. Use the `spec-driver` skill to initialize the track.
-2. **Copy the `spec-template.md`** from the `templates/` directory to the `specs/<ID>-<name>/spec.md` file.
+1. Create or identify the target track directory: `specs/<ID>-<name>/`.
+2. **Copy the `spec-template.md`** from the `templates/` directory to `specs/<ID>-<name>/spec.md`.
 3. Apply Sequential Questioning to fill in all sections of the template.
 4. Output the final `spec.md` in the designated `specs/<ID>-<name>/` folder.

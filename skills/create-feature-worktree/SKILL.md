@@ -10,7 +10,7 @@ This skill helps you initialize a new feature development environment properly.
 ## When to Use
 
 Use this skill when you have:
-1.  Created a new spec or plan file.
+1.  Created a new spec file.
 2.  Staged those files.
 3.  Want to implement the feature in a clean, isolated worktree without disturbing your current workspace.
 

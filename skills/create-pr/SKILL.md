@@ -48,10 +48,9 @@ The ID is extracted from the current branch name or a logical scope is used.
 3. **Analyze changes** to determine:
    - Summary: What does the change do?
 
-4. **Validate Plan Completion**:
-   - Locate the relevant `plan.md` (usually in `specs/<ID>-<name>/plan.md`).
-   - Check if all checkboxes in the plan are marked as completed (`[x]`).
-   - **MANDATORY**: A PR should not be created if there are pending `[ ]` items in the `plan.md` unless explicitly justified.
+4. **Validate Scope Completion**:
+   - Locate the relevant `spec.md` (usually in `specs/<ID>-<name>/spec.md`).
+   - Confirm the implemented changes match the defined spec scope before creating the PR.
 
 5. **Push branch if needed**:
    ```bash
@@ -84,7 +83,7 @@ The ID is extracted from the current branch name or a logical scope is used.
    - [ ] I have performed a self-review of my own code
    - [ ] I have commented my code, particularly in hard-to-understand areas
    - [ ] I have made corresponding changes to the documentation
-   - [ ] I have updated the implementation plan (plan.md)
+   - [ ] I have verified the implementation against the spec (spec.md)
    - [ ] New and existing unit tests pass locally with my changes
    - [ ] I have checked my code and corrected any misspellings
    EOF
