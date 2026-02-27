@@ -1,11 +1,11 @@
 ---
 name: commit
-description: Use this skill when requested to commit changes. It ensures commit messages follow project standards, follows the operational policy for character encoding (escaping backticks), and ensures code quality via verification steps.
+description: Use this skill when requested to commit changes. It ensures commit messages follow project standards and ensures code quality via verification steps.
 ---
 
 # Commit Skill
 
-This skill guides the process of committing code changes to the repository, ensuring consistency, quality, and adherence to the project's operational policies.
+This skill guides the process of committing code changes to the repository, ensuring consistency, quality, and adherence to project standards.
 
 ## Workflow
 
@@ -22,28 +22,20 @@ Adhere to the project mandates (e.g. `AGENTS.md`):
 ### 3. Crafting the Commit Message
 Follow these standards for all commit messages:
 
-- **Summary Line:** Use the format `[Scope/ID]: [summary]`.
-    - **Scope/ID:** Mandatory. Extract from the branch name (e.g., `123`, `feature`) or use a logical scope (e.g., `api`, `core`).
+- **Summary Line:** Use the format `[scope]: [summary]`.
+    - **Scope:** Mandatory. Use the crate name or module name (e.g., `api`, `core`).
     - **Summary:** A concise, imperative summary of the change (e.g., "Refactor service handlers").
 - **Body (Optional but Recommended):** A bulleted list of specific changes or a brief explanation of *why* the changes were made.
-- **Character Encoding (CRITICAL):**
-    - **NEVER** use emoji characters.
-    - **ALWAYS escape literal backticks as \`** in commit message text (for inline code, filenames, and similar content).
-    - Example message text: `Update \`src/lib.rs\` to fix a bug.`
-- **Shell Safety (CRITICAL):**
-    - **PREFER `git commit -F <file>`** for multi-line messages.
-    - **AVOID** `git commit -m "..."` when the body may contain backticks, because shells can evaluate raw backticks in double-quoted strings.
-    - If `-m` must be used, use single-quoted arguments and keep backticks escaped as `\`` in message content.
 
 ### 4. Executing the Commit
-Use a message file and `git commit -F` as the default, safest approach.
+Use a message file and `git commit -F` when preparing a multi-line message.
 
 ```bash
 cat > /tmp/commit-msg.txt <<'EOF'
-[scope]: Summary line
+[module]: Summary line
 
 - Detailed bullet point 1
-- Detailed bullet point 2 with escaped backticks: \`code_snippet\`
+- Detailed bullet point 2 with `code_snippet`
 EOF
 
 git commit -F /tmp/commit-msg.txt
@@ -53,8 +45,7 @@ rm -f /tmp/commit-msg.txt
 Fallback only when needed:
 
 ```bash
-# Use single quotes with -m to avoid command substitution.
-git commit -m '[scope]: Summary line' -m '- Detail with escaped backticks: \`code_snippet\`'
+git commit -m '[module]: Summary line' -m '- Detail bullet point'
 ```
 
 ## Examples
@@ -64,4 +55,4 @@ git commit -m '[scope]: Summary line' -m '- Detail with escaped backticks: \`cod
 **Action:**
 1. Check staged changes.
 2. Run build verification.
-3. Commit with extracted ID or scope.
+3. Commit with crate or module scope.
