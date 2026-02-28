@@ -1,5 +1,5 @@
 ---
-name: dioxus-ui-skill
+name: dioxus-ui-ux
 description: "Dioxus UI/UX design intelligence. Specialized guidelines for Dioxus Components, plus 50 styles, 21 palettes, 50 font pairings. Stacks: dioxus, daisyui, shadcn, html-tailwind. Actions: plan, build, create, design, implement, review, fix, improve, optimize. Projects: web app, dashboard, admin panel, SaaS, mobile app. Elements: button, modal, navbar, card, form, chart."
 ---
 
