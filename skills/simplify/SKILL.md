@@ -23,7 +23,7 @@ Run this skill before opening a pull request or while refining an active pull re
 - Prioritize recently changed files and review-critical paths before broad rewrites.
 
 2. Lock behavior and constraints
-- Identify invariants and external contracts that must stay stable.
+- Identify invariants and external contracts that must stay stable using standard search tools or by delegating to an analysis sub-agent (e.g., `codebase_investigator` in Gemini CLI, `explore` in Copilot CLI) to map dependencies.
 - Check project conventions in `CLAUDE.md` (or closest equivalent guidance file) and align to them.
 
 3. Apply targeted simplifications

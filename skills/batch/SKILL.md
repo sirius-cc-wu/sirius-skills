@@ -22,7 +22,8 @@ Orchestrate large-scale changes by splitting work into independent units and run
 - Record acceptance criteria for each unit.
 
 2. Build and prioritize the queue
-- Enumerate targets with `rg`/globs and assign each to a batch.
+- Enumerate targets using standard search tools (`rg`/globs) or delegate to an analysis sub-agent (e.g., `codebase_investigator` in Gemini CLI, `explore` in Copilot CLI) for comprehensive architectural mapping.
+- Define boundaries so each unit can be executed without cross-unit conflicts.
 - Mark risky or ambiguous targets for manual handling.
 - Track state per unit: `todo`, `in_progress`, `blocked`, `done`.
 
