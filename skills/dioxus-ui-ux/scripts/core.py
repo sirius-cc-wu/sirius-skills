@@ -70,7 +70,8 @@ CSV_CONFIG = {
 STACK_CONFIG = {
     "html-tailwind": {"file": "stacks/html-tailwind.csv"},
     "shadcn": {"file": "stacks/shadcn.csv"},
-    "dioxus": {"file": "stacks/dioxus.csv"}
+    "dioxus": {"file": "stacks/dioxus.csv"},
+    "daisyui": {"file": "stacks/daisyui.csv"}
 }
 
 # Common columns for all stacks

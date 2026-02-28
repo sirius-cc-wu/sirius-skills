@@ -1,6 +1,6 @@
 ---
 name: dioxus-ui-skill
-description: "Dioxus UI/UX design intelligence. Specialized guidelines for Dioxus Components, plus 50 styles, 21 palettes, 50 font pairings. Stacks: dioxus, shadcn, html-tailwind. Actions: plan, build, create, design, implement, review, fix, improve, optimize. Projects: web app, dashboard, admin panel, SaaS, mobile app. Elements: button, modal, navbar, card, form, chart."
+description: "Dioxus UI/UX design intelligence. Specialized guidelines for Dioxus Components, plus 50 styles, 21 palettes, 50 font pairings. Stacks: dioxus, daisyui, shadcn, html-tailwind. Actions: plan, build, create, design, implement, review, fix, improve, optimize. Projects: web app, dashboard, admin panel, SaaS, mobile app. Elements: button, modal, navbar, card, form, chart."
 ---
 
 # Dioxus UI/UX Skill - Design Intelligence
@@ -64,14 +64,14 @@ When user requests UI/UX work for Dioxus, follow this workflow:
 Extract key information from user request:
 - **Product type**: SaaS, e-commerce, portfolio, dashboard, etc.
 - **Style keywords**: minimal, professional, elegant, etc.
-- **Stack**: **dioxus** (Primary), shadcn (Reference), html-tailwind (Styling)
+- **Stack**: **dioxus** (Primary), daisyui (Components), shadcn (Reference), html-tailwind (Styling)
 
 ### Step 2: Generate Design System (REQUIRED)
 
 **Always start with `--design-system`** to get comprehensive recommendations:
 
 ```bash
-python3 src/dioxus-skill/scripts/search.py "<product_type> <keywords>" --design-system -p "Project Name"
+python3 skills/dioxus-ui-ux/scripts/search.py "<product_type> <keywords>" --design-system -p "Project Name"
 ```
 
 ### Step 3: Dioxus Guidelines
@@ -79,12 +79,12 @@ python3 src/dioxus-skill/scripts/search.py "<product_type> <keywords>" --design-
 Get implementation-specific best practices for Dioxus Components:
 
 ```bash
-python3 src/dioxus-skill/scripts/search.py "<component_name>" --stack dioxus
+python3 skills/dioxus-ui-ux/scripts/search.py "<component_name>" --stack dioxus
 ```
 
 **Example:**
 ```bash
-python3 src/dioxus-skill/scripts/search.py "button" --stack dioxus
+python3 skills/dioxus-ui-ux/scripts/search.py "button" --stack dioxus
 ```
 
 ### Step 4: Supplement with Reference Patterns (Optional)
@@ -92,7 +92,7 @@ python3 src/dioxus-skill/scripts/search.py "button" --stack dioxus
 If Dioxus docs are sparse, check Shadcn patterns:
 
 ```bash
-python3 src/dioxus-skill/scripts/search.py "dialog" --stack shadcn
+python3 skills/dioxus-ui-ux/scripts/search.py "dialog" --stack shadcn
 ```
 
 ### Step 5: General UI Search
@@ -100,8 +100,8 @@ python3 src/dioxus-skill/scripts/search.py "dialog" --stack shadcn
 For styles, colors, and typography:
 
 ```bash
-python3 src/dioxus-skill/scripts/search.py "glassmorphism" --domain style
-python3 src/dioxus-skill/scripts/search.py "fintech" --domain color
+python3 skills/dioxus-ui-ux/scripts/search.py "glassmorphism" --domain style
+python3 skills/dioxus-ui-ux/scripts/search.py "fintech" --domain color
 ```
 
 ---
@@ -113,6 +113,7 @@ python3 src/dioxus-skill/scripts/search.py "fintech" --domain color
 | Stack | Focus | Usage |
 |-------|-------|-------|
 | `dioxus` | Core Dioxus Components guidelines | `--stack dioxus` |
+| `daisyui` | Semantic daisyUI component classes | `--stack daisyui` |
 | `shadcn` | Upstream React component patterns | `--stack shadcn` |
 | `html-tailwind` | Utility class best practices | `--stack html-tailwind` |
 
