@@ -1,20 +1,11 @@
 ---
 name: simplify
-description: Use this skill as a branch/PR cleanup pass to simplify recent code changes, remove code smells, and improve readability while preserving behavior.
+description: Use this skill as a branch/PR cleanup pass to simplify recent code changes, remove code smells, and improve readability while preserving behavior. When to use: before opening a PR, while refining an active PR, or after feedback to clean up without changing behavior.
 ---
 
 # Simplify
 
 Run this skill before opening a pull request or while refining an active pull request. It is a focused refactor pass over branch diffs and nearby context.
-
-## When To Use
-
-- "Run /simplify."
-- "Make the code change, then simplify."
-- "Clean up this PR before review."
-- "Simplify this branch before I open a PR."
-- "Simplify this branch with the current PR feedback."
-- "Refactor this without changing behavior."
 
 ## Workflow
 
@@ -24,7 +15,7 @@ Run this skill before opening a pull request or while refining an active pull re
 
 2. Lock behavior and constraints
 - Identify invariants and external contracts that must stay stable using standard search tools or by delegating to an analysis sub-agent (e.g., `codebase_investigator` in Gemini CLI, `explore` in Copilot CLI) to map dependencies.
-- Check project conventions in `CLAUDE.md` (or closest equivalent guidance file) and align to them.
+- Check project conventions in `AGENTS.md` and align to them.
 
 3. Apply targeted simplifications
 - Remove duplicate or dead code.
