@@ -1,45 +1,33 @@
 ---
 name: simplify
-description: Use this skill as a branch/PR cleanup pass to simplify recent code changes, remove code smells, and improve readability while preserving behavior.
+description: Simplify branch/PR changes without altering behavior; use before opening a PR, while refining one, or after review feedback.
 ---
 
 # Simplify
 
-Run this skill before opening a pull request or while refining an active pull request. It is a focused refactor pass over branch diffs and nearby context.
+Run this skill as a focused cleanup pass on branch/PR diffs.
 
-## When To Use
+## Workflow (3 phases, 3 perspectives)
 
-- "Run /simplify."
-- "Make the code change, then simplify."
-- "Clean up this PR before review."
-- "Simplify this branch before I open a PR."
-- "Simplify this branch with the current PR feedback."
-- "Refactor this without changing behavior."
+1. Phase 1: Scope
 
-## Workflow
+- Start with `git diff HEAD` (or PR diff/comments).
+- Focus on changed files and critical paths.
+- Lock invariants/contracts and follow `AGENTS.md`.
 
-1. Inspect branch or PR scope first
-- Review branch diff against base (or PR diff/comments if a PR exists).
-- Prioritize recently changed files and review-critical paths before broad rewrites.
+2. Phase 2: Review
 
-2. Lock behavior and constraints
-- Identify invariants and external contracts that must stay stable using standard search tools or by delegating to an analysis sub-agent (e.g., `codebase_investigator` in Gemini CLI, `explore` in Copilot CLI) to map dependencies.
-- Check project conventions in `CLAUDE.md` (or closest equivalent guidance file) and align to them.
+- **Code Reuse:** duplicate logic, missed helper/utility reuse, dead code.
+- **Code Quality:** redundant state, parameter sprawl, copy-paste variants, leaky abstractions, stringly types.
+- **Efficiency:** unnecessary `await`/work, missed parallelization, hot-path bloat, TOCTOU, memory leaks, overly broad operations.
+- Keep only actionable findings in changed scope.
 
-3. Apply targeted simplifications
-- Remove duplicate or dead code.
-- Remove commented-out or temporary "vibe-coding" artifacts.
-- Inline single-use variables when clarity improves.
-- Simplify nested conditionals and complex boolean expressions.
-- Reduce unnecessary abstraction introduced during implementation.
+3. Phase 3: Fix and verify
 
-4. Validate no behavior change
+- Apply high-signal fixes; skip false positives/low-value items.
+- Preserve external behavior unless asked otherwise.
 - Run relevant tests/lint/type checks for touched scope.
-- If no tests exist for risky logic, add minimal focused tests before finalizing.
-
-5. Produce PR-ready summary
-- State what was simplified, what behavior was preserved, and what checks were run.
-- If PR feedback exists, map simplifications to feedback themes.
+- End with a short summary of fixes, skips, and checks (or confirm code is already clean).
 
 ## Guardrails
 
@@ -50,7 +38,7 @@ Run this skill before opening a pull request or while refining an active pull re
 
 ## Output Checklist
 
-1. Files/areas simplified (centered on branch/PR diff).
-2. Simplifications applied (dedupe, conditional cleanup, inline/removal).
-3. Invariants preserved.
+1. Files/areas simplified.
+2. Changes by perspective (reuse, quality, efficiency).
+3. Invariants preserved and skipped items.
 4. Verification commands and outcomes.
