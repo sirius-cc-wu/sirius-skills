@@ -13,7 +13,6 @@ COMMON_FLAGS=(
 )
 
 npx skills add "$REPO_ROOT/skills/commit" "${COMMON_FLAGS[@]}"
-npx skills add "$REPO_ROOT/skills/sb-tracker" "${COMMON_FLAGS[@]}"
 npx skills add "$REPO_ROOT/skills/simplify" "${COMMON_FLAGS[@]}"
 npx skills add "$REPO_ROOT/skills/batch" "${COMMON_FLAGS[@]}"
 npx skills add "$REPO_ROOT/skills/dioxus-ui-ux" "${COMMON_FLAGS[@]}"
