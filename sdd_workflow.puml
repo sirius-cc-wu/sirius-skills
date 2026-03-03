@@ -1,0 +1,51 @@
+@startuml
+!theme plain
+autonumber
+title Figure 4 - Spec-Driven Development (Detailed Workflow)
+
+participant "Product Owner" as PO
+participant "Architect" as AR
+participant "Developer" as DEV
+participant "AI\n(Discover role)" as AID
+participant "AI\n(Design role)" as AIH
+participant "AI\n(Task role)" as AIT
+participant "Implementation\nAgents" as IA
+database "Product Backlog" as BL
+
+== Discover Phase (What / Why) ==
+PO -> BL: Select prioritized feature
+loop Iterative intent articulation
+  PO -> AID: Share business context and outcomes
+  AID --> PO: Clarify assumptions and draft discover spec
+  PO -> PO: Refine requirements and acceptance criteria
+end
+PO -> AR: Handoff Discover spec
+
+== Design Phase (How) ==
+loop Technical alignment
+  AR -> AIH: Map discover spec to architecture
+  AIH --> AR: Propose modules, interfaces, constraints
+  AR -> PO: Review trade-offs and architecture fit
+  PO --> AR: Confirm or adjust intent
+end
+AR -> DEV: Handoff Design spec
+
+== Task Phase (Execution Plan) ==
+loop Task shaping
+  DEV -> AIT: Convert design into executable tasks
+  AIT --> DEV: Tasks with checks and parallelization options
+  DEV -> DEV: Finalize verifiable task plan
+end
+DEV -> IA: Dispatch tasks for autonomous execution
+
+== Execution and Review ==
+loop Until implementation aligns with specs
+  IA -> IA: Implement tasks in parallel
+  IA --> DEV: Return code/results
+  DEV -> DEV: Validate against discover/design/task specs
+  DEV -> AIT: Request targeted fixes for gaps
+end
+DEV -> BL: Mark work done and update status
+DEV -> PO: Share outcome and capture feedback
+
+@enduml
