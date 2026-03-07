@@ -110,6 +110,9 @@ You can use any of the following formats for your user stories.
 <!--
   ACTION REQUIRED: The content in this section represents placeholders.
   Fill them out with the right functional requirements.
+
+  Keep this section implementation-agnostic:
+  - Do NOT specify frameworks, libraries, classes, API routes, or DB schemas.
 -->
 
 ### Functional Requirements
@@ -130,6 +133,11 @@ You can use any of the following formats for your user stories.
 - **[Entity 1]**: [What it represents, key attributes without implementation]
 - **[Entity 2]**: [What it represents, relationships to other entities]
 
+## Assumptions & Dependencies
+
+- **Assumption A1**: [Reasonable default chosen when details are missing]
+- **Dependency D1**: [External dependency, policy, or system prerequisite]
+
 ## Success Criteria *(mandatory)*
 
 <!--
@@ -143,3 +151,12 @@ You can use any of the following formats for your user stories.
 - **SC-002**: [Measurable metric, e.g., "System handles 1000 concurrent users without degradation"]
 - **SC-003**: [User satisfaction metric, e.g., "90% of users successfully complete primary task on first attempt"]
 - **SC-004**: [Business metric, e.g., "Reduce support tickets related to [X] by 50%"]
+
+## Clarifications
+
+<!--
+  Keep unresolved clarifications to <= 3 and only for critical decisions.
+  Preferred final state is 0 unresolved clarifications.
+-->
+
+- [NEEDS CLARIFICATION: critical decision 1]

@@ -1,90 +1,285 @@
-import os
-import json
 import argparse
-import subprocess
+import json
+import os
 import re
+import subprocess
 import sys
 from datetime import datetime
+from typing import Dict, List, Optional, Tuple
 
-specs_dir = "specs"
-index_file = os.path.join(specs_dir, "README.md")
-config_file = ".specs/config.json"
+SPECS_DIR = "specs"
+INDEX_FILE = os.path.join(SPECS_DIR, "README.md")
+CONFIG_DIR = ".specs"
+CONFIG_FILE = os.path.join(CONFIG_DIR, "config.json")
+REGISTRY_HEADER = (
+    "# Specification Registry\n\n| ID | Feature | Status | Path |\n|---|---|---|---|\n"
+)
+VALID_STATUSES = {
+    "draft_spec",
+    "spec_ready",
+    "plan_ready",
+    "implementation_ready",
+    "implementing",
+    "done",
+}
 
 
-def init():
-    if not os.path.exists(specs_dir):
-        os.makedirs(specs_dir)
-    if not os.path.exists(index_file):
-        with open(index_file, "w") as f:
-            f.write(
-                "# Specification Registry\n\n| ID | Feature | Status | Path |\n|---|---|---|---|\n"
+def slugify(value: str) -> str:
+    value = value.strip().lower()
+    value = re.sub(r"[^a-z0-9]+", "-", value)
+    return value.strip("-") or "feature"
+
+
+def ensure_registry() -> None:
+    os.makedirs(SPECS_DIR, exist_ok=True)
+    os.makedirs(CONFIG_DIR, exist_ok=True)
+    if not os.path.exists(INDEX_FILE):
+        with open(INDEX_FILE, "w", encoding="utf-8") as f:
+            f.write(REGISTRY_HEADER)
+    if not os.path.exists(CONFIG_FILE):
+        with open(CONFIG_FILE, "w", encoding="utf-8") as f:
+            json.dump({"spec_dir": SPECS_DIR, "preferred_workflow": "TDD"}, f, indent=2)
+
+
+def parse_registry() -> List[Dict[str, str]]:
+    ensure_registry()
+    rows: List[Dict[str, str]] = []
+    with open(INDEX_FILE, "r", encoding="utf-8") as f:
+        for line in f:
+            line = line.strip()
+            if not line.startswith("|"):
+                continue
+            if line.startswith("| ID |") or line.startswith("|---"):
+                continue
+            cols = [c.strip() for c in line.strip("|").split("|")]
+            if len(cols) != 4:
+                continue
+            rows.append(
+                {"id": cols[0], "feature": cols[1], "status": cols[2], "path": cols[3]}
             )
-    if not os.path.exists(".specs"):
-        os.makedirs(".specs")
-    if not os.path.exists(config_file):
-        with open(config_file, "w") as f:
-            json.dump({"spec_dir": specs_dir, "preferred_workflow": "TDD"}, f)
+    return rows
 
 
-def add_track(id, name):
-    folder_name = f"{id}-{name.lower().replace(' ', '-')}"
-    path = os.path.join(specs_dir, folder_name)
-    if not os.path.exists(path):
-        os.makedirs(path)
+def write_registry(rows: List[Dict[str, str]]) -> None:
+    ensure_registry()
+    with open(INDEX_FILE, "w", encoding="utf-8") as f:
+        f.write(REGISTRY_HEADER)
+        for row in rows:
+            f.write(
+                f"| {row['id']} | {row['feature']} | {row['status']} | {row['path']} |\n"
+            )
 
-    with open(index_file, "a") as f:
-        f.write(f"| {id} | {name} | Draft | {path}/ |\n")
-    print(f"Created track: {folder_name}")
+
+def normalize_track_path(path: str) -> str:
+    normalized = path.rstrip("/")
+    if normalized.startswith("./"):
+        normalized = normalized[2:]
+    return normalized + "/"
+
+
+def infer_id_from_branch() -> Optional[str]:
+    try:
+        branch = (
+            subprocess.check_output(
+                ["git", "rev-parse", "--abbrev-ref", "HEAD"], stderr=subprocess.DEVNULL
+            )
+            .decode()
+            .strip()
+        )
+    except Exception:
+        return None
+    match = re.search(r"(?:^|/|-)(\d+)(?:-|$)", branch)
+    if match:
+        return match.group(1)
+    return None
+
+
+def resolve_track(rows: List[Dict[str, str]], selector: str) -> Optional[Dict[str, str]]:
+    selector = selector.strip().rstrip("/")
+    for row in rows:
+        row_path = row["path"].rstrip("/")
+        if row["id"] == selector or row_path.endswith(selector):
+            return row
+        if os.path.basename(row_path) == selector:
+            return row
+    return None
+
+
+def find_active_track(rows: List[Dict[str, str]]) -> Optional[Dict[str, str]]:
+    priority = ["implementing", "implementation_ready", "plan_ready", "spec_ready", "draft_spec"]
+    for wanted in priority:
+        matches = [r for r in rows if r["status"] == wanted]
+        if matches:
+            return matches[-1]
+    return rows[-1] if rows else None
+
+
+def expected_status_for_files(spec_exists: bool, plan_exists: bool, tasks_exists: bool) -> str:
+    if not spec_exists:
+        return "draft_spec"
+    if spec_exists and not plan_exists:
+        return "spec_ready"
+    if plan_exists and not tasks_exists:
+        return "plan_ready"
+    return "implementation_ready"
+
+
+def validate_track(row: Dict[str, str]) -> Tuple[bool, List[str], Dict[str, bool]]:
+    issues: List[str] = []
+    path = row["path"].rstrip("/")
+    spec = os.path.join(path, "spec.md")
+    plan = os.path.join(path, "plan.md")
+    tasks = os.path.join(path, "tasks.md")
+    checks = {
+        "track_dir_exists": os.path.isdir(path),
+        "spec_exists": os.path.isfile(spec),
+        "plan_exists": os.path.isfile(plan),
+        "tasks_exists": os.path.isfile(tasks),
+    }
+
+    if row["status"] not in VALID_STATUSES:
+        issues.append(f"invalid_status:{row['status']}")
+
+    if not checks["track_dir_exists"]:
+        issues.append("missing_track_directory")
+        return False, issues, checks
+
+    expected = expected_status_for_files(
+        checks["spec_exists"], checks["plan_exists"], checks["tasks_exists"]
+    )
+    if row["status"] in {"draft_spec", "spec_ready", "plan_ready", "implementation_ready"}:
+        if row["status"] != expected:
+            issues.append(
+                f"status_mismatch:status={row['status']} expected={expected} based_on_files"
+            )
+    if row["status"] == "implementing" and not checks["plan_exists"]:
+        issues.append("implementing_without_plan")
+    if row["status"] == "done" and not (checks["spec_exists"] and checks["plan_exists"]):
+        issues.append("done_without_core_artifacts")
+
+    return len(issues) == 0, issues, checks
+
+
+def cmd_init(_: argparse.Namespace) -> int:
+    ensure_registry()
+    print("Initialized specs registry and config.")
+    return 0
+
+
+def cmd_add(args: argparse.Namespace) -> int:
+    ensure_registry()
+    cmd_args = args.args
+    if len(cmd_args) == 1:
+        id_to_use = None
+        name = cmd_args[0]
+    else:
+        id_to_use = cmd_args[0]
+        name = " ".join(cmd_args[1:])
+
+    if not id_to_use:
+        id_to_use = infer_id_from_branch() or datetime.now().strftime("%Y%m%d")
+
+    slug = slugify(name)
+    folder = f"{id_to_use}-{slug}"
+    track_path = os.path.join(SPECS_DIR, folder)
+    os.makedirs(track_path, exist_ok=True)
+
+    rows = parse_registry()
+    if any(r["id"] == id_to_use or r["path"].rstrip("/").endswith(folder) for r in rows):
+        print(f"Track already exists: {folder}")
+        return 0
+
+    rows.append(
+        {
+            "id": id_to_use,
+            "feature": name,
+            "status": "draft_spec",
+            "path": normalize_track_path(track_path),
+        }
+    )
+    write_registry(rows)
+    print(f"Created track: {folder}")
+    return 0
+
+
+def cmd_set_status(args: argparse.Namespace) -> int:
+    status = args.status.strip()
+    if status not in VALID_STATUSES:
+        print(f"Invalid status '{status}'. Valid: {sorted(VALID_STATUSES)}", file=sys.stderr)
+        return 2
+
+    rows = parse_registry()
+    track = resolve_track(rows, args.track)
+    if not track:
+        print(f"Track not found: {args.track}", file=sys.stderr)
+        return 2
+
+    track["status"] = status
+    write_registry(rows)
+    print(f"Updated {track['id']} to status '{status}'")
+    return 0
+
+
+def cmd_get_active(_: argparse.Namespace) -> int:
+    rows = parse_registry()
+    track = find_active_track(rows)
+    if not track:
+        print("No tracks found.", file=sys.stderr)
+        return 1
+    print(json.dumps(track, indent=2))
+    return 0
+
+
+def cmd_validate_track(args: argparse.Namespace) -> int:
+    rows = parse_registry()
+    track = resolve_track(rows, args.track)
+    if not track:
+        print(f"Track not found: {args.track}", file=sys.stderr)
+        return 2
+
+    ok, issues, checks = validate_track(track)
+    result = {"track": track, "ok": ok, "checks": checks, "issues": issues}
+    print(json.dumps(result, indent=2))
+    return 0 if ok else 3
+
+
+def build_parser() -> argparse.ArgumentParser:
+    parser = argparse.ArgumentParser()
+    subparsers = parser.add_subparsers(dest="command", required=True)
+
+    subparsers.add_parser("init")
+
+    add_p = subparsers.add_parser("add")
+    add_p.add_argument("args", nargs="+", help="[ID] Name")
+
+    set_p = subparsers.add_parser("set-status")
+    set_p.add_argument("track", help="Track ID, folder name, or path")
+    set_p.add_argument("status", help="New status")
+
+    subparsers.add_parser("get-active")
+
+    validate_p = subparsers.add_parser("validate-track")
+    validate_p.add_argument("track", help="Track ID, folder name, or path")
+
+    return parser
+
+
+def main() -> int:
+    parser = build_parser()
+    args = parser.parse_args()
+    if args.command == "init":
+        return cmd_init(args)
+    if args.command == "add":
+        return cmd_add(args)
+    if args.command == "set-status":
+        return cmd_set_status(args)
+    if args.command == "get-active":
+        return cmd_get_active(args)
+    if args.command == "validate-track":
+        return cmd_validate_track(args)
+    parser.print_help()
+    return 1
 
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser()
-    subparsers = parser.add_subparsers(dest="command")
-    subparsers.add_parser("init")
-    add_p = subparsers.add_parser("add")
-    # specific arguments are replaced by a flexible list to support optional ID
-    add_p.add_argument("args", nargs="+", help="[ID] Name")
-
-    args = parser.parse_args()
-    if args.command == "init":
-        init()
-    elif args.command == "add":
-        # Smart argument parsing
-        cmd_args = args.args
-        id_to_use = None
-        name = None
-
-        if len(cmd_args) == 1:
-            name = cmd_args[0]
-        elif len(cmd_args) >= 2:
-            id_to_use = cmd_args[0]
-            name = " ".join(cmd_args[1:])
-
-        # Auto-detect ID if missing
-        if not id_to_use:
-            # 1. Try Git branch name
-            branch = None
-            try:
-                branch = (
-                    subprocess.check_output(
-                        ["git", "rev-parse", "--abbrev-ref", "HEAD"],
-                        stderr=subprocess.DEVNULL,
-                    )
-                    .decode()
-                    .strip()
-                )
-            except Exception:
-                pass
-
-            if branch:
-                # Look for numeric ID in branch (e.g. 123-feature, feature/123)
-                m = re.search(r"(?:^|/|-)(\d+)(?:-|$)", branch)
-                if m:
-                    id_to_use = m.group(1)
-
-        # 2. Fallback to specific format or timestamp
-        if not id_to_use:
-            # Generate a simple timestamp-based ID
-            id_to_use = datetime.now().strftime("%Y%m%d")
-
-        add_track(id_to_use, name)
+    sys.exit(main())

@@ -5,28 +5,91 @@ description: High-level orchestrator for the spec-driven lifecycle. Use this whe
 
 # Spec-driver Skill (Orchestrator)
 
-This skill manages the transition between Specification, Planning, and Implementation.
+This skill manages deterministic transitions between Specification, Planning, and Implementation.
 
-## Workflow & Responsibilities
+## Lifecycle State Machine
 
-1.  **Discovery**: Look at `specs/README.md` to identify the active feature track.
-2.  **Lifecycle Gatekeeping**:
-    -   **If no `spec.md` exists or the spec is incomplete**:
-        1.  Activate the `specify` skill to create or update a `spec.md` with user stories.
-        2.  After user stories are defined, ask if any are complex enough for a detailed use case. If so, activate the `use-case` skill to elaborate.
-    -   **If `spec.md` is complete but no `plan.md` exists**: Activate the `plan` skill to create a detailed implementation plan.
-    -   **If both `spec.md` and `plan.md` exist and are complete**: Activate the `implement` skill to begin code implementation, using the `plan.md` as a guide.
-3.  **State Management**:
-    -   Update the status in `specs/README.md` after each major milestone (e.g., spec complete, plan complete).
-    -   **CRITICAL**: During implementation, the `implement` skill is responsible for marking checkboxes in the active `plan.md` as completed (`[x]`) immediately after the corresponding work is verified.
+Use these statuses in `specs/README.md`:
+
+- `draft_spec`
+- `spec_ready`
+- `plan_ready`
+- `implementation_ready`
+- `implementing`
+- `done`
+
+Allowed transitions:
+
+1. `draft_spec -> spec_ready`
+2. `spec_ready -> plan_ready`
+3. `plan_ready -> implementation_ready`
+4. `implementation_ready -> implementing`
+5. `implementing -> done`
+
+Do not skip states without explicit user approval.
+
+## Preflight (Required Before Routing)
+
+1. Ensure the registry exists (`specs/README.md`). If missing, initialize via tooling.
+2. Resolve the active track using tooling (or by user-provided ID/path).
+3. Confirm track path exists.
+4. Check presence of:
+   - `spec.md`
+   - `plan.md`
+   - `tasks.md` (optional, but required for strict task execution mode)
+5. Verify registry status is consistent with file reality. If inconsistent, repair status first.
+
+## Routing Rules
+
+1. If no `spec.md` or spec is incomplete:
+   - Activate `specify` to create/update `spec.md`.
+   - Optionally activate `use-case` for complex stories.
+   - Set status to `draft_spec` during authoring, then `spec_ready` when complete.
+2. If `spec.md` is complete and no `plan.md`:
+   - Activate `plan` to produce planning artifacts.
+   - Set status to `plan_ready` when complete.
+3. If `spec.md` and `plan.md` are complete:
+   - Set status to `implementation_ready`.
+   - Internal implementation capability is assumed for coding agents in this workflow.
+   - Proceed directly to implementation (`implementing`) using the active coding agent.
+
+## Completion Criteria Per State
+
+1. `spec_ready`:
+   - No unresolved placeholders.
+   - At most 3 unresolved critical clarifications; preferably zero.
+   - Requirements and success criteria are measurable.
+2. `plan_ready`:
+   - FR-to-steps traceability exists.
+   - Paths and test strategy are concrete.
+   - Planning gates are passed or explicitly waived with rationale.
+3. `implementation_ready`:
+   - Plan is actionable and ordered.
+   - Acceptance scenarios are mapped to verification steps.
+4. `done`:
+   - Planned scope implemented and verified.
+   - Plan/tasks checkboxes reflect actual completion.
+   - Registry status updated.
 
 ## Tooling
-Always use `scripts/manage_specs.py` for registry updates to ensure cross-platform compatibility. The script supports automatic ID generation or extraction from the branch name.
+Always use `scripts/manage_specs.py` for registry updates to ensure cross-platform compatibility.
 
 ```bash
-# Auto-detect ID from branch name or generate timestamp:
+# Initialize registry/config:
+python3 <path-to-spec-driver>/scripts/manage_specs.py init
+
+# Add track (auto-detect ID from branch or use timestamp):
 python3 <path-to-spec-driver>/scripts/manage_specs.py add "feature-name"
 
 # To specify an ID manually:
 python3 <path-to-spec-driver>/scripts/manage_specs.py add "ID" "feature-name"
+
+# Update track status:
+python3 <path-to-spec-driver>/scripts/manage_specs.py set-status "<track-id-or-path>" "spec_ready"
+
+# Resolve active track:
+python3 <path-to-spec-driver>/scripts/manage_specs.py get-active
+
+# Validate track consistency:
+python3 <path-to-spec-driver>/scripts/manage_specs.py validate-track "<track-id-or-path>"
 ```
