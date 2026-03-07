@@ -13,7 +13,7 @@ CURRENT_BRANCH=$(git branch --show-current)
 
 # Ensure there are staged changes
 if git diff --cached --quiet; then
-    echo "Error: No staged changes found. Please stage your spec first."
+    echo "Error: No staged changes found. Please stage your spec/plan first."
     exit 1
 fi
 

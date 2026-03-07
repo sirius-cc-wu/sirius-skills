@@ -1,10 +1,10 @@
 ---
 name: branch-uml-diagrams
-description: Finds important changes in the current branch against its merge-base with main, and creates before and after PlantUML files in the relevant spec folders by locating matching specs directly. It also checks the syntax of the generated PlantUML files.
+description: Finds important changes in the current branch against its merge-base with main, and creates before and after PlantUML files in the relevant spec folders, guided by the spec-driver skill for finding spec files. It also checks the syntax of the generated PlantUML files.
 ---
 # Branch UML Diagram Generator
 
-This skill analyzes the current branch, identifies significant code changes against the merge-base with the `main` branch, and generates PlantUML diagrams to visualize the architecture before and after the modifications. It locates the appropriate specification file directly from the `specs/` registry and track structure.
+This skill analyzes the current branch, identifies significant code changes against the merge-base with the `main` branch, and generates PlantUML diagrams to visualize the architecture before and after the modifications. It uses the spec-driver skill's guidance to locate the appropriate specification file.
 
 ## Workflow
 
