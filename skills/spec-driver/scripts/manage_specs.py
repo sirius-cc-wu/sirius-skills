@@ -14,6 +14,8 @@ CONFIG_FILE = os.path.join(CONFIG_DIR, "config.json")
 REGISTRY_HEADER = (
     "# Specification Registry\n\n| ID | Feature | Status | Path |\n|---|---|---|---|\n"
 )
+TRACK_METADATA_FILE = ".track-meta.json"
+TRACK_ID_PATTERN = re.compile(r"^[A-Za-z0-9][A-Za-z0-9._-]*$")
 VALID_STATUSES = {
     "draft_spec",
     "spec_ready",
@@ -28,6 +30,22 @@ def slugify(value: str) -> str:
     value = value.strip().lower()
     value = re.sub(r"[^a-z0-9]+", "-", value)
     return value.strip("-") or "feature"
+
+
+def normalize_feature_name(value: str) -> str:
+    normalized = re.sub(r"\s+", " ", value.strip())
+    return normalized.replace("|", "/")
+
+
+def validate_track_id(value: str) -> str:
+    track_id = value.strip()
+    if not track_id:
+        raise ValueError("Track ID cannot be empty.")
+    if not TRACK_ID_PATTERN.fullmatch(track_id):
+        raise ValueError(
+            "Invalid track ID. Use only letters, numbers, dot, underscore, and hyphen."
+        )
+    return track_id
 
 
 def ensure_registry() -> None:
@@ -86,7 +104,7 @@ def infer_id_from_branch() -> Optional[str]:
             .decode()
             .strip()
         )
-    except Exception:
+    except (subprocess.CalledProcessError, FileNotFoundError):
         return None
     match = re.search(r"(?:^|/|-)(\d+)(?:-|$)", branch)
     if match:
@@ -160,6 +178,107 @@ def validate_track(row: Dict[str, str]) -> Tuple[bool, List[str], Dict[str, bool
     return len(issues) == 0, issues, checks
 
 
+def write_track_metadata(track_path: str, metadata: Dict[str, object]) -> None:
+    metadata_path = os.path.join(track_path, TRACK_METADATA_FILE)
+    with open(metadata_path, "w", encoding="utf-8") as f:
+        json.dump(metadata, f, indent=2)
+        f.write("\n")
+
+
+def create_track(
+    track_id: str, name: str, metadata: Optional[Dict[str, object]] = None
+) -> Tuple[str, bool]:
+    ensure_registry()
+    normalized_id = validate_track_id(track_id)
+    normalized_name = normalize_feature_name(name)
+    if not normalized_name:
+        raise ValueError("Feature name cannot be empty.")
+
+    slug = slugify(normalized_name)
+    folder = f"{normalized_id}-{slug}"
+    track_path = os.path.join(SPECS_DIR, folder)
+
+    rows = parse_registry()
+    if any(r["id"] == normalized_id or r["path"].rstrip("/").endswith(folder) for r in rows):
+        return folder, False
+
+    os.makedirs(track_path, exist_ok=True)
+    if metadata is not None:
+        write_track_metadata(track_path, metadata)
+
+    rows.append(
+        {
+            "id": normalized_id,
+            "feature": normalized_name,
+            "status": "draft_spec",
+            "path": normalize_track_path(track_path),
+        }
+    )
+    write_registry(rows)
+    return folder, True
+
+
+def get_sb_issue(issue_id: str) -> Dict[str, object]:
+    requested_id = validate_track_id(issue_id)
+    try:
+        result = subprocess.run(
+            ["sb", "show", requested_id, "--json"],
+            check=False,
+            capture_output=True,
+            text=True,
+        )
+    except FileNotFoundError as exc:
+        raise RuntimeError("The 'sb' CLI was not found on PATH.") from exc
+
+    if result.returncode != 0:
+        details = result.stderr.strip() or result.stdout.strip()
+        if not details:
+            details = f"sb show exited with code {result.returncode}"
+        raise RuntimeError(f"Failed to resolve sb issue '{requested_id}': {details}")
+
+    try:
+        issue = json.loads(result.stdout)
+    except json.JSONDecodeError as exc:
+        raise RuntimeError("The 'sb show --json' output was not valid JSON.") from exc
+
+    if not isinstance(issue, dict):
+        raise RuntimeError("The 'sb show --json' output must be a JSON object.")
+
+    resolved_id = issue.get("id")
+    title = issue.get("title")
+    if not isinstance(resolved_id, str):
+        raise RuntimeError("The 'sb show --json' output did not include a string 'id'.")
+    if not isinstance(title, str):
+        raise RuntimeError("The 'sb show --json' output did not include a string 'title'.")
+
+    issue["id"] = validate_track_id(resolved_id)
+    issue["title"] = normalize_feature_name(title)
+    if not issue["title"]:
+        raise RuntimeError("The 'sb' issue title cannot be empty.")
+    return issue
+
+
+def build_sb_metadata(issue: Dict[str, object]) -> Dict[str, object]:
+    tracked_fields = [
+        "id",
+        "title",
+        "description",
+        "status",
+        "priority",
+        "repo",
+        "repo_branch",
+        "repo_commit",
+        "worktree_path",
+        "created_at",
+    ]
+    issue_metadata = {field: issue[field] for field in tracked_fields if field in issue}
+    return {
+        "source": "sb",
+        "imported_at": datetime.now().isoformat(timespec="seconds"),
+        "issue": issue_metadata,
+    }
+
+
 def cmd_init(_: argparse.Namespace) -> int:
     ensure_registry()
     print("Initialized specs registry and config.")
@@ -167,7 +286,6 @@ def cmd_init(_: argparse.Namespace) -> int:
 
 
 def cmd_add(args: argparse.Namespace) -> int:
-    ensure_registry()
     cmd_args = args.args
     if len(cmd_args) == 1:
         id_to_use = None
@@ -179,26 +297,35 @@ def cmd_add(args: argparse.Namespace) -> int:
     if not id_to_use:
         id_to_use = infer_id_from_branch() or datetime.now().strftime("%Y%m%d")
 
-    slug = slugify(name)
-    folder = f"{id_to_use}-{slug}"
-    track_path = os.path.join(SPECS_DIR, folder)
-    os.makedirs(track_path, exist_ok=True)
+    try:
+        folder, created = create_track(id_to_use, name)
+    except ValueError as exc:
+        print(str(exc), file=sys.stderr)
+        return 2
 
-    rows = parse_registry()
-    if any(r["id"] == id_to_use or r["path"].rstrip("/").endswith(folder) for r in rows):
+    if not created:
         print(f"Track already exists: {folder}")
         return 0
 
-    rows.append(
-        {
-            "id": id_to_use,
-            "feature": name,
-            "status": "draft_spec",
-            "path": normalize_track_path(track_path),
-        }
-    )
-    write_registry(rows)
     print(f"Created track: {folder}")
+    return 0
+
+
+def cmd_add_from_sb(args: argparse.Namespace) -> int:
+    try:
+        issue = get_sb_issue(args.issue_id)
+        folder, created = create_track(
+            issue["id"], issue["title"], metadata=build_sb_metadata(issue)
+        )
+    except (RuntimeError, ValueError) as exc:
+        print(str(exc), file=sys.stderr)
+        return 2
+
+    if not created:
+        print(f"Track already exists: {folder}")
+        return 0
+
+    print(f"Created track from sb issue: {folder}")
     return 0
 
 
@@ -247,18 +374,23 @@ def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser()
     subparsers = parser.add_subparsers(dest="command", required=True)
 
-    subparsers.add_parser("init")
+    subparsers.add_parser("init", help="Initialize the specs registry and config")
 
-    add_p = subparsers.add_parser("add")
+    add_p = subparsers.add_parser("add", help="Create a track from a name or explicit opaque ID")
     add_p.add_argument("args", nargs="+", help="[ID] Name")
 
-    set_p = subparsers.add_parser("set-status")
+    add_from_sb_p = subparsers.add_parser(
+        "add-from-sb", help="Create a track from an sb issue ID"
+    )
+    add_from_sb_p.add_argument("issue_id", help="sb issue ID, for example BNC-lg2fwe")
+
+    set_p = subparsers.add_parser("set-status", help="Update a track status")
     set_p.add_argument("track", help="Track ID, folder name, or path")
     set_p.add_argument("status", help="New status")
 
-    subparsers.add_parser("get-active")
+    subparsers.add_parser("get-active", help="Return the active track as JSON")
 
-    validate_p = subparsers.add_parser("validate-track")
+    validate_p = subparsers.add_parser("validate-track", help="Validate track/file consistency")
     validate_p.add_argument("track", help="Track ID, folder name, or path")
 
     return parser
@@ -271,6 +403,8 @@ def main() -> int:
         return cmd_init(args)
     if args.command == "add":
         return cmd_add(args)
+    if args.command == "add-from-sb":
+        return cmd_add_from_sb(args)
     if args.command == "set-status":
         return cmd_set_status(args)
     if args.command == "get-active":

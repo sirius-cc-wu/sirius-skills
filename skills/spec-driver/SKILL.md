@@ -74,6 +74,8 @@ Do not skip states without explicit user approval.
 ## Tooling
 Always use `scripts/manage_specs.py` for registry updates to ensure cross-platform compatibility.
 
+Track IDs are treated as opaque identifiers. Manual IDs may include letters, numbers, `.`, `_`, and `-`, so IDs like `BNC-lg2fwe` are valid.
+
 ```bash
 # Initialize registry/config:
 python3 <path-to-spec-driver>/scripts/manage_specs.py init
@@ -84,6 +86,12 @@ python3 <path-to-spec-driver>/scripts/manage_specs.py add "feature-name"
 # To specify an ID manually:
 python3 <path-to-spec-driver>/scripts/manage_specs.py add "ID" "feature-name"
 
+# Example with an sb-style ID:
+python3 <path-to-spec-driver>/scripts/manage_specs.py add "BNC-lg2fwe" "feature-name"
+
+# Create a track directly from an sb issue:
+python3 <path-to-spec-driver>/scripts/manage_specs.py add-from-sb "BNC-lg2fwe"
+
 # Update track status:
 python3 <path-to-spec-driver>/scripts/manage_specs.py set-status "<track-id-or-path>" "spec_ready"
 
@@ -93,3 +101,5 @@ python3 <path-to-spec-driver>/scripts/manage_specs.py get-active
 # Validate track consistency:
 python3 <path-to-spec-driver>/scripts/manage_specs.py validate-track "<track-id-or-path>"
 ```
+
+`add-from-sb` shells out to `sb show <id> --json`, uses the issue title as the feature name, and writes source metadata to a per-track sidecar file without changing the registry table format.
