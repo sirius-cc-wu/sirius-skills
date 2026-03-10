@@ -1,0 +1,3 @@
+[submodule "sb-tracker"]
+	path = sb-tracker
+	url = git@github.com:sirius-cc-wu/sb-tracker.git
