@@ -12,10 +12,13 @@ COMMON_FLAGS=(
   --agent gemini-cli
 )
 
+npx skills add "$REPO_ROOT/skills/spec-driver" "${COMMON_FLAGS[@]}"
+npx skills add "$REPO_ROOT/skills/specify" "${COMMON_FLAGS[@]}"
+npx skills add "$REPO_ROOT/skills/plan" "${COMMON_FLAGS[@]}"
 npx skills add "$REPO_ROOT/skills/commit" "${COMMON_FLAGS[@]}"
 npx skills add "$REPO_ROOT/skills/simplify" "${COMMON_FLAGS[@]}"
 npx skills add "$REPO_ROOT/skills/batch" "${COMMON_FLAGS[@]}"
 npx skills add "$REPO_ROOT/skills/dioxus-ui-ux" "${COMMON_FLAGS[@]}"
 npx skills add "$REPO_ROOT/skills/dioxus-stitch" "${COMMON_FLAGS[@]}"
-npx skills add https://github.com/sirius-cc-wu/sb-tracker/tree/main/skills/sb-tracker "${COMMON_FLAGS[@]}"
+npx skills add "$REPO_ROOT/sb-tracker/skills/sb-tracker" "${COMMON_FLAGS[@]}"
 npx skills add https://github.com/google-labs-code/stitch-skills --skill '*' "${COMMON_FLAGS[@]}"

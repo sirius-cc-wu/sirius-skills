@@ -5,7 +5,7 @@ description: Brainstorming and requirement specification expert.
 
 # Specification Skill
 
-Use this skill to transform vague ideas into concrete `spec.md` files.
+Use this skill to transform vague ideas into concrete, validated `spec.md` files.
 
 ## Specification Format
 This skill uses a single, comprehensive specification format that includes:
@@ -50,6 +50,15 @@ This format is used for technical tasks or non-functional requirements that don'
 ## Specification Template
 This skill uses a single markdown template (`spec-template.md`) to ensure a consistent, rigorous structure for all specifications.
 
+## Required Outputs
+
+For each track, produce:
+
+1. `specs/<ID>-<name>/spec.md`
+2. `specs/<ID>-<name>/checklists/requirements.md`
+
+The checklist is required and must be updated as validation progresses.
+
 ## Protocol: Sequential Questioning
 
 To maintain precision and reduce cognitive load, follow these rules:
@@ -57,9 +66,33 @@ To maintain precision and reduce cognitive load, follow these rules:
 2. **Prioritize**: Group related ambiguities into logical clusters.
 3. **The One-Question Rule**: Present only ONE group of questions to the user at a time.
 4. **Iterate**: Integrate the user's answer into the draft before moving to the next ambiguity group.
+5. **Clarification Cap**: Keep unresolved markers to a maximum of 3 using:
+   - `[NEEDS CLARIFICATION: ...]`
+6. **Defaulting Rule**: If non-critical details are missing, make reasonable defaults and document them explicitly in the spec.
+
+## Quality Gates (Must Pass Before Handoff)
+
+1. No implementation leakage:
+   - No framework, library, API route, class, schema, or code-level design decisions in `spec.md`.
+2. Requirement quality:
+   - Requirements are testable and unambiguous.
+   - Success criteria are measurable and technology-agnostic.
+3. Scenario quality:
+   - At least one independent P1 story with Given/When/Then acceptance scenarios.
+4. Clarifications:
+   - 0 preferred; at most 3 unresolved critical clarifications allowed.
+
+If a gate fails, revise and re-run validation. Perform up to 3 correction passes.
 
 ## Workflow
-1. Create or identify the target track directory: `specs/<ID>-<name>/`.
-2. **Copy the `spec-template.md`** from the `templates/` directory to `specs/<ID>-<name>/spec.md`.
-3. Apply Sequential Questioning to fill in all sections of the template.
-4. Output the final `spec.md` in the designated `specs/<ID>-<name>/` folder.
+1. Use `spec-driver` tooling to bootstrap/resolve the active track.
+2. Copy `templates/spec-template.md` to `specs/<ID>-<name>/spec.md`.
+3. Apply Sequential Questioning and fill all template sections.
+4. Create checklist from `templates/requirements-checklist-template.md` into `checklists/requirements.md`.
+5. Run quality gates and update checklist status.
+6. If needed, perform correction passes (max 3).
+7. Return a completion summary:
+   - Track ID and path
+   - `spec.md` path
+   - Checklist pass/fail status
+   - Recommended next step (`plan` or additional clarification)

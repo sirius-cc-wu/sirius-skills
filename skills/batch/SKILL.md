@@ -1,6 +1,6 @@
 ---
 name: batch
-description: Use this skill to decompose large repetitive work into independent subtasks, execute them in parallel batches, track progress, and merge verified results. When to use: repo-wide changes, large migrations, or tasks that can be split into independent chunks and run in parallel.
+description: "Use this skill to decompose large repetitive work into independent subtasks, execute them in parallel batches, track progress, and merge verified results. When to use: repo-wide changes, large migrations, or tasks that can be split into independent chunks and run in parallel."
 ---
 
 # Batch
