@@ -276,10 +276,6 @@ def infer_id_from_branch(identity_config: Optional[Dict[str, str]] = None) -> Op
             if match.lastindex:
                 return match.group(1)
             return match.group(0)
-
-    match = re.search(r"(?:^|/|-)(\d+)(?:-|$)", branch)
-    if match:
-        return match.group(1)
     return None
 
 

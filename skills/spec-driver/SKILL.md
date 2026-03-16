@@ -118,10 +118,9 @@ Supported Phase 1 fields:
 If `.skills/identity.json` is absent:
 
 - `manage_specs.py add "<feature-name>"` keeps the generic default behavior
-- it first looks for a numeric token in the current branch name
-- if none is found, it falls back to a date-based ID
+- it falls back to a date-based ID
 
-If `.skills/identity.json` is present and defines `branch_extract_pattern`, `manage_specs.py add "<feature-name>"` uses that pattern first. Manual IDs always override auto-detection.
+If `.skills/identity.json` is present and defines `branch_extract_pattern`, `manage_specs.py add "<feature-name>"` uses that pattern before falling back to a date-based ID. Manual IDs always override auto-detection.
 
 Example:
 
@@ -144,7 +143,7 @@ python3 <path-to-spec-driver>/scripts/manage_specs.py init [spec-dir]
 python3 <path-to-spec-driver>/scripts/manage_specs.py init docs/specs
 
 # Add track (use branch_extract_pattern from .skills/identity.json when present,
-# otherwise use a numeric token from the branch name or fall back to a date stamp):
+# otherwise fall back to a date stamp):
 python3 <path-to-spec-driver>/scripts/manage_specs.py add "feature-name"
 
 # To specify an ID manually:
