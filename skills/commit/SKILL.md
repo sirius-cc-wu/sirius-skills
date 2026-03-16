@@ -22,17 +22,38 @@ Adhere to the project mandates (e.g. `AGENTS.md`):
 ### 3. Crafting the Commit Message
 Follow these standards for all commit messages:
 
-- **Summary Line:** Use the format `[scope]: [summary]`.
+- **Default Summary Line:** Use the format `scope: summary`.
     - **Scope:** Mandatory. Use the crate name or module name (e.g., `api`, `core`).
     - **Summary:** A concise, imperative summary of the change (e.g., "Refactor service handlers").
 - **Body (Optional but Recommended):** A bulleted list of specific changes or a brief explanation of *why* the changes were made.
+
+### 3a. Optional Project-Specific Conventions
+If the project defines `.skills/identity.json`, follow that configuration instead of assuming the default format.
+
+- Use `commit_format` when it is present.
+- Common placeholders are `{ID}`, `{scope}`, and `{summary}`.
+- If the configured format requires an ID, resolve it from:
+  1. the current branch using `branch_extract_pattern`,
+  2. the active spec track ID, or
+  3. direct user input.
+- Do **not** assume Jira, Azure DevOps, or any issue tracker unless the project config explicitly opts in.
+
+Example project config:
+
+```json
+{
+  "issue_tracker": "jira",
+  "branch_extract_pattern": "^([A-Z][A-Z0-9]*-[0-9]+)-(.+)$",
+  "commit_format": "{ID}: {summary}"
+}
+```
 
 ### 4. Executing the Commit
 Use a message file and `git commit -F` when preparing a multi-line message.
 
 ```bash
 cat > /tmp/commit-msg.txt <<'EOF'
-[module]: Summary line
+module: Summary line
 
 - Detailed bullet point 1
 - Detailed bullet point 2 with `code_snippet`
@@ -45,7 +66,7 @@ rm -f /tmp/commit-msg.txt
 Fallback only when needed:
 
 ```bash
-git commit -m '[module]: Summary line' -m '- Detail bullet point'
+git commit -m 'module: Summary line' -m '- Detail bullet point'
 ```
 
 ## Examples
@@ -56,3 +77,10 @@ git commit -m '[module]: Summary line' -m '- Detail bullet point'
 1. Check staged changes.
 2. Run build verification.
 3. Commit with crate or module scope.
+
+### Example 2: Configured Ticket-Based Workflow
+If `.skills/identity.json` defines `commit_format` as `{ID}: {summary}` and the branch is `BSP-3313-buffer-fix`, use a title like:
+
+```text
+BSP-3313: Fix uds buffer bounds handling
+```

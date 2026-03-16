@@ -10,6 +10,8 @@ from typing import Dict, List, Optional, Tuple
 DEFAULT_SPECS_DIR = "specs"
 CONFIG_DIR = ".specs"
 CONFIG_FILE = os.path.join(CONFIG_DIR, "config.json")
+IDENTITY_CONFIG_DIR = ".skills"
+IDENTITY_CONFIG_FILE = os.path.join(IDENTITY_CONFIG_DIR, "identity.json")
 DEFAULT_PREFERRED_WORKFLOW = "TDD"
 REGISTRY_HEADER = (
     "# Specification Registry\n\n| ID | Feature | Status | Path |\n|---|---|---|---|\n"
@@ -98,6 +100,43 @@ def load_config(required: bool = True) -> Dict[str, str]:
     }
 
 
+def load_identity_config(required: bool = False) -> Dict[str, str]:
+    if not os.path.exists(IDENTITY_CONFIG_FILE):
+        if required:
+            raise RuntimeError(
+                "Identity config not found at '.skills/identity.json'."
+            )
+        return {}
+
+    try:
+        with open(IDENTITY_CONFIG_FILE, "r", encoding="utf-8") as f:
+            config = json.load(f)
+    except json.JSONDecodeError as exc:
+        raise RuntimeError("Identity config is not valid JSON.") from exc
+
+    if not isinstance(config, dict):
+        raise RuntimeError("Identity config must be a JSON object.")
+
+    string_fields = (
+        "issue_tracker",
+        "id_pattern",
+        "branch_extract_pattern",
+        "commit_format",
+        "pr_title_format",
+        "issue_url_template",
+    )
+    normalized: Dict[str, str] = {}
+    for field in string_fields:
+        value = config.get(field)
+        if value is None:
+            continue
+        if not isinstance(value, str):
+            raise RuntimeError(f"Identity config field '{field}' must be a string.")
+        normalized[field] = value
+
+    return normalized
+
+
 def write_config(
     spec_dir: str, preferred_workflow: str = DEFAULT_PREFERRED_WORKFLOW
 ) -> None:
@@ -166,17 +205,48 @@ def normalize_track_path(path: str) -> str:
     return normalized + "/"
 
 
-def infer_id_from_branch() -> Optional[str]:
-    try:
-        branch = (
-            subprocess.check_output(
-                ["git", "rev-parse", "--abbrev-ref", "HEAD"], stderr=subprocess.DEVNULL
+def get_current_branch() -> Optional[str]:
+    commands = (
+        ["git", "branch", "--show-current"],
+        ["git", "rev-parse", "--abbrev-ref", "HEAD"],
+    )
+    for command in commands:
+        try:
+            branch = (
+                subprocess.check_output(command, stderr=subprocess.DEVNULL)
+                .decode()
+                .strip()
             )
-            .decode()
-            .strip()
-        )
-    except (subprocess.CalledProcessError, FileNotFoundError):
+        except (subprocess.CalledProcessError, FileNotFoundError):
+            continue
+        if branch and branch != "HEAD":
+            return branch
+    return None
+
+
+def infer_id_from_branch(identity_config: Optional[Dict[str, str]] = None) -> Optional[str]:
+    branch = get_current_branch()
+    if not branch:
         return None
+
+    if identity_config:
+        pattern = identity_config.get("branch_extract_pattern")
+        if pattern:
+            try:
+                match = re.search(pattern, branch)
+            except re.error as exc:
+                raise RuntimeError(
+                    "Identity config field 'branch_extract_pattern' is not a valid regex."
+                ) from exc
+            if not match:
+                return None
+            named_id = match.groupdict().get("id")
+            if named_id:
+                return named_id
+            if match.lastindex:
+                return match.group(1)
+            return match.group(0)
+
     match = re.search(r"(?:^|/|-)(\d+)(?:-|$)", branch)
     if match:
         return match.group(1)
@@ -372,7 +442,10 @@ def cmd_add(args: argparse.Namespace) -> int:
         name = " ".join(cmd_args[1:])
 
     if not id_to_use:
-        id_to_use = infer_id_from_branch() or datetime.now().strftime("%Y%m%d")
+        identity_config = load_identity_config(required=False)
+        id_to_use = infer_id_from_branch(identity_config) or datetime.now().strftime(
+            "%Y%m%d"
+        )
 
     try:
         folder, created = create_track(id_to_use, name)

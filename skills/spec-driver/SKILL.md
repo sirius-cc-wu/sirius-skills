@@ -87,6 +87,39 @@ The configured specs directory is stored in `.specs/config.json` under `spec_dir
 
 Track IDs are treated as opaque identifiers. Manual IDs may include letters, numbers, `.`, `_`, and `-`, so IDs like `BNC-lg2fwe` are valid.
 
+### Optional Identity Configuration
+
+Projects may define `.skills/identity.json` to describe issue-tracker or branch naming conventions without changing the base workflow.
+
+Supported Phase 1 fields:
+
+- `branch_extract_pattern`: regex used by `manage_specs.py add "<feature-name>"` to infer an ID from the current branch
+- `id_pattern`: project-level documentation for what a valid ID looks like
+- `commit_format`: convention for the `commit` skill
+- `pr_title_format`: convention for the `create-pr` skill
+- `issue_url_template`: optional documentation hook for linking IDs to a tracker
+
+If `.skills/identity.json` is absent:
+
+- `manage_specs.py add "<feature-name>"` keeps the generic default behavior
+- it first looks for a numeric token in the current branch name
+- if none is found, it falls back to a date-based ID
+
+If `.skills/identity.json` is present and defines `branch_extract_pattern`, `manage_specs.py add "<feature-name>"` uses that pattern first. Manual IDs always override auto-detection.
+
+Example:
+
+```json
+{
+  "issue_tracker": "jira",
+  "id_pattern": "^[A-Z][A-Z0-9]*-[0-9]+$",
+  "branch_extract_pattern": "^([A-Z][A-Z0-9]*-[0-9]+)-(.+)$",
+  "commit_format": "{ID}: {summary}",
+  "pr_title_format": "{ID}: {summary}",
+  "issue_url_template": "https://jira.example.com/browse/{ID}"
+}
+```
+
 ```bash
 # Initialize registry/config:
 python3 <path-to-spec-driver>/scripts/manage_specs.py init [spec-dir]
@@ -94,7 +127,8 @@ python3 <path-to-spec-driver>/scripts/manage_specs.py init [spec-dir]
 # Example with a custom specs directory:
 python3 <path-to-spec-driver>/scripts/manage_specs.py init docs/specs
 
-# Add track (auto-detect ID from branch or use timestamp):
+# Add track (use branch_extract_pattern from .skills/identity.json when present,
+# otherwise use a numeric token from the branch name or fall back to a date stamp):
 python3 <path-to-spec-driver>/scripts/manage_specs.py add "feature-name"
 
 # To specify an ID manually:

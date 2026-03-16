@@ -10,6 +10,8 @@ Creates GitHub PRs with clear, descriptive titles.
 
 ## PR Title Format
 
+Default format:
+
 ```
 <ID/Scope>: <summary>
 ```
@@ -24,6 +26,27 @@ The ID is extracted from the current branch name or a logical scope is used.
 | `3916-optimize-init` | `3916` |
 | `feature/add-new-feature` | `feature` |
 | `fix/memory-leak` | `fix` |
+
+### Optional Project-Specific Conventions
+
+If the project defines `.skills/identity.json`, use it to tighten title generation rules instead of hardcoding tracker behavior into the skill.
+
+- Use `branch_extract_pattern` to extract an ID from the branch when present.
+- Use `pr_title_format` when present.
+- Use `id_pattern` to validate extracted or user-provided IDs when the project requires one.
+- If no ID can be resolved, fall back to a logical scope unless the configured format explicitly requires an ID.
+- Do **not** assume Jira or any other tracker unless the config says so.
+
+Example project config:
+
+```json
+{
+  "issue_tracker": "jira",
+  "id_pattern": "^[A-Z][A-Z0-9]*-[0-9]+$",
+  "branch_extract_pattern": "^([A-Z][A-Z0-9]*-[0-9]+)-(.+)$",
+  "pr_title_format": "{ID}: {summary}"
+}
+```
 
 ### Summary Rules
 
@@ -114,7 +137,9 @@ All items should be addressed before merging
 
 ## Validation
 
-The PR title should generally match this pattern:
+When no project-specific format is configured, the PR title should generally match this pattern:
 ```
 ^[^:]+: [A-Z].+[^.]$
 ```
+
+If `.skills/identity.json` provides stricter conventions, validate against those instead.
