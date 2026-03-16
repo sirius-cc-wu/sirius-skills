@@ -1,46 +1,51 @@
 ---
 name: plan
-description: Technical implementation planning expert.
+description: Produces an actionable implementation plan from a completed spec.
 ---
 
-# Implementation Planning Skill
+# Plan
 
-Use this skill to convert `spec.md` into a decision-complete implementation bundle.
+Use this skill to convert `spec.md` into a concrete `plan.md`.
 
-## Required Outputs
+## Responsibilities
 
-Write planning artifacts into the active track directory resolved by `spec-driver` tooling.
+1. Read the active track's `spec.md`.
+2. Produce `<track_path>/plan.md`.
+3. Make implementation decisions explicit.
+4. Map requirements to execution and validation.
 
-1. `<track_path>/plan.md` (required)
-2. `<track_path>/research.md` (required for unresolved constraints/tradeoffs)
-3. `<track_path>/data-model.md` (required when feature includes data entities)
-4. `<track_path>/contracts/` (required when feature exposes interfaces)
-5. `<track_path>/quickstart.md` (required verification scenarios)
+## Required Output
 
-Use templates from `skills/plan/templates/`.
+- `<track_path>/plan.md`
 
-## Protocol
-1. **Track Resolution**: Use `spec-driver` tooling to resolve the active track before planning.
-2. **Context Scan**: Analyze existing code and relevant interfaces in the target module.
-3. **Gates First**:
-    - **Architecture/Constraints Gate**: Stack and structural constraints are explicit.
-    - **Risk/Compliance Gate**: Security, data retention, and compliance risks are called out.
-    - **Testability Gate**: Every requirement can be validated.
-4. **Phase Breakdown**:
-    - **Phase 0**: Baseline, environment, and unknown resolution.
-    - **Phase 1**: Core implementation packets.
-    - **Phase 2**: Refinement, docs, and edge-case coverage.
-5. **Atomic Steps**: Every step is discrete, verifiable, and mapped to requirement IDs.
+Optional sections may cover:
+- research notes
+- data model notes
+- interface notes
+- verification scenarios
 
-## Validation
-Before finalizing, check:
+Resolve `<track_path>` through `spec-driver`.
 
-1. Every requirement in `spec.md` maps to:
-    - one or more implementation steps
-    - one or more validation steps
-2. File paths are resolved against the project structure and the active `<track_path>`.
-3. All failed gates are either fixed or explicitly waived with rationale.
-4. The plan is executable without extra design decisions.
+## Planning Rules
+
+- Use the existing codebase and target module as context.
+- Keep file paths concrete where possible.
+- Every requirement must map to implementation work.
+- Every requirement must map to validation.
+- Avoid leaving major design decisions unresolved.
+
+## Planning Gates
+
+1. **Architecture / Constraints**
+   - stack and structural constraints are explicit
+
+2. **Risk / Compliance**
+   - security, retention, and compliance risks are identified
+
+3. **Testability**
+   - every requirement has a clear validation path
+
+Failed gates must be fixed or explicitly waived with rationale.
 
 ## `plan.md` Requirements
 
@@ -48,25 +53,15 @@ Before finalizing, check:
 
 1. Technical context and assumptions
 2. Gate outcomes
-3. FR-to-step traceability table
-4. Execution packets with:
-   - packet ID
-   - scope
-   - file targets
-   - validation steps
-   - definition of done
-   - rollback/mitigation notes
+3. Requirement traceability
+4. Ordered execution packets or steps
+5. Validation steps
+6. Delivery notes for sequencing and risk
 
-## Execution Mandate
-The planning bundle is a live implementation contract.
+## Workflow
 
-Agents must:
-1. Reference `<track_path>/plan.md` at the start of each implementation session.
-2. Mark steps as completed (`[x]`) in `<track_path>/plan.md` (and `<track_path>/tasks.md` if present) after verification.
-3. Keep users informed using packet-level milestones.
-
-## Implementation Capability Requirement
-
-Implementation is assumed to run on coding agents with internal implementation capability.
-
-Use that internal capability as the default execution path for all `<track_path>/plan.md` packets.
+1. Resolve the active track with `spec-driver`.
+2. Read `spec.md` and scan the target codebase.
+3. Fill `plan-template.md`.
+4. Validate traceability and gates.
+5. Stop when the plan is actionable and ready for implementation.

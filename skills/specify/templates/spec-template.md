@@ -1,162 +1,87 @@
 # Feature Specification: [FEATURE NAME]
 
-**Feature Branch**: `[###-feature-name]`  
+**Track**: `[ID-feature-name]`
 **Created**: [DATE]  
 **Status**: Draft  
-**Input**: User description: "$ARGUMENTS"
+**Input**: "$ARGUMENTS"
 
-## User Scenarios & Testing *(mandatory)*
+## 1. User Stories
 
-<!--
-  This section supports multiple story formats. Choose the one that best fits your needs.
--->
-
-### Story Types
-
-You can use any of the following formats for your user stories.
-
-- **Standard User Story**: `As a [user role], I want to [goal] so that [benefit].`
-- **Job Story**: `When [situation], I want to [motivation] so I can [expected outcome].`
-- **Team Story**: `We want to [action] so that [reason].`
-- **Technical Story**: `[Action] the [result] [by|for|of|to] a(n) [object].`
-
----
-
-<!--
-  IMPORTANT: User stories should be PRIORITIZED as user journeys ordered by importance.
-  Each user story/journey must be INDEPENDENTLY TESTABLE - meaning if you implement just ONE of them,
-  you should still have a viable MVP (Minimum Viable Product) that delivers value.
-  
-  Assign priorities (P1, P2, P3, etc.) to each story, where P1 is the most critical.
-  Think of each story as a standalone slice of functionality that can be:
-  - Developed independently
-  - Tested independently
-  - Deployed independently
-  - Demonstrated to users independently
--->
-
-### User Story 1 - [Brief Title] (Priority: P1)
-
-**Story Type**: [Choose: Standard, Job, Team, or Technical]
+### Story 1 - [Title] (Priority: P1)
 
 **Story**:
-```
-[Write your story here using the chosen format]
-```
+[As a / When / We want / Technical story statement]
 
-**Why this priority**: [Explain the value and why it has this priority level]
+**Why this matters**: [Value of this story]
 
-**Independent Test**: [Describe how this can be tested independently - e.g., "Can be fully tested by [specific action] and delivers [specific value]"]
+**Independent Test**: [How this can be verified on its own]
 
 **Acceptance Scenarios**:
-
 1. **Given** [initial state], **When** [action], **Then** [expected outcome]
 2. **Given** [initial state], **When** [action], **Then** [expected outcome]
 
----
-
-### User Story 2 - [Brief Title] (Priority: P2)
-
-**Story Type**: [Choose: Standard, Job, Team, or Technical]
+### Story 2 - [Title] (Priority: P2)
 
 **Story**:
-```
-[Write your story here using the chosen format]
-```
+[Story statement]
 
-**Why this priority**: [Explain the value and why it has this priority level]
+**Why this matters**: [Value]
 
-**Independent Test**: [Describe how this can be tested independently]
+**Independent Test**: [Verification]
 
 **Acceptance Scenarios**:
-
 1. **Given** [initial state], **When** [action], **Then** [expected outcome]
 
----
-
-### User Story 3 - [Brief Title] (Priority: P3)
-
-**Story Type**: [Choose: Standard, Job, Team, or Technical]
+### Story 3 - [Title] (Priority: P3)
 
 **Story**:
-```
-[Write your story here using the chosen format]
-```
+[Story statement]
 
-**Why this priority**: [Explain the value and why it has this priority level]
+**Why this matters**: [Value]
 
-**Independent Test**: [Describe how this can be tested independently]
+**Independent Test**: [Verification]
 
 **Acceptance Scenarios**:
-
 1. **Given** [initial state], **When** [action], **Then** [expected outcome]
 
----
+## 2. Edge Cases
 
-[Add more user stories as needed, each with an assigned priority]
+- [Boundary condition]
+- [Failure scenario]
+- [Permission or state conflict]
 
-### Edge Cases
+## 3. Functional Requirements
 
-<!--
-  ACTION REQUIRED: The content in this section represents placeholders.
-  Fill them out with the right edge cases.
--->
+- **FR-001**: System MUST [capability]
+- **FR-002**: System MUST [capability]
+- **FR-003**: Users MUST be able to [interaction]
+- **FR-004**: System MUST [behavior]
+- **FR-005**: System MUST [constraint or rule]
 
-- What happens when [boundary condition]?
-- How does system handle [error scenario]?
+## 4. Key Entities
 
-## Requirements *(mandatory)*
+- **[Entity A]**: [Meaning and important attributes]
+- **[Entity B]**: [Meaning and relationships]
 
-<!--
-  ACTION REQUIRED: The content in this section represents placeholders.
-  Fill them out with the right functional requirements.
+## 5. Assumptions
 
-  Keep this section implementation-agnostic:
-  - Do NOT specify frameworks, libraries, classes, API routes, or DB schemas.
--->
+- **A1**: [Reasonable default]
+- **A2**: [Reasonable default]
 
-### Functional Requirements
+## 6. Dependencies
 
-- **FR-001**: System MUST [specific capability, e.g., "allow users to create accounts"]
-- **FR-002**: System MUST [specific capability, e.g., "validate email addresses"]  
-- **FR-003**: Users MUST be able to [key interaction, e.g., "reset their password"]
-- **FR-004**: System MUST [data requirement, e.g., "persist user preferences"]
-- **FR-005**: System MUST [behavior, e.g., "log all security events"]
+- **D1**: [External system, policy, or prerequisite]
+- **D2**: [External dependency]
 
-*Example of marking unclear requirements:*
+## 7. Success Criteria
 
-- **FR-006**: System MUST authenticate users via [NEEDS CLARIFICATION: auth method not specified - email/password, SSO, OAuth?]
-- **FR-007**: System MUST retain user data for [NEEDS CLARIFICATION: retention period not specified]
+- **SC-001**: [Measurable user or business outcome]
+- **SC-002**: [Measurable outcome]
+- **SC-003**: [Adoption, speed, accuracy, or completion metric]
 
-### Key Entities *(include if feature involves data)*
+## 8. Open Clarifications
 
-- **[Entity 1]**: [What it represents, key attributes without implementation]
-- **[Entity 2]**: [What it represents, relationships to other entities]
+- [NEEDS CLARIFICATION: only if critical]
+- [NEEDS CLARIFICATION: only if critical]
 
-## Assumptions & Dependencies
-
-- **Assumption A1**: [Reasonable default chosen when details are missing]
-- **Dependency D1**: [External dependency, policy, or system prerequisite]
-
-## Success Criteria *(mandatory)*
-
-<!--
-  ACTION REQUIRED: Define measurable success criteria.
-  These must be technology-agnostic and measurable.
--->
-
-### Measurable Outcomes
-
-- **SC-001**: [Measurable metric, e.g., "Users can complete account creation in under 2 minutes"]
-- **SC-002**: [Measurable metric, e.g., "System handles 1000 concurrent users without degradation"]
-- **SC-003**: [User satisfaction metric, e.g., "90% of users successfully complete primary task on first attempt"]
-- **SC-004**: [Business metric, e.g., "Reduce support tickets related to [X] by 50%"]
-
-## Clarifications
-
-<!--
-  Keep unresolved clarifications to <= 3 and only for critical decisions.
-  Preferred final state is 0 unresolved clarifications.
--->
-
-- [NEEDS CLARIFICATION: critical decision 1]
+<!-- Keep open clarifications to 3 or fewer. Remove this section if none remain. -->

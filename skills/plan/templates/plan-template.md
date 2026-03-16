@@ -3,41 +3,48 @@
 **Track**: `[ID-feature-name]`  
 **Date**: [DATE]  
 **Status**: Draft
+**Spec**: [link to spec.md]
 
-## 1. Technical Context
+## 1. Summary
+
+[Short summary of the feature, implementation shape, and goal]
+
+## 2. Technical Context
 
 - Current system context:
-- Target area/modules:
+- Target modules / files:
 - Constraints:
 - Assumptions:
+- Out of scope:
 
-## 2. Planning Gates
+## 3. Planning Gates
 
-### 2.1 Architecture / Constraints Gate
+### Architecture / Constraints
 
 - Decision:
 - Result: PASS / WAIVED / FAIL
 - Notes:
 
-### 2.2 Risk / Compliance Gate
+### Risk / Compliance
 
-- Security and compliance notes:
+- Decision:
 - Result: PASS / WAIVED / FAIL
 - Notes:
 
-### 2.3 Testability Gate
+### Testability
 
-- Validation strategy:
+- Decision:
 - Result: PASS / WAIVED / FAIL
 - Notes:
 
-## 3. Requirement Traceability
+## 4. Requirement Traceability
 
-| Requirement ID | Implementation Steps | Validation Steps |
+| Requirement | Implementation Steps | Validation |
 | --- | --- | --- |
-| FR-001 | [step IDs] | [test/check IDs] |
+| FR-001 | [step IDs] | [check IDs] |
+| FR-002 | [step IDs] | [check IDs] |
 
-## 4. Execution Packets
+## 5. Execution Plan
 
 ### Packet P01: [Name]
 
@@ -45,12 +52,12 @@
 - Target files:
 - Dependencies:
 - Steps:
-  - [ ] S001 ...
-  - [ ] S002 ...
+  - [ ] S001 [concrete change]
+  - [ ] S002 [concrete change]
 - Validation:
-  - [ ] V001 ...
+  - [ ] V001 [test or manual check]
 - Definition of Done:
-- Rollback/Mitigation:
+- Rollback / Mitigation:
 
 ### Packet P02: [Name]
 
@@ -58,14 +65,44 @@
 - Target files:
 - Dependencies:
 - Steps:
-  - [ ] S003 ...
+  - [ ] S003 [concrete change]
 - Validation:
-  - [ ] V002 ...
+  - [ ] V002 [test or manual check]
 - Definition of Done:
-- Rollback/Mitigation:
+- Rollback / Mitigation:
 
-## 5. Delivery Notes
+## 6. Supporting Notes
+
+### Research Decisions
+
+- [Only include if needed]
+- Decision:
+- Rationale:
+- Alternative considered:
+
+### Data Model Notes
+
+- [Only include if needed]
+- Entity:
+- Fields / relationships:
+- Validation rules:
+
+### Interface Notes
+
+- [Only include if needed]
+- Interface:
+- Inputs / outputs:
+- Error states / compatibility notes:
+
+### Verification Scenarios
+
+- [Only include if needed]
+- Happy path:
+- Edge case:
+- Regression checks:
+
+## 7. Delivery Notes
 
 - Sequencing rationale:
 - Risks to monitor:
-- Handoff to implementation:
+- Handoff notes for implementation:
