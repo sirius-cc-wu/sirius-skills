@@ -20,7 +20,7 @@ VALID_STATUSES = {
     "draft_spec",
     "spec_ready",
     "plan_ready",
-    "implementation_ready",
+    "tasks_ready",
     "implementing",
     "done",
 }
@@ -195,7 +195,7 @@ def resolve_track(rows: List[Dict[str, str]], selector: str) -> Optional[Dict[st
 
 
 def find_active_track(rows: List[Dict[str, str]]) -> Optional[Dict[str, str]]:
-    priority = ["implementing", "implementation_ready", "plan_ready", "spec_ready", "draft_spec"]
+    priority = ["implementing", "tasks_ready", "plan_ready", "spec_ready", "draft_spec"]
     for wanted in priority:
         matches = [r for r in rows if r["status"] == wanted]
         if matches:
@@ -210,7 +210,7 @@ def expected_status_for_files(spec_exists: bool, plan_exists: bool, tasks_exists
         return "spec_ready"
     if plan_exists and not tasks_exists:
         return "plan_ready"
-    return "implementation_ready"
+    return "tasks_ready"
 
 
 def validate_track(row: Dict[str, str]) -> Tuple[bool, List[str], Dict[str, bool]]:
@@ -236,14 +236,16 @@ def validate_track(row: Dict[str, str]) -> Tuple[bool, List[str], Dict[str, bool
     expected = expected_status_for_files(
         checks["spec_exists"], checks["plan_exists"], checks["tasks_exists"]
     )
-    if row["status"] in {"draft_spec", "spec_ready", "plan_ready", "implementation_ready"}:
+    if row["status"] in {"draft_spec", "spec_ready", "plan_ready", "tasks_ready"}:
         if row["status"] != expected:
             issues.append(
                 f"status_mismatch:status={row['status']} expected={expected} based_on_files"
             )
-    if row["status"] == "implementing" and not checks["plan_exists"]:
-        issues.append("implementing_without_plan")
-    if row["status"] == "done" and not (checks["spec_exists"] and checks["plan_exists"]):
+    if row["status"] == "implementing" and not checks["tasks_exists"]:
+        issues.append("implementing_without_tasks")
+    if row["status"] == "done" and not (
+        checks["spec_exists"] and checks["plan_exists"] and checks["tasks_exists"]
+    ):
         issues.append("done_without_core_artifacts")
 
     return len(issues) == 0, issues, checks

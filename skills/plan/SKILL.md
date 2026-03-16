@@ -6,6 +6,7 @@ description: Produces an actionable implementation plan from a completed spec.
 # Plan
 
 Use this skill to convert `spec.md` into a concrete `plan.md`.
+The next workflow step after this skill is `tasks`.
 
 ## Responsibilities
 
@@ -64,4 +65,4 @@ Failed gates must be fixed or explicitly waived with rationale.
 2. Read `spec.md` and scan the target codebase.
 3. Fill `plan-template.md`.
 4. Validate traceability and gates.
-5. Stop when the plan is actionable and ready for implementation.
+5. Stop when the plan is actionable and ready for task breakdown.

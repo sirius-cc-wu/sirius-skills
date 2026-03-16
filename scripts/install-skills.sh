@@ -15,6 +15,7 @@ COMMON_FLAGS=(
 npx skills add "$REPO_ROOT/skills/spec-driver" "${COMMON_FLAGS[@]}"
 npx skills add "$REPO_ROOT/skills/specify" "${COMMON_FLAGS[@]}"
 npx skills add "$REPO_ROOT/skills/plan" "${COMMON_FLAGS[@]}"
+npx skills add "$REPO_ROOT/skills/tasks" "${COMMON_FLAGS[@]}"
 npx skills add "$REPO_ROOT/skills/commit" "${COMMON_FLAGS[@]}"
 npx skills add "$REPO_ROOT/skills/simplify" "${COMMON_FLAGS[@]}"
 npx skills add "$REPO_ROOT/skills/batch" "${COMMON_FLAGS[@]}"

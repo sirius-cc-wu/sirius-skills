@@ -48,10 +48,11 @@ The ID is extracted from the current branch name or a logical scope is used.
 3. **Analyze changes** to determine:
    - Summary: What does the change do?
 
-4. **Validate Plan Completion**:
-   - Locate the relevant `plan.md` (usually in `specs/<ID>-<name>/plan.md`).
-   - Check if all checkboxes in the plan are marked as completed (`[x]`).
-   - **MANDATORY**: A PR should not be created if there are pending `[ ]` items in the `plan.md` unless explicitly justified.
+4. **Validate Execution Checklist Completion**:
+   - Locate the relevant `tasks.md` (usually in `specs/<ID>-<name>/tasks.md`).
+   - For legacy tracks without `tasks.md`, fall back to `plan.md`.
+   - Check if all checklist items in the execution artifact are marked as completed (`[x]`).
+   - **MANDATORY**: A PR should not be created if there are pending `[ ]` items in `tasks.md` (or the legacy `plan.md`) unless explicitly justified.
 
 5. **Push branch if needed**:
    ```bash
@@ -84,7 +85,7 @@ The ID is extracted from the current branch name or a logical scope is used.
    - [ ] I have performed a self-review of my own code
    - [ ] I have commented my code, particularly in hard-to-understand areas
    - [ ] I have made corresponding changes to the documentation
-   - [ ] I have updated the implementation plan (plan.md)
+   - [ ] I have updated the execution checklist (`tasks.md`, or `plan.md` for legacy tracks)
    - [ ] New and existing unit tests pass locally with my changes
    - [ ] I have checked my code and corrected any misspellings
    EOF

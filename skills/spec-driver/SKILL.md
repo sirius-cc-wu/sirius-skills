@@ -11,7 +11,7 @@ Use this skill to manage workflow state for specification and planning.
 
 1. Resolve or initialize the active track.
 2. Verify required files and registry status.
-3. Route work to `specify` or `plan`.
+3. Route work to `specify`, `plan`, or `tasks`.
 4. Update track status when a phase is complete.
 
 ## Lifecycle States
@@ -19,7 +19,7 @@ Use this skill to manage workflow state for specification and planning.
 - `draft_spec`
 - `spec_ready`
 - `plan_ready`
-- `implementation_ready`
+- `tasks_ready`
 - `implementing`
 - `done`
 
@@ -27,8 +27,8 @@ Allowed transitions:
 
 1. `draft_spec -> spec_ready`
 2. `spec_ready -> plan_ready`
-3. `plan_ready -> implementation_ready`
-4. `implementation_ready -> implementing`
+3. `plan_ready -> tasks_ready`
+4. `tasks_ready -> implementing`
 5. `implementing -> done`
 
 Do not skip states without explicit user approval.
@@ -42,7 +42,7 @@ Do not skip states without explicit user approval.
 5. Check presence of:
     - `spec.md`
     - `plan.md`
-    - `tasks.md` (optional)
+    - `tasks.md`
 6. Verify registry status is consistent with file reality. If inconsistent, repair status first.
 
 ## Routing Rules
@@ -53,8 +53,11 @@ Do not skip states without explicit user approval.
 2. If `spec.md` is complete and no `plan.md`:
     - Use `plan` to produce `plan.md`.
     - Set status to `plan_ready` when complete.
-3. If `spec.md` and `plan.md` are complete:
-    - Set status to `implementation_ready`.
+3. If `spec.md` and `plan.md` are complete and no `tasks.md`:
+    - Use `tasks` to produce `tasks.md`.
+    - Set status to `tasks_ready` when complete.
+4. If `spec.md`, `plan.md`, and `tasks.md` are complete:
+    - Set status to `implementing` when coding begins.
     - Proceed to implementation with the active coding agent.
 
 ## Completion Checks
@@ -68,7 +71,14 @@ A track is `spec_ready` when:
 A track is `plan_ready` when:
 - `plan.md` is actionable
 - requirements map to implementation and validation steps
+- the next task is generating `tasks.md`
 - gates are passed or explicitly waived
+
+A track is `tasks_ready` when:
+- `tasks.md` is actionable
+- tasks map back to the approved plan and requirements
+- dependencies and parallel-safe work are explicit
+- implementation can begin without major replanning
 
 ## Tooling
 Always use `scripts/manage_specs.py` for initialization, active track resolution, status updates, and validation.
@@ -98,6 +108,9 @@ python3 <path-to-spec-driver>/scripts/manage_specs.py add-from-sb "BNC-lg2fwe"
 
 # Update track status:
 python3 <path-to-spec-driver>/scripts/manage_specs.py set-status "<track-id-or-path>" "spec_ready"
+
+# Mark a track ready for implementation:
+python3 <path-to-spec-driver>/scripts/manage_specs.py set-status "<track-id-or-path>" "tasks_ready"
 
 # Resolve active track:
 python3 <path-to-spec-driver>/scripts/manage_specs.py get-active
