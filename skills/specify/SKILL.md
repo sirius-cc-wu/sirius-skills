@@ -54,10 +54,12 @@ This skill uses a single markdown template (`spec-template.md`) to ensure a cons
 
 For each track, produce:
 
-1. `specs/<ID>-<name>/spec.md`
-2. `specs/<ID>-<name>/checklists/requirements.md`
+1. `<track_path>/spec.md`
+2. `<track_path>/checklists/requirements.md`
 
 The checklist is required and must be updated as validation progresses.
+
+Resolve `<track_path>` with `spec-driver` tooling.
 
 ## Protocol: Sequential Questioning
 
@@ -86,9 +88,9 @@ If a gate fails, revise and re-run validation. Perform up to 3 correction passes
 
 ## Workflow
 1. Use `spec-driver` tooling to bootstrap/resolve the active track.
-2. Copy `templates/spec-template.md` to `specs/<ID>-<name>/spec.md`.
+2. Copy `templates/spec-template.md` to `<track_path>/spec.md`.
 3. Apply Sequential Questioning and fill all template sections.
-4. Create checklist from `templates/requirements-checklist-template.md` into `checklists/requirements.md`.
+4. Create checklist from `templates/requirements-checklist-template.md` into `<track_path>/checklists/requirements.md`.
 5. Run quality gates and update checklist status.
 6. If needed, perform correction passes (max 3).
 7. Return a completion summary:

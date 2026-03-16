@@ -38,8 +38,8 @@ For each file with an important change, you will generate a pair of UML diagrams
 ### 3. Find Corresponding Spec File
 
 For each changed file, you must locate its corresponding `spec.md` file. This can be done by:
-1.  First, inspect `specs/README.md` to identify the active track or tracks relevant to the changed component.
-2.  Then, within the identified track's directory (e.g., `specs/<track_id>/`), look for `spec.md`.
+1.  First, use `spec-driver` tooling to resolve the active track and configured registry.
+2.  Then, inspect the resolved active track or tracks relevant to the changed component, and look for `spec.md` within the resolved `<track_path>/`.
 3.  If a direct match isn't found, you may need to infer the relevant track based on the changed file's path and the existing track structures.
 
 ### 4. Generate "Before" UML Diagram

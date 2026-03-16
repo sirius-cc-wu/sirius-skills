@@ -9,7 +9,7 @@ This skill manages deterministic transitions between Specification, Planning, an
 
 ## Lifecycle State Machine
 
-Use these statuses in `specs/README.md`:
+Use these statuses in the registry README at `<spec_dir>/README.md` (default: `specs/README.md`):
 
 - `draft_spec`
 - `spec_ready`
@@ -30,14 +30,15 @@ Do not skip states without explicit user approval.
 
 ## Preflight (Required Before Routing)
 
-1. Ensure the registry exists (`specs/README.md`). If missing, initialize via tooling.
-2. Resolve the active track using tooling (or by user-provided ID/path).
-3. Confirm track path exists.
-4. Check presence of:
+1. If `.specs/config.json` is missing, ask the user where specs should be created, then initialize via tooling with that path.
+2. Ensure the configured registry exists (`<spec_dir>/README.md`).
+3. Resolve the active track using tooling (or by user-provided ID/path).
+4. Confirm track path exists.
+5. Check presence of:
    - `spec.md`
    - `plan.md`
    - `tasks.md` (optional, but required for strict task execution mode)
-5. Verify registry status is consistent with file reality. If inconsistent, repair status first.
+6. Verify registry status is consistent with file reality. If inconsistent, repair status first.
 
 ## Routing Rules
 
@@ -74,11 +75,16 @@ Do not skip states without explicit user approval.
 ## Tooling
 Always use `scripts/manage_specs.py` for registry updates to ensure cross-platform compatibility.
 
+The configured specs directory is stored in `.specs/config.json` under `spec_dir`. If `.specs/config.json` does not exist yet, ask the user where specs should be created before running `init`.
+
 Track IDs are treated as opaque identifiers. Manual IDs may include letters, numbers, `.`, `_`, and `-`, so IDs like `BNC-lg2fwe` are valid.
 
 ```bash
 # Initialize registry/config:
-python3 <path-to-spec-driver>/scripts/manage_specs.py init
+python3 <path-to-spec-driver>/scripts/manage_specs.py init [spec-dir]
+
+# Example with a custom specs directory:
+python3 <path-to-spec-driver>/scripts/manage_specs.py init docs/specs
 
 # Add track (auto-detect ID from branch or use timestamp):
 python3 <path-to-spec-driver>/scripts/manage_specs.py add "feature-name"
