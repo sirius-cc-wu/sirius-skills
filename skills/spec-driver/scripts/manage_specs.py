@@ -19,12 +19,28 @@ REGISTRY_HEADER = (
 TRACK_METADATA_FILE = ".track-meta.json"
 TRACK_ID_PATTERN = re.compile(r"^[A-Za-z0-9][A-Za-z0-9._-]*$")
 VALID_STATUSES = {
-    "draft_spec",
+    "draft",
     "spec_ready",
     "plan_ready",
-    "tasks_ready",
-    "implementing",
-    "done",
+    "execution_ready",
+    "closed",
+}
+STATUS_ALIASES = {
+    "draft": "draft",
+    "draft_spec": "draft",
+    "spec_ready": "spec_ready",
+    "planned": "plan_ready",
+    "plan_ready": "plan_ready",
+    "tasks_ready": "execution_ready",
+    "approved": "execution_ready",
+    "implementing": "execution_ready",
+    "in progress": "execution_ready",
+    "in-progress": "execution_ready",
+    "blocked": "execution_ready",
+    "done": "closed",
+    "completed": "closed",
+    "released": "closed",
+    "closed": "closed",
 }
 
 
@@ -60,6 +76,15 @@ def validate_track_id(value: str) -> str:
             "Invalid track ID. Use only letters, numbers, dot, underscore, and hyphen."
         )
     return track_id
+
+
+def normalize_status(value: str) -> str:
+    normalized = value.strip().lower()
+    if normalized not in STATUS_ALIASES:
+        raise ValueError(
+            f"Invalid status '{value}'. Valid canonical states: {sorted(VALID_STATUSES)}"
+        )
+    return STATUS_ALIASES[normalized]
 
 
 def load_config(required: bool = True) -> Dict[str, str]:
@@ -181,8 +206,13 @@ def parse_registry() -> List[Dict[str, str]]:
             cols = [c.strip() for c in line.strip("|").split("|")]
             if len(cols) != 4:
                 continue
+            status = cols[2]
+            try:
+                status = normalize_status(status)
+            except ValueError:
+                pass
             rows.append(
-                {"id": cols[0], "feature": cols[1], "status": cols[2], "path": cols[3]}
+                {"id": cols[0], "feature": cols[1], "status": status, "path": cols[3]}
             )
     return rows
 
@@ -265,7 +295,7 @@ def resolve_track(rows: List[Dict[str, str]], selector: str) -> Optional[Dict[st
 
 
 def find_active_track(rows: List[Dict[str, str]]) -> Optional[Dict[str, str]]:
-    priority = ["implementing", "tasks_ready", "plan_ready", "spec_ready", "draft_spec"]
+    priority = ["execution_ready", "plan_ready", "spec_ready", "draft"]
     for wanted in priority:
         matches = [r for r in rows if r["status"] == wanted]
         if matches:
@@ -273,14 +303,15 @@ def find_active_track(rows: List[Dict[str, str]]) -> Optional[Dict[str, str]]:
     return rows[-1] if rows else None
 
 
-def expected_status_for_files(spec_exists: bool, plan_exists: bool, tasks_exists: bool) -> str:
+def expected_status_for_files(
+    spec_exists: bool, plan_exists: bool, tasks_exists: bool
+) -> str:
+    del tasks_exists
     if not spec_exists:
-        return "draft_spec"
-    if spec_exists and not plan_exists:
+        return "draft"
+    if not plan_exists:
         return "spec_ready"
-    if plan_exists and not tasks_exists:
-        return "plan_ready"
-    return "tasks_ready"
+    return "plan_ready"
 
 
 def validate_track(row: Dict[str, str]) -> Tuple[bool, List[str], Dict[str, bool]]:
@@ -296,8 +327,11 @@ def validate_track(row: Dict[str, str]) -> Tuple[bool, List[str], Dict[str, bool
         "tasks_exists": os.path.isfile(tasks),
     }
 
-    if row["status"] not in VALID_STATUSES:
+    try:
+        normalized_status = normalize_status(row["status"])
+    except ValueError:
         issues.append(f"invalid_status:{row['status']}")
+        normalized_status = row["status"]
 
     if not checks["track_dir_exists"]:
         issues.append("missing_track_directory")
@@ -306,17 +340,17 @@ def validate_track(row: Dict[str, str]) -> Tuple[bool, List[str], Dict[str, bool
     expected = expected_status_for_files(
         checks["spec_exists"], checks["plan_exists"], checks["tasks_exists"]
     )
-    if row["status"] in {"draft_spec", "spec_ready", "plan_ready", "tasks_ready"}:
-        if row["status"] != expected:
+    if normalized_status in {"draft", "spec_ready", "plan_ready"}:
+        if normalized_status != expected:
             issues.append(
-                f"status_mismatch:status={row['status']} expected={expected} based_on_files"
+                f"status_mismatch:status={normalized_status} expected={expected} based_on_files"
             )
-    if row["status"] == "implementing" and not checks["tasks_exists"]:
-        issues.append("implementing_without_tasks")
-    if row["status"] == "done" and not (
-        checks["spec_exists"] and checks["plan_exists"] and checks["tasks_exists"]
+    if normalized_status == "execution_ready" and not checks["plan_exists"]:
+        issues.append("execution_ready_without_plan")
+    if normalized_status == "closed" and not (
+        checks["spec_exists"] and checks["plan_exists"]
     ):
-        issues.append("done_without_core_artifacts")
+        issues.append("closed_without_core_artifacts")
 
     return len(issues) == 0, issues, checks
 
@@ -354,7 +388,7 @@ def create_track(
         {
             "id": normalized_id,
             "feature": normalized_name,
-            "status": "draft_spec",
+            "status": "draft",
             "path": normalize_track_path(track_path),
         }
     )
@@ -480,9 +514,10 @@ def cmd_add_from_sb(args: argparse.Namespace) -> int:
 
 
 def cmd_set_status(args: argparse.Namespace) -> int:
-    status = args.status.strip()
-    if status not in VALID_STATUSES:
-        print(f"Invalid status '{status}'. Valid: {sorted(VALID_STATUSES)}", file=sys.stderr)
+    try:
+        status = normalize_status(args.status)
+    except ValueError as exc:
+        print(str(exc), file=sys.stderr)
         return 2
 
     rows = parse_registry()

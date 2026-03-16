@@ -5,33 +5,45 @@ description: Orchestrates the spec-driven workflow by resolving the active track
 
 # Spec Driver
 
-Use this skill to manage workflow state for specification and planning.
+Use this skill to manage workflow state for track readiness.
 
 ## Responsibilities
 
 1. Resolve or initialize the active track.
 2. Verify required files and registry status.
-3. Route work to `specify`, `plan`, or `tasks`.
+3. Route work to `specify`, `plan`, and optionally `tasks`.
 4. Update track status when a phase is complete.
 
 ## Lifecycle States
 
-- `draft_spec`
+- `draft`
 - `spec_ready`
 - `plan_ready`
-- `tasks_ready`
-- `implementing`
-- `done`
+- `execution_ready`
+- `closed`
 
 Allowed transitions:
 
-1. `draft_spec -> spec_ready`
+1. `draft -> spec_ready`
 2. `spec_ready -> plan_ready`
-3. `plan_ready -> tasks_ready`
-4. `tasks_ready -> implementing`
-5. `implementing -> done`
+3. `plan_ready -> execution_ready`
+4. `execution_ready -> closed`
 
 Do not skip states without explicit user approval.
+
+## State Ownership
+
+`spec-driver` owns **track/document readiness** only:
+
+- `draft`
+- `spec_ready`
+- `plan_ready`
+- `execution_ready`
+- `closed`
+
+If you also use `sb-tracker`, let `sb` own **execution/task lifecycle** such as `Backlog`, `Ready`, `Doing`, `Review`, `Done`, and `Blocked`.
+
+Do not duplicate task-execution states like `implementing`, `in progress`, or `blocked` in the track registry.
 
 ## Preflight
 
@@ -42,23 +54,22 @@ Do not skip states without explicit user approval.
 5. Check presence of:
     - `spec.md`
     - `plan.md`
-    - `tasks.md`
+    - `tasks.md` (optional)
 6. Verify registry status is consistent with file reality. If inconsistent, repair status first.
 
 ## Routing Rules
 
 1. If no `spec.md` or spec is incomplete:
     - Use `specify` to create or update `spec.md`.
-    - Set status to `draft_spec` during authoring and `spec_ready` when complete.
+    - Set status to `draft` during authoring and `spec_ready` when complete.
 2. If `spec.md` is complete and no `plan.md`:
     - Use `plan` to produce `plan.md`.
     - Set status to `plan_ready` when complete.
-3. If `spec.md` and `plan.md` are complete and no `tasks.md`:
-    - Use `tasks` to produce `tasks.md`.
-    - Set status to `tasks_ready` when complete.
-4. If `spec.md`, `plan.md`, and `tasks.md` are complete:
-    - Set status to `implementing` when coding begins.
-    - Proceed to implementation with the active coding agent.
+3. If `spec.md` and `plan.md` are complete:
+    - Optionally use `tasks` to produce `tasks.md` or an execution checklist when it helps execution.
+    - Set status to `execution_ready` when the plan is actionable and execution can begin.
+4. Once execution is finished and verified:
+    - Set status to `closed`.
 
 ## Completion Checks
 
@@ -74,11 +85,16 @@ A track is `plan_ready` when:
 - the next task is generating `tasks.md`
 - gates are passed or explicitly waived
 
-A track is `tasks_ready` when:
-- `tasks.md` is actionable
-- tasks map back to the approved plan and requirements
-- dependencies and parallel-safe work are explicit
-- implementation can begin without major replanning
+A track is `execution_ready` when:
+- `plan.md` is actionable
+- execution can begin without major replanning
+- any optional `tasks.md` or execution checklist is aligned with the plan
+- the next lifecycle owner is the active coding agent or task tracker
+
+A track is `closed` when:
+- the execution work is complete
+- verification has passed or been explicitly waived
+- any follow-up execution tracking lives in the task system rather than the track state
 
 ## Tooling
 Always use `scripts/manage_specs.py` for initialization, active track resolution, status updates, and validation.
@@ -143,8 +159,11 @@ python3 <path-to-spec-driver>/scripts/manage_specs.py add-from-sb "BNC-lg2fwe"
 # Update track status:
 python3 <path-to-spec-driver>/scripts/manage_specs.py set-status "<track-id-or-path>" "spec_ready"
 
-# Mark a track ready for implementation:
-python3 <path-to-spec-driver>/scripts/manage_specs.py set-status "<track-id-or-path>" "tasks_ready"
+# Mark a track ready for execution:
+python3 <path-to-spec-driver>/scripts/manage_specs.py set-status "<track-id-or-path>" "execution_ready"
+
+# Close a track after execution is complete:
+python3 <path-to-spec-driver>/scripts/manage_specs.py set-status "<track-id-or-path>" "closed"
 
 # Resolve active track:
 python3 <path-to-spec-driver>/scripts/manage_specs.py get-active
@@ -154,3 +173,5 @@ python3 <path-to-spec-driver>/scripts/manage_specs.py validate-track "<track-id-
 ```
 
 `add-from-sb` shells out to `sb show <id> --json`, uses the issue title as the feature name, and writes source metadata to a per-track sidecar file without changing the registry table format.
+
+For backward compatibility, `manage_specs.py` still accepts legacy status inputs such as `draft_spec`, `tasks_ready`, `implementing`, `done`, `approved`, and `completed`, but it normalizes them to the canonical track states above.
