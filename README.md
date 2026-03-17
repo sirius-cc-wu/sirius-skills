@@ -2,6 +2,20 @@
 
 `sirius-skills` is a generic-first skill collection for spec-driven development, planning, implementation support, and repository workflows.
 
+## Installing skills
+
+Use the repository `Makefile` to register the managed skill set:
+
+```bash
+make install
+```
+
+To remove the same managed skill set later:
+
+```bash
+make uninstall
+```
+
 The intended direction is:
 
 - keep core workflow skills reusable across personal and company projects
