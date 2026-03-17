@@ -1,4 +1,5 @@
 import argparse
+import hashlib
 import json
 import os
 import re
@@ -14,6 +15,7 @@ IDENTITY_CONFIG_DIR = ".skills"
 IDENTITY_CONFIG_FILE = os.path.join(IDENTITY_CONFIG_DIR, "identity.json")
 DEFAULT_PREFERRED_WORKFLOW = "TDD"
 REGISTRY_JSON_FILE = "registry.json"
+DEFAULT_GENERATED_TRACK_PREFIX = "SPC"
 REGISTRY_HEADER = (
     "# Specification Registry\n\n"
     "| ID | Feature | Status | Updated | Closed | Path |\n"
@@ -21,6 +23,9 @@ REGISTRY_HEADER = (
 )
 TRACK_METADATA_FILE = ".track-meta.json"
 TRACK_ID_PATTERN = re.compile(r"^[A-Za-z0-9][A-Za-z0-9._-]*$")
+SB_PREFIX_OUTPUT_PATTERN = re.compile(
+    r"^Effective prefix:\s*(?P<prefix>.+?)\s*\(from (?P<source>[^)]+)\)\s*$"
+)
 STATUS_SEQUENCE = [
     "draft",
     "spec_ready",
@@ -754,6 +759,63 @@ def audit_relations(
     }
 
 
+def encode_base36(data: bytes, length: int) -> str:
+    alphabet = "0123456789abcdefghijklmnopqrstuvwxyz"
+    num = int.from_bytes(data, "big")
+    if num == 0:
+        encoded = "0"
+    else:
+        chars: List[str] = []
+        while num > 0:
+            num, rem = divmod(num, 36)
+            chars.append(alphabet[rem])
+        encoded = "".join(reversed(chars))
+    if len(encoded) < length:
+        encoded = ("0" * (length - len(encoded))) + encoded
+    if len(encoded) > length:
+        encoded = encoded[-length:]
+    return encoded
+
+
+def normalize_generated_prefix(value: str) -> Optional[str]:
+    prefix = value.strip().rstrip("-")
+    if not prefix:
+        return None
+    if not TRACK_ID_PATTERN.fullmatch(prefix):
+        return None
+    return prefix
+
+
+def resolve_repo_specific_sb_prefix() -> Optional[str]:
+    try:
+        result = subprocess.run(
+            ["sb", "config", "get", "prefix"],
+            check=False,
+            capture_output=True,
+            text=True,
+        )
+    except FileNotFoundError:
+        return None
+
+    if result.returncode != 0:
+        return None
+
+    output_lines = [line.strip() for line in result.stdout.splitlines() if line.strip()]
+    if not output_lines:
+        return None
+
+    match = SB_PREFIX_OUTPUT_PATTERN.match(output_lines[-1])
+    if not match:
+        return None
+    if match.group("source") != "repo":
+        return None
+    return normalize_generated_prefix(match.group("prefix"))
+
+
+def resolve_generated_track_prefix() -> str:
+    return resolve_repo_specific_sb_prefix() or DEFAULT_GENERATED_TRACK_PREFIX
+
+
 def get_current_branch() -> Optional[str]:
     commands = (
         ["git", "branch", "--show-current"],
@@ -795,11 +857,32 @@ def infer_id_from_branch(identity_config: Optional[Dict[str, str]] = None) -> Op
             if match.lastindex:
                 return match.group(1)
             return match.group(0)
-
-    match = re.search(r"(?:^|/|-)(\d+)(?:-|$)", branch)
-    if match:
-        return match.group(1)
     return None
+
+def generate_hash_track_id(
+    rows: List[Dict[str, object]],
+    name: str,
+    description: str = "",
+    created_at: Optional[str] = None,
+) -> str:
+    normalized_name = normalize_feature_name(name)
+    if not normalized_name:
+        raise ValueError("Feature name cannot be empty.")
+
+    prefix = resolve_generated_track_prefix()
+    timestamp = created_at or datetime.now().isoformat()
+    existing_ids = {row["id"] for row in rows}
+
+    for length in range(6, 9):
+        for nonce in range(100):
+            content = f"{normalized_name}|{description}|{timestamp}|{nonce}"
+            digest = hashlib.sha256(content.encode("utf-8")).digest()[:5]
+            short = encode_base36(digest, length)
+            candidate = f"{prefix}-{short}"
+            if candidate not in existing_ids:
+                return candidate
+
+    raise RuntimeError("Failed to generate a unique track ID.")
 
 
 def resolve_track(rows: List[Dict[str, object]], selector: str) -> Optional[Dict[str, object]]:
@@ -1075,13 +1158,14 @@ def cmd_add(args: argparse.Namespace) -> int:
 
     if not id_to_use:
         identity_config = load_identity_config(required=False)
-        id_to_use = infer_id_from_branch(identity_config) or datetime.now().strftime(
-            "%Y%m%d"
+        rows = parse_registry()
+        id_to_use = infer_id_from_branch(identity_config) or generate_hash_track_id(
+            rows, name
         )
 
     try:
         folder, created = create_track(id_to_use, name)
-    except ValueError as exc:
+    except (RuntimeError, ValueError) as exc:
         print(str(exc), file=sys.stderr)
         return 2
 

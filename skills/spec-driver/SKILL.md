@@ -121,7 +121,7 @@ Closed tracks are non-destructive: the original `spec.md`, `plan.md`, and option
 
 The configured specs directory is stored in `.specs/config.json` under `spec_dir`. If `.specs/config.json` does not exist yet, ask the user where specs should be created before running `init`.
 
-Track IDs are treated as opaque identifiers. Manual IDs may include letters, numbers, `.`, `_`, and `-`, so IDs like `BNC-lg2fwe` are valid.
+Track IDs are treated as opaque identifiers. Manual IDs may include letters, numbers, `.`, `_`, and `-`, so IDs like `BNC-lg2fwe` are valid. Auto-generated standalone track IDs use an `sb`-style hash format such as `SPC-a3f8e9` or `CLAW-a3f8e9`.
 
 ### Optional Identity Configuration
 
@@ -138,10 +138,11 @@ Supported Phase 1 fields:
 If `.skills/identity.json` is absent:
 
 - `manage_specs.py add "<feature-name>"` keeps the generic default behavior
-- it first looks for a numeric token in the current branch name
-- if none is found, it falls back to a date-based ID
+- it generates an `sb`-style hash ID
+- it uses the repo-specific `sb` prefix when `sb config get prefix` reports `(from repo)`
+- otherwise it falls back to the standalone `SPC` prefix
 
-If `.skills/identity.json` is present and defines `branch_extract_pattern`, `manage_specs.py add "<feature-name>"` uses that pattern first. Manual IDs always override auto-detection.
+If `.skills/identity.json` is present and defines `branch_extract_pattern`, `manage_specs.py add "<feature-name>"` uses that pattern before falling back to hash generation. Manual IDs always override auto-detection. Tracks created via `add-from-sb` preserve the exact `sb` issue ID.
 
 Example:
 
@@ -164,7 +165,7 @@ python3 <path-to-spec-driver>/scripts/manage_specs.py init [spec-dir]
 python3 <path-to-spec-driver>/scripts/manage_specs.py init docs/specs
 
 # Add track (use branch_extract_pattern from .skills/identity.json when present,
-# otherwise use a numeric token from the branch name or fall back to a date stamp):
+# otherwise generate an sb-style hash ID with a repo prefix or SPC fallback):
 python3 <path-to-spec-driver>/scripts/manage_specs.py add "feature-name"
 
 # To specify an ID manually:
