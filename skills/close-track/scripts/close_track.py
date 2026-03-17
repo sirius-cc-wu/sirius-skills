@@ -1,0 +1,640 @@
+import argparse
+import importlib.util
+import json
+import re
+import sys
+from datetime import datetime
+from pathlib import Path
+from typing import Dict, List, Optional, Tuple
+
+
+DEFAULT_CONFIG_PATH = Path(".skills/plugins/spec-publish.json")
+DEFAULT_DOCUMENT_TITLE = "Specification History"
+DEFAULT_SECTION_TITLE = "Closed Tracks"
+OUTGOING_RELATION_TYPES = {
+    "supersedes",
+    "invalidates",
+    "narrows",
+    "replaces_partially",
+}
+
+
+def now_timestamp() -> str:
+    return datetime.now().isoformat(timespec="seconds")
+
+
+def load_manage_specs_module():
+    script_path = (
+        Path(__file__).resolve().parents[2] / "spec-driver" / "scripts" / "manage_specs.py"
+    )
+    spec = importlib.util.spec_from_file_location("manage_specs", script_path)
+    module = importlib.util.module_from_spec(spec)
+    if spec.loader is None:
+        raise RuntimeError(f"Unable to load spec-driver tooling from {script_path}")
+    spec.loader.exec_module(module)
+    return module
+
+
+def load_publish_config(config_path: Path) -> Dict[str, str]:
+    if not config_path.exists():
+        return {}
+
+    try:
+        payload = json.loads(config_path.read_text(encoding="utf-8"))
+    except json.JSONDecodeError as exc:
+        raise RuntimeError(f"Publish config is not valid JSON: {config_path}") from exc
+
+    if not isinstance(payload, dict):
+        raise RuntimeError(f"Publish config must be a JSON object: {config_path}")
+
+    normalized: Dict[str, str] = {}
+    for field in ("target_file", "document_title", "section_title"):
+        value = payload.get(field)
+        if value is None:
+            continue
+        if not isinstance(value, str) or not value.strip():
+            raise RuntimeError(
+                f"Publish config field '{field}' must be a non-empty string."
+            )
+        normalized[field] = value.strip()
+    return normalized
+
+
+def resolve_track(module, selector: Optional[str]) -> Tuple[List[Dict[str, object]], Dict[str, object]]:
+    rows = module.parse_registry()
+    track = module.resolve_track(rows, selector) if selector else module.find_active_track(rows)
+    if not track:
+        if selector:
+            raise RuntimeError(f"Track not found: {selector}")
+        raise RuntimeError("No active track found.")
+    return rows, track
+
+
+def normalize_relation_request(
+    module, relation_type: str, target_track: str
+) -> Tuple[str, str]:
+    normalized_type = module.normalize_relation_type(relation_type)
+    if normalized_type not in OUTGOING_RELATION_TYPES:
+        raise RuntimeError(
+            "Only outgoing relation types are supported here: "
+            f"{sorted(OUTGOING_RELATION_TYPES)}"
+        )
+    return normalized_type, target_track
+
+
+def ensure_track_closed(
+    module, rows: List[Dict[str, object]], track: Dict[str, object], force: bool
+) -> Tuple[List[Dict[str, object]], Dict[str, object]]:
+    status = module.normalize_status(str(track["status"]))
+    if status == "closed":
+        refreshed_rows = module.parse_registry()
+        refreshed_track = module.resolve_track(refreshed_rows, str(track["id"]))
+        if not refreshed_track:
+            raise RuntimeError(f"Track disappeared after refresh: {track['id']}")
+        return refreshed_rows, refreshed_track
+
+    success, message = module.update_track_status(rows, track, "closed", force=force)
+    if not success:
+        raise RuntimeError(message)
+
+    refreshed_rows = module.parse_registry()
+    refreshed_track = module.resolve_track(refreshed_rows, str(track["id"]))
+    if not refreshed_track:
+        raise RuntimeError(f"Track disappeared after close: {track['id']}")
+    return refreshed_rows, refreshed_track
+
+
+def read_text_if_exists(path: Path) -> str:
+    if not path.exists():
+        return ""
+    return path.read_text(encoding="utf-8")
+
+
+def normalize_list_item(stripped: str) -> Optional[str]:
+    if stripped.startswith("- [ ] "):
+        return stripped[6:].strip()
+    if stripped.startswith("- [x] ") or stripped.startswith("- [X] "):
+        return stripped[6:].strip()
+    if stripped.startswith("- "):
+        return stripped[2:].strip()
+    return None
+
+
+def dedupe_preserve_order(values: List[str]) -> List[str]:
+    seen = set()
+    result: List[str] = []
+    for value in values:
+        if value in seen:
+            continue
+        seen.add(value)
+        result.append(value)
+    return result
+
+
+def extract_list_section(markdown: str, heading_fragment: str, limit: int = 3) -> List[str]:
+    lines = markdown.splitlines()
+    wanted = heading_fragment.strip().lower()
+    in_section = False
+    bullets: List[str] = []
+
+    for line in lines:
+        stripped = line.strip()
+        if stripped.startswith("#"):
+            heading_text = stripped.lstrip("#").strip().lower()
+            if in_section and heading_text != wanted:
+                break
+            in_section = heading_text == wanted
+            continue
+        if not in_section:
+            continue
+        item = normalize_list_item(stripped)
+        if item:
+            bullets.append(item)
+            if len(bullets) >= limit:
+                break
+    return bullets
+
+
+def extract_keyed_values(markdown: str, prefixes: List[str], limit: int = 3) -> List[str]:
+    results: List[str] = []
+    for line in markdown.splitlines():
+        stripped = line.strip()
+        for prefix in prefixes:
+            if stripped.startswith(prefix):
+                value = stripped[len(prefix) :].strip()
+                if value:
+                    results.append(value)
+                break
+        if len(results) >= limit:
+            break
+    return results
+
+
+def extract_nested_list_after_label(markdown: str, label: str, limit: int = 4) -> List[str]:
+    lines = markdown.splitlines()
+    results: List[str] = []
+    capture_indent: Optional[int] = None
+
+    for index, line in enumerate(lines):
+        stripped = line.strip()
+        if stripped != label:
+            continue
+
+        for nested_line in lines[index + 1 :]:
+            nested_stripped = nested_line.strip()
+            if not nested_stripped:
+                if capture_indent is None:
+                    continue
+                break
+            if nested_stripped.startswith("#"):
+                break
+            indent = len(nested_line) - len(nested_line.lstrip(" "))
+            if capture_indent is None:
+                item = normalize_list_item(nested_stripped)
+                if item is None:
+                    break
+                capture_indent = indent
+            elif indent < capture_indent:
+                break
+
+            item = normalize_list_item(nested_stripped)
+            if item:
+                results.append(item)
+            elif capture_indent is not None and indent <= capture_indent:
+                break
+
+            if len(results) >= limit:
+                return results
+        if results:
+            break
+    return results
+
+
+def extract_verification_summary(
+    plan_text: str, tasks_text: str, limit: int = 6
+) -> List[str]:
+    items: List[str] = []
+    items.extend(extract_nested_list_after_label(plan_text, "- Validation:", limit=limit))
+    items.extend(
+        extract_keyed_values(
+            plan_text,
+            prefixes=["- Happy path:", "- Edge case:", "- Regression checks:"],
+            limit=limit,
+        )
+    )
+    items.extend(
+        extract_keyed_values(tasks_text, prefixes=["- Validation approach:"], limit=limit)
+    )
+    items.extend(extract_list_section(tasks_text, "7. exit criteria", limit=limit))
+    return dedupe_preserve_order(items)[:limit]
+
+
+def render_issue_reference(
+    metadata: Dict[str, object], issue_url_template: Optional[str]
+) -> Optional[str]:
+    issue = metadata.get("issue")
+    if not isinstance(issue, dict):
+        return None
+    issue_id = issue.get("id")
+    if not isinstance(issue_id, str) or not issue_id:
+        return None
+
+    issue_title = issue.get("title")
+    issue_status = issue.get("status")
+    suffix_parts = []
+    if isinstance(issue_title, str) and issue_title.strip():
+        suffix_parts.append(issue_title.strip())
+    if isinstance(issue_status, str) and issue_status.strip():
+        suffix_parts.append(f"status: {issue_status.strip()}")
+
+    if issue_url_template:
+        reference = f"[{issue_id}]({issue_url_template.replace('{ID}', issue_id)})"
+    else:
+        reference = f"`{issue_id}`"
+
+    if suffix_parts:
+        return f"{reference} — {'; '.join(suffix_parts)}"
+    return reference
+
+
+def render_relation_scope(scope: Dict[str, object]) -> Optional[str]:
+    if not isinstance(scope, dict) or not scope:
+        return None
+
+    parts: List[str] = []
+    story_title = scope.get("story_title")
+    if isinstance(story_title, str) and story_title.strip():
+        parts.append(f"story: {story_title.strip()}")
+    requirement_ids = scope.get("requirement_ids")
+    if isinstance(requirement_ids, list) and requirement_ids:
+        parts.append("requirements: " + ", ".join(str(item) for item in requirement_ids))
+    selector = scope.get("selector")
+    if isinstance(selector, str) and selector.strip():
+        parts.append(f"selector: {selector.strip()}")
+    if not parts:
+        return None
+    return "; ".join(parts)
+
+
+def render_relation_summary(metadata: Dict[str, object]) -> List[str]:
+    relations = metadata.get("relations")
+    if not isinstance(relations, list):
+        return []
+
+    summaries: List[str] = []
+    for relation in relations:
+        if not isinstance(relation, dict):
+            continue
+        relation_type = relation.get("type")
+        target_track = relation.get("target_track")
+        if relation_type not in OUTGOING_RELATION_TYPES or not isinstance(target_track, str):
+            continue
+        summary = f"{relation_type} `{target_track}`"
+        scope_text = render_relation_scope(relation.get("scope", {}))
+        if scope_text:
+            summary += f" ({scope_text})"
+        summaries.append(summary)
+    return summaries
+
+
+def render_publication_entry(
+    track: Dict[str, object],
+    metadata: Dict[str, object],
+    issue_reference: Optional[str],
+    requirements: List[str],
+    success_criteria: List[str],
+    relation_summary: List[str],
+    verification_summary: List[str],
+) -> str:
+    track_path = Path(str(track["path"]).rstrip("/"))
+    artifacts = [f"`{track_path / 'spec.md'}`", f"`{track_path / 'plan.md'}`"]
+    tasks_path = track_path / "tasks.md"
+    if tasks_path.exists():
+        artifacts.append(f"`{tasks_path}`")
+
+    closed_at = str(track.get("closed_at") or metadata.get("closed_at") or now_timestamp())
+    closed_day = closed_at.split("T", 1)[0]
+    lines = [
+        f"### {closed_day} — {track['feature']} (`{track['id']}`)",
+        "",
+        f"- Track: `{track['id']}`",
+        f"- Closed: `{closed_at}`",
+    ]
+
+    if issue_reference:
+        lines.append(f"- Source issue: {issue_reference}")
+
+    lines.append("- Artifacts:")
+    lines.extend([f"  - {artifact}" for artifact in artifacts])
+
+    if requirements:
+        lines.append("- Functional requirements snapshot:")
+        lines.extend([f"  - {item}" for item in requirements])
+
+    if success_criteria:
+        lines.append("- Success criteria snapshot:")
+        lines.extend([f"  - {item}" for item in success_criteria])
+
+    if relation_summary:
+        lines.append("- Spec relations:")
+        lines.extend([f"  - {item}" for item in relation_summary])
+
+    if verification_summary:
+        lines.append("- Implementation verification snapshot:")
+        lines.extend([f"  - {item}" for item in verification_summary])
+
+    return "\n".join(lines).rstrip() + "\n"
+
+
+def ensure_document_scaffold(
+    content: str, document_title: str, section_title: str
+) -> str:
+    stripped = content.strip()
+    if not stripped:
+        return f"# {document_title}\n\n## {section_title}\n\n"
+
+    if f"\n## {section_title}\n" in f"\n{content}\n":
+        return content if content.endswith("\n") else content + "\n"
+
+    suffix = "" if content.endswith("\n") else "\n"
+    return f"{content}{suffix}\n## {section_title}\n\n"
+
+
+def upsert_publication_entry(
+    target_file: Path,
+    document_title: str,
+    section_title: str,
+    track_id: str,
+    entry: str,
+) -> None:
+    start_marker = f"<!-- spec-publish:{track_id}:start -->"
+    end_marker = f"<!-- spec-publish:{track_id}:end -->"
+    wrapped_entry = f"{start_marker}\n{entry}{end_marker}\n"
+
+    content = ensure_document_scaffold(
+        read_text_if_exists(target_file), document_title, section_title
+    )
+    pattern = re.compile(
+        re.escape(start_marker) + r".*?" + re.escape(end_marker) + r"\n?",
+        re.DOTALL,
+    )
+
+    if pattern.search(content):
+        updated = pattern.sub(wrapped_entry, content)
+    else:
+        updated = content
+        if not updated.endswith("\n"):
+            updated += "\n"
+        updated += wrapped_entry
+
+    target_file.parent.mkdir(parents=True, exist_ok=True)
+    target_file.write_text(updated, encoding="utf-8")
+
+
+def update_publication_metadata(
+    module,
+    track: Dict[str, object],
+    target_file: Path,
+    document_title: str,
+    section_title: str,
+) -> Dict[str, object]:
+    track_path = Path(str(track["path"]).rstrip("/"))
+    metadata = module.load_track_metadata(str(track_path))
+    publications = metadata.get("publications")
+    if not isinstance(publications, list):
+        publications = []
+
+    publication_record = {
+        "published_at": now_timestamp(),
+        "target_file": str(target_file),
+        "document_title": document_title,
+        "section_title": section_title,
+    }
+
+    retained: List[Dict[str, object]] = []
+    replaced = False
+    for item in publications:
+        if not isinstance(item, dict):
+            continue
+        if item.get("target_file") == publication_record["target_file"]:
+            retained.append(publication_record)
+            replaced = True
+        else:
+            retained.append(item)
+    if not replaced:
+        retained.append(publication_record)
+
+    metadata["publications"] = retained
+    module.write_track_metadata(str(track_path), metadata)
+    return metadata
+
+
+def build_result(
+    track: Dict[str, object],
+    published_to: Optional[Path],
+    metadata: Dict[str, object],
+) -> Dict[str, object]:
+    result = {
+        "track_id": track["id"],
+        "feature": track["feature"],
+        "status": track["status"],
+        "path": track["path"],
+        "closed_at": track.get("closed_at"),
+    }
+    if published_to is not None:
+        result["published_to"] = str(published_to)
+    relations = metadata.get("relations")
+    if isinstance(relations, list):
+        result["relations"] = relations
+    publications = metadata.get("publications")
+    if isinstance(publications, list):
+        result["publications"] = publications
+    return result
+
+
+def build_parser() -> argparse.ArgumentParser:
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--track", help="Track ID, folder name, or path. Defaults to active track.")
+    parser.add_argument(
+        "--relate",
+        action="append",
+        nargs=2,
+        metavar=("TYPE", "TRACK"),
+        help="Record an explicit impact relation such as supersedes OLD-123. Repeatable.",
+    )
+    parser.add_argument(
+        "--story-title",
+        help="Optional soft selector for the affected story title when the relation is partial.",
+    )
+    parser.add_argument(
+        "--requirement-id",
+        action="append",
+        default=[],
+        help="Optional requirement ID for partial invalidation. Repeatable.",
+    )
+    parser.add_argument(
+        "--selector",
+        help="Optional freeform selector text for partial invalidation.",
+    )
+    parser.add_argument(
+        "--confirm-impact",
+        action="store_true",
+        help="Explicitly confirm relation-bearing closure or invalidation at close time.",
+    )
+    parser.add_argument(
+        "--publish",
+        help="Write or update a publication entry in this file. Overrides config target.",
+    )
+    parser.add_argument(
+        "--no-publish",
+        action="store_true",
+        help="Close the track without writing any publication document.",
+    )
+    parser.add_argument(
+        "--config",
+        default=str(DEFAULT_CONFIG_PATH),
+        help="Path to optional publish config JSON.",
+    )
+    parser.add_argument(
+        "--document-title",
+        help="Override the publication document title.",
+    )
+    parser.add_argument(
+        "--section-title",
+        help="Override the publication section title.",
+    )
+    parser.add_argument(
+        "--force",
+        action="store_true",
+        help="Force close through temporary inconsistencies after manual verification.",
+    )
+    parser.add_argument("--json", action="store_true", help="Emit JSON output.")
+    return parser
+
+
+def main() -> int:
+    args = build_parser().parse_args()
+    try:
+        module = load_manage_specs_module()
+        rows, track = resolve_track(module, args.track)
+        track_path = Path(str(track["path"]).rstrip("/"))
+        metadata = module.load_track_metadata(str(track_path))
+        relation_requests = [
+            normalize_relation_request(module, relation_type, target_track)
+            for relation_type, target_track in (args.relate or [])
+        ]
+        relation_confirmation_required = (
+            bool(relation_requests)
+            or (
+                module.normalize_status(str(track["status"])) != "closed"
+                and bool(metadata.get("relations"))
+            )
+        )
+        if relation_confirmation_required and not args.confirm_impact and not args.force:
+            raise RuntimeError(
+                "Closing a track with invalidation or supersession relations requires "
+                "--confirm-impact."
+            )
+
+        _, track = ensure_track_closed(module, rows, track, force=args.force)
+        rows = module.parse_registry()
+        track = module.resolve_track(rows, str(track["id"]))
+        if not track:
+            raise RuntimeError("Track disappeared after close.")
+        track_path = Path(str(track["path"]).rstrip("/"))
+        metadata = module.load_track_metadata(str(track_path))
+
+        if relation_requests:
+            for relation_type, target_track in relation_requests:
+                success, message = module.add_relation(
+                    rows,
+                    track,
+                    relation_type,
+                    target_track,
+                    story_title=args.story_title,
+                    requirement_ids=args.requirement_id,
+                    selector=args.selector,
+                )
+                if not success:
+                    raise RuntimeError(message)
+            audit_result = module.audit_relations(rows, track_selector=str(track["id"]))
+            if not audit_result["ok"] and not args.force:
+                raise RuntimeError(
+                    "Relation audit failed after recording impacts: "
+                    + "; ".join(issue["message"] for issue in audit_result["issues"])
+                )
+            rows = module.parse_registry()
+            track = module.resolve_track(rows, str(track["id"]))
+            if not track:
+                raise RuntimeError("Track disappeared after relation update.")
+            track_path = Path(str(track["path"]).rstrip("/"))
+            metadata = module.load_track_metadata(str(track_path))
+
+        publish_config = load_publish_config(Path(args.config))
+        target_file_value = None if args.no_publish else (args.publish or publish_config.get("target_file"))
+        published_to: Optional[Path] = None
+
+        if target_file_value:
+            document_title = (
+                args.document_title
+                or publish_config.get("document_title")
+                or DEFAULT_DOCUMENT_TITLE
+            )
+            section_title = (
+                args.section_title
+                or publish_config.get("section_title")
+                or DEFAULT_SECTION_TITLE
+            )
+            spec_text = read_text_if_exists(track_path / "spec.md")
+            plan_text = read_text_if_exists(track_path / "plan.md")
+            tasks_text = read_text_if_exists(track_path / "tasks.md")
+            requirements = extract_list_section(spec_text, "3. functional requirements")
+            success_criteria = extract_list_section(spec_text, "7. success criteria")
+            relation_summary = render_relation_summary(metadata)
+            verification_summary = extract_verification_summary(plan_text, tasks_text)
+            identity_config = module.load_identity_config(required=False)
+            issue_reference = render_issue_reference(
+                metadata, identity_config.get("issue_url_template")
+            )
+            entry = render_publication_entry(
+                track,
+                metadata,
+                issue_reference,
+                requirements,
+                success_criteria,
+                relation_summary,
+                verification_summary,
+            )
+            published_to = Path(target_file_value)
+            upsert_publication_entry(
+                published_to,
+                document_title=document_title,
+                section_title=section_title,
+                track_id=str(track["id"]),
+                entry=entry,
+            )
+            metadata = update_publication_metadata(
+                module,
+                track,
+                target_file=published_to,
+                document_title=document_title,
+                section_title=section_title,
+            )
+
+        result = build_result(track, published_to, metadata)
+        if args.json:
+            print(json.dumps(result, indent=2))
+        elif published_to is not None:
+            print(
+                f"Closed track {track['id']} and published to {published_to}"
+            )
+        else:
+            print(f"Closed track {track['id']}")
+        return 0
+    except RuntimeError as exc:
+        print(str(exc), file=sys.stderr)
+        return 2
+
+
+if __name__ == "__main__":
+    sys.exit(main())

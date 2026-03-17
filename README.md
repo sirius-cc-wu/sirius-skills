@@ -18,8 +18,34 @@ These core skills should remain tracker-agnostic by default:
 - `skills/specify/`
 - `skills/plan/`
 - `skills/tasks/`
+- `skills/close-track/`
 
 If a project has no extra configuration, these skills should still work with generic conventions.
+
+## Spec track source of truth
+
+The `spec-driver` workflow now keeps three complementary artifacts in sync:
+
+- `<spec_dir>/README.md` for a human-readable registry
+- `<spec_dir>/registry.json` for machine-readable registry/state
+- `<track_path>/.track-meta.json` for per-track lifecycle metadata such as `created_at`, `updated_at`, and `closed_at`
+
+The machine-readable metadata can also store explicit cross-track relations such as `supersedes`, `invalidates`, `narrows`, and `replaces_partially`, with reciprocal backlinks and optional soft selectors for story titles, requirement IDs, or freeform selectors.
+
+Closed tracks are retained in place. `sirius-skills` does not merge or delete the original `spec.md`/`plan.md` artifacts when a track closes; instead it records closure durably and leaves project-specific publishing or rollup logic to local extensions.
+
+If a project wants a canonical rollup document, `skills/close-track/` can optionally publish closed-track summaries into a project-local history file such as `docs/spec-history.md`, driven by explicit command arguments or `.skills/plugins/spec-publish.json`.
+
+The published entry can include:
+
+- backlinks to the retained `spec.md` / `plan.md` / `tasks.md` artifacts
+- explicit relation summaries such as which older track or story scope is superseded
+- source issue links when `.track-meta.json` and `.skills/identity.json` provide them
+- implementation verification highlights inferred from `plan.md` and `tasks.md`
+
+For a starting point, see `skills/close-track/assets/spec-publish.example.json`.
+
+To keep relation metadata healthy over time, `skills/spec-driver/scripts/manage_specs.py` also provides `audit-relations`, which checks for missing targets and missing reciprocal links.
 
 ## Optional project configuration
 

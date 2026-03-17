@@ -13,24 +13,29 @@ CONFIG_FILE = os.path.join(CONFIG_DIR, "config.json")
 IDENTITY_CONFIG_DIR = ".skills"
 IDENTITY_CONFIG_FILE = os.path.join(IDENTITY_CONFIG_DIR, "identity.json")
 DEFAULT_PREFERRED_WORKFLOW = "TDD"
+REGISTRY_JSON_FILE = "registry.json"
 REGISTRY_HEADER = (
-    "# Specification Registry\n\n| ID | Feature | Status | Path |\n|---|---|---|---|\n"
+    "# Specification Registry\n\n"
+    "| ID | Feature | Status | Updated | Closed | Path |\n"
+    "|---|---|---|---|---|---|\n"
 )
 TRACK_METADATA_FILE = ".track-meta.json"
 TRACK_ID_PATTERN = re.compile(r"^[A-Za-z0-9][A-Za-z0-9._-]*$")
-VALID_STATUSES = {
+STATUS_SEQUENCE = [
     "draft",
     "spec_ready",
     "plan_ready",
     "execution_ready",
     "closed",
-}
+]
+VALID_STATUSES = set(STATUS_SEQUENCE)
 STATUS_ALIASES = {
     "draft": "draft",
     "draft_spec": "draft",
     "spec_ready": "spec_ready",
     "planned": "plan_ready",
     "plan_ready": "plan_ready",
+    "execution_ready": "execution_ready",
     "tasks_ready": "execution_ready",
     "approved": "execution_ready",
     "implementing": "execution_ready",
@@ -42,6 +47,35 @@ STATUS_ALIASES = {
     "released": "closed",
     "closed": "closed",
 }
+RELATION_ALIASES = {
+    "supersedes": "supersedes",
+    "superseded_by": "superseded_by",
+    "superseded-by": "superseded_by",
+    "invalidates": "invalidates",
+    "invalidated_by": "invalidated_by",
+    "invalidated-by": "invalidated_by",
+    "narrows": "narrows",
+    "narrowed_by": "narrowed_by",
+    "narrowed-by": "narrowed_by",
+    "replaces_partially": "replaces_partially",
+    "replaces-partially": "replaces_partially",
+    "replaced_partially_by": "replaced_partially_by",
+    "replaced-partially-by": "replaced_partially_by",
+}
+RELATION_INVERSES = {
+    "supersedes": "superseded_by",
+    "superseded_by": "supersedes",
+    "invalidates": "invalidated_by",
+    "invalidated_by": "invalidates",
+    "narrows": "narrowed_by",
+    "narrowed_by": "narrows",
+    "replaces_partially": "replaced_partially_by",
+    "replaced_partially_by": "replaces_partially",
+}
+
+
+def now_timestamp() -> str:
+    return datetime.now().isoformat(timespec="seconds")
 
 
 def slugify(value: str) -> str:
@@ -85,6 +119,158 @@ def normalize_status(value: str) -> str:
             f"Invalid status '{value}'. Valid canonical states: {sorted(VALID_STATUSES)}"
         )
     return STATUS_ALIASES[normalized]
+
+
+def normalize_relation_type(value: str) -> str:
+    normalized = value.strip().lower().replace(" ", "_")
+    if normalized not in RELATION_ALIASES:
+        raise ValueError(
+            "Invalid relation type "
+            f"'{value}'. Valid relation types: {sorted(set(RELATION_ALIASES.values()))}"
+        )
+    return RELATION_ALIASES[normalized]
+
+
+def normalize_optional_timestamp(value: object) -> Optional[str]:
+    if value in {None, "", "-"}:
+        return None
+    if not isinstance(value, str):
+        raise RuntimeError("Registry timestamp fields must be strings when present.")
+    return value
+
+
+def format_registry_value(value: object) -> str:
+    if value in {None, ""}:
+        return "-"
+    return str(value)
+
+
+def normalize_relation_scope(value: object) -> Dict[str, object]:
+    if value is None or value == "":
+        return {}
+    if not isinstance(value, dict):
+        raise RuntimeError("Relation scope must be a JSON object when present.")
+
+    normalized: Dict[str, object] = {}
+
+    story_title = value.get("story_title")
+    if story_title is not None:
+        if not isinstance(story_title, str) or not story_title.strip():
+            raise RuntimeError("Relation scope field 'story_title' must be a non-empty string.")
+        normalized["story_title"] = re.sub(r"\s+", " ", story_title.strip())
+
+    selector = value.get("selector")
+    if selector is not None:
+        if not isinstance(selector, str) or not selector.strip():
+            raise RuntimeError("Relation scope field 'selector' must be a non-empty string.")
+        normalized["selector"] = re.sub(r"\s+", " ", selector.strip())
+
+    requirement_ids = value.get("requirement_ids")
+    if requirement_ids is not None:
+        if not isinstance(requirement_ids, list):
+            raise RuntimeError("Relation scope field 'requirement_ids' must be a list.")
+        cleaned_ids: List[str] = []
+        for item in requirement_ids:
+            if not isinstance(item, str) or not item.strip():
+                raise RuntimeError(
+                    "Relation scope field 'requirement_ids' must contain non-empty strings."
+                )
+            cleaned_ids.append(item.strip())
+        if cleaned_ids:
+            normalized["requirement_ids"] = list(dict.fromkeys(cleaned_ids))
+
+    return normalized
+
+
+def normalize_relation(relation: object) -> Dict[str, object]:
+    if not isinstance(relation, dict):
+        raise RuntimeError("Relation entries must be JSON objects.")
+
+    normalized = {
+        "type": normalize_relation_type(str(relation.get("type", ""))),
+        "target_track": validate_track_id(str(relation.get("target_track", ""))),
+    }
+
+    scope = normalize_relation_scope(relation.get("scope"))
+    if scope:
+        normalized["scope"] = scope
+
+    recorded_at = relation.get("recorded_at")
+    if recorded_at is not None:
+        normalized["recorded_at"] = normalize_optional_timestamp(recorded_at)
+
+    return normalized
+
+
+def normalize_relations(value: object) -> List[Dict[str, object]]:
+    if value is None or value == "":
+        return []
+    if not isinstance(value, list):
+        raise RuntimeError("Relations must be stored as a list.")
+    return [normalize_relation(item) for item in value]
+
+
+def relation_key(relation: Dict[str, object]) -> Tuple[str, str, str]:
+    scope = relation.get("scope", {})
+    return (
+        str(relation["type"]),
+        str(relation["target_track"]),
+        json.dumps(scope, sort_keys=True),
+    )
+
+
+def build_relation(
+    relation_type: str,
+    target_track: str,
+    story_title: Optional[str] = None,
+    requirement_ids: Optional[List[str]] = None,
+    selector: Optional[str] = None,
+    recorded_at: Optional[str] = None,
+) -> Dict[str, object]:
+    scope: Dict[str, object] = {}
+    if story_title:
+        scope["story_title"] = story_title
+    if requirement_ids:
+        scope["requirement_ids"] = requirement_ids
+    if selector:
+        scope["selector"] = selector
+
+    relation: Dict[str, object] = {
+        "type": normalize_relation_type(relation_type),
+        "target_track": validate_track_id(target_track),
+        "recorded_at": recorded_at or now_timestamp(),
+    }
+    if scope:
+        relation["scope"] = scope
+    return normalize_relation(relation)
+
+
+def normalize_track_path(path: str) -> str:
+    normalized = path.rstrip("/")
+    if normalized.startswith("./"):
+        normalized = normalized[2:]
+    return normalized + "/"
+
+
+def normalize_registry_row(row: Dict[str, object]) -> Dict[str, object]:
+    feature_value = row.get("feature")
+    path_value = row.get("path")
+    if not isinstance(feature_value, str) or not normalize_feature_name(feature_value):
+        raise RuntimeError("Registry row field 'feature' must be a non-empty string.")
+    if not isinstance(path_value, str):
+        raise RuntimeError("Registry row field 'path' must be a string.")
+
+    normalized = {
+        "id": validate_track_id(str(row.get("id", ""))),
+        "feature": normalize_feature_name(feature_value),
+        "status": normalize_status(str(row.get("status", ""))),
+        "path": normalize_track_path(path_value),
+        "updated_at": normalize_optional_timestamp(row.get("updated_at")),
+        "closed_at": normalize_optional_timestamp(row.get("closed_at")),
+    }
+    if "relations" in row:
+        normalized["relations"] = normalize_relations(row.get("relations"))
+    return normalized
 
 
 def load_config(required: bool = True) -> Dict[str, str]:
@@ -178,24 +364,21 @@ def write_config(
         f.write("\n")
 
 
-def get_registry_paths(required_config: bool = True) -> Tuple[str, str]:
+def get_registry_paths(required_config: bool = True) -> Tuple[str, str, str]:
     config = load_config(required=required_config)
     specs_dir = normalize_spec_dir(config["spec_dir"])
-    return specs_dir, os.path.join(specs_dir, "README.md")
+    return (
+        specs_dir,
+        os.path.join(specs_dir, "README.md"),
+        os.path.join(specs_dir, REGISTRY_JSON_FILE),
+    )
 
 
-def ensure_registry(specs_dir: str) -> None:
-    os.makedirs(specs_dir, exist_ok=True)
-    index_file = os.path.join(specs_dir, "README.md")
+def parse_registry_markdown(index_file: str) -> List[Dict[str, object]]:
+    rows: List[Dict[str, object]] = []
     if not os.path.exists(index_file):
-        with open(index_file, "w", encoding="utf-8") as f:
-            f.write(REGISTRY_HEADER)
+        return rows
 
-
-def parse_registry() -> List[Dict[str, str]]:
-    specs_dir, index_file = get_registry_paths()
-    ensure_registry(specs_dir)
-    rows: List[Dict[str, str]] = []
     with open(index_file, "r", encoding="utf-8") as f:
         for line in f:
             line = line.strip()
@@ -204,35 +387,371 @@ def parse_registry() -> List[Dict[str, str]]:
             if line.startswith("| ID |") or line.startswith("|---"):
                 continue
             cols = [c.strip() for c in line.strip("|").split("|")]
-            if len(cols) != 4:
+            if len(cols) not in {4, 6}:
                 continue
-            status = cols[2]
-            try:
-                status = normalize_status(status)
-            except ValueError:
-                pass
-            rows.append(
-                {"id": cols[0], "feature": cols[1], "status": status, "path": cols[3]}
-            )
+            row: Dict[str, object] = {
+                "id": cols[0],
+                "feature": cols[1],
+                "status": cols[2],
+                "path": cols[-1],
+            }
+            if len(cols) == 6:
+                row["updated_at"] = normalize_optional_timestamp(cols[3])
+                row["closed_at"] = normalize_optional_timestamp(cols[4])
+            rows.append(normalize_registry_row(row))
     return rows
 
 
-def write_registry(rows: List[Dict[str, str]]) -> None:
-    specs_dir, index_file = get_registry_paths()
-    ensure_registry(specs_dir)
+def load_registry_json(registry_json_file: str) -> List[Dict[str, object]]:
+    try:
+        with open(registry_json_file, "r", encoding="utf-8") as f:
+            payload = json.load(f)
+    except json.JSONDecodeError as exc:
+        raise RuntimeError("Specs registry JSON is not valid JSON.") from exc
+
+    if isinstance(payload, list):
+        raw_rows = payload
+    elif isinstance(payload, dict):
+        raw_rows = payload.get("tracks")
+    else:
+        raise RuntimeError("Specs registry JSON must be a JSON object or list.")
+
+    if not isinstance(raw_rows, list):
+        raise RuntimeError("Specs registry JSON field 'tracks' must be a list.")
+
+    return [normalize_registry_row(row) for row in raw_rows]
+
+
+def write_registry_markdown(index_file: str, rows: List[Dict[str, object]]) -> None:
     with open(index_file, "w", encoding="utf-8") as f:
         f.write(REGISTRY_HEADER)
         for row in rows:
             f.write(
-                f"| {row['id']} | {row['feature']} | {row['status']} | {row['path']} |\n"
+                "| "
+                + " | ".join(
+                    [
+                        str(row["id"]),
+                        str(row["feature"]),
+                        str(row["status"]),
+                        format_registry_value(row.get("updated_at")),
+                        format_registry_value(row.get("closed_at")),
+                        str(row["path"]),
+                    ]
+                )
+                + " |\n"
             )
 
 
-def normalize_track_path(path: str) -> str:
-    normalized = path.rstrip("/")
-    if normalized.startswith("./"):
-        normalized = normalized[2:]
-    return normalized + "/"
+def write_registry_json(registry_json_file: str, rows: List[Dict[str, object]]) -> None:
+    with open(registry_json_file, "w", encoding="utf-8") as f:
+        json.dump(
+            {
+                "version": 1,
+                "generated_at": now_timestamp(),
+                "tracks": rows,
+            },
+            f,
+            indent=2,
+        )
+        f.write("\n")
+
+
+def ensure_registry(specs_dir: str) -> None:
+    os.makedirs(specs_dir, exist_ok=True)
+    index_file = os.path.join(specs_dir, "README.md")
+    registry_json_file = os.path.join(specs_dir, REGISTRY_JSON_FILE)
+
+    if os.path.exists(registry_json_file):
+        rows = load_registry_json(registry_json_file)
+        if not os.path.exists(index_file):
+            write_registry_markdown(index_file, rows)
+        return
+
+    if os.path.exists(index_file):
+        rows = parse_registry_markdown(index_file)
+        write_registry_markdown(index_file, rows)
+        write_registry_json(registry_json_file, rows)
+        return
+
+    write_registry_markdown(index_file, [])
+    write_registry_json(registry_json_file, [])
+
+
+def parse_registry() -> List[Dict[str, object]]:
+    specs_dir, index_file, registry_json_file = get_registry_paths()
+    ensure_registry(specs_dir)
+    if os.path.exists(registry_json_file):
+        return load_registry_json(registry_json_file)
+    return parse_registry_markdown(index_file)
+
+
+def write_registry(rows: List[Dict[str, object]]) -> None:
+    specs_dir, index_file, registry_json_file = get_registry_paths()
+    ensure_registry(specs_dir)
+    normalized_rows = [normalize_registry_row(row) for row in rows]
+    write_registry_markdown(index_file, normalized_rows)
+    write_registry_json(registry_json_file, normalized_rows)
+
+
+def get_track_metadata_path(track_path: str) -> str:
+    return os.path.join(track_path, TRACK_METADATA_FILE)
+
+
+def load_track_metadata(track_path: str) -> Dict[str, object]:
+    metadata_path = get_track_metadata_path(track_path)
+    if not os.path.exists(metadata_path):
+        return {}
+
+    try:
+        with open(metadata_path, "r", encoding="utf-8") as f:
+            metadata = json.load(f)
+    except json.JSONDecodeError as exc:
+        raise RuntimeError(f"Track metadata is not valid JSON: {metadata_path}") from exc
+
+    if not isinstance(metadata, dict):
+        raise RuntimeError(f"Track metadata must be a JSON object: {metadata_path}")
+    if "relations" in metadata:
+        metadata["relations"] = normalize_relations(metadata.get("relations"))
+    return metadata
+
+
+def write_track_metadata(track_path: str, metadata: Dict[str, object]) -> None:
+    metadata_path = get_track_metadata_path(track_path)
+    with open(metadata_path, "w", encoding="utf-8") as f:
+        json.dump(metadata, f, indent=2)
+        f.write("\n")
+
+
+def build_track_metadata(
+    row: Dict[str, object],
+    status: str,
+    existing: Optional[Dict[str, object]] = None,
+) -> Dict[str, object]:
+    metadata = dict(existing or {})
+    timestamp = now_timestamp()
+
+    created_at = metadata.get("created_at")
+    if not isinstance(created_at, str):
+        metadata["created_at"] = timestamp
+
+    metadata["updated_at"] = timestamp
+    metadata["status"] = status
+    metadata["track_id"] = row["id"]
+    metadata["feature"] = row["feature"]
+    metadata["path"] = row["path"]
+    metadata["relations"] = normalize_relations(metadata.get("relations"))
+
+    if status == "closed":
+        closed_at = metadata.get("closed_at")
+        metadata["closed_at"] = closed_at if isinstance(closed_at, str) else timestamp
+    else:
+        metadata.pop("closed_at", None)
+
+    return metadata
+
+
+def apply_metadata_to_row(
+    row: Dict[str, object], metadata: Dict[str, object]
+) -> Dict[str, object]:
+    updated = dict(row)
+    updated["updated_at"] = normalize_optional_timestamp(metadata.get("updated_at"))
+    updated["closed_at"] = normalize_optional_timestamp(metadata.get("closed_at"))
+    updated["relations"] = normalize_relations(metadata.get("relations"))
+    return normalize_registry_row(updated)
+
+
+def sync_track_metadata(row: Dict[str, object], metadata: Dict[str, object]) -> None:
+    updated_row = apply_metadata_to_row(row, metadata)
+    row.clear()
+    row.update(updated_row)
+    write_track_metadata(str(row["path"]).rstrip("/"), metadata)
+
+
+def upsert_relation_entry(
+    relations: List[Dict[str, object]], relation: Dict[str, object]
+) -> List[Dict[str, object]]:
+    normalized = [normalize_relation(item) for item in relations]
+    key = relation_key(relation)
+    retained = [item for item in normalized if relation_key(item) != key]
+    retained.append(relation)
+    return retained
+
+
+def relation_display(relation: Dict[str, object]) -> str:
+    scope = relation.get("scope", {})
+    parts = [f"{relation['type']} -> {relation['target_track']}"]
+    if isinstance(scope, dict) and scope:
+        scope_bits: List[str] = []
+        story_title = scope.get("story_title")
+        if isinstance(story_title, str):
+            scope_bits.append(f"story_title={story_title}")
+        requirement_ids = scope.get("requirement_ids")
+        if isinstance(requirement_ids, list) and requirement_ids:
+            scope_bits.append("requirement_ids=" + ",".join(str(item) for item in requirement_ids))
+        selector = scope.get("selector")
+        if isinstance(selector, str):
+            scope_bits.append(f"selector={selector}")
+        if scope_bits:
+            parts.append(f"({' ; '.join(scope_bits)})")
+    return " ".join(parts)
+
+
+def add_relation(
+    rows: List[Dict[str, object]],
+    source_track: Dict[str, object],
+    relation_type: str,
+    target_selector: str,
+    story_title: Optional[str] = None,
+    requirement_ids: Optional[List[str]] = None,
+    selector: Optional[str] = None,
+) -> Tuple[bool, str]:
+    target_track = resolve_track(rows, target_selector)
+    if not target_track:
+        return False, f"Track not found: {target_selector}"
+
+    if source_track["id"] == target_track["id"]:
+        return False, "Track relations cannot target the same track."
+
+    relation = build_relation(
+        relation_type,
+        str(target_track["id"]),
+        story_title=story_title,
+        requirement_ids=requirement_ids,
+        selector=selector,
+    )
+    inverse_relation = build_relation(
+        RELATION_INVERSES[relation["type"]],
+        str(source_track["id"]),
+        story_title=story_title,
+        requirement_ids=requirement_ids,
+        selector=selector,
+        recorded_at=str(relation.get("recorded_at") or now_timestamp()),
+    )
+
+    source_metadata = build_track_metadata(
+        source_track,
+        normalize_status(str(source_track["status"])),
+        existing=load_track_metadata(str(source_track["path"]).rstrip("/")),
+    )
+    source_metadata["relations"] = upsert_relation_entry(
+        normalize_relations(source_metadata.get("relations")), relation
+    )
+    sync_track_metadata(source_track, source_metadata)
+
+    target_metadata = build_track_metadata(
+        target_track,
+        normalize_status(str(target_track["status"])),
+        existing=load_track_metadata(str(target_track["path"]).rstrip("/")),
+    )
+    target_metadata["relations"] = upsert_relation_entry(
+        normalize_relations(target_metadata.get("relations")), inverse_relation
+    )
+    sync_track_metadata(target_track, target_metadata)
+
+    write_registry(rows)
+    return True, f"Recorded relation {relation_display(relation)}"
+
+
+def audit_relations(
+    rows: List[Dict[str, object]], track_selector: Optional[str] = None
+) -> Dict[str, object]:
+    selected_tracks: List[Dict[str, object]]
+    if track_selector:
+        track = resolve_track(rows, track_selector)
+        if not track:
+            raise RuntimeError(f"Track not found: {track_selector}")
+        selected_tracks = [track]
+    else:
+        selected_tracks = rows
+
+    row_by_id = {str(row["id"]): row for row in rows}
+    metadata_by_id = {
+        str(row["id"]): load_track_metadata(str(row["path"]).rstrip("/")) for row in rows
+    }
+
+    issues: List[Dict[str, str]] = []
+    for row in selected_tracks:
+        track_id = str(row["id"])
+        relations = normalize_relations(metadata_by_id[track_id].get("relations"))
+        seen = set()
+        for relation in relations:
+            key = relation_key(relation)
+            if key in seen:
+                issues.append(
+                    {
+                        "track_id": track_id,
+                        "relation_type": str(relation["type"]),
+                        "target_track": str(relation["target_track"]),
+                        "code": "duplicate_relation",
+                        "message": "Duplicate relation entry detected.",
+                    }
+                )
+                continue
+            seen.add(key)
+
+            target_track = str(relation["target_track"])
+            if target_track == track_id:
+                issues.append(
+                    {
+                        "track_id": track_id,
+                        "relation_type": str(relation["type"]),
+                        "target_track": target_track,
+                        "code": "self_reference",
+                        "message": "Relation points back to the same track.",
+                    }
+                )
+                continue
+
+            target_row = row_by_id.get(target_track)
+            if not target_row:
+                issues.append(
+                    {
+                        "track_id": track_id,
+                        "relation_type": str(relation["type"]),
+                        "target_track": target_track,
+                        "code": "missing_target_track",
+                        "message": "Relation target track does not exist in the registry.",
+                    }
+                )
+                continue
+
+            target_relations = normalize_relations(
+                metadata_by_id[target_track].get("relations")
+            )
+            expected_inverse = build_relation(
+                RELATION_INVERSES[str(relation["type"])],
+                track_id,
+                story_title=relation.get("scope", {}).get("story_title")
+                if isinstance(relation.get("scope"), dict)
+                else None,
+                requirement_ids=relation.get("scope", {}).get("requirement_ids")
+                if isinstance(relation.get("scope"), dict)
+                else None,
+                selector=relation.get("scope", {}).get("selector")
+                if isinstance(relation.get("scope"), dict)
+                else None,
+                recorded_at=str(relation.get("recorded_at") or now_timestamp()),
+            )
+            expected_key = relation_key(expected_inverse)
+            if not any(relation_key(item) == expected_key for item in target_relations):
+                issues.append(
+                    {
+                        "track_id": track_id,
+                        "relation_type": str(relation["type"]),
+                        "target_track": target_track,
+                        "code": "missing_reciprocal_relation",
+                        "message": (
+                            "Expected reciprocal relation "
+                            f"{RELATION_INVERSES[str(relation['type'])]} -> {track_id} was not found."
+                        ),
+                    }
+                )
+
+    return {
+        "ok": len(issues) == 0,
+        "track_ids": [str(row["id"]) for row in selected_tracks],
+        "issues": issues,
+    }
 
 
 def get_current_branch() -> Optional[str]:
@@ -283,10 +802,10 @@ def infer_id_from_branch(identity_config: Optional[Dict[str, str]] = None) -> Op
     return None
 
 
-def resolve_track(rows: List[Dict[str, str]], selector: str) -> Optional[Dict[str, str]]:
+def resolve_track(rows: List[Dict[str, object]], selector: str) -> Optional[Dict[str, object]]:
     selector = selector.strip().rstrip("/")
     for row in rows:
-        row_path = row["path"].rstrip("/")
+        row_path = str(row["path"]).rstrip("/")
         if row["id"] == selector or row_path.endswith(selector):
             return row
         if os.path.basename(row_path) == selector:
@@ -294,7 +813,7 @@ def resolve_track(rows: List[Dict[str, str]], selector: str) -> Optional[Dict[st
     return None
 
 
-def find_active_track(rows: List[Dict[str, str]]) -> Optional[Dict[str, str]]:
+def find_active_track(rows: List[Dict[str, object]]) -> Optional[Dict[str, object]]:
     priority = ["execution_ready", "plan_ready", "spec_ready", "draft"]
     for wanted in priority:
         matches = [r for r in rows if r["status"] == wanted]
@@ -314,24 +833,29 @@ def expected_status_for_files(
     return "plan_ready"
 
 
-def validate_track(row: Dict[str, str]) -> Tuple[bool, List[str], Dict[str, bool]]:
+def validate_track(
+    row: Dict[str, object], skip_metadata_status_check: bool = False
+) -> Tuple[bool, List[str], Dict[str, bool]]:
     issues: List[str] = []
-    path = row["path"].rstrip("/")
+    path = str(row["path"]).rstrip("/")
     spec = os.path.join(path, "spec.md")
     plan = os.path.join(path, "plan.md")
     tasks = os.path.join(path, "tasks.md")
+    metadata = load_track_metadata(path)
     checks = {
         "track_dir_exists": os.path.isdir(path),
+        "metadata_exists": bool(metadata),
         "spec_exists": os.path.isfile(spec),
         "plan_exists": os.path.isfile(plan),
         "tasks_exists": os.path.isfile(tasks),
+        "closed_at_recorded": isinstance(metadata.get("closed_at"), str),
     }
 
     try:
-        normalized_status = normalize_status(row["status"])
+        normalized_status = normalize_status(str(row["status"]))
     except ValueError:
         issues.append(f"invalid_status:{row['status']}")
-        normalized_status = row["status"]
+        normalized_status = str(row["status"])
 
     if not checks["track_dir_exists"]:
         issues.append("missing_track_directory")
@@ -351,21 +875,30 @@ def validate_track(row: Dict[str, str]) -> Tuple[bool, List[str], Dict[str, bool
         checks["spec_exists"] and checks["plan_exists"]
     ):
         issues.append("closed_without_core_artifacts")
+    if normalized_status == "closed" and not checks["metadata_exists"]:
+        issues.append("closed_without_metadata")
+    if normalized_status == "closed" and not checks["closed_at_recorded"]:
+        issues.append("closed_without_closed_at")
+
+    metadata_status = metadata.get("status")
+    if not skip_metadata_status_check and isinstance(metadata_status, str):
+        try:
+            normalized_metadata_status = normalize_status(metadata_status)
+            if normalized_metadata_status != normalized_status:
+                issues.append(
+                    "metadata_status_mismatch:"
+                    f"metadata={normalized_metadata_status} registry={normalized_status}"
+                )
+        except ValueError:
+            issues.append(f"invalid_metadata_status:{metadata_status}")
 
     return len(issues) == 0, issues, checks
-
-
-def write_track_metadata(track_path: str, metadata: Dict[str, object]) -> None:
-    metadata_path = os.path.join(track_path, TRACK_METADATA_FILE)
-    with open(metadata_path, "w", encoding="utf-8") as f:
-        json.dump(metadata, f, indent=2)
-        f.write("\n")
 
 
 def create_track(
     track_id: str, name: str, metadata: Optional[Dict[str, object]] = None
 ) -> Tuple[str, bool]:
-    specs_dir, _ = get_registry_paths()
+    specs_dir, _, _ = get_registry_paths()
     ensure_registry(specs_dir)
     normalized_id = validate_track_id(track_id)
     normalized_name = normalize_feature_name(name)
@@ -377,21 +910,27 @@ def create_track(
     track_path = os.path.join(specs_dir, folder)
 
     rows = parse_registry()
-    if any(r["id"] == normalized_id or r["path"].rstrip("/").endswith(folder) for r in rows):
+    if any(
+        r["id"] == normalized_id or str(r["path"]).rstrip("/").endswith(folder)
+        for r in rows
+    ):
         return folder, False
 
     os.makedirs(track_path, exist_ok=True)
-    if metadata is not None:
-        write_track_metadata(track_path, metadata)
-
-    rows.append(
+    row = normalize_registry_row(
         {
             "id": normalized_id,
             "feature": normalized_name,
             "status": "draft",
             "path": normalize_track_path(track_path),
+            "updated_at": now_timestamp(),
+            "closed_at": None,
         }
     )
+    track_metadata = build_track_metadata(row, "draft", existing=metadata)
+    write_track_metadata(track_path, track_metadata)
+
+    rows.append(apply_metadata_to_row(row, track_metadata))
     write_registry(rows)
     return folder, True
 
@@ -452,9 +991,68 @@ def build_sb_metadata(issue: Dict[str, object]) -> Dict[str, object]:
     issue_metadata = {field: issue[field] for field in tracked_fields if field in issue}
     return {
         "source": "sb",
-        "imported_at": datetime.now().isoformat(timespec="seconds"),
+        "imported_at": now_timestamp(),
         "issue": issue_metadata,
     }
+
+
+def is_allowed_transition(current_status: str, target_status: str) -> bool:
+    if current_status == target_status:
+        return True
+    if current_status not in STATUS_SEQUENCE or target_status not in STATUS_SEQUENCE:
+        return False
+    current_index = STATUS_SEQUENCE.index(current_status)
+    target_index = STATUS_SEQUENCE.index(target_status)
+    return target_index == current_index + 1
+
+
+def validate_track_for_status(
+    row: Dict[str, object], target_status: str
+) -> Tuple[bool, List[str], Dict[str, bool]]:
+    candidate = dict(row)
+    candidate["status"] = target_status
+    ok, issues, checks = validate_track(candidate, skip_metadata_status_check=True)
+    if target_status == "closed":
+        issues = [
+            issue
+            for issue in issues
+            if issue not in {"closed_without_metadata", "closed_without_closed_at"}
+        ]
+        ok = len(issues) == 0
+    return ok, issues, checks
+
+
+def update_track_status(
+    rows: List[Dict[str, object]],
+    track: Dict[str, object],
+    status: str,
+    force: bool = False,
+) -> Tuple[bool, str]:
+    current_status = normalize_status(str(track["status"]))
+    if not force and not is_allowed_transition(current_status, status):
+        return (
+            False,
+            "Invalid status transition: "
+            f"{current_status} -> {status}. Use --force to override.",
+        )
+
+    ok, issues, _ = validate_track_for_status(track, status)
+    if not ok and not force:
+        return (
+            False,
+            f"Cannot set {track['id']} to status '{status}': {', '.join(issues)}",
+        )
+
+    track_path = str(track["path"]).rstrip("/")
+    metadata = load_track_metadata(track_path)
+    updated_metadata = build_track_metadata(track, status, existing=metadata)
+    write_track_metadata(track_path, updated_metadata)
+
+    track["status"] = status
+    track["updated_at"] = normalize_optional_timestamp(updated_metadata.get("updated_at"))
+    track["closed_at"] = normalize_optional_timestamp(updated_metadata.get("closed_at"))
+    write_registry(rows)
+    return True, f"Updated {track['id']} to status '{status}'"
 
 
 def cmd_init(args: argparse.Namespace) -> int:
@@ -526,10 +1124,37 @@ def cmd_set_status(args: argparse.Namespace) -> int:
         print(f"Track not found: {args.track}", file=sys.stderr)
         return 2
 
-    track["status"] = status
-    write_registry(rows)
-    print(f"Updated {track['id']} to status '{status}'")
-    return 0
+    success, message = update_track_status(rows, track, status, force=args.force)
+    stream = sys.stdout if success else sys.stderr
+    print(message, file=stream)
+    return 0 if success else 2
+
+
+def cmd_add_relation(args: argparse.Namespace) -> int:
+    rows = parse_registry()
+    track = resolve_track(rows, args.track)
+    if not track:
+        print(f"Track not found: {args.track}", file=sys.stderr)
+        return 2
+
+    try:
+        relation_type = normalize_relation_type(args.relation_type)
+    except ValueError as exc:
+        print(str(exc), file=sys.stderr)
+        return 2
+
+    success, message = add_relation(
+        rows,
+        track,
+        relation_type,
+        args.target_track,
+        story_title=args.story_title,
+        requirement_ids=args.requirement_id,
+        selector=args.selector,
+    )
+    stream = sys.stdout if success else sys.stderr
+    print(message, file=stream)
+    return 0 if success else 2
 
 
 def cmd_get_active(_: argparse.Namespace) -> int:
@@ -555,6 +1180,24 @@ def cmd_validate_track(args: argparse.Namespace) -> int:
     return 0 if ok else 3
 
 
+def cmd_audit_relations(args: argparse.Namespace) -> int:
+    try:
+        result = audit_relations(parse_registry(), track_selector=args.track)
+    except RuntimeError as exc:
+        print(str(exc), file=sys.stderr)
+        return 2
+
+    if args.json or result["ok"]:
+        print(json.dumps(result, indent=2))
+    else:
+        for issue in result["issues"]:
+            print(
+                f"{issue['track_id']}: {issue['code']} -> {issue['message']}",
+                file=sys.stderr,
+            )
+    return 0 if result["ok"] else 3
+
+
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser()
     subparsers = parser.add_subparsers(dest="command", required=True)
@@ -577,11 +1220,47 @@ def build_parser() -> argparse.ArgumentParser:
     set_p = subparsers.add_parser("set-status", help="Update a track status")
     set_p.add_argument("track", help="Track ID, folder name, or path")
     set_p.add_argument("status", help="New status")
+    set_p.add_argument(
+        "--force",
+        action="store_true",
+        help="Override transition and validation safeguards during manual repair.",
+    )
+
+    relation_p = subparsers.add_parser(
+        "add-relation", help="Record an explicit track relation with reciprocal metadata"
+    )
+    relation_p.add_argument("track", help="Source track ID, folder name, or path")
+    relation_p.add_argument("relation_type", help="Relation type, for example supersedes")
+    relation_p.add_argument("target_track", help="Target track ID, folder name, or path")
+    relation_p.add_argument(
+        "--story-title",
+        help="Optional soft selector describing the affected story title.",
+    )
+    relation_p.add_argument(
+        "--requirement-id",
+        action="append",
+        default=[],
+        help="Optional requirement ID to scope a partial relation. Repeatable.",
+    )
+    relation_p.add_argument(
+        "--selector",
+        help="Optional freeform soft selector for fuzzy story or scope references.",
+    )
 
     subparsers.add_parser("get-active", help="Return the active track as JSON")
 
     validate_p = subparsers.add_parser("validate-track", help="Validate track/file consistency")
     validate_p.add_argument("track", help="Track ID, folder name, or path")
+
+    audit_p = subparsers.add_parser(
+        "audit-relations",
+        help="Audit relation metadata for missing targets or missing reciprocal links",
+    )
+    audit_p.add_argument(
+        "--track",
+        help="Optional track ID, folder name, or path to audit a single track.",
+    )
+    audit_p.add_argument("--json", action="store_true", help="Emit JSON output.")
 
     return parser
 
@@ -598,10 +1277,14 @@ def main() -> int:
             return cmd_add_from_sb(args)
         if args.command == "set-status":
             return cmd_set_status(args)
+        if args.command == "add-relation":
+            return cmd_add_relation(args)
         if args.command == "get-active":
             return cmd_get_active(args)
         if args.command == "validate-track":
             return cmd_validate_track(args)
+        if args.command == "audit-relations":
+            return cmd_audit_relations(args)
     except (RuntimeError, ValueError) as exc:
         print(str(exc), file=sys.stderr)
         return 2
