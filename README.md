@@ -21,6 +21,39 @@ These core skills should remain tracker-agnostic by default:
 
 If a project has no extra configuration, these skills should still work with generic conventions.
 
+## Planning layer
+
+For repositories that use repo-first planning and `sb-tracker` for execution work, the recommended short-name planning skills are:
+
+- `skills/discover/`
+- `skills/design/`
+- `skills/ui-flow/`
+- `skills/breakdown/`
+- `skills/track/`
+
+These skills sit **before** the execution-track skills:
+
+- planning layer: `discover`, `design`, `ui-flow`, `breakdown`, `track`
+- execution layer: `spec-driver`, `specify`, `plan`, `tasks`
+- execution tracker: `sb-tracker`
+
+Recommended boundary:
+
+- keep goals, design, stories, and decomposition in repo documents
+- use `sb-tracker` for executable tasks and dependency tracking
+- bootstrap one spec track per executable `sb` task
+- let `spec-driver` own track readiness, while `sb-tracker` owns task execution state
+
+Preferred planning flow:
+
+1. `discover` creates problem framing and initial story candidates.
+2. `design` turns that into architecture, interfaces, and risks.
+3. `ui-flow` adds optional UX or screen-flow artifacts.
+4. `breakdown` turns repo stories into directly executable tracker work.
+5. `track` bootstraps a task-scoped execution track and hands off to `spec-driver`.
+
+`skills/agent-sprint-planning/` remains useful for generic agent sprint packet planning, but `breakdown` is the preferred short-name skill for repo-story decomposition into executable work items.
+
 ## Optional project configuration
 
 Projects can add `.skills/identity.json` in the repository root to describe their local conventions.

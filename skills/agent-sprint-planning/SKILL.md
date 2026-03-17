@@ -7,6 +7,9 @@ description: Plan coding sprints for AI agents using execution packets, machine-
 
 Use this skill when the user asks to create or improve sprint planning for coding agents.
 
+If the goal is to convert repo stories or design docs into directly executable tracker items, prefer `breakdown`.
+Keep `agent-sprint-planning` for execution-packet planning once scope is already concrete.
+
 ## Why this skill exists
 
 Human sprint planning optimizes for team communication and coordination.
