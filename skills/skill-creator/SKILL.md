@@ -71,7 +71,7 @@ Every SKILL.md consists of:
 Executable code (Node.js/Python/Bash/etc.) for tasks that require deterministic reliability or are repeatedly rewritten.
 
 - **When to include**: When the same code is being rewritten repeatedly or deterministic reliability is needed
-- **Example**: `scripts/rotate_pdf.cjs` for PDF rotation tasks
+- **Example**: `scripts/rotate_pdf.py` for PDF rotation tasks
 - **Benefits**: Token efficient, deterministic, may be executed without loading into context
 - **Agentic Ergonomics**: Scripts must output LLM-friendly stdout. Suppress standard tracebacks. Output clear, concise success/failure messages, and paginate or truncate outputs (e.g., "Success: First 50 lines of processed file...") to prevent context window overflow.
 - **Note**: Scripts may still need to be read by Gemini CLI for patching or environment-specific adjustments
@@ -199,9 +199,9 @@ Skill creation involves these steps:
 
 1. Understand the skill with concrete examples
 2. Plan reusable skill contents (scripts, references, assets)
-3. Initialize the skill (run node init_skill.cjs)
+3. Initialize the skill (run `python init_skill.py`)
 4. Edit the skill (implement resources and write SKILL.md)
-5. Package the skill (run node package_skill.cjs)
+5. Package the skill (run `python package_skill.py`)
 6. Install and reload the skill
 7. Iterate based on real usage
 
@@ -242,7 +242,7 @@ To turn concrete examples into an effective skill, analyze each example by:
 Example: When building a `pdf-editor` skill to handle queries like "Help me rotate this PDF," the analysis shows:
 
 1. Rotating a PDF requires re-writing the same code each time
-2. A `scripts/rotate_pdf.cjs` script would be helpful to store in the skill
+2. A `scripts/rotate_pdf.py` script would be helpful to store in the skill
 
 Example: When designing a `frontend-webapp-builder` skill for queries like "Build me a todo app" or "Build me a dashboard to track my steps," the analysis shows:
 
@@ -262,14 +262,14 @@ At this point, it is time to actually create the skill.
 
 Skip this step only if the skill being developed already exists, and iteration or packaging is needed. In this case, continue to the next step.
 
-When creating a new skill from scratch, always run the `init_skill.cjs` script. The script conveniently generates a new template skill directory that automatically includes everything a skill requires, making the skill creation process much more efficient and reliable.
+When creating a new skill from scratch, always run the `init_skill.py` script. The script conveniently generates a new template skill directory that automatically includes everything a skill requires, making the skill creation process much more efficient and reliable.
 
 **Note:** Use the absolute path to the script as provided in the `available_resources` section.
 
 Usage:
 
 ```bash
-node <path-to-skill-creator>/scripts/init_skill.cjs <skill-name> --path <output-directory>
+python <path-to-skill-creator>/scripts/init_skill.py <skill-name> --path <output-directory>
 ```
 
 The script:
@@ -277,7 +277,7 @@ The script:
 - Creates the skill directory at the specified path
 - Generates a SKILL.md template with proper frontmatter and TODO placeholders
 - Creates example resource directories: `scripts/`, `references/`, and `assets/`
-- Adds example files (`scripts/example_script.cjs`, `references/example_reference.md`, `assets/example_asset.txt`) that can be customized or deleted
+- Adds example files (`scripts/example_script.py`, `references/example_reference.md`, `assets/example_asset.txt`) that can be customized or deleted
 
 After initialization, customize or remove the generated SKILL.md and example files as needed.
 
@@ -291,6 +291,7 @@ Consult these helpful guides based on your skill's needs:
 
 - **Multi-step processes**: See references/workflows.md for sequential workflows and conditional logic
 - **Specific output formats or quality standards**: See references/output-patterns.md for template and example patterns
+- **Multi-domain or multi-framework skills**: See references/multi-skill-design.md for progressive disclosure and reference organization patterns
 
 These files contain established best practices for effective skill design.
 
@@ -330,13 +331,13 @@ Once development of the skill is complete, it must be packaged into a distributa
 **Note:** Use the absolute path to the script as provided in the `available_resources` section.
 
 ```bash
-node <path-to-skill-creator>/scripts/package_skill.cjs <path/to/skill-folder>
+python <path-to-skill-creator>/scripts/package_skill.py <path/to/skill-folder>
 ```
 
 Optional output directory specification:
 
 ```bash
-node <path-to-skill-creator>/scripts/package_skill.cjs <path/to/skill-folder> ./dist
+python <path-to-skill-creator>/scripts/package_skill.py <path/to/skill-folder> ./dist
 ```
 
 The packaging script will:
@@ -348,6 +349,8 @@ The packaging script will:
    - File organization and resource references
 
 2. **Package** the skill if validation passes, creating a .skill file named after the skill (e.g., `my-skill.skill`) that includes all files and maintains the proper directory structure for distribution. The .skill file is a zip file with a .skill extension.
+
+The packager excludes local development clutter such as `__pycache__/`, `node_modules/`, and a root-level `evals/` directory so you can keep iteration artifacts nearby without shipping them inside the skill.
 
 If validation fails, the script will report the errors and exit without creating a package. Fix any validation errors and run the packaging command again.
 
@@ -377,6 +380,18 @@ After testing the skill, users may request improvements. Often this happens righ
 **Iteration workflow:**
 
 1. Use the skill on real tasks
-2. Notice struggles or inefficiencies
-3. Identify how SKILL.md or bundled resources should be updated
-4. Implement changes and test again
+2. For objectively verifiable skills, keep a lightweight local `evals/` folder with representative prompts, inputs, and expected outcomes
+3. Notice struggles or inefficiencies
+4. Generalize from the feedback instead of overfitting to one example
+5. Remove instructions that are not pulling their weight
+6. Look for repeated work that should become a bundled script, reference, or asset
+7. Implement changes and test again
+
+**Improvement heuristics:**
+
+- **Explain the why**: Prefer reasoning and intent over rigid lists of MUSTs when possible.
+- **Keep the prompt lean**: If instructions cause wasted work or repeated detours, simplify them.
+- **Bundle repeated work**: If the same helper script or boilerplate keeps reappearing, add it to the skill once and teach the skill to use it.
+- **Broaden coverage over time**: Start with a few realistic examples, then add edge cases only after the core flow works.
+
+For skills that benefit from local regression prompts, keep those iteration files in a root-level `evals/` directory. The packaging script excludes that directory so it stays a development aid rather than part of the distributed skill.

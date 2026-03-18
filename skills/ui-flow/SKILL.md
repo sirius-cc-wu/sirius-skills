@@ -1,0 +1,38 @@
+---
+name: ui-flow
+description: Captures optional UI and UX flows, screen-level requirements, and interaction notes before implementation.
+---
+
+# UI Flow
+
+Use this skill when a project needs screen flows, interaction requirements, or UX notes before implementation work is decomposed.
+
+## Responsibilities
+
+1. Capture user journeys, states, and interaction boundaries.
+2. Define screen-level requirements, transitions, and edge cases.
+3. Record UX constraints that should influence system design or task breakdown.
+4. Keep UI decisions in repository documents instead of burying them in tracker tickets.
+
+## Required Output
+
+- `<project_path>/ui-design.md`
+
+Optional companion output:
+
+- updates to `<project_path>/user-stories.md`
+- links to mockups or external design references
+
+## Workflow
+
+1. Read `discover.md` and `system-design.md` when present.
+2. Capture flows, states, and notable UX constraints.
+3. Write `ui-design.md` with screen-level requirements and edge cases.
+4. Refine story boundaries or acceptance notes if the UI changes scope.
+5. Stop when the UI work is concrete enough for `breakdown`.
+
+## Guardrails
+
+- Keep the output lightweight and implementation-relevant.
+- Do not create implementation tracks from UX notes alone.
+- If the project has no meaningful UI surface, skip this skill.

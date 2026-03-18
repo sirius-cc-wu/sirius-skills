@@ -4,9 +4,12 @@ REPO_ROOT := $(CURDIR)
 COMMON_FLAGS := --global --yes --agent github-copilot --agent codex --agent antigravity --agent gemini-cli
 MANAGED_SKILLS := \
 	batch \
+	breakdown \
 	close-track \
 	commit \
+	design \
 	design-md \
+	discover \
 	dioxus-stitch \
 	dioxus-ui-ux \
 	enhance-prompt \
@@ -20,13 +23,20 @@ MANAGED_SKILLS := \
 	specify \
 	stitch-design \
 	stitch-loop \
-	tasks
+	track \
+	tasks \
+	ui-flow
 
 install:
 	npx skills add "$(REPO_ROOT)/skills/spec-driver" $(COMMON_FLAGS)
 	npx skills add "$(REPO_ROOT)/skills/specify" $(COMMON_FLAGS)
 	npx skills add "$(REPO_ROOT)/skills/plan" $(COMMON_FLAGS)
 	npx skills add "$(REPO_ROOT)/skills/tasks" $(COMMON_FLAGS)
+	npx skills add "$(REPO_ROOT)/skills/discover" $(COMMON_FLAGS)
+	npx skills add "$(REPO_ROOT)/skills/design" $(COMMON_FLAGS)
+	npx skills add "$(REPO_ROOT)/skills/ui-flow" $(COMMON_FLAGS)
+	npx skills add "$(REPO_ROOT)/skills/breakdown" $(COMMON_FLAGS)
+	npx skills add "$(REPO_ROOT)/skills/track" $(COMMON_FLAGS)
 	npx skills add "$(REPO_ROOT)/skills/close-track" $(COMMON_FLAGS)
 	npx skills add "$(REPO_ROOT)/skills/commit" $(COMMON_FLAGS)
 	npx skills add "$(REPO_ROOT)/skills/simplify" $(COMMON_FLAGS)

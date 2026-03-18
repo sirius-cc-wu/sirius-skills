@@ -14,6 +14,22 @@ Use this skill to manage workflow state for track readiness.
 3. Route work to `specify`, `plan`, and optionally `tasks`.
 4. Update track status when a phase is complete.
 
+## Upstream Handoff
+
+`spec-driver` starts after planning has already produced one execution-ready work item.
+
+In repositories that use the planning-layer skills, the usual handoff is:
+
+```text
+discover -> design -> ui-flow -> breakdown -> track -> spec-driver
+```
+
+- `breakdown` turns repo stories into directly executable work items.
+- `track` bootstraps one task-scoped spec track for one ready work item.
+- `spec-driver` then manages track readiness for that bootstrapped track.
+
+If the input is still project-scoped, story-scoped, or too large for one execution track, send it back to `breakdown` instead of stretching `spec-driver` to own decomposition.
+
 ## Lifecycle States
 
 - `draft`
@@ -50,7 +66,7 @@ Do not duplicate task-execution states like `implementing`, `in progress`, or `b
 1. If `.specs/config.json` is missing, ask the user where specs should be created, then initialize via tooling with that path.
 2. Ensure the configured registry exists (`<spec_dir>/README.md` and `<spec_dir>/registry.json`).
 3. Resolve the active track using tooling (or by user-provided ID/path).
-4. Confirm track path exists.
+4. Confirm track path exists and represents one execution-ready work item.
 5. Check presence of:
     - `spec.md`
     - `plan.md`
