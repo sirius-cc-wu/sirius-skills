@@ -46,11 +46,15 @@ Each skill is a directory containing:
 - **Scripts/Assets**: Helper scripts or templates referenced by the skill.
 
 ### Installation
-- Use the provided script to install skills into the AI agent configuration:
+- Use the repository `Makefile` to install skills into the AI agent configuration:
   ```bash
-  ./scripts/install-skills.sh
+  make install
   ```
-  - This utilizes `npx skills add` to register skills.
+  - This uses `npx skills add` to register the managed skills.
+- To remove the same managed skill set:
+  ```bash
+  make uninstall
+  ```
 
 ## 3. Workflow Conventions (Spec-Driven Development)
 

@@ -10,7 +10,7 @@ Use this skill to manage workflow state for track readiness.
 ## Responsibilities
 
 1. Resolve or initialize the active track.
-2. Verify required files and registry status.
+2. Verify required files, registry state, and track metadata.
 3. Route work to `specify`, `plan`, and optionally `tasks`.
 4. Update track status when a phase is complete.
 
@@ -45,7 +45,7 @@ Allowed transitions:
 3. `plan_ready -> execution_ready`
 4. `execution_ready -> closed`
 
-Do not skip states without explicit user approval.
+Do not skip states without explicit user approval. Adjacent transitions are the default; use tooling overrides only for deliberate repair.
 
 ## State Ownership
 
@@ -64,7 +64,7 @@ Do not duplicate task-execution states like `implementing`, `in progress`, or `b
 ## Preflight
 
 1. If `.specs/config.json` is missing, ask the user where specs should be created, then initialize via tooling with that path.
-2. Ensure the configured registry exists (`<spec_dir>/README.md`).
+2. Ensure the configured registry exists (`<spec_dir>/README.md` and `<spec_dir>/registry.json`).
 3. Resolve the active track using tooling (or by user-provided ID/path).
 4. Confirm track path exists and represents one execution-ready work item.
 5. Check presence of:
@@ -72,6 +72,7 @@ Do not duplicate task-execution states like `implementing`, `in progress`, or `b
     - `plan.md`
     - `tasks.md` (optional)
 6. Verify registry status is consistent with file reality. If inconsistent, repair status first.
+7. For closed tracks, verify closure metadata exists in `<track_path>/.track-meta.json`.
 
 ## Routing Rules
 
@@ -86,6 +87,7 @@ Do not duplicate task-execution states like `implementing`, `in progress`, or `b
     - Set status to `execution_ready` when the plan is actionable and execution can begin.
 4. Once execution is finished and verified:
     - Set status to `closed`.
+    - Record closure metadata and keep the original track artifacts in place.
 
 ## Completion Checks
 
@@ -111,9 +113,27 @@ A track is `closed` when:
 - the execution work is complete
 - verification has passed or been explicitly waived
 - any follow-up execution tracking lives in the task system rather than the track state
+- closure metadata has been recorded in `.track-meta.json`
 
 ## Tooling
-Always use `scripts/manage_specs.py` for initialization, active track resolution, status updates, and validation.
+Always use `scripts/manage_specs.py` for initialization, active track resolution, status updates, validation, and registry synchronization.
+
+`manage_specs.py` maintains:
+
+- a human-readable registry at `<spec_dir>/README.md`
+- a machine-readable registry at `<spec_dir>/registry.json`
+- per-track lifecycle metadata at `<track_path>/.track-meta.json`
+
+Track metadata may also contain explicit relation records such as:
+
+- `supersedes` / `superseded_by`
+- `invalidates` / `invalidated_by`
+- `narrows` / `narrowed_by`
+- `replaces_partially` / `replaced_partially_by`
+
+Partial invalidation is represented with soft selectors in relation scope, for example story title, requirement IDs, or a freeform selector string.
+
+Closed tracks are non-destructive: the original `spec.md`, `plan.md`, and optional `tasks.md` stay in place, while the metadata and registry record that the track is closed.
 
 The configured specs directory is stored in `.specs/config.json` under `spec_dir`. If `.specs/config.json` does not exist yet, ask the user where specs should be created before running `init`.
 
@@ -182,13 +202,25 @@ python3 <path-to-spec-driver>/scripts/manage_specs.py set-status "<track-id-or-p
 # Close a track after execution is complete:
 python3 <path-to-spec-driver>/scripts/manage_specs.py set-status "<track-id-or-path>" "closed"
 
+# Use --force only for deliberate repair when the registry/file state is temporarily inconsistent:
+python3 <path-to-spec-driver>/scripts/manage_specs.py set-status "<track-id-or-path>" "plan_ready" --force
+
+# Record that one track supersedes another:
+python3 <path-to-spec-driver>/scripts/manage_specs.py add-relation "<track-id-or-path>" supersedes "<target-track-id-or-path>"
+
+# Record a partial replacement scoped to one story or requirement:
+python3 <path-to-spec-driver>/scripts/manage_specs.py add-relation "<track-id-or-path>" replaces_partially "<target-track-id-or-path>" --story-title "Story 2 - Legacy flow" --requirement-id FR-002 --selector "legacy checkout path"
+
 # Resolve active track:
 python3 <path-to-spec-driver>/scripts/manage_specs.py get-active
 
 # Validate track consistency:
 python3 <path-to-spec-driver>/scripts/manage_specs.py validate-track "<track-id-or-path>"
+
+# Audit relation consistency:
+python3 <path-to-spec-driver>/scripts/manage_specs.py audit-relations --json
 ```
 
-`add-from-sb` shells out to `sb show <id> --json`, uses the issue title as the feature name, and writes source metadata to a per-track sidecar file without changing the registry table format.
+`add-from-sb` shells out to `sb show <id> --json`, uses the issue title as the feature name, and writes source metadata to a per-track sidecar file.
 
 For backward compatibility, `manage_specs.py` still accepts legacy status inputs such as `draft_spec`, `tasks_ready`, `implementing`, `done`, `approved`, and `completed`, but it normalizes them to the canonical track states above.

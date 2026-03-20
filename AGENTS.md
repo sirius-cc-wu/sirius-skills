@@ -84,8 +84,9 @@ When editing skills:
 
 ### Installation
 
-Use `./scripts/install-skills.sh` to install or refresh skills. Keep repo-level
-guidance agent-agnostic unless a specific integration requires otherwise.
+Use `make install` to install or refresh skills and `make uninstall` to remove
+the managed skill set. Keep repo-level guidance agent-agnostic unless a
+specific integration requires otherwise.
 
 ## Agent Checklist
 
