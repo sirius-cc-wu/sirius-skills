@@ -19,6 +19,7 @@ Use a **two-layer workflow**:
    - `specify`
    - `plan`
    - `tasks`
+   - `close-track`
    - `sb-tracker`
 
 The planning layer keeps scope, design, and decomposition in repo documents.
@@ -145,6 +146,28 @@ Keep the responsibility boundary clear:
 
 - `spec-driver` owns **track readiness**
 - `sb-tracker` owns **execution state**
+
+### 8. Close the spec track
+
+After implementation is complete and the execution task is finished, use `close-track` to close the spec track cleanly.
+
+Its job is to:
+
+- validate that the track is ready to close
+- record durable closure metadata without moving or deleting the original artifacts
+- optionally publish a project-local summary entry such as `docs/spec-history.md` or `CHANGELOG.md`
+
+Recommended handoff:
+
+```text
+sb finish -> close-track
+```
+
+Important closure rules:
+
+- closing a track does not merge or delete the original `spec.md`, `plan.md`, or `tasks.md`
+- publishing is optional and project-local
+- closure metadata belongs in the spec system, not in `sb-tracker`
 
 ## Recommended Repository Layout
 
