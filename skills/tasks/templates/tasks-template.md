@@ -11,6 +11,8 @@
 - Sequencing rationale:
 - Parallelization notes:
 - Validation approach:
+- Risk stop gates:
+- Integration checkpoints:
 
 ## 2. Task Format
 
@@ -24,6 +26,7 @@ Where:
 - `T###` is a stable task ID
 - `[P]` marks work that can run in parallel without touching the same files or dependencies
 - `[Phase/Story]` identifies the execution packet, phase, or user story
+- include exact file paths where practical and keep verification work as explicit checklist items
 
 ## 3. Setup / Shared Foundations
 
@@ -36,7 +39,9 @@ Where:
 
 - Goal:
 - Dependencies:
-- Independent validation:
+- Exact validation:
+- Stop gate:
+- Handoff / integration:
 
 - [ ] T010 [P01] [Replace with a concrete implementation step and file path]
 - [ ] T011 [P01] [Replace with the next dependent step]
@@ -46,7 +51,9 @@ Where:
 
 - Goal:
 - Dependencies:
-- Independent validation:
+- Exact validation:
+- Stop gate:
+- Handoff / integration:
 
 - [ ] T020 [P02] [Replace with a concrete implementation step and file path]
 - [ ] T021 [P02] [Replace with the next dependent step]
@@ -61,10 +68,13 @@ Where:
 - Packet order:
 - Blocking prerequisites:
 - Parallel-safe groups:
+- Lane handoffs:
+- Integration checkpoints:
 
 ## 7. Exit Criteria
 
 - [ ] All required implementation tasks are listed
 - [ ] Each requirement or packet maps to one or more tasks
-- [ ] Validation work is represented where required
+- [ ] Validation work is represented with exact commands or concrete artifact checks
+- [ ] Risk stop gates are called out where required
 - [ ] The implementation agent can begin without major replanning

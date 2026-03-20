@@ -44,15 +44,16 @@ Recommended boundary:
 - bootstrap one spec track per executable `sb` task
 - let `spec-driver` own track readiness, while `sb-tracker` owns task execution state
 
-Preferred planning flow:
+Preferred repo workflow:
 
 1. `discover` creates problem framing and initial story candidates.
 2. `design` turns that into architecture, interfaces, and risks.
 3. `ui-flow` adds optional UX or screen-flow artifacts.
 4. `breakdown` turns repo stories into directly executable tracker work.
 5. `track` bootstraps a task-scoped execution track and hands off to `spec-driver`.
+6. `spec-driver` routes task-scoped execution through `specify`, `plan`, and `tasks` as needed.
 
-`skills/agent-sprint-planning/` remains useful for generic agent sprint packet planning, but `breakdown` is the preferred short-name skill for repo-story decomposition into executable work items.
+In the repo-native flow, `breakdown` owns repo-story decomposition and `tasks` owns the final task-scoped, machine-checkable execution checklist.
 
 ## Optional project configuration
 

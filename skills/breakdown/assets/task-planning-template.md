@@ -11,6 +11,7 @@ Use this file to decompose repo stories into execution-ready slices before boots
   - `ui-design.md` (if applicable)
   - `user-stories.md`
 - Execution tracker: `sb-tracker` | other
+- Execution mode: `single-agent` | `multi-agent`
 - Notes:
 
 ## 2. Story Decisions
@@ -28,17 +29,19 @@ Decision rules:
 
 ## 3. Execution Task Backlog
 
-| Slice ID | Story ID | Title | Summary | Target Area | Validation | Planned Tracker Action | Depends On | Track Ready |
-| --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| AUTH-03-api | AUTH-03 | Implement refresh token endpoint | Add refresh endpoint and token rotation logic | `auth/api` | `pytest tests/auth/test_refresh.py` | `sb add` |  | yes |
-| AUTH-03-tests | AUTH-03 | Add refresh token integration tests | Cover refresh flow end-to-end | `tests/auth` | `pytest tests/auth/test_refresh.py` | `sb add` | AUTH-03-api | yes |
-| <slice-id> | <story-id> | <task title> | <short summary> | <module/path> | <command or manual check> | <sb add | sb add --id ... | defer> | <slice-id[, ...] or blank> | <yes|no> |
+| Slice ID | Story ID | Title | Summary | Target Area | Lane | Validation | Planned Tracker Action | Depends On | Track Ready |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| AUTH-03-api | AUTH-03 | Implement refresh token endpoint | Add refresh endpoint and token rotation logic | `auth/api` | primary | `pytest tests/auth/test_refresh.py` | `sb add` |  | yes |
+| AUTH-03-tests | AUTH-03 | Add refresh token integration tests | Cover refresh flow end-to-end | `tests/auth` | primary | `pytest tests/auth/test_refresh.py` | `sb add` | AUTH-03-api | yes |
+| <slice-id> | <story-id> | <task title> | <short summary> | <module/path> | <lane name or primary> | <command or manual check> | <sb add | sb add --id ... | defer> | <slice-id[, ...] or blank> | <yes|no> |
 
 ## 4. Dependency Notes
 
 - Critical path:
 - Explicit blockers:
 - Parallel-safe slices:
+- Lane owners and handoffs:
+- Integration checkpoints:
 
 ## 5. Bootstrap Order
 

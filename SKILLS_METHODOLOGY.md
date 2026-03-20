@@ -119,13 +119,18 @@ After a track exists, use the execution layer:
 1. `spec-driver`
 2. `specify`
 3. `plan`
-4. `tasks` (when helpful)
+4. `tasks` (optional, but preferred when execution benefits from an explicit checklist)
 
 This is where task-scoped execution artifacts are created:
 
 - `spec.md`
 - `plan.md`
 - `tasks.md`
+
+Keep the boundary explicit:
+
+- `breakdown` owns repo-story decomposition and tracker-ready slices
+- `tasks` owns the final task-scoped, machine-checkable execution checklist
 
 ### 7. Track execution in sb-tracker
 

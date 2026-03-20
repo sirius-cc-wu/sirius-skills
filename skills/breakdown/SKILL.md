@@ -1,6 +1,6 @@
 ---
 name: breakdown
-description: Converts repo stories and planning docs into directly executable work items with traceability, dependencies, and tracker handoff.
+description: Converts repo stories and planning docs into directly executable, dependency-aware work items with traceability and tracker handoff.
 ---
 
 # Breakdown
@@ -23,9 +23,9 @@ doc/specs/projects/<project-slug>/task-traceability.md
 ## Responsibilities
 
 1. Validate that stories are concrete, scoped, and ready for decomposition.
-2. Split oversized work into smaller, independently verifiable tasks.
-3. Produce planning artifacts that preserve story-to-task traceability.
-4. Create executable tracker items and dependency links.
+2. Split oversized work into smaller, independently verifiable execution packets.
+3. Produce planning artifacts that preserve story-to-task traceability, sequencing, and execution mode assumptions.
+4. Create executable tracker items, dependency links, and explicit parallel-safe lanes where appropriate.
 5. Hand off ready work to `track` for spec-track bootstrap.
 
 ## Required Output
@@ -47,7 +47,30 @@ Use `scripts/scaffold_breakdown.py` when you want both files scaffolded together
 - Prefer repository story sizes such as `S`, `M`, `L`, and `XL`.
 - Split any `XL` item before creating execution-ready tasks.
 - Every executable task should be small enough to fit one task-scoped spec track.
+- Prefer execution packets that stay within one subsystem or a small set of files.
+- Every execution-ready slice should have concrete acceptance notes and a validation command or artifact check.
 - Preserve stable story identifiers so task traceability is durable.
+
+## Execution Mode and Packet Design
+
+Default to `single-agent` execution when:
+
+- work has a tight critical path
+- task coupling is high and handoff risk is non-trivial
+- codebase context is concentrated in one subsystem
+
+Prefer `multi-agent` execution only when:
+
+- there are clear parallel lanes with minimal overlap
+- integration points can be validated with deterministic checks
+- ownership and handoff boundaries can be documented explicitly
+
+When a story becomes execution-ready:
+
+- split it into small packets that can be executed without broad repo-wide context
+- mark blockers and sequencing constraints explicitly
+- label only genuinely independent slices as parallel-safe
+- if using `multi-agent`, record lane ownership, handoff targets, and an integration checkpoint after each lane
 
 ## Tracker Guidance
 
@@ -56,6 +79,7 @@ When `sb-tracker` is available, use it as the default execution tracker:
 - create one `sb` task per directly executable task
 - use parent-child relationships when a larger story needs grouped subtasks
 - record blockers with `sb dep`
+- reflect safe parallel lanes and integration checkpoints in `task-planning.md`
 - keep mapping from repo story IDs to `sb` task IDs in `task-traceability.md`
 
 If another tracker is configured, keep the same boundary and map these concepts to the local tracker.
@@ -125,9 +149,9 @@ In `task-traceability.md`, record the mapping explicitly, for example:
 
 1. Read `discover.md`, `system-design.md`, optional `ui-design.md`, and `user-stories.md`.
 2. Validate that each story has scope, acceptance notes, and an explicit size.
-3. Split oversized work into smaller task candidates.
-4. Write `task-planning.md` and `task-traceability.md`.
-5. Create tracker tasks and dependency links for execution-ready work.
+3. Split oversized work into smaller execution packets and choose `single-agent` or `multi-agent` handling where relevant.
+4. Write `task-planning.md` and `task-traceability.md` with dependency notes, parallel-safe lanes, and integration checkpoints as needed.
+5. Create tracker tasks and dependency links for execution-ready work, keeping packet validation explicit.
 6. Stop when each task is ready to be bootstrapped by `track`.
 
 When generating `task-planning.md`, start from `assets/task-planning-template.md` and replace placeholders rather than inventing a new structure each time.
@@ -138,4 +162,5 @@ When generating `task-traceability.md`, start from `assets/task-traceability-tem
 - Do not create execution tracks directly from vague stories.
 - Do not mirror tracker execution states inside project planning docs.
 - Do not turn `task-planning.md` into a task-scoped `tasks.md`; that belongs to `spec-driver` later.
+- Do not mark work as parallel-safe unless overlap and integration risk are genuinely low.
 - If a task still needs major replanning, split it again before handoff.
