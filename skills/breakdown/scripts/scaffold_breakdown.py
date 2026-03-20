@@ -18,7 +18,7 @@ PROJECT_SLUG_PATTERN = re.compile(r"^[A-Za-z0-9][A-Za-z0-9._-]*$")
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(
         description=(
-            "Scaffold breakdown planning files for a project under "
+            "Scaffold increment-ready breakdown planning files for a project under "
             "doc/specs/projects/<project-slug>/ by default."
         )
     )
@@ -109,7 +109,7 @@ def main() -> int:
         print(f"Failure: {exc}", file=sys.stderr)
         return 1
 
-    print(f"Success: scaffolded breakdown files in {target_dir}")
+    print(f"Success: scaffolded increment-ready breakdown files in {target_dir}")
     print(f"- {target_dir / 'task-planning.md'}")
     print(f"- {target_dir / 'task-traceability.md'}")
     return 0

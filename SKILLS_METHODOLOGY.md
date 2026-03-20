@@ -22,7 +22,7 @@ Use a **two-layer workflow**:
    - `close-track`
    - `sb-tracker`
 
-The planning layer keeps scope, design, and decomposition in repo documents.
+The planning layer keeps scope, design, decomposition, and increment planning in repo documents.
 
 The execution layer works one implementation-ready task at a time.
 
@@ -69,12 +69,15 @@ Its job is to:
 - validate story scope and size
 - split oversized work
 - create execution-ready slices
+- group slices into small demonstrable increments
 - map stories to tracker work
 
 Expected outputs:
 
 - `task-planning.md`
 - `task-traceability.md`
+
+In this workflow, an increment is a small, demonstrable system outcome made from one or more execution-ready slices. A slice maps to one executable task; an increment groups related tasks so the team can target the smallest useful demo or handoff. As a rule of thumb, Increment 1 should be the simplest end-to-end usable path.
 
 Use the built-in helper when starting a new planning folder:
 
@@ -86,9 +89,17 @@ python3 skills/breakdown/scripts/scaffold_breakdown.py <project-slug>
 
 Use `breakdown` with `sb-tracker` to create the executable work items.
 
+Use `task-planning.md` to record the increment structure before bootstrapping tracks. For each increment, capture:
+
+- the increment goal or user-visible value
+- the included story IDs and planned `sb` task IDs
+- the expected demo or verification outcome
+- any sequencing constraints between tasks or increments
+
 Recommended rule:
 
 - one execution-ready slice = one `sb` task
+- one increment = one or more related `sb` tasks
 
 Recommended tracker usage:
 
@@ -131,6 +142,7 @@ This is where task-scoped execution artifacts are created:
 Keep the boundary explicit:
 
 - `breakdown` owns repo-story decomposition and tracker-ready slices
+- `breakdown` also owns increment grouping at the repo-planning level
 - `tasks` owns the final task-scoped, machine-checkable execution checklist
 
 ### 7. Track execution in sb-tracker
@@ -197,8 +209,10 @@ The exact execution-track path depends on `spec-driver` configuration. The impor
 ## Operating Rules
 
 - Keep stories and design in repo docs.
+- Keep increment plans in repo docs.
 - Keep executable work in `sb-tracker`.
 - Do not use `spec-driver` for project-level discovery or decomposition.
+- Do not use spec tracks as increment containers; keep tracks task-scoped.
 - Do not use `sb` lifecycle states as spec-track states.
 - Split work before bootstrapping a track, not after.
 - Preserve story-to-task traceability from planning through execution.

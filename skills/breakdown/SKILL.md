@@ -24,7 +24,7 @@ doc/specs/projects/<project-slug>/task-traceability.md
 
 1. Validate that stories are concrete, scoped, and ready for decomposition.
 2. Split oversized work into smaller, independently verifiable execution packets.
-3. Produce planning artifacts that preserve story-to-task traceability, sequencing, and execution mode assumptions.
+3. Produce planning artifacts that preserve story-to-task traceability, increment grouping, sequencing, and execution mode assumptions.
 4. Create executable tracker items, dependency links, and explicit parallel-safe lanes where appropriate.
 5. Hand off ready work to `track` for spec-track bootstrap.
 
@@ -47,9 +47,20 @@ Use `scripts/scaffold_breakdown.py` when you want both files scaffolded together
 - Prefer repository story sizes such as `S`, `M`, `L`, and `XL`.
 - Split any `XL` item before creating execution-ready tasks.
 - Every executable task should be small enough to fit one task-scoped spec track.
+- Group related slices into small, demonstrable increments before bootstrapping tracks.
 - Prefer execution packets that stay within one subsystem or a small set of files.
 - Every execution-ready slice should have concrete acceptance notes and a validation command or artifact check.
 - Preserve stable story identifiers so task traceability is durable.
+
+## Increment Planning
+
+Use increments to bridge repo-level planning and task-level execution:
+
+- an increment is a small, demonstrable outcome made from one or more execution-ready slices
+- Increment 1 should usually be the simplest end-to-end usable path
+- increments belong in `task-planning.md` and `task-traceability.md`, not in spec-track state
+- one increment can contain multiple `sb` tasks, but each `sb` task still gets its own track later
+- if a story spans multiple increments, record that explicitly instead of hiding it in notes
 
 ## Execution Mode and Packet Design
 
@@ -77,6 +88,7 @@ When a story becomes execution-ready:
 When `sb-tracker` is available, use it as the default execution tracker:
 
 - create one `sb` task per directly executable task
+- group those tasks under increment headings in `task-planning.md` before creating them in `sb`
 - use parent-child relationships when a larger story needs grouped subtasks
 - record blockers with `sb dep`
 - reflect safe parallel lanes and integration checkpoints in `task-planning.md`
@@ -101,6 +113,7 @@ Preferred description shape for `sb add`:
 
 ```text
 Story: <story-id>
+Increment: <increment-id>
 Slice: <short slice name>
 Acceptance:
 - ...
@@ -140,19 +153,20 @@ sb dep <tests-task-id> <api-task-id>
 In `task-traceability.md`, record the mapping explicitly, for example:
 
 ```text
-| Story ID | Story Size | Story Summary | sb Task IDs | Task Slices | Blocked By | Track IDs | Notes |
-| --- | --- | --- | --- | --- | --- | --- | --- |
-| AUTH-03 | L | Refresh token support | BNC-a1b2c3, BNC-d4e5f6 | API, Tests | BNC-d4e5f6 -> BNC-a1b2c3 | BNC-a1b2c3, BNC-d4e5f6 | Split into API and tests |
+| Story ID | Story Size | Story Summary | Increments | sb Task IDs | Task Slices | Blocked By | Track IDs | Notes |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| AUTH-03 | L | Refresh token support | I1 | BNC-a1b2c3, BNC-d4e5f6 | API, Tests | BNC-d4e5f6 -> BNC-a1b2c3 | BNC-a1b2c3, BNC-d4e5f6 | Split into API and tests |
 ```
 
 ## Workflow
 
 1. Read `discover.md`, `system-design.md`, optional `ui-design.md`, and `user-stories.md`.
 2. Validate that each story has scope, acceptance notes, and an explicit size.
-3. Split oversized work into smaller execution packets and choose `single-agent` or `multi-agent` handling where relevant.
-4. Write `task-planning.md` and `task-traceability.md` with dependency notes, parallel-safe lanes, and integration checkpoints as needed.
-5. Create tracker tasks and dependency links for execution-ready work, keeping packet validation explicit.
-6. Stop when each task is ready to be bootstrapped by `track`.
+3. Split oversized work into smaller execution packets and group them into increments with clear demo outcomes.
+4. Choose `single-agent` or `multi-agent` handling where relevant and record lane assumptions.
+5. Write `task-planning.md` and `task-traceability.md` with increment groupings, dependency notes, parallel-safe lanes, and integration checkpoints as needed.
+6. Create tracker tasks and dependency links for execution-ready work, keeping packet validation explicit.
+7. Stop when each task is ready to be bootstrapped by `track`.
 
 When generating `task-planning.md`, start from `assets/task-planning-template.md` and replace placeholders rather than inventing a new structure each time.
 When generating `task-traceability.md`, start from `assets/task-traceability-template.md` and replace placeholders rather than inventing a new table shape each time.
@@ -161,6 +175,7 @@ When generating `task-traceability.md`, start from `assets/task-traceability-tem
 
 - Do not create execution tracks directly from vague stories.
 - Do not mirror tracker execution states inside project planning docs.
+- Do not turn increments into tracker states or spec-track containers.
 - Do not turn `task-planning.md` into a task-scoped `tasks.md`; that belongs to `spec-driver` later.
 - Do not mark work as parallel-safe unless overlap and integration risk are genuinely low.
 - If a task still needs major replanning, split it again before handoff.
