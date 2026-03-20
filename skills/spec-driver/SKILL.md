@@ -11,8 +11,30 @@ Use this skill to manage workflow state for track readiness.
 
 1. Resolve or initialize the active track.
 2. Verify required files, registry state, and track metadata.
-3. Route work to `specify`, `plan`, and optionally `tasks`.
-4. Update track status when a phase is complete.
+3. Decide whether the request belongs in the planning layer or the task-scoped execution layer.
+4. Route task-scoped work to `specify`, `plan`, `tasks`, or `close-track` as appropriate.
+5. Update track status when a phase is complete.
+
+## Entry Decision Guide
+
+Use `spec-driver` as the execution-layer entrypoint when you need to decide the next step for one task-scoped track.
+
+Before routing execution work, classify the request:
+
+1. If the problem, outcomes, or constraints are still being framed:
+   - send the work to `discover`
+2. If the architecture, interfaces, or technical approach are still unresolved:
+   - send the work to `design`
+3. If UI or interaction flow is still a material part of scope:
+   - send the work to `ui-flow`
+4. If the work is still repo-scoped, story-scoped, or needs decomposition into tracker slices:
+   - send the work to `breakdown`
+5. If there is one execution-ready work item but no task-scoped spec track yet:
+   - send the work to `track`
+6. If a task-scoped track already exists or can be resolved:
+   - stay in `spec-driver` and route inside the execution layer
+
+`spec-driver` should not absorb project-level discovery, design, or decomposition just because it was invoked first. Route back out to the planning layer instead.
 
 ## Upstream Handoff
 
@@ -73,6 +95,7 @@ Do not duplicate task-execution states like `implementing`, `in progress`, or `b
     - `tasks.md` (optional)
 6. Verify registry status is consistent with file reality. If inconsistent, repair status first.
 7. For closed tracks, verify closure metadata exists in `<track_path>/.track-meta.json`.
+8. If no track can be resolved, do not invent project-level planning inside `spec-driver`; route to `track` or the planning layer based on scope.
 
 ## Routing Rules
 
@@ -83,11 +106,15 @@ Do not duplicate task-execution states like `implementing`, `in progress`, or `b
     - Use `plan` to produce `plan.md`.
     - Set status to `plan_ready` when complete.
 3. If `spec.md` and `plan.md` are complete:
-    - Optionally use `tasks` to produce `tasks.md` or an execution checklist when it helps execution.
+    - Use `tasks` when execution benefits from an explicit checklist, dependency notes, validation checkpoints, or parallel-safe slicing.
+    - `tasks` may be skipped when `plan.md` is already concrete enough for direct execution without major replanning.
     - Set status to `execution_ready` when the plan is actionable and execution can begin.
-4. Once execution is finished and verified:
-    - Set status to `closed`.
-    - Record closure metadata and keep the original track artifacts in place.
+4. While implementation is underway:
+    - let `sb-tracker` own `begin`, `verify`, `finish`, `pause`, and other execution lifecycle events
+    - keep `spec-driver` focused on track readiness and artifact state
+5. Once execution is finished and verified:
+    - route to `close-track` to perform the final closure step
+    - close the track non-destructively, record closure metadata, and optionally publish a project-local summary
 
 ## Completion Checks
 
@@ -100,7 +127,7 @@ A track is `spec_ready` when:
 A track is `plan_ready` when:
 - `plan.md` is actionable
 - requirements map to implementation and validation steps
-- the next task is generating `tasks.md`
+- the next step is either generating `tasks.md` or beginning execution directly when `plan.md` is already sufficient
 - gates are passed or explicitly waived
 
 A track is `execution_ready` when:
@@ -114,6 +141,7 @@ A track is `closed` when:
 - verification has passed or been explicitly waived
 - any follow-up execution tracking lives in the task system rather than the track state
 - closure metadata has been recorded in `.track-meta.json`
+- any closure or publication step has been handled through `close-track` or equivalent tooling
 
 ## Tooling
 Always use `scripts/manage_specs.py` for initialization, active track resolution, status updates, validation, and registry synchronization.
@@ -199,8 +227,11 @@ python3 <path-to-spec-driver>/scripts/manage_specs.py set-status "<track-id-or-p
 # Mark a track ready for execution:
 python3 <path-to-spec-driver>/scripts/manage_specs.py set-status "<track-id-or-path>" "execution_ready"
 
-# Close a track after execution is complete:
-python3 <path-to-spec-driver>/scripts/manage_specs.py set-status "<track-id-or-path>" "closed"
+# Preferred close path after execution is complete:
+# use `close-track` for normal closure and optional publication
+
+# Low-level status repair only:
+python3 <path-to-spec-driver>/scripts/manage_specs.py set-status "<track-id-or-path>" "closed" --force
 
 # Use --force only for deliberate repair when the registry/file state is temporarily inconsistent:
 python3 <path-to-spec-driver>/scripts/manage_specs.py set-status "<track-id-or-path>" "plan_ready" --force
