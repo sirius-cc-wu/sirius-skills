@@ -1,54 +1,22 @@
-# Feature Specification: [FEATURE NAME]
+# Task Specification: [WORK ITEM NAME]
 
-**Track**: `[ID-feature-name]`
+**Track**: `[ID-work-item-name]`
 **Created**: [DATE]  
 **Status**: Draft  
 **Input**: "$ARGUMENTS"
 
-## 1. User Stories
+## 1. Work Item Summary
 
-### Story 1 - [Title] (Priority: P1)
+- **Work Item**: [Short task-scoped summary]
+- **Source Story / Slice / Task**: [Originating story ID, slice ID, tracker task, or "standalone"]
+- **Requested Outcome**: [As a / When / We want / Technical task statement]
+- **Why this matters**: [Value of this work item]
+- **Independent Test**: [How this can be verified on its own]
 
-**Story**:
-[As a / When / We want / Technical story statement]
+## 2. Acceptance Scenarios
 
-**Why this matters**: [Value of this story]
-
-**Independent Test**: [How this can be verified on its own]
-
-**Acceptance Scenarios**:
 1. **Given** [initial state], **When** [action], **Then** [expected outcome]
 2. **Given** [initial state], **When** [action], **Then** [expected outcome]
-
-### Story 2 - [Title] (Priority: P2)
-
-**Story**:
-[Story statement]
-
-**Why this matters**: [Value]
-
-**Independent Test**: [Verification]
-
-**Acceptance Scenarios**:
-1. **Given** [initial state], **When** [action], **Then** [expected outcome]
-
-### Story 3 - [Title] (Priority: P3)
-
-**Story**:
-[Story statement]
-
-**Why this matters**: [Value]
-
-**Independent Test**: [Verification]
-
-**Acceptance Scenarios**:
-1. **Given** [initial state], **When** [action], **Then** [expected outcome]
-
-## 2. Edge Cases
-
-- [Boundary condition]
-- [Failure scenario]
-- [Permission or state conflict]
 
 ## 3. Functional Requirements
 
@@ -63,12 +31,20 @@
 - **[Entity A]**: [Meaning and important attributes]
 - **[Entity B]**: [Meaning and relationships]
 
-## 5. Assumptions
+## 5. Edge Cases
+
+- [Boundary condition]
+- [Failure scenario]
+- [Permission or state conflict]
+
+## 6. Assumptions and Dependencies
+
+### Assumptions
 
 - **A1**: [Reasonable default]
 - **A2**: [Reasonable default]
 
-## 6. Dependencies
+### Dependencies
 
 - **D1**: [External system, policy, or prerequisite]
 - **D2**: [External dependency]

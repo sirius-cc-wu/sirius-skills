@@ -1,6 +1,6 @@
-# Tasks: [FEATURE NAME]
+# Tasks: [WORK ITEM NAME]
 
-**Track**: `[ID-feature-name]`  
+**Track**: `[ID-work-item-name]`  
 **Status**: Draft  
 **Inputs**: `spec.md`, `plan.md`  
 **Optional Inputs**: research notes, data model notes, interface notes, verification scenarios
@@ -18,14 +18,14 @@
 
 Use checklist items in this format:
 
-- `[ ] T001 [Phase/Story] Concrete action with file path`
-- `[ ] T002 [P] [Phase/Story] Parallel-safe action with file path`
+- `[ ] T001 [Phase/Group] Concrete action with file path`
+- `[ ] T002 [P] [Phase/Group] Parallel-safe action with file path`
 
 Where:
 
 - `T###` is a stable task ID
 - `[P]` marks work that can run in parallel without touching the same files or dependencies
-- `[Phase/Story]` identifies the execution packet, phase, or user story
+- `[Phase/Group]` identifies the execution packet, phase, or traceability group
 - include exact file paths where practical and keep verification work as explicit checklist items
 
 ## 3. Setup / Shared Foundations
@@ -35,7 +35,7 @@ Where:
 
 ## 4. Execution Packets
 
-### Packet P01 / Story [Identifier]
+### Packet P01 / Group [Identifier]
 
 - Goal:
 - Dependencies:
@@ -47,7 +47,7 @@ Where:
 - [ ] T011 [P01] [Replace with the next dependent step]
 - [ ] T012 [P01] [Replace with a validation or verification step]
 
-### Packet P02 / Story [Identifier]
+### Packet P02 / Group [Identifier]
 
 - Goal:
 - Dependencies:

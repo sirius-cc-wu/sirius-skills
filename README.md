@@ -68,10 +68,10 @@ Preferred repo workflow:
 3. `ui-flow` adds optional UX or screen-flow artifacts.
 4. `breakdown` turns repo stories into directly executable work items and groups those slices into small demonstrable increments.
 5. `track` bootstraps a task-scoped execution track and hands off to `spec-driver`.
-6. `spec-driver` routes task-scoped execution through `specify`, `plan`, and `tasks` as needed.
+6. `spec-driver` routes task-scoped execution through `specify` to capture task intent and acceptance, then through `plan` and `tasks` as needed.
 7. `close-track` closes completed spec tracks and can optionally publish a project-local summary.
 
-In the repo-native flow, `breakdown` owns repo-story decomposition and `tasks` owns the final task-scoped, machine-checkable execution checklist.
+In the repo-native flow, `breakdown` owns repo-story decomposition, `specify` owns the task-scoped `spec.md`, and `tasks` owns the final task-scoped, machine-checkable execution checklist.
 
 ## Spec track source of truth
 

@@ -139,6 +139,12 @@ This is where task-scoped execution artifacts are created:
 - `plan.md`
 - `tasks.md`
 
+Within that execution layer:
+
+- `specify` creates the task-scoped `spec.md` for one execution-ready work item, including acceptance and requirement context
+- `plan` converts that task-scoped spec into implementation packets, traceability, and validation steps
+- `tasks` turns the plan into the final execution checklist when an explicit checklist adds value
+
 Keep the boundary explicit:
 
 - `breakdown` owns repo-story decomposition and tracker-ready slices
@@ -207,6 +213,40 @@ Keep discovery, design, and breakdown artifacts in a feature-local planning fold
 ```
 
 The exact execution-track path depends on `spec-driver` configuration. The important rule is that execution tracks are **task-scoped**, not feature-scoped, and remain centrally managed separately from the feature-local planning docs.
+
+### Example layout
+
+For a small feature such as a habit tracker, the resulting repository shape could look like:
+
+```text
+my-app/
+  src/
+  tests/
+  docs/
+    features/
+      habit-tracker/
+        discover.md
+        system-design.md
+        ui-design.md
+        user-stories.md
+        task-planning.md
+        task-traceability.md
+  specs/
+    HAB-101-create-schema/
+      spec.md
+      plan.md
+      tasks.md
+    HAB-102-add-habit-form/
+      spec.md
+      plan.md
+      tasks.md
+    HAB-103-mark-habit-done/
+      spec.md
+      plan.md
+      tasks.md
+```
+
+In this example, `docs/features/habit-tracker/` holds the feature-level planning artifacts, while each executable task gets its own centralized execution track under `specs/`.
 
 ## Operating Rules
 

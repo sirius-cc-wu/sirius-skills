@@ -1,11 +1,11 @@
 ---
 name: specify
-description: Creates and validates feature specifications.
+description: Creates and validates task-scoped specifications.
 ---
 
 # Specify
 
-Use this skill to turn a feature idea into a complete `spec.md`.
+Use this skill to turn one execution-ready work item into a complete `spec.md`.
 
 ## Responsibilities
 
@@ -26,6 +26,7 @@ Resolve `<track_path>` through `spec-driver`.
 - Focus on user value, expected behavior, and outcomes.
 - Avoid implementation details.
 - Use reasonable defaults when details are missing.
+- Capture traceability back to the originating story, slice, or tracker task when available.
 - Record assumptions explicitly.
 - Keep unresolved clarifications to a maximum of 3, and only for critical decisions.
 
@@ -43,7 +44,7 @@ Before handoff, confirm:
 1. No implementation leakage
 2. Requirements are testable and unambiguous
 3. Success criteria are measurable and technology-agnostic
-4. At least one independently valuable primary story exists
+4. The spec describes one independently valuable work item that fits the active track
 5. Checklist is updated to reflect current status
 
 ## Workflow

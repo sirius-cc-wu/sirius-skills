@@ -1,6 +1,6 @@
-# Implementation Plan: [FEATURE NAME]
+# Implementation Plan: [WORK ITEM NAME]
 
-**Track**: `[ID-feature-name]`  
+**Track**: `[ID-work-item-name]`  
 **Date**: [DATE]  
 **Status**: Draft
 **Spec**: [link to spec.md]

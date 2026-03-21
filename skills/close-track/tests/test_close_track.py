@@ -32,7 +32,7 @@ def setup_execution_ready_track(tmp_path, monkeypatch):
 
     track_dir = tmp_path / "specs" / "DEMO-demo-feature"
     (track_dir / "spec.md").write_text(
-        "# Feature Specification: Demo Feature\n\n"
+        "# Task Specification: Demo Feature\n\n"
         "## 3. Functional Requirements\n\n"
         "- **FR-001**: System MUST store a summary entry.\n"
         "- **FR-002**: System MUST preserve backlinks.\n\n"
@@ -187,7 +187,7 @@ def test_close_track_republishes_without_duplicate_markers(tmp_path, monkeypatch
     )
 
     (track_dir / "spec.md").write_text(
-        "# Feature Specification: Demo Feature\n\n"
+        "# Task Specification: Demo Feature\n\n"
         "## 3. Functional Requirements\n\n"
         "- **FR-001**: Updated summary text.\n\n"
         "## 7. Success Criteria\n\n"
