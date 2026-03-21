@@ -39,7 +39,7 @@ Use increments to group related slices into small, demonstrable outcomes. Increm
 
 Rules:
 
-- keep increments project-scoped planning artifacts, not execution tracks
+- keep increments feature-scoped planning artifacts, not execution tracks
 - each increment should be demonstrable without requiring the full project to be complete
 - an increment can include one or many execution-ready slices
 - tracker tasks and spec tracks remain task-scoped even when they belong to the same increment
@@ -74,7 +74,7 @@ Rules:
 
 ## Notes
 
-- This file is project-scoped planning, not track-scoped execution.
+- This file is feature-scoped planning, not track-scoped execution.
 - Keep increment definitions here, not in spec-track artifacts.
 - Once tracker tasks are created, record the actual task IDs in `task-traceability.md`.
 - Keep slice IDs stable enough that they can be cross-referenced from traceability notes and planning discussion.

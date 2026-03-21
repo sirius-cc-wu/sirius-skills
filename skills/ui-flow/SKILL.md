@@ -16,11 +16,11 @@ Use this skill when a project needs screen flows, interaction requirements, or U
 
 ## Required Output
 
-- `<project_path>/ui-design.md`
+- `<feature_path>/ui-design.md`
 
 Optional companion output:
 
-- updates to `<project_path>/user-stories.md`
+- updates to `<feature_path>/user-stories.md`
 - links to mockups or external design references
 
 ## Workflow

@@ -5,7 +5,7 @@ description: Converts repo stories and planning docs into directly executable, d
 
 # Breakdown
 
-Use this skill after project-level discovery and design to turn repo stories into directly executable work.
+Use this skill after feature-level discovery and design to turn repo stories into directly executable work.
 
 If you need a starting folder for a new project, scaffold the default breakdown files with:
 
@@ -30,15 +30,15 @@ docs/features/<project-slug>/task-traceability.md
 
 ## Required Output
 
-- `<project_path>/task-planning.md`
-- `<project_path>/task-traceability.md`
+- `<feature_path>/task-planning.md`
+- `<feature_path>/task-traceability.md`
 
 Preferred tracker output when available:
 
 - tracker tasks and dependency links
 
-Use `assets/task-planning-template.md` as the default starting point for `<project_path>/task-planning.md`.
-Use `assets/task-traceability-template.md` as the default starting point for `<project_path>/task-traceability.md`.
+Use `assets/task-planning-template.md` as the default starting point for `<feature_path>/task-planning.md`.
+Use `assets/task-traceability-template.md` as the default starting point for `<feature_path>/task-traceability.md`.
 Use `scripts/scaffold_breakdown.py` when you want both files scaffolded together from a project slug.
 
 ## Breakdown Rules
@@ -152,7 +152,7 @@ When generating `task-traceability.md`, start from `assets/task-traceability-tem
 ## Guardrails
 
 - Do not create execution tracks directly from vague stories.
-- Do not mirror tracker execution states inside project planning docs.
+- Do not mirror tracker execution states inside feature planning docs.
 - Do not turn increments into tracker states or spec-track containers.
 - Do not turn `task-planning.md` into a task-scoped `tasks.md`; that belongs to `spec-driver` later.
 - Do not mark work as parallel-safe unless overlap and integration risk are genuinely low.

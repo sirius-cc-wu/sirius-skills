@@ -34,7 +34,7 @@ Before routing execution work, classify the request:
 6. If a task-scoped track already exists or can be resolved:
    - stay in `spec-driver` and route inside the execution layer
 
-`spec-driver` should not absorb project-level discovery, design, or decomposition just because it was invoked first. Route back out to the planning layer instead.
+`spec-driver` should not absorb feature-level discovery, design, or decomposition just because it was invoked first. Route back out to the planning layer instead.
 
 ## Upstream Handoff
 
@@ -50,7 +50,7 @@ discover -> design -> ui-flow -> breakdown -> track -> spec-driver
 - `track` bootstraps one task-scoped spec track for one ready work item.
 - `spec-driver` then manages track readiness for that bootstrapped track.
 
-If the input is still project-scoped, story-scoped, or too large for one execution track, send it back to `breakdown` instead of stretching `spec-driver` to own decomposition.
+If the input is still feature-scoped, story-scoped, or too large for one execution track, send it back to `breakdown` instead of stretching `spec-driver` to own decomposition.
 
 ## Lifecycle States
 
@@ -93,7 +93,7 @@ Do not duplicate task-execution states like `implementing`, `in progress`, or `b
     - `tasks.md` (optional)
 6. Verify registry status is consistent with file reality. If inconsistent, repair status first.
 7. For closed tracks, verify closure metadata exists in `<track_path>/.track-meta.json`.
-8. If no track can be resolved, do not invent project-level planning inside `spec-driver`; route to `track` or the planning layer based on scope.
+8. If no track can be resolved, do not invent feature-level planning inside `spec-driver`; route to `track` or the planning layer based on scope.
 
 ## Routing Rules
 

@@ -16,11 +16,11 @@ Use this skill at the start of a project, capability, or larger feature before s
 
 ## Required Output
 
-- `<project_path>/discover.md`
+- `<feature_path>/discover.md`
 
 Optional companion output:
 
-- `<project_path>/user-stories.md`
+- `<feature_path>/user-stories.md`
 
 If the repository uses the standard planning layout, prefer:
 
@@ -37,7 +37,7 @@ docs/features/<project-slug>/
 
 ## Workflow
 
-1. Identify or create the project planning folder.
+1. Identify or create the feature planning folder.
 2. Inspect the repository, existing docs, and relevant context.
 3. Write `discover.md` with problem framing, actors, goals, constraints, and risks.
 4. If helpful, draft an initial `user-stories.md` with stable story identifiers.

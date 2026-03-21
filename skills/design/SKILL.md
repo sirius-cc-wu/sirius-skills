@@ -1,6 +1,6 @@
 ---
 name: design
-description: Produces project-level system design artifacts covering architecture, interfaces, constraints, and validation strategy.
+description: Produces feature-level system design artifacts covering architecture, interfaces, constraints, and validation strategy.
 ---
 
 # Design
@@ -16,23 +16,23 @@ Use this skill after `discover` when the work needs architecture, integration, o
 
 ## Required Output
 
-- `<project_path>/system-design.md`
+- `<feature_path>/system-design.md`
 
 Optional companion output:
 
-- updates to `<project_path>/discover.md`
-- updates to `<project_path>/user-stories.md`
+- updates to `<feature_path>/discover.md`
+- updates to `<feature_path>/user-stories.md`
 
 ## Design Rules
 
-- Keep this skill project-scoped, not task-scoped.
+- Keep this skill feature-scoped, not task-scoped.
 - Focus on decisions that unblock later decomposition and execution.
 - Document interfaces, dependencies, and operational constraints clearly.
 - Call out risks that should affect task ordering or stop-and-ask gates.
 
 ## Workflow
 
-1. Read `discover.md` and any existing project planning docs.
+1. Read `discover.md` and any existing feature planning docs.
 2. Inspect the relevant codebase or adjacent systems as needed.
 3. Write `system-design.md` with architecture, interfaces, constraints, and validation notes.
 4. Refine story boundaries when the design changes implementation shape.

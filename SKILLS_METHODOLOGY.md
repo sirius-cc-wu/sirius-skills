@@ -206,14 +206,14 @@ Keep discovery, design, and breakdown artifacts in a feature-local planning fold
   tasks.md
 ```
 
-The exact execution-track path depends on `spec-driver` configuration. The important rule is that execution tracks are **task-scoped**, not project-scoped, and remain centrally managed separately from the feature-local planning docs.
+The exact execution-track path depends on `spec-driver` configuration. The important rule is that execution tracks are **task-scoped**, not feature-scoped, and remain centrally managed separately from the feature-local planning docs.
 
 ## Operating Rules
 
 - Keep stories and design in repo docs.
 - Keep increment plans in repo docs.
 - Keep executable work in your task system.
-- Do not use `spec-driver` for project-level discovery or decomposition.
+- Do not use `spec-driver` for feature-level discovery or decomposition.
 - Do not use spec tracks as increment containers; keep tracks task-scoped.
 - Do not use execution lifecycle states as spec-track states.
 - Split work before bootstrapping a track, not after.
