@@ -2,16 +2,13 @@
 
 Default guidance for agents working in `sirius-skills`.
 
-More specific `AGENTS.md` files override this one for their subtree. In
-particular, follow `sb-tracker/AGENTS.md` when working in `sb-tracker/`.
-
 ## Repo Shape
 
 `sirius-skills` has three main areas:
 
 - `skills/`: reusable skill definitions and helper scripts
-- `sb-tracker/`: a standalone Python task-tracker project
-- `scripts/`: repo-level helper scripts such as skill installation
+- `.github/`: repository guidance for GitHub tooling
+- top-level docs and install helpers such as `README.md`, `SKILLS_METHODOLOGY.md`, and `Makefile`
 
 ## Core Rules
 
@@ -37,9 +34,9 @@ useful generic default.
 Do not mix workflow responsibilities:
 
 - `spec-driver` owns spec track readiness and registry state
-- `sb-tracker` owns execution/task lifecycle
+- the execution tracker owns task lifecycle
 
-Do not duplicate `sb-tracker` lifecycle states inside spec track state.
+Do not duplicate execution-tracker lifecycle states inside spec track state.
 
 ### Treat IDs as opaque
 
@@ -74,14 +71,6 @@ When editing skills:
 - do not document behavior the repo does not actually implement
 - prefer simple interfaces over clever indirection
 
-### `sb-tracker`
-
-`sb-tracker/` is its own Python project. When working there:
-
-- read `sb-tracker/AGENTS.md` first
-- install from source with `pip install -e .` if needed
-- run tests from `sb-tracker/` with `PYTHONPATH=src pytest -q`
-
 ### Installation
 
 Use `make install` to install or refresh skills and `make uninstall` to remove
@@ -96,4 +85,3 @@ specific integration requires otherwise.
 - If you change config semantics, update docs and examples together.
 - If you touch `spec-driver`, keep `.specs/`, `specs/`, and `.skills/`
   behavior consistent.
-- If you touch `sb-tracker`, verify behavior with tests, not docs alone.

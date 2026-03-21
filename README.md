@@ -40,7 +40,7 @@ For the operational guide to using the skills together, see `SKILLS_METHODOLOGY.
 
 ## Planning layer
 
-For repositories that use repo-first planning and `sb-tracker` for execution work, the recommended short-name planning skills are:
+For repositories that use repo-first planning and a separate execution tracker, the recommended short-name planning skills are:
 
 - `skills/discover/`
 - `skills/design/`
@@ -52,21 +52,21 @@ These skills sit **before** the execution-track skills:
 
 - planning layer: `discover`, `design`, `ui-flow`, `breakdown`, `track`
 - execution layer: `spec-driver`, `specify`, `plan`, `tasks`, `close-track`
-- execution tracker: `sb-tracker`
+- execution tracker: your task system or issue tracker
 
 Recommended boundary:
 
 - keep goals, design, stories, decomposition, and increment plans in repo documents
-- use `sb-tracker` for executable tasks and dependency tracking
-- bootstrap one spec track per executable `sb` task
-- let `spec-driver` own track readiness, while `sb-tracker` owns task execution state
+- keep executable tasks and dependency tracking in your task system
+- bootstrap one spec track per executable task
+- let `spec-driver` own track readiness, while the execution tracker owns task execution state
 
 Preferred repo workflow:
 
 1. `discover` creates problem framing and initial story candidates.
 2. `design` turns that into architecture, interfaces, and risks.
 3. `ui-flow` adds optional UX or screen-flow artifacts.
-4. `breakdown` turns repo stories into directly executable tracker work and groups those slices into small demonstrable increments.
+4. `breakdown` turns repo stories into directly executable work items and groups those slices into small demonstrable increments.
 5. `track` bootstraps a task-scoped execution track and hands off to `spec-driver`.
 6. `spec-driver` routes task-scoped execution through `specify`, `plan`, and `tasks` as needed.
 7. `close-track` closes completed spec tracks and can optionally publish a project-local summary.

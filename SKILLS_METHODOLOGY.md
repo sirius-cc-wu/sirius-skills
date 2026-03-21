@@ -20,7 +20,7 @@ Use a **two-layer workflow**:
    - `plan`
    - `tasks`
    - `close-track`
-   - `sb-tracker`
+   - your execution tracker
 
 The planning layer keeps scope, design, decomposition, and increment planning in repo documents.
 
@@ -87,41 +87,41 @@ python3 skills/breakdown/scripts/scaffold_breakdown.py <project-slug>
 
 ### 4. Create tracker tasks
 
-Use `breakdown` with `sb-tracker` to create the executable work items.
+Use `breakdown` with your task system to create the executable work items.
 
 Use `task-planning.md` to record the increment structure before bootstrapping tracks. For each increment, capture:
 
 - the increment goal or user-visible value
-- the included story IDs and planned `sb` task IDs
+- the included story IDs and planned tracker task IDs
 - the expected demo or verification outcome
 - any sequencing constraints between tasks or increments
 
 Recommended rule:
 
-- one execution-ready slice = one `sb` task
-- one increment = one or more related `sb` tasks
+- one execution-ready slice = one tracker task
+- one increment = one or more related tracker tasks
 
 Recommended tracker usage:
 
-- use `sb add` for executable tasks
-- use `sb dep` for real execution blockers
+- create one task per execution-ready slice
+- record real execution blockers as tracker dependencies
 - keep repo story IDs in `task-traceability.md`
-- keep `sb` task IDs as execution identifiers
+- keep tracker task IDs as execution identifiers
 
 ### 5. Bootstrap one execution track per task
 
-Once an `sb` task is implementation-ready, use `track`.
+Once a tracker task is implementation-ready, use `track`.
 
 Preferred handoff:
 
 ```text
-breakdown -> sb-tracker -> track -> spec-driver
+breakdown -> execution tracker -> track -> spec-driver
 ```
 
-`track` should bootstrap a task-scoped spec track from the `sb` task, typically with:
+`track` should bootstrap a task-scoped spec track from the execution-ready work item, typically with:
 
 ```bash
-python3 skills/spec-driver/scripts/manage_specs.py add-from-sb <id>
+python3 skills/spec-driver/scripts/manage_specs.py add "<task-id>" "<task-name>"
 ```
 
 ### 6. Execute with spec-driver
@@ -145,19 +145,19 @@ Keep the boundary explicit:
 - `breakdown` also owns increment grouping at the repo-planning level
 - `tasks` owns the final task-scoped, machine-checkable execution checklist
 
-### 7. Track execution in sb-tracker
+### 7. Track execution in the execution tracker
 
-Use `sb-tracker` for actual task lifecycle:
+Use your task system for the actual task lifecycle:
 
-- `sb begin`
-- `sb verify`
-- `sb finish`
-- `sb pause`
+- start or claim work
+- record blockers or pauses
+- verify the implementation
+- mark work complete
 
 Keep the responsibility boundary clear:
 
 - `spec-driver` owns **track readiness**
-- `sb-tracker` owns **execution state**
+- the execution tracker owns **execution state**
 
 ### 8. Close the spec track
 
@@ -172,14 +172,14 @@ Its job is to:
 Recommended handoff:
 
 ```text
-sb finish -> close-track
+task complete -> close-track
 ```
 
 Important closure rules:
 
 - closing a track does not merge or delete the original `spec.md`, `plan.md`, or `tasks.md`
 - publishing is optional and project-local
-- closure metadata belongs in the spec system, not in `sb-tracker`
+- closure metadata belongs in the spec system, not in the execution tracker
 
 ## Recommended Repository Layout
 
@@ -210,10 +210,10 @@ The exact execution-track path depends on `spec-driver` configuration. The impor
 
 - Keep stories and design in repo docs.
 - Keep increment plans in repo docs.
-- Keep executable work in `sb-tracker`.
+- Keep executable work in your task system.
 - Do not use `spec-driver` for project-level discovery or decomposition.
 - Do not use spec tracks as increment containers; keep tracks task-scoped.
-- Do not use `sb` lifecycle states as spec-track states.
+- Do not use execution lifecycle states as spec-track states.
 - Split work before bootstrapping a track, not after.
 - Preserve story-to-task traceability from planning through execution.
 
@@ -224,6 +224,6 @@ Use this methodology when:
 - the work is larger than a one-off coding task
 - design or decomposition matters
 - multiple implementation tasks will come out of one project or feature
-- you want resumable execution with `sb-tracker`
+- you want resumable execution with a separate task system
 
 For small one-shot changes, you may skip most of the planning layer and go directly to `spec-driver` or straight implementation if no spec workflow is needed.
