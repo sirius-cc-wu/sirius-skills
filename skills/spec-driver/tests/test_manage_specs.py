@@ -24,25 +24,36 @@ def test_init_creates_human_and_machine_registry(tmp_path, monkeypatch):
     module = load_manage_specs_module()
     monkeypatch.chdir(tmp_path)
 
-    assert run_cli(module, monkeypatch, "init", "specs") == 0
+    assert run_cli(module, monkeypatch, "init", "tracks") == 0
 
-    readme = (tmp_path / "specs" / "README.md").read_text(encoding="utf-8")
-    registry = json.loads((tmp_path / "specs" / "registry.json").read_text(encoding="utf-8"))
+    readme = (tmp_path / "tracks" / "README.md").read_text(encoding="utf-8")
+    registry = json.loads((tmp_path / "tracks" / "registry.json").read_text(encoding="utf-8"))
 
     assert "| ID | Feature | Status | Updated | Closed | Path |" in readme
     assert registry["tracks"] == []
+
+
+def test_init_defaults_to_tracks_directory(tmp_path, monkeypatch):
+    module = load_manage_specs_module()
+    monkeypatch.chdir(tmp_path)
+
+    assert run_cli(module, monkeypatch, "init") == 0
+
+    assert (tmp_path / "tracks" / "README.md").exists()
+    config = json.loads((tmp_path / ".specs" / "config.json").read_text(encoding="utf-8"))
+    assert config["spec_dir"] == "tracks"
 
 
 def test_add_creates_track_metadata_and_registry_entries(tmp_path, monkeypatch):
     module = load_manage_specs_module()
     monkeypatch.chdir(tmp_path)
 
-    assert run_cli(module, monkeypatch, "init", "specs") == 0
+    assert run_cli(module, monkeypatch, "init", "tracks") == 0
     assert run_cli(module, monkeypatch, "add", "DEMO", "Demo Feature") == 0
 
-    track_dir = tmp_path / "specs" / "DEMO-demo-feature"
+    track_dir = tmp_path / "tracks" / "DEMO-demo-feature"
     metadata = json.loads((track_dir / ".track-meta.json").read_text(encoding="utf-8"))
-    registry = json.loads((tmp_path / "specs" / "registry.json").read_text(encoding="utf-8"))
+    registry = json.loads((tmp_path / "tracks" / "registry.json").read_text(encoding="utf-8"))
 
     assert metadata["track_id"] == "DEMO"
     assert metadata["status"] == "draft"
@@ -57,7 +68,7 @@ def test_set_status_blocks_invalid_transition(tmp_path, monkeypatch, capsys):
     module = load_manage_specs_module()
     monkeypatch.chdir(tmp_path)
 
-    assert run_cli(module, monkeypatch, "init", "specs") == 0
+    assert run_cli(module, monkeypatch, "init", "tracks") == 0
     assert run_cli(module, monkeypatch, "add", "DEMO", "Demo Feature") == 0
 
     exit_code = run_cli(module, monkeypatch, "set-status", "DEMO", "closed")
@@ -71,10 +82,10 @@ def test_closing_track_records_closed_at_and_updates_registry(tmp_path, monkeypa
     module = load_manage_specs_module()
     monkeypatch.chdir(tmp_path)
 
-    assert run_cli(module, monkeypatch, "init", "specs") == 0
+    assert run_cli(module, monkeypatch, "init", "tracks") == 0
     assert run_cli(module, monkeypatch, "add", "DEMO", "Demo Feature") == 0
 
-    track_dir = tmp_path / "specs" / "DEMO-demo-feature"
+    track_dir = tmp_path / "tracks" / "DEMO-demo-feature"
     (track_dir / "spec.md").write_text("# spec\n", encoding="utf-8")
     assert run_cli(module, monkeypatch, "set-status", "DEMO", "spec_ready") == 0
 
@@ -84,8 +95,8 @@ def test_closing_track_records_closed_at_and_updates_registry(tmp_path, monkeypa
     assert run_cli(module, monkeypatch, "set-status", "DEMO", "closed") == 0
 
     metadata = json.loads((track_dir / ".track-meta.json").read_text(encoding="utf-8"))
-    registry = json.loads((tmp_path / "specs" / "registry.json").read_text(encoding="utf-8"))
-    readme = (tmp_path / "specs" / "README.md").read_text(encoding="utf-8")
+    registry = json.loads((tmp_path / "tracks" / "registry.json").read_text(encoding="utf-8"))
+    readme = (tmp_path / "tracks" / "README.md").read_text(encoding="utf-8")
 
     assert metadata["status"] == "closed"
     assert metadata["closed_at"]
@@ -105,7 +116,7 @@ def test_legacy_markdown_registry_is_migrated_to_json(tmp_path, monkeypatch):
     )
     (tmp_path / "specs").mkdir()
     (tmp_path / "specs" / "README.md").write_text(
-        "# Specification Registry\n\n"
+        "# Track Registry\n\n"
         "| ID | Feature | Status | Path |\n"
         "|---|---|---|---|\n"
         "| DEMO | Demo Feature | draft | specs/DEMO-demo-feature/ |\n",
@@ -123,7 +134,7 @@ def test_add_relation_records_reciprocal_scope_and_registry(tmp_path, monkeypatc
     module = load_manage_specs_module()
     monkeypatch.chdir(tmp_path)
 
-    assert run_cli(module, monkeypatch, "init", "specs") == 0
+    assert run_cli(module, monkeypatch, "init", "tracks") == 0
     assert run_cli(module, monkeypatch, "add", "OLD", "Old Feature") == 0
     assert run_cli(module, monkeypatch, "add", "NEW", "New Feature") == 0
 
@@ -146,16 +157,16 @@ def test_add_relation_records_reciprocal_scope_and_registry(tmp_path, monkeypatc
     )
 
     new_meta = json.loads(
-        (tmp_path / "specs" / "NEW-new-feature" / ".track-meta.json").read_text(
+        (tmp_path / "tracks" / "NEW-new-feature" / ".track-meta.json").read_text(
             encoding="utf-8"
         )
     )
     old_meta = json.loads(
-        (tmp_path / "specs" / "OLD-old-feature" / ".track-meta.json").read_text(
+        (tmp_path / "tracks" / "OLD-old-feature" / ".track-meta.json").read_text(
             encoding="utf-8"
         )
     )
-    registry = json.loads((tmp_path / "specs" / "registry.json").read_text(encoding="utf-8"))
+    registry = json.loads((tmp_path / "tracks" / "registry.json").read_text(encoding="utf-8"))
 
     assert new_meta["relations"][0]["type"] == "supersedes"
     assert new_meta["relations"][0]["target_track"] == "OLD"
@@ -170,12 +181,12 @@ def test_audit_relations_reports_missing_reciprocal(tmp_path, monkeypatch):
     module = load_manage_specs_module()
     monkeypatch.chdir(tmp_path)
 
-    assert run_cli(module, monkeypatch, "init", "specs") == 0
+    assert run_cli(module, monkeypatch, "init", "tracks") == 0
     assert run_cli(module, monkeypatch, "add", "OLD", "Old Feature") == 0
     assert run_cli(module, monkeypatch, "add", "NEW", "New Feature") == 0
     assert run_cli(module, monkeypatch, "add-relation", "NEW", "supersedes", "OLD") == 0
 
-    old_meta_path = tmp_path / "specs" / "OLD-old-feature" / ".track-meta.json"
+    old_meta_path = tmp_path / "tracks" / "OLD-old-feature" / ".track-meta.json"
     old_meta = json.loads(old_meta_path.read_text(encoding="utf-8"))
     old_meta["relations"] = []
     old_meta_path.write_text(json.dumps(old_meta, indent=2) + "\n", encoding="utf-8")

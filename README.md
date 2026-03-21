@@ -28,8 +28,8 @@ These core skills should remain tracker-agnostic by default:
 
 - `skills/commit/`
 - `skills/create-pr/`
+- `skills/define/`
 - `skills/spec-driver/`
-- `skills/specify/`
 - `skills/plan/`
 - `skills/close-track/`
 
@@ -50,7 +50,7 @@ For repositories that use repo-first planning and a separate execution tracker, 
 These skills sit **before** the execution-track skills:
 
 - planning layer: `discover`, `design`, `ui-flow`, `breakdown`, `track`
-- execution layer: `spec-driver`, `specify`, `plan`, `close-track`
+- execution layer: `spec-driver`, `define`, `plan`, `close-track`
 - execution tracker: your task system or issue tracker
 
 Recommended boundary:
@@ -67,10 +67,12 @@ Preferred repo workflow:
 3. `ui-flow` adds optional UX or screen-flow artifacts.
 4. `breakdown` turns repo stories into directly executable work items and groups those slices into small demonstrable increments.
 5. `track` bootstraps a task-scoped execution track and hands off to `spec-driver`.
-6. `spec-driver` routes task-scoped execution through `specify` to capture task intent and acceptance, then through `plan` to produce the final execution artifact.
+6. `spec-driver` routes task-scoped execution through `define` to capture task intent and acceptance, then through `plan` to produce the final execution artifact.
 7. `close-track` closes completed spec tracks and can optionally publish a project-local summary.
 
-In the repo-native flow, `breakdown` owns repo-story decomposition, `specify` owns the task-scoped `spec.md`, and `plan` owns the final task-scoped execution plan and validation checklist.
+In the repo-native flow, `breakdown` owns repo-story decomposition, `define` owns the task-scoped `spec.md`, and `plan` owns the final task-scoped execution plan and validation checklist.
+
+By default, new execution tracks are created under `tracks/` unless `.specs/config.json` overrides the location.
 
 When UML diagrams are useful, use **PlantUML**:
 

@@ -12,7 +12,7 @@ Use this skill to manage workflow state for track readiness.
 1. Resolve or initialize the active track.
 2. Verify required files, registry state, and track metadata.
 3. Decide whether the request belongs in the planning layer or the task-scoped execution layer.
-4. Route task-scoped work to `specify`, `plan`, or `close-track` as appropriate.
+4. Route task-scoped work to `define`, `plan`, or `close-track` as appropriate.
 5. Update track status when a phase is complete.
 
 ## Entry Decision Guide
@@ -83,7 +83,7 @@ Do not duplicate task-execution states like `implementing`, `in progress`, or `b
 
 ## Preflight
 
-1. If `.specs/config.json` is missing, ask the user where specs should be created, then initialize via tooling with that path.
+1. If `.specs/config.json` is missing, ask the user where tracks should be created, then initialize via tooling with that path.
 2. Ensure the configured registry exists (`<spec_dir>/README.md` and `<spec_dir>/registry.json`).
 3. Resolve the active track using tooling (or by user-provided ID/path).
 4. Confirm track path exists and represents one execution-ready work item.
@@ -98,7 +98,7 @@ Do not duplicate task-execution states like `implementing`, `in progress`, or `b
 ## Routing Rules
 
 1. If no `spec.md` or spec is incomplete:
-    - Use `specify` to create or update `spec.md`.
+    - Use `define` to create or update `spec.md`.
     - Set status to `draft` during authoring and `spec_ready` when complete.
 2. If `spec.md` is complete and no `plan.md`:
     - Use `plan` to produce `plan.md`.
@@ -161,7 +161,7 @@ Partial invalidation is represented with soft selectors in relation scope, for e
 
 Closed tracks are non-destructive: the original `spec.md` and `plan.md` stay in place, and any legacy `tasks.md` may remain as well, while the metadata and registry record that the track is closed.
 
-The configured specs directory is stored in `.specs/config.json` under `spec_dir`. If `.specs/config.json` does not exist yet, ask the user where specs should be created before running `init`.
+The configured tracks directory is stored in `.specs/config.json` under `spec_dir` for backward compatibility. If `.specs/config.json` does not exist yet, ask the user where tracks should be created before running `init`.
 
 Track IDs are treated as opaque identifiers. Manual IDs may include letters, numbers, `.`, `_`, and `-`, so IDs like `BNC-lg2fwe` are valid. Auto-generated standalone track IDs use a hash format such as `SPC-a3f8e9` or `CLAW-a3f8e9`.
 
@@ -199,10 +199,10 @@ Example:
 
 ```bash
 # Initialize registry/config:
-python3 <path-to-spec-driver>/scripts/manage_specs.py init [spec-dir]
+python3 <path-to-spec-driver>/scripts/manage_specs.py init [track-dir]
 
-# Example with a custom specs directory:
-python3 <path-to-spec-driver>/scripts/manage_specs.py init docs/specs
+# Example with a custom tracks directory:
+python3 <path-to-spec-driver>/scripts/manage_specs.py init docs/tracks
 
 # Add track (use branch_extract_pattern from .skills/identity.json when present,
 # otherwise generate a hash ID with the SPC prefix):

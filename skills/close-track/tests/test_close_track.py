@@ -27,10 +27,10 @@ def setup_execution_ready_track(tmp_path, monkeypatch, include_tasks=True):
     manage_specs = load_module(MANAGE_SPECS_PATH, "manage_specs")
     monkeypatch.chdir(tmp_path)
 
-    assert run_cli(manage_specs, monkeypatch, "init", "specs") == 0
+    assert run_cli(manage_specs, monkeypatch, "init", "tracks") == 0
     assert run_cli(manage_specs, monkeypatch, "add", "DEMO", "Demo Feature") == 0
 
-    track_dir = tmp_path / "specs" / "DEMO-demo-feature"
+    track_dir = tmp_path / "tracks" / "DEMO-demo-feature"
     (track_dir / "spec.md").write_text(
         "# Task Specification: Demo Feature\n\n"
         "## 3. Functional Requirements\n\n"
@@ -91,7 +91,7 @@ def test_close_track_publishes_to_explicit_file(tmp_path, monkeypatch):
     assert "### " in content
     assert "Demo Feature (`DEMO`)" in content
     assert "Functional requirements snapshot" in content
-    assert "`specs/DEMO-demo-feature/spec.md`" in content
+    assert "`tracks/DEMO-demo-feature/spec.md`" in content
     assert "Implementation verification snapshot" in content
     assert "Run demo integration test" in content
     assert metadata["status"] == "closed"
@@ -290,7 +290,7 @@ def test_close_track_records_relations_and_publishes_them(tmp_path, monkeypatch)
     content = (tmp_path / "docs" / "spec-history.md").read_text(encoding="utf-8")
     source_meta = json.loads((track_dir / ".track-meta.json").read_text(encoding="utf-8"))
     target_meta = json.loads(
-        (tmp_path / "specs" / "OLD-old-feature" / ".track-meta.json").read_text(
+        (tmp_path / "tracks" / "OLD-old-feature" / ".track-meta.json").read_text(
             encoding="utf-8"
         )
     )

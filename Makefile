@@ -18,6 +18,7 @@ MANAGED_SKILLS := \
 	remotion \
 	shadcn-ui \
 	simplify \
+	define \
 	spec-driver \
 	specify \
 	stitch-design \
@@ -27,7 +28,7 @@ MANAGED_SKILLS := \
 
 install:
 	npx skills add "$(REPO_ROOT)/skills/spec-driver" $(COMMON_FLAGS)
-	npx skills add "$(REPO_ROOT)/skills/specify" $(COMMON_FLAGS)
+	npx skills add "$(REPO_ROOT)/skills/define" $(COMMON_FLAGS)
 	npx skills add "$(REPO_ROOT)/skills/plan" $(COMMON_FLAGS)
 	npx skills add "$(REPO_ROOT)/skills/discover" $(COMMON_FLAGS)
 	npx skills add "$(REPO_ROOT)/skills/design" $(COMMON_FLAGS)

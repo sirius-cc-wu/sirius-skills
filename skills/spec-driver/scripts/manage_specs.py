@@ -8,7 +8,7 @@ import sys
 from datetime import datetime
 from typing import Dict, List, Optional, Tuple
 
-DEFAULT_SPECS_DIR = "specs"
+DEFAULT_SPECS_DIR = "tracks"
 CONFIG_DIR = ".specs"
 CONFIG_FILE = os.path.join(CONFIG_DIR, "config.json")
 IDENTITY_CONFIG_DIR = ".skills"
@@ -17,7 +17,7 @@ DEFAULT_PREFERRED_WORKFLOW = "TDD"
 REGISTRY_JSON_FILE = "registry.json"
 DEFAULT_GENERATED_TRACK_PREFIX = "SPC"
 REGISTRY_HEADER = (
-    "# Specification Registry\n\n"
+    "# Track Registry\n\n"
     "| ID | Feature | Status | Updated | Closed | Path |\n"
     "|---|---|---|---|---|---|\n"
 )
@@ -279,9 +279,9 @@ def load_config(required: bool = True) -> Dict[str, str]:
     if not os.path.exists(CONFIG_FILE):
         if required:
             raise RuntimeError(
-                "Spec config not found at '.specs/config.json'. "
-                "Ask the user where specs should be created, then run "
-                "`manage_specs.py init <spec-dir>`."
+                "Track config not found at '.specs/config.json'. "
+                "Ask the user where tracks should be created, then run "
+                "`manage_specs.py init <track-dir>`."
             )
         return {
             "spec_dir": DEFAULT_SPECS_DIR,
@@ -409,14 +409,14 @@ def load_registry_json(registry_json_file: str) -> List[Dict[str, object]]:
         with open(registry_json_file, "r", encoding="utf-8") as f:
             payload = json.load(f)
     except json.JSONDecodeError as exc:
-        raise RuntimeError("Specs registry JSON is not valid JSON.") from exc
+        raise RuntimeError("Track registry JSON is not valid JSON.") from exc
 
     if isinstance(payload, list):
         raw_rows = payload
     elif isinstance(payload, dict):
         raw_rows = payload.get("tracks")
     else:
-        raise RuntimeError("Specs registry JSON must be a JSON object or list.")
+        raise RuntimeError("Track registry JSON must be a JSON object or list.")
 
     if not isinstance(raw_rows, list):
         raise RuntimeError("Specs registry JSON field 'tracks' must be a list.")
@@ -1044,7 +1044,7 @@ def cmd_init(args: argparse.Namespace) -> int:
     spec_dir = normalize_spec_dir(args.spec_dir) if args.spec_dir else config["spec_dir"]
     write_config(spec_dir, preferred_workflow=config["preferred_workflow"])
     ensure_registry(spec_dir)
-    print(f"Initialized specs registry and config in '{spec_dir}/'.")
+    print(f"Initialized track registry and config in '{spec_dir}/'.")
     return 0
 
 

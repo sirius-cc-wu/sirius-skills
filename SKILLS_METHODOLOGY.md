@@ -16,7 +16,7 @@ Use a **two-layer workflow**:
    - `track`
 2. **Execution layer**
    - `spec-driver`
-   - `specify`
+   - `define`
    - `plan`
    - `close-track`
    - your execution tracker
@@ -129,7 +129,7 @@ python3 skills/spec-driver/scripts/manage_specs.py add "<task-id>" "<task-name>"
 After a track exists, use the execution layer:
 
 1. `spec-driver`
-2. `specify`
+2. `define`
 3. `plan`
 
 This is where task-scoped execution artifacts are created:
@@ -139,7 +139,7 @@ This is where task-scoped execution artifacts are created:
 
 Within that execution layer:
 
-- `specify` creates the task-scoped `spec.md` for one execution-ready work item, including acceptance and requirement context
+- `define` creates the task-scoped `spec.md` for one execution-ready work item, including acceptance and requirement context
 - `plan` converts that task-scoped spec into the final implementation packets, traceability, validation steps, and PlantUML detailed design needed for execution
 
 Keep the boundary explicit:
@@ -234,7 +234,7 @@ my-app/
         user-stories.md
         task-planning.md
         task-traceability.md
-  specs/
+  tracks/
     HAB-101-create-schema/
       spec.md
       plan.md
@@ -246,7 +246,7 @@ my-app/
       plan.md
 ```
 
-In this example, `docs/features/habit-tracker/` holds the feature-level planning artifacts, while each executable task gets its own centralized execution track under `specs/`.
+In this example, `docs/features/habit-tracker/` holds the feature-level planning artifacts, while each executable task gets its own centralized execution track under `tracks/`.
 
 ## Operating Rules
 

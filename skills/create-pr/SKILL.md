@@ -72,7 +72,7 @@ Example project config:
    - Summary: What does the change do?
 
 4. **Validate Execution Checklist Completion**:
-   - Locate the relevant `plan.md` (usually in `specs/<ID>-<name>/plan.md`).
+   - Locate the relevant `plan.md` (usually in `tracks/<ID>-<name>/plan.md`).
    - If a legacy `tasks.md` also exists, review it alongside `plan.md`.
    - Check if all checklist items in the execution artifact(s) are marked as completed (`[x]`).
    - **MANDATORY**: A PR should not be created if there are pending `[ ]` items in `plan.md` (or any legacy `tasks.md`) unless explicitly justified.

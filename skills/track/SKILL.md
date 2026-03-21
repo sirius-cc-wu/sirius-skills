@@ -5,12 +5,12 @@ description: Bootstraps a task-scoped execution track from a ready work item and
 
 # Track
 
-Use this skill when a work item is small enough to execute and needs a task-scoped spec track.
+Use this skill when a work item is small enough to execute and needs a task-scoped track.
 
 ## Responsibilities
 
 1. Validate that the selected work item is ready for execution.
-2. Bootstrap one task-scoped spec track for that work item.
+2. Bootstrap one task-scoped track for that work item.
 3. Confirm the track exists and is aligned with the repository's spec layout.
 4. Hand off to `spec-driver` for `spec.md` and `plan.md`.
 
@@ -22,7 +22,7 @@ If no tracker is in use, use the repository's configured issue ID and track boot
 
 ## Bootstrap Rules
 
-- One executable work item should map to one spec track.
+- One executable work item should map to one track.
 - Prefer preserving the tracker ID as the track ID when the tooling supports it.
 - Do not create a track for work that still needs major decomposition.
 - Keep task execution state in the tracker and track readiness in `spec-driver`.

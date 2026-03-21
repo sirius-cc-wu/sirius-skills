@@ -83,5 +83,5 @@ specific integration requires otherwise.
   changing behavior.
 - Keep edits small and aligned with the repo's generic-first design.
 - If you change config semantics, update docs and examples together.
-- If you touch `spec-driver`, keep `.specs/`, `specs/`, and `.skills/`
+- If you touch `spec-driver`, keep `.specs/`, `tracks/`, and `.skills/`
   behavior consistent.
