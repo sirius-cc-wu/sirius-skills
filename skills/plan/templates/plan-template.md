@@ -73,6 +73,18 @@
 
 ## 6. Supporting Notes
 
+### Detailed Design Diagrams (PlantUML)
+
+- [Include when the work benefits from detailed structure or interaction diagrams]
+- Diagram purpose:
+- Diagram type:
+
+```plantuml
+@startuml
+' Replace with a task-scoped class, sequence, state, or activity diagram
+@enduml
+```
+
 ### Research Decisions
 
 - [Only include if needed]

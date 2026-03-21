@@ -31,7 +31,7 @@ This project follows a **Spec-Driven Development (SDD)** lifecycle:
 1.  **Discover & Design**: Articulate intent, scope, and architecture before coding.
 2.  **Break Down**: Turn stories into execution-ready work items and increments.
 3.  **Track**: Bootstrap one task-scoped spec track per implementation-ready work item.
-4.  **Execute**: Use `spec-driver`, `specify`, and `plan` to create task-scoped execution artifacts.
+4.  **Execute**: Use `spec-driver`, `specify`, and `plan` to create task-scoped execution artifacts, including PlantUML detailed design when it clarifies implementation.
 5.  **Close**: Use `close-track` after implementation and verification are complete.
 
 ### PR Guidelines

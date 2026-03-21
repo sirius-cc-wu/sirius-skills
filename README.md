@@ -72,6 +72,11 @@ Preferred repo workflow:
 
 In the repo-native flow, `breakdown` owns repo-story decomposition, `specify` owns the task-scoped `spec.md`, and `plan` owns the final task-scoped execution plan and validation checklist.
 
+When UML diagrams are useful, use **PlantUML**:
+
+- `design` should produce feature-scoped system-design diagrams in `system-design.md`
+- `plan` should produce task-scoped detailed-design diagrams in `plan.md`
+
 ## Spec track source of truth
 
 The `spec-driver` workflow now keeps three complementary artifacts in sync:

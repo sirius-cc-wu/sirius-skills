@@ -50,6 +50,7 @@ Use `design` to define:
 - data flow
 - risks
 - validation approach
+- PlantUML system-design diagrams
 
 Expected output:
 
@@ -139,7 +140,7 @@ This is where task-scoped execution artifacts are created:
 Within that execution layer:
 
 - `specify` creates the task-scoped `spec.md` for one execution-ready work item, including acceptance and requirement context
-- `plan` converts that task-scoped spec into the final implementation packets, traceability, and validation steps needed for execution
+- `plan` converts that task-scoped spec into the final implementation packets, traceability, validation steps, and PlantUML detailed design needed for execution
 
 Keep the boundary explicit:
 
@@ -208,6 +209,13 @@ Keep discovery, design, and breakdown artifacts in a feature-local planning fold
 ```
 
 The exact execution-track path depends on `spec-driver` configuration. The important rule is that execution tracks are **task-scoped**, not feature-scoped, and remain centrally managed separately from the feature-local planning docs.
+
+## Diagram Conventions
+
+- Use **PlantUML** as the standard UML language in both layers.
+- In the planning layer, keep UML diagrams feature-scoped and embed them in `system-design.md` unless a separate adjacent `.puml` file is clearly easier to maintain.
+- In the execution layer, keep UML diagrams task-scoped and place detailed design diagrams in `plan.md`.
+- Prefer diagrams that answer a concrete question for the current phase rather than diagramming everything by default.
 
 ### Example layout
 

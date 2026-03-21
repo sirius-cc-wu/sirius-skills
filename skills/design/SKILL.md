@@ -1,6 +1,6 @@
 ---
 name: design
-description: Produces feature-level system design artifacts covering architecture, interfaces, constraints, and validation strategy.
+description: Produces feature-level system design artifacts covering architecture, interfaces, constraints, validation strategy, and PlantUML diagrams.
 ---
 
 # Design
@@ -13,6 +13,7 @@ Use this skill after `discover` when the work needs architecture, integration, o
 2. Capture architecture, interfaces, data flow, and constraints.
 3. Make major tradeoffs, risks, and assumptions explicit.
 4. Define the validation strategy needed before implementation starts.
+5. Produce feature-scoped PlantUML diagrams that clarify the system design.
 
 ## Required Output
 
@@ -29,12 +30,15 @@ Optional companion output:
 - Focus on decisions that unblock later decomposition and execution.
 - Document interfaces, dependencies, and operational constraints clearly.
 - Call out risks that should affect task ordering or stop-and-ask gates.
+- Use PlantUML as the UML language whenever you include diagrams.
+- Include system-design diagrams directly in `system-design.md` with fenced `plantuml` blocks unless a separate adjacent `.puml` file is clearly better.
+- Prefer feature-level diagrams such as component, package, sequence, state, or deployment diagrams over low-level implementation detail.
 
 ## Workflow
 
 1. Read `discover.md` and any existing feature planning docs.
 2. Inspect the relevant codebase or adjacent systems as needed.
-3. Write `system-design.md` with architecture, interfaces, constraints, and validation notes.
+3. Write `system-design.md` with architecture, interfaces, constraints, validation notes, and PlantUML system-design diagrams.
 4. Refine story boundaries when the design changes implementation shape.
 5. Stop when the work is concrete enough for `breakdown`.
 
@@ -43,3 +47,4 @@ Optional companion output:
 - Do not generate task-scoped `plan.md` or other execution-track artifacts.
 - Do not create tracker tasks for vague or unresolved designs.
 - If the work is purely UX-focused, use `ui-flow` instead or alongside this skill.
+- Do not let feature-level UML drift into task-scoped class-by-class implementation design; that belongs in `plan`.
