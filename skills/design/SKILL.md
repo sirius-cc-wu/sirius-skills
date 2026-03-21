@@ -40,6 +40,6 @@ Optional companion output:
 
 ## Guardrails
 
-- Do not generate task-scoped `plan.md` or `tasks.md`.
+- Do not generate task-scoped `plan.md` or other execution-track artifacts.
 - Do not create tracker tasks for vague or unresolved designs.
 - If the work is purely UX-focused, use `ui-flow` instead or alongside this skill.

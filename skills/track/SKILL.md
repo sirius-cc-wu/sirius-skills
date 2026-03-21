@@ -12,7 +12,7 @@ Use this skill when a work item is small enough to execute and needs a task-scop
 1. Validate that the selected work item is ready for execution.
 2. Bootstrap one task-scoped spec track for that work item.
 3. Confirm the track exists and is aligned with the repository's spec layout.
-4. Hand off to `spec-driver` for `spec.md`, `plan.md`, and `tasks.md`.
+4. Hand off to `spec-driver` for `spec.md` and `plan.md`.
 
 ## Preferred Input
 
@@ -39,7 +39,7 @@ python3 skills/spec-driver/scripts/manage_specs.py add "<track-id>" "<feature-na
    If the tracker supports exporting issue metadata as JSON, you may pass `--id` manually to preserve the tracker ID as the track ID.
 
 3. Confirm the new track path exists and registry state is consistent.
-4. Hand off to `spec-driver` to author `spec.md`, `plan.md`, and optionally `tasks.md`.
+4. Hand off to `spec-driver` to author `spec.md` and `plan.md`.
 
 ## Guardrails
 

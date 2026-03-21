@@ -23,7 +23,7 @@ def run_cli(module, monkeypatch, *args):
     return module.main()
 
 
-def setup_execution_ready_track(tmp_path, monkeypatch):
+def setup_execution_ready_track(tmp_path, monkeypatch, include_tasks=True):
     manage_specs = load_module(MANAGE_SPECS_PATH, "manage_specs")
     monkeypatch.chdir(tmp_path)
 
@@ -53,15 +53,16 @@ def setup_execution_ready_track(tmp_path, monkeypatch):
         "- Regression checks: Existing track artifacts remain in place\n",
         encoding="utf-8",
     )
-    (track_dir / "tasks.md").write_text(
-        "# Tasks: Demo Feature\n\n"
-        "## 1. Execution Strategy\n\n"
-        "- Validation approach: Run focused tests before closing the track\n\n"
-        "## 7. Exit Criteria\n\n"
-        "- [ ] Validation work is represented where required\n"
-        "- [ ] The implementation agent can begin without major replanning\n",
-        encoding="utf-8",
-    )
+    if include_tasks:
+        (track_dir / "tasks.md").write_text(
+            "# Tasks: Demo Feature\n\n"
+            "## 1. Execution Strategy\n\n"
+            "- Validation approach: Run focused tests before closing the track\n\n"
+            "## 7. Exit Criteria\n\n"
+            "- [ ] Validation work is represented where required\n"
+            "- [ ] The implementation agent can begin without major replanning\n",
+            encoding="utf-8",
+        )
     assert run_cli(manage_specs, monkeypatch, "set-status", "DEMO", "plan_ready") == 0
     assert run_cli(manage_specs, monkeypatch, "set-status", "DEMO", "execution_ready") == 0
     return manage_specs, track_dir
@@ -125,6 +126,31 @@ def test_close_track_uses_config_when_publish_target_not_passed(tmp_path, monkey
     assert "## Published Tracks" in content
     assert "Run focused tests before closing the track" in content
     assert metadata["publications"][0]["target_file"] == "docs/history.md"
+
+
+def test_close_track_publishes_without_legacy_tasks_md(tmp_path, monkeypatch):
+    close_track = load_module(CLOSE_TRACK_PATH, "close_track")
+    _, track_dir = setup_execution_ready_track(tmp_path, monkeypatch, include_tasks=False)
+
+    assert (
+        run_cli(
+            close_track,
+            monkeypatch,
+            "--track",
+            "DEMO",
+            "--publish",
+            "docs/spec-history.md",
+        )
+        == 0
+    )
+
+    content = (tmp_path / "docs" / "spec-history.md").read_text(encoding="utf-8")
+    metadata = json.loads((track_dir / ".track-meta.json").read_text(encoding="utf-8"))
+
+    assert "Demo Feature (`DEMO`)" in content
+    assert "Implementation verification snapshot" in content
+    assert "User can see published history entry" in content
+    assert metadata["status"] == "closed"
 
 
 def test_close_track_renders_issue_link_when_identity_config_exists(tmp_path, monkeypatch):

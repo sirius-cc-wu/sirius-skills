@@ -23,14 +23,12 @@ MANAGED_SKILLS := \
 	stitch-design \
 	stitch-loop \
 	track \
-	tasks \
 	ui-flow
 
 install:
 	npx skills add "$(REPO_ROOT)/skills/spec-driver" $(COMMON_FLAGS)
 	npx skills add "$(REPO_ROOT)/skills/specify" $(COMMON_FLAGS)
 	npx skills add "$(REPO_ROOT)/skills/plan" $(COMMON_FLAGS)
-	npx skills add "$(REPO_ROOT)/skills/tasks" $(COMMON_FLAGS)
 	npx skills add "$(REPO_ROOT)/skills/discover" $(COMMON_FLAGS)
 	npx skills add "$(REPO_ROOT)/skills/design" $(COMMON_FLAGS)
 	npx skills add "$(REPO_ROOT)/skills/ui-flow" $(COMMON_FLAGS)

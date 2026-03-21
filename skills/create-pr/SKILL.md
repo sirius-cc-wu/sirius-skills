@@ -72,10 +72,10 @@ Example project config:
    - Summary: What does the change do?
 
 4. **Validate Execution Checklist Completion**:
-   - Locate the relevant `tasks.md` (usually in `specs/<ID>-<name>/tasks.md`).
-   - For legacy tracks without `tasks.md`, fall back to `plan.md`.
-   - Check if all checklist items in the execution artifact are marked as completed (`[x]`).
-   - **MANDATORY**: A PR should not be created if there are pending `[ ]` items in `tasks.md` (or the legacy `plan.md`) unless explicitly justified.
+   - Locate the relevant `plan.md` (usually in `specs/<ID>-<name>/plan.md`).
+   - If a legacy `tasks.md` also exists, review it alongside `plan.md`.
+   - Check if all checklist items in the execution artifact(s) are marked as completed (`[x]`).
+   - **MANDATORY**: A PR should not be created if there are pending `[ ]` items in `plan.md` (or any legacy `tasks.md`) unless explicitly justified.
 
 5. **Push branch if needed**:
    ```bash
@@ -108,7 +108,7 @@ Example project config:
    - [ ] I have performed a self-review of my own code
    - [ ] I have commented my code, particularly in hard-to-understand areas
    - [ ] I have made corresponding changes to the documentation
-   - [ ] I have updated the execution checklist (`tasks.md`, or `plan.md` for legacy tracks)
+   - [ ] I have updated the execution checklist (`plan.md`, plus any legacy `tasks.md`)
    - [ ] New and existing unit tests pass locally with my changes
    - [ ] I have checked my code and corrected any misspellings
    EOF

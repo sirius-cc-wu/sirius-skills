@@ -154,6 +154,6 @@ When generating `task-traceability.md`, start from `assets/task-traceability-tem
 - Do not create execution tracks directly from vague stories.
 - Do not mirror tracker execution states inside feature planning docs.
 - Do not turn increments into tracker states or spec-track containers.
-- Do not turn `task-planning.md` into a task-scoped `tasks.md`; that belongs to `spec-driver` later.
+- Do not turn `task-planning.md` into a task-scoped execution checklist; that belongs to `spec-driver` and `plan` later.
 - Do not mark work as parallel-safe unless overlap and integration risk are genuinely low.
 - If a task still needs major replanning, split it again before handoff.

@@ -19,7 +19,7 @@ Use this skill when implementation is complete and you want to close a spec trac
 
 - Keep the original track folder in place.
 - Treat `<spec_dir>/README.md`, `<spec_dir>/registry.json`, and `<track_path>/.track-meta.json` as the canonical closure records.
-- Publishing is additive. It creates or updates a rollup entry with backlinks; it does not merge or erase the original `spec.md` / `plan.md` / `tasks.md`.
+- Publishing is additive. It creates or updates a rollup entry with backlinks; it does not merge or erase the original `spec.md` / `plan.md` artifacts, and it may also reference legacy `tasks.md` files when present.
 
 ## Project-Local Publishing Configuration
 
@@ -45,10 +45,10 @@ If the config file is absent, the skill still works for closing tracks. Publishi
 2. Run `manage_specs.py validate-track`.
 3. If the track is not already `closed`, close it through tooling.
 4. If publishing is requested or configured:
-    - generate a concise summary from `spec.md`, `plan.md`, `tasks.md`, and metadata
-   - include explicit spec relations such as `supersedes` or `replaces_partially` when they are confirmed at close time
-   - include source issue links when track metadata and `.skills/identity.json` provide them
-   - include implementation verification highlights when they can be inferred from the plan/tasks artifacts
+    - generate a concise summary from `spec.md`, `plan.md`, any legacy `tasks.md`, and metadata
+    - include explicit spec relations such as `supersedes` or `replaces_partially` when they are confirmed at close time
+    - include source issue links when track metadata and `.skills/identity.json` provide them
+    - include implementation verification highlights when they can be inferred from `plan.md` and any legacy `tasks.md`
     - write or update the configured rollup document using stable markers
     - record publication metadata back into `.track-meta.json`
 5. Return the outcome, published target if any, and the retained source artifacts.

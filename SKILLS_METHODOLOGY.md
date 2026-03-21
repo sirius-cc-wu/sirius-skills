@@ -18,7 +18,6 @@ Use a **two-layer workflow**:
    - `spec-driver`
    - `specify`
    - `plan`
-   - `tasks`
    - `close-track`
    - your execution tracker
 
@@ -131,25 +130,22 @@ After a track exists, use the execution layer:
 1. `spec-driver`
 2. `specify`
 3. `plan`
-4. `tasks` (optional, but preferred when execution benefits from an explicit checklist)
 
 This is where task-scoped execution artifacts are created:
 
 - `spec.md`
 - `plan.md`
-- `tasks.md`
 
 Within that execution layer:
 
 - `specify` creates the task-scoped `spec.md` for one execution-ready work item, including acceptance and requirement context
-- `plan` converts that task-scoped spec into implementation packets, traceability, and validation steps
-- `tasks` turns the plan into the final execution checklist when an explicit checklist adds value
+- `plan` converts that task-scoped spec into the final implementation packets, traceability, and validation steps needed for execution
 
 Keep the boundary explicit:
 
 - `breakdown` owns repo-story decomposition and tracker-ready slices
 - `breakdown` also owns increment grouping at the repo-planning level
-- `tasks` owns the final task-scoped, machine-checkable execution checklist
+- `plan` owns the final task-scoped execution checklist for new tracks
 
 ### 7. Track execution in the execution tracker
 
@@ -183,7 +179,7 @@ task complete -> close-track
 
 Important closure rules:
 
-- closing a track does not merge or delete the original `spec.md`, `plan.md`, or `tasks.md`
+ - closing a track does not merge or delete the original `spec.md` or `plan.md`; older tracks may also retain `tasks.md`
 - publishing is optional and project-local
 - closure metadata belongs in the spec system, not in the execution tracker
 
@@ -209,7 +205,6 @@ Keep discovery, design, and breakdown artifacts in a feature-local planning fold
 <spec_dir>/<task-id>-<task-slug>/
   spec.md
   plan.md
-  tasks.md
 ```
 
 The exact execution-track path depends on `spec-driver` configuration. The important rule is that execution tracks are **task-scoped**, not feature-scoped, and remain centrally managed separately from the feature-local planning docs.
@@ -235,15 +230,12 @@ my-app/
     HAB-101-create-schema/
       spec.md
       plan.md
-      tasks.md
     HAB-102-add-habit-form/
       spec.md
       plan.md
-      tasks.md
     HAB-103-mark-habit-done/
       spec.md
       plan.md
-      tasks.md
 ```
 
 In this example, `docs/features/habit-tracker/` holds the feature-level planning artifacts, while each executable task gets its own centralized execution track under `specs/`.

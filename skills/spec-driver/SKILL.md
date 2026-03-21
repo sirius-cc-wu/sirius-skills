@@ -12,7 +12,7 @@ Use this skill to manage workflow state for track readiness.
 1. Resolve or initialize the active track.
 2. Verify required files, registry state, and track metadata.
 3. Decide whether the request belongs in the planning layer or the task-scoped execution layer.
-4. Route task-scoped work to `specify`, `plan`, `tasks`, or `close-track` as appropriate.
+4. Route task-scoped work to `specify`, `plan`, or `close-track` as appropriate.
 5. Update track status when a phase is complete.
 
 ## Entry Decision Guide
@@ -90,7 +90,7 @@ Do not duplicate task-execution states like `implementing`, `in progress`, or `b
 5. Check presence of:
     - `spec.md`
     - `plan.md`
-    - `tasks.md` (optional)
+    - `tasks.md` (legacy optional)
 6. Verify registry status is consistent with file reality. If inconsistent, repair status first.
 7. For closed tracks, verify closure metadata exists in `<track_path>/.track-meta.json`.
 8. If no track can be resolved, do not invent feature-level planning inside `spec-driver`; route to `track` or the planning layer based on scope.
@@ -104,8 +104,8 @@ Do not duplicate task-execution states like `implementing`, `in progress`, or `b
     - Use `plan` to produce `plan.md`.
     - Set status to `plan_ready` when complete.
 3. If `spec.md` and `plan.md` are complete:
-    - Use `tasks` when execution benefits from an explicit checklist, dependency notes, validation checkpoints, or parallel-safe slicing.
-    - `tasks` may be skipped when `plan.md` is already concrete enough for direct execution without major replanning.
+    - Use `plan.md` as the final execution artifact for sequencing, validation, and checklist coverage.
+    - Legacy tracks may still contain `tasks.md`; if present, keep it aligned with the plan rather than regenerating it as a required step.
     - Set status to `execution_ready` when the plan is actionable and execution can begin.
 4. While implementation is underway:
     - keep `spec-driver` focused on track readiness and artifact state
@@ -125,13 +125,13 @@ A track is `spec_ready` when:
 A track is `plan_ready` when:
 - `plan.md` is actionable
 - requirements map to implementation and validation steps
-- the next step is either generating `tasks.md` or beginning execution directly when `plan.md` is already sufficient
+- the next step is final readiness review or beginning execution
 - gates are passed or explicitly waived
 
 A track is `execution_ready` when:
 - `plan.md` is actionable
 - execution can begin without major replanning
-- any optional `tasks.md` or execution checklist is aligned with the plan
+- any legacy `tasks.md` or execution checklist is aligned with the plan
 - the next lifecycle owner is the active coding agent or task tracker
 
 A track is `closed` when:
@@ -159,7 +159,7 @@ Track metadata may also contain explicit relation records such as:
 
 Partial invalidation is represented with soft selectors in relation scope, for example story title, requirement IDs, or a freeform selector string.
 
-Closed tracks are non-destructive: the original `spec.md`, `plan.md`, and optional `tasks.md` stay in place, while the metadata and registry record that the track is closed.
+Closed tracks are non-destructive: the original `spec.md` and `plan.md` stay in place, and any legacy `tasks.md` may remain as well, while the metadata and registry record that the track is closed.
 
 The configured specs directory is stored in `.specs/config.json` under `spec_dir`. If `.specs/config.json` does not exist yet, ask the user where specs should be created before running `init`.
 
