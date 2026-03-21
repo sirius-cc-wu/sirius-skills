@@ -23,9 +23,6 @@ REGISTRY_HEADER = (
 )
 TRACK_METADATA_FILE = ".track-meta.json"
 TRACK_ID_PATTERN = re.compile(r"^[A-Za-z0-9][A-Za-z0-9._-]*$")
-SB_PREFIX_OUTPUT_PATTERN = re.compile(
-    r"^Effective prefix:\s*(?P<prefix>.+?)\s*\(from (?P<source>[^)]+)\)\s*$"
-)
 STATUS_SEQUENCE = [
     "draft",
     "spec_ready",
@@ -777,43 +774,8 @@ def encode_base36(data: bytes, length: int) -> str:
     return encoded
 
 
-def normalize_generated_prefix(value: str) -> Optional[str]:
-    prefix = value.strip().rstrip("-")
-    if not prefix:
-        return None
-    if not TRACK_ID_PATTERN.fullmatch(prefix):
-        return None
-    return prefix
-
-
-def resolve_repo_specific_sb_prefix() -> Optional[str]:
-    try:
-        result = subprocess.run(
-            ["sb", "config", "get", "prefix"],
-            check=False,
-            capture_output=True,
-            text=True,
-        )
-    except FileNotFoundError:
-        return None
-
-    if result.returncode != 0:
-        return None
-
-    output_lines = [line.strip() for line in result.stdout.splitlines() if line.strip()]
-    if not output_lines:
-        return None
-
-    match = SB_PREFIX_OUTPUT_PATTERN.match(output_lines[-1])
-    if not match:
-        return None
-    if match.group("source") != "repo":
-        return None
-    return normalize_generated_prefix(match.group("prefix"))
-
-
 def resolve_generated_track_prefix() -> str:
-    return resolve_repo_specific_sb_prefix() or DEFAULT_GENERATED_TRACK_PREFIX
+    return DEFAULT_GENERATED_TRACK_PREFIX
 
 
 def get_current_branch() -> Optional[str]:
@@ -1018,67 +980,6 @@ def create_track(
     return folder, True
 
 
-def get_sb_issue(issue_id: str) -> Dict[str, object]:
-    requested_id = validate_track_id(issue_id)
-    try:
-        result = subprocess.run(
-            ["sb", "show", requested_id, "--json"],
-            check=False,
-            capture_output=True,
-            text=True,
-        )
-    except FileNotFoundError as exc:
-        raise RuntimeError("The 'sb' CLI was not found on PATH.") from exc
-
-    if result.returncode != 0:
-        details = result.stderr.strip() or result.stdout.strip()
-        if not details:
-            details = f"sb show exited with code {result.returncode}"
-        raise RuntimeError(f"Failed to resolve sb issue '{requested_id}': {details}")
-
-    try:
-        issue = json.loads(result.stdout)
-    except json.JSONDecodeError as exc:
-        raise RuntimeError("The 'sb show --json' output was not valid JSON.") from exc
-
-    if not isinstance(issue, dict):
-        raise RuntimeError("The 'sb show --json' output must be a JSON object.")
-
-    resolved_id = issue.get("id")
-    title = issue.get("title")
-    if not isinstance(resolved_id, str):
-        raise RuntimeError("The 'sb show --json' output did not include a string 'id'.")
-    if not isinstance(title, str):
-        raise RuntimeError("The 'sb show --json' output did not include a string 'title'.")
-
-    issue["id"] = validate_track_id(resolved_id)
-    issue["title"] = normalize_feature_name(title)
-    if not issue["title"]:
-        raise RuntimeError("The 'sb' issue title cannot be empty.")
-    return issue
-
-
-def build_sb_metadata(issue: Dict[str, object]) -> Dict[str, object]:
-    tracked_fields = [
-        "id",
-        "title",
-        "description",
-        "status",
-        "priority",
-        "repo",
-        "repo_branch",
-        "repo_commit",
-        "worktree_path",
-        "created_at",
-    ]
-    issue_metadata = {field: issue[field] for field in tracked_fields if field in issue}
-    return {
-        "source": "sb",
-        "imported_at": now_timestamp(),
-        "issue": issue_metadata,
-    }
-
-
 def is_allowed_transition(current_status: str, target_status: str) -> bool:
     if current_status == target_status:
         return True
@@ -1174,24 +1075,6 @@ def cmd_add(args: argparse.Namespace) -> int:
         return 0
 
     print(f"Created track: {folder}")
-    return 0
-
-
-def cmd_add_from_sb(args: argparse.Namespace) -> int:
-    try:
-        issue = get_sb_issue(args.issue_id)
-        folder, created = create_track(
-            issue["id"], issue["title"], metadata=build_sb_metadata(issue)
-        )
-    except (RuntimeError, ValueError) as exc:
-        print(str(exc), file=sys.stderr)
-        return 2
-
-    if not created:
-        print(f"Track already exists: {folder}")
-        return 0
-
-    print(f"Created track from sb issue: {folder}")
     return 0
 
 
@@ -1296,11 +1179,6 @@ def build_parser() -> argparse.ArgumentParser:
     add_p = subparsers.add_parser("add", help="Create a track from a name or explicit opaque ID")
     add_p.add_argument("args", nargs="+", help="[ID] Name")
 
-    add_from_sb_p = subparsers.add_parser(
-        "add-from-sb", help="Create a track from an sb issue ID"
-    )
-    add_from_sb_p.add_argument("issue_id", help="sb issue ID, for example BNC-lg2fwe")
-
     set_p = subparsers.add_parser("set-status", help="Update a track status")
     set_p.add_argument("track", help="Track ID, folder name, or path")
     set_p.add_argument("status", help="New status")
@@ -1357,8 +1235,6 @@ def main() -> int:
             return cmd_init(args)
         if args.command == "add":
             return cmd_add(args)
-        if args.command == "add-from-sb":
-            return cmd_add_from_sb(args)
         if args.command == "set-status":
             return cmd_set_status(args)
         if args.command == "add-relation":

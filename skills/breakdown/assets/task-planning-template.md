@@ -10,7 +10,7 @@ Use this file to decompose repo stories into execution-ready slices before boots
   - `system-design.md`
   - `ui-design.md` (if applicable)
   - `user-stories.md`
-- Execution tracker: `sb-tracker` | other
+- Execution tracker: <tracker name or none>
 - Execution mode: `single-agent` | `multi-agent`
 - Notes:
 
@@ -48,9 +48,9 @@ Rules:
 
 | Slice ID | Story ID | Title | Summary | Target Area | Lane | Validation | Planned Tracker Action | Depends On | Track Ready |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| AUTH-03-api | AUTH-03 | Implement refresh token endpoint | Add refresh endpoint and token rotation logic | `auth/api` | primary | `pytest tests/auth/test_refresh.py` | `sb add` |  | yes |
-| AUTH-03-tests | AUTH-03 | Add refresh token integration tests | Cover refresh flow end-to-end | `tests/auth` | primary | `pytest tests/auth/test_refresh.py` | `sb add` | AUTH-03-api | yes |
-| <slice-id> | <story-id> | <task title> | <short summary> | <module/path> | <lane name or primary> | <command or manual check> | <sb add | sb add --id ... | defer> | <slice-id[, ...] or blank> | <yes|no> |
+| AUTH-03-api | AUTH-03 | Implement refresh token endpoint | Add refresh endpoint and token rotation logic | `auth/api` | primary | `pytest tests/auth/test_refresh.py` | create task |  | yes |
+| AUTH-03-tests | AUTH-03 | Add refresh token integration tests | Cover refresh flow end-to-end | `tests/auth` | primary | `pytest tests/auth/test_refresh.py` | create task | AUTH-03-api | yes |
+| <slice-id> | <story-id> | <task title> | <short summary> | <module/path> | <lane name or primary> | <command or manual check> | <create task | defer> | <slice-id[, ...] or blank> | <yes|no> |
 
 ## 5. Dependency Notes
 
@@ -76,5 +76,5 @@ Rules:
 
 - This file is project-scoped planning, not track-scoped execution.
 - Keep increment definitions here, not in spec-track artifacts.
-- Once tracker tasks are created, record the actual `sb` IDs in `task-traceability.md`.
+- Once tracker tasks are created, record the actual task IDs in `task-traceability.md`.
 - Keep slice IDs stable enough that they can be cross-referenced from traceability notes and planning discussion.

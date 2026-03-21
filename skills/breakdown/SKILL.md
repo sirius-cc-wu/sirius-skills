@@ -35,7 +35,7 @@ doc/specs/projects/<project-slug>/task-traceability.md
 
 Preferred tracker output when available:
 
-- `sb` tasks and dependencies
+- tracker tasks and dependency links
 
 Use `assets/task-planning-template.md` as the default starting point for `<project_path>/task-planning.md`.
 Use `assets/task-traceability-template.md` as the default starting point for `<project_path>/task-traceability.md`.
@@ -59,7 +59,7 @@ Use increments to bridge repo-level planning and task-level execution:
 - an increment is a small, demonstrable outcome made from one or more execution-ready slices
 - Increment 1 should usually be the simplest end-to-end usable path
 - increments belong in `task-planning.md` and `task-traceability.md`, not in spec-track state
-- one increment can contain multiple `sb` tasks, but each `sb` task still gets its own track later
+- one increment can contain multiple tracker tasks, but each task still gets its own track later
 - if a story spans multiple increments, record that explicitly instead of hiding it in notes
 
 ## Execution Mode and Packet Design
@@ -85,31 +85,31 @@ When a story becomes execution-ready:
 
 ## Tracker Guidance
 
-When `sb-tracker` is available, use it as the default execution tracker:
+When a task tracker is available, use it as the execution tracker:
 
-- create one `sb` task per directly executable task
-- group those tasks under increment headings in `task-planning.md` before creating them in `sb`
+- create one tracker task per directly executable task
+- group those tasks under increment headings in `task-planning.md` before creating them in the tracker
 - use parent-child relationships when a larger story needs grouped subtasks
-- record blockers with `sb dep`
+- record blockers as explicit dependency links in the tracker
 - reflect safe parallel lanes and integration checkpoints in `task-planning.md`
-- keep mapping from repo story IDs to `sb` task IDs in `task-traceability.md`
+- keep mapping from repo story IDs to tracker task IDs in `task-traceability.md`
 
-If another tracker is configured, keep the same boundary and map these concepts to the local tracker.
+If no tracker is configured, record tasks and dependencies directly in `task-planning.md` and use it as the execution backlog.
 
-## Story-to-`sb` Mapping
+## Story-to-Task Mapping
 
-Treat repo story IDs as the planning-system identifiers and `sb` task IDs as the execution identifiers.
+Treat repo story IDs as the planning-system identifiers and tracker task IDs as the execution identifiers.
 
 Default mapping:
 
-- one repo story can map to one or many `sb` tasks
-- each execution-ready slice becomes one `sb` task
+- one repo story can map to one or many tracker tasks
+- each execution-ready slice becomes one tracker task
 - preserve the repo story ID in:
   - `task-traceability.md`
-  - the `sb` task description
-- use `sb dep <child_id> <parent_id>` only for real execution blockers, not for narrative grouping
+  - the tracker task description
+- use dependency links only for real execution blockers, not for narrative grouping
 
-Preferred description shape for `sb add`:
+Preferred description shape for a new task:
 
 ```text
 Story: <story-id>
@@ -124,39 +124,17 @@ Validation:
 If one repo story splits into multiple executable tasks:
 
 - keep the story as a repo concept in `user-stories.md`
-- create multiple `sb` tasks for the slices
-- optionally create a non-executable parent `sb` task only when it helps grouped review
+- create multiple tracker tasks for the slices
+- optionally create a non-executable parent task only when it helps grouped review
 - record the story-to-task fan-out in `task-traceability.md`
 
-Only use `sb add --id <story-id>` when **all** of the following are true:
+Only reuse the repo story ID as the tracker task ID when **all** of the following are true:
 
 - the repo story maps to exactly one executable task
 - the team wants the story ID preserved end-to-end
 - that ID will not collide with another execution item
 
-Otherwise, let `sb` generate the task ID and keep the repo story ID in traceability metadata.
-
-## Recommended `sb` Command Pattern
-
-Example for a story `AUTH-03` that splits into two executable tasks:
-
-```bash
-sb add "Implement refresh token endpoint" \
-  --desc $'Story: AUTH-03\nSlice: API\nAcceptance:\n- POST /refresh rotates tokens\nValidation:\n- pytest tests/auth/test_refresh.py'
-
-sb add "Add refresh token integration tests" \
-  --desc $'Story: AUTH-03\nSlice: Tests\nAcceptance:\n- refresh flow covered end-to-end\nValidation:\n- pytest tests/auth/test_refresh.py'
-
-sb dep <tests-task-id> <api-task-id>
-```
-
-In `task-traceability.md`, record the mapping explicitly, for example:
-
-```text
-| Story ID | Story Size | Story Summary | Increments | sb Task IDs | Task Slices | Blocked By | Track IDs | Notes |
-| --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| AUTH-03 | L | Refresh token support | I1 | BNC-a1b2c3, BNC-d4e5f6 | API, Tests | BNC-d4e5f6 -> BNC-a1b2c3 | BNC-a1b2c3, BNC-d4e5f6 | Split into API and tests |
-```
+Otherwise, let the tracker generate the task ID and keep the repo story ID in traceability metadata.
 
 ## Workflow
 

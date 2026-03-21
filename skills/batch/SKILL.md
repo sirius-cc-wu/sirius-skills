@@ -45,7 +45,7 @@ Orchestrate large-scale changes by splitting work into independent units and run
 
 - Use worktrees or equivalent isolated branches for workers.
 - Prefer syntax-aware codemods over raw text replacement.
-- Keep a live progress board (for example via `sb` or a simple checklist).
+- Keep a live progress board (for example via a task tracker or a simple checklist).
 - Merge small verified batches frequently instead of one large final merge.
 
 ## Output Checklist

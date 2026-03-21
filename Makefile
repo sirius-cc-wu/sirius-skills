@@ -16,7 +16,6 @@ MANAGED_SKILLS := \
 	plan \
 	react:components \
 	remotion \
-	sb-tracker \
 	shadcn-ui \
 	simplify \
 	spec-driver \
@@ -43,7 +42,6 @@ install:
 	npx skills add "$(REPO_ROOT)/skills/batch" $(COMMON_FLAGS)
 	npx skills add "$(REPO_ROOT)/skills/dioxus-ui-ux" $(COMMON_FLAGS)
 	npx skills add "$(REPO_ROOT)/skills/dioxus-stitch" $(COMMON_FLAGS)
-	npx skills add "$(REPO_ROOT)/sb-tracker/skills/sb-tracker" $(COMMON_FLAGS)
 	npx skills add https://github.com/google-labs-code/stitch-skills --skill '*' $(COMMON_FLAGS)
 
 uninstall:

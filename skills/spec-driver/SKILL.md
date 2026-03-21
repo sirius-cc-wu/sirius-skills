@@ -79,9 +79,7 @@ Do not skip states without explicit user approval. Adjacent transitions are the 
 - `execution_ready`
 - `closed`
 
-If you also use `sb-tracker`, let `sb` own **execution/task lifecycle** such as `Backlog`, `Ready`, `Doing`, `Review`, `Done`, and `Blocked`.
-
-Do not duplicate task-execution states like `implementing`, `in progress`, or `blocked` in the track registry.
+Do not duplicate task-execution states like `implementing`, `in progress`, or `blocked` in the track registry. If you use an external task tracker, let it own the execution lifecycle (task start, progress, verification, and finish); keep `spec-driver` focused on track readiness and artifact state.
 
 ## Preflight
 
@@ -110,8 +108,8 @@ Do not duplicate task-execution states like `implementing`, `in progress`, or `b
     - `tasks` may be skipped when `plan.md` is already concrete enough for direct execution without major replanning.
     - Set status to `execution_ready` when the plan is actionable and execution can begin.
 4. While implementation is underway:
-    - let `sb-tracker` own `begin`, `verify`, `finish`, `pause`, and other execution lifecycle events
     - keep `spec-driver` focused on track readiness and artifact state
+    - delegate execution lifecycle events (begin, verify, finish, pause) to your task tracker if one is in use
 5. Once execution is finished and verified:
     - route to `close-track` to perform the final closure step
     - close the track non-destructively, record closure metadata, and optionally publish a project-local summary
@@ -165,7 +163,7 @@ Closed tracks are non-destructive: the original `spec.md`, `plan.md`, and option
 
 The configured specs directory is stored in `.specs/config.json` under `spec_dir`. If `.specs/config.json` does not exist yet, ask the user where specs should be created before running `init`.
 
-Track IDs are treated as opaque identifiers. Manual IDs may include letters, numbers, `.`, `_`, and `-`, so IDs like `BNC-lg2fwe` are valid. Auto-generated standalone track IDs use an `sb`-style hash format such as `SPC-a3f8e9` or `CLAW-a3f8e9`.
+Track IDs are treated as opaque identifiers. Manual IDs may include letters, numbers, `.`, `_`, and `-`, so IDs like `BNC-lg2fwe` are valid. Auto-generated standalone track IDs use a hash format such as `SPC-a3f8e9` or `CLAW-a3f8e9`.
 
 ### Optional Identity Configuration
 
@@ -182,11 +180,9 @@ Supported Phase 1 fields:
 If `.skills/identity.json` is absent:
 
 - `manage_specs.py add "<feature-name>"` keeps the generic default behavior
-- it generates an `sb`-style hash ID
-- it uses the repo-specific `sb` prefix when `sb config get prefix` reports `(from repo)`
-- otherwise it falls back to the standalone `SPC` prefix
+- it generates a hash ID with the `SPC` prefix
 
-If `.skills/identity.json` is present and defines `branch_extract_pattern`, `manage_specs.py add "<feature-name>"` uses that pattern before falling back to hash generation. Manual IDs always override auto-detection. Tracks created via `add-from-sb` preserve the exact `sb` issue ID.
+If `.skills/identity.json` is present and defines `branch_extract_pattern`, `manage_specs.py add "<feature-name>"` uses that pattern before falling back to hash generation. Manual IDs always override auto-detection.
 
 Example:
 
@@ -209,17 +205,14 @@ python3 <path-to-spec-driver>/scripts/manage_specs.py init [spec-dir]
 python3 <path-to-spec-driver>/scripts/manage_specs.py init docs/specs
 
 # Add track (use branch_extract_pattern from .skills/identity.json when present,
-# otherwise generate an sb-style hash ID with a repo prefix or SPC fallback):
+# otherwise generate a hash ID with the SPC prefix):
 python3 <path-to-spec-driver>/scripts/manage_specs.py add "feature-name"
 
-# To specify an ID manually:
+# To specify an ID manually (e.g., to match your issue tracker):
 python3 <path-to-spec-driver>/scripts/manage_specs.py add "ID" "feature-name"
 
-# Example with an sb-style ID:
+# Example with a custom tracker ID:
 python3 <path-to-spec-driver>/scripts/manage_specs.py add "BNC-lg2fwe" "feature-name"
-
-# Create a track directly from an sb issue:
-python3 <path-to-spec-driver>/scripts/manage_specs.py add-from-sb "BNC-lg2fwe"
 
 # Update track status:
 python3 <path-to-spec-driver>/scripts/manage_specs.py set-status "<track-id-or-path>" "spec_ready"
@@ -251,7 +244,5 @@ python3 <path-to-spec-driver>/scripts/manage_specs.py validate-track "<track-id-
 # Audit relation consistency:
 python3 <path-to-spec-driver>/scripts/manage_specs.py audit-relations --json
 ```
-
-`add-from-sb` shells out to `sb show <id> --json`, uses the issue title as the feature name, and writes source metadata to a per-track sidecar file.
 
 For backward compatibility, `manage_specs.py` still accepts legacy status inputs such as `draft_spec`, `tasks_ready`, `implementing`, `done`, `approved`, and `completed`, but it normalizes them to the canonical track states above.

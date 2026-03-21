@@ -16,9 +16,9 @@ Use this skill when a work item is small enough to execute and needs a task-scop
 
 ## Preferred Input
 
-- an `sb` task ID created by `breakdown`
+- a work item ID from your execution tracker (for example, one created by `breakdown`)
 
-If `sb-tracker` is not the source of truth, use the repository's configured issue ID and track bootstrap convention.
+If no tracker is in use, use the repository's configured issue ID and track bootstrap convention.
 
 ## Bootstrap Rules
 
@@ -30,11 +30,13 @@ If `sb-tracker` is not the source of truth, use the repository's configured issu
 ## Workflow
 
 1. Inspect the target work item and confirm dependencies, scope, and acceptance notes are clear.
-2. If the source is `sb`, bootstrap with:
+2. Bootstrap the track with:
 
 ```bash
-python3 skills/spec-driver/scripts/manage_specs.py add-from-sb <id>
+python3 skills/spec-driver/scripts/manage_specs.py add "<track-id>" "<feature-name>"
 ```
+
+   If the tracker supports exporting issue metadata as JSON, you may pass `--id` manually to preserve the tracker ID as the track ID.
 
 3. Confirm the new track path exists and registry state is consistent.
 4. Hand off to `spec-driver` to author `spec.md`, `plan.md`, and optionally `tasks.md`.
