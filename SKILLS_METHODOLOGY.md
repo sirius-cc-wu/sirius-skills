@@ -183,10 +183,10 @@ Important closure rules:
 
 ## Recommended Repository Layout
 
-### Project-level planning
+### Feature-local planning
 
 ```text
-doc/specs/projects/<project-slug>/
+docs/features/<project-slug>/
   discover.md
   system-design.md
   ui-design.md              # optional
@@ -194,6 +194,8 @@ doc/specs/projects/<project-slug>/
   task-planning.md
   task-traceability.md
 ```
+
+Keep discovery, design, and breakdown artifacts in a feature-local planning folder so the project context stays together. The planning folder is still a repository document area; it is not a task-execution track.
 
 ### Task-level execution
 
@@ -204,7 +206,7 @@ doc/specs/projects/<project-slug>/
   tasks.md
 ```
 
-The exact execution-track path depends on `spec-driver` configuration. The important rule is that execution tracks are **task-scoped**, not project-scoped.
+The exact execution-track path depends on `spec-driver` configuration. The important rule is that execution tracks are **task-scoped**, not project-scoped, and remain centrally managed separately from the feature-local planning docs.
 
 ## Operating Rules
 

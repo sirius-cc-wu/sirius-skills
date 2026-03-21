@@ -11,7 +11,7 @@ SKILL_DIR = SCRIPT_DIR.parent
 ASSETS_DIR = SKILL_DIR / "assets"
 TASK_PLANNING_TEMPLATE = ASSETS_DIR / "task-planning-template.md"
 TASK_TRACEABILITY_TEMPLATE = ASSETS_DIR / "task-traceability-template.md"
-DEFAULT_BASE_DIR = Path("doc/specs/projects")
+DEFAULT_BASE_DIR = Path("docs/features")
 PROJECT_SLUG_PATTERN = re.compile(r"^[A-Za-z0-9][A-Za-z0-9._-]*$")
 
 
@@ -19,7 +19,7 @@ def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(
         description=(
             "Scaffold increment-ready breakdown planning files for a project under "
-            "doc/specs/projects/<project-slug>/ by default."
+            "docs/features/<project-slug>/ by default."
         )
     )
     parser.add_argument("project_slug", help="Project slug, for example: pm-tool")

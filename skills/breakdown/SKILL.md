@@ -16,8 +16,8 @@ python3 skills/breakdown/scripts/scaffold_breakdown.py <project-slug>
 By default this creates:
 
 ```text
-doc/specs/projects/<project-slug>/task-planning.md
-doc/specs/projects/<project-slug>/task-traceability.md
+docs/features/<project-slug>/task-planning.md
+docs/features/<project-slug>/task-traceability.md
 ```
 
 ## Responsibilities
