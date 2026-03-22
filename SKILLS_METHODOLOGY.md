@@ -13,11 +13,13 @@ Use a **two-layer workflow**:
    - `design`
    - `ui-flow` (optional)
    - `breakdown`
+   - `review-planning`
    - `track`
 2. **Execution layer**
    - `spec-driver`
    - `define`
    - `plan`
+   - `review-execution`
    - `close-track`
    - your execution tracker
 
@@ -41,6 +43,11 @@ Expected outputs:
 - `discover.md`
 - optional early `user-stories.md`
 
+Review checkpoint:
+
+- confirm the business intent, scope, constraints, and success criteria with the relevant stakeholders before moving into design
+- update the discovery artifacts with that feedback so the next phase starts from reviewed intent rather than side-channel notes
+
 ### 2. Design the solution
 
 Use `design` to define:
@@ -59,6 +66,11 @@ Expected output:
 If the work has meaningful UI or interaction design, also use `ui-flow` to create:
 
 - `ui-design.md`
+
+Review checkpoint:
+
+- review the proposed architecture, interfaces, repository boundaries, and major risks before starting breakdown
+- fold design feedback back into `system-design.md` and `ui-design.md` so decomposition starts from an approved technical direction
 
 ### 3. Break stories into executable work
 
@@ -85,6 +97,11 @@ Use the built-in helper when starting a new planning folder:
 python3 skills/breakdown/scripts/scaffold_breakdown.py <project-slug>
 ```
 
+Review checkpoint:
+
+- review the slices and increments for scope, sequencing, ownership, and demonstrability before creating tracker tasks
+- make sure the planned validation approach is clear enough that each slice can be checked independently during execution
+
 ### 4. Create tracker tasks
 
 Use `breakdown` with your task system to create the executable work items.
@@ -108,14 +125,36 @@ Recommended tracker usage:
 - keep repo story IDs in `task-traceability.md`
 - keep tracker task IDs as execution identifiers
 
-### 5. Bootstrap one execution track per task
+Review checkpoint:
+
+- confirm each tracker task has clear scope, dependencies, and expected verification before bootstrapping a track
+- add any role-specific review expectations that matter for execution, such as architecture, security, or platform input, in the tracker task or linked planning docs
+
+### 5. Review planning outputs
+
+Use `review-planning` after the discovery, design, and breakdown artifacts are concrete enough to support execution handoff.
+
+Its job is to:
+
+- review the planning artifacts and task definitions together rather than in isolation
+- identify blocking scope, design, sequencing, or validation gaps before track bootstrap
+- record durable findings in the planning docs or tracker context already used by the team
+- confirm whether the work is ready for `track` or needs another planning pass
+
+Recommended handoff:
+
+```text
+discover -> design -> breakdown -> execution tracker -> review-planning -> track
+```
+
+### 6. Bootstrap one execution track per task
 
 Once a tracker task is implementation-ready, use `track`.
 
 Preferred handoff:
 
 ```text
-breakdown -> execution tracker -> track -> spec-driver
+breakdown -> execution tracker -> review-planning -> track -> spec-driver
 ```
 
 `track` should bootstrap a task-scoped spec track from the execution-ready work item, typically with:
@@ -124,7 +163,7 @@ breakdown -> execution tracker -> track -> spec-driver
 python3 skills/spec-driver/scripts/manage_specs.py add "<task-id>" "<task-name>"
 ```
 
-### 6. Execute with spec-driver
+### 7. Execute with spec-driver
 
 After a track exists, use the execution layer:
 
@@ -148,21 +187,48 @@ Keep the boundary explicit:
 - `breakdown` also owns increment grouping at the repo-planning level
 - `plan` owns the final task-scoped execution checklist for new tracks
 
-### 7. Track execution in the execution tracker
+Execution review loop:
+
+- review the task-scoped `spec.md` and `plan.md` before implementation starts if the task carries meaningful risk or ambiguity
+- review spec-to-implementation alignment during execution, not only at final handoff
+- when validation or review finds a gap, update the task-scoped execution artifacts or surrounding guidance so the fix persists at the spec level
+
+### 8. Track execution in the execution tracker
 
 Use your task system for the actual task lifecycle:
 
 - start or claim work
 - record blockers or pauses
+- request or record implementation review as required by your team
+- capture review findings that affect execution or acceptance
 - verify the implementation
 - mark work complete
+
+If review uncovers an intent gap or spec gap, feed that back into the relevant spec or planning artifact before considering the task fully done.
 
 Keep the responsibility boundary clear:
 
 - `spec-driver` owns **track readiness**
 - the execution tracker owns **execution state**
 
-### 8. Close the spec track
+### 9. Review execution outcomes
+
+Use `review-execution` after implementation and validation, and before closing the track.
+
+Its job is to:
+
+- compare the implementation and validation evidence with the task-scoped `spec.md` and `plan.md`
+- classify whether a finding is an intent-to-spec gap, a spec-to-implementation gap, or a follow-up outside the active track
+- feed durable fixes back into `spec.md`, `plan.md`, or upstream planning guidance when the issue reflects missing context
+- confirm whether the work is actually ready for `close-track`
+
+Recommended handoff:
+
+```text
+implementation complete -> review-execution -> close-track
+```
+
+### 10. Close the spec track
 
 After implementation is complete and the execution task is finished, use `close-track` to close the spec track cleanly.
 
@@ -171,16 +237,18 @@ Its job is to:
 - validate that the track is ready to close
 - record durable closure metadata without moving or deleting the original artifacts
 - optionally publish a project-local summary entry such as `docs/spec-history.md` or `CHANGELOG.md`
+- capture durable feedback that should improve future specs, prompts, or validation harnesses
 
 Recommended handoff:
 
 ```text
-task complete -> close-track
+review-execution complete -> close-track
 ```
 
 Important closure rules:
 
- - closing a track does not merge or delete the original `spec.md` or `plan.md`; older tracks may also retain `tasks.md`
+- closing a track should happen after required review, validation, and spec feedback loops are complete
+- closing a track does not merge or delete the original `spec.md` or `plan.md`; older tracks may also retain `tasks.md`
 - publishing is optional and project-local
 - closure metadata belongs in the spec system, not in the execution tracker
 

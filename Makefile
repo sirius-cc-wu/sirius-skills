@@ -14,6 +14,8 @@ MANAGED_SKILLS := \
 	dioxus-ui-ux \
 	enhance-prompt \
 	plan \
+	review-execution \
+	review-planning \
 	react:components \
 	remotion \
 	shadcn-ui \
@@ -34,8 +36,10 @@ install:
 	npx skills add "$(REPO_ROOT)/skills/design" $(COMMON_FLAGS)
 	npx skills add "$(REPO_ROOT)/skills/ui-flow" $(COMMON_FLAGS)
 	npx skills add "$(REPO_ROOT)/skills/breakdown" $(COMMON_FLAGS)
+	npx skills add "$(REPO_ROOT)/skills/review-planning" $(COMMON_FLAGS)
 	npx skills add "$(REPO_ROOT)/skills/track" $(COMMON_FLAGS)
 	npx skills add "$(REPO_ROOT)/skills/close-track" $(COMMON_FLAGS)
+	npx skills add "$(REPO_ROOT)/skills/review-execution" $(COMMON_FLAGS)
 	npx skills add "$(REPO_ROOT)/skills/commit" $(COMMON_FLAGS)
 	npx skills add "$(REPO_ROOT)/skills/simplify" $(COMMON_FLAGS)
 	npx skills add "$(REPO_ROOT)/skills/batch" $(COMMON_FLAGS)

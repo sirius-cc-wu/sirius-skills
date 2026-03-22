@@ -12,7 +12,7 @@ Use this skill to manage workflow state for track readiness.
 1. Resolve or initialize the active track.
 2. Verify required files, registry state, and track metadata.
 3. Decide whether the request belongs in the planning layer or the task-scoped execution layer.
-4. Route task-scoped work to `define`, `plan`, or `close-track` as appropriate.
+4. Route task-scoped work to `define`, `plan`, `review-execution`, or `close-track` as appropriate.
 5. Update track status when a phase is complete.
 
 ## Entry Decision Guide
@@ -111,7 +111,8 @@ Do not duplicate task-execution states like `implementing`, `in progress`, or `b
     - keep `spec-driver` focused on track readiness and artifact state
     - delegate execution lifecycle events (begin, verify, finish, pause) to your task tracker if one is in use
 5. Once execution is finished and verified:
-    - route to `close-track` to perform the final closure step
+    - route to `review-execution` before final closure when an explicit implementation-versus-spec review is needed
+    - route to `close-track` after review is complete
     - close the track non-destructively, record closure metadata, and optionally publish a project-local summary
 
 ## Completion Checks

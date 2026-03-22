@@ -31,6 +31,8 @@ These core skills should remain tracker-agnostic by default:
 - `skills/define/`
 - `skills/spec-driver/`
 - `skills/plan/`
+- `skills/review-planning/`
+- `skills/review-execution/`
 - `skills/close-track/`
 
 If a project has no extra configuration, these skills should still work with generic conventions.
@@ -45,12 +47,13 @@ For repositories that use repo-first planning and a separate execution tracker, 
 - `skills/design/`
 - `skills/ui-flow/`
 - `skills/breakdown/`
+- `skills/review-planning/`
 - `skills/track/`
 
 These skills sit **before** the execution-track skills:
 
-- planning layer: `discover`, `design`, `ui-flow`, `breakdown`, `track`
-- execution layer: `spec-driver`, `define`, `plan`, `close-track`
+- planning layer: `discover`, `design`, `ui-flow`, `breakdown`, `review-planning`, `track`
+- execution layer: `spec-driver`, `define`, `plan`, `review-execution`, `close-track`
 - execution tracker: your task system or issue tracker
 
 Recommended boundary:
@@ -66,11 +69,13 @@ Preferred repo workflow:
 2. `design` turns that into architecture, interfaces, and risks.
 3. `ui-flow` adds optional UX or screen-flow artifacts.
 4. `breakdown` turns repo stories into directly executable work items and groups those slices into small demonstrable increments.
-5. `track` bootstraps a task-scoped execution track and hands off to `spec-driver`.
-6. `spec-driver` routes task-scoped execution through `define` to capture task intent and acceptance, then through `plan` to produce the final execution artifact.
-7. `close-track` closes completed spec tracks and can optionally publish a project-local summary.
+5. `review-planning` reviews planning artifacts and task definitions before task-scoped track bootstrap.
+6. `track` bootstraps a task-scoped execution track and hands off to `spec-driver`.
+7. `spec-driver` routes task-scoped execution through `define` to capture task intent and acceptance, then through `plan` to produce the final execution artifact.
+8. `review-execution` checks implementation and validation outcomes against the task-scoped execution artifacts before closure.
+9. `close-track` closes completed spec tracks and can optionally publish a project-local summary.
 
-In the repo-native flow, `breakdown` owns repo-story decomposition, `define` owns the task-scoped `spec.md`, and `plan` owns the final task-scoped execution plan and validation checklist.
+In the repo-native flow, `breakdown` owns repo-story decomposition, `review-planning` owns planning readiness review, `define` owns the task-scoped `spec.md`, `plan` owns the final task-scoped execution plan and validation checklist, and `review-execution` owns the final implementation-versus-spec review before closure.
 
 By default, new execution tracks are created under `tracks/` unless `.specs/config.json` overrides the location.
 

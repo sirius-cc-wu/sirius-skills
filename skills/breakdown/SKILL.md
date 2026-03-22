@@ -26,7 +26,7 @@ docs/features/<project-slug>/task-traceability.md
 2. Split oversized work into smaller, independently verifiable execution packets.
 3. Produce planning artifacts that preserve story-to-task traceability, increment grouping, sequencing, and execution mode assumptions.
 4. Create executable tracker items, dependency links, and explicit parallel-safe lanes where appropriate.
-5. Hand off ready work to `track` for spec-track bootstrap.
+5. Hand off ready work to `review-planning` and then `track` for spec-track bootstrap.
 
 ## Required Output
 
@@ -144,7 +144,7 @@ Otherwise, let the tracker generate the task ID and keep the repo story ID in tr
 4. Choose `single-agent` or `multi-agent` handling where relevant and record lane assumptions.
 5. Write `task-planning.md` and `task-traceability.md` with increment groupings, dependency notes, parallel-safe lanes, and integration checkpoints as needed.
 6. Create tracker tasks and dependency links for execution-ready work, keeping packet validation explicit.
-7. Stop when each task is ready to be bootstrapped by `track`.
+7. Stop when each task is ready for `review-planning` and subsequent bootstrap by `track`.
 
 When generating `task-planning.md`, start from `assets/task-planning-template.md` and replace placeholders rather than inventing a new structure each time.
 When generating `task-traceability.md`, start from `assets/task-traceability-template.md` and replace placeholders rather than inventing a new table shape each time.

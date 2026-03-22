@@ -5,7 +5,7 @@ description: Bootstraps a task-scoped execution track from a ready work item and
 
 # Track
 
-Use this skill when a work item is small enough to execute and needs a task-scoped track.
+Use this skill when a work item is small enough to execute, has passed planning review, and needs a task-scoped track.
 
 ## Responsibilities
 
