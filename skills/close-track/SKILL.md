@@ -21,6 +21,12 @@ Use this skill when implementation is complete and you want to close a spec trac
 - Treat `<spec_dir>/README.md`, `<spec_dir>/registry.json`, and `<track_path>/.track-meta.json` as the canonical closure records.
 - Publishing is additive. It creates or updates a rollup entry with backlinks; it does not merge or erase the original `spec.md` / `plan.md` artifacts, and it may also reference legacy `tasks.md` files when present.
 
+## Artifact Ownership
+
+`close-track` owns closure metadata updates and any optional publication outputs.
+
+`spec-driver` should route into closure only after execution review is complete; it should not replace `close-track` by mutating closure state directly outside normal registry/status tooling.
+
 ## Project-Local Publishing Configuration
 
 This skill may optionally read `.skills/plugins/spec-publish.json`.

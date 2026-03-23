@@ -81,6 +81,23 @@ def test_set_status_blocks_invalid_transition(tmp_path, monkeypatch, capsys):
     assert "Invalid status transition" in captured.err
 
 
+def test_spec_ready_requires_requirements_checklist(tmp_path, monkeypatch, capsys):
+    module = load_manage_specs_module()
+    monkeypatch.chdir(tmp_path)
+
+    assert run_cli(module, monkeypatch, "init", "tracks") == 0
+    assert run_cli(module, monkeypatch, "add", "DEMO", "Demo Feature") == 0
+
+    track_dir = tmp_path / "tracks" / "DEMO-demo-feature"
+    (track_dir / "spec.md").write_text("# spec\n", encoding="utf-8")
+
+    exit_code = run_cli(module, monkeypatch, "set-status", "DEMO", "spec_ready")
+    captured = capsys.readouterr()
+
+    assert exit_code == 2
+    assert "missing_requirements_checklist" in captured.err
+
+
 def test_closing_track_records_closed_at_and_updates_registry(tmp_path, monkeypatch):
     module = load_manage_specs_module()
     monkeypatch.chdir(tmp_path)
@@ -90,6 +107,10 @@ def test_closing_track_records_closed_at_and_updates_registry(tmp_path, monkeypa
 
     track_dir = tmp_path / "tracks" / "DEMO-demo-feature"
     (track_dir / "spec.md").write_text("# spec\n", encoding="utf-8")
+    (track_dir / "checklists").mkdir()
+    (track_dir / "checklists" / "requirements.md").write_text(
+        "- [x] requirements complete\n", encoding="utf-8"
+    )
     assert run_cli(module, monkeypatch, "set-status", "DEMO", "spec_ready") == 0
 
     (track_dir / "plan.md").write_text("# plan\n", encoding="utf-8")
@@ -131,6 +152,23 @@ def test_legacy_markdown_registry_is_migrated_to_json(tmp_path, monkeypatch):
     registry = json.loads((tmp_path / "specs" / "registry.json").read_text(encoding="utf-8"))
     assert rows[0]["id"] == "DEMO"
     assert registry["tracks"][0]["id"] == "DEMO"
+
+
+def test_validate_track_reports_missing_track_metadata(tmp_path, monkeypatch, capsys):
+    module = load_manage_specs_module()
+    monkeypatch.chdir(tmp_path)
+
+    assert run_cli(module, monkeypatch, "init", "tracks") == 0
+    assert run_cli(module, monkeypatch, "add", "DEMO", "Demo Feature") == 0
+
+    track_dir = tmp_path / "tracks" / "DEMO-demo-feature"
+    (track_dir / ".track-meta.json").unlink()
+
+    exit_code = run_cli(module, monkeypatch, "validate-track", "DEMO")
+    captured = capsys.readouterr()
+
+    assert exit_code == 3
+    assert "missing_track_metadata" in captured.out
 
 
 def test_add_requires_skills_spec_driver_config(tmp_path, monkeypatch, capsys):

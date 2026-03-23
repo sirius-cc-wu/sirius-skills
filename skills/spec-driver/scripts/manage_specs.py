@@ -868,10 +868,10 @@ def find_active_track(rows: List[Dict[str, object]]) -> Optional[Dict[str, objec
 
 
 def expected_status_for_files(
-    spec_exists: bool, plan_exists: bool, tasks_exists: bool
+    spec_exists: bool, requirements_exists: bool, plan_exists: bool, tasks_exists: bool
 ) -> str:
     del tasks_exists
-    if not spec_exists:
+    if not spec_exists or not requirements_exists:
         return "draft"
     if not plan_exists:
         return "spec_ready"
@@ -884,6 +884,7 @@ def validate_track(
     issues: List[str] = []
     path = str(row["path"]).rstrip("/")
     spec = os.path.join(path, "spec.md")
+    requirements = os.path.join(path, "checklists", "requirements.md")
     plan = os.path.join(path, "plan.md")
     tasks = os.path.join(path, "tasks.md")
     metadata = load_track_metadata(path)
@@ -891,6 +892,7 @@ def validate_track(
         "track_dir_exists": os.path.isdir(path),
         "metadata_exists": bool(metadata),
         "spec_exists": os.path.isfile(spec),
+        "requirements_exists": os.path.isfile(requirements),
         "plan_exists": os.path.isfile(plan),
         "tasks_exists": os.path.isfile(tasks),
         "closed_at_recorded": isinstance(metadata.get("closed_at"), str),
@@ -905,19 +907,30 @@ def validate_track(
     if not checks["track_dir_exists"]:
         issues.append("missing_track_directory")
         return False, issues, checks
+    if not checks["metadata_exists"]:
+        issues.append("missing_track_metadata")
 
     expected = expected_status_for_files(
-        checks["spec_exists"], checks["plan_exists"], checks["tasks_exists"]
+        checks["spec_exists"],
+        checks["requirements_exists"],
+        checks["plan_exists"],
+        checks["tasks_exists"],
     )
     if normalized_status in {"draft", "spec_ready", "plan_ready"}:
         if normalized_status != expected:
             issues.append(
                 f"status_mismatch:status={normalized_status} expected={expected} based_on_files"
             )
+    if normalized_status in {"spec_ready", "plan_ready", "execution_ready"} and not checks[
+        "requirements_exists"
+    ]:
+        issues.append("missing_requirements_checklist")
     if normalized_status == "execution_ready" and not checks["plan_exists"]:
         issues.append("execution_ready_without_plan")
+    if normalized_status == "execution_ready" and not checks["spec_exists"]:
+        issues.append("execution_ready_without_spec")
     if normalized_status == "closed" and not (
-        checks["spec_exists"] and checks["plan_exists"]
+        checks["spec_exists"] and checks["requirements_exists"] and checks["plan_exists"]
     ):
         issues.append("closed_without_core_artifacts")
     if normalized_status == "closed" and not checks["metadata_exists"]:

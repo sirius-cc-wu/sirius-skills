@@ -208,14 +208,19 @@ This is where task-scoped execution artifacts are created:
 
 Within that execution layer:
 
+- `spec-driver` owns routing, readiness checks, and registry state
 - `define` creates the task-scoped `spec.md` for one execution-ready work item, including acceptance and requirement context
 - `plan` converts that task-scoped spec into the final implementation packets, traceability, validation steps, and PlantUML detailed design needed for execution
+- `review-execution` owns the explicit implementation-versus-spec review outcome
+- `close-track` owns closure metadata and any optional publication output
 
 Keep the boundary explicit:
 
 - `breakdown` owns repo-story decomposition and tracker-ready slices
 - `breakdown` also owns increment grouping at the repo-planning level
+- `define` owns `spec.md` and `checklists/requirements.md`
 - `plan` owns the final task-scoped execution checklist for new tracks
+- `spec-driver` should validate handoffs and route work, not take over artifact authoring from the other execution skills
 
 Execution review loop:
 

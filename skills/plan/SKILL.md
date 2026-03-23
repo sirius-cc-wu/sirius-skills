@@ -29,6 +29,12 @@ Optional sections may cover:
 
 Resolve `<track_path>` through `spec-driver`.
 
+## Artifact Ownership
+
+`plan` owns the content of `<track_path>/plan.md`.
+
+`spec-driver` should route into planning and validate readiness, but it should not take over implementation-plan authoring that belongs to `plan`.
+
 ## Planning Rules
 
 - Use the existing codebase and target module as context.

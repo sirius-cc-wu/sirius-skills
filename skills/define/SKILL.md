@@ -21,6 +21,15 @@ Use this skill to turn one execution-ready work item into a complete `spec.md`.
 
 Resolve `<track_path>` through `spec-driver`.
 
+## Artifact Ownership
+
+`define` owns the content of:
+
+- `<track_path>/spec.md`
+- `<track_path>/checklists/requirements.md`
+
+`spec-driver` should resolve the active track and enforce readiness gates, but it should not take over specification authoring that belongs to `define`.
+
 ## Authoring Rules
 
 - Focus on user value, expected behavior, and outcomes.

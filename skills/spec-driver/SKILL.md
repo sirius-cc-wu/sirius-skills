@@ -15,6 +15,8 @@ Use this skill to manage workflow state for track readiness.
 4. Route task-scoped work to `define`, `plan`, `review-execution`, or `close-track` as appropriate.
 5. Update track status when a phase is complete.
 
+`spec-driver` owns orchestration only. It should not absorb artifact authoring that belongs to `define`, `plan`, `review-execution`, or `close-track`.
+
 ## Entry Decision Guide
 
 Use `spec-driver` as the execution-layer entrypoint when you need to decide the next step for one task-scoped track.
@@ -145,6 +147,12 @@ Always use `scripts/manage_specs.py` for initialization, active track resolution
 - a human-readable registry at `<spec_dir>/README.md`
 - a machine-readable registry at `<spec_dir>/registry.json`
 - per-track lifecycle metadata at `<track_path>/.track-meta.json`
+
+`manage_specs.py` validates orchestration prerequisites such as:
+
+- `.track-meta.json` presence and status consistency
+- `spec.md` plus `checklists/requirements.md` before a track is treated as `spec_ready`
+- `plan.md` before a track is treated as `plan_ready` or `execution_ready`
 
 Track metadata may also contain explicit relation records such as:
 

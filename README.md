@@ -84,6 +84,8 @@ Preferred repo workflow:
 
 In the repo-native flow, `planning-driver` owns feature-planning readiness and routing, `breakdown` owns repo-story decomposition, `review-planning` owns planning readiness review, `define` owns the task-scoped `spec.md`, `plan` owns the final task-scoped execution plan and validation checklist, and `review-execution` owns the final implementation-versus-spec review before closure.
 
+Execution follows the same pattern: `spec-driver` owns routing, readiness, and registry state, while `define`, `plan`, `review-execution`, and `close-track` own their artifacts and outputs.
+
 By default, new execution tracks are created under `tracks/` unless `.skills/spec-driver.json` overrides the location.
 
 When UML diagrams are useful, use **PlantUML**:

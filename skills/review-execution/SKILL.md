@@ -29,6 +29,12 @@ Resolve `<track_path>` through `spec-driver`.
 - updated task-scoped execution artifacts when the review exposes durable gaps
 - explicit review outcome recorded in the tracker, PR, or closure context used by the team
 
+## Artifact Ownership
+
+`review-execution` owns the review outcome and any durable updates needed in `spec.md`, `plan.md`, or upstream planning guidance when the review exposes context gaps.
+
+`spec-driver` should route into execution review, but it should not absorb the review itself or silently close tracks without that owning review step.
+
 ## Review Rules
 
 - Check that requirements, acceptance notes, and validation steps still match the implementation.

@@ -40,6 +40,11 @@ def setup_execution_ready_track(tmp_path, monkeypatch, include_tasks=True):
         "- **SC-001**: Teams can discover closed tracks quickly.\n",
         encoding="utf-8",
     )
+    (track_dir / "checklists").mkdir()
+    (track_dir / "checklists" / "requirements.md").write_text(
+        "- [x] FR-001 requirements captured\n- [x] FR-002 requirements captured\n",
+        encoding="utf-8",
+    )
     assert run_cli(manage_specs, monkeypatch, "set-status", "DEMO", "spec_ready") == 0
 
     (track_dir / "plan.md").write_text(
