@@ -7,17 +7,17 @@ description: Converts repo stories and planning docs into directly executable, d
 
 Use this skill after feature-level discovery and design to turn repo stories into directly executable work.
 
-If you need a starting folder for a new project, scaffold the default breakdown files with:
+If you need a starting folder for a new feature, scaffold the default breakdown files with:
 
 ```bash
-python3 skills/breakdown/scripts/scaffold_breakdown.py <project-slug>
+python3 skills/breakdown/scripts/scaffold_breakdown.py <feature-slug>
 ```
 
 By default this creates:
 
 ```text
-docs/features/<project-slug>/task-planning.md
-docs/features/<project-slug>/task-traceability.md
+docs/features/<feature-slug>/task-planning.md
+docs/features/<feature-slug>/task-traceability.md
 ```
 
 ## Responsibilities
@@ -39,7 +39,7 @@ Preferred tracker output when available:
 
 Use `assets/task-planning-template.md` as the default starting point for `<feature_path>/task-planning.md`.
 Use `assets/task-traceability-template.md` as the default starting point for `<feature_path>/task-traceability.md`.
-Use `scripts/scaffold_breakdown.py` when you want both files scaffolded together from a project slug.
+Use `scripts/scaffold_breakdown.py` when you want both files scaffolded together from a feature slug.
 
 ## Breakdown Rules
 

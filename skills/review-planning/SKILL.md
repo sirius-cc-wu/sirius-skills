@@ -26,7 +26,7 @@ Use this skill after `discover`, `design`, or `breakdown` when the planning arti
 If the repository uses the standard planning layout, prefer:
 
 ```text
-docs/features/<project-slug>/
+docs/features/<feature-slug>/
 ```
 
 ## Required Output

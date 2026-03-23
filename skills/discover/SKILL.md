@@ -25,7 +25,7 @@ Optional companion output:
 If the repository uses the standard planning layout, prefer:
 
 ```text
-docs/features/<project-slug>/
+docs/features/<feature-slug>/
 ```
 
 ## Discovery Rules

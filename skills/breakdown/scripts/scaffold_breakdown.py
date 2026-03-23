@@ -12,22 +12,22 @@ ASSETS_DIR = SKILL_DIR / "assets"
 TASK_PLANNING_TEMPLATE = ASSETS_DIR / "task-planning-template.md"
 TASK_TRACEABILITY_TEMPLATE = ASSETS_DIR / "task-traceability-template.md"
 DEFAULT_BASE_DIR = Path("docs/features")
-PROJECT_SLUG_PATTERN = re.compile(r"^[A-Za-z0-9][A-Za-z0-9._-]*$")
+FEATURE_SLUG_PATTERN = re.compile(r"^[A-Za-z0-9][A-Za-z0-9._-]*$")
 
 
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(
         description=(
-            "Scaffold increment-ready breakdown planning files for a project under "
-            "docs/features/<project-slug>/ by default."
+            "Scaffold increment-ready breakdown planning files for a feature under "
+            "docs/features/<feature-slug>/ by default."
         )
     )
-    parser.add_argument("project_slug", help="Project slug, for example: pm-tool")
+    parser.add_argument("feature_slug", help="Feature slug, for example: pm-tool")
     parser.add_argument(
         "--base-dir",
         default=str(DEFAULT_BASE_DIR),
         help=(
-            "Base directory for project planning folders. Relative paths are "
+            "Base directory for feature planning folders. Relative paths are "
             "resolved from the current working directory."
         ),
     )
@@ -39,15 +39,15 @@ def parse_args() -> argparse.Namespace:
     return parser.parse_args()
 
 
-def validate_project_slug(value: str) -> str:
+def validate_feature_slug(value: str) -> str:
     slug = value.strip()
     if not slug:
-        raise ValueError("Project slug cannot be empty.")
+        raise ValueError("Feature slug cannot be empty.")
     if "/" in slug or "\\" in slug:
-        raise ValueError("Project slug must not contain path separators.")
-    if not PROJECT_SLUG_PATTERN.fullmatch(slug):
+        raise ValueError("Feature slug must not contain path separators.")
+    if not FEATURE_SLUG_PATTERN.fullmatch(slug):
         raise ValueError(
-            "Project slug may contain only letters, numbers, dot, underscore, and hyphen."
+            "Feature slug may contain only letters, numbers, dot, underscore, and hyphen."
         )
     return slug
 
@@ -67,9 +67,9 @@ def load_template(path: Path) -> str:
     return path.read_text(encoding="utf-8")
 
 
-def render_task_planning(project_slug: str) -> str:
+def render_task_planning(feature_slug: str) -> str:
     template = load_template(TASK_PLANNING_TEMPLATE)
-    return template.replace("- Project:\n", f"- Project: {project_slug}\n", 1)
+    return template.replace("- Feature:\n", f"- Feature: {feature_slug}\n", 1)
 
 
 def render_task_traceability() -> str:
@@ -86,15 +86,15 @@ def ensure_writable(paths: list[Path], force: bool) -> None:
         )
 
 
-def scaffold(project_slug: str, base_dir: Path, force: bool) -> Path:
-    target_dir = base_dir / project_slug
+def scaffold(feature_slug: str, base_dir: Path, force: bool) -> Path:
+    target_dir = base_dir / feature_slug
     task_planning_path = target_dir / "task-planning.md"
     task_traceability_path = target_dir / "task-traceability.md"
 
     ensure_writable([task_planning_path, task_traceability_path], force=force)
     target_dir.mkdir(parents=True, exist_ok=True)
 
-    task_planning_path.write_text(render_task_planning(project_slug), encoding="utf-8")
+    task_planning_path.write_text(render_task_planning(feature_slug), encoding="utf-8")
     task_traceability_path.write_text(render_task_traceability(), encoding="utf-8")
     return target_dir
 
@@ -102,9 +102,9 @@ def scaffold(project_slug: str, base_dir: Path, force: bool) -> Path:
 def main() -> int:
     args = parse_args()
     try:
-        project_slug = validate_project_slug(args.project_slug)
+        feature_slug = validate_feature_slug(args.feature_slug)
         base_dir = resolve_base_dir(args.base_dir)
-        target_dir = scaffold(project_slug, base_dir, force=args.force)
+        target_dir = scaffold(feature_slug, base_dir, force=args.force)
     except (FileExistsError, FileNotFoundError, OSError, ValueError) as exc:
         print(f"Failure: {exc}", file=sys.stderr)
         return 1

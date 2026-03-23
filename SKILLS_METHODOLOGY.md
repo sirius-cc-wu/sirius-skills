@@ -94,7 +94,7 @@ In this workflow, an increment is a small, demonstrable system outcome made from
 Use the built-in helper when starting a new planning folder:
 
 ```bash
-python3 skills/breakdown/scripts/scaffold_breakdown.py <project-slug>
+python3 skills/breakdown/scripts/scaffold_breakdown.py <feature-slug>
 ```
 
 Review checkpoint:
@@ -257,7 +257,7 @@ Important closure rules:
 ### Feature-local planning
 
 ```text
-docs/features/<project-slug>/
+docs/features/<feature-slug>/
   discover.md
   system-design.md
   ui-design.md              # optional

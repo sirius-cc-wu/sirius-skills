@@ -4,7 +4,7 @@ Use this file to decompose repo stories into execution-ready slices before boots
 
 ## 1. Planning Scope
 
-- Project:
+- Feature:
 - Planning sources:
   - `discover.md`
   - `system-design.md`
