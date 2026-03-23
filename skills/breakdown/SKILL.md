@@ -20,6 +20,9 @@ docs/features/<feature-slug>/task-planning.md
 docs/features/<feature-slug>/task-traceability.md
 ```
 
+If `.skills/planning.json` defines `planning_dir`, the scaffold uses
+`<planning_dir>/<feature-slug>/` instead unless `--base-dir` is passed.
+
 ## Responsibilities
 
 1. Validate that stories are concrete, scoped, and ready for decomposition.
@@ -32,6 +35,11 @@ docs/features/<feature-slug>/task-traceability.md
 
 - `<feature_path>/task-planning.md`
 - `<feature_path>/task-traceability.md`
+
+Resolve `<feature_path>` as `<planning_dir>/<feature-slug>/`.
+
+- If `.skills/planning.json` defines `planning_dir`, use that as `<planning_dir>`.
+- Otherwise default to `docs/features`.
 
 Preferred tracker output when available:
 

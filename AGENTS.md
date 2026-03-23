@@ -22,9 +22,10 @@ that behavior.
 
 Project-specific behavior should normally live in:
 
+- `.skills/planning.json`
 - `.skills/identity.json`
+- `.skills/spec-driver.json`
 - `.skills/plugins/`
-- `.specs/config.json`
 
 If you add configurable behavior, document the config surface and preserve a
 useful generic default.
@@ -83,5 +84,5 @@ specific integration requires otherwise.
   changing behavior.
 - Keep edits small and aligned with the repo's generic-first design.
 - If you change config semantics, update docs and examples together.
-- If you touch `spec-driver`, keep `.specs/`, `tracks/`, and `.skills/`
-  behavior consistent.
+- If you touch `spec-driver`, keep `tracks/`, registry behavior, and `.skills/`
+  configuration consistent.

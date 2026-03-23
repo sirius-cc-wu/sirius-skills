@@ -40,8 +40,11 @@ def test_init_defaults_to_tracks_directory(tmp_path, monkeypatch):
     assert run_cli(module, monkeypatch, "init") == 0
 
     assert (tmp_path / "tracks" / "README.md").exists()
-    config = json.loads((tmp_path / ".specs" / "config.json").read_text(encoding="utf-8"))
+    config = json.loads(
+        (tmp_path / ".skills" / "spec-driver.json").read_text(encoding="utf-8")
+    )
     assert config["spec_dir"] == "tracks"
+    assert not (tmp_path / ".specs").exists()
 
 
 def test_add_creates_track_metadata_and_registry_entries(tmp_path, monkeypatch):
@@ -109,8 +112,8 @@ def test_legacy_markdown_registry_is_migrated_to_json(tmp_path, monkeypatch):
     module = load_manage_specs_module()
     monkeypatch.chdir(tmp_path)
 
-    (tmp_path / ".specs").mkdir()
-    (tmp_path / ".specs" / "config.json").write_text(
+    (tmp_path / ".skills").mkdir()
+    (tmp_path / ".skills" / "spec-driver.json").write_text(
         json.dumps({"spec_dir": "specs", "preferred_workflow": "TDD"}) + "\n",
         encoding="utf-8",
     )
@@ -128,6 +131,17 @@ def test_legacy_markdown_registry_is_migrated_to_json(tmp_path, monkeypatch):
     registry = json.loads((tmp_path / "specs" / "registry.json").read_text(encoding="utf-8"))
     assert rows[0]["id"] == "DEMO"
     assert registry["tracks"][0]["id"] == "DEMO"
+
+
+def test_add_requires_skills_spec_driver_config(tmp_path, monkeypatch, capsys):
+    module = load_manage_specs_module()
+    monkeypatch.chdir(tmp_path)
+
+    exit_code = run_cli(module, monkeypatch, "add", "DEMO", "Demo Feature")
+
+    captured = capsys.readouterr()
+    assert exit_code == 2
+    assert "Track config not found at '.skills/spec-driver.json'." in captured.err
 
 
 def test_add_relation_records_reciprocal_scope_and_registry(tmp_path, monkeypatch):

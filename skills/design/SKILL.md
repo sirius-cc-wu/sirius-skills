@@ -24,6 +24,13 @@ Optional companion output:
 - updates to `<feature_path>/discover.md`
 - updates to `<feature_path>/user-stories.md`
 
+## Feature Path Resolution
+
+Resolve `<feature_path>` as `<planning_dir>/<feature-slug>/`.
+
+- If `.skills/planning.json` defines `planning_dir`, use that as `<planning_dir>`.
+- Otherwise default to `docs/features`.
+
 ## Design Rules
 
 - Keep this skill feature-scoped, not task-scoped.

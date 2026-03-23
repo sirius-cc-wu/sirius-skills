@@ -97,6 +97,9 @@ Use the built-in helper when starting a new planning folder:
 python3 skills/breakdown/scripts/scaffold_breakdown.py <feature-slug>
 ```
 
+The helper uses `.skills/planning.json` field `planning_dir` when present and
+otherwise defaults to `docs/features`.
+
 Review checkpoint:
 
 - review the slices and increments for scope, sequencing, ownership, and demonstrability before creating tracker tasks
@@ -257,7 +260,7 @@ Important closure rules:
 ### Feature-local planning
 
 ```text
-docs/features/<feature-slug>/
+<planning_dir>/<feature-slug>/
   discover.md
   system-design.md
   ui-design.md              # optional
@@ -266,7 +269,7 @@ docs/features/<feature-slug>/
   task-traceability.md
 ```
 
-Keep discovery, design, and breakdown artifacts in a feature-local planning folder so the project context stays together. The planning folder is still a repository document area; it is not a task-execution track.
+Keep discovery, design, and breakdown artifacts in a feature-local planning folder so the project context stays together. The planning folder is still a repository document area; it is not a task-execution track. By default, `planning_dir` is `docs/features`; projects can override it in `.skills/planning.json`.
 
 ### Task-level execution
 
@@ -277,6 +280,9 @@ Keep discovery, design, and breakdown artifacts in a feature-local planning fold
 ```
 
 The exact execution-track path depends on `spec-driver` configuration. The important rule is that execution tracks are **task-scoped**, not feature-scoped, and remain centrally managed separately from the feature-local planning docs.
+
+By default, `spec-driver` uses `tracks/`; projects can override that by setting
+`spec_dir` in `.skills/spec-driver.json`.
 
 ## Diagram Conventions
 
@@ -314,7 +320,7 @@ my-app/
       plan.md
 ```
 
-In this example, `docs/features/habit-tracker/` holds the feature-level planning artifacts, while each executable task gets its own centralized execution track under `tracks/`.
+In this example, the default planning layout `docs/features/habit-tracker/` holds the feature-level planning artifacts, while each executable task gets its own centralized execution track under `tracks/`.
 
 ## Operating Rules
 

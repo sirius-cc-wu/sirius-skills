@@ -63,6 +63,9 @@ Recommended boundary:
 - bootstrap one spec track per executable task
 - let `spec-driver` own track readiness, while the execution tracker owns task execution state
 
+Feature-local planning defaults to `docs/features/<feature-slug>/` unless
+`.skills/planning.json` defines a different `planning_dir`.
+
 Preferred repo workflow:
 
 1. `discover` creates problem framing and initial story candidates.
@@ -77,7 +80,7 @@ Preferred repo workflow:
 
 In the repo-native flow, `breakdown` owns repo-story decomposition, `review-planning` owns planning readiness review, `define` owns the task-scoped `spec.md`, `plan` owns the final task-scoped execution plan and validation checklist, and `review-execution` owns the final implementation-versus-spec review before closure.
 
-By default, new execution tracks are created under `tracks/` unless `.specs/config.json` overrides the location.
+By default, new execution tracks are created under `tracks/` unless `.skills/spec-driver.json` overrides the location.
 
 When UML diagrams are useful, use **PlantUML**:
 
@@ -110,7 +113,28 @@ For a starting point, see `skills/close-track/assets/spec-publish.example.json`.
 To keep relation metadata healthy over time, `skills/spec-driver/scripts/manage_specs.py` also provides `audit-relations`, which checks for missing targets and missing reciprocal links.
 ## Optional project configuration
 
+Projects can add `.skills/planning.json` in the repository root to configure planning-layer layout.
+
+Example:
+
+```json
+{
+  "planning_dir": "planning/features"
+}
+```
+
 Projects can add `.skills/identity.json` in the repository root to describe their local conventions.
+
+Projects can add `.skills/spec-driver.json` in the repository root to configure execution-track layout for `spec-driver`.
+
+Example:
+
+```json
+{
+  "spec_dir": "tracks",
+  "preferred_workflow": "TDD"
+}
+```
 
 Example:
 
@@ -127,6 +151,9 @@ Example:
 
 Current Phase 1 usage:
 
+- planning-layer skills resolve `<feature_path>` from `.skills/planning.json` field `planning_dir` when the file is present, otherwise they default to `docs/features/<feature-slug>/`
+- `skills/breakdown/scripts/scaffold_breakdown.py` uses `.skills/planning.json` field `planning_dir` during scaffolding when the file is present
+- `skills/spec-driver/scripts/manage_specs.py` reads `.skills/spec-driver.json` for `spec_dir` and `preferred_workflow`
 - `skills/spec-driver/scripts/manage_specs.py` uses `branch_extract_pattern` during `add` when the file is present
 - `skills/commit/SKILL.md` documents how `commit_format` can override the generic default
 - `skills/create-pr/SKILL.md` documents how `pr_title_format`, `branch_extract_pattern`, and `id_pattern` can define stricter PR conventions
@@ -145,7 +172,7 @@ Current usage model:
 - have a specific skill or script read them explicitly
 - document that behavior in the relevant skill
 
-Today, the only project-local file that is actually consumed automatically is `.skills/identity.json`.
+Today, the project-local files that are actually consumed automatically are `.skills/planning.json`, `.skills/identity.json`, and `.skills/spec-driver.json`.
 
 Examples:
 

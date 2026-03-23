@@ -23,6 +23,13 @@ Optional companion output:
 - updates to `<feature_path>/user-stories.md`
 - links to mockups or external design references
 
+## Feature Path Resolution
+
+Resolve `<feature_path>` as `<planning_dir>/<feature-slug>/`.
+
+- If `.skills/planning.json` defines `planning_dir`, use that as `<planning_dir>`.
+- Otherwise default to `docs/features`.
+
 ## Workflow
 
 1. Read `discover.md` and `system-design.md` when present.

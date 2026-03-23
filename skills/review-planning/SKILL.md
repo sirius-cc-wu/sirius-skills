@@ -23,11 +23,14 @@ Use this skill after `discover`, `design`, or `breakdown` when the planning arti
 - `<feature_path>/task-traceability.md`
 - linked backlog or tracker context when available
 
-If the repository uses the standard planning layout, prefer:
+Resolve `<feature_path>` from the repository planning layout:
 
 ```text
-docs/features/<feature-slug>/
+<planning_dir>/<feature-slug>/
 ```
+
+- If `.skills/planning.json` defines `planning_dir`, use that as `<planning_dir>`.
+- Otherwise default to `docs/features`.
 
 ## Required Output
 

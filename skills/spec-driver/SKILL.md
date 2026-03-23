@@ -83,7 +83,7 @@ Do not duplicate task-execution states like `implementing`, `in progress`, or `b
 
 ## Preflight
 
-1. If `.specs/config.json` is missing, ask the user where tracks should be created, then initialize via tooling with that path.
+1. If `.skills/spec-driver.json` is missing, ask the user where tracks should be created, then initialize via tooling with that path.
 2. Ensure the configured registry exists (`<spec_dir>/README.md` and `<spec_dir>/registry.json`).
 3. Resolve the active track using tooling (or by user-provided ID/path).
 4. Confirm track path exists and represents one execution-ready work item.
@@ -162,7 +162,16 @@ Partial invalidation is represented with soft selectors in relation scope, for e
 
 Closed tracks are non-destructive: the original `spec.md` and `plan.md` stay in place, and any legacy `tasks.md` may remain as well, while the metadata and registry record that the track is closed.
 
-The configured tracks directory is stored in `.specs/config.json` under `spec_dir` for backward compatibility. If `.specs/config.json` does not exist yet, ask the user where tracks should be created before running `init`.
+The configured tracks directory is stored in `.skills/spec-driver.json` under `spec_dir`. If `.skills/spec-driver.json` does not exist yet, ask the user where tracks should be created before running `init`.
+
+Example:
+
+```json
+{
+  "spec_dir": "tracks",
+  "preferred_workflow": "TDD"
+}
+```
 
 Track IDs are treated as opaque identifiers. Manual IDs may include letters, numbers, `.`, `_`, and `-`, so IDs like `BNC-lg2fwe` are valid. Auto-generated standalone track IDs use a hash format such as `SPC-a3f8e9` or `CLAW-a3f8e9`.
 

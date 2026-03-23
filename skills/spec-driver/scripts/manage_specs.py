@@ -9,8 +9,8 @@ from datetime import datetime
 from typing import Dict, List, Optional, Tuple
 
 DEFAULT_SPECS_DIR = "tracks"
-CONFIG_DIR = ".specs"
-CONFIG_FILE = os.path.join(CONFIG_DIR, "config.json")
+CONFIG_DIR = ".skills"
+CONFIG_FILE = os.path.join(CONFIG_DIR, "spec-driver.json")
 IDENTITY_CONFIG_DIR = ".skills"
 IDENTITY_CONFIG_FILE = os.path.join(IDENTITY_CONFIG_DIR, "identity.json")
 DEFAULT_PREFERRED_WORKFLOW = "TDD"
@@ -279,7 +279,7 @@ def load_config(required: bool = True) -> Dict[str, str]:
     if not os.path.exists(CONFIG_FILE):
         if required:
             raise RuntimeError(
-                "Track config not found at '.specs/config.json'. "
+                "Track config not found at '.skills/spec-driver.json'. "
                 "Ask the user where tracks should be created, then run "
                 "`manage_specs.py init <track-dir>`."
             )
@@ -1169,11 +1169,13 @@ def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser()
     subparsers = parser.add_subparsers(dest="command", required=True)
 
-    init_p = subparsers.add_parser("init", help="Initialize the specs registry and config")
+    init_p = subparsers.add_parser(
+        "init", help="Initialize the track registry and spec-driver config"
+    )
     init_p.add_argument(
         "spec_dir",
         nargs="?",
-        help="Specs directory path (defaults to configured path or 'specs')",
+        help="Track directory path (defaults to configured path or 'tracks')",
     )
 
     add_p = subparsers.add_parser("add", help="Create a track from a name or explicit opaque ID")

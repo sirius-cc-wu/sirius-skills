@@ -22,11 +22,14 @@ Optional companion output:
 
 - `<feature_path>/user-stories.md`
 
-If the repository uses the standard planning layout, prefer:
+Resolve `<feature_path>` from the repository planning layout:
 
 ```text
-docs/features/<feature-slug>/
+<planning_dir>/<feature-slug>/
 ```
+
+- If `.skills/planning.json` defines `planning_dir`, use that as `<planning_dir>`.
+- Otherwise default to `docs/features`.
 
 ## Discovery Rules
 
@@ -37,7 +40,7 @@ docs/features/<feature-slug>/
 
 ## Workflow
 
-1. Identify or create the feature planning folder.
+1. Resolve `<feature_path>` from `.skills/planning.json` when `planning_dir` is present; otherwise use `docs/features/<feature-slug>/`, then identify or create the feature planning folder.
 2. Inspect the repository, existing docs, and relevant context.
 3. Write `discover.md` with problem framing, actors, goals, constraints, and risks.
 4. If helpful, draft an initial `user-stories.md` with stable story identifiers.
