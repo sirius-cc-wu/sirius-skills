@@ -3,7 +3,6 @@
 REPO_ROOT := $(CURDIR)
 COMMON_FLAGS := --global --yes --agent github-copilot --agent codex --agent antigravity --agent gemini-cli
 MANAGED_SKILLS := \
-	batch \
 	breakdown \
 	close-track \
 	commit \
@@ -42,7 +41,6 @@ install:
 	npx skills add "$(REPO_ROOT)/skills/review-execution" $(COMMON_FLAGS)
 	npx skills add "$(REPO_ROOT)/skills/commit" $(COMMON_FLAGS)
 	npx skills add "$(REPO_ROOT)/skills/simplify" $(COMMON_FLAGS)
-	npx skills add "$(REPO_ROOT)/skills/batch" $(COMMON_FLAGS)
 	npx skills add "$(REPO_ROOT)/skills/dioxus-ui-ux" $(COMMON_FLAGS)
 	npx skills add "$(REPO_ROOT)/skills/dioxus-stitch" $(COMMON_FLAGS)
 	npx skills add https://github.com/google-labs-code/stitch-skills --skill '*' $(COMMON_FLAGS)
