@@ -41,7 +41,7 @@ def test_init_defaults_to_tracks_directory(tmp_path, monkeypatch):
 
     assert (tmp_path / "tracks" / "README.md").exists()
     config = json.loads(
-        (tmp_path / ".skills" / "execution-driver.json").read_text(encoding="utf-8")
+        (tmp_path / ".skills" / "execution.json").read_text(encoding="utf-8")
     )
     assert config["track_dir"] == "tracks"
     assert not (tmp_path / ".specs").exists()
@@ -134,7 +134,7 @@ def test_legacy_markdown_registry_is_migrated_to_json(tmp_path, monkeypatch):
     monkeypatch.chdir(tmp_path)
 
     (tmp_path / ".skills").mkdir()
-    (tmp_path / ".skills" / "execution-driver.json").write_text(
+    (tmp_path / ".skills" / "execution.json").write_text(
         json.dumps({"track_dir": "specs", "preferred_workflow": "TDD"}) + "\n",
         encoding="utf-8",
     )
@@ -179,7 +179,7 @@ def test_add_requires_execution_driver_config(tmp_path, monkeypatch, capsys):
 
     captured = capsys.readouterr()
     assert exit_code == 2
-    assert ".skills/execution-driver.json" in captured.err
+    assert ".skills/execution.json" in captured.err
 
 
 def test_add_relation_records_reciprocal_scope_and_registry(tmp_path, monkeypatch):

@@ -86,13 +86,13 @@ def test_scaffold_rejects_non_string_planning_config_dir(tmp_path, monkeypatch, 
     assert "Planning config field 'planning_dir' must be a string." in captured.err
 
 
-def test_scaffold_ignores_identity_planning_dir(tmp_path, monkeypatch):
+def test_scaffold_ignores_conventions_planning_dir(tmp_path, monkeypatch):
     module = load_module()
     monkeypatch.chdir(tmp_path)
 
     config_dir = tmp_path / ".skills"
     config_dir.mkdir(parents=True, exist_ok=True)
-    (config_dir / "identity.json").write_text(
+    (config_dir / "conventions.json").write_text(
         json.dumps({"planning_dir": "legacy/features"}) + "\n",
         encoding="utf-8",
     )

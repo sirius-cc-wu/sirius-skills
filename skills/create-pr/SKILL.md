@@ -29,7 +29,7 @@ The ID is extracted from the current branch name or a logical scope is used.
 
 ### Optional Project-Specific Conventions
 
-If the project defines `.skills/identity.json`, use it to tighten title generation rules instead of hardcoding tracker behavior into the skill.
+If the project defines `.skills/conventions.json`, use it to tighten title generation rules instead of hardcoding tracker behavior into the skill.
 
 - Use `branch_extract_pattern` to extract an ID from the branch when present.
 - Use `pr_title_format` when present.
@@ -142,4 +142,4 @@ When no project-specific format is configured, the PR title should generally mat
 ^[^:]+: [A-Z].+[^.]$
 ```
 
-If `.skills/identity.json` provides stricter conventions, validate against those instead.
+If `.skills/conventions.json` provides stricter conventions, validate against those instead.

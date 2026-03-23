@@ -599,9 +599,9 @@ def main() -> int:
             success_criteria = extract_list_section(brief_text, "7. success criteria")
             relation_summary = render_relation_summary(metadata)
             verification_summary = extract_verification_summary(plan_text, tasks_text)
-            identity_config = module.load_identity_config(required=False)
+            conventions_config = module.load_conventions_config(required=False)
             issue_reference = render_issue_reference(
-                metadata, identity_config.get("issue_url_template")
+                metadata, conventions_config.get("issue_url_template")
             )
             entry = render_publication_entry(
                 track,

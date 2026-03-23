@@ -158,13 +158,13 @@ def test_close_track_publishes_without_legacy_tasks_md(tmp_path, monkeypatch):
     assert metadata["status"] == "closed"
 
 
-def test_close_track_renders_issue_link_when_identity_config_exists(tmp_path, monkeypatch):
+def test_close_track_renders_issue_link_when_conventions_config_exists(tmp_path, monkeypatch):
     close_track = load_module(CLOSE_TRACK_PATH, "close_track")
     _, track_dir = setup_execution_ready_track(tmp_path, monkeypatch)
 
-    identity_dir = tmp_path / ".skills"
-    identity_dir.mkdir(parents=True, exist_ok=True)
-    (identity_dir / "identity.json").write_text(
+    conventions_dir = tmp_path / ".skills"
+    conventions_dir.mkdir(parents=True, exist_ok=True)
+    (conventions_dir / "conventions.json").write_text(
         json.dumps(
             {"issue_url_template": "https://tracker.example.com/issues/{ID}"}
         )

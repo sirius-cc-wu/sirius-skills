@@ -53,7 +53,7 @@ If the config file is absent, the skill still works for closing tracks. Publishi
 4. If publishing is requested or configured:
     - generate a concise summary from `brief.md`, `plan.md`, any legacy `tasks.md`, and metadata
     - include explicit track relations such as `supersedes` or `replaces_partially` when they are confirmed at close time
-    - include source issue links when track metadata and `.skills/identity.json` provide them
+    - include source issue links when track metadata and `.skills/conventions.json` provide them
     - include implementation verification highlights when they can be inferred from `plan.md` and any legacy `tasks.md`
     - write or update the configured rollup document using stable markers
     - record publication metadata back into `.track-meta.json`

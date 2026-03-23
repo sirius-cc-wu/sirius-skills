@@ -314,7 +314,7 @@ Keep discovery, design, and breakdown artifacts in a feature-local planning fold
 The exact execution-track path depends on `execution-driver` configuration. The important rule is that execution tracks are **task-scoped**, not feature-scoped, and remain centrally managed separately from the feature-local planning docs.
 
 By default, `execution-driver` uses `tracks/`; projects can override that by setting
-`track_dir` in `.skills/execution-driver.json`.
+`track_dir` in `.skills/execution.json`.
 
 ## Diagram Conventions
 

@@ -10,9 +10,9 @@ from typing import Dict, List, Optional, Tuple
 
 DEFAULT_TRACKS_DIR = "tracks"
 CONFIG_DIR = ".skills"
-CONFIG_FILE = os.path.join(CONFIG_DIR, "execution-driver.json")
-IDENTITY_CONFIG_DIR = ".skills"
-IDENTITY_CONFIG_FILE = os.path.join(IDENTITY_CONFIG_DIR, "identity.json")
+CONFIG_FILE = os.path.join(CONFIG_DIR, "execution.json")
+CONVENTIONS_CONFIG_DIR = ".skills"
+CONVENTIONS_CONFIG_FILE = os.path.join(CONVENTIONS_CONFIG_DIR, "conventions.json")
 DEFAULT_PREFERRED_WORKFLOW = "TDD"
 REGISTRY_JSON_FILE = "registry.json"
 DEFAULT_GENERATED_TRACK_PREFIX = "SPC"
@@ -90,6 +90,8 @@ def normalize_track_dir(value: str) -> str:
     if normalized.startswith("./"):
         normalized = normalized[2:]
     return normalized
+
+
 def validate_track_id(value: str) -> str:
     track_id = value.strip()
     if not track_id:
@@ -266,7 +268,7 @@ def load_config(required: bool = True) -> Dict[str, str]:
     if not os.path.exists(CONFIG_FILE):
         if required:
             raise RuntimeError(
-                "Track config not found at '.skills/execution-driver.json'. "
+                "Track config not found at '.skills/execution.json'. "
                 "Ask the user where tracks should be created, then run "
                 "`manage_execution.py init <track-dir>`."
             )
@@ -279,10 +281,10 @@ def load_config(required: bool = True) -> Dict[str, str]:
         with open(CONFIG_FILE, "r", encoding="utf-8") as f:
             config = json.load(f)
     except json.JSONDecodeError as exc:
-        raise RuntimeError("Execution-driver config is not valid JSON.") from exc
+        raise RuntimeError("Execution config is not valid JSON.") from exc
 
     if not isinstance(config, dict):
-        raise RuntimeError("Execution-driver config must be a JSON object.")
+        raise RuntimeError("Execution config must be a JSON object.")
 
     track_dir = config.get("track_dir", DEFAULT_TRACKS_DIR)
     preferred_workflow = config.get(
@@ -290,10 +292,10 @@ def load_config(required: bool = True) -> Dict[str, str]:
     )
 
     if not isinstance(track_dir, str):
-        raise RuntimeError("Execution-driver config field 'track_dir' must be a string.")
+        raise RuntimeError("Execution config field 'track_dir' must be a string.")
     if not isinstance(preferred_workflow, str):
         raise RuntimeError(
-            "Execution-driver config field 'preferred_workflow' must be a string."
+            "Execution config field 'preferred_workflow' must be a string."
         )
 
     return {
@@ -302,22 +304,22 @@ def load_config(required: bool = True) -> Dict[str, str]:
     }
 
 
-def load_identity_config(required: bool = False) -> Dict[str, str]:
-    if not os.path.exists(IDENTITY_CONFIG_FILE):
+def load_conventions_config(required: bool = False) -> Dict[str, str]:
+    if not os.path.exists(CONVENTIONS_CONFIG_FILE):
         if required:
             raise RuntimeError(
-                "Identity config not found at '.skills/identity.json'."
+                "Conventions config not found at '.skills/conventions.json'."
             )
         return {}
 
     try:
-        with open(IDENTITY_CONFIG_FILE, "r", encoding="utf-8") as f:
+        with open(CONVENTIONS_CONFIG_FILE, "r", encoding="utf-8") as f:
             config = json.load(f)
     except json.JSONDecodeError as exc:
-        raise RuntimeError("Identity config is not valid JSON.") from exc
+        raise RuntimeError("Conventions config is not valid JSON.") from exc
 
     if not isinstance(config, dict):
-        raise RuntimeError("Identity config must be a JSON object.")
+        raise RuntimeError("Conventions config must be a JSON object.")
 
     string_fields = (
         "issue_tracker",
@@ -333,7 +335,7 @@ def load_identity_config(required: bool = False) -> Dict[str, str]:
         if value is None:
             continue
         if not isinstance(value, str):
-            raise RuntimeError(f"Identity config field '{field}' must be a string.")
+            raise RuntimeError(f"Conventions config field '{field}' must be a string.")
         normalized[field] = value
 
     return normalized
@@ -786,19 +788,19 @@ def get_current_branch() -> Optional[str]:
     return None
 
 
-def infer_id_from_branch(identity_config: Optional[Dict[str, str]] = None) -> Optional[str]:
+def infer_id_from_branch(conventions_config: Optional[Dict[str, str]] = None) -> Optional[str]:
     branch = get_current_branch()
     if not branch:
         return None
 
-    if identity_config:
-        pattern = identity_config.get("branch_extract_pattern")
+    if conventions_config:
+        pattern = conventions_config.get("branch_extract_pattern")
         if pattern:
             try:
                 match = re.search(pattern, branch)
             except re.error as exc:
                 raise RuntimeError(
-                    "Identity config field 'branch_extract_pattern' is not a valid regex."
+                    "Conventions config field 'branch_extract_pattern' is not a valid regex."
                 ) from exc
             if not match:
                 return None
@@ -1062,9 +1064,9 @@ def cmd_add(args: argparse.Namespace) -> int:
         name = " ".join(cmd_args[1:])
 
     if not id_to_use:
-        identity_config = load_identity_config(required=False)
+        conventions_config = load_conventions_config(required=False)
         rows = parse_registry()
-        id_to_use = infer_id_from_branch(identity_config) or generate_hash_track_id(
+        id_to_use = infer_id_from_branch(conventions_config) or generate_hash_track_id(
             rows, name
         )
 
@@ -1174,7 +1176,7 @@ def build_parser() -> argparse.ArgumentParser:
     subparsers = parser.add_subparsers(dest="command", required=True)
 
     init_p = subparsers.add_parser(
-        "init", help="Initialize the track registry and execution-driver config"
+        "init", help="Initialize the track registry and execution config"
     )
     init_p.add_argument(
         "track_dir",

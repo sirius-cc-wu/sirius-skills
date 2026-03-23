@@ -23,8 +23,8 @@ that behavior.
 Project-specific behavior should normally live in:
 
 - `.skills/planning.json`
-- `.skills/identity.json`
-- `.skills/execution-driver.json`
+- `.skills/conventions.json`
+- `.skills/execution.json`
 - `.skills/plugins/`
 
 If you add configurable behavior, document the config surface and preserve a

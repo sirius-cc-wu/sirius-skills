@@ -86,7 +86,7 @@ In the repo-native flow, `planning-driver` owns feature-planning readiness and r
 
 Execution follows the same pattern: `execution-driver` owns routing, readiness, and registry state, while `define`, `plan`, `review-execution`, and `close-track` own their artifacts and outputs.
 
-By default, new execution tracks are created under `tracks/` unless `.skills/execution-driver.json` overrides the location.
+By default, new execution tracks are created under `tracks/` unless `.skills/execution.json` overrides the location.
 
 When UML diagrams are useful, use **PlantUML**:
 
@@ -111,7 +111,7 @@ The published entry can include:
 
 - backlinks to the retained `brief.md` / `plan.md` artifacts, plus any legacy `tasks.md`
 - explicit relation summaries such as which older track or story scope is superseded
-- source issue links when `.track-meta.json` and `.skills/identity.json` provide them
+- source issue links when `.track-meta.json` and `.skills/conventions.json` provide them
 - implementation verification highlights inferred from `plan.md` and any legacy `tasks.md`
 
 For a starting point, see `skills/close-track/assets/spec-publish.example.json`.
@@ -129,9 +129,9 @@ Example:
 }
 ```
 
-Projects can add `.skills/identity.json` in the repository root to describe their local conventions.
+Projects can add `.skills/conventions.json` in the repository root to describe their local conventions.
 
-Projects can add `.skills/execution-driver.json` in the repository root to configure execution-track layout for `execution-driver`.
+Projects can add `.skills/execution.json` in the repository root to configure execution-track layout for `execution-driver`.
 
 Example:
 
@@ -160,7 +160,7 @@ Current Phase 1 usage:
 - planning-layer skills resolve `<feature_path>` from `.skills/planning.json` field `planning_dir` when the file is present, otherwise they default to `docs/features/<feature-slug>/`
 - `skills/planning-driver/scripts/manage_planning.py` reads `.skills/planning.json` for `planning_dir` and maintains planning readiness metadata under `<feature_path>/.planning-meta.json`
 - `skills/breakdown/scripts/scaffold_breakdown.py` uses `.skills/planning.json` field `planning_dir` during scaffolding when the file is present
-- `skills/execution-driver/scripts/manage_execution.py` reads `.skills/execution-driver.json` for `track_dir` and `preferred_workflow`
+- `skills/execution-driver/scripts/manage_execution.py` reads `.skills/execution.json` for `track_dir` and `preferred_workflow`
 - `skills/execution-driver/scripts/manage_execution.py` uses `branch_extract_pattern` during `add` when the file is present
 - `skills/commit/SKILL.md` documents how `commit_format` can override the generic default
 - `skills/create-pr/SKILL.md` documents how `pr_title_format`, `branch_extract_pattern`, and `id_pattern` can define stricter PR conventions
@@ -179,7 +179,7 @@ Current usage model:
 - have a specific skill or script read them explicitly
 - document that behavior in the relevant skill
 
-Today, the project-local files that are actually consumed automatically are `.skills/planning.json`, `.skills/identity.json`, and `.skills/execution-driver.json`.
+Today, the project-local files that are actually consumed automatically are `.skills/planning.json`, `.skills/conventions.json`, and `.skills/execution.json`.
 
 Examples:
 

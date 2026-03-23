@@ -80,7 +80,7 @@ Do not duplicate task-execution states like `implementing`, `in progress`, or `b
 
 ## Preflight
 
-1. If `.skills/execution-driver.json` is missing, ask the user where tracks should be created, then initialize via tooling with that path.
+1. If `.skills/execution.json` is missing, ask the user where tracks should be created, then initialize via tooling with that path.
 2. Ensure the configured registry exists (`<track_dir>/README.md` and `<track_dir>/registry.json`).
 3. Resolve the active track using tooling (or by user-provided ID/path).
 4. Confirm track path exists and represents one execution-ready work item.
@@ -165,7 +165,7 @@ Partial invalidation is represented with soft selectors in relation scope, for e
 
 Closed tracks are non-destructive: the original `brief.md` and `plan.md` stay in place, and any legacy `tasks.md` may remain as well, while the metadata and registry record that the track is closed.
 
-The configured tracks directory is stored in `.skills/execution-driver.json` under `track_dir`. If `.skills/execution-driver.json` does not exist yet, ask the user where tracks should be created before running `init`.
+The configured tracks directory is stored in `.skills/execution.json` under `track_dir`. If `.skills/execution.json` does not exist yet, ask the user where tracks should be created before running `init`.
 
 Example:
 
@@ -178,9 +178,9 @@ Example:
 
 Track IDs are treated as opaque identifiers. Manual IDs may include letters, numbers, `.`, `_`, and `-`, so IDs like `BNC-lg2fwe` are valid. Auto-generated standalone track IDs use a hash format such as `SPC-a3f8e9` or `CLAW-a3f8e9`.
 
-### Optional Identity Configuration
+### Optional Conventions Configuration
 
-Projects may define `.skills/identity.json` to describe issue-tracker or branch naming conventions without changing the base workflow.
+Projects may define `.skills/conventions.json` to describe issue-tracker or branch naming conventions without changing the base workflow.
 
 Supported Phase 1 fields:
 
@@ -190,12 +190,12 @@ Supported Phase 1 fields:
 - `pr_title_format`: convention for the `create-pr` skill
 - `issue_url_template`: optional documentation hook for linking IDs to a tracker
 
-If `.skills/identity.json` is absent:
+If `.skills/conventions.json` is absent:
 
 - `manage_execution.py add "<feature-name>"` keeps the generic default behavior
 - it generates a hash ID with the `SPC` prefix
 
-If `.skills/identity.json` is present and defines `branch_extract_pattern`, `manage_execution.py add "<feature-name>"` uses that pattern before falling back to hash generation. Manual IDs always override auto-detection.
+If `.skills/conventions.json` is present and defines `branch_extract_pattern`, `manage_execution.py add "<feature-name>"` uses that pattern before falling back to hash generation. Manual IDs always override auto-detection.
 
 Example:
 
@@ -217,7 +217,7 @@ python3 <path-to-execution-driver>/scripts/manage_execution.py init [track-dir]
 # Example with a custom tracks directory:
 python3 <path-to-execution-driver>/scripts/manage_execution.py init docs/tracks
 
-# Add track (use branch_extract_pattern from .skills/identity.json when present,
+# Add track (use branch_extract_pattern from .skills/conventions.json when present,
 # otherwise generate a hash ID with the SPC prefix):
 python3 <path-to-execution-driver>/scripts/manage_execution.py add "feature-name"
 

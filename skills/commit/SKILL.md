@@ -28,7 +28,7 @@ Follow these standards for all commit messages:
 - **Body (Optional but Recommended):** A bulleted list of specific changes or a brief explanation of *why* the changes were made.
 
 ### 3a. Optional Project-Specific Conventions
-If the project defines `.skills/identity.json`, follow that configuration instead of assuming the default format.
+If the project defines `.skills/conventions.json`, follow that configuration instead of assuming the default format.
 
 - Use `commit_format` when it is present.
 - Common placeholders are `{ID}`, `{scope}`, and `{summary}`.
@@ -79,7 +79,7 @@ git commit -m 'module: Summary line' -m '- Detail bullet point'
 3. Commit with crate or module scope.
 
 ### Example 2: Configured Ticket-Based Workflow
-If `.skills/identity.json` defines `commit_format` as `{ID}: {summary}` and the branch is `BSP-3313-buffer-fix`, use a title like:
+If `.skills/conventions.json` defines `commit_format` as `{ID}: {summary}` and the branch is `BSP-3313-buffer-fix`, use a title like:
 
 ```text
 BSP-3313: Fix uds buffer bounds handling
