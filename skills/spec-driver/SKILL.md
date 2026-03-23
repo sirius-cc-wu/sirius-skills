@@ -21,17 +21,11 @@ Use `spec-driver` as the execution-layer entrypoint when you need to decide the 
 
 Before routing execution work, classify the request:
 
-1. If the problem, outcomes, or constraints are still being framed:
-   - send the work to `discover`
-2. If the architecture, interfaces, or technical approach are still unresolved:
-   - send the work to `design`
-3. If UI or interaction flow is still a material part of scope:
-   - send the work to `ui-flow`
-4. If the work is still repo-scoped, story-scoped, or needs decomposition into tracker slices:
-   - send the work to `breakdown`
-5. If there is one execution-ready work item but no task-scoped spec track yet:
+1. If the work is still feature-scoped, story-scoped, or needs planning-layer routing:
+   - send the work to `planning-driver`
+2. If there is one execution-ready work item but no task-scoped spec track yet:
    - send the work to `track`
-6. If a task-scoped track already exists or can be resolved:
+3. If a task-scoped track already exists or can be resolved:
    - stay in `spec-driver` and route inside the execution layer
 
 `spec-driver` should not absorb feature-level discovery, design, or decomposition just because it was invoked first. Route back out to the planning layer instead.
@@ -43,14 +37,15 @@ Before routing execution work, classify the request:
 In repositories that use the planning-layer skills, the usual handoff is:
 
 ```text
-discover -> design -> ui-flow -> breakdown -> track -> spec-driver
+planning-driver -> discover -> design -> ui-flow -> breakdown -> review-planning -> track -> spec-driver
 ```
 
+- `planning-driver` owns feature-planning readiness and routes to the right planning skill.
 - `breakdown` turns repo stories into directly executable work items.
 - `track` bootstraps one task-scoped spec track for one ready work item.
 - `spec-driver` then manages track readiness for that bootstrapped track.
 
-If the input is still feature-scoped, story-scoped, or too large for one execution track, send it back to `breakdown` instead of stretching `spec-driver` to own decomposition.
+If the input is still feature-scoped, story-scoped, or too large for one execution track, send it back to `planning-driver` instead of stretching `spec-driver` to own planning decomposition.
 
 ## Lifecycle States
 

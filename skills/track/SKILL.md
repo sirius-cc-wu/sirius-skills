@@ -45,4 +45,4 @@ python3 skills/spec-driver/scripts/manage_specs.py add "<track-id>" "<feature-na
 
 - Do not invent extra track states to mirror tracker execution lifecycle.
 - Do not skip `spec-driver`; this skill only bootstraps and hands off.
-- If the input work item is still too large, send it back to `breakdown`.
+- If the input work item is still too large, send it back to `planning-driver` or `breakdown`.

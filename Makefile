@@ -9,6 +9,7 @@ MANAGED_SKILLS := \
 	design \
 	design-md \
 	discover \
+	planning-driver \
 	dioxus-stitch \
 	dioxus-ui-ux \
 	enhance-prompt \
@@ -31,6 +32,7 @@ install:
 	npx skills add "$(REPO_ROOT)/skills/spec-driver" $(COMMON_FLAGS)
 	npx skills add "$(REPO_ROOT)/skills/define" $(COMMON_FLAGS)
 	npx skills add "$(REPO_ROOT)/skills/plan" $(COMMON_FLAGS)
+	npx skills add "$(REPO_ROOT)/skills/planning-driver" $(COMMON_FLAGS)
 	npx skills add "$(REPO_ROOT)/skills/discover" $(COMMON_FLAGS)
 	npx skills add "$(REPO_ROOT)/skills/design" $(COMMON_FLAGS)
 	npx skills add "$(REPO_ROOT)/skills/ui-flow" $(COMMON_FLAGS)

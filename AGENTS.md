@@ -34,6 +34,7 @@ useful generic default.
 
 Do not mix workflow responsibilities:
 
+- `planning-driver` owns planning readiness and registry state
 - `spec-driver` owns spec track readiness and registry state
 - the execution tracker owns task lifecycle
 

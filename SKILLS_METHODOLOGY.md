@@ -9,6 +9,7 @@ This document explains **how to use the skills together**.
 Use a **two-layer workflow**:
 
 1. **Planning layer**
+   - `planning-driver`
    - `discover`
    - `design`
    - `ui-flow` (optional)
@@ -23,11 +24,37 @@ Use a **two-layer workflow**:
    - `close-track`
    - your execution tracker
 
-The planning layer keeps scope, design, decomposition, and increment planning in repo documents.
+The planning layer keeps scope, design, decomposition, and increment planning in repo documents, and `planning-driver` owns readiness and routing across those artifacts.
 
 The execution layer works one implementation-ready task at a time.
 
 ## Recommended Workflow
+
+### 0. Route planning with planning-driver
+
+Use `planning-driver` as the planning-layer entrypoint when you need to decide what should happen next for a feature.
+
+Its job is to:
+
+- resolve or initialize the feature planning folder
+- verify the current planning artifacts and metadata
+- decide whether the next step is `discover`, `design`, `ui-flow`, `breakdown`, `review-planning`, or `track`
+- keep planning handoff decisions durable through explicit readiness states
+
+Expected planning states:
+
+- `discovery_pending`
+- `discovery_ready`
+- `design_ready`
+- `breakdown_ready`
+- `planning_reviewed`
+- `track_ready`
+
+Recommended handoff:
+
+```text
+planning-driver -> discover/design/ui-flow/breakdown/review-planning/track
+```
 
 ### 1. Discover the work
 
@@ -135,7 +162,7 @@ Review checkpoint:
 
 ### 5. Review planning outputs
 
-Use `review-planning` after the discovery, design, and breakdown artifacts are concrete enough to support execution handoff.
+Use `review-planning` after the discovery, design, and breakdown artifacts are concrete enough to support execution handoff, typically when `planning-driver` routes the feature into readiness review.
 
 Its job is to:
 
@@ -147,7 +174,7 @@ Its job is to:
 Recommended handoff:
 
 ```text
-discover -> design -> breakdown -> execution tracker -> review-planning -> track
+planning-driver -> discover -> design -> breakdown -> execution tracker -> review-planning -> track
 ```
 
 ### 6. Bootstrap one execution track per task
@@ -157,7 +184,7 @@ Once a tracker task is implementation-ready, use `track`.
 Preferred handoff:
 
 ```text
-breakdown -> execution tracker -> review-planning -> track -> spec-driver
+planning-driver -> breakdown -> execution tracker -> review-planning -> track -> spec-driver
 ```
 
 `track` should bootstrap a task-scoped spec track from the execution-ready work item, typically with:
