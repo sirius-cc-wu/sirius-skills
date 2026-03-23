@@ -1,8 +1,8 @@
-# Specification Checklist: [WORK ITEM NAME]
+# Brief Checklist: [WORK ITEM NAME]
 
-**Purpose**: Validate that the task-scoped `spec.md` is ready for planning
+**Purpose**: Validate that the task-scoped `brief.md` is ready for planning
 **Created**: [DATE]  
-**Spec**: [link to spec.md]
+**Brief**: [link to brief.md]
 
 ## Content
 
@@ -28,8 +28,8 @@
 
 ## Readiness
 
-- [ ] The spec describes one independently valuable work item
-- [ ] Specification is ready for planning
+- [ ] The brief describes one independently valuable work item
+- [ ] Brief is ready for planning
 
 ## Notes
 

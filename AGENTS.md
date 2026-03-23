@@ -24,7 +24,7 @@ Project-specific behavior should normally live in:
 
 - `.skills/planning.json`
 - `.skills/identity.json`
-- `.skills/spec-driver.json`
+- `.skills/execution-driver.json`
 - `.skills/plugins/`
 
 If you add configurable behavior, document the config surface and preserve a
@@ -35,10 +35,10 @@ useful generic default.
 Do not mix workflow responsibilities:
 
 - `planning-driver` owns planning readiness and registry state
-- `spec-driver` owns spec track readiness and registry state
+- `execution-driver` owns execution-track readiness and registry state
 - the execution tracker owns task lifecycle
 
-Do not duplicate execution-tracker lifecycle states inside spec track state.
+Do not duplicate execution-tracker lifecycle states inside execution-track state.
 
 ### Treat IDs as opaque
 
@@ -85,5 +85,5 @@ specific integration requires otherwise.
   changing behavior.
 - Keep edits small and aligned with the repo's generic-first design.
 - If you change config semantics, update docs and examples together.
-- If you touch `spec-driver`, keep `tracks/`, registry behavior, and `.skills/`
+- If you touch `execution-driver`, keep `tracks/`, registry behavior, and `.skills/`
   configuration consistent.

@@ -1,34 +1,34 @@
 ---
 name: define
-description: Creates and validates task-scoped specifications.
+description: Creates and validates task-scoped briefs.
 ---
 
 # Define
 
-Use this skill to turn one execution-ready work item into a complete `spec.md`.
+Use this skill to turn one execution-ready work item into a complete `brief.md`.
 
 ## Responsibilities
 
-1. Create or update `<track_path>/spec.md`.
+1. Create or update `<track_path>/brief.md`.
 2. Create or update `<track_path>/checklists/requirements.md`.
 3. Clarify only what is necessary.
-4. Validate the spec before handoff.
+4. Validate the brief before handoff.
 
 ## Required Outputs
 
-- `<track_path>/spec.md`
+- `<track_path>/brief.md`
 - `<track_path>/checklists/requirements.md`
 
-Resolve `<track_path>` through `spec-driver`.
+Resolve `<track_path>` through `execution-driver`.
 
 ## Artifact Ownership
 
 `define` owns the content of:
 
-- `<track_path>/spec.md`
+- `<track_path>/brief.md`
 - `<track_path>/checklists/requirements.md`
 
-`spec-driver` should resolve the active track and enforce readiness gates, but it should not take over specification authoring that belongs to `define`.
+`execution-driver` should resolve the active track and enforce readiness gates, but it should not take over brief authoring that belongs to `define`.
 
 ## Authoring Rules
 
@@ -53,12 +53,12 @@ Before handoff, confirm:
 1. No implementation leakage
 2. Requirements are testable and unambiguous
 3. Success criteria are measurable and technology-agnostic
-4. The spec describes one independently valuable work item that fits the active track
+4. The brief describes one independently valuable work item that fits the active track
 5. Checklist is updated to reflect current status
 
 ## Workflow
-1. Resolve the active track with `spec-driver`.
-2. Fill `spec-template.md`.
+1. Resolve the active track with `execution-driver`.
+2. Fill `brief-template.md`.
 3. Create or update the requirements checklist.
 4. Run validation and revise if needed.
-5. Stop when the spec is ready for planning.
+5. Stop when the brief is ready for planning.

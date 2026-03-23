@@ -4,11 +4,11 @@ import sys
 from pathlib import Path
 
 
-SCRIPT_PATH = Path(__file__).resolve().parents[1] / "scripts" / "manage_specs.py"
+SCRIPT_PATH = Path(__file__).resolve().parents[1] / "scripts" / "manage_execution.py"
 
 
 def load_manage_specs_module():
-    spec = importlib.util.spec_from_file_location("manage_specs", SCRIPT_PATH)
+    spec = importlib.util.spec_from_file_location("manage_execution", SCRIPT_PATH)
     module = importlib.util.module_from_spec(spec)
     assert spec.loader is not None
     spec.loader.exec_module(module)
@@ -16,7 +16,7 @@ def load_manage_specs_module():
 
 
 def run_cli(module, monkeypatch, *args):
-    monkeypatch.setattr(sys, "argv", ["manage_specs.py", *args])
+    monkeypatch.setattr(sys, "argv", ["manage_execution.py", *args])
     return module.main()
 
 
@@ -41,9 +41,9 @@ def test_init_defaults_to_tracks_directory(tmp_path, monkeypatch):
 
     assert (tmp_path / "tracks" / "README.md").exists()
     config = json.loads(
-        (tmp_path / ".skills" / "spec-driver.json").read_text(encoding="utf-8")
+        (tmp_path / ".skills" / "execution-driver.json").read_text(encoding="utf-8")
     )
-    assert config["spec_dir"] == "tracks"
+    assert config["track_dir"] == "tracks"
     assert not (tmp_path / ".specs").exists()
 
 
@@ -81,7 +81,7 @@ def test_set_status_blocks_invalid_transition(tmp_path, monkeypatch, capsys):
     assert "Invalid status transition" in captured.err
 
 
-def test_spec_ready_requires_requirements_checklist(tmp_path, monkeypatch, capsys):
+def test_brief_ready_requires_requirements_checklist(tmp_path, monkeypatch, capsys):
     module = load_manage_specs_module()
     monkeypatch.chdir(tmp_path)
 
@@ -89,9 +89,9 @@ def test_spec_ready_requires_requirements_checklist(tmp_path, monkeypatch, capsy
     assert run_cli(module, monkeypatch, "add", "DEMO", "Demo Feature") == 0
 
     track_dir = tmp_path / "tracks" / "DEMO-demo-feature"
-    (track_dir / "spec.md").write_text("# spec\n", encoding="utf-8")
+    (track_dir / "brief.md").write_text("# brief\n", encoding="utf-8")
 
-    exit_code = run_cli(module, monkeypatch, "set-status", "DEMO", "spec_ready")
+    exit_code = run_cli(module, monkeypatch, "set-status", "DEMO", "brief_ready")
     captured = capsys.readouterr()
 
     assert exit_code == 2
@@ -106,12 +106,12 @@ def test_closing_track_records_closed_at_and_updates_registry(tmp_path, monkeypa
     assert run_cli(module, monkeypatch, "add", "DEMO", "Demo Feature") == 0
 
     track_dir = tmp_path / "tracks" / "DEMO-demo-feature"
-    (track_dir / "spec.md").write_text("# spec\n", encoding="utf-8")
+    (track_dir / "brief.md").write_text("# brief\n", encoding="utf-8")
     (track_dir / "checklists").mkdir()
     (track_dir / "checklists" / "requirements.md").write_text(
         "- [x] requirements complete\n", encoding="utf-8"
     )
-    assert run_cli(module, monkeypatch, "set-status", "DEMO", "spec_ready") == 0
+    assert run_cli(module, monkeypatch, "set-status", "DEMO", "brief_ready") == 0
 
     (track_dir / "plan.md").write_text("# plan\n", encoding="utf-8")
     assert run_cli(module, monkeypatch, "set-status", "DEMO", "plan_ready") == 0
@@ -134,8 +134,8 @@ def test_legacy_markdown_registry_is_migrated_to_json(tmp_path, monkeypatch):
     monkeypatch.chdir(tmp_path)
 
     (tmp_path / ".skills").mkdir()
-    (tmp_path / ".skills" / "spec-driver.json").write_text(
-        json.dumps({"spec_dir": "specs", "preferred_workflow": "TDD"}) + "\n",
+    (tmp_path / ".skills" / "execution-driver.json").write_text(
+        json.dumps({"track_dir": "specs", "preferred_workflow": "TDD"}) + "\n",
         encoding="utf-8",
     )
     (tmp_path / "specs").mkdir()
@@ -171,7 +171,7 @@ def test_validate_track_reports_missing_track_metadata(tmp_path, monkeypatch, ca
     assert "missing_track_metadata" in captured.out
 
 
-def test_add_requires_skills_spec_driver_config(tmp_path, monkeypatch, capsys):
+def test_add_requires_execution_driver_config(tmp_path, monkeypatch, capsys):
     module = load_manage_specs_module()
     monkeypatch.chdir(tmp_path)
 
@@ -179,7 +179,7 @@ def test_add_requires_skills_spec_driver_config(tmp_path, monkeypatch, capsys):
 
     captured = capsys.readouterr()
     assert exit_code == 2
-    assert "Track config not found at '.skills/spec-driver.json'." in captured.err
+    assert ".skills/execution-driver.json" in captured.err
 
 
 def test_add_relation_records_reciprocal_scope_and_registry(tmp_path, monkeypatch):

@@ -37,7 +37,7 @@ Before routing planning work, classify the request:
 7. If the feature already has one or more execution-ready work items with explicit task IDs:
    - route to `track`
 8. If a task-scoped execution track already exists:
-   - route to `spec-driver`
+   - route to `execution-driver`
 
 `planning-driver` should not absorb discovery, architecture, decomposition, or execution bootstrap work just because it was invoked first. Route to the owning skill and keep readiness state separate from the artifact authoring skill.
 
@@ -48,14 +48,14 @@ Before routing planning work, classify the request:
 In repositories that use the planning-layer skills, the usual flow is:
 
 ```text
-planning-driver -> discover -> design -> ui-flow -> breakdown -> review-planning -> track -> spec-driver
+planning-driver -> discover -> design -> ui-flow -> breakdown -> review-planning -> track -> execution-driver
 ```
 
 - `planning-driver` owns feature planning readiness and routing.
 - `discover`, `design`, `ui-flow`, and `breakdown` own the planning artifacts.
 - `review-planning` owns the readiness review pass.
 - `track` bootstraps one task-scoped execution track for one ready work item.
-- `spec-driver` then manages task-scoped execution readiness.
+- `execution-driver` then manages task-scoped execution-track readiness.
 
 ## Lifecycle States
 
@@ -87,7 +87,7 @@ Do not skip states without explicit user approval. Adjacent transitions are the 
 - `planning_reviewed`
 - `track_ready`
 
-Do not duplicate task tracker lifecycle states in planning metadata. Keep task execution state in the tracker and task-scoped execution readiness in `spec-driver`.
+Do not duplicate task tracker lifecycle states in planning metadata. Keep task execution state in the tracker and task-scoped execution-track readiness in `execution-driver`.
 
 ## Preflight
 
@@ -124,7 +124,7 @@ Do not duplicate task tracker lifecycle states in planning metadata. Keep task e
    - route to `track`
    - set status to `track_ready` when the handoff to task-scoped execution is explicit
 6. If task-scoped execution tracks already exist:
-   - route to `spec-driver`
+   - route to `execution-driver`
 
 ## Completion Checks
 
@@ -154,7 +154,7 @@ A feature is `track_ready` when:
 
 - planning review is complete
 - one or more ready task IDs are recorded for bootstrap
-- the next lifecycle owner is `track` and then `spec-driver`
+- the next lifecycle owner is `track` and then `execution-driver`
 
 ## Tooling
 

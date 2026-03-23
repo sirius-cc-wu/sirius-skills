@@ -29,7 +29,7 @@ If `.skills/planning.json` defines `planning_dir`, the scaffold uses
 2. Split oversized work into smaller, independently verifiable execution packets.
 3. Produce planning artifacts that preserve story-to-task traceability, increment grouping, sequencing, and execution mode assumptions.
 4. Create executable tracker items, dependency links, and explicit parallel-safe lanes where appropriate.
-5. Hand off ready work to `review-planning` and then `track` for spec-track bootstrap.
+5. Hand off ready work to `review-planning` and then `track` for execution-track bootstrap.
 
 ## Required Output
 
@@ -54,7 +54,7 @@ Use `scripts/scaffold_breakdown.py` when you want both files scaffolded together
 - Keep stories and design in repo docs; keep executable tasks in the tracker.
 - Prefer repository story sizes such as `S`, `M`, `L`, and `XL`.
 - Split any `XL` item before creating execution-ready tasks.
-- Every executable task should be small enough to fit one task-scoped spec track.
+- Every executable task should be small enough to fit one task-scoped execution track.
 - Group related slices into small, demonstrable increments before bootstrapping tracks.
 - Prefer execution packets that stay within one subsystem or a small set of files.
 - Every execution-ready slice should have concrete acceptance notes and a validation command or artifact check.
@@ -162,6 +162,6 @@ When generating `task-traceability.md`, start from `assets/task-traceability-tem
 - Do not create execution tracks directly from vague stories.
 - Do not mirror tracker execution states inside feature planning docs.
 - Do not turn increments into tracker states or spec-track containers.
-- Do not turn `task-planning.md` into a task-scoped execution checklist; that belongs to `spec-driver` and `plan` later.
+- Do not turn `task-planning.md` into a task-scoped execution checklist; that belongs to `execution-driver` and `plan` later.
 - Do not mark work as parallel-safe unless overlap and integration risk are genuinely low.
 - If a task still needs major replanning, split it again before handoff.

@@ -9,7 +9,7 @@ from typing import Dict, List, Optional, Tuple
 
 
 DEFAULT_CONFIG_PATH = Path(".skills/plugins/spec-publish.json")
-DEFAULT_DOCUMENT_TITLE = "Specification History"
+DEFAULT_DOCUMENT_TITLE = "Execution Track History"
 DEFAULT_SECTION_TITLE = "Closed Tracks"
 OUTGOING_RELATION_TYPES = {
     "supersedes",
@@ -25,12 +25,15 @@ def now_timestamp() -> str:
 
 def load_manage_specs_module():
     script_path = (
-        Path(__file__).resolve().parents[2] / "spec-driver" / "scripts" / "manage_specs.py"
+        Path(__file__).resolve().parents[2]
+        / "execution-driver"
+        / "scripts"
+        / "manage_execution.py"
     )
-    spec = importlib.util.spec_from_file_location("manage_specs", script_path)
+    spec = importlib.util.spec_from_file_location("manage_execution", script_path)
     module = importlib.util.module_from_spec(spec)
     if spec.loader is None:
-        raise RuntimeError(f"Unable to load spec-driver tooling from {script_path}")
+        raise RuntimeError(f"Unable to load execution-driver tooling from {script_path}")
     spec.loader.exec_module(module)
     return module
 
@@ -108,6 +111,10 @@ def read_text_if_exists(path: Path) -> str:
     if not path.exists():
         return ""
     return path.read_text(encoding="utf-8")
+
+
+def resolve_brief_path(track_path: Path) -> Path:
+    return track_path / "brief.md"
 
 
 def normalize_list_item(stripped: str) -> Optional[str]:
@@ -307,7 +314,7 @@ def render_publication_entry(
     verification_summary: List[str],
 ) -> str:
     track_path = Path(str(track["path"]).rstrip("/"))
-    artifacts = [f"`{track_path / 'spec.md'}`", f"`{track_path / 'plan.md'}`"]
+    artifacts = [f"`{resolve_brief_path(track_path)}`", f"`{track_path / 'plan.md'}`"]
     tasks_path = track_path / "tasks.md"
     if tasks_path.exists():
         artifacts.append(f"`{tasks_path}`")
@@ -336,7 +343,7 @@ def render_publication_entry(
         lines.extend([f"  - {item}" for item in success_criteria])
 
     if relation_summary:
-        lines.append("- Spec relations:")
+        lines.append("- Track relations:")
         lines.extend([f"  - {item}" for item in relation_summary])
 
     if verification_summary:
@@ -585,11 +592,11 @@ def main() -> int:
                 or publish_config.get("section_title")
                 or DEFAULT_SECTION_TITLE
             )
-            spec_text = read_text_if_exists(track_path / "spec.md")
+            brief_text = read_text_if_exists(resolve_brief_path(track_path))
             plan_text = read_text_if_exists(track_path / "plan.md")
             tasks_text = read_text_if_exists(track_path / "tasks.md")
-            requirements = extract_list_section(spec_text, "3. functional requirements")
-            success_criteria = extract_list_section(spec_text, "7. success criteria")
+            requirements = extract_list_section(brief_text, "3. functional requirements")
+            success_criteria = extract_list_section(brief_text, "7. success criteria")
             relation_summary = render_relation_summary(metadata)
             verification_summary = extract_verification_summary(plan_text, tasks_text)
             identity_config = module.load_identity_config(required=False)

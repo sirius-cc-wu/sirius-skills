@@ -8,9 +8,9 @@ import sys
 from datetime import datetime
 from typing import Dict, List, Optional, Tuple
 
-DEFAULT_SPECS_DIR = "tracks"
+DEFAULT_TRACKS_DIR = "tracks"
 CONFIG_DIR = ".skills"
-CONFIG_FILE = os.path.join(CONFIG_DIR, "spec-driver.json")
+CONFIG_FILE = os.path.join(CONFIG_DIR, "execution-driver.json")
 IDENTITY_CONFIG_DIR = ".skills"
 IDENTITY_CONFIG_FILE = os.path.join(IDENTITY_CONFIG_DIR, "identity.json")
 DEFAULT_PREFERRED_WORKFLOW = "TDD"
@@ -25,7 +25,7 @@ TRACK_METADATA_FILE = ".track-meta.json"
 TRACK_ID_PATTERN = re.compile(r"^[A-Za-z0-9][A-Za-z0-9._-]*$")
 STATUS_SEQUENCE = [
     "draft",
-    "spec_ready",
+    "brief_ready",
     "plan_ready",
     "execution_ready",
     "closed",
@@ -33,20 +33,9 @@ STATUS_SEQUENCE = [
 VALID_STATUSES = set(STATUS_SEQUENCE)
 STATUS_ALIASES = {
     "draft": "draft",
-    "draft_spec": "draft",
-    "spec_ready": "spec_ready",
-    "planned": "plan_ready",
+    "brief_ready": "brief_ready",
     "plan_ready": "plan_ready",
     "execution_ready": "execution_ready",
-    "tasks_ready": "execution_ready",
-    "approved": "execution_ready",
-    "implementing": "execution_ready",
-    "in progress": "execution_ready",
-    "in-progress": "execution_ready",
-    "blocked": "execution_ready",
-    "done": "closed",
-    "completed": "closed",
-    "released": "closed",
     "closed": "closed",
 }
 RELATION_ALIASES = {
@@ -91,18 +80,16 @@ def normalize_feature_name(value: str) -> str:
     return normalized.replace("|", "/")
 
 
-def normalize_spec_dir(value: str) -> str:
+def normalize_track_dir(value: str) -> str:
     normalized = value.strip()
     if not normalized:
-        raise ValueError("Spec directory cannot be empty.")
+        raise ValueError("Track directory cannot be empty.")
     if normalized in {".", "./"}:
-        raise ValueError("Spec directory cannot be the repository root.")
+        raise ValueError("Track directory cannot be the repository root.")
     normalized = normalized.rstrip("/")
     if normalized.startswith("./"):
         normalized = normalized[2:]
     return normalized
-
-
 def validate_track_id(value: str) -> str:
     track_id = value.strip()
     if not track_id:
@@ -279,12 +266,12 @@ def load_config(required: bool = True) -> Dict[str, str]:
     if not os.path.exists(CONFIG_FILE):
         if required:
             raise RuntimeError(
-                "Track config not found at '.skills/spec-driver.json'. "
+                "Track config not found at '.skills/execution-driver.json'. "
                 "Ask the user where tracks should be created, then run "
-                "`manage_specs.py init <track-dir>`."
+                "`manage_execution.py init <track-dir>`."
             )
         return {
-            "spec_dir": DEFAULT_SPECS_DIR,
+            "track_dir": DEFAULT_TRACKS_DIR,
             "preferred_workflow": DEFAULT_PREFERRED_WORKFLOW,
         }
 
@@ -292,23 +279,25 @@ def load_config(required: bool = True) -> Dict[str, str]:
         with open(CONFIG_FILE, "r", encoding="utf-8") as f:
             config = json.load(f)
     except json.JSONDecodeError as exc:
-        raise RuntimeError("Spec config is not valid JSON.") from exc
+        raise RuntimeError("Execution-driver config is not valid JSON.") from exc
 
     if not isinstance(config, dict):
-        raise RuntimeError("Spec config must be a JSON object.")
+        raise RuntimeError("Execution-driver config must be a JSON object.")
 
-    spec_dir = config.get("spec_dir", DEFAULT_SPECS_DIR)
+    track_dir = config.get("track_dir", DEFAULT_TRACKS_DIR)
     preferred_workflow = config.get(
         "preferred_workflow", DEFAULT_PREFERRED_WORKFLOW
     )
 
-    if not isinstance(spec_dir, str):
-        raise RuntimeError("Spec config field 'spec_dir' must be a string.")
+    if not isinstance(track_dir, str):
+        raise RuntimeError("Execution-driver config field 'track_dir' must be a string.")
     if not isinstance(preferred_workflow, str):
-        raise RuntimeError("Spec config field 'preferred_workflow' must be a string.")
+        raise RuntimeError(
+            "Execution-driver config field 'preferred_workflow' must be a string."
+        )
 
     return {
-        "spec_dir": normalize_spec_dir(spec_dir),
+        "track_dir": normalize_track_dir(track_dir),
         "preferred_workflow": preferred_workflow,
     }
 
@@ -351,13 +340,13 @@ def load_identity_config(required: bool = False) -> Dict[str, str]:
 
 
 def write_config(
-    spec_dir: str, preferred_workflow: str = DEFAULT_PREFERRED_WORKFLOW
+    track_dir: str, preferred_workflow: str = DEFAULT_PREFERRED_WORKFLOW
 ) -> None:
     os.makedirs(CONFIG_DIR, exist_ok=True)
     with open(CONFIG_FILE, "w", encoding="utf-8") as f:
         json.dump(
             {
-                "spec_dir": normalize_spec_dir(spec_dir),
+                "track_dir": normalize_track_dir(track_dir),
                 "preferred_workflow": preferred_workflow,
             },
             f,
@@ -368,7 +357,7 @@ def write_config(
 
 def get_registry_paths(required_config: bool = True) -> Tuple[str, str, str]:
     config = load_config(required=required_config)
-    specs_dir = normalize_spec_dir(config["spec_dir"])
+    specs_dir = normalize_track_dir(config["track_dir"])
     return (
         specs_dir,
         os.path.join(specs_dir, "README.md"),
@@ -859,7 +848,7 @@ def resolve_track(rows: List[Dict[str, object]], selector: str) -> Optional[Dict
 
 
 def find_active_track(rows: List[Dict[str, object]]) -> Optional[Dict[str, object]]:
-    priority = ["execution_ready", "plan_ready", "spec_ready", "draft"]
+    priority = ["execution_ready", "plan_ready", "brief_ready", "draft"]
     for wanted in priority:
         matches = [r for r in rows if r["status"] == wanted]
         if matches:
@@ -868,13 +857,13 @@ def find_active_track(rows: List[Dict[str, object]]) -> Optional[Dict[str, objec
 
 
 def expected_status_for_files(
-    spec_exists: bool, requirements_exists: bool, plan_exists: bool, tasks_exists: bool
+    brief_exists: bool, requirements_exists: bool, plan_exists: bool, tasks_exists: bool
 ) -> str:
     del tasks_exists
-    if not spec_exists or not requirements_exists:
+    if not brief_exists or not requirements_exists:
         return "draft"
     if not plan_exists:
-        return "spec_ready"
+        return "brief_ready"
     return "plan_ready"
 
 
@@ -883,7 +872,7 @@ def validate_track(
 ) -> Tuple[bool, List[str], Dict[str, bool]]:
     issues: List[str] = []
     path = str(row["path"]).rstrip("/")
-    spec = os.path.join(path, "spec.md")
+    brief = os.path.join(path, "brief.md")
     requirements = os.path.join(path, "checklists", "requirements.md")
     plan = os.path.join(path, "plan.md")
     tasks = os.path.join(path, "tasks.md")
@@ -891,7 +880,7 @@ def validate_track(
     checks = {
         "track_dir_exists": os.path.isdir(path),
         "metadata_exists": bool(metadata),
-        "spec_exists": os.path.isfile(spec),
+        "brief_exists": os.path.isfile(brief),
         "requirements_exists": os.path.isfile(requirements),
         "plan_exists": os.path.isfile(plan),
         "tasks_exists": os.path.isfile(tasks),
@@ -911,26 +900,26 @@ def validate_track(
         issues.append("missing_track_metadata")
 
     expected = expected_status_for_files(
-        checks["spec_exists"],
+        checks["brief_exists"],
         checks["requirements_exists"],
         checks["plan_exists"],
         checks["tasks_exists"],
     )
-    if normalized_status in {"draft", "spec_ready", "plan_ready"}:
+    if normalized_status in {"draft", "brief_ready", "plan_ready"}:
         if normalized_status != expected:
             issues.append(
                 f"status_mismatch:status={normalized_status} expected={expected} based_on_files"
             )
-    if normalized_status in {"spec_ready", "plan_ready", "execution_ready"} and not checks[
+    if normalized_status in {"brief_ready", "plan_ready", "execution_ready"} and not checks[
         "requirements_exists"
     ]:
         issues.append("missing_requirements_checklist")
     if normalized_status == "execution_ready" and not checks["plan_exists"]:
         issues.append("execution_ready_without_plan")
-    if normalized_status == "execution_ready" and not checks["spec_exists"]:
-        issues.append("execution_ready_without_spec")
+    if normalized_status == "execution_ready" and not checks["brief_exists"]:
+        issues.append("execution_ready_without_brief")
     if normalized_status == "closed" and not (
-        checks["spec_exists"] and checks["requirements_exists"] and checks["plan_exists"]
+        checks["brief_exists"] and checks["requirements_exists"] and checks["plan_exists"]
     ):
         issues.append("closed_without_core_artifacts")
     if normalized_status == "closed" and not checks["metadata_exists"]:
@@ -1054,10 +1043,12 @@ def update_track_status(
 
 def cmd_init(args: argparse.Namespace) -> int:
     config = load_config(required=False)
-    spec_dir = normalize_spec_dir(args.spec_dir) if args.spec_dir else config["spec_dir"]
-    write_config(spec_dir, preferred_workflow=config["preferred_workflow"])
-    ensure_registry(spec_dir)
-    print(f"Initialized track registry and config in '{spec_dir}/'.")
+    track_dir = (
+        normalize_track_dir(args.track_dir) if args.track_dir else config["track_dir"]
+    )
+    write_config(track_dir, preferred_workflow=config["preferred_workflow"])
+    ensure_registry(track_dir)
+    print(f"Initialized track registry and config in '{track_dir}/'.")
     return 0
 
 
@@ -1183,10 +1174,10 @@ def build_parser() -> argparse.ArgumentParser:
     subparsers = parser.add_subparsers(dest="command", required=True)
 
     init_p = subparsers.add_parser(
-        "init", help="Initialize the track registry and spec-driver config"
+        "init", help="Initialize the track registry and execution-driver config"
     )
     init_p.add_argument(
-        "spec_dir",
+        "track_dir",
         nargs="?",
         help="Track directory path (defaults to configured path or 'tracks')",
     )

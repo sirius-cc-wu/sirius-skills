@@ -21,7 +21,7 @@ MANAGED_SKILLS := \
 	shadcn-ui \
 	simplify \
 	define \
-	spec-driver \
+	execution-driver \
 	specify \
 	stitch-design \
 	stitch-loop \
@@ -29,7 +29,7 @@ MANAGED_SKILLS := \
 	ui-flow
 
 install:
-	npx skills add "$(REPO_ROOT)/skills/spec-driver" $(COMMON_FLAGS)
+	npx skills add "$(REPO_ROOT)/skills/execution-driver" $(COMMON_FLAGS)
 	npx skills add "$(REPO_ROOT)/skills/define" $(COMMON_FLAGS)
 	npx skills add "$(REPO_ROOT)/skills/plan" $(COMMON_FLAGS)
 	npx skills add "$(REPO_ROOT)/skills/planning-driver" $(COMMON_FLAGS)

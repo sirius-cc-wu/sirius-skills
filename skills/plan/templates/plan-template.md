@@ -3,7 +3,7 @@
 **Track**: `[ID-work-item-name]`  
 **Date**: [DATE]  
 **Status**: Draft
-**Spec**: [link to spec.md]
+**Spec**: [link to brief.md]
 
 ## 1. Summary
 

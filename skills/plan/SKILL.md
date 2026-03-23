@@ -1,16 +1,16 @@
 ---
 name: plan
-description: Produces an actionable implementation plan from a completed spec, including PlantUML detailed design when needed.
+description: Produces an actionable implementation plan from a completed brief, including PlantUML detailed design when needed.
 ---
 
 # Plan
 
-Use this skill to convert `spec.md` into a concrete `plan.md`.
+Use this skill to convert `brief.md` into a concrete `plan.md`.
 For new tracks, `plan.md` is the final execution artifact before implementation begins.
 
 ## Responsibilities
 
-1. Read the active track's `spec.md`.
+1. Read the active track's `brief.md`.
 2. Produce `<track_path>/plan.md`.
 3. Make implementation decisions explicit.
 4. Map requirements to execution and validation.
@@ -27,13 +27,13 @@ Optional sections may cover:
 - detailed design diagrams
 - verification scenarios
 
-Resolve `<track_path>` through `spec-driver`.
+Resolve `<track_path>` through `execution-driver`.
 
 ## Artifact Ownership
 
 `plan` owns the content of `<track_path>/plan.md`.
 
-`spec-driver` should route into planning and validate readiness, but it should not take over implementation-plan authoring that belongs to `plan`.
+`execution-driver` should route into planning and validate readiness, but it should not take over implementation-plan authoring that belongs to `plan`.
 
 ## Planning Rules
 
@@ -72,8 +72,8 @@ Failed gates must be fixed or explicitly waived with rationale.
 
 ## Workflow
 
-1. Resolve the active track with `spec-driver`.
-2. Read `spec.md` and scan the target codebase.
+1. Resolve the active track with `execution-driver`.
+2. Read `brief.md` and scan the target codebase.
 3. Fill `plan-template.md`.
 4. Add PlantUML detailed design where structure, behavior, or state transitions need extra precision.
 5. Validate traceability and gates.

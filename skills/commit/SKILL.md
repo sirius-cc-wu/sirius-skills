@@ -34,7 +34,7 @@ If the project defines `.skills/identity.json`, follow that configuration instea
 - Common placeholders are `{ID}`, `{scope}`, and `{summary}`.
 - If the configured format requires an ID, resolve it from:
   1. the current branch using `branch_extract_pattern`,
-  2. the active spec track ID, or
+  2. the active execution track ID, or
   3. direct user input.
 - Do **not** assume Jira, Azure DevOps, or any issue tracker unless the project config explicitly opts in.
 

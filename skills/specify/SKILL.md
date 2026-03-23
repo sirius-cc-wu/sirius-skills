@@ -7,11 +7,11 @@ description: Deprecated compatibility alias for `define`.
 
 This skill has been renamed to `define`.
 
-Use `define` as the canonical execution-layer skill for creating task-scoped `spec.md` files.
+Use `define` as the canonical execution-layer skill for creating task-scoped `brief.md` files.
 
 If you still invoke `specify`, follow the same behavior and outputs as `define`:
 
-- create or update `<track_path>/spec.md`
+- create or update `<track_path>/brief.md`
 - create or update `<track_path>/checklists/requirements.md`
 - use the templates and rules in `skills/define/`
 

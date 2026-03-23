@@ -17,7 +17,7 @@ Use a **two-layer workflow**:
    - `review-planning`
    - `track`
 2. **Execution layer**
-   - `spec-driver`
+   - `execution-driver`
    - `define`
    - `plan`
    - `review-execution`
@@ -184,49 +184,49 @@ Once a tracker task is implementation-ready, use `track`.
 Preferred handoff:
 
 ```text
-planning-driver -> breakdown -> execution tracker -> review-planning -> track -> spec-driver
+planning-driver -> breakdown -> execution tracker -> review-planning -> track -> execution-driver
 ```
 
-`track` should bootstrap a task-scoped spec track from the execution-ready work item, typically with:
+`track` should bootstrap a task-scoped execution track from the execution-ready work item, typically with:
 
 ```bash
-python3 skills/spec-driver/scripts/manage_specs.py add "<task-id>" "<task-name>"
+python3 skills/execution-driver/scripts/manage_execution.py add "<task-id>" "<task-name>"
 ```
 
-### 7. Execute with spec-driver
+### 7. Execute with execution-driver
 
 After a track exists, use the execution layer:
 
-1. `spec-driver`
+1. `execution-driver`
 2. `define`
 3. `plan`
 
 This is where task-scoped execution artifacts are created:
 
-- `spec.md`
+- `brief.md`
 - `plan.md`
 
 Within that execution layer:
 
-- `spec-driver` owns routing, readiness checks, and registry state
-- `define` creates the task-scoped `spec.md` for one execution-ready work item, including acceptance and requirement context
-- `plan` converts that task-scoped spec into the final implementation packets, traceability, validation steps, and PlantUML detailed design needed for execution
-- `review-execution` owns the explicit implementation-versus-spec review outcome
+- `execution-driver` owns routing, readiness checks, and registry state
+- `define` creates the task-scoped `brief.md` for one execution-ready work item, including acceptance and requirement context
+- `plan` converts that task-scoped brief into the final implementation packets, traceability, validation steps, and PlantUML detailed design needed for execution
+- `review-execution` owns the explicit implementation-versus-brief review outcome
 - `close-track` owns closure metadata and any optional publication output
 
 Keep the boundary explicit:
 
 - `breakdown` owns repo-story decomposition and tracker-ready slices
 - `breakdown` also owns increment grouping at the repo-planning level
-- `define` owns `spec.md` and `checklists/requirements.md`
+- `define` owns `brief.md` and `checklists/requirements.md`
 - `plan` owns the final task-scoped execution checklist for new tracks
-- `spec-driver` should validate handoffs and route work, not take over artifact authoring from the other execution skills
+- `execution-driver` should validate handoffs and route work, not take over artifact authoring from the other execution skills
 
 Execution review loop:
 
-- review the task-scoped `spec.md` and `plan.md` before implementation starts if the task carries meaningful risk or ambiguity
-- review spec-to-implementation alignment during execution, not only at final handoff
-- when validation or review finds a gap, update the task-scoped execution artifacts or surrounding guidance so the fix persists at the spec level
+- review the task-scoped `brief.md` and `plan.md` before implementation starts if the task carries meaningful risk or ambiguity
+- review brief-to-implementation alignment during execution, not only at final handoff
+- when validation or review finds a gap, update the task-scoped execution artifacts or surrounding guidance so the fix persists at the brief level
 
 ### 8. Track execution in the execution tracker
 
@@ -239,11 +239,11 @@ Use your task system for the actual task lifecycle:
 - verify the implementation
 - mark work complete
 
-If review uncovers an intent gap or spec gap, feed that back into the relevant spec or planning artifact before considering the task fully done.
+If review uncovers an intent gap or brief gap, feed that back into the relevant brief or planning artifact before considering the task fully done.
 
 Keep the responsibility boundary clear:
 
-- `spec-driver` owns **track readiness**
+- `execution-driver` owns **track readiness**
 - the execution tracker owns **execution state**
 
 ### 9. Review execution outcomes
@@ -252,9 +252,9 @@ Use `review-execution` after implementation and validation, and before closing t
 
 Its job is to:
 
-- compare the implementation and validation evidence with the task-scoped `spec.md` and `plan.md`
-- classify whether a finding is an intent-to-spec gap, a spec-to-implementation gap, or a follow-up outside the active track
-- feed durable fixes back into `spec.md`, `plan.md`, or upstream planning guidance when the issue reflects missing context
+- compare the implementation and validation evidence with the task-scoped `brief.md` and `plan.md`
+- classify whether a finding is an intent-to-brief gap, a brief-to-implementation gap, or a follow-up outside the active track
+- feed durable fixes back into `brief.md`, `plan.md`, or upstream planning guidance when the issue reflects missing context
 - confirm whether the work is actually ready for `close-track`
 
 Recommended handoff:
@@ -263,16 +263,16 @@ Recommended handoff:
 implementation complete -> review-execution -> close-track
 ```
 
-### 10. Close the spec track
+### 10. Close the execution track
 
-After implementation is complete and the execution task is finished, use `close-track` to close the spec track cleanly.
+After implementation is complete and the execution task is finished, use `close-track` to close the execution track cleanly.
 
 Its job is to:
 
 - validate that the track is ready to close
 - record durable closure metadata without moving or deleting the original artifacts
-- optionally publish a project-local summary entry such as `docs/spec-history.md` or `CHANGELOG.md`
-- capture durable feedback that should improve future specs, prompts, or validation harnesses
+- optionally publish a project-local summary entry such as `docs/track-history.md` or `CHANGELOG.md`
+- capture durable feedback that should improve future briefs, prompts, or validation harnesses
 
 Recommended handoff:
 
@@ -282,10 +282,10 @@ review-execution complete -> close-track
 
 Important closure rules:
 
-- closing a track should happen after required review, validation, and spec feedback loops are complete
-- closing a track does not merge or delete the original `spec.md` or `plan.md`; older tracks may also retain `tasks.md`
+- closing a track should happen after required review, validation, and brief feedback loops are complete
+- closing a track does not merge or delete the original `brief.md` or `plan.md`; older tracks may also retain `tasks.md`
 - publishing is optional and project-local
-- closure metadata belongs in the spec system, not in the execution tracker
+- closure metadata belongs in the track system, not in the execution tracker
 
 ## Recommended Repository Layout
 
@@ -306,15 +306,15 @@ Keep discovery, design, and breakdown artifacts in a feature-local planning fold
 ### Task-level execution
 
 ```text
-<spec_dir>/<task-id>-<task-slug>/
-  spec.md
+<track_dir>/<task-id>-<task-slug>/
+  brief.md
   plan.md
 ```
 
-The exact execution-track path depends on `spec-driver` configuration. The important rule is that execution tracks are **task-scoped**, not feature-scoped, and remain centrally managed separately from the feature-local planning docs.
+The exact execution-track path depends on `execution-driver` configuration. The important rule is that execution tracks are **task-scoped**, not feature-scoped, and remain centrally managed separately from the feature-local planning docs.
 
-By default, `spec-driver` uses `tracks/`; projects can override that by setting
-`spec_dir` in `.skills/spec-driver.json`.
+By default, `execution-driver` uses `tracks/`; projects can override that by setting
+`track_dir` in `.skills/execution-driver.json`.
 
 ## Diagram Conventions
 
@@ -342,13 +342,13 @@ my-app/
         task-traceability.md
   tracks/
     HAB-101-create-schema/
-      spec.md
+      brief.md
       plan.md
     HAB-102-add-habit-form/
-      spec.md
+      brief.md
       plan.md
     HAB-103-mark-habit-done/
-      spec.md
+      brief.md
       plan.md
 ```
 
@@ -359,8 +359,8 @@ In this example, the default planning layout `docs/features/habit-tracker/` hold
 - Keep stories and design in repo docs.
 - Keep increment plans in repo docs.
 - Keep executable work in your task system.
-- Do not use `spec-driver` for feature-level discovery or decomposition.
-- Do not use spec tracks as increment containers; keep tracks task-scoped.
+- Do not use `execution-driver` for feature-level discovery or decomposition.
+- Do not use execution tracks as increment containers; keep tracks task-scoped.
 - Do not use execution lifecycle states as spec-track states.
 - Split work before bootstrapping a track, not after.
 - Preserve story-to-task traceability from planning through execution.
@@ -374,4 +374,4 @@ Use this methodology when:
 - multiple implementation tasks will come out of one project or feature
 - you want resumable execution with a separate task system
 
-For small one-shot changes, you may skip most of the planning layer and go directly to `spec-driver` or straight implementation if no spec workflow is needed.
+For small one-shot changes, you may skip most of the planning layer and go directly to `execution-driver` or straight implementation if no spec workflow is needed.

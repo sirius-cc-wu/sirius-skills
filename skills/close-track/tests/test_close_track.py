@@ -5,8 +5,8 @@ from pathlib import Path
 
 
 CLOSE_TRACK_PATH = Path(__file__).resolve().parents[1] / "scripts" / "close_track.py"
-MANAGE_SPECS_PATH = (
-    Path(__file__).resolve().parents[2] / "spec-driver" / "scripts" / "manage_specs.py"
+MANAGE_EXECUTION_PATH = (
+    Path(__file__).resolve().parents[2] / "execution-driver" / "scripts" / "manage_execution.py"
 )
 
 
@@ -24,15 +24,15 @@ def run_cli(module, monkeypatch, *args):
 
 
 def setup_execution_ready_track(tmp_path, monkeypatch, include_tasks=True):
-    manage_specs = load_module(MANAGE_SPECS_PATH, "manage_specs")
+    manage_execution = load_module(MANAGE_EXECUTION_PATH, "manage_execution")
     monkeypatch.chdir(tmp_path)
 
-    assert run_cli(manage_specs, monkeypatch, "init", "tracks") == 0
-    assert run_cli(manage_specs, monkeypatch, "add", "DEMO", "Demo Feature") == 0
+    assert run_cli(manage_execution, monkeypatch, "init", "tracks") == 0
+    assert run_cli(manage_execution, monkeypatch, "add", "DEMO", "Demo Feature") == 0
 
     track_dir = tmp_path / "tracks" / "DEMO-demo-feature"
-    (track_dir / "spec.md").write_text(
-        "# Task Specification: Demo Feature\n\n"
+    (track_dir / "brief.md").write_text(
+        "# Task Brief: Demo Feature\n\n"
         "## 3. Functional Requirements\n\n"
         "- **FR-001**: System MUST store a summary entry.\n"
         "- **FR-002**: System MUST preserve backlinks.\n\n"
@@ -45,7 +45,7 @@ def setup_execution_ready_track(tmp_path, monkeypatch, include_tasks=True):
         "- [x] FR-001 requirements captured\n- [x] FR-002 requirements captured\n",
         encoding="utf-8",
     )
-    assert run_cli(manage_specs, monkeypatch, "set-status", "DEMO", "spec_ready") == 0
+    assert run_cli(manage_execution, monkeypatch, "set-status", "DEMO", "brief_ready") == 0
 
     (track_dir / "plan.md").write_text(
         "# Implementation Plan: Demo Feature\n\n"
@@ -68,9 +68,9 @@ def setup_execution_ready_track(tmp_path, monkeypatch, include_tasks=True):
             "- [ ] The implementation agent can begin without major replanning\n",
             encoding="utf-8",
         )
-    assert run_cli(manage_specs, monkeypatch, "set-status", "DEMO", "plan_ready") == 0
-    assert run_cli(manage_specs, monkeypatch, "set-status", "DEMO", "execution_ready") == 0
-    return manage_specs, track_dir
+    assert run_cli(manage_execution, monkeypatch, "set-status", "DEMO", "plan_ready") == 0
+    assert run_cli(manage_execution, monkeypatch, "set-status", "DEMO", "execution_ready") == 0
+    return manage_execution, track_dir
 
 
 def test_close_track_publishes_to_explicit_file(tmp_path, monkeypatch):
@@ -84,23 +84,23 @@ def test_close_track_publishes_to_explicit_file(tmp_path, monkeypatch):
             "--track",
             "DEMO",
             "--publish",
-            "docs/spec-history.md",
+            "docs/track-history.md",
         )
         == 0
     )
 
-    target = tmp_path / "docs" / "spec-history.md"
+    target = tmp_path / "docs" / "track-history.md"
     metadata = json.loads((track_dir / ".track-meta.json").read_text(encoding="utf-8"))
     content = target.read_text(encoding="utf-8")
 
     assert "### " in content
     assert "Demo Feature (`DEMO`)" in content
     assert "Functional requirements snapshot" in content
-    assert "`tracks/DEMO-demo-feature/spec.md`" in content
+    assert "`tracks/DEMO-demo-feature/brief.md`" in content
     assert "Implementation verification snapshot" in content
     assert "Run demo integration test" in content
     assert metadata["status"] == "closed"
-    assert metadata["publications"][0]["target_file"] == "docs/spec-history.md"
+    assert metadata["publications"][0]["target_file"] == "docs/track-history.md"
 
 
 def test_close_track_uses_config_when_publish_target_not_passed(tmp_path, monkeypatch):
@@ -113,7 +113,7 @@ def test_close_track_uses_config_when_publish_target_not_passed(tmp_path, monkey
         json.dumps(
             {
                 "target_file": "docs/history.md",
-                "document_title": "Team Spec History",
+                "document_title": "Team Track History",
                 "section_title": "Published Tracks",
             }
         )
@@ -127,7 +127,7 @@ def test_close_track_uses_config_when_publish_target_not_passed(tmp_path, monkey
     content = target.read_text(encoding="utf-8")
     metadata = json.loads((track_dir / ".track-meta.json").read_text(encoding="utf-8"))
 
-    assert content.startswith("# Team Spec History")
+    assert content.startswith("# Team Track History")
     assert "## Published Tracks" in content
     assert "Run focused tests before closing the track" in content
     assert metadata["publications"][0]["target_file"] == "docs/history.md"
@@ -144,12 +144,12 @@ def test_close_track_publishes_without_legacy_tasks_md(tmp_path, monkeypatch):
             "--track",
             "DEMO",
             "--publish",
-            "docs/spec-history.md",
+            "docs/track-history.md",
         )
         == 0
     )
 
-    content = (tmp_path / "docs" / "spec-history.md").read_text(encoding="utf-8")
+    content = (tmp_path / "docs" / "track-history.md").read_text(encoding="utf-8")
     metadata = json.loads((track_dir / ".track-meta.json").read_text(encoding="utf-8"))
 
     assert "Demo Feature (`DEMO`)" in content
@@ -189,12 +189,12 @@ def test_close_track_renders_issue_link_when_identity_config_exists(tmp_path, mo
             "--track",
             "DEMO",
             "--publish",
-            "docs/spec-history.md",
+            "docs/track-history.md",
         )
         == 0
     )
 
-    content = (tmp_path / "docs" / "spec-history.md").read_text(encoding="utf-8")
+    content = (tmp_path / "docs" / "track-history.md").read_text(encoding="utf-8")
     assert (
         "[BNC-123](https://tracker.example.com/issues/BNC-123) — Demo source issue; status: Done"
         in content
@@ -212,13 +212,13 @@ def test_close_track_republishes_without_duplicate_markers(tmp_path, monkeypatch
             "--track",
             "DEMO",
             "--publish",
-            "docs/spec-history.md",
+            "docs/track-history.md",
         )
         == 0
     )
 
-    (track_dir / "spec.md").write_text(
-        "# Task Specification: Demo Feature\n\n"
+    (track_dir / "brief.md").write_text(
+        "# Task Brief: Demo Feature\n\n"
         "## 3. Functional Requirements\n\n"
         "- **FR-001**: Updated summary text.\n\n"
         "## 7. Success Criteria\n\n"
@@ -233,21 +233,21 @@ def test_close_track_republishes_without_duplicate_markers(tmp_path, monkeypatch
             "--track",
             "DEMO",
             "--publish",
-            "docs/spec-history.md",
+            "docs/track-history.md",
         )
         == 0
     )
 
-    content = (tmp_path / "docs" / "spec-history.md").read_text(encoding="utf-8")
+    content = (tmp_path / "docs" / "track-history.md").read_text(encoding="utf-8")
     assert content.count("<!-- spec-publish:DEMO:start -->") == 1
     assert "Updated summary text." in content
 
 
 def test_close_track_requires_confirm_impact_for_relations(tmp_path, monkeypatch, capsys):
     close_track = load_module(CLOSE_TRACK_PATH, "close_track")
-    manage_specs, _ = setup_execution_ready_track(tmp_path, monkeypatch)
+    manage_execution, _ = setup_execution_ready_track(tmp_path, monkeypatch)
 
-    assert run_cli(manage_specs, monkeypatch, "add", "OLD", "Old Feature") == 0
+    assert run_cli(manage_execution, monkeypatch, "add", "OLD", "Old Feature") == 0
 
     exit_code = run_cli(
         close_track,
@@ -266,9 +266,9 @@ def test_close_track_requires_confirm_impact_for_relations(tmp_path, monkeypatch
 
 def test_close_track_records_relations_and_publishes_them(tmp_path, monkeypatch):
     close_track = load_module(CLOSE_TRACK_PATH, "close_track")
-    manage_specs, track_dir = setup_execution_ready_track(tmp_path, monkeypatch)
+    manage_execution, track_dir = setup_execution_ready_track(tmp_path, monkeypatch)
 
-    assert run_cli(manage_specs, monkeypatch, "add", "OLD", "Old Feature") == 0
+    assert run_cli(manage_execution, monkeypatch, "add", "OLD", "Old Feature") == 0
 
     assert (
         run_cli(
@@ -287,12 +287,12 @@ def test_close_track_records_relations_and_publishes_them(tmp_path, monkeypatch)
             "legacy checkout path",
             "--confirm-impact",
             "--publish",
-            "docs/spec-history.md",
+            "docs/track-history.md",
         )
         == 0
     )
 
-    content = (tmp_path / "docs" / "spec-history.md").read_text(encoding="utf-8")
+    content = (tmp_path / "docs" / "track-history.md").read_text(encoding="utf-8")
     source_meta = json.loads((track_dir / ".track-meta.json").read_text(encoding="utf-8"))
     target_meta = json.loads(
         (tmp_path / "tracks" / "OLD-old-feature" / ".track-meta.json").read_text(
@@ -300,7 +300,7 @@ def test_close_track_records_relations_and_publishes_them(tmp_path, monkeypatch)
         )
     )
 
-    assert "Spec relations:" in content
+    assert "Track relations:" in content
     assert "supersedes `OLD` (story: Story 2 - Legacy checkout; requirements: FR-002; selector: legacy checkout path)" in content
     assert source_meta["relations"][0]["type"] == "supersedes"
     assert target_meta["relations"][0]["type"] == "superseded_by"
