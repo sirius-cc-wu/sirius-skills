@@ -22,7 +22,6 @@ MANAGED_SKILLS := \
 	simplify \
 	define \
 	execution-driver \
-	specify \
 	stitch-design \
 	stitch-loop \
 	track \
