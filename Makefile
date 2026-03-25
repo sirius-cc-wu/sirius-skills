@@ -8,23 +8,16 @@ MANAGED_SKILLS := \
 	commit \
 	configure-project \
 	design \
-	design-md \
 	discover \
 	planning-driver \
 	dioxus-stitch \
 	dioxus-ui-ux \
-	enhance-prompt \
 	plan \
 	review-execution \
 	review-planning \
-	react:components \
-	remotion \
-	shadcn-ui \
 	simplify \
 	define \
 	execution-driver \
-	stitch-design \
-	stitch-loop \
 	track \
 	ui-flow
 
@@ -46,7 +39,6 @@ install:
 	npx skills add "$(REPO_ROOT)/skills/simplify" $(COMMON_FLAGS)
 	npx skills add "$(REPO_ROOT)/skills/dioxus-ui-ux" $(COMMON_FLAGS)
 	npx skills add "$(REPO_ROOT)/skills/dioxus-stitch" $(COMMON_FLAGS)
-	npx skills add https://github.com/google-labs-code/stitch-skills --skill '*' $(COMMON_FLAGS)
 
 uninstall:
 	@installed="$$(npx skills ls -g --json | python3 -c 'import json, sys; managed = set("$(MANAGED_SKILLS)".split()); installed = [item["name"] for item in json.load(sys.stdin) if item.get("name") in managed]; print("\n".join(installed))')"; \
