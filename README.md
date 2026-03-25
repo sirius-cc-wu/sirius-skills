@@ -26,6 +26,7 @@ The intended direction is:
 
 These core skills should remain tracker-agnostic by default:
 
+- `skills/configure-project/`
 - `skills/commit/`
 - `skills/create-pr/`
 - `skills/define/`
@@ -118,6 +119,12 @@ For a starting point, see `skills/close-track/assets/spec-publish.example.json`.
 
 To keep relation metadata healthy over time, `skills/execution-driver/scripts/manage_execution.py` also provides `audit-relations`, which checks for missing targets and missing reciprocal links.
 ## Optional project configuration
+
+Use `skills/configure-project/` when you want an agent to bootstrap the repo's
+supported `.skills/planning.json`, `.skills/execution.json`, and
+`.skills/conventions.json` files. The skill supports a generic `default` mode,
+a Jira-oriented `jira` mode, and an `ask` mode that makes the agent stop and
+ask the user which preset to apply before writing config.
 
 Projects can add `.skills/planning.json` in the repository root to configure planning-layer layout.
 

@@ -6,6 +6,7 @@ MANAGED_SKILLS := \
 	breakdown \
 	close-track \
 	commit \
+	configure-project \
 	design \
 	design-md \
 	discover \
@@ -41,6 +42,7 @@ install:
 	npx skills add "$(REPO_ROOT)/skills/close-track" $(COMMON_FLAGS)
 	npx skills add "$(REPO_ROOT)/skills/review-execution" $(COMMON_FLAGS)
 	npx skills add "$(REPO_ROOT)/skills/commit" $(COMMON_FLAGS)
+	npx skills add "$(REPO_ROOT)/skills/configure-project" $(COMMON_FLAGS)
 	npx skills add "$(REPO_ROOT)/skills/simplify" $(COMMON_FLAGS)
 	npx skills add "$(REPO_ROOT)/skills/dioxus-ui-ux" $(COMMON_FLAGS)
 	npx skills add "$(REPO_ROOT)/skills/dioxus-stitch" $(COMMON_FLAGS)
