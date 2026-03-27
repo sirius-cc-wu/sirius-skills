@@ -15,8 +15,6 @@ MANAGED_SKILLS := \
 	review-planning \
 	simplify \
 	guide-execution \
-	planning-driver \
-	execution-driver \
 	slice \
 	ui-flow
 

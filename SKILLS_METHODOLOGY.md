@@ -4,7 +4,6 @@ This document explains **how to use the skills together**.
 
 `README.md` already covers the repository direction, the planning-layer skill names, and the generic-first boundary. This file is the operational guide: what to do first, what each phase should produce, and when to hand off to the next skill.
 
-Deprecated compatibility aliases remain available as `planning-driver` and `execution-driver`, but new guidance should use `guide-planning` and `guide-execution`.
 
 ## Core Idea
 

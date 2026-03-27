@@ -58,7 +58,6 @@ These skills sit **before** the execution-slice skills:
 - planning layer: `guide-planning`, `discover`, `design`, `ui-flow`, `breakdown`, `review-planning`, `slice`
 - execution layer: `guide-execution`, `brief`, `blueprint`, `review-execution`, `close-slice`
 
-Deprecated compatibility aliases remain available as `planning-driver` and `execution-driver`.
 
 Recommended boundary:
 

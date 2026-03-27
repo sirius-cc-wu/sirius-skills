@@ -1,11 +1,11 @@
 ---
 name: guide-planning
-description: Resolves feature planning state and routes to the right planning skill. Canonical name for planning-driver.
+description: Resolves feature planning state and routes to the right planning skill.
 ---
 
 # Guide Planning
 
-Use this skill as the planning-layer entrypoint when you need to decide the next step for one feature planning folder.
+Use this skill as the planning-layer entrypoint when you need to decide the next planning step for one feature planning folder.
 
 ## Responsibilities
 
@@ -64,8 +64,3 @@ Use adjacent transitions by default and repair skipped states only deliberately.
 ## Tooling
 
 Always use `scripts/manage_planning.py` in this skill directory for initialization, registry synchronization, state transitions, and validation.
-
-## Compatibility
-
-`guide-planning` is the canonical verb-style name.
-The older `planning-driver` skill remains available as a deprecated compatibility alias.

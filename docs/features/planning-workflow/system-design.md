@@ -28,8 +28,7 @@ The planning workflow is a feature-scoped orchestration layer. `guide-planning` 
 
 ## Validation Strategy
 
-- Use `skills/planning-driver/tests/test_manage_planning.py` for deprecated alias coverage and state-gate behavior.
-- Use `skills/guide-planning/tests/test_manage_planning_wrapper.py` for canonical wrapper coverage.
+- Use `skills/guide-planning/tests/test_manage_planning.py` for planning state-gate behavior.
 - Use `skills/breakdown/tests/test_scaffold_breakdown.py` for deterministic scaffold behavior.
 - Validate each feature with `python3 skills/guide-planning/scripts/manage_planning.py validate-feature <feature-slug>`.
 

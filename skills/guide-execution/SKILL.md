@@ -1,6 +1,6 @@
 ---
 name: guide-execution
-description: Resolves the active slice and routes execution-layer work to the right skill. Canonical name for execution-driver.
+description: Resolves the active slice and routes execution-layer work to the right skill.
 ---
 
 # Guide Execution
@@ -54,8 +54,3 @@ Do not duplicate day-to-day implementation states like `implementing` or `blocke
 ## Tooling
 
 Always use `scripts/manage_execution.py` in this skill directory for initialization, active-slice resolution, status updates, validation, registry synchronization, and relation management.
-
-## Compatibility
-
-`guide-execution` is the canonical verb-style name.
-The older `execution-driver` skill remains available as a deprecated compatibility alias.

@@ -31,8 +31,7 @@ The execution workflow is a centralized slice system. `guide-execution` manages 
 ## Validation Strategy
 
 - Use `skills/slice/tests/test_bootstrap_slice.py` for slice bootstrap behavior.
-- Use `skills/execution-driver/tests/test_manage_execution.py` for deprecated alias coverage and lifecycle behavior.
-- Use `skills/guide-execution/tests/test_manage_execution_wrapper.py` for canonical wrapper coverage.
+- Use `skills/guide-execution/tests/test_manage_execution.py` for execution lifecycle behavior.
 - Use `skills/close-slice/tests/test_close_slice.py` for publication and relation behavior.
 - Validate slices with `python3 skills/guide-execution/scripts/manage_execution.py validate-slice <slice-id>`.
 
