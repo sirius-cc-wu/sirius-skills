@@ -12,7 +12,7 @@ Use this skill when a project needs screen flows, interaction requirements, or U
 1. Capture user journeys, states, and interaction boundaries.
 2. Define screen-level requirements, transitions, and edge cases.
 3. Record UX constraints that should influence system design or slice breakdown.
-4. Keep UI decisions in repository documents instead of burying them in tracker tickets.
+4. Keep UI decisions in repository documents instead of burying them in ad hoc execution notes.
 
 ## Required Output
 

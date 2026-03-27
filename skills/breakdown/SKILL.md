@@ -1,6 +1,6 @@
 ---
 name: breakdown
-description: Converts repo stories and planning docs into directly executable, dependency-aware work items with traceability and tracker handoff.
+description: Converts repo stories and planning docs into directly executable, dependency-aware work items with traceability and execution handoff.
 ---
 
 # Breakdown
@@ -28,7 +28,7 @@ If `.skills/planning.json` defines `planning_dir`, the scaffold uses
 1. Validate that stories are concrete, scoped, and ready for decomposition.
 2. Split oversized work into smaller, independently verifiable execution packets.
 3. Produce planning artifacts that preserve story-to-slice traceability, increment grouping, sequencing, and execution mode assumptions.
-4. Create executable tracker items, dependency links, and explicit parallel-safe lanes where appropriate.
+4. Create executable work items, dependency links, and explicit parallel-safe lanes where appropriate.
 5. Hand off ready work to `review-planning` and then `slice` for execution-slice bootstrap.
 
 ## Required Output
@@ -41,9 +41,9 @@ Resolve `<feature_path>` as `<planning_dir>/<feature-slug>/`.
 - If `.skills/planning.json` defines `planning_dir`, use that as `<planning_dir>`.
 - Otherwise default to `docs/features`.
 
-Preferred tracker output when available:
+Preferred execution output when available:
 
-- tracker slices and dependency links
+- planned slices and dependency links
 
 Use `assets/slice-planning-template.md` as the default starting point for `<feature_path>/slice-planning.md`.
 Use `assets/slice-traceability-template.md` as the default starting point for `<feature_path>/slice-traceability.md`.
@@ -51,7 +51,7 @@ Use `scripts/scaffold_breakdown.py` when you want both files scaffolded together
 
 ## Breakdown Rules
 
-- Keep stories and design in repo docs; keep executable slices in the tracker.
+- Keep stories and design in repo docs; keep executable slices in the repository's planning artifacts.
 - Prefer repository story sizes such as `S`, `M`, `L`, and `XL`.
 - Split any `XL` item before creating execution-ready slices.
 - Every executable slice should be small enough to fit one slice-scoped execution slice.
@@ -67,7 +67,7 @@ Use increments to bridge repo-level planning and slice-level execution:
 - an increment is a small, demonstrable outcome made from one or more execution-ready slices
 - Increment 1 should usually be the simplest end-to-end usable path
 - increments belong in `slice-planning.md` and `slice-traceability.md`, not in spec-slice state
-- one increment can contain multiple tracker slices, but each slice still gets its own slice later
+- one increment can contain multiple planned slices, but each slice still gets its own execution slice later
 - if a story spans multiple increments, record that explicitly instead of hiding it in notes
 
 ## Execution Mode and Packet Design
@@ -91,30 +91,30 @@ When a story becomes execution-ready:
 - label only genuinely independent slices as parallel-safe
 - if using `multi-agent`, record lane ownership, handoff targets, and an integration checkpoint after each lane
 
-## Tracker Guidance
+## Execution Backlog Guidance
 
-When a slice tracker is available, use it as the execution tracker:
+Use `slice-planning.md` as the execution backlog:
 
-- create one tracker slice per directly executable slice
-- group those slices under increment headings in `slice-planning.md` before creating them in the tracker
+- create one planned slice per directly executable work item
+- group those slices under increment headings in `slice-planning.md`
 - use parent-child relationships when a larger story needs grouped sub-slices
-- record blockers as explicit dependency links in the tracker
+- record blockers as explicit dependency links in `slice-planning.md`
 - reflect safe parallel lanes and integration checkpoints in `slice-planning.md`
-- keep mapping from repo story IDs to tracker slice IDs in `slice-traceability.md`
+- keep mapping from repo story IDs to planned slice IDs in `slice-traceability.md`
 
-If no tracker is configured, record slices and dependencies directly in `slice-planning.md` and use it as the execution backlog.
+Record slices and dependencies directly in `slice-planning.md` and use it as the primary execution backlog.
 
 ## Story-to-Slice Mapping
 
-Treat repo story IDs as the planning-system identifiers and tracker slice IDs as the execution identifiers.
+Treat repo story IDs as the planning-system identifiers and planned slice IDs as the execution identifiers.
 
 Default mapping:
 
-- one repo story can map to one or many tracker slices
-- each execution-ready slice becomes one tracker slice
+- one repo story can map to one or many planned slices
+- each execution-ready work item becomes one planned slice
 - preserve the repo story ID in:
   - `slice-traceability.md`
-  - the tracker slice description
+  - the planned slice description
 - use dependency links only for real execution blockers, not for narrative grouping
 
 Preferred description shape for a new slice:
@@ -129,20 +129,20 @@ Validation:
 - ...
 ```
 
-If one repo story splits into multiple executable slices:
+If one repo story splits into multiple executable work items:
 
 - keep the story as a repo concept in `user-stories.md`
-- create multiple tracker slices for the slices
-- optionally create a non-executable parent slice only when it helps grouped review
+- create multiple planned slices
+- optionally create a non-executable parent item only when it helps grouped review
 - record the story-to-slice fan-out in `slice-traceability.md`
 
-Only reuse the repo story ID as the tracker slice ID when **all** of the following are true:
+Only reuse the repo story ID as the planned slice ID when **all** of the following are true:
 
-- the repo story maps to exactly one executable slice
+- the repo story maps to exactly one executable work item
 - the team wants the story ID preserved end-to-end
 - that ID will not collide with another execution item
 
-Otherwise, let the tracker generate the slice ID and keep the repo story ID in traceability metadata.
+Otherwise, use an opaque slice ID and keep the repo story ID in traceability metadata.
 
 ## Workflow
 
@@ -151,7 +151,7 @@ Otherwise, let the tracker generate the slice ID and keep the repo story ID in t
 3. Split oversized work into smaller execution packets and group them into increments with clear demo outcomes.
 4. Choose `single-agent` or `multi-agent` handling where relevant and record lane assumptions.
 5. Write `slice-planning.md` and `slice-traceability.md` with increment groupings, dependency notes, parallel-safe lanes, and integration checkpoints as needed.
-6. Create tracker slices and dependency links for execution-ready work, keeping packet validation explicit.
+6. Create planned slices and dependency links for execution-ready work, keeping packet validation explicit.
 7. Stop when each slice is ready for `review-planning` and subsequent bootstrap by `slice`.
 
 When generating `slice-planning.md`, start from `assets/slice-planning-template.md` and replace placeholders rather than inventing a new structure each time.
@@ -160,8 +160,8 @@ When generating `slice-traceability.md`, start from `assets/slice-traceability-t
 ## Guardrails
 
 - Do not create execution slices directly from vague stories.
-- Do not mirror tracker execution states inside feature planning docs.
-- Do not turn increments into tracker states or spec-slice containers.
-- Do not turn `slice-planning.md` into a slice-scoped execution checklist; that belongs to `execution-driver` and `plan` later.
+- Do not mirror external execution states inside feature planning docs.
+- Do not turn increments into execution states or spec-slice containers.
+- Do not turn `slice-planning.md` into a slice-scoped execution checklist; that belongs to `execution-driver` and `blueprint` later.
 - Do not mark work as parallel-safe unless overlap and integration risk are genuinely low.
 - If a slice still needs major replanning, split it again before handoff.

@@ -13,7 +13,7 @@
   - `skills/close-slice/SKILL.md`
   - `skills/commit/SKILL.md`
   - `skills/create-pr/SKILL.md`
-- Execution tracker: none (reverse-engineered repo planning only)
+- Execution system: repository-managed slices (reverse-engineered repo planning only)
 - Execution mode: `single-agent`
 - Notes: This breakdown models the existing slice-scoped execution system in the repo.
 
@@ -36,7 +36,7 @@
 
 ## 4. Execution Slice Backlog
 
-| Slice ID | Story ID | Title | Summary | Target Area | Lane | Validation | Planned Tracker Action | Depends On | Slice Ready |
+| Slice ID | Story ID | Title | Summary | Target Area | Lane | Validation | Planned Action | Depends On | Slice Ready |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
 | EW-01-bootstrap | EW-01 | Bootstrap execution registry and slices | Manage config, slice registry, metadata, and slice creation. | `skills/execution-driver/scripts/manage_execution.py` | primary | `pytest -q skills/execution-driver/tests/test_manage_execution.py` | create slice |  | yes |
 | EW-02-brief | EW-02 | Author slice brief structure | Maintain `brief.md` structure, acceptance framing, and requirement sections. | `skills/brief/SKILL.md`, `skills/brief/templates/brief-template.md` | primary | Review generated brief against skill rules | create slice | EW-01-bootstrap | yes |

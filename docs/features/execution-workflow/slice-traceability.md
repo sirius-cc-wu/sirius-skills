@@ -3,7 +3,7 @@
 ## Conventions
 
 - Use stable story IDs from `user-stories.md`.
-- Use provisional slice IDs because no external execution tracker is configured for this reverse-engineered planning set.
+- Use provisional slice IDs because these planning docs model work before slice bootstrap.
 - Leave `Slice IDs` blank until actual slice bootstrap occurs.
 
 ## Mapping Table
@@ -18,4 +18,4 @@
 ## Notes
 
 - `Blocked By` shows execution-slice sequencing rather than story ownership.
-- These mappings are intended to seed later tracker and slice bootstrap work.
+- These mappings are intended to seed later slice bootstrap and backlog-refinement work.

@@ -8,14 +8,14 @@ The repository provides a slice-scoped execution workflow, but that workflow spa
 
 - Bootstrap one slice per execution-ready work item.
 - Capture slice intent in `brief.md` and make execution sequencing explicit in `blueprint.md`.
-- Keep slice readiness separate from external slice execution state.
+- Keep slice readiness separate from day-to-day implementation progress.
 - Preserve non-destructive closure and relation metadata for auditing and historical publishing.
 
 ## Non-Goals
 
 - Replace the planning layer with slice-scoped execution docs.
-- Make the execution registry own tracker lifecycle states such as in-progress or blocked.
-- Force project-specific tracker behavior into the core execution skills.
+- Make the execution registry own ad hoc workflow states such as in-progress or blocked.
+- Force project-specific execution behavior into the core execution skills.
 
 ## Primary Actors
 
@@ -29,7 +29,7 @@ The repository provides a slice-scoped execution workflow, but that workflow spa
 
 - Slice layout defaults to `slices/` unless `.skills/execution.json` overrides `slice_dir`.
 - Execution state machine is `draft -> brief_ready -> blueprint_ready -> execution_ready -> closed`.
-- `execution-driver` owns readiness only; execution tracker owns slice progress.
+- `execution-driver` owns readiness and registry state; teams should not invent extra registry states for day-to-day progress.
 - Closed slices retain `brief.md`, `blueprint.md`, and any legacy `slices.md`.
 - Relations such as `supersedes` and `replaces_partially` are durable metadata, not transient notes.
 
@@ -49,6 +49,6 @@ The repository provides a slice-scoped execution workflow, but that workflow spa
 
 ## Risks and Open Questions
 
-- Slice readiness can drift from actual implementation state if the external tracker is not updated.
+- Slice readiness can drift from actual implementation state if review and closure context is not kept current.
 - Checklist and validation completion rely on agent discipline plus PR checks rather than fully structured evidence.
 - Relation recording is powerful but can become inconsistent if not reviewed carefully.

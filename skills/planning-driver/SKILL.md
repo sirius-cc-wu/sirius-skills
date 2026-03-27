@@ -30,7 +30,7 @@ Before routing planning work, classify the request:
    - route to `design`
 4. If UI or interaction flow is still a material part of scope:
    - route to `ui-flow`
-5. If the work is still too large for execution or tracker slices are not yet defined:
+5. If the work is still too large for execution or slices are not yet defined:
    - route to `breakdown`
 6. If the planning artifacts need a readiness pass before slice bootstrap:
    - route to `review-planning`
@@ -87,7 +87,7 @@ Do not skip states without explicit user approval. Adjacent transitions are the 
 - `planning_reviewed`
 - `slice_ready`
 
-Do not duplicate slice tracker lifecycle states in planning metadata. Keep slice execution state in the tracker and slice-scoped execution-slice readiness in `execution-driver`.
+Do not duplicate slice lifecycle states in planning metadata. Keep slice execution and readiness state in `execution-driver`.
 
 ## Preflight
 

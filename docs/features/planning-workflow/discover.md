@@ -14,8 +14,8 @@ The repository offers a planning-layer workflow, but its value is distributed ac
 ## Non-Goals
 
 - Manage slice-scoped execution artifacts such as `brief.md` or `blueprint.md`.
-- Replace the execution tracker with planning metadata.
-- Encode tracker-specific behavior directly into the core planning skills.
+- Move execution readiness or execution progress into planning metadata.
+- Encode execution-layer behavior directly into the core planning skills.
 
 ## Primary Actors
 
@@ -31,7 +31,7 @@ The repository offers a planning-layer workflow, but its value is distributed ac
 - `planning-driver` owns planning readiness state only.
 - `discover`, `design`, `ui-flow`, `breakdown`, `review-planning`, and `slice` must stay feature-scoped.
 - Increments belong in planning artifacts, not execution-slice state.
-- Core skills should remain generic-first and tracker-agnostic.
+- Core skills should remain generic-first and repository-centric.
 
 ## Confirmed Signals in Repo
 

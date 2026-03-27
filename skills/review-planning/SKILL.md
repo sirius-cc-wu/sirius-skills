@@ -11,7 +11,7 @@ Use this skill after `discover`, `design`, or `breakdown` when the planning arti
 
 1. Review planning artifacts for intent clarity, scope, architecture fit, sequencing, and validation readiness.
 2. Identify gaps, contradictions, unresolved risks, or oversized work that would make execution brittle.
-3. Feed findings back into the existing planning docs or tracker slices rather than leaving critical decisions in side-channel notes.
+3. Feed findings back into the existing planning docs rather than leaving critical decisions in side-channel notes.
 4. Confirm whether the work is ready for `slice` or needs another planning pass first.
 
 ## Preferred Input
@@ -21,7 +21,7 @@ Use this skill after `discover`, `design`, or `breakdown` when the planning arti
 - optional `<feature_path>/ui-design.md`
 - `<feature_path>/slice-planning.md`
 - `<feature_path>/slice-traceability.md`
-- linked backlog or tracker context when available
+- linked backlog context when available
 
 Resolve `<feature_path>` from the repository planning layout:
 
@@ -35,7 +35,7 @@ Resolve `<feature_path>` from the repository planning layout:
 ## Required Output
 
 - updated planning docs under `<feature_path>/`
-- explicit review findings or a readiness note recorded in the planning docs or execution tracker used by the team
+- explicit review findings or a readiness note recorded in the planning docs
 
 ## Review Rules
 
@@ -47,9 +47,9 @@ Resolve `<feature_path>` from the repository planning layout:
 
 ## Workflow
 
-1. Read the current planning artifacts and any linked tracker context.
+1. Read the current planning artifacts and any linked backlog context.
 2. Compare discovery intent, design direction, and breakdown outputs for contradictions or missing handoff details.
-3. Record findings directly in the planning docs or tracker context already used by the team.
+3. Record findings directly in the planning docs already used by the team.
 4. Update the affected planning artifacts so the reviewed state is durable.
 5. Stop when the work is ready for `slice` or return it to `discover`, `design`, or `breakdown` as needed.
 

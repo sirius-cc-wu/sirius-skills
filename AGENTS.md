@@ -36,9 +36,9 @@ Do not mix workflow responsibilities:
 
 - `planning-driver` owns planning readiness and registry state
 - `execution-driver` owns execution-slice readiness and registry state
-- the execution tracker owns slice lifecycle
+- the execution layer owns slice lifecycle state within the repository
 
-Do not duplicate execution-tracker lifecycle states inside execution-slice state.
+Do not duplicate registry states inside execution-slice artifacts.
 
 ### Treat IDs as opaque
 

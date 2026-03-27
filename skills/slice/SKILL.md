@@ -16,16 +16,14 @@ Use this skill when a work item is small enough to execute, has passed planning 
 
 ## Preferred Input
 
-- a work item ID from your execution tracker (for example, one created by `breakdown`)
-
-If no tracker is in use, use the repository's configured issue ID and slice bootstrap convention.
+- a work item ID from repository planning (for example, one created by `breakdown`)
 
 ## Bootstrap Rules
 
 - One executable work item should map to one slice.
-- Prefer preserving the tracker ID as the slice ID when the tooling supports it.
+- Prefer preserving the planned ID as the slice ID when available.
 - Do not create a slice for work that still needs major decomposition.
-- Keep slice execution state in the tracker and slice readiness in `execution-driver`.
+- Keep slice readiness and registry state in `execution-driver`.
 
 ## Workflow
 
@@ -36,13 +34,11 @@ If no tracker is in use, use the repository's configured issue ID and slice boot
 python3 skills/execution-driver/scripts/manage_execution.py add "<slice-id>" "<feature-name>"
 ```
 
-   If the tracker supports exporting issue metadata as JSON, you may pass `--id` manually to preserve the tracker ID as the slice ID.
-
 3. Confirm the new slice path exists and registry state is consistent.
 4. Hand off to `execution-driver` to author `brief.md` and `blueprint.md`.
 
 ## Guardrails
 
-- Do not invent extra slice states to mirror tracker execution lifecycle.
+- Do not invent extra slice states to mirror external execution lifecycles.
 - Do not skip `execution-driver`; this skill only bootstraps and hands off.
 - If the input work item is still too large, send it back to `planning-driver` or `breakdown`.

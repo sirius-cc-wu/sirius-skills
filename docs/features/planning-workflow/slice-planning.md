@@ -12,7 +12,7 @@
   - `skills/breakdown/SKILL.md`
   - `skills/review-planning/SKILL.md`
   - `skills/slice/SKILL.md`
-- Execution tracker: none (reverse-engineered repo planning only)
+- Execution system: repository-managed slices (reverse-engineered repo planning only)
 - Execution mode: `single-agent`
 - Notes: This breakdown models the planning-layer capability already present in the repo.
 
@@ -35,7 +35,7 @@
 
 ## 4. Execution Slice Backlog
 
-| Slice ID | Story ID | Title | Summary | Target Area | Lane | Validation | Planned Tracker Action | Depends On | Slice Ready |
+| Slice ID | Story ID | Title | Summary | Target Area | Lane | Validation | Planned Action | Depends On | Slice Ready |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
 | PW-01-registry | PW-01 | Initialize planning registry and metadata | Manage planning config, registry, and `.planning-meta.json` lifecycle. | `skills/planning-driver/scripts/manage_planning.py` | primary | `pytest -q skills/planning-driver/tests/test_manage_planning.py` | create slice |  | yes |
 | PW-02-gates | PW-02 | Enforce planning readiness gates | Validate required artifacts across discovery and design transitions. | `skills/planning-driver/scripts/manage_planning.py` | primary | `pytest -q skills/planning-driver/tests/test_manage_planning.py` | create slice | PW-01-registry | yes |
@@ -63,7 +63,7 @@
 
 ## 7. Open Questions / Stop-and-Ask Items
 
-- Should planning review ever become a tooling-enforced gate before tracker slice creation?
+- Should planning review ever become a tooling-enforced gate before slice bootstrap?
 - How much semantic validation should the repo enforce beyond non-empty planning artifacts?
 ## 8. Review Notes
 

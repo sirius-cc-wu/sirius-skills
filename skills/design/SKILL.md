@@ -52,6 +52,6 @@ Resolve `<feature_path>` as `<planning_dir>/<feature-slug>/`.
 ## Guardrails
 
 - Do not generate slice-scoped `blueprint.md` or other execution-slice artifacts.
-- Do not create tracker slices for vague or unresolved designs.
+- Do not create execution-ready slices for vague or unresolved designs.
 - If the work is purely UX-focused, use `ui-flow` instead or alongside this skill.
 - Do not let feature-level UML drift into slice-scoped class-by-class implementation design; that belongs in `plan`.

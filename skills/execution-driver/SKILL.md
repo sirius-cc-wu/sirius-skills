@@ -15,7 +15,7 @@ Use this skill to manage workflow state for slice readiness.
 4. Route slice-scoped work to `brief`, `blueprint`, `review-execution`, or `close-slice` as appropriate.
 5. Update slice status when a phase is complete.
 
-`execution-driver` owns orchestration only. It should not absorb artifact authoring that belongs to `brief`, `blueprint`, `review-execution`, or `close-slice`.
+`execution-driver` owns orchestration and readiness only. It should not absorb artifact authoring that belongs to `brief`, `blueprint`, `review-execution`, or `close-slice`.
 
 ## Entry Decision Guide
 
@@ -76,7 +76,7 @@ Do not skip states without explicit user approval. Adjacent transitions are the 
 - `execution_ready`
 - `closed`
 
-Do not duplicate slice-execution states like `implementing`, `in progress`, or `blocked` in the slice registry. If you use an external slice tracker, let it own the execution lifecycle (slice start, progress, verification, and finish); keep `execution-driver` focused on slice readiness and artifact state.
+Do not duplicate slice-execution states like `implementing`, `in progress`, or `blocked` in the slice registry. Keep `execution-driver` focused on slice readiness and artifact state.
 
 ## Preflight
 
@@ -106,7 +106,7 @@ Do not duplicate slice-execution states like `implementing`, `in progress`, or `
     - Set status to `execution_ready` when the plan is actionable and execution can begin.
 4. While implementation is underway:
     - keep `execution-driver` focused on slice readiness and artifact state
-    - delegate execution lifecycle events (begin, verify, finish, pause) to your slice tracker if one is in use
+    - keep day-to-day execution progress in PRs, review notes, or the working context your team uses without adding new registry states
 5. Once execution is finished and verified:
     - route to `review-execution` before final closure when an explicit implementation-versus-brief review is needed
     - route to `close-slice` after review is complete
@@ -130,7 +130,7 @@ A slice is `execution_ready` when:
 - `blueprint.md` is actionable
 - execution can begin without major replanning
 - any legacy `slices.md` or execution checklist is aligned with the plan
-- the next lifecycle owner is the active coding agent or slice tracker
+- the next lifecycle owner is the active coding agent
 
 A slice is `closed` when:
 - the execution work is complete
@@ -180,7 +180,7 @@ Slice IDs are treated as opaque identifiers. Manual IDs may include letters, num
 
 ### Optional Conventions Configuration
 
-Projects may define `.skills/conventions.json` to describe issue-tracker or branch naming conventions without changing the base workflow.
+Projects may define `.skills/conventions.json` to describe branch naming conventions without changing the base workflow.
 
 Supported Phase 1 fields:
 
@@ -188,7 +188,7 @@ Supported Phase 1 fields:
 - `id_pattern`: project-level documentation for what a valid ID looks like
 - `commit_format`: convention for the `commit` skill
 - `pr_title_format`: convention for the `create-pr` skill
-- `issue_url_template`: optional documentation hook for linking IDs to a tracker
+- `issue_url_template`: optional documentation hook for linking IDs to a remote system (if still in use)
 
 If `.skills/conventions.json` is absent:
 
@@ -221,10 +221,10 @@ python3 <path-to-execution-driver>/scripts/manage_execution.py init docs/slices
 # otherwise generate a hash ID with the SPC prefix):
 python3 <path-to-execution-driver>/scripts/manage_execution.py add "feature-name"
 
-# To specify an ID manually (e.g., to match your issue tracker):
+# To specify an ID manually (e.g., to match an external reference):
 python3 <path-to-execution-driver>/scripts/manage_execution.py add "ID" "feature-name"
 
-# Example with a custom tracker ID:
+# Example with a custom ID:
 python3 <path-to-execution-driver>/scripts/manage_execution.py add "BNC-lg2fwe" "feature-name"
 
 # Update slice status:

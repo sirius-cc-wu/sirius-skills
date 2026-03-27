@@ -15,7 +15,7 @@ The repository is designed as a reusable skill collection, but successful adopti
 
 - Auto-load arbitrary plugin code from `.skills/plugins/`.
 - Collapse all configuration into one generic catch-all file.
-- Force tracker-specific setup for repositories that want generic defaults.
+- Force project-specific workflow setup for repositories that want generic defaults.
 
 ## Primary Actors
 

@@ -33,7 +33,7 @@ Resolve `<feature_path>` from the repository planning layout:
 
 ## Discovery Rules
 
-- Keep product thinking in the repository, not in the execution tracker.
+- Keep product thinking in the repository, not in slice-scoped execution artifacts.
 - Record success criteria and constraints explicitly.
 - Separate confirmed facts from assumptions and open questions.
 - Name candidate stories in a way that later decomposition can preserve traceability.

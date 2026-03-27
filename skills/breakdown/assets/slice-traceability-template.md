@@ -1,6 +1,6 @@
 # Slice Traceability
 
-Use this file to map repo story IDs to execution slices without moving story ownership into the tracker.
+Use this file to map repo story IDs to execution slices without moving story ownership outside repository planning artifacts.
 
 ## Conventions
 
@@ -21,6 +21,6 @@ Use this file to map repo story IDs to execution slices without moving story own
 ## Notes
 
 - `Blocked By` should use execution-slice relationships, not story relationships.
-- `Increments` records planning-level grouping only; do not treat it as a tracker state.
-- If a story maps 1:1 to one tracker slice, the same ID may later appear in `Slice IDs` after `slice` runs.
-- If a story fans out into multiple executable slices, keep the fan-out here instead of inventing story-state in the tracker.
+- `Increments` records planning-level grouping only; do not treat it as an execution state.
+- If a story maps 1:1 to one planned slice, the same ID may later appear in `Slice IDs` after `slice` runs.
+- If a story fans out into multiple executable slices, keep the fan-out here instead of inventing story-state outside the planning artifacts.

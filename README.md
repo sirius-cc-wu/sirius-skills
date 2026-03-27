@@ -24,7 +24,7 @@ The intended direction is:
 
 ## Generic-first workflow
 
-These core skills should remain tracker-agnostic by default:
+These core skills remain repository-centric and system-agnostic by default:
 
 - `skills/configure-project/`
 - `skills/commit/`
@@ -43,7 +43,7 @@ For the operational guide to using the skills together, see `SKILLS_METHODOLOGY.
 
 ## Planning layer
 
-For repositories that use repo-first planning and a separate execution tracker, the recommended short-name planning skills are:
+For repositories that use repo-first planning, the recommended short-name planning skills are:
 
 - `skills/planning-driver/`
 - `skills/discover/`
@@ -57,15 +57,14 @@ These skills sit **before** the execution-slice skills:
 
 - planning layer: `planning-driver`, `discover`, `design`, `ui-flow`, `breakdown`, `review-planning`, `slice`
 - execution layer: `execution-driver`, `brief`, `blueprint`, `review-execution`, `close-slice`
-- execution tracker: your slice system or issue tracker
 
 Recommended boundary:
 
 - keep goals, design, stories, decomposition, and increment plans in repo documents
-- keep executable slices and dependency tracking in your slice system
+- keep executable slices and dependency tracking in the repository planning artifacts
 - bootstrap one execution slice per executable slice
 - let `planning-driver` own feature-planning readiness and routing inside the planning layer
-- let `execution-driver` own slice readiness, while the execution tracker owns slice execution state
+- let `execution-driver` own slice readiness and state transitions within the execution layer
 
 Feature-local planning defaults to `docs/features/<feature-slug>/` unless
 `.skills/planning.json` defines a different `planning_dir`.

@@ -20,14 +20,14 @@ Use this skill after implementation and validation, and before `close-slice`, wh
 - `<slice_path>/blueprint.md`
 - optional `<slice_path>/slices.md` for legacy slices
 - the implementation diff or changed files
-- validation results, tracker notes, or PR context when available
+- validation results, review notes, or PR context when available
 
 Resolve `<slice_path>` through `execution-driver`.
 
 ## Required Output
 
 - updated slice-scoped execution artifacts when the review exposes durable gaps
-- explicit review outcome recorded in the tracker, PR, or closure context used by the team
+- explicit review outcome recorded in the PR, closure context, or repository docs used by the team
 
 ## Artifact Ownership
 
@@ -43,7 +43,7 @@ Resolve `<slice_path>` through `execution-driver`.
   - intent-to-brief gap
   - follow-up improvement outside the active slice
 - Prefer fixing the brief or plan when the issue reflects missing or ambiguous execution context.
-- Capture any follow-up work in the team's execution tracker instead of overloading slice readiness state.
+- Capture any follow-up work in planning docs, the next slice backlog, or PR context instead of overloading slice readiness state.
 
 ## Workflow
 
@@ -57,4 +57,4 @@ Resolve `<slice_path>` through `execution-driver`.
 
 - Do not close the slice while blocking review findings remain unresolved.
 - Do not treat code-only fixes as complete if the underlying brief or plan is still wrong.
-- Do not use slice metadata to mirror execution lifecycle states owned by the tracker.
+- Do not use slice metadata to mirror ad hoc execution states beyond the readiness model owned by `execution-driver`.

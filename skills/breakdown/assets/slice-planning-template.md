@@ -10,7 +10,7 @@ Use this file to decompose repo stories into execution-ready slices before boots
   - `system-design.md`
   - `ui-design.md` (if applicable)
   - `user-stories.md`
-- Execution tracker: <tracker name or none>
+- Execution system: repository-managed slices
 - Execution mode: `single-agent` | `multi-agent`
 - Notes:
 
@@ -25,7 +25,7 @@ Decision rules:
 
 - `keep` means the story is already small enough to map to one executable slice.
 - `split` means the story fans out into multiple execution-ready slices.
-- `defer` means the story is not ready and should not create tracker work yet.
+- `defer` means the story is not ready and should not be executed yet.
 
 ## 3. Increment Plan
 
@@ -42,11 +42,11 @@ Rules:
 - keep increments feature-scoped planning artifacts, not execution slices
 - each increment should be demonstrable without requiring the full project to be complete
 - an increment can include one or many execution-ready slices
-- tracker slices and execution slices remain slice-scoped even when they belong to the same increment
+- planned slices and execution slices remain slice-scoped even when they belong to the same increment
 
 ## 4. Execution Slice Backlog
 
-| Slice ID | Story ID | Title | Summary | Target Area | Lane | Validation | Planned Tracker Action | Depends On | Slice Ready |
+| Slice ID | Story ID | Title | Summary | Target Area | Lane | Validation | Planned Action | Depends On | Slice Ready |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
 | AUTH-03-api | AUTH-03 | Implement refresh token endpoint | Add refresh endpoint and token rotation logic | `auth/api` | primary | `pytest tests/auth/test_refresh.py` | create slice |  | yes |
 | AUTH-03-tests | AUTH-03 | Add refresh token integration tests | Cover refresh flow end-to-end | `tests/auth` | primary | `pytest tests/auth/test_refresh.py` | create slice | AUTH-03-api | yes |
@@ -76,5 +76,5 @@ Rules:
 
 - This file is feature-scoped planning, not slice-scoped execution.
 - Keep increment definitions here, not in execution-slice artifacts.
-- Once tracker slices are created, record the actual slice IDs in `slice-traceability.md`.
+- Once planned slices are created, record the actual slice IDs in `slice-traceability.md`.
 - Keep slice IDs stable enough that they can be cross-referenced from traceability notes and planning discussion.

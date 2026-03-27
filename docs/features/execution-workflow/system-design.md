@@ -26,7 +26,7 @@ The execution workflow is a centralized slice system. `execution-driver` manages
 
 - Slice-scoped slices improve auditability but require stronger discipline to keep one work item per slice.
 - Closure is non-destructive, which preserves history at the cost of leaving more retained artifacts in the repo.
-- External tracker state is intentionally separate, reducing coupling but requiring careful handoff discipline.
+- Day-to-day execution context stays intentionally lightweight, reducing workflow overhead but requiring careful handoff discipline.
 
 ## Validation Strategy
 

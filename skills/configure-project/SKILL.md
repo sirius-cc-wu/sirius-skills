@@ -109,7 +109,7 @@ Successful runs should leave the repository with:
 - `.skills/execution.json`
 - `.skills/conventions.json`
 
-In `default` mode, `.skills/conventions.json` may remain an empty object so the repo keeps its generic behavior explicit without inventing tracker-specific rules.
+In `default` mode, `.skills/conventions.json` may remain an empty object so the repo keeps its generic behavior explicit without inventing project-specific workflow rules.
 
 ## Examples
 

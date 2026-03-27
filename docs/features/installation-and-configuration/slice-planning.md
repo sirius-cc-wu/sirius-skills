@@ -12,7 +12,7 @@
   - `skills/commit/SKILL.md`
   - `skills/create-pr/SKILL.md`
   - `skills/close-slice/SKILL.md`
-- Execution tracker: none (reverse-engineered repo planning only)
+- Execution system: repository-managed slices (reverse-engineered repo planning only)
 - Execution mode: `single-agent`
 - Notes: This feature captures how the repo is adopted and configured rather than how a single execution slice runs.
 
@@ -30,17 +30,17 @@
 | Increment | Goal / User-Visible Value | Included Story IDs | Planned Slice IDs | Demo / Verification Outcome | Notes |
 | --- | --- | --- | --- | --- | --- |
 | I1 | Managed repo setup works out of the box | IC-01, IC-02 | IC-01-install, IC-02-planning-config, IC-02-execution-config | A project can install the shared skills and resolve planning/execution layout from config. | Simplest repository adoption path |
-| I2 | Project conventions stay generic-first | IC-03 | IC-03-conventions-config | Commit, PR, and execution naming behavior can be configured without hardcoding tracker logic. | Depends on I1 |
+| I2 | Project conventions stay generic-first | IC-03 | IC-03-conventions-config | Commit, PR, and execution naming behavior can be configured without hardcoding project-specific workflow logic. | Depends on I1 |
 | I3 | Project-local extension boundaries are explicit | IC-04 | IC-04-plugin-convention, IC-04-doc-alignment | A maintainer understands where optional extension scripts/configs live and that core skills read them explicitly. | Depends on I2 |
 
 ## 4. Execution Slice Backlog
 
-| Slice ID | Story ID | Title | Summary | Target Area | Lane | Validation | Planned Tracker Action | Depends On | Slice Ready |
+| Slice ID | Story ID | Title | Summary | Target Area | Lane | Validation | Planned Action | Depends On | Slice Ready |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
 | IC-01-install | IC-01 | Manage installed skill set | Keep `make install` / `make uninstall` aligned with the managed skills list. | `Makefile` | primary | Review install/uninstall targets and managed skill list | create slice |  | yes |
 | IC-02-planning-config | IC-02 | Resolve planning layout from config | Keep `planning.json` semantics explicit and stable. | `skills/planning-driver/scripts/manage_planning.py`, docs | primary | `pytest -q skills/planning-driver/tests/test_manage_planning.py` | create slice | IC-01-install | yes |
 | IC-02-execution-config | IC-02 | Resolve execution layout from config | Keep `execution.json` semantics explicit and stable. | `skills/execution-driver/scripts/manage_execution.py`, docs | primary | `pytest -q skills/execution-driver/tests/test_manage_execution.py` | create slice | IC-02-planning-config | yes |
-| IC-03-conventions-config | IC-03 | Apply repo naming and tracker conventions | Keep `conventions.json` as the cross-cutting conventions surface. | `skills/execution-driver/scripts/manage_execution.py`, `skills/commit/SKILL.md`, `skills/create-pr/SKILL.md` | primary | Review config consumers and tests | create slice | IC-02-execution-config | yes |
+| IC-03-conventions-config | IC-03 | Apply repo naming and ID conventions | Keep `conventions.json` as the cross-cutting conventions surface. | `skills/execution-driver/scripts/manage_execution.py`, `skills/commit/SKILL.md`, `skills/create-pr/SKILL.md` | primary | Review config consumers and tests | create slice | IC-02-execution-config | yes |
 | IC-04-plugin-convention | IC-04 | Document project-local plugin behavior | Keep `.skills/plugins/` explicit and opt-in rather than auto-loaded. | `README.md`, `AGENTS.md`, consumer skills | primary | Review docs for explicit plugin loading language | create slice | IC-03-conventions-config | yes |
 | IC-04-doc-alignment | IC-04 | Keep docs aligned with config behavior | Update docs and examples whenever config semantics shift. | `README.md`, `AGENTS.md`, skill docs | primary | Cross-check docs with code readers | create slice | IC-04-plugin-convention | yes |
 

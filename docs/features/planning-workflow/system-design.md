@@ -24,7 +24,7 @@ The planning workflow is a feature-scoped orchestration layer. `planning-driver`
 
 - Artifact ownership stays separated by skill instead of centralizing all writing in `planning-driver`.
 - Validation is mostly file-presence and non-empty-content based; semantic quality is enforced through skill guidance and review.
-- Planning remains repository-first, so the tracker only receives execution-ready slices after breakdown.
+- Planning remains repository-first, so reviewed planning artifacts hand off directly to slice bootstrap after breakdown.
 
 ## Validation Strategy
 
