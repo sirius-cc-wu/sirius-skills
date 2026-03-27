@@ -12,10 +12,12 @@ Use this skill as the execution-layer entrypoint when you need to decide the nex
 1. Resolve or initialize the active slice.
 2. Verify required files, registry state, and slice metadata.
 3. Decide whether work belongs in the planning layer or the slice-scoped execution layer.
-4. Route slice-scoped work to `brief`, `blueprint`, `review-execution`, or `close-slice`.
+4. Route slice-scoped work to `brief`, `blueprint`, active repository implementation, `review-execution`, or `close-slice`.
 5. Update slice readiness status when a phase is complete.
 
 `guide-execution` owns orchestration and readiness only. It should not absorb artifact authoring that belongs to `brief`, `blueprint`, `review-execution`, or `close-slice`.
+
+When `.skills/execution.json` sets `auto_start_implementation` to `true`, treat `blueprint_ready` as an automatic handoff into implementation: once `blueprint.md` is complete, update the slice through `manage_execution.py set-status <slice> blueprint_ready`, let the tooling advance the slice to `execution_ready`, and continue directly into code changes instead of stopping for a second manual handoff.
 
 ## Entry Decision Guide
 
@@ -49,7 +51,8 @@ Do not duplicate day-to-day implementation states like `implementing` or `blocke
 2. Resolve the active slice using tooling or a user-provided ID/path.
 3. Confirm the slice path represents one execution-ready work item.
 4. Check `brief.md`, `blueprint.md`, optional legacy `slices.md`, and `.slice-meta.json` as appropriate for the current state.
-5. Repair registry inconsistencies before routing deeper into execution.
+5. Check whether `auto_start_implementation` is enabled so the blueprint handoff behavior matches repository config.
+6. Repair registry inconsistencies before routing deeper into execution.
 
 ## Tooling
 

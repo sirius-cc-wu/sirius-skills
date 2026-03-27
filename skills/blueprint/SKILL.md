@@ -7,6 +7,7 @@ description: Produces an actionable implementation plan from a completed brief, 
 
 Use this skill to convert `brief.md` into a concrete `blueprint.md`.
 For new slices, `blueprint.md` is the final execution artifact before implementation begins.
+When `.skills/execution.json` sets `auto_start_implementation` to `true`, the blueprint handoff should continue directly into implementation after the slice is marked `blueprint_ready`.
 
 ## Responsibilities
 
@@ -77,4 +78,5 @@ Failed gates must be fixed or explicitly waived with rationale.
 3. Fill `plan-template.md`.
 4. Add PlantUML detailed design where structure, behavior, or state transitions need extra precision.
 5. Validate traceability and gates.
-6. Stop when the plan is actionable and ready for execution.
+6. Update the slice through `guide-execution` when the blueprint is ready.
+7. If `auto_start_implementation` is enabled, continue directly into repository implementation work after the handoff; otherwise stop when the plan is actionable and ready for execution.

@@ -14,6 +14,7 @@ CONFIG_FILE = os.path.join(CONFIG_DIR, "execution.json")
 CONVENTIONS_CONFIG_DIR = ".skills"
 CONVENTIONS_CONFIG_FILE = os.path.join(CONVENTIONS_CONFIG_DIR, "conventions.json")
 DEFAULT_PREFERRED_WORKFLOW = "TDD"
+DEFAULT_AUTO_START_IMPLEMENTATION = True
 REGISTRY_JSON_FILE = "registry.json"
 DEFAULT_GENERATED_SLICE_PREFIX = "SPC"
 REGISTRY_HEADER = (
@@ -264,7 +265,7 @@ def normalize_registry_row(row: Dict[str, object]) -> Dict[str, object]:
     return normalized
 
 
-def load_config(required: bool = True) -> Dict[str, str]:
+def load_config(required: bool = True) -> Dict[str, object]:
     if not os.path.exists(CONFIG_FILE):
         if required:
             raise RuntimeError(
@@ -275,6 +276,7 @@ def load_config(required: bool = True) -> Dict[str, str]:
         return {
             "slice_dir": DEFAULT_SLICES_DIR,
             "preferred_workflow": DEFAULT_PREFERRED_WORKFLOW,
+            "auto_start_implementation": DEFAULT_AUTO_START_IMPLEMENTATION,
         }
 
     try:
@@ -290,6 +292,7 @@ def load_config(required: bool = True) -> Dict[str, str]:
     preferred_workflow = config.get(
         "preferred_workflow", DEFAULT_PREFERRED_WORKFLOW
     )
+    auto_start_implementation = config.get("auto_start_implementation", False)
 
     if not isinstance(slice_dir, str):
         raise RuntimeError("Execution config field 'slice_dir' must be a string.")
@@ -297,10 +300,15 @@ def load_config(required: bool = True) -> Dict[str, str]:
         raise RuntimeError(
             "Execution config field 'preferred_workflow' must be a string."
         )
+    if not isinstance(auto_start_implementation, bool):
+        raise RuntimeError(
+            "Execution config field 'auto_start_implementation' must be a boolean."
+        )
 
     return {
         "slice_dir": normalize_slice_dir(slice_dir),
         "preferred_workflow": preferred_workflow,
+        "auto_start_implementation": auto_start_implementation,
     }
 
 
@@ -342,7 +350,9 @@ def load_conventions_config(required: bool = False) -> Dict[str, str]:
 
 
 def write_config(
-    slice_dir: str, preferred_workflow: str = DEFAULT_PREFERRED_WORKFLOW
+    slice_dir: str,
+    preferred_workflow: str = DEFAULT_PREFERRED_WORKFLOW,
+    auto_start_implementation: bool = DEFAULT_AUTO_START_IMPLEMENTATION,
 ) -> None:
     os.makedirs(CONFIG_DIR, exist_ok=True)
     with open(CONFIG_FILE, "w", encoding="utf-8") as f:
@@ -350,6 +360,7 @@ def write_config(
             {
                 "slice_dir": normalize_slice_dir(slice_dir),
                 "preferred_workflow": preferred_workflow,
+                "auto_start_implementation": auto_start_implementation,
             },
             f,
             indent=2,
@@ -1031,15 +1042,36 @@ def update_slice_status(
             f"Cannot set {slice['id']} to status '{status}': {', '.join(issues)}",
         )
 
+    final_status = status
+    auto_started = False
+    if status == "blueprint_ready" and not force:
+        config = load_config(required=True)
+        if bool(config["auto_start_implementation"]):
+            auto_ok, auto_issues, _ = validate_slice_for_status(slice, "execution_ready")
+            if not auto_ok:
+                return (
+                    False,
+                    "Cannot auto-start implementation for "
+                    f"{slice['id']}: {', '.join(auto_issues)}",
+                )
+            final_status = "execution_ready"
+            auto_started = True
+
     slice_path = str(slice["path"]).rstrip("/")
     metadata = load_slice_metadata(slice_path)
-    updated_metadata = build_slice_metadata(slice, status, existing=metadata)
+    updated_metadata = build_slice_metadata(slice, final_status, existing=metadata)
     write_slice_metadata(slice_path, updated_metadata)
 
-    slice["status"] = status
+    slice["status"] = final_status
     slice["updated_at"] = normalize_optional_timestamp(updated_metadata.get("updated_at"))
     slice["closed_at"] = normalize_optional_timestamp(updated_metadata.get("closed_at"))
     write_registry(rows)
+    if auto_started:
+        return (
+            True,
+            f"Updated {slice['id']} to status 'blueprint_ready' and "
+            "auto-started implementation with status 'execution_ready'",
+        )
     return True, f"Updated {slice['id']} to status '{status}'"
 
 
@@ -1048,7 +1080,11 @@ def cmd_init(args: argparse.Namespace) -> int:
     slice_dir = (
         normalize_slice_dir(args.slice_dir) if args.slice_dir else config["slice_dir"]
     )
-    write_config(slice_dir, preferred_workflow=config["preferred_workflow"])
+    write_config(
+        str(slice_dir),
+        preferred_workflow=str(config["preferred_workflow"]),
+        auto_start_implementation=bool(config["auto_start_implementation"]),
+    )
     ensure_registry(slice_dir)
     print(f"Initialized slice registry and config in '{slice_dir}/'.")
     return 0

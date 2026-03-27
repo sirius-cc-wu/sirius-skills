@@ -79,13 +79,13 @@ Preferred repo workflow:
 5. `breakdown` turns repo stories into directly executable work items and groups those slices into small demonstrable increments.
 6. `review-planning` reviews planning artifacts and slice definitions before execution slice bootstrap.
 7. `slice` validates execution-ready input, bootstraps a slice-scoped execution slice, and hands off to `guide-execution`.
-8. `guide-execution` routes slice-scoped execution through `brief` to capture slice intent and acceptance, then through `blueprint` to produce the final execution artifact.
+8. `guide-execution` routes slice-scoped execution through `brief` to capture slice intent and acceptance, then through `blueprint` to produce the final execution artifact. When `.skills/execution.json` enables `auto_start_implementation`, that handoff continues directly into implementation after the blueprint is marked ready.
 9. `review-execution` checks implementation and validation outcomes against the slice-scoped execution artifacts before closure.
 10. `close-slice` closes completed execution slices and can optionally publish a project-local summary.
 
 In the repo-native flow, `guide-planning` owns feature-planning readiness and routing, `breakdown` owns repo-story decomposition, `review-planning` owns planning readiness review, `brief` owns the slice-scoped `brief.md`, `blueprint` owns the final slice-scoped execution plan and validation checklist, and `review-execution` owns the final implementation-versus-brief review before closure.
 
-Execution follows the same pattern: `guide-execution` owns routing, readiness, and registry state, while `brief`, `blueprint`, `review-execution`, and `close-slice` own their artifacts and outputs.
+Execution follows the same pattern: `guide-execution` owns routing, readiness, and registry state, while `brief`, `blueprint`, `review-execution`, and `close-slice` own their artifacts and outputs. With `auto_start_implementation`, `guide-execution` can promote a slice from `blueprint_ready` to `execution_ready` as the signal to begin coding immediately.
 
 By default, new execution slices are created under `slices/` unless `.skills/execution.json` overrides the location.
 
@@ -145,7 +145,8 @@ Example:
 ```json
 {
   "slice_dir": "slices",
-  "preferred_workflow": "TDD"
+  "preferred_workflow": "TDD",
+  "auto_start_implementation": true
 }
 ```
 
@@ -168,7 +169,8 @@ Current Phase 1 usage:
 - `skills/guide-planning/scripts/manage_planning.py` reads `.skills/planning.json` for `planning_dir` and maintains planning readiness metadata under `<feature_path>/.planning-meta.json`
 - `skills/breakdown/scripts/scaffold_breakdown.py` uses `.skills/planning.json` field `planning_dir` during scaffolding when the file is present
 - `skills/slice/scripts/bootstrap_slice.py` can initialize `.skills/execution.json` with the generic `slices/` default (or an explicit `--slice-dir`) before delegating to execution-layer tooling
-- `skills/guide-execution/scripts/manage_execution.py` reads `.skills/execution.json` for `slice_dir` and `preferred_workflow`
+- `skills/guide-execution/scripts/manage_execution.py` reads `.skills/execution.json` for `slice_dir`, `preferred_workflow`, and `auto_start_implementation`
+- when `auto_start_implementation` is `true`, `skills/guide-execution/scripts/manage_execution.py set-status <slice> blueprint_ready` auto-advances the slice into `execution_ready`
 - `skills/guide-execution/scripts/manage_execution.py` uses `branch_extract_pattern` during `add` when the file is present
 - `skills/commit/SKILL.md` documents how `commit_format` can override the generic default
 - `skills/create-pr/SKILL.md` documents how `pr_title_format`, `branch_extract_pattern`, and `id_pattern` can define stricter PR conventions

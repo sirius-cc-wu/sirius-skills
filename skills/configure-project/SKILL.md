@@ -42,6 +42,7 @@ Use these defaults unless the user asked for different values:
 - `planning_dir`: `docs/features`
 - `slice_dir`: `slices`
 - `preferred_workflow`: `TDD`
+- `auto_start_implementation`: `true`
 
 For `jira` mode, use these preset conventions unless the user supplies project-specific values:
 
@@ -77,7 +78,8 @@ python3 skills/configure-project/scripts/configure_project.py \
   --mode default \
   --planning-dir planning/features \
   --slice-dir specs \
-  --workflow TDD
+  --workflow TDD \
+  --auto-start-implementation
 ```
 
 ### 4. Validate the generated files

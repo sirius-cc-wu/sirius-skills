@@ -18,7 +18,7 @@ Installation and configuration form the repository integration layer. The `Makef
 - `make install` registers the managed skill set.
 - `make uninstall` removes only the managed skill names currently installed.
 - `manage_planning.py` reads `planning.json` for `planning_dir`.
-- `manage_execution.py` reads `execution.json` for `slice_dir` and `preferred_workflow`.
+- `manage_execution.py` reads `execution.json` for `slice_dir`, `preferred_workflow`, and `auto_start_implementation`.
 - `manage_execution.py`, `commit`, `create-pr`, and `close-slice` read `conventions.json` for naming and issue-link behavior.
 
 ## Constraints and Tradeoffs

@@ -17,6 +17,7 @@ The execution workflow is a centralized slice system. `guide-execution` manages 
 
 - `bootstrap_slice.py` can initialize `.skills/execution.json` and the slice registry before delegating to execution-layer tooling.
 - `manage_execution.py add` still creates the slice folder and metadata entry once execution bootstrap prerequisites exist.
+- `manage_execution.py set-status` can auto-advance `blueprint_ready` to `execution_ready` when `.skills/execution.json` enables `auto_start_implementation`, so the execution layer can continue directly into implementation.
 - `brief` owns `brief.md` and `checklists/requirements.md`.
 - `blueprint` owns `blueprint.md`, requirement traceability, and validation steps.
 - `review-execution` compares implementation results with the brief and plan.

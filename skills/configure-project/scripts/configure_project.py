@@ -12,6 +12,7 @@ from typing import Any
 DEFAULT_PLANNING_DIR = "docs/features"
 DEFAULT_SLICE_DIR = "slices"
 DEFAULT_WORKFLOW = "TDD"
+DEFAULT_AUTO_START_IMPLEMENTATION = True
 
 DEFAULT_JIRA_CONVENTIONS = {
     "issue_sliceer": "jira",
@@ -54,6 +55,15 @@ def parse_args() -> argparse.Namespace:
         help=f"Preferred workflow for .skills/execution.json (default: {DEFAULT_WORKFLOW}).",
     )
     parser.add_argument(
+        "--auto-start-implementation",
+        action=argparse.BooleanOptionalAction,
+        default=DEFAULT_AUTO_START_IMPLEMENTATION,
+        help=(
+            "Whether guide-execution should auto-advance from blueprint_ready into "
+            "execution_ready and begin implementation."
+        ),
+    )
+    parser.add_argument(
         "--issue-url-template",
         default=DEFAULT_JIRA_CONVENTIONS["issue_url_template"],
         help="Issue URL template for jira mode.",
@@ -86,11 +96,15 @@ def build_planning_config(existing: dict[str, Any], planning_dir: str) -> dict[s
 
 
 def build_execution_config(
-    existing: dict[str, Any], slice_dir: str, workflow: str
+    existing: dict[str, Any],
+    slice_dir: str,
+    workflow: str,
+    auto_start_implementation: bool,
 ) -> dict[str, Any]:
     updated = dict(existing)
     updated["slice_dir"] = slice_dir
     updated["preferred_workflow"] = workflow
+    updated["auto_start_implementation"] = auto_start_implementation
     return updated
 
 
@@ -123,7 +137,10 @@ def main() -> int:
 
     planning_config = build_planning_config(planning_existing, args.planning_dir)
     execution_config = build_execution_config(
-        execution_existing, args.slice_dir, args.workflow
+        execution_existing,
+        args.slice_dir,
+        args.workflow,
+        args.auto_start_implementation,
     )
     conventions_config = build_conventions_config(
         conventions_existing, args.mode, args.issue_url_template

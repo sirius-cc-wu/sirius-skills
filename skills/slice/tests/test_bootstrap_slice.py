@@ -36,7 +36,11 @@ def test_bootstrap_initializes_default_execution_registry(tmp_path, monkeypatch)
         )
     )
 
-    assert execution == {"slice_dir": "slices", "preferred_workflow": "TDD"}
+    assert execution == {
+        "slice_dir": "slices",
+        "preferred_workflow": "TDD",
+        "auto_start_implementation": True,
+    }
     assert registry["slices"][0]["id"] == "DEMO"
     assert metadata["status"] == "draft"
 

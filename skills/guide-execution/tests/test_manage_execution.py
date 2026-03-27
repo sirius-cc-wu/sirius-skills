@@ -44,6 +44,7 @@ def test_init_defaults_to_slices_directory(tmp_path, monkeypatch):
         (tmp_path / ".skills" / "execution.json").read_text(encoding="utf-8")
     )
     assert config["slice_dir"] == "slices"
+    assert config["auto_start_implementation"] is True
     assert not (tmp_path / ".specs").exists()
 
 
@@ -127,6 +128,69 @@ def test_closing_slice_records_closed_at_and_updates_registry(tmp_path, monkeypa
     assert registry["slices"][0]["status"] == "closed"
     assert registry["slices"][0]["closed_at"] == metadata["closed_at"]
     assert "| DEMO | Demo Feature | closed |" in readme
+
+
+def test_blueprint_ready_auto_starts_execution_when_enabled(
+    tmp_path, monkeypatch, capsys
+):
+    module = load_manage_specs_module()
+    monkeypatch.chdir(tmp_path)
+
+    assert run_cli(module, monkeypatch, "init", "slices") == 0
+    assert run_cli(module, monkeypatch, "add", "DEMO", "Demo Feature") == 0
+
+    slice_dir = tmp_path / "slices" / "DEMO-demo-feature"
+    (slice_dir / "brief.md").write_text("# brief\n", encoding="utf-8")
+    (slice_dir / "checklists").mkdir()
+    (slice_dir / "checklists" / "requirements.md").write_text(
+        "- [x] requirements complete\n", encoding="utf-8"
+    )
+    assert run_cli(module, monkeypatch, "set-status", "DEMO", "brief_ready") == 0
+
+    (slice_dir / "blueprint.md").write_text("# plan\n", encoding="utf-8")
+    assert run_cli(module, monkeypatch, "set-status", "DEMO", "blueprint_ready") == 0
+    captured = capsys.readouterr()
+
+    metadata = json.loads((slice_dir / ".slice-meta.json").read_text(encoding="utf-8"))
+    registry = json.loads((tmp_path / "slices" / "registry.json").read_text(encoding="utf-8"))
+
+    assert "auto-started implementation" in captured.out
+    assert metadata["status"] == "execution_ready"
+    assert registry["slices"][0]["status"] == "execution_ready"
+
+
+def test_blueprint_ready_stays_manual_for_legacy_config_without_auto_start_flag(
+    tmp_path, monkeypatch
+):
+    module = load_manage_specs_module()
+    monkeypatch.chdir(tmp_path)
+
+    skills_dir = tmp_path / ".skills"
+    skills_dir.mkdir()
+    (skills_dir / "execution.json").write_text(
+        json.dumps({"slice_dir": "slices", "preferred_workflow": "TDD"}) + "\n",
+        encoding="utf-8",
+    )
+
+    assert run_cli(module, monkeypatch, "init") == 0
+    assert run_cli(module, monkeypatch, "add", "DEMO", "Demo Feature") == 0
+
+    slice_dir = tmp_path / "slices" / "DEMO-demo-feature"
+    (slice_dir / "brief.md").write_text("# brief\n", encoding="utf-8")
+    (slice_dir / "checklists").mkdir()
+    (slice_dir / "checklists" / "requirements.md").write_text(
+        "- [x] requirements complete\n", encoding="utf-8"
+    )
+    assert run_cli(module, monkeypatch, "set-status", "DEMO", "brief_ready") == 0
+
+    (slice_dir / "blueprint.md").write_text("# plan\n", encoding="utf-8")
+    assert run_cli(module, monkeypatch, "set-status", "DEMO", "blueprint_ready") == 0
+
+    metadata = json.loads((slice_dir / ".slice-meta.json").read_text(encoding="utf-8"))
+    config = json.loads((skills_dir / "execution.json").read_text(encoding="utf-8"))
+
+    assert config["auto_start_implementation"] is False
+    assert metadata["status"] == "blueprint_ready"
 
 
 def test_legacy_markdown_registry_is_migrated_to_json(tmp_path, monkeypatch):

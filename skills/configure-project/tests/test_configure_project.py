@@ -37,7 +37,11 @@ def test_default_mode_writes_generic_config_files(tmp_path, monkeypatch):
     )
 
     assert planning == {"planning_dir": "docs/features"}
-    assert execution == {"slice_dir": "slices", "preferred_workflow": "TDD"}
+    assert execution == {
+        "slice_dir": "slices",
+        "preferred_workflow": "TDD",
+        "auto_start_implementation": True,
+    }
     assert conventions == {}
 
 

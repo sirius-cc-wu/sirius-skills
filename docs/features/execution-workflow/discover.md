@@ -29,6 +29,7 @@ The repository provides a slice-scoped execution workflow, but that workflow spa
 
 - Slice layout defaults to `slices/` unless `.skills/execution.json` overrides `slice_dir`.
 - Execution state machine is `draft -> brief_ready -> blueprint_ready -> execution_ready -> closed`.
+- When `.skills/execution.json` sets `auto_start_implementation` to `true`, reaching `blueprint_ready` should immediately hand off into implementation and advance the slice to `execution_ready`.
 - `guide-execution` owns readiness and registry state; teams should not invent extra registry states for day-to-day progress.
 - Closed slices retain `brief.md`, `blueprint.md`, and any legacy `slices.md`.
 - Relations such as `supersedes` and `replaces_partially` are durable metadata, not transient notes.
