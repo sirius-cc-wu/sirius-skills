@@ -15,8 +15,8 @@ The execution workflow is a centralized slice system. `execution-driver` manages
 
 ## Interfaces and Responsibilities
 
-- `manage_execution.py init` initializes `.skills/execution.json` and the slice registry.
-- `manage_execution.py add` creates a slice folder and metadata entry.
+- `bootstrap_slice.py` can initialize `.skills/execution.json` and the slice registry before delegating to execution-layer tooling.
+- `manage_execution.py add` still creates the slice folder and metadata entry once execution bootstrap prerequisites exist.
 - `brief` owns `brief.md` and `checklists/requirements.md`.
 - `blueprint` owns `blueprint.md`, requirement traceability, and validation steps.
 - `review-execution` compares implementation results with the brief and plan.
@@ -30,6 +30,7 @@ The execution workflow is a centralized slice system. `execution-driver` manages
 
 ## Validation Strategy
 
+- Use `skills/slice/tests/test_bootstrap_slice.py` for slice bootstrap behavior.
 - Use `skills/execution-driver/tests/test_manage_execution.py` for slice lifecycle and registry behavior.
 - Use `skills/close-slice/tests/test_close_slice.py` for publication and relation behavior.
 - Validate slices with `python3 skills/execution-driver/scripts/manage_execution.py validate-slice <slice-id>`.

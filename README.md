@@ -77,7 +77,7 @@ Preferred repo workflow:
 4. `ui-flow` adds optional UX or screen-flow artifacts.
 5. `breakdown` turns repo stories into directly executable work items and groups those slices into small demonstrable increments.
 6. `review-planning` reviews planning artifacts and slice definitions before execution slice bootstrap.
-7. `slice` bootstraps a slice-scoped execution slice and hands off to `execution-driver`.
+7. `slice` validates execution-ready input, bootstraps a slice-scoped execution slice, and hands off to `execution-driver`.
 8. `execution-driver` routes slice-scoped execution through `brief` to capture slice intent and acceptance, then through `blueprint` to produce the final execution artifact.
 9. `review-execution` checks implementation and validation outcomes against the slice-scoped execution artifacts before closure.
 10. `close-slice` closes completed execution slices and can optionally publish a project-local summary.
@@ -137,7 +137,7 @@ Example:
 
 Projects can add `.skills/conventions.json` in the repository root to describe their local conventions.
 
-Projects can add `.skills/execution.json` in the repository root to configure execution-slice layout for `execution-driver`.
+Projects can add `.skills/execution.json` in the repository root to configure execution-slice layout for `execution-driver` and `slice` bootstrap.
 
 Example:
 
@@ -166,6 +166,7 @@ Current Phase 1 usage:
 - planning-layer skills resolve `<feature_path>` from `.skills/planning.json` field `planning_dir` when the file is present, otherwise they default to `docs/features/<feature-slug>/`
 - `skills/planning-driver/scripts/manage_planning.py` reads `.skills/planning.json` for `planning_dir` and maintains planning readiness metadata under `<feature_path>/.planning-meta.json`
 - `skills/breakdown/scripts/scaffold_breakdown.py` uses `.skills/planning.json` field `planning_dir` during scaffolding when the file is present
+- `skills/slice/scripts/bootstrap_slice.py` can initialize `.skills/execution.json` with the generic `slices/` default (or an explicit `--slice-dir`) before delegating to execution-layer tooling
 - `skills/execution-driver/scripts/manage_execution.py` reads `.skills/execution.json` for `slice_dir` and `preferred_workflow`
 - `skills/execution-driver/scripts/manage_execution.py` uses `branch_extract_pattern` during `add` when the file is present
 - `skills/commit/SKILL.md` documents how `commit_format` can override the generic default

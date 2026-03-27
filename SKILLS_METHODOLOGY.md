@@ -189,7 +189,13 @@ planning-driver -> breakdown -> review-planning -> slice -> execution-driver
 `slice` should bootstrap a slice-scoped execution slice from the execution-ready work item, typically with:
 
 ```bash
-python3 skills/execution-driver/scripts/manage_execution.py add "<slice-id>" "<slice-name>"
+python3 skills/slice/scripts/bootstrap_slice.py "<slice-id>" "<slice-name>"
+```
+
+If execution config has not been initialized yet and the default `slices/` location is not the right fit, bootstrap the first slice with an explicit directory:
+
+```bash
+python3 skills/slice/scripts/bootstrap_slice.py --slice-dir "team-slices" "<slice-id>" "<slice-name>"
 ```
 
 ### 7. Execute with execution-driver
