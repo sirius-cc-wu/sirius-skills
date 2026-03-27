@@ -9,21 +9,22 @@ MANAGED_SKILLS := \
 	configure-project \
 	design \
 	discover \
-	planning-driver \
+	guide-planning \
 	blueprint \
 	review-execution \
 	review-planning \
 	simplify \
-	define \
+	guide-execution \
+	planning-driver \
 	execution-driver \
 	slice \
 	ui-flow
 
 install:
-	npx skills add "$(REPO_ROOT)/skills/execution-driver" $(COMMON_FLAGS)
+	npx skills add "$(REPO_ROOT)/skills/guide-execution" $(COMMON_FLAGS)
 	npx skills add "$(REPO_ROOT)/skills/brief" $(COMMON_FLAGS)
 	npx skills add "$(REPO_ROOT)/skills/blueprint" $(COMMON_FLAGS)
-	npx skills add "$(REPO_ROOT)/skills/planning-driver" $(COMMON_FLAGS)
+	npx skills add "$(REPO_ROOT)/skills/guide-planning" $(COMMON_FLAGS)
 	npx skills add "$(REPO_ROOT)/skills/discover" $(COMMON_FLAGS)
 	npx skills add "$(REPO_ROOT)/skills/design" $(COMMON_FLAGS)
 	npx skills add "$(REPO_ROOT)/skills/ui-flow" $(COMMON_FLAGS)

@@ -6,7 +6,7 @@ from pathlib import Path
 
 CLOSE_SLICE_PATH = Path(__file__).resolve().parents[1] / "scripts" / "close_slice.py"
 MANAGE_EXECUTION_PATH = (
-    Path(__file__).resolve().parents[2] / "execution-driver" / "scripts" / "manage_execution.py"
+    Path(__file__).resolve().parents[2] / "guide-execution" / "scripts" / "manage_execution.py"
 )
 
 

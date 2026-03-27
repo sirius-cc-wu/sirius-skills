@@ -1,0 +1,30 @@
+import importlib.util
+import json
+import sys
+from pathlib import Path
+
+
+SCRIPT_PATH = Path(__file__).resolve().parents[1] / "scripts" / "manage_planning.py"
+
+
+def load_module():
+    spec = importlib.util.spec_from_file_location("guide_manage_planning", SCRIPT_PATH)
+    module = importlib.util.module_from_spec(spec)
+    assert spec.loader is not None
+    spec.loader.exec_module(module)
+    return module
+
+
+def run_cli(module, monkeypatch, *args):
+    monkeypatch.setattr(sys, "argv", ["manage_planning.py", *args])
+    return module.main()
+
+
+def test_wrapper_runs_planning_init(tmp_path, monkeypatch):
+    module = load_module()
+    monkeypatch.chdir(tmp_path)
+
+    assert run_cli(module, monkeypatch, "init") == 0
+
+    config = json.loads((tmp_path / ".skills" / "planning.json").read_text(encoding="utf-8"))
+    assert config["planning_dir"] == "docs/features"

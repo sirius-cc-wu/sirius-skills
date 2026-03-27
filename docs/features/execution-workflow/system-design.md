@@ -2,7 +2,7 @@
 
 ## Overview
 
-The execution workflow is a centralized slice system. `execution-driver` manages slice registry state and readiness transitions, while `brief`, `plan`, `review-execution`, and `close-slice` own the slice-scoped artifacts and review outcomes.
+The execution workflow is a centralized slice system. `guide-execution` manages slice registry state and readiness transitions, while `brief`, `plan`, `review-execution`, and `close-slice` own the slice-scoped artifacts and review outcomes.
 
 ## Key Components
 
@@ -31,16 +31,17 @@ The execution workflow is a centralized slice system. `execution-driver` manages
 ## Validation Strategy
 
 - Use `skills/slice/tests/test_bootstrap_slice.py` for slice bootstrap behavior.
-- Use `skills/execution-driver/tests/test_manage_execution.py` for slice lifecycle and registry behavior.
+- Use `skills/execution-driver/tests/test_manage_execution.py` for deprecated alias coverage and lifecycle behavior.
+- Use `skills/guide-execution/tests/test_manage_execution_wrapper.py` for canonical wrapper coverage.
 - Use `skills/close-slice/tests/test_close_slice.py` for publication and relation behavior.
-- Validate slices with `python3 skills/execution-driver/scripts/manage_execution.py validate-slice <slice-id>`.
+- Validate slices with `python3 skills/guide-execution/scripts/manage_execution.py validate-slice <slice-id>`.
 
 ## PlantUML
 
 ```plantuml
 @startuml
 package "Execution Layer" {
-  [execution-driver]
+  [guide-execution]
   [brief]
   [blueprint]
   [review-execution]
@@ -53,13 +54,13 @@ file "brief.md" as Brief
 file "blueprint.md" as PlanDoc
 file "requirements.md" as Requirements
 
-[slice] --> [execution-driver]
-[execution-driver] --> Registry
-[execution-driver] --> Meta
-[execution-driver] --> [brief]
-[execution-driver] --> [blueprint]
-[execution-driver] --> [review-execution]
-[execution-driver] --> [close-slice]
+[slice] --> [guide-execution]
+[guide-execution] --> Registry
+[guide-execution] --> Meta
+[guide-execution] --> [brief]
+[guide-execution] --> [blueprint]
+[guide-execution] --> [review-execution]
+[guide-execution] --> [close-slice]
 [brief] --> Brief
 [brief] --> Requirements
 [blueprint] --> PlanDoc

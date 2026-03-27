@@ -29,13 +29,13 @@ The repository provides a slice-scoped execution workflow, but that workflow spa
 
 - Slice layout defaults to `slices/` unless `.skills/execution.json` overrides `slice_dir`.
 - Execution state machine is `draft -> brief_ready -> blueprint_ready -> execution_ready -> closed`.
-- `execution-driver` owns readiness and registry state; teams should not invent extra registry states for day-to-day progress.
+- `guide-execution` owns readiness and registry state; teams should not invent extra registry states for day-to-day progress.
 - Closed slices retain `brief.md`, `blueprint.md`, and any legacy `slices.md`.
 - Relations such as `supersedes` and `replaces_partially` are durable metadata, not transient notes.
 
 ## Confirmed Signals in Repo
 
-- `skills/execution-driver/scripts/manage_execution.py` manages registry, status updates, and relations.
+- `skills/guide-execution/scripts/manage_execution.py` manages registry, status updates, and relations.
 - `skills/brief/templates/brief-template.md` defines the slice brief structure.
 - `skills/blueprint/templates/plan-template.md` defines implementation packets and validation mapping.
 - `skills/close-slice/scripts/close_slice.py` publishes non-destructive closure summaries.

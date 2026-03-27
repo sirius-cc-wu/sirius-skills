@@ -28,7 +28,7 @@ Each skill is a directory containing:
 
 This project follows a **Spec-Driven Development (SDD)** lifecycle:
 
-1.  **Route Planning**: Use `planning-driver` to resolve the feature planning folder and route to the right planning skill.
+1.  **Route Planning**: Use `guide-planning` to resolve the feature planning folder and route to the right planning skill.
 2.  **Discover & Design**: Articulate intent, scope, and architecture before coding.
 3.  **Break Down**: Turn stories into execution-ready work items and increments.
 4.  **Review Planning**: Use `review-planning` to review planning artifacts before track bootstrap.

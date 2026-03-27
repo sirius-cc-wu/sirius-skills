@@ -162,6 +162,6 @@ When generating `slice-traceability.md`, start from `assets/slice-traceability-t
 - Do not create execution slices directly from vague stories.
 - Do not mirror external execution states inside feature planning docs.
 - Do not turn increments into execution states or spec-slice containers.
-- Do not turn `slice-planning.md` into a slice-scoped execution checklist; that belongs to `execution-driver` and `blueprint` later.
+- Do not turn `slice-planning.md` into a slice-scoped execution checklist; that belongs to `guide-execution` and `blueprint` later.
 - Do not mark work as parallel-safe unless overlap and integration risk are genuinely low.
 - If a slice still needs major replanning, split it again before handoff.

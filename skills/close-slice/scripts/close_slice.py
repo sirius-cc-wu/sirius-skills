@@ -26,14 +26,14 @@ def now_timestamp() -> str:
 def load_manage_specs_module():
     script_path = (
         Path(__file__).resolve().parents[2]
-        / "execution-driver"
+        / "guide-execution"
         / "scripts"
         / "manage_execution.py"
     )
     spec = importlib.util.spec_from_file_location("manage_execution", script_path)
     module = importlib.util.module_from_spec(spec)
     if spec.loader is None:
-        raise RuntimeError(f"Unable to load execution-driver tooling from {script_path}")
+        raise RuntimeError(f"Unable to load guide-execution tooling from {script_path}")
     spec.loader.exec_module(module)
     return module
 

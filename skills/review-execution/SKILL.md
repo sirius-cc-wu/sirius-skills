@@ -22,7 +22,7 @@ Use this skill after implementation and validation, and before `close-slice`, wh
 - the implementation diff or changed files
 - validation results, review notes, or PR context when available
 
-Resolve `<slice_path>` through `execution-driver`.
+Resolve `<slice_path>` through `guide-execution`.
 
 ## Required Output
 
@@ -33,7 +33,7 @@ Resolve `<slice_path>` through `execution-driver`.
 
 `review-execution` owns the review outcome and any durable updates needed in `brief.md`, `blueprint.md`, or upstream planning guidance when the review exposes context gaps.
 
-`execution-driver` should route into execution review, but it should not absorb the review itself or silently close slices without that owning review step.
+`guide-execution` should route into execution review, but it should not absorb the review itself or silently close slices without that owning review step.
 
 ## Review Rules
 
@@ -47,7 +47,7 @@ Resolve `<slice_path>` through `execution-driver`.
 
 ## Workflow
 
-1. Resolve the active slice with `execution-driver`.
+1. Resolve the active slice with `guide-execution`.
 2. Read `brief.md`, `blueprint.md`, changed code, and available validation evidence.
 3. Compare the implementation with the slice-scoped requirements and validation plan.
 4. Update `brief.md`, `blueprint.md`, or upstream planning guidance when the review reveals a durable context gap.
@@ -57,4 +57,4 @@ Resolve `<slice_path>` through `execution-driver`.
 
 - Do not close the slice while blocking review findings remain unresolved.
 - Do not treat code-only fixes as complete if the underlying brief or plan is still wrong.
-- Do not use slice metadata to mirror ad hoc execution states beyond the readiness model owned by `execution-driver`.
+- Do not use slice metadata to mirror ad hoc execution states beyond the readiness model owned by `guide-execution`.

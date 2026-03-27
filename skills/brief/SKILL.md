@@ -19,7 +19,7 @@ Use this skill to turn one execution-ready work item into a complete `brief.md`.
 - `<slice_path>/brief.md`
 - `<slice_path>/checklists/requirements.md`
 
-Resolve `<slice_path>` through `execution-driver`.
+Resolve `<slice_path>` through `guide-execution`.
 
 ## Artifact Ownership
 
@@ -28,7 +28,7 @@ Resolve `<slice_path>` through `execution-driver`.
 - `<slice_path>/brief.md`
 - `<slice_path>/checklists/requirements.md`
 
-`execution-driver` should resolve the active slice and enforce readiness gates, but it should not take over brief authoring that belongs to `brief`.
+`guide-execution` should resolve the active slice and enforce readiness gates, but it should not take over brief authoring that belongs to `brief`.
 
 ## Authoring Rules
 
@@ -57,7 +57,7 @@ Before handoff, confirm:
 5. Checklist is updated to reflect current status
 
 ## Workflow
-1. Resolve the active slice with `execution-driver`.
+1. Resolve the active slice with `guide-execution`.
 2. Fill `brief-template.md`.
 3. Create or update the requirements checklist.
 4. Run validation and revise if needed.

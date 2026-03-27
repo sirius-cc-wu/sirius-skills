@@ -2,7 +2,7 @@
 
 ## Overview
 
-The planning workflow is a feature-scoped orchestration layer. `planning-driver` maintains the planning registry and readiness metadata, while authoring skills own individual artifacts. The planning layer hands off only when a feature has been decomposed into execution-ready slices.
+The planning workflow is a feature-scoped orchestration layer. `guide-planning` maintains the planning registry and readiness metadata, while authoring skills own individual artifacts. The planning layer hands off only when a feature has been decomposed into execution-ready slices.
 
 ## Key Components
 
@@ -22,22 +22,23 @@ The planning workflow is a feature-scoped orchestration layer. `planning-driver`
 
 ## Constraints and Tradeoffs
 
-- Artifact ownership stays separated by skill instead of centralizing all writing in `planning-driver`.
+- Artifact ownership stays separated by skill instead of centralizing all writing in `guide-planning`.
 - Validation is mostly file-presence and non-empty-content based; semantic quality is enforced through skill guidance and review.
 - Planning remains repository-first, so reviewed planning artifacts hand off directly to slice bootstrap after breakdown.
 
 ## Validation Strategy
 
-- Use `skills/planning-driver/tests/test_manage_planning.py` for registry and state-gate behavior.
+- Use `skills/planning-driver/tests/test_manage_planning.py` for deprecated alias coverage and state-gate behavior.
+- Use `skills/guide-planning/tests/test_manage_planning_wrapper.py` for canonical wrapper coverage.
 - Use `skills/breakdown/tests/test_scaffold_breakdown.py` for deterministic scaffold behavior.
-- Validate each feature with `python3 skills/planning-driver/scripts/manage_planning.py validate-feature <feature-slug>`.
+- Validate each feature with `python3 skills/guide-planning/scripts/manage_planning.py validate-feature <feature-slug>`.
 
 ## PlantUML
 
 ```plantuml
 @startuml
 package "Planning Layer" {
-  [planning-driver]
+  [guide-planning]
   [discover]
   [design]
   [ui-flow]
@@ -53,18 +54,18 @@ file "system-design.md" as DesignDoc
 file "slice-planning.md" as SlicePlanning
 file "slice-traceability.md" as SliceTraceability
 
-[planning-driver] --> Registry
-[planning-driver] --> Meta
-[planning-driver] --> [discover]
-[planning-driver] --> [design]
-[planning-driver] --> [ui-flow]
-[planning-driver] --> [breakdown]
-[planning-driver] --> [review-planning]
-[planning-driver] --> [slice]
+[guide-planning] --> Registry
+[guide-planning] --> Meta
+[guide-planning] --> [discover]
+[guide-planning] --> [design]
+[guide-planning] --> [ui-flow]
+[guide-planning] --> [breakdown]
+[guide-planning] --> [review-planning]
+[guide-planning] --> [slice]
 [discover] --> Discover
 [design] --> DesignDoc
 [breakdown] --> SlicePlanning
 [breakdown] --> SliceTraceability
-[slice] --> [execution-driver]
+[slice] --> [guide-execution]
 @enduml
 ```

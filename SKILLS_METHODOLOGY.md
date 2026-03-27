@@ -4,12 +4,14 @@ This document explains **how to use the skills together**.
 
 `README.md` already covers the repository direction, the planning-layer skill names, and the generic-first boundary. This file is the operational guide: what to do first, what each phase should produce, and when to hand off to the next skill.
 
+Deprecated compatibility aliases remain available as `planning-driver` and `execution-driver`, but new guidance should use `guide-planning` and `guide-execution`.
+
 ## Core Idea
 
 Use a **two-layer workflow**:
 
 1. **Planning layer**
-   - `planning-driver`
+   - `guide-planning`
    - `discover`
    - `design`
    - `ui-flow` (optional)
@@ -17,21 +19,21 @@ Use a **two-layer workflow**:
    - `review-planning`
    - `slice`
 2. **Execution layer**
-   - `execution-driver`
+   - `guide-execution`
    - `brief`
    - `blueprint`
    - `review-execution`
    - `close-slice`
 
-The planning layer keeps scope, design, decomposition, and increment planning in repo documents, and `planning-driver` owns readiness and routing across those artifacts.
+The planning layer keeps scope, design, decomposition, and increment planning in repo documents, and `guide-planning` owns readiness and routing across those artifacts.
 
 The execution layer works one implementation-ready slice at a time.
 
 ## Recommended Workflow
 
-### 0. Route planning with planning-driver
+### 0. Route planning with guide-planning
 
-Use `planning-driver` as the planning-layer entrypoint when you need to decide what should happen next for a feature.
+Use `guide-planning` as the planning-layer entrypoint when you need to decide what should happen next for a feature.
 
 Its job is to:
 
@@ -52,7 +54,7 @@ Expected planning states:
 Recommended handoff:
 
 ```text
-planning-driver -> discover/design/ui-flow/breakdown/review-planning/slice
+guide-planning -> discover/design/ui-flow/breakdown/review-planning/slice
 ```
 
 ### 1. Discover the work
@@ -161,7 +163,7 @@ Review checkpoint:
 
 ### 5. Review planning outputs
 
-Use `review-planning` after the discovery, design, and breakdown artifacts are concrete enough to support execution handoff, typically when `planning-driver` routes the feature into readiness review.
+Use `review-planning` after the discovery, design, and breakdown artifacts are concrete enough to support execution handoff, typically when `guide-planning` routes the feature into readiness review.
 
 Its job is to:
 
@@ -173,7 +175,7 @@ Its job is to:
 Recommended handoff:
 
 ```text
-planning-driver -> discover -> design -> breakdown -> review-planning -> slice
+guide-planning -> discover -> design -> breakdown -> review-planning -> slice
 ```
 
 ### 6. Bootstrap one execution slice per planned slice
@@ -183,7 +185,7 @@ Once a planned slice is implementation-ready, use `slice`.
 Preferred handoff:
 
 ```text
-planning-driver -> breakdown -> review-planning -> slice -> execution-driver
+guide-planning -> breakdown -> review-planning -> slice -> guide-execution
 ```
 
 `slice` should bootstrap a slice-scoped execution slice from the execution-ready work item, typically with:
@@ -198,11 +200,11 @@ If execution config has not been initialized yet and the default `slices/` locat
 python3 skills/slice/scripts/bootstrap_slice.py --slice-dir "team-slices" "<slice-id>" "<slice-name>"
 ```
 
-### 7. Execute with execution-driver
+### 7. Execute with guide-execution
 
 After a slice exists, use the execution layer:
 
-1. `execution-driver`
+1. `guide-execution`
 2. `brief`
 3. `blueprint`
 
@@ -213,7 +215,7 @@ This is where slice-scoped execution artifacts are created:
 
 Within that execution layer:
 
-- `execution-driver` owns routing, readiness checks, and registry state
+- `guide-execution` owns routing, readiness checks, and registry state
 - `brief` creates the slice-scoped `brief.md` for one execution-ready work item, including acceptance and requirement context
 - `blueprint` converts that slice-scoped brief into the final implementation packets, traceability, validation steps, and PlantUML detailed design needed for execution
 - `review-execution` owns the explicit implementation-versus-brief review outcome
@@ -225,7 +227,7 @@ Keep the boundary explicit:
 - `breakdown` also owns increment grouping at the repo-planning level
 - `brief` owns `brief.md` and `checklists/requirements.md`
 - `blueprint` owns the final slice-scoped execution checklist for new slices
-- `execution-driver` should validate handoffs and route work, not take over artifact authoring from the other execution skills
+- `guide-execution` should validate handoffs and route work, not take over artifact authoring from the other execution skills
 
 Execution review loop:
 
@@ -235,7 +237,7 @@ Execution review loop:
 
 ### 8. Manage slice execution
 
-Use the repository and `execution-driver` for the actual slice lifecycle:
+Use the repository and `guide-execution` for the actual slice lifecycle:
 
 - track slice readiness and state transitions
 - record blockers or pauses in slice metadata
@@ -248,8 +250,8 @@ If review uncovers an intent gap or brief gap, feed that back into the relevant 
 
 Keep the responsibility boundary clear:
 
-- `planning-driver` owns **planning readiness**
-- `execution-driver` owns **execution readiness and registry state**
+- `guide-planning` owns **planning readiness**
+- `guide-execution` owns **execution readiness and registry state**
 
 ### 9. Review execution outcomes
 
@@ -316,9 +318,9 @@ Keep discovery, design, and breakdown artifacts in a feature-local planning fold
   blueprint.md
 ```
 
-The exact execution-slice path depends on `execution-driver` configuration. The important rule is that execution slices are **slice-scoped**, not feature-scoped, and remain centrally managed separately from the feature-local planning docs.
+The exact execution-slice path depends on `guide-execution` configuration. The important rule is that execution slices are **slice-scoped**, not feature-scoped, and remain centrally managed separately from the feature-local planning docs.
 
-By default, `execution-driver` uses `slices/`; projects can override that by setting
+By default, `guide-execution` uses `slices/`; projects can override that by setting
 `slice_dir` in `.skills/execution.json`.
 
 ## Diagram Conventions
@@ -364,7 +366,7 @@ In this example, the default planning layout `docs/features/habit-tracker/` hold
 - Keep stories and design in repo docs.
 - Keep increment plans in repo docs.
 - Keep executable work in the repository's slice system.
-- Do not use `execution-driver` for feature-level discovery or decomposition.
+- Do not use `guide-execution` for feature-level discovery or decomposition.
 - Do not use execution slices as increment containers; keep slices slice-scoped.
 - Do not use execution lifecycle states as spec-slice states.
 - Split work before bootstrapping a slice, not after.
@@ -379,4 +381,4 @@ Use this methodology when:
 - multiple implementation slices will come out of one project or feature
 - you want resumable execution with a separate slice system
 
-For small one-shot changes, you may skip most of the planning layer and go directly to `execution-driver` or straight implementation if no spec workflow is needed.
+For small one-shot changes, you may skip most of the planning layer and go directly to `guide-execution` or straight implementation if no spec workflow is needed.

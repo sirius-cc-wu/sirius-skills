@@ -34,8 +34,8 @@ useful generic default.
 
 Do not mix workflow responsibilities:
 
-- `planning-driver` owns planning readiness and registry state
-- `execution-driver` owns execution-slice readiness and registry state
+- `guide-planning` owns planning readiness and registry state
+- `guide-execution` owns execution-slice readiness and registry state
 - the execution layer owns slice lifecycle state within the repository
 
 Do not duplicate registry states inside execution-slice artifacts.
@@ -85,5 +85,5 @@ specific integration requires otherwise.
   changing behavior.
 - Keep edits small and aligned with the repo's generic-first design.
 - If you change config semantics, update docs and examples together.
-- If you touch `execution-driver`, keep `slices/`, registry behavior, and `.skills/`
+- If you touch `guide-execution`, keep `slices/`, registry behavior, and `.skills/`
   configuration consistent.

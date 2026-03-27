@@ -36,7 +36,7 @@ The repository is designed as a reusable skill collection, but successful adopti
 - `Makefile` defines `make install` and `make uninstall` using `npx skills add/remove`.
 - `README.md` documents generic-first workflow and config surfaces.
 - `AGENTS.md` emphasizes configuration over hardcoding and preserving ownership boundaries.
-- `skills/commit/`, `skills/create-pr/`, `skills/planning-driver/`, and `skills/execution-driver/` all consume configuration in controlled ways.
+- `skills/commit/`, `skills/create-pr/`, `skills/guide-planning/`, and `skills/guide-execution/` all consume configuration in controlled ways.
 
 ## Success Criteria
 

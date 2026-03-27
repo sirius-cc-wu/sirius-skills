@@ -28,14 +28,14 @@ The repository offers a planning-layer workflow, but its value is distributed ac
 ## Constraints
 
 - Planning docs default to `docs/features/<feature-slug>/` unless `.skills/planning.json` overrides `planning_dir`.
-- `planning-driver` owns planning readiness state only.
+- `guide-planning` owns planning readiness state only.
 - `discover`, `design`, `ui-flow`, `breakdown`, `review-planning`, and `slice` must stay feature-scoped.
 - Increments belong in planning artifacts, not execution-slice state.
 - Core skills should remain generic-first and repository-centric.
 
 ## Confirmed Signals in Repo
 
-- `skills/planning-driver/scripts/manage_planning.py` manages planning registry and `.planning-meta.json`.
+- `skills/guide-planning/scripts/manage_planning.py` manages planning registry and `.planning-meta.json`.
 - `skills/discover/SKILL.md` defines `discover.md` as the starting artifact.
 - `skills/design/SKILL.md` defines `system-design.md` with PlantUML diagrams.
 - `skills/breakdown/SKILL.md` and its templates define `slice-planning.md` and `slice-traceability.md`.

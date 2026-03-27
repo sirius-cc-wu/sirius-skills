@@ -8,7 +8,7 @@ from typing import Dict, List, Optional, Tuple
 
 EXECUTION_SCRIPT_PATH = (
     Path(__file__).resolve().parents[2]
-    / "execution-driver"
+    / "guide-execution"
     / "scripts"
     / "manage_execution.py"
 )
@@ -103,7 +103,7 @@ def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
         description=(
             "Bootstrap one execution slice from a ready work item while preserving "
-            "execution-driver as the owner of execution readiness and registry state."
+            "guide-execution as the owner of execution readiness and registry state."
         )
     )
     parser.add_argument(

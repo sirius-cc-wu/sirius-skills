@@ -1,6 +1,6 @@
 ---
 name: slice
-description: Validates execution-ready work, bootstraps a slice-scoped execution slice, and hands off to execution-driver.
+description: Validates execution-ready work, bootstraps a slice-scoped execution slice, and hands off to guide-execution.
 ---
 
 # Slice
@@ -13,7 +13,7 @@ Use this skill when a work item is small enough to execute, has passed planning 
 2. Ensure execution bootstrap prerequisites exist, including `.skills/execution.json` and the slice registry.
 3. Bootstrap one execution slice for that work item.
 4. Confirm the slice exists and is aligned with the repository's execution layout.
-5. Hand off to `execution-driver` for `brief.md` and `blueprint.md`.
+5. Hand off to `guide-execution` for `brief.md` and `blueprint.md`.
 
 ## Preferred Input
 
@@ -25,7 +25,7 @@ Use this skill when a work item is small enough to execute, has passed planning 
 - Prefer preserving the planned ID as the slice ID when available.
 - Do not create a slice for work that still needs major decomposition.
 - If execution config does not exist yet, initialize it with a repository-specific slice directory when known, otherwise use the generic default `slices/`.
-- Keep slice readiness and registry state in `execution-driver`.
+- Keep slice readiness and registry state in `guide-execution`.
 
 ## Preflight
 
@@ -52,12 +52,12 @@ python3 skills/slice/scripts/bootstrap_slice.py --slice-dir "team-slices" "<slic
 ```
 
 4. Confirm the new slice path exists and registry state is consistent.
-5. Hand off to `execution-driver` to author `brief.md` and `blueprint.md`.
+5. Hand off to `guide-execution` to author `brief.md` and `blueprint.md`.
 
-`bootstrap_slice.py` keeps the ownership boundary intact by delegating registry creation, slice creation, and validation to `skills/execution-driver/scripts/manage_execution.py`.
+`bootstrap_slice.py` keeps the ownership boundary intact by delegating registry creation, slice creation, and validation to `skills/guide-execution/scripts/manage_execution.py`.
 
 ## Guardrails
 
 - Do not invent extra slice states to mirror external execution lifecycles.
-- Do not skip `execution-driver`; this skill prepares and bootstraps the slice, but `execution-driver` still owns execution readiness and routing.
-- If the input work item is still too large, send it back to `planning-driver` or `breakdown`.
+- Do not skip `guide-execution`; this skill prepares and bootstraps the slice, but `guide-execution` still owns execution readiness and routing.
+- If the input work item is still too large, send it back to `guide-planning` or `breakdown`.

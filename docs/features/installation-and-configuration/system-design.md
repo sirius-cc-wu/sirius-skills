@@ -11,7 +11,7 @@ Installation and configuration form the repository integration layer. The `Makef
 - **Execution layout config**: `.skills/execution.json`
 - **Conventions config**: `.skills/conventions.json`
 - **Project-local extensions**: `.skills/plugins/`
-- **Consumer skills**: planning-driver, execution-driver, commit, create-pr, close-slice, breakdown
+- **Consumer skills**: guide-planning, guide-execution, commit, create-pr, close-slice, breakdown
 
 ## Interfaces and Responsibilities
 
@@ -45,8 +45,8 @@ folder ".skills/" {
   folder "plugins/"
 }
 component Makefile
-component "planning-driver" as Planning
-component "execution-driver" as Execution
+component "guide-planning" as Planning
+component "guide-execution" as Execution
 component commit
 component "create-pr" as CreatePR
 component breakdown

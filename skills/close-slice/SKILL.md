@@ -9,7 +9,7 @@ Use this skill when implementation is complete and you want to close an executio
 
 ## Responsibilities
 
-1. Resolve the target slice through `execution-driver`.
+1. Resolve the target slice through `guide-execution`.
 2. Validate that the slice is ready to close.
 3. Close the slice without moving or deleting the original artifacts.
 4. Optionally publish a summary entry into a project-local canonical doc such as `docs/slice-history.md` or `CHANGELOG.md`.
@@ -25,7 +25,7 @@ Use this skill when implementation is complete and you want to close an executio
 
 `close-slice` owns closure metadata updates and any optional publication outputs.
 
-`execution-driver` should route into closure only after execution review is complete; it should not replace `close-slice` by mutating closure state directly outside normal registry/status tooling.
+`guide-execution` should route into closure only after execution review is complete; it should not replace `close-slice` by mutating closure state directly outside normal registry/status tooling.
 
 ## Project-Local Publishing Configuration
 

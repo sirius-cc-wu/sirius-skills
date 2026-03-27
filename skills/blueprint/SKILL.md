@@ -27,13 +27,13 @@ Optional sections may cover:
 - detailed design diagrams
 - verification scenarios
 
-Resolve `<slice_path>` through `execution-driver`.
+Resolve `<slice_path>` through `guide-execution`.
 
 ## Artifact Ownership
 
 `blueprint` owns the content of `<slice_path>/blueprint.md`.
 
-`execution-driver` should route into planning and validate readiness, but it should not take over implementation-plan authoring that belongs to `blueprint`.
+`guide-execution` should route into planning and validate readiness, but it should not take over implementation-plan authoring that belongs to `blueprint`.
 
 ## Planning Rules
 
@@ -72,7 +72,7 @@ Failed gates must be fixed or explicitly waived with rationale.
 
 ## Workflow
 
-1. Resolve the active slice with `execution-driver`.
+1. Resolve the active slice with `guide-execution`.
 2. Read `brief.md` and scan the target codebase.
 3. Fill `plan-template.md`.
 4. Add PlantUML detailed design where structure, behavior, or state transitions need extra precision.
