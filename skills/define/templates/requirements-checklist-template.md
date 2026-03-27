@@ -1,6 +1,6 @@
 # Brief Checklist: [WORK ITEM NAME]
 
-**Purpose**: Validate that the task-scoped `brief.md` is ready for planning
+**Purpose**: Validate that the slice-scoped `brief.md` is ready for planning
 **Created**: [DATE]  
 **Brief**: [link to brief.md]
 
@@ -8,7 +8,7 @@
 
 - [ ] Focuses on the value and expected behavior of one work item
 - [ ] Avoids implementation details
-- [ ] Source story, slice, or task traceability is captured when available
+- [ ] Source story, slice, or slice traceability is captured when available
 - [ ] Required sections are complete
 
 ## Quality
@@ -21,7 +21,7 @@
 
 ## Scope Control
 
-- [ ] The work item fits one execution-ready track
+- [ ] The work item fits one execution-ready slice
 - [ ] Assumptions are documented
 - [ ] Dependencies are documented
 - [ ] Open clarifications are 0 preferred, or <= 3 if critical

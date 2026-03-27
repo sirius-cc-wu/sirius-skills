@@ -24,54 +24,54 @@ def test_init_creates_human_and_machine_registry(tmp_path, monkeypatch):
     module = load_manage_specs_module()
     monkeypatch.chdir(tmp_path)
 
-    assert run_cli(module, monkeypatch, "init", "tracks") == 0
+    assert run_cli(module, monkeypatch, "init", "slices") == 0
 
-    readme = (tmp_path / "tracks" / "README.md").read_text(encoding="utf-8")
-    registry = json.loads((tmp_path / "tracks" / "registry.json").read_text(encoding="utf-8"))
+    readme = (tmp_path / "slices" / "README.md").read_text(encoding="utf-8")
+    registry = json.loads((tmp_path / "slices" / "registry.json").read_text(encoding="utf-8"))
 
     assert "| ID | Feature | Status | Updated | Closed | Path |" in readme
-    assert registry["tracks"] == []
+    assert registry["slices"] == []
 
 
-def test_init_defaults_to_tracks_directory(tmp_path, monkeypatch):
+def test_init_defaults_to_slices_directory(tmp_path, monkeypatch):
     module = load_manage_specs_module()
     monkeypatch.chdir(tmp_path)
 
     assert run_cli(module, monkeypatch, "init") == 0
 
-    assert (tmp_path / "tracks" / "README.md").exists()
+    assert (tmp_path / "slices" / "README.md").exists()
     config = json.loads(
         (tmp_path / ".skills" / "execution.json").read_text(encoding="utf-8")
     )
-    assert config["track_dir"] == "tracks"
+    assert config["slice_dir"] == "slices"
     assert not (tmp_path / ".specs").exists()
 
 
-def test_add_creates_track_metadata_and_registry_entries(tmp_path, monkeypatch):
+def test_add_creates_slice_metadata_and_registry_entries(tmp_path, monkeypatch):
     module = load_manage_specs_module()
     monkeypatch.chdir(tmp_path)
 
-    assert run_cli(module, monkeypatch, "init", "tracks") == 0
+    assert run_cli(module, monkeypatch, "init", "slices") == 0
     assert run_cli(module, monkeypatch, "add", "DEMO", "Demo Feature") == 0
 
-    track_dir = tmp_path / "tracks" / "DEMO-demo-feature"
-    metadata = json.loads((track_dir / ".track-meta.json").read_text(encoding="utf-8"))
-    registry = json.loads((tmp_path / "tracks" / "registry.json").read_text(encoding="utf-8"))
+    slice_dir = tmp_path / "slices" / "DEMO-demo-feature"
+    metadata = json.loads((slice_dir / ".slice-meta.json").read_text(encoding="utf-8"))
+    registry = json.loads((tmp_path / "slices" / "registry.json").read_text(encoding="utf-8"))
 
-    assert metadata["track_id"] == "DEMO"
+    assert metadata["slice_id"] == "DEMO"
     assert metadata["status"] == "draft"
     assert metadata["created_at"]
     assert metadata["updated_at"]
-    assert registry["tracks"][0]["id"] == "DEMO"
-    assert registry["tracks"][0]["updated_at"] == metadata["updated_at"]
-    assert registry["tracks"][0]["closed_at"] is None
+    assert registry["slices"][0]["id"] == "DEMO"
+    assert registry["slices"][0]["updated_at"] == metadata["updated_at"]
+    assert registry["slices"][0]["closed_at"] is None
 
 
 def test_set_status_blocks_invalid_transition(tmp_path, monkeypatch, capsys):
     module = load_manage_specs_module()
     monkeypatch.chdir(tmp_path)
 
-    assert run_cli(module, monkeypatch, "init", "tracks") == 0
+    assert run_cli(module, monkeypatch, "init", "slices") == 0
     assert run_cli(module, monkeypatch, "add", "DEMO", "Demo Feature") == 0
 
     exit_code = run_cli(module, monkeypatch, "set-status", "DEMO", "closed")
@@ -85,11 +85,11 @@ def test_brief_ready_requires_requirements_checklist(tmp_path, monkeypatch, caps
     module = load_manage_specs_module()
     monkeypatch.chdir(tmp_path)
 
-    assert run_cli(module, monkeypatch, "init", "tracks") == 0
+    assert run_cli(module, monkeypatch, "init", "slices") == 0
     assert run_cli(module, monkeypatch, "add", "DEMO", "Demo Feature") == 0
 
-    track_dir = tmp_path / "tracks" / "DEMO-demo-feature"
-    (track_dir / "brief.md").write_text("# brief\n", encoding="utf-8")
+    slice_dir = tmp_path / "slices" / "DEMO-demo-feature"
+    (slice_dir / "brief.md").write_text("# brief\n", encoding="utf-8")
 
     exit_code = run_cli(module, monkeypatch, "set-status", "DEMO", "brief_ready")
     captured = capsys.readouterr()
@@ -98,34 +98,34 @@ def test_brief_ready_requires_requirements_checklist(tmp_path, monkeypatch, caps
     assert "missing_requirements_checklist" in captured.err
 
 
-def test_closing_track_records_closed_at_and_updates_registry(tmp_path, monkeypatch):
+def test_closing_slice_records_closed_at_and_updates_registry(tmp_path, monkeypatch):
     module = load_manage_specs_module()
     monkeypatch.chdir(tmp_path)
 
-    assert run_cli(module, monkeypatch, "init", "tracks") == 0
+    assert run_cli(module, monkeypatch, "init", "slices") == 0
     assert run_cli(module, monkeypatch, "add", "DEMO", "Demo Feature") == 0
 
-    track_dir = tmp_path / "tracks" / "DEMO-demo-feature"
-    (track_dir / "brief.md").write_text("# brief\n", encoding="utf-8")
-    (track_dir / "checklists").mkdir()
-    (track_dir / "checklists" / "requirements.md").write_text(
+    slice_dir = tmp_path / "slices" / "DEMO-demo-feature"
+    (slice_dir / "brief.md").write_text("# brief\n", encoding="utf-8")
+    (slice_dir / "checklists").mkdir()
+    (slice_dir / "checklists" / "requirements.md").write_text(
         "- [x] requirements complete\n", encoding="utf-8"
     )
     assert run_cli(module, monkeypatch, "set-status", "DEMO", "brief_ready") == 0
 
-    (track_dir / "plan.md").write_text("# plan\n", encoding="utf-8")
-    assert run_cli(module, monkeypatch, "set-status", "DEMO", "plan_ready") == 0
+    (slice_dir / "blueprint.md").write_text("# plan\n", encoding="utf-8")
+    assert run_cli(module, monkeypatch, "set-status", "DEMO", "blueprint_ready") == 0
     assert run_cli(module, monkeypatch, "set-status", "DEMO", "execution_ready") == 0
     assert run_cli(module, monkeypatch, "set-status", "DEMO", "closed") == 0
 
-    metadata = json.loads((track_dir / ".track-meta.json").read_text(encoding="utf-8"))
-    registry = json.loads((tmp_path / "tracks" / "registry.json").read_text(encoding="utf-8"))
-    readme = (tmp_path / "tracks" / "README.md").read_text(encoding="utf-8")
+    metadata = json.loads((slice_dir / ".slice-meta.json").read_text(encoding="utf-8"))
+    registry = json.loads((tmp_path / "slices" / "registry.json").read_text(encoding="utf-8"))
+    readme = (tmp_path / "slices" / "README.md").read_text(encoding="utf-8")
 
     assert metadata["status"] == "closed"
     assert metadata["closed_at"]
-    assert registry["tracks"][0]["status"] == "closed"
-    assert registry["tracks"][0]["closed_at"] == metadata["closed_at"]
+    assert registry["slices"][0]["status"] == "closed"
+    assert registry["slices"][0]["closed_at"] == metadata["closed_at"]
     assert "| DEMO | Demo Feature | closed |" in readme
 
 
@@ -135,12 +135,12 @@ def test_legacy_markdown_registry_is_migrated_to_json(tmp_path, monkeypatch):
 
     (tmp_path / ".skills").mkdir()
     (tmp_path / ".skills" / "execution.json").write_text(
-        json.dumps({"track_dir": "specs", "preferred_workflow": "TDD"}) + "\n",
+        json.dumps({"slice_dir": "specs", "preferred_workflow": "TDD"}) + "\n",
         encoding="utf-8",
     )
     (tmp_path / "specs").mkdir()
     (tmp_path / "specs" / "README.md").write_text(
-        "# Track Registry\n\n"
+        "# Slice Registry\n\n"
         "| ID | Feature | Status | Path |\n"
         "|---|---|---|---|\n"
         "| DEMO | Demo Feature | draft | specs/DEMO-demo-feature/ |\n",
@@ -151,24 +151,24 @@ def test_legacy_markdown_registry_is_migrated_to_json(tmp_path, monkeypatch):
 
     registry = json.loads((tmp_path / "specs" / "registry.json").read_text(encoding="utf-8"))
     assert rows[0]["id"] == "DEMO"
-    assert registry["tracks"][0]["id"] == "DEMO"
+    assert registry["slices"][0]["id"] == "DEMO"
 
 
-def test_validate_track_reports_missing_track_metadata(tmp_path, monkeypatch, capsys):
+def test_validate_slice_reports_missing_slice_metadata(tmp_path, monkeypatch, capsys):
     module = load_manage_specs_module()
     monkeypatch.chdir(tmp_path)
 
-    assert run_cli(module, monkeypatch, "init", "tracks") == 0
+    assert run_cli(module, monkeypatch, "init", "slices") == 0
     assert run_cli(module, monkeypatch, "add", "DEMO", "Demo Feature") == 0
 
-    track_dir = tmp_path / "tracks" / "DEMO-demo-feature"
-    (track_dir / ".track-meta.json").unlink()
+    slice_dir = tmp_path / "slices" / "DEMO-demo-feature"
+    (slice_dir / ".slice-meta.json").unlink()
 
-    exit_code = run_cli(module, monkeypatch, "validate-track", "DEMO")
+    exit_code = run_cli(module, monkeypatch, "validate-slice", "DEMO")
     captured = capsys.readouterr()
 
     assert exit_code == 3
-    assert "missing_track_metadata" in captured.out
+    assert "missing_slice_metadata" in captured.out
 
 
 def test_add_requires_execution_driver_config(tmp_path, monkeypatch, capsys):
@@ -186,7 +186,7 @@ def test_add_relation_records_reciprocal_scope_and_registry(tmp_path, monkeypatc
     module = load_manage_specs_module()
     monkeypatch.chdir(tmp_path)
 
-    assert run_cli(module, monkeypatch, "init", "tracks") == 0
+    assert run_cli(module, monkeypatch, "init", "slices") == 0
     assert run_cli(module, monkeypatch, "add", "OLD", "Old Feature") == 0
     assert run_cli(module, monkeypatch, "add", "NEW", "New Feature") == 0
 
@@ -209,40 +209,40 @@ def test_add_relation_records_reciprocal_scope_and_registry(tmp_path, monkeypatc
     )
 
     new_meta = json.loads(
-        (tmp_path / "tracks" / "NEW-new-feature" / ".track-meta.json").read_text(
+        (tmp_path / "slices" / "NEW-new-feature" / ".slice-meta.json").read_text(
             encoding="utf-8"
         )
     )
     old_meta = json.loads(
-        (tmp_path / "tracks" / "OLD-old-feature" / ".track-meta.json").read_text(
+        (tmp_path / "slices" / "OLD-old-feature" / ".slice-meta.json").read_text(
             encoding="utf-8"
         )
     )
-    registry = json.loads((tmp_path / "tracks" / "registry.json").read_text(encoding="utf-8"))
+    registry = json.loads((tmp_path / "slices" / "registry.json").read_text(encoding="utf-8"))
 
     assert new_meta["relations"][0]["type"] == "supersedes"
-    assert new_meta["relations"][0]["target_track"] == "OLD"
+    assert new_meta["relations"][0]["target_slice"] == "OLD"
     assert new_meta["relations"][0]["scope"]["story_title"] == "Story 2 - Old flow"
     assert new_meta["relations"][0]["scope"]["requirement_ids"] == ["FR-002"]
     assert old_meta["relations"][0]["type"] == "superseded_by"
-    assert old_meta["relations"][0]["target_track"] == "NEW"
-    assert registry["tracks"][1]["relations"][0]["type"] == "supersedes"
+    assert old_meta["relations"][0]["target_slice"] == "NEW"
+    assert registry["slices"][1]["relations"][0]["type"] == "supersedes"
 
 
 def test_audit_relations_reports_missing_reciprocal(tmp_path, monkeypatch):
     module = load_manage_specs_module()
     monkeypatch.chdir(tmp_path)
 
-    assert run_cli(module, monkeypatch, "init", "tracks") == 0
+    assert run_cli(module, monkeypatch, "init", "slices") == 0
     assert run_cli(module, monkeypatch, "add", "OLD", "Old Feature") == 0
     assert run_cli(module, monkeypatch, "add", "NEW", "New Feature") == 0
     assert run_cli(module, monkeypatch, "add-relation", "NEW", "supersedes", "OLD") == 0
 
-    old_meta_path = tmp_path / "tracks" / "OLD-old-feature" / ".track-meta.json"
+    old_meta_path = tmp_path / "slices" / "OLD-old-feature" / ".slice-meta.json"
     old_meta = json.loads(old_meta_path.read_text(encoding="utf-8"))
     old_meta["relations"] = []
     old_meta_path.write_text(json.dumps(old_meta, indent=2) + "\n", encoding="utf-8")
 
-    exit_code = run_cli(module, monkeypatch, "audit-relations", "--track", "NEW")
+    exit_code = run_cli(module, monkeypatch, "audit-relations", "--slice", "NEW")
 
     assert exit_code == 3

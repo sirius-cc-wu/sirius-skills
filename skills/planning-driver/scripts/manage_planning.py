@@ -25,7 +25,7 @@ STATUS_SEQUENCE = [
     "design_ready",
     "breakdown_ready",
     "planning_reviewed",
-    "track_ready",
+    "slice_ready",
 ]
 VALID_STATUSES = set(STATUS_SEQUENCE)
 STATUS_ALIASES = {
@@ -38,7 +38,7 @@ STATUS_ALIASES = {
     "review_ready": "planning_reviewed",
     "planning_reviewed": "planning_reviewed",
     "reviewed": "planning_reviewed",
-    "track_ready": "track_ready",
+    "slice_ready": "slice_ready",
 }
 
 
@@ -104,15 +104,15 @@ def normalize_review_note(value: object) -> Optional[str]:
     return cleaned or None
 
 
-def normalize_task_ids(value: object) -> List[str]:
+def normalize_slice_ids(value: object) -> List[str]:
     if value is None or value == "":
         return []
     if not isinstance(value, list):
-        raise RuntimeError("Ready task IDs must be stored as a list.")
+        raise RuntimeError("Ready slice IDs must be stored as a list.")
     normalized: List[str] = []
     for item in value:
         if not isinstance(item, str) or not item.strip():
-            raise RuntimeError("Ready task IDs must contain non-empty strings.")
+            raise RuntimeError("Ready slice IDs must contain non-empty strings.")
         normalized.append(item.strip())
     return list(dict.fromkeys(normalized))
 
@@ -281,7 +281,7 @@ def build_metadata(feature_slug: str, requires_ui_flow: bool = False) -> Dict[st
         "updated_at": timestamp,
         "requires_ui_flow": requires_ui_flow,
         "review_note": None,
-        "ready_task_ids": [],
+        "ready_slice_ids": [],
     }
 
 
@@ -304,7 +304,7 @@ def normalize_metadata(payload: object) -> Dict[str, object]:
         "updated_at": normalize_optional_timestamp(payload.get("updated_at")) or now_timestamp(),
         "requires_ui_flow": requires_ui_flow,
         "review_note": normalize_review_note(payload.get("review_note")),
-        "ready_task_ids": normalize_task_ids(payload.get("ready_task_ids")),
+        "ready_slice_ids": normalize_slice_ids(payload.get("ready_slice_ids")),
     }
 
 
@@ -350,7 +350,7 @@ def find_feature(rows: List[Dict[str, object]], selector: str) -> Optional[Dict[
 def find_active_feature(rows: List[Dict[str, object]]) -> Optional[Dict[str, object]]:
     if not rows:
         return None
-    open_rows = [row for row in rows if row["status"] != "track_ready"]
+    open_rows = [row for row in rows if row["status"] != "slice_ready"]
     candidates = open_rows or rows
     return max(candidates, key=lambda row: (row.get("updated_at") or "", row["feature"]))
 
@@ -394,10 +394,10 @@ def validate_feature_state(feature_dir: str, metadata: Dict[str, object]) -> Tup
             record_check("ui_design", ok, detail)
 
     if status_index >= STATUS_SEQUENCE.index("breakdown_ready"):
-        ok, detail = validate_required_file(feature_dir, "task-planning.md")
-        record_check("task_planning", ok, detail)
-        ok, detail = validate_required_file(feature_dir, "task-traceability.md")
-        record_check("task_traceability", ok, detail)
+        ok, detail = validate_required_file(feature_dir, "slice-planning.md")
+        record_check("slice_planning", ok, detail)
+        ok, detail = validate_required_file(feature_dir, "slice-traceability.md")
+        record_check("slice_traceability", ok, detail)
 
     if status_index >= STATUS_SEQUENCE.index("planning_reviewed"):
         review_note = metadata.get("review_note")
@@ -408,15 +408,15 @@ def validate_feature_state(feature_dir: str, metadata: Dict[str, object]) -> Tup
             "Planning review note recorded." if ok else "Planning review requires a non-empty review note.",
         )
 
-    if status_index >= STATUS_SEQUENCE.index("track_ready"):
-        task_ids = metadata.get("ready_task_ids")
-        ok = isinstance(task_ids, list) and len(task_ids) > 0
+    if status_index >= STATUS_SEQUENCE.index("slice_ready"):
+        slice_ids = metadata.get("ready_slice_ids")
+        ok = isinstance(slice_ids, list) and len(slice_ids) > 0
         record_check(
-            "ready_task_ids",
+            "ready_slice_ids",
             ok,
-            "Ready task IDs recorded for track bootstrap."
+            "Ready slice IDs recorded for slice bootstrap."
             if ok
-            else "Track readiness requires at least one ready task ID.",
+            else "Slice readiness requires at least one ready slice ID.",
         )
 
     return not issues, issues, checks
@@ -458,7 +458,7 @@ def update_feature_status(
     status: str,
     force: bool = False,
     review_note: Optional[str] = None,
-    task_ids: Optional[List[str]] = None,
+    slice_ids: Optional[List[str]] = None,
     requires_ui_flow: Optional[bool] = None,
 ) -> Tuple[bool, str]:
     feature_dir = feature_dir_for_row(feature)
@@ -477,8 +477,8 @@ def update_feature_status(
     updated_metadata["updated_at"] = now_timestamp()
     if review_note is not None:
         updated_metadata["review_note"] = normalize_review_note(review_note)
-    if task_ids is not None:
-        updated_metadata["ready_task_ids"] = normalize_task_ids(task_ids)
+    if slice_ids is not None:
+        updated_metadata["ready_slice_ids"] = normalize_slice_ids(slice_ids)
     if requires_ui_flow is not None:
         updated_metadata["requires_ui_flow"] = requires_ui_flow
 
@@ -555,7 +555,7 @@ def cmd_set_status(args: argparse.Namespace) -> int:
         status,
         force=args.force,
         review_note=args.review_note,
-        task_ids=args.task_id if args.task_id else None,
+        slice_ids=args.slice_id if args.slice_id else None,
         requires_ui_flow=requires_ui_flow,
     )
     stream = sys.stdout if success else sys.stderr
@@ -617,10 +617,10 @@ def build_parser() -> argparse.ArgumentParser:
         help="Readiness note to persist when planning review is complete.",
     )
     set_p.add_argument(
-        "--task-id",
+        "--slice-id",
         action="append",
         default=[],
-        help="Ready task ID for track bootstrap. Repeatable.",
+        help="Ready slice ID for slice bootstrap. Repeatable.",
     )
     ui_group = set_p.add_mutually_exclusive_group()
     ui_group.add_argument(

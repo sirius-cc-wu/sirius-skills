@@ -1,6 +1,6 @@
 # Implementation Plan: [WORK ITEM NAME]
 
-**Track**: `[ID-work-item-name]`  
+**Slice**: `[ID-work-item-name]`  
 **Date**: [DATE]  
 **Status**: Draft
 **Spec**: [link to brief.md]
@@ -81,7 +81,7 @@
 
 ```plantuml
 @startuml
-' Replace with a task-scoped class, sequence, state, or activity diagram
+' Replace with a slice-scoped class, sequence, state, or activity diagram
 @enduml
 ```
 

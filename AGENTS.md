@@ -35,10 +35,10 @@ useful generic default.
 Do not mix workflow responsibilities:
 
 - `planning-driver` owns planning readiness and registry state
-- `execution-driver` owns execution-track readiness and registry state
-- the execution tracker owns task lifecycle
+- `execution-driver` owns execution-slice readiness and registry state
+- the execution tracker owns slice lifecycle
 
-Do not duplicate execution-tracker lifecycle states inside execution-track state.
+Do not duplicate execution-tracker lifecycle states inside execution-slice state.
 
 ### Treat IDs as opaque
 
@@ -85,5 +85,5 @@ specific integration requires otherwise.
   changing behavior.
 - Keep edits small and aligned with the repo's generic-first design.
 - If you change config semantics, update docs and examples together.
-- If you touch `execution-driver`, keep `tracks/`, registry behavior, and `.skills/`
+- If you touch `execution-driver`, keep `slices/`, registry behavior, and `.skills/`
   configuration consistent.

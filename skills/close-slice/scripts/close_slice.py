@@ -9,8 +9,8 @@ from typing import Dict, List, Optional, Tuple
 
 
 DEFAULT_CONFIG_PATH = Path(".skills/plugins/spec-publish.json")
-DEFAULT_DOCUMENT_TITLE = "Execution Track History"
-DEFAULT_SECTION_TITLE = "Closed Tracks"
+DEFAULT_DOCUMENT_TITLE = "Execution Slice History"
+DEFAULT_SECTION_TITLE = "Closed Slices"
 OUTGOING_RELATION_TYPES = {
     "supersedes",
     "invalidates",
@@ -63,18 +63,18 @@ def load_publish_config(config_path: Path) -> Dict[str, str]:
     return normalized
 
 
-def resolve_track(module, selector: Optional[str]) -> Tuple[List[Dict[str, object]], Dict[str, object]]:
+def resolve_slice(module, selector: Optional[str]) -> Tuple[List[Dict[str, object]], Dict[str, object]]:
     rows = module.parse_registry()
-    track = module.resolve_track(rows, selector) if selector else module.find_active_track(rows)
-    if not track:
+    slice = module.resolve_slice(rows, selector) if selector else module.find_active_slice(rows)
+    if not slice:
         if selector:
-            raise RuntimeError(f"Track not found: {selector}")
-        raise RuntimeError("No active track found.")
-    return rows, track
+            raise RuntimeError(f"Slice not found: {selector}")
+        raise RuntimeError("No active slice found.")
+    return rows, slice
 
 
 def normalize_relation_request(
-    module, relation_type: str, target_track: str
+    module, relation_type: str, target_slice: str
 ) -> Tuple[str, str]:
     normalized_type = module.normalize_relation_type(relation_type)
     if normalized_type not in OUTGOING_RELATION_TYPES:
@@ -82,29 +82,29 @@ def normalize_relation_request(
             "Only outgoing relation types are supported here: "
             f"{sorted(OUTGOING_RELATION_TYPES)}"
         )
-    return normalized_type, target_track
+    return normalized_type, target_slice
 
 
-def ensure_track_closed(
-    module, rows: List[Dict[str, object]], track: Dict[str, object], force: bool
+def ensure_slice_closed(
+    module, rows: List[Dict[str, object]], slice: Dict[str, object], force: bool
 ) -> Tuple[List[Dict[str, object]], Dict[str, object]]:
-    status = module.normalize_status(str(track["status"]))
+    status = module.normalize_status(str(slice["status"]))
     if status == "closed":
         refreshed_rows = module.parse_registry()
-        refreshed_track = module.resolve_track(refreshed_rows, str(track["id"]))
-        if not refreshed_track:
-            raise RuntimeError(f"Track disappeared after refresh: {track['id']}")
-        return refreshed_rows, refreshed_track
+        refreshed_slice = module.resolve_slice(refreshed_rows, str(slice["id"]))
+        if not refreshed_slice:
+            raise RuntimeError(f"Slice disappeared after refresh: {slice['id']}")
+        return refreshed_rows, refreshed_slice
 
-    success, message = module.update_track_status(rows, track, "closed", force=force)
+    success, message = module.update_slice_status(rows, slice, "closed", force=force)
     if not success:
         raise RuntimeError(message)
 
     refreshed_rows = module.parse_registry()
-    refreshed_track = module.resolve_track(refreshed_rows, str(track["id"]))
-    if not refreshed_track:
-        raise RuntimeError(f"Track disappeared after close: {track['id']}")
-    return refreshed_rows, refreshed_track
+    refreshed_slice = module.resolve_slice(refreshed_rows, str(slice["id"]))
+    if not refreshed_slice:
+        raise RuntimeError(f"Slice disappeared after close: {slice['id']}")
+    return refreshed_rows, refreshed_slice
 
 
 def read_text_if_exists(path: Path) -> str:
@@ -113,8 +113,8 @@ def read_text_if_exists(path: Path) -> str:
     return path.read_text(encoding="utf-8")
 
 
-def resolve_brief_path(track_path: Path) -> Path:
-    return track_path / "brief.md"
+def resolve_brief_path(slice_path: Path) -> Path:
+    return slice_path / "brief.md"
 
 
 def normalize_list_item(stripped: str) -> Optional[str]:
@@ -218,7 +218,7 @@ def extract_nested_list_after_label(markdown: str, label: str, limit: int = 4) -
 
 
 def extract_verification_summary(
-    plan_text: str, tasks_text: str, limit: int = 6
+    plan_text: str, slices_text: str, limit: int = 6
 ) -> List[str]:
     items: List[str] = []
     items.extend(extract_nested_list_after_label(plan_text, "- Validation:", limit=limit))
@@ -230,9 +230,9 @@ def extract_verification_summary(
         )
     )
     items.extend(
-        extract_keyed_values(tasks_text, prefixes=["- Validation approach:"], limit=limit)
+        extract_keyed_values(slices_text, prefixes=["- Validation approach:"], limit=limit)
     )
-    items.extend(extract_list_section(tasks_text, "7. exit criteria", limit=limit))
+    items.extend(extract_list_section(slices_text, "7. exit criteria", limit=limit))
     return dedupe_preserve_order(items)[:limit]
 
 
@@ -293,10 +293,10 @@ def render_relation_summary(metadata: Dict[str, object]) -> List[str]:
         if not isinstance(relation, dict):
             continue
         relation_type = relation.get("type")
-        target_track = relation.get("target_track")
-        if relation_type not in OUTGOING_RELATION_TYPES or not isinstance(target_track, str):
+        target_slice = relation.get("target_slice")
+        if relation_type not in OUTGOING_RELATION_TYPES or not isinstance(target_slice, str):
             continue
-        summary = f"{relation_type} `{target_track}`"
+        summary = f"{relation_type} `{target_slice}`"
         scope_text = render_relation_scope(relation.get("scope", {}))
         if scope_text:
             summary += f" ({scope_text})"
@@ -305,7 +305,7 @@ def render_relation_summary(metadata: Dict[str, object]) -> List[str]:
 
 
 def render_publication_entry(
-    track: Dict[str, object],
+    slice: Dict[str, object],
     metadata: Dict[str, object],
     issue_reference: Optional[str],
     requirements: List[str],
@@ -313,18 +313,18 @@ def render_publication_entry(
     relation_summary: List[str],
     verification_summary: List[str],
 ) -> str:
-    track_path = Path(str(track["path"]).rstrip("/"))
-    artifacts = [f"`{resolve_brief_path(track_path)}`", f"`{track_path / 'plan.md'}`"]
-    tasks_path = track_path / "tasks.md"
-    if tasks_path.exists():
-        artifacts.append(f"`{tasks_path}`")
+    slice_path = Path(str(slice["path"]).rstrip("/"))
+    artifacts = [f"`{resolve_brief_path(slice_path)}`", f"`{slice_path / 'blueprint.md'}`"]
+    slices_path = slice_path / "slices.md"
+    if slices_path.exists():
+        artifacts.append(f"`{slices_path}`")
 
-    closed_at = str(track.get("closed_at") or metadata.get("closed_at") or now_timestamp())
+    closed_at = str(slice.get("closed_at") or metadata.get("closed_at") or now_timestamp())
     closed_day = closed_at.split("T", 1)[0]
     lines = [
-        f"### {closed_day} — {track['feature']} (`{track['id']}`)",
+        f"### {closed_day} — {slice['feature']} (`{slice['id']}`)",
         "",
-        f"- Track: `{track['id']}`",
+        f"- Slice: `{slice['id']}`",
         f"- Closed: `{closed_at}`",
     ]
 
@@ -343,7 +343,7 @@ def render_publication_entry(
         lines.extend([f"  - {item}" for item in success_criteria])
 
     if relation_summary:
-        lines.append("- Track relations:")
+        lines.append("- Slice relations:")
         lines.extend([f"  - {item}" for item in relation_summary])
 
     if verification_summary:
@@ -371,11 +371,11 @@ def upsert_publication_entry(
     target_file: Path,
     document_title: str,
     section_title: str,
-    track_id: str,
+    slice_id: str,
     entry: str,
 ) -> None:
-    start_marker = f"<!-- spec-publish:{track_id}:start -->"
-    end_marker = f"<!-- spec-publish:{track_id}:end -->"
+    start_marker = f"<!-- spec-publish:{slice_id}:start -->"
+    end_marker = f"<!-- spec-publish:{slice_id}:end -->"
     wrapped_entry = f"{start_marker}\n{entry}{end_marker}\n"
 
     content = ensure_document_scaffold(
@@ -400,13 +400,13 @@ def upsert_publication_entry(
 
 def update_publication_metadata(
     module,
-    track: Dict[str, object],
+    slice: Dict[str, object],
     target_file: Path,
     document_title: str,
     section_title: str,
 ) -> Dict[str, object]:
-    track_path = Path(str(track["path"]).rstrip("/"))
-    metadata = module.load_track_metadata(str(track_path))
+    slice_path = Path(str(slice["path"]).rstrip("/"))
+    metadata = module.load_slice_metadata(str(slice_path))
     publications = metadata.get("publications")
     if not isinstance(publications, list):
         publications = []
@@ -432,21 +432,21 @@ def update_publication_metadata(
         retained.append(publication_record)
 
     metadata["publications"] = retained
-    module.write_track_metadata(str(track_path), metadata)
+    module.write_slice_metadata(str(slice_path), metadata)
     return metadata
 
 
 def build_result(
-    track: Dict[str, object],
+    slice: Dict[str, object],
     published_to: Optional[Path],
     metadata: Dict[str, object],
 ) -> Dict[str, object]:
     result = {
-        "track_id": track["id"],
-        "feature": track["feature"],
-        "status": track["status"],
-        "path": track["path"],
-        "closed_at": track.get("closed_at"),
+        "slice_id": slice["id"],
+        "feature": slice["feature"],
+        "status": slice["status"],
+        "path": slice["path"],
+        "closed_at": slice.get("closed_at"),
     }
     if published_to is not None:
         result["published_to"] = str(published_to)
@@ -461,12 +461,12 @@ def build_result(
 
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser()
-    parser.add_argument("--track", help="Track ID, folder name, or path. Defaults to active track.")
+    parser.add_argument("--slice", help="Slice ID, folder name, or path. Defaults to active slice.")
     parser.add_argument(
         "--relate",
         action="append",
         nargs=2,
-        metavar=("TYPE", "TRACK"),
+        metavar=("TYPE", "SLICE"),
         help="Record an explicit impact relation such as supersedes OLD-123. Repeatable.",
     )
     parser.add_argument(
@@ -495,7 +495,7 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument(
         "--no-publish",
         action="store_true",
-        help="Close the track without writing any publication document.",
+        help="Close the slice without writing any publication document.",
     )
     parser.add_argument(
         "--config",
@@ -523,59 +523,59 @@ def main() -> int:
     args = build_parser().parse_args()
     try:
         module = load_manage_specs_module()
-        rows, track = resolve_track(module, args.track)
-        track_path = Path(str(track["path"]).rstrip("/"))
-        metadata = module.load_track_metadata(str(track_path))
+        rows, slice = resolve_slice(module, args.slice)
+        slice_path = Path(str(slice["path"]).rstrip("/"))
+        metadata = module.load_slice_metadata(str(slice_path))
         relation_requests = [
-            normalize_relation_request(module, relation_type, target_track)
-            for relation_type, target_track in (args.relate or [])
+            normalize_relation_request(module, relation_type, target_slice)
+            for relation_type, target_slice in (args.relate or [])
         ]
         relation_confirmation_required = (
             bool(relation_requests)
             or (
-                module.normalize_status(str(track["status"])) != "closed"
+                module.normalize_status(str(slice["status"])) != "closed"
                 and bool(metadata.get("relations"))
             )
         )
         if relation_confirmation_required and not args.confirm_impact and not args.force:
             raise RuntimeError(
-                "Closing a track with invalidation or supersession relations requires "
+                "Closing a slice with invalidation or supersession relations requires "
                 "--confirm-impact."
             )
 
-        _, track = ensure_track_closed(module, rows, track, force=args.force)
+        _, slice = ensure_slice_closed(module, rows, slice, force=args.force)
         rows = module.parse_registry()
-        track = module.resolve_track(rows, str(track["id"]))
-        if not track:
-            raise RuntimeError("Track disappeared after close.")
-        track_path = Path(str(track["path"]).rstrip("/"))
-        metadata = module.load_track_metadata(str(track_path))
+        slice = module.resolve_slice(rows, str(slice["id"]))
+        if not slice:
+            raise RuntimeError("Slice disappeared after close.")
+        slice_path = Path(str(slice["path"]).rstrip("/"))
+        metadata = module.load_slice_metadata(str(slice_path))
 
         if relation_requests:
-            for relation_type, target_track in relation_requests:
+            for relation_type, target_slice in relation_requests:
                 success, message = module.add_relation(
                     rows,
-                    track,
+                    slice,
                     relation_type,
-                    target_track,
+                    target_slice,
                     story_title=args.story_title,
                     requirement_ids=args.requirement_id,
                     selector=args.selector,
                 )
                 if not success:
                     raise RuntimeError(message)
-            audit_result = module.audit_relations(rows, track_selector=str(track["id"]))
+            audit_result = module.audit_relations(rows, slice_selector=str(slice["id"]))
             if not audit_result["ok"] and not args.force:
                 raise RuntimeError(
                     "Relation audit failed after recording impacts: "
                     + "; ".join(issue["message"] for issue in audit_result["issues"])
                 )
             rows = module.parse_registry()
-            track = module.resolve_track(rows, str(track["id"]))
-            if not track:
-                raise RuntimeError("Track disappeared after relation update.")
-            track_path = Path(str(track["path"]).rstrip("/"))
-            metadata = module.load_track_metadata(str(track_path))
+            slice = module.resolve_slice(rows, str(slice["id"]))
+            if not slice:
+                raise RuntimeError("Slice disappeared after relation update.")
+            slice_path = Path(str(slice["path"]).rstrip("/"))
+            metadata = module.load_slice_metadata(str(slice_path))
 
         publish_config = load_publish_config(Path(args.config))
         target_file_value = None if args.no_publish else (args.publish or publish_config.get("target_file"))
@@ -592,19 +592,19 @@ def main() -> int:
                 or publish_config.get("section_title")
                 or DEFAULT_SECTION_TITLE
             )
-            brief_text = read_text_if_exists(resolve_brief_path(track_path))
-            plan_text = read_text_if_exists(track_path / "plan.md")
-            tasks_text = read_text_if_exists(track_path / "tasks.md")
+            brief_text = read_text_if_exists(resolve_brief_path(slice_path))
+            plan_text = read_text_if_exists(slice_path / "blueprint.md")
+            slices_text = read_text_if_exists(slice_path / "slices.md")
             requirements = extract_list_section(brief_text, "3. functional requirements")
             success_criteria = extract_list_section(brief_text, "7. success criteria")
             relation_summary = render_relation_summary(metadata)
-            verification_summary = extract_verification_summary(plan_text, tasks_text)
+            verification_summary = extract_verification_summary(plan_text, slices_text)
             conventions_config = module.load_conventions_config(required=False)
             issue_reference = render_issue_reference(
                 metadata, conventions_config.get("issue_url_template")
             )
             entry = render_publication_entry(
-                track,
+                slice,
                 metadata,
                 issue_reference,
                 requirements,
@@ -617,26 +617,26 @@ def main() -> int:
                 published_to,
                 document_title=document_title,
                 section_title=section_title,
-                track_id=str(track["id"]),
+                slice_id=str(slice["id"]),
                 entry=entry,
             )
             metadata = update_publication_metadata(
                 module,
-                track,
+                slice,
                 target_file=published_to,
                 document_title=document_title,
                 section_title=section_title,
             )
 
-        result = build_result(track, published_to, metadata)
+        result = build_result(slice, published_to, metadata)
         if args.json:
             print(json.dumps(result, indent=2))
         elif published_to is not None:
             print(
-                f"Closed track {track['id']} and published to {published_to}"
+                f"Closed slice {slice['id']} and published to {published_to}"
             )
         else:
-            print(f"Closed track {track['id']}")
+            print(f"Closed slice {slice['id']}")
         return 0
     except RuntimeError as exc:
         print(str(exc), file=sys.stderr)

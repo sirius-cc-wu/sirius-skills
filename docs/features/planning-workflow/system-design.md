@@ -10,8 +10,8 @@ The planning workflow is a feature-scoped orchestration layer. `planning-driver`
 - **Feature metadata**: `<feature_path>/.planning-meta.json`
 - **Discovery authoring**: `discover.md`
 - **Design authoring**: `system-design.md` and optional `ui-design.md`
-- **Breakdown authoring**: `task-planning.md` and `task-traceability.md`
-- **Planning review and handoff**: `review-planning` then `track`
+- **Breakdown authoring**: `slice-planning.md` and `slice-traceability.md`
+- **Planning review and handoff**: `review-planning` then `slice`
 
 ## Interfaces and Responsibilities
 
@@ -24,7 +24,7 @@ The planning workflow is a feature-scoped orchestration layer. `planning-driver`
 
 - Artifact ownership stays separated by skill instead of centralizing all writing in `planning-driver`.
 - Validation is mostly file-presence and non-empty-content based; semantic quality is enforced through skill guidance and review.
-- Planning remains repository-first, so the tracker only receives execution-ready tasks after breakdown.
+- Planning remains repository-first, so the tracker only receives execution-ready slices after breakdown.
 
 ## Validation Strategy
 
@@ -43,15 +43,15 @@ package "Planning Layer" {
   [ui-flow]
   [breakdown]
   [review-planning]
-  [track]
+  [slice]
 }
 
 database "docs/features/registry.json" as Registry
 file ".planning-meta.json" as Meta
 file "discover.md" as Discover
 file "system-design.md" as DesignDoc
-file "task-planning.md" as TaskPlanning
-file "task-traceability.md" as TaskTraceability
+file "slice-planning.md" as SlicePlanning
+file "slice-traceability.md" as SliceTraceability
 
 [planning-driver] --> Registry
 [planning-driver] --> Meta
@@ -60,11 +60,11 @@ file "task-traceability.md" as TaskTraceability
 [planning-driver] --> [ui-flow]
 [planning-driver] --> [breakdown]
 [planning-driver] --> [review-planning]
-[planning-driver] --> [track]
+[planning-driver] --> [slice]
 [discover] --> Discover
 [design] --> DesignDoc
-[breakdown] --> TaskPlanning
-[breakdown] --> TaskTraceability
-[track] --> [execution-driver]
+[breakdown] --> SlicePlanning
+[breakdown] --> SliceTraceability
+[slice] --> [execution-driver]
 @enduml
 ```

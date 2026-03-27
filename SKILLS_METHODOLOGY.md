@@ -15,18 +15,18 @@ Use a **two-layer workflow**:
    - `ui-flow` (optional)
    - `breakdown`
    - `review-planning`
-   - `track`
+   - `slice`
 2. **Execution layer**
    - `execution-driver`
    - `define`
-   - `plan`
+   - `blueprint`
    - `review-execution`
-   - `close-track`
+   - `close-slice`
    - your execution tracker
 
 The planning layer keeps scope, design, decomposition, and increment planning in repo documents, and `planning-driver` owns readiness and routing across those artifacts.
 
-The execution layer works one implementation-ready task at a time.
+The execution layer works one implementation-ready slice at a time.
 
 ## Recommended Workflow
 
@@ -38,7 +38,7 @@ Its job is to:
 
 - resolve or initialize the feature planning folder
 - verify the current planning artifacts and metadata
-- decide whether the next step is `discover`, `design`, `ui-flow`, `breakdown`, `review-planning`, or `track`
+- decide whether the next step is `discover`, `design`, `ui-flow`, `breakdown`, `review-planning`, or `slice`
 - keep planning handoff decisions durable through explicit readiness states
 
 Expected planning states:
@@ -48,12 +48,12 @@ Expected planning states:
 - `design_ready`
 - `breakdown_ready`
 - `planning_reviewed`
-- `track_ready`
+- `slice_ready`
 
 Recommended handoff:
 
 ```text
-planning-driver -> discover/design/ui-flow/breakdown/review-planning/track
+planning-driver -> discover/design/ui-flow/breakdown/review-planning/slice
 ```
 
 ### 1. Discover the work
@@ -113,10 +113,10 @@ Its job is to:
 
 Expected outputs:
 
-- `task-planning.md`
-- `task-traceability.md`
+- `slice-planning.md`
+- `slice-traceability.md`
 
-In this workflow, an increment is a small, demonstrable system outcome made from one or more execution-ready slices. A slice maps to one executable task; an increment groups related tasks so the team can target the smallest useful demo or handoff. As a rule of thumb, Increment 1 should be the simplest end-to-end usable path.
+In this workflow, an increment is a small, demonstrable system outcome made from one or more execution-ready slices. A slice maps to one executable slice; an increment groups related slices so the team can target the smallest useful demo or handoff. As a rule of thumb, Increment 1 should be the simplest end-to-end usable path.
 
 Use the built-in helper when starting a new planning folder:
 
@@ -129,36 +129,36 @@ otherwise defaults to `docs/features`.
 
 Review checkpoint:
 
-- review the slices and increments for scope, sequencing, ownership, and demonstrability before creating tracker tasks
+- review the slices and increments for scope, sequencing, ownership, and demonstrability before creating tracker slices
 - make sure the planned validation approach is clear enough that each slice can be checked independently during execution
 
-### 4. Create tracker tasks
+### 4. Create tracker slices
 
-Use `breakdown` with your task system to create the executable work items.
+Use `breakdown` with your slice system to create the executable work items.
 
-Use `task-planning.md` to record the increment structure before bootstrapping tracks. For each increment, capture:
+Use `slice-planning.md` to record the increment structure before bootstrapping slices. For each increment, capture:
 
 - the increment goal or user-visible value
-- the included story IDs and planned tracker task IDs
+- the included story IDs and planned tracker slice IDs
 - the expected demo or verification outcome
-- any sequencing constraints between tasks or increments
+- any sequencing constraints between slices or increments
 
 Recommended rule:
 
-- one execution-ready slice = one tracker task
-- one increment = one or more related tracker tasks
+- one execution-ready slice = one tracker slice
+- one increment = one or more related tracker slices
 
 Recommended tracker usage:
 
-- create one task per execution-ready slice
+- create one slice per execution-ready slice
 - record real execution blockers as tracker dependencies
-- keep repo story IDs in `task-traceability.md`
-- keep tracker task IDs as execution identifiers
+- keep repo story IDs in `slice-traceability.md`
+- keep tracker slice IDs as execution identifiers
 
 Review checkpoint:
 
-- confirm each tracker task has clear scope, dependencies, and expected verification before bootstrapping a track
-- add any role-specific review expectations that matter for execution, such as architecture, security, or platform input, in the tracker task or linked planning docs
+- confirm each tracker slice has clear scope, dependencies, and expected verification before bootstrapping a slice
+- add any role-specific review expectations that matter for execution, such as architecture, security, or platform input, in the tracker slice or linked planning docs
 
 ### 5. Review planning outputs
 
@@ -166,71 +166,71 @@ Use `review-planning` after the discovery, design, and breakdown artifacts are c
 
 Its job is to:
 
-- review the planning artifacts and task definitions together rather than in isolation
-- identify blocking scope, design, sequencing, or validation gaps before track bootstrap
+- review the planning artifacts and slice definitions together rather than in isolation
+- identify blocking scope, design, sequencing, or validation gaps before slice bootstrap
 - record durable findings in the planning docs or tracker context already used by the team
-- confirm whether the work is ready for `track` or needs another planning pass
+- confirm whether the work is ready for `slice` or needs another planning pass
 
 Recommended handoff:
 
 ```text
-planning-driver -> discover -> design -> breakdown -> execution tracker -> review-planning -> track
+planning-driver -> discover -> design -> breakdown -> execution tracker -> review-planning -> slice
 ```
 
-### 6. Bootstrap one execution track per task
+### 6. Bootstrap one execution slice per slice
 
-Once a tracker task is implementation-ready, use `track`.
+Once a tracker slice is implementation-ready, use `slice`.
 
 Preferred handoff:
 
 ```text
-planning-driver -> breakdown -> execution tracker -> review-planning -> track -> execution-driver
+planning-driver -> breakdown -> execution tracker -> review-planning -> slice -> execution-driver
 ```
 
-`track` should bootstrap a task-scoped execution track from the execution-ready work item, typically with:
+`slice` should bootstrap a slice-scoped execution slice from the execution-ready work item, typically with:
 
 ```bash
-python3 skills/execution-driver/scripts/manage_execution.py add "<task-id>" "<task-name>"
+python3 skills/execution-driver/scripts/manage_execution.py add "<slice-id>" "<slice-name>"
 ```
 
 ### 7. Execute with execution-driver
 
-After a track exists, use the execution layer:
+After a slice exists, use the execution layer:
 
 1. `execution-driver`
 2. `define`
-3. `plan`
+3. `blueprint`
 
-This is where task-scoped execution artifacts are created:
+This is where slice-scoped execution artifacts are created:
 
 - `brief.md`
-- `plan.md`
+- `blueprint.md`
 
 Within that execution layer:
 
 - `execution-driver` owns routing, readiness checks, and registry state
-- `define` creates the task-scoped `brief.md` for one execution-ready work item, including acceptance and requirement context
-- `plan` converts that task-scoped brief into the final implementation packets, traceability, validation steps, and PlantUML detailed design needed for execution
+- `define` creates the slice-scoped `brief.md` for one execution-ready work item, including acceptance and requirement context
+- `blueprint` converts that slice-scoped brief into the final implementation packets, traceability, validation steps, and PlantUML detailed design needed for execution
 - `review-execution` owns the explicit implementation-versus-brief review outcome
-- `close-track` owns closure metadata and any optional publication output
+- `close-slice` owns closure metadata and any optional publication output
 
 Keep the boundary explicit:
 
 - `breakdown` owns repo-story decomposition and tracker-ready slices
 - `breakdown` also owns increment grouping at the repo-planning level
 - `define` owns `brief.md` and `checklists/requirements.md`
-- `plan` owns the final task-scoped execution checklist for new tracks
+- `blueprint` owns the final slice-scoped execution checklist for new slices
 - `execution-driver` should validate handoffs and route work, not take over artifact authoring from the other execution skills
 
 Execution review loop:
 
-- review the task-scoped `brief.md` and `plan.md` before implementation starts if the task carries meaningful risk or ambiguity
+- review the slice-scoped `brief.md` and `blueprint.md` before implementation starts if the slice carries meaningful risk or ambiguity
 - review brief-to-implementation alignment during execution, not only at final handoff
-- when validation or review finds a gap, update the task-scoped execution artifacts or surrounding guidance so the fix persists at the brief level
+- when validation or review finds a gap, update the slice-scoped execution artifacts or surrounding guidance so the fix persists at the brief level
 
-### 8. Track execution in the execution tracker
+### 8. Slice execution in the execution tracker
 
-Use your task system for the actual task lifecycle:
+Use your slice system for the actual slice lifecycle:
 
 - start or claim work
 - record blockers or pauses
@@ -239,53 +239,53 @@ Use your task system for the actual task lifecycle:
 - verify the implementation
 - mark work complete
 
-If review uncovers an intent gap or brief gap, feed that back into the relevant brief or planning artifact before considering the task fully done.
+If review uncovers an intent gap or brief gap, feed that back into the relevant brief or planning artifact before considering the slice fully done.
 
 Keep the responsibility boundary clear:
 
-- `execution-driver` owns **track readiness**
+- `execution-driver` owns **slice readiness**
 - the execution tracker owns **execution state**
 
 ### 9. Review execution outcomes
 
-Use `review-execution` after implementation and validation, and before closing the track.
+Use `review-execution` after implementation and validation, and before closing the slice.
 
 Its job is to:
 
-- compare the implementation and validation evidence with the task-scoped `brief.md` and `plan.md`
-- classify whether a finding is an intent-to-brief gap, a brief-to-implementation gap, or a follow-up outside the active track
-- feed durable fixes back into `brief.md`, `plan.md`, or upstream planning guidance when the issue reflects missing context
-- confirm whether the work is actually ready for `close-track`
+- compare the implementation and validation evidence with the slice-scoped `brief.md` and `blueprint.md`
+- classify whether a finding is an intent-to-brief gap, a brief-to-implementation gap, or a follow-up outside the active slice
+- feed durable fixes back into `brief.md`, `blueprint.md`, or upstream planning guidance when the issue reflects missing context
+- confirm whether the work is actually ready for `close-slice`
 
 Recommended handoff:
 
 ```text
-implementation complete -> review-execution -> close-track
+implementation complete -> review-execution -> close-slice
 ```
 
-### 10. Close the execution track
+### 10. Close the execution slice
 
-After implementation is complete and the execution task is finished, use `close-track` to close the execution track cleanly.
+After implementation is complete and the execution slice is finished, use `close-slice` to close the execution slice cleanly.
 
 Its job is to:
 
-- validate that the track is ready to close
+- validate that the slice is ready to close
 - record durable closure metadata without moving or deleting the original artifacts
-- optionally publish a project-local summary entry such as `docs/track-history.md` or `CHANGELOG.md`
+- optionally publish a project-local summary entry such as `docs/slice-history.md` or `CHANGELOG.md`
 - capture durable feedback that should improve future briefs, prompts, or validation harnesses
 
 Recommended handoff:
 
 ```text
-review-execution complete -> close-track
+review-execution complete -> close-slice
 ```
 
 Important closure rules:
 
-- closing a track should happen after required review, validation, and brief feedback loops are complete
-- closing a track does not merge or delete the original `brief.md` or `plan.md`; older tracks may also retain `tasks.md`
+- closing a slice should happen after required review, validation, and brief feedback loops are complete
+- closing a slice does not merge or delete the original `brief.md` or `blueprint.md`; older slices may also retain `slices.md`
 - publishing is optional and project-local
-- closure metadata belongs in the track system, not in the execution tracker
+- closure metadata belongs in the slice system, not in the execution tracker
 
 ## Recommended Repository Layout
 
@@ -297,30 +297,30 @@ Important closure rules:
   system-design.md
   ui-design.md              # optional
   user-stories.md
-  task-planning.md
-  task-traceability.md
+  slice-planning.md
+  slice-traceability.md
 ```
 
-Keep discovery, design, and breakdown artifacts in a feature-local planning folder so the project context stays together. The planning folder is still a repository document area; it is not a task-execution track. By default, `planning_dir` is `docs/features`; projects can override it in `.skills/planning.json`.
+Keep discovery, design, and breakdown artifacts in a feature-local planning folder so the project context stays together. The planning folder is still a repository document area; it is not a slice-execution slice. By default, `planning_dir` is `docs/features`; projects can override it in `.skills/planning.json`.
 
-### Task-level execution
+### Slice-level execution
 
 ```text
-<track_dir>/<task-id>-<task-slug>/
+<slice_dir>/<slice-id>-<slice-slug>/
   brief.md
-  plan.md
+  blueprint.md
 ```
 
-The exact execution-track path depends on `execution-driver` configuration. The important rule is that execution tracks are **task-scoped**, not feature-scoped, and remain centrally managed separately from the feature-local planning docs.
+The exact execution-slice path depends on `execution-driver` configuration. The important rule is that execution slices are **slice-scoped**, not feature-scoped, and remain centrally managed separately from the feature-local planning docs.
 
-By default, `execution-driver` uses `tracks/`; projects can override that by setting
-`track_dir` in `.skills/execution.json`.
+By default, `execution-driver` uses `slices/`; projects can override that by setting
+`slice_dir` in `.skills/execution.json`.
 
 ## Diagram Conventions
 
 - Use **PlantUML** as the standard UML language in both layers.
 - In the planning layer, keep UML diagrams feature-scoped and embed them in `system-design.md` unless a separate adjacent `.puml` file is clearly easier to maintain.
-- In the execution layer, keep UML diagrams task-scoped and place detailed design diagrams in `plan.md`.
+- In the execution layer, keep UML diagrams slice-scoped and place detailed design diagrams in `blueprint.md`.
 - Prefer diagrams that answer a concrete question for the current phase rather than diagramming everything by default.
 
 ### Example layout
@@ -338,40 +338,40 @@ my-app/
         system-design.md
         ui-design.md
         user-stories.md
-        task-planning.md
-        task-traceability.md
-  tracks/
+        slice-planning.md
+        slice-traceability.md
+  slices/
     HAB-101-create-schema/
       brief.md
-      plan.md
+      blueprint.md
     HAB-102-add-habit-form/
       brief.md
-      plan.md
+      blueprint.md
     HAB-103-mark-habit-done/
       brief.md
-      plan.md
+      blueprint.md
 ```
 
-In this example, the default planning layout `docs/features/habit-tracker/` holds the feature-level planning artifacts, while each executable task gets its own centralized execution track under `tracks/`.
+In this example, the default planning layout `docs/features/habit-tracker/` holds the feature-level planning artifacts, while each executable slice gets its own centralized execution slice under `slices/`.
 
 ## Operating Rules
 
 - Keep stories and design in repo docs.
 - Keep increment plans in repo docs.
-- Keep executable work in your task system.
+- Keep executable work in your slice system.
 - Do not use `execution-driver` for feature-level discovery or decomposition.
-- Do not use execution tracks as increment containers; keep tracks task-scoped.
-- Do not use execution lifecycle states as spec-track states.
-- Split work before bootstrapping a track, not after.
-- Preserve story-to-task traceability from planning through execution.
+- Do not use execution slices as increment containers; keep slices slice-scoped.
+- Do not use execution lifecycle states as spec-slice states.
+- Split work before bootstrapping a slice, not after.
+- Preserve story-to-slice traceability from planning through execution.
 
 ## When to Use This Methodology
 
 Use this methodology when:
 
-- the work is larger than a one-off coding task
+- the work is larger than a one-off coding slice
 - design or decomposition matters
-- multiple implementation tasks will come out of one project or feature
-- you want resumable execution with a separate task system
+- multiple implementation slices will come out of one project or feature
+- you want resumable execution with a separate slice system
 
 For small one-shot changes, you may skip most of the planning layer and go directly to `execution-driver` or straight implementation if no spec workflow is needed.

@@ -4,7 +4,7 @@ import sys
 from pathlib import Path
 
 
-CLOSE_TRACK_PATH = Path(__file__).resolve().parents[1] / "scripts" / "close_track.py"
+CLOSE_SLICE_PATH = Path(__file__).resolve().parents[1] / "scripts" / "close_slice.py"
 MANAGE_EXECUTION_PATH = (
     Path(__file__).resolve().parents[2] / "execution-driver" / "scripts" / "manage_execution.py"
 )
@@ -23,31 +23,31 @@ def run_cli(module, monkeypatch, *args):
     return module.main()
 
 
-def setup_execution_ready_track(tmp_path, monkeypatch, include_tasks=True):
+def setup_execution_ready_slice(tmp_path, monkeypatch, include_tasks=True):
     manage_execution = load_module(MANAGE_EXECUTION_PATH, "manage_execution")
     monkeypatch.chdir(tmp_path)
 
-    assert run_cli(manage_execution, monkeypatch, "init", "tracks") == 0
+    assert run_cli(manage_execution, monkeypatch, "init", "slices") == 0
     assert run_cli(manage_execution, monkeypatch, "add", "DEMO", "Demo Feature") == 0
 
-    track_dir = tmp_path / "tracks" / "DEMO-demo-feature"
-    (track_dir / "brief.md").write_text(
-        "# Task Brief: Demo Feature\n\n"
+    slice_dir = tmp_path / "slices" / "DEMO-demo-feature"
+    (slice_dir / "brief.md").write_text(
+        "# Slice Brief: Demo Feature\n\n"
         "## 3. Functional Requirements\n\n"
         "- **FR-001**: System MUST store a summary entry.\n"
         "- **FR-002**: System MUST preserve backlinks.\n\n"
         "## 7. Success Criteria\n\n"
-        "- **SC-001**: Teams can discover closed tracks quickly.\n",
+        "- **SC-001**: Teams can discover closed slices quickly.\n",
         encoding="utf-8",
     )
-    (track_dir / "checklists").mkdir()
-    (track_dir / "checklists" / "requirements.md").write_text(
+    (slice_dir / "checklists").mkdir()
+    (slice_dir / "checklists" / "requirements.md").write_text(
         "- [x] FR-001 requirements captured\n- [x] FR-002 requirements captured\n",
         encoding="utf-8",
     )
     assert run_cli(manage_execution, monkeypatch, "set-status", "DEMO", "brief_ready") == 0
 
-    (track_dir / "plan.md").write_text(
+    (slice_dir / "blueprint.md").write_text(
         "# Implementation Plan: Demo Feature\n\n"
         "### Packet P01: Demo Packet\n\n"
         "- Validation:\n"
@@ -55,57 +55,57 @@ def setup_execution_ready_track(tmp_path, monkeypatch, include_tasks=True):
         "  - [ ] V002 Confirm rollback behavior\n\n"
         "### Verification Scenarios\n\n"
         "- Happy path: User can see published history entry\n"
-        "- Regression checks: Existing track artifacts remain in place\n",
+        "- Regression checks: Existing slice artifacts remain in place\n",
         encoding="utf-8",
     )
     if include_tasks:
-        (track_dir / "tasks.md").write_text(
-            "# Tasks: Demo Feature\n\n"
+        (slice_dir / "slices.md").write_text(
+            "# Slices: Demo Feature\n\n"
             "## 1. Execution Strategy\n\n"
-            "- Validation approach: Run focused tests before closing the track\n\n"
+            "- Validation approach: Run focused tests before closing the slice\n\n"
             "## 7. Exit Criteria\n\n"
             "- [ ] Validation work is represented where required\n"
             "- [ ] The implementation agent can begin without major replanning\n",
             encoding="utf-8",
         )
-    assert run_cli(manage_execution, monkeypatch, "set-status", "DEMO", "plan_ready") == 0
+    assert run_cli(manage_execution, monkeypatch, "set-status", "DEMO", "blueprint_ready") == 0
     assert run_cli(manage_execution, monkeypatch, "set-status", "DEMO", "execution_ready") == 0
-    return manage_execution, track_dir
+    return manage_execution, slice_dir
 
 
-def test_close_track_publishes_to_explicit_file(tmp_path, monkeypatch):
-    close_track = load_module(CLOSE_TRACK_PATH, "close_track")
-    _, track_dir = setup_execution_ready_track(tmp_path, monkeypatch)
+def test_close_slice_publishes_to_explicit_file(tmp_path, monkeypatch):
+    close_slice = load_module(CLOSE_SLICE_PATH, "close_slice")
+    _, slice_dir = setup_execution_ready_slice(tmp_path, monkeypatch)
 
     assert (
         run_cli(
-            close_track,
+            close_slice,
             monkeypatch,
-            "--track",
+            "--slice",
             "DEMO",
             "--publish",
-            "docs/track-history.md",
+            "docs/slice-history.md",
         )
         == 0
     )
 
-    target = tmp_path / "docs" / "track-history.md"
-    metadata = json.loads((track_dir / ".track-meta.json").read_text(encoding="utf-8"))
+    target = tmp_path / "docs" / "slice-history.md"
+    metadata = json.loads((slice_dir / ".slice-meta.json").read_text(encoding="utf-8"))
     content = target.read_text(encoding="utf-8")
 
     assert "### " in content
     assert "Demo Feature (`DEMO`)" in content
     assert "Functional requirements snapshot" in content
-    assert "`tracks/DEMO-demo-feature/brief.md`" in content
+    assert "`slices/DEMO-demo-feature/brief.md`" in content
     assert "Implementation verification snapshot" in content
     assert "Run demo integration test" in content
     assert metadata["status"] == "closed"
-    assert metadata["publications"][0]["target_file"] == "docs/track-history.md"
+    assert metadata["publications"][0]["target_file"] == "docs/slice-history.md"
 
 
-def test_close_track_uses_config_when_publish_target_not_passed(tmp_path, monkeypatch):
-    close_track = load_module(CLOSE_TRACK_PATH, "close_track")
-    _, track_dir = setup_execution_ready_track(tmp_path, monkeypatch)
+def test_close_slice_uses_config_when_publish_target_not_passed(tmp_path, monkeypatch):
+    close_slice = load_module(CLOSE_SLICE_PATH, "close_slice")
+    _, slice_dir = setup_execution_ready_slice(tmp_path, monkeypatch)
 
     plugins_dir = tmp_path / ".skills" / "plugins"
     plugins_dir.mkdir(parents=True)
@@ -113,44 +113,44 @@ def test_close_track_uses_config_when_publish_target_not_passed(tmp_path, monkey
         json.dumps(
             {
                 "target_file": "docs/history.md",
-                "document_title": "Team Track History",
-                "section_title": "Published Tracks",
+                "document_title": "Team Slice History",
+                "section_title": "Published Slices",
             }
         )
         + "\n",
         encoding="utf-8",
     )
 
-    assert run_cli(close_track, monkeypatch, "--track", "DEMO") == 0
+    assert run_cli(close_slice, monkeypatch, "--slice", "DEMO") == 0
 
     target = tmp_path / "docs" / "history.md"
     content = target.read_text(encoding="utf-8")
-    metadata = json.loads((track_dir / ".track-meta.json").read_text(encoding="utf-8"))
+    metadata = json.loads((slice_dir / ".slice-meta.json").read_text(encoding="utf-8"))
 
-    assert content.startswith("# Team Track History")
-    assert "## Published Tracks" in content
-    assert "Run focused tests before closing the track" in content
+    assert content.startswith("# Team Slice History")
+    assert "## Published Slices" in content
+    assert "Run focused tests before closing the slice" in content
     assert metadata["publications"][0]["target_file"] == "docs/history.md"
 
 
-def test_close_track_publishes_without_legacy_tasks_md(tmp_path, monkeypatch):
-    close_track = load_module(CLOSE_TRACK_PATH, "close_track")
-    _, track_dir = setup_execution_ready_track(tmp_path, monkeypatch, include_tasks=False)
+def test_close_slice_publishes_without_legacy_tasks_md(tmp_path, monkeypatch):
+    close_slice = load_module(CLOSE_SLICE_PATH, "close_slice")
+    _, slice_dir = setup_execution_ready_slice(tmp_path, monkeypatch, include_tasks=False)
 
     assert (
         run_cli(
-            close_track,
+            close_slice,
             monkeypatch,
-            "--track",
+            "--slice",
             "DEMO",
             "--publish",
-            "docs/track-history.md",
+            "docs/slice-history.md",
         )
         == 0
     )
 
-    content = (tmp_path / "docs" / "track-history.md").read_text(encoding="utf-8")
-    metadata = json.loads((track_dir / ".track-meta.json").read_text(encoding="utf-8"))
+    content = (tmp_path / "docs" / "slice-history.md").read_text(encoding="utf-8")
+    metadata = json.loads((slice_dir / ".slice-meta.json").read_text(encoding="utf-8"))
 
     assert "Demo Feature (`DEMO`)" in content
     assert "Implementation verification snapshot" in content
@@ -158,9 +158,9 @@ def test_close_track_publishes_without_legacy_tasks_md(tmp_path, monkeypatch):
     assert metadata["status"] == "closed"
 
 
-def test_close_track_renders_issue_link_when_conventions_config_exists(tmp_path, monkeypatch):
-    close_track = load_module(CLOSE_TRACK_PATH, "close_track")
-    _, track_dir = setup_execution_ready_track(tmp_path, monkeypatch)
+def test_close_slice_renders_issue_link_when_conventions_config_exists(tmp_path, monkeypatch):
+    close_slice = load_module(CLOSE_SLICE_PATH, "close_slice")
+    _, slice_dir = setup_execution_ready_slice(tmp_path, monkeypatch)
 
     conventions_dir = tmp_path / ".skills"
     conventions_dir.mkdir(parents=True, exist_ok=True)
@@ -172,53 +172,53 @@ def test_close_track_renders_issue_link_when_conventions_config_exists(tmp_path,
         encoding="utf-8",
     )
 
-    metadata = json.loads((track_dir / ".track-meta.json").read_text(encoding="utf-8"))
+    metadata = json.loads((slice_dir / ".slice-meta.json").read_text(encoding="utf-8"))
     metadata["issue"] = {
         "id": "BNC-123",
         "title": "Demo source issue",
         "status": "Done",
     }
-    (track_dir / ".track-meta.json").write_text(
+    (slice_dir / ".slice-meta.json").write_text(
         json.dumps(metadata, indent=2) + "\n", encoding="utf-8"
     )
 
     assert (
         run_cli(
-            close_track,
+            close_slice,
             monkeypatch,
-            "--track",
+            "--slice",
             "DEMO",
             "--publish",
-            "docs/track-history.md",
+            "docs/slice-history.md",
         )
         == 0
     )
 
-    content = (tmp_path / "docs" / "track-history.md").read_text(encoding="utf-8")
+    content = (tmp_path / "docs" / "slice-history.md").read_text(encoding="utf-8")
     assert (
         "[BNC-123](https://tracker.example.com/issues/BNC-123) — Demo source issue; status: Done"
         in content
     )
 
 
-def test_close_track_republishes_without_duplicate_markers(tmp_path, monkeypatch):
-    close_track = load_module(CLOSE_TRACK_PATH, "close_track")
-    _, track_dir = setup_execution_ready_track(tmp_path, monkeypatch)
+def test_close_slice_republishes_without_duplicate_markers(tmp_path, monkeypatch):
+    close_slice = load_module(CLOSE_SLICE_PATH, "close_slice")
+    _, slice_dir = setup_execution_ready_slice(tmp_path, monkeypatch)
 
     assert (
         run_cli(
-            close_track,
+            close_slice,
             monkeypatch,
-            "--track",
+            "--slice",
             "DEMO",
             "--publish",
-            "docs/track-history.md",
+            "docs/slice-history.md",
         )
         == 0
     )
 
-    (track_dir / "brief.md").write_text(
-        "# Task Brief: Demo Feature\n\n"
+    (slice_dir / "brief.md").write_text(
+        "# Slice Brief: Demo Feature\n\n"
         "## 3. Functional Requirements\n\n"
         "- **FR-001**: Updated summary text.\n\n"
         "## 7. Success Criteria\n\n"
@@ -228,31 +228,31 @@ def test_close_track_republishes_without_duplicate_markers(tmp_path, monkeypatch
 
     assert (
         run_cli(
-            close_track,
+            close_slice,
             monkeypatch,
-            "--track",
+            "--slice",
             "DEMO",
             "--publish",
-            "docs/track-history.md",
+            "docs/slice-history.md",
         )
         == 0
     )
 
-    content = (tmp_path / "docs" / "track-history.md").read_text(encoding="utf-8")
+    content = (tmp_path / "docs" / "slice-history.md").read_text(encoding="utf-8")
     assert content.count("<!-- spec-publish:DEMO:start -->") == 1
     assert "Updated summary text." in content
 
 
-def test_close_track_requires_confirm_impact_for_relations(tmp_path, monkeypatch, capsys):
-    close_track = load_module(CLOSE_TRACK_PATH, "close_track")
-    manage_execution, _ = setup_execution_ready_track(tmp_path, monkeypatch)
+def test_close_slice_requires_confirm_impact_for_relations(tmp_path, monkeypatch, capsys):
+    close_slice = load_module(CLOSE_SLICE_PATH, "close_slice")
+    manage_execution, _ = setup_execution_ready_slice(tmp_path, monkeypatch)
 
     assert run_cli(manage_execution, monkeypatch, "add", "OLD", "Old Feature") == 0
 
     exit_code = run_cli(
-        close_track,
+        close_slice,
         monkeypatch,
-        "--track",
+        "--slice",
         "DEMO",
         "--relate",
         "supersedes",
@@ -264,17 +264,17 @@ def test_close_track_requires_confirm_impact_for_relations(tmp_path, monkeypatch
     assert "--confirm-impact" in captured.err
 
 
-def test_close_track_records_relations_and_publishes_them(tmp_path, monkeypatch):
-    close_track = load_module(CLOSE_TRACK_PATH, "close_track")
-    manage_execution, track_dir = setup_execution_ready_track(tmp_path, monkeypatch)
+def test_close_slice_records_relations_and_publishes_them(tmp_path, monkeypatch):
+    close_slice = load_module(CLOSE_SLICE_PATH, "close_slice")
+    manage_execution, slice_dir = setup_execution_ready_slice(tmp_path, monkeypatch)
 
     assert run_cli(manage_execution, monkeypatch, "add", "OLD", "Old Feature") == 0
 
     assert (
         run_cli(
-            close_track,
+            close_slice,
             monkeypatch,
-            "--track",
+            "--slice",
             "DEMO",
             "--relate",
             "supersedes",
@@ -287,20 +287,20 @@ def test_close_track_records_relations_and_publishes_them(tmp_path, monkeypatch)
             "legacy checkout path",
             "--confirm-impact",
             "--publish",
-            "docs/track-history.md",
+            "docs/slice-history.md",
         )
         == 0
     )
 
-    content = (tmp_path / "docs" / "track-history.md").read_text(encoding="utf-8")
-    source_meta = json.loads((track_dir / ".track-meta.json").read_text(encoding="utf-8"))
+    content = (tmp_path / "docs" / "slice-history.md").read_text(encoding="utf-8")
+    source_meta = json.loads((slice_dir / ".slice-meta.json").read_text(encoding="utf-8"))
     target_meta = json.loads(
-        (tmp_path / "tracks" / "OLD-old-feature" / ".track-meta.json").read_text(
+        (tmp_path / "slices" / "OLD-old-feature" / ".slice-meta.json").read_text(
             encoding="utf-8"
         )
     )
 
-    assert "Track relations:" in content
+    assert "Slice relations:" in content
     assert "supersedes `OLD` (story: Story 2 - Legacy checkout; requirements: FR-002; selector: legacy checkout path)" in content
     assert source_meta["relations"][0]["type"] == "supersedes"
     assert target_meta["relations"][0]["type"] == "superseded_by"

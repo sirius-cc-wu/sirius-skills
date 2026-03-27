@@ -88,7 +88,7 @@ def test_ui_required_blocks_design_ready_without_ui_design(tmp_path, monkeypatch
     assert "Missing required file 'ui-design.md'." in captured.err
 
 
-def test_track_ready_requires_review_note_and_task_ids(tmp_path, monkeypatch, capsys):
+def test_slice_ready_requires_review_note_and_slice_ids(tmp_path, monkeypatch, capsys):
     module = load_manage_planning_module()
     monkeypatch.chdir(tmp_path)
 
@@ -98,8 +98,8 @@ def test_track_ready_requires_review_note_and_task_ids(tmp_path, monkeypatch, ca
     feature_dir = tmp_path / "docs" / "features" / "habit-tracker"
     write_file(feature_dir / "discover.md")
     write_file(feature_dir / "system-design.md")
-    write_file(feature_dir / "task-planning.md")
-    write_file(feature_dir / "task-traceability.md")
+    write_file(feature_dir / "slice-planning.md")
+    write_file(feature_dir / "slice-traceability.md")
 
     assert run_cli(module, monkeypatch, "set-status", "habit-tracker", "discovery_ready") == 0
     assert run_cli(module, monkeypatch, "set-status", "habit-tracker", "design_ready") == 0
@@ -123,10 +123,10 @@ def test_track_ready_requires_review_note_and_task_ids(tmp_path, monkeypatch, ca
         == 0
     )
 
-    exit_code = run_cli(module, monkeypatch, "set-status", "habit-tracker", "track_ready")
+    exit_code = run_cli(module, monkeypatch, "set-status", "habit-tracker", "slice_ready")
     captured = capsys.readouterr()
     assert exit_code == 2
-    assert "Track readiness requires at least one ready task ID." in captured.err
+    assert "Slice readiness requires at least one ready slice ID." in captured.err
 
     assert (
         run_cli(
@@ -134,15 +134,15 @@ def test_track_ready_requires_review_note_and_task_ids(tmp_path, monkeypatch, ca
             monkeypatch,
             "set-status",
             "habit-tracker",
-            "track_ready",
-            "--task-id",
+            "slice_ready",
+            "--slice-id",
             "HAB-101",
         )
         == 0
     )
 
     metadata = json.loads((feature_dir / ".planning-meta.json").read_text(encoding="utf-8"))
-    assert metadata["ready_task_ids"] == ["HAB-101"]
+    assert metadata["ready_slice_ids"] == ["HAB-101"]
 
 
 def test_validate_feature_reports_success_for_ready_feature(tmp_path, monkeypatch):
@@ -155,8 +155,8 @@ def test_validate_feature_reports_success_for_ready_feature(tmp_path, monkeypatc
     feature_dir = tmp_path / "docs" / "features" / "habit-tracker"
     write_file(feature_dir / "discover.md")
     write_file(feature_dir / "system-design.md")
-    write_file(feature_dir / "task-planning.md")
-    write_file(feature_dir / "task-traceability.md")
+    write_file(feature_dir / "slice-planning.md")
+    write_file(feature_dir / "slice-traceability.md")
 
     assert run_cli(module, monkeypatch, "set-status", "habit-tracker", "discovery_ready") == 0
     assert run_cli(module, monkeypatch, "set-status", "habit-tracker", "design_ready") == 0
@@ -179,8 +179,8 @@ def test_validate_feature_reports_success_for_ready_feature(tmp_path, monkeypatc
             monkeypatch,
             "set-status",
             "habit-tracker",
-            "track_ready",
-            "--task-id",
+            "slice_ready",
+            "--slice-id",
             "HAB-101",
         )
         == 0

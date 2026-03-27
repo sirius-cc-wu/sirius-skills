@@ -40,12 +40,12 @@ Preserve unrelated keys in existing JSON files. This skill should only update th
 Use these defaults unless the user asked for different values:
 
 - `planning_dir`: `docs/features`
-- `track_dir`: `tracks`
+- `slice_dir`: `slices`
 - `preferred_workflow`: `TDD`
 
 For `jira` mode, use these preset conventions unless the user supplies project-specific values:
 
-- `issue_tracker`: `jira`
+- `issue_sliceer`: `jira`
 - `id_pattern`: `^[A-Z][A-Z0-9]*-[0-9]+$`
 - `branch_extract_pattern`: `^([A-Z][A-Z0-9]*-[0-9]+)-(.+)$`
 - `commit_format`: `{ID}: {summary}`
@@ -76,7 +76,7 @@ If the user wants custom planning or execution layout, pass those values too:
 python3 skills/configure-project/scripts/configure_project.py \
   --mode default \
   --planning-dir planning/features \
-  --track-dir specs \
+  --slice-dir specs \
   --workflow TDD
 ```
 

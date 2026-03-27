@@ -5,7 +5,7 @@ description: Produces feature-level system design artifacts covering architectur
 
 # Design
 
-Use this skill after `discover` when the work needs architecture, integration, or validation decisions before task breakdown.
+Use this skill after `discover` when the work needs architecture, integration, or validation decisions before slice breakdown.
 
 ## Responsibilities
 
@@ -33,10 +33,10 @@ Resolve `<feature_path>` as `<planning_dir>/<feature-slug>/`.
 
 ## Design Rules
 
-- Keep this skill feature-scoped, not task-scoped.
+- Keep this skill feature-scoped, not slice-scoped.
 - Focus on decisions that unblock later decomposition and execution.
 - Document interfaces, dependencies, and operational constraints clearly.
-- Call out risks that should affect task ordering or stop-and-ask gates.
+- Call out risks that should affect slice ordering or stop-and-ask gates.
 - Use PlantUML as the UML language whenever you include diagrams.
 - Include system-design diagrams directly in `system-design.md` with fenced `plantuml` blocks unless a separate adjacent `.puml` file is clearly better.
 - Prefer feature-level diagrams such as component, package, sequence, state, or deployment diagrams over low-level implementation detail.
@@ -51,7 +51,7 @@ Resolve `<feature_path>` as `<planning_dir>/<feature-slug>/`.
 
 ## Guardrails
 
-- Do not generate task-scoped `plan.md` or other execution-track artifacts.
-- Do not create tracker tasks for vague or unresolved designs.
+- Do not generate slice-scoped `blueprint.md` or other execution-slice artifacts.
+- Do not create tracker slices for vague or unresolved designs.
 - If the work is purely UX-focused, use `ui-flow` instead or alongside this skill.
-- Do not let feature-level UML drift into task-scoped class-by-class implementation design; that belongs in `plan`.
+- Do not let feature-level UML drift into slice-scoped class-by-class implementation design; that belongs in `plan`.

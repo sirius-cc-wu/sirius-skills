@@ -11,15 +11,15 @@ Installation and configuration form the repository integration layer. The `Makef
 - **Execution layout config**: `.skills/execution.json`
 - **Conventions config**: `.skills/conventions.json`
 - **Project-local extensions**: `.skills/plugins/`
-- **Consumer skills**: planning-driver, execution-driver, commit, create-pr, close-track, breakdown
+- **Consumer skills**: planning-driver, execution-driver, commit, create-pr, close-slice, breakdown
 
 ## Interfaces and Responsibilities
 
 - `make install` registers the managed skill set.
 - `make uninstall` removes only the managed skill names currently installed.
 - `manage_planning.py` reads `planning.json` for `planning_dir`.
-- `manage_execution.py` reads `execution.json` for `track_dir` and `preferred_workflow`.
-- `manage_execution.py`, `commit`, `create-pr`, and `close-track` read `conventions.json` for naming and issue-link behavior.
+- `manage_execution.py` reads `execution.json` for `slice_dir` and `preferred_workflow`.
+- `manage_execution.py`, `commit`, `create-pr`, and `close-slice` read `conventions.json` for naming and issue-link behavior.
 
 ## Constraints and Tradeoffs
 
@@ -29,7 +29,7 @@ Installation and configuration form the repository integration layer. The `Makef
 
 ## Validation Strategy
 
-- Use repository tests that exercise config readers in planning, execution, breakdown, and close-track flows.
+- Use repository tests that exercise config readers in planning, execution, breakdown, and close-slice flows.
 - Review `README.md` and `AGENTS.md` whenever config semantics change.
 - Verify `make install` / `make uninstall` continue to match the managed skill list.
 
@@ -50,7 +50,7 @@ component "execution-driver" as Execution
 component commit
 component "create-pr" as CreatePR
 component breakdown
-component "close-track" as CloseTrack
+component "close-slice" as CloseTrack
 
 Maintainer --> Makefile : install / uninstall
 Planning --> "planning.json"

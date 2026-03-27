@@ -10,11 +10,11 @@ from typing import Any
 
 
 DEFAULT_PLANNING_DIR = "docs/features"
-DEFAULT_TRACK_DIR = "tracks"
+DEFAULT_SLICE_DIR = "slices"
 DEFAULT_WORKFLOW = "TDD"
 
 DEFAULT_JIRA_CONVENTIONS = {
-    "issue_tracker": "jira",
+    "issue_sliceer": "jira",
     "id_pattern": r"^[A-Z][A-Z0-9]*-[0-9]+$",
     "branch_extract_pattern": r"^([A-Z][A-Z0-9]*-[0-9]+)-(.+)$",
     "commit_format": "{ID}: {summary}",
@@ -44,9 +44,9 @@ def parse_args() -> argparse.Namespace:
         help=f"Planning directory for .skills/planning.json (default: {DEFAULT_PLANNING_DIR}).",
     )
     parser.add_argument(
-        "--track-dir",
-        default=DEFAULT_TRACK_DIR,
-        help=f"Track directory for .skills/execution.json (default: {DEFAULT_TRACK_DIR}).",
+        "--slice-dir",
+        default=DEFAULT_SLICE_DIR,
+        help=f"Slice directory for .skills/execution.json (default: {DEFAULT_SLICE_DIR}).",
     )
     parser.add_argument(
         "--workflow",
@@ -86,10 +86,10 @@ def build_planning_config(existing: dict[str, Any], planning_dir: str) -> dict[s
 
 
 def build_execution_config(
-    existing: dict[str, Any], track_dir: str, workflow: str
+    existing: dict[str, Any], slice_dir: str, workflow: str
 ) -> dict[str, Any]:
     updated = dict(existing)
-    updated["track_dir"] = track_dir
+    updated["slice_dir"] = slice_dir
     updated["preferred_workflow"] = workflow
     return updated
 
@@ -123,7 +123,7 @@ def main() -> int:
 
     planning_config = build_planning_config(planning_existing, args.planning_dir)
     execution_config = build_execution_config(
-        execution_existing, args.track_dir, args.workflow
+        execution_existing, args.slice_dir, args.workflow
     )
     conventions_config = build_conventions_config(
         conventions_existing, args.mode, args.issue_url_template

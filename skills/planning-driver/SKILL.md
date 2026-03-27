@@ -11,13 +11,13 @@ Use this skill as the planning-layer entrypoint when you need to decide the next
 
 1. Resolve or initialize the active feature planning folder.
 2. Verify required planning files, registry state, and feature metadata.
-3. Route feature-scoped work to `discover`, `design`, `ui-flow`, `breakdown`, `review-planning`, or `track` as appropriate.
+3. Route feature-scoped work to `discover`, `design`, `ui-flow`, `breakdown`, `review-planning`, or `slice` as appropriate.
 4. Update planning readiness state when a phase is complete.
 5. Keep planning handoff decisions durable in the repository instead of in transient chat.
 
 ## Entry Decision Guide
 
-Use `planning-driver` when you need to decide the next planning step for a feature before task-scoped execution begins.
+Use `planning-driver` when you need to decide the next planning step for a feature before slice-scoped execution begins.
 
 Before routing planning work, classify the request:
 
@@ -30,32 +30,32 @@ Before routing planning work, classify the request:
    - route to `design`
 4. If UI or interaction flow is still a material part of scope:
    - route to `ui-flow`
-5. If the work is still too large for execution or tracker tasks are not yet defined:
+5. If the work is still too large for execution or tracker slices are not yet defined:
    - route to `breakdown`
-6. If the planning artifacts need a readiness pass before task bootstrap:
+6. If the planning artifacts need a readiness pass before slice bootstrap:
    - route to `review-planning`
-7. If the feature already has one or more execution-ready work items with explicit task IDs:
-   - route to `track`
-8. If a task-scoped execution track already exists:
+7. If the feature already has one or more execution-ready work items with explicit slice IDs:
+   - route to `slice`
+8. If a slice-scoped execution slice already exists:
    - route to `execution-driver`
 
 `planning-driver` should not absorb discovery, architecture, decomposition, or execution bootstrap work just because it was invoked first. Route to the owning skill and keep readiness state separate from the artifact authoring skill.
 
 ## Upstream and Downstream Handoff
 
-`planning-driver` sits between feature-scoped planning artifacts and task-scoped execution tracks.
+`planning-driver` sits between feature-scoped planning artifacts and slice-scoped execution slices.
 
 In repositories that use the planning-layer skills, the usual flow is:
 
 ```text
-planning-driver -> discover -> design -> ui-flow -> breakdown -> review-planning -> track -> execution-driver
+planning-driver -> discover -> design -> ui-flow -> breakdown -> review-planning -> slice -> execution-driver
 ```
 
 - `planning-driver` owns feature planning readiness and routing.
 - `discover`, `design`, `ui-flow`, and `breakdown` own the planning artifacts.
 - `review-planning` owns the readiness review pass.
-- `track` bootstraps one task-scoped execution track for one ready work item.
-- `execution-driver` then manages task-scoped execution-track readiness.
+- `slice` bootstraps one slice-scoped execution slice for one ready work item.
+- `execution-driver` then manages slice-scoped execution-slice readiness.
 
 ## Lifecycle States
 
@@ -64,7 +64,7 @@ planning-driver -> discover -> design -> ui-flow -> breakdown -> review-planning
 - `design_ready`
 - `breakdown_ready`
 - `planning_reviewed`
-- `track_ready`
+- `slice_ready`
 
 Allowed transitions:
 
@@ -72,7 +72,7 @@ Allowed transitions:
 2. `discovery_ready -> design_ready`
 3. `design_ready -> breakdown_ready`
 4. `breakdown_ready -> planning_reviewed`
-5. `planning_reviewed -> track_ready`
+5. `planning_reviewed -> slice_ready`
 
 Do not skip states without explicit user approval. Adjacent transitions are the default; use tooling overrides only for deliberate repair.
 
@@ -85,9 +85,9 @@ Do not skip states without explicit user approval. Adjacent transitions are the 
 - `design_ready`
 - `breakdown_ready`
 - `planning_reviewed`
-- `track_ready`
+- `slice_ready`
 
-Do not duplicate task tracker lifecycle states in planning metadata. Keep task execution state in the tracker and task-scoped execution-track readiness in `execution-driver`.
+Do not duplicate slice tracker lifecycle states in planning metadata. Keep slice execution state in the tracker and slice-scoped execution-slice readiness in `execution-driver`.
 
 ## Preflight
 
@@ -99,8 +99,8 @@ Do not duplicate task tracker lifecycle states in planning metadata. Keep task e
    - `discover.md`
    - `system-design.md`
    - optional `ui-design.md`
-   - `task-planning.md`
-   - `task-traceability.md`
+   - `slice-planning.md`
+   - `slice-traceability.md`
 6. Verify feature planning metadata exists at `<feature_path>/.planning-meta.json`.
 7. If no feature can be resolved, initialize one before routing further work.
 
@@ -115,15 +115,15 @@ Do not duplicate task tracker lifecycle states in planning metadata. Keep task e
    - set status to `design_ready` when system design is concrete enough for decomposition
 3. If design is complete but no breakdown artifacts exist or slices are still too large:
    - use `breakdown`
-   - set status to `breakdown_ready` when `task-planning.md` and `task-traceability.md` make the execution-ready slices explicit
+   - set status to `breakdown_ready` when `slice-planning.md` and `slice-traceability.md` make the execution-ready slices explicit
 4. If breakdown is complete but planning has not yet been reviewed:
    - use `review-planning`
    - record a durable readiness note
    - set status to `planning_reviewed` when blocking issues are resolved
-5. If planning has been reviewed and there is at least one execution-ready task ID:
-   - route to `track`
-   - set status to `track_ready` when the handoff to task-scoped execution is explicit
-6. If task-scoped execution tracks already exist:
+5. If planning has been reviewed and there is at least one execution-ready slice ID:
+   - route to `slice`
+   - set status to `slice_ready` when the handoff to slice-scoped execution is explicit
+6. If slice-scoped execution slices already exist:
    - route to `execution-driver`
 
 ## Completion Checks
@@ -141,7 +141,7 @@ A feature is `design_ready` when:
 
 A feature is `breakdown_ready` when:
 
-- `task-planning.md` and `task-traceability.md` exist and are non-empty
+- `slice-planning.md` and `slice-traceability.md` exist and are non-empty
 - execution-ready slices and validation paths are explicit enough for review
 
 A feature is `planning_reviewed` when:
@@ -150,11 +150,11 @@ A feature is `planning_reviewed` when:
 - a non-empty review note is recorded in planning metadata
 - blocking planning issues have been resolved or explicitly forced for repair
 
-A feature is `track_ready` when:
+A feature is `slice_ready` when:
 
 - planning review is complete
-- one or more ready task IDs are recorded for bootstrap
-- the next lifecycle owner is `track` and then `execution-driver`
+- one or more ready slice IDs are recorded for bootstrap
+- the next lifecycle owner is `slice` and then `execution-driver`
 
 ## Tooling
 
@@ -192,8 +192,8 @@ python3 <path-to-planning-driver>/scripts/manage_planning.py set-status "feature
 # Record planning review completion:
 python3 <path-to-planning-driver>/scripts/manage_planning.py set-status "feature-slug" planning_reviewed --review-note "Reviewed for scope, sequencing, and validation readiness."
 
-# Mark the feature ready to bootstrap one or more tracks:
-python3 <path-to-planning-driver>/scripts/manage_planning.py set-status "feature-slug" track_ready --task-id ABC-101 --task-id ABC-102
+# Mark the feature ready to bootstrap one or more slices:
+python3 <path-to-planning-driver>/scripts/manage_planning.py set-status "feature-slug" slice_ready --slice-id ABC-101 --slice-id ABC-102
 
 # Resolve the active planning feature:
 python3 <path-to-planning-driver>/scripts/manage_planning.py get-active

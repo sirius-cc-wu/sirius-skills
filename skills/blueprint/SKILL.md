@@ -1,24 +1,24 @@
 ---
-name: plan
+name: blueprint
 description: Produces an actionable implementation plan from a completed brief, including PlantUML detailed design when needed.
 ---
 
 # Plan
 
-Use this skill to convert `brief.md` into a concrete `plan.md`.
-For new tracks, `plan.md` is the final execution artifact before implementation begins.
+Use this skill to convert `brief.md` into a concrete `blueprint.md`.
+For new slices, `blueprint.md` is the final execution artifact before implementation begins.
 
 ## Responsibilities
 
-1. Read the active track's `brief.md`.
-2. Produce `<track_path>/plan.md`.
+1. Read the active slice's `brief.md`.
+2. Produce `<slice_path>/blueprint.md`.
 3. Make implementation decisions explicit.
 4. Map requirements to execution and validation.
-5. Capture task-scoped detailed design diagrams in PlantUML when they clarify implementation.
+5. Capture slice-scoped detailed design diagrams in PlantUML when they clarify implementation.
 
 ## Required Output
 
-- `<track_path>/plan.md`
+- `<slice_path>/blueprint.md`
 
 Optional sections may cover:
 - research notes
@@ -27,11 +27,11 @@ Optional sections may cover:
 - detailed design diagrams
 - verification scenarios
 
-Resolve `<track_path>` through `execution-driver`.
+Resolve `<slice_path>` through `execution-driver`.
 
 ## Artifact Ownership
 
-`plan` owns the content of `<track_path>/plan.md`.
+`plan` owns the content of `<slice_path>/blueprint.md`.
 
 `execution-driver` should route into planning and validate readiness, but it should not take over implementation-plan authoring that belongs to `plan`.
 
@@ -43,7 +43,7 @@ Resolve `<track_path>` through `execution-driver`.
 - Every requirement must map to validation.
 - Avoid leaving major design decisions unresolved.
 - Use PlantUML as the UML language whenever you include detailed design diagrams.
-- Prefer task-scoped detailed design diagrams such as class, sequence, state, or activity diagrams when they help explain non-trivial implementation work.
+- Prefer slice-scoped detailed design diagrams such as class, sequence, state, or activity diagrams when they help explain non-trivial implementation work.
 - Keep execution-layer diagrams focused on the active work item rather than the whole feature.
 
 ## Planning Gates
@@ -59,9 +59,9 @@ Resolve `<track_path>` through `execution-driver`.
 
 Failed gates must be fixed or explicitly waived with rationale.
 
-## `plan.md` Requirements
+## `blueprint.md` Requirements
 
-`<track_path>/plan.md` must include:
+`<slice_path>/blueprint.md` must include:
 
 1. Technical context and assumptions
 2. Gate outcomes
@@ -72,7 +72,7 @@ Failed gates must be fixed or explicitly waived with rationale.
 
 ## Workflow
 
-1. Resolve the active track with `execution-driver`.
+1. Resolve the active slice with `execution-driver`.
 2. Read `brief.md` and scan the target codebase.
 3. Fill `plan-template.md`.
 4. Add PlantUML detailed design where structure, behavior, or state transitions need extra precision.

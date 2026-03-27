@@ -41,7 +41,7 @@ Example project config:
 
 ```json
 {
-  "issue_tracker": "jira",
+  "issue_sliceer": "jira",
   "id_pattern": "^[A-Z][A-Z0-9]*-[0-9]+$",
   "branch_extract_pattern": "^([A-Z][A-Z0-9]*-[0-9]+)-(.+)$",
   "pr_title_format": "{ID}: {summary}"
@@ -72,10 +72,10 @@ Example project config:
    - Summary: What does the change do?
 
 4. **Validate Execution Checklist Completion**:
-   - Locate the relevant `plan.md` (usually in `tracks/<ID>-<name>/plan.md`).
-   - If a legacy `tasks.md` also exists, review it alongside `plan.md`.
+   - Locate the relevant `blueprint.md` (usually in `slices/<ID>-<name>/blueprint.md`).
+   - If a legacy `slices.md` also exists, review it alongside `blueprint.md`.
    - Check if all checklist items in the execution artifact(s) are marked as completed (`[x]`).
-   - **MANDATORY**: A PR should not be created if there are pending `[ ]` items in `plan.md` (or any legacy `tasks.md`) unless explicitly justified.
+   - **MANDATORY**: A PR should not be created if there are pending `[ ]` items in `blueprint.md` (or any legacy `slices.md`) unless explicitly justified.
 
 5. **Push branch if needed**:
    ```bash
@@ -108,7 +108,7 @@ Example project config:
    - [ ] I have performed a self-review of my own code
    - [ ] I have commented my code, particularly in hard-to-understand areas
    - [ ] I have made corresponding changes to the documentation
-   - [ ] I have updated the execution checklist (`plan.md`, plus any legacy `tasks.md`)
+   - [ ] I have updated the execution checklist (`blueprint.md`, plus any legacy `slices.md`)
    - [ ] New and existing unit tests pass locally with my changes
    - [ ] I have checked my code and corrected any misspellings
    EOF

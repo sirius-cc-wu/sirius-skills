@@ -1,15 +1,15 @@
-# Task Specification: [WORK ITEM NAME]
+# Slice Specification: [WORK ITEM NAME]
 
-**Track**: `[ID-work-item-name]`
+**Slice**: `[ID-work-item-name]`
 **Created**: [DATE]  
 **Status**: Draft  
 **Input**: "$ARGUMENTS"
 
 ## 1. Work Item Summary
 
-- **Work Item**: [Short task-scoped summary]
-- **Source Story / Slice / Task**: [Originating story ID, slice ID, tracker task, or "standalone"]
-- **Requested Outcome**: [As a / When / We want / Technical task statement]
+- **Work Item**: [Short slice-scoped summary]
+- **Source Story / Slice / Slice**: [Originating story ID, slice ID, tracker slice, or "standalone"]
+- **Requested Outcome**: [As a / When / We want / Technical slice statement]
 - **Why this matters**: [Value of this work item]
 - **Independent Test**: [How this can be verified on its own]
 

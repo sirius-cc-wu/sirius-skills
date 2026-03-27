@@ -37,7 +37,7 @@ def test_default_mode_writes_generic_config_files(tmp_path, monkeypatch):
     )
 
     assert planning == {"planning_dir": "docs/features"}
-    assert execution == {"track_dir": "tracks", "preferred_workflow": "TDD"}
+    assert execution == {"slice_dir": "slices", "preferred_workflow": "TDD"}
     assert conventions == {}
 
 
@@ -71,7 +71,7 @@ def test_jira_mode_sets_jira_conventions_and_preserves_other_keys(
     )
 
     assert conventions["custom_key"] == "keep-me"
-    assert conventions["issue_tracker"] == "jira"
+    assert conventions["issue_sliceer"] == "jira"
     assert conventions["id_pattern"] == r"^[A-Z][A-Z0-9]*-[0-9]+$"
     assert conventions["branch_extract_pattern"] == r"^([A-Z][A-Z0-9]*-[0-9]+)-(.+)$"
     assert conventions["commit_format"] == "{ID}: {summary}"

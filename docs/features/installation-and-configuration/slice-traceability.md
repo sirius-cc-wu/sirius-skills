@@ -1,14 +1,14 @@
-# Task Traceability
+# Slice Traceability
 
 ## Conventions
 
 - Keep story IDs stable across planning docs.
-- Use provisional task IDs because no external execution tracker is configured for this reverse-engineered planning set.
-- Leave `Track IDs` blank until real execution-track bootstrap happens.
+- Use provisional slice IDs because no external execution tracker is configured for this reverse-engineered planning set.
+- Leave `Slice IDs` blank until real execution-slice bootstrap happens.
 
 ## Mapping Table
 
-| Story ID | Story Size | Story Summary | Increments | Task IDs | Task Slices | Blocked By | Track IDs | Notes |
+| Story ID | Story Size | Story Summary | Increments | Slice IDs | Slice Slices | Blocked By | Slice IDs | Notes |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- |
 | IC-01 | M | Install and uninstall the managed skill set | I1 | IC-101 | Install |  |  | Anchors the managed repo setup entrypoint |
 | IC-02 | M | Configure planning and execution layout separately | I1 | IC-102, IC-103 | Planning config, Execution config | IC-101 |  | Split by config ownership surface |
@@ -18,4 +18,4 @@
 ## Notes
 
 - `Blocked By` reflects slice sequencing needed to keep config semantics coherent.
-- These rows can seed future tracker tasks if the repo chooses to execute further integration work.
+- These rows can seed future tracker slices if the repo chooses to execute further integration work.

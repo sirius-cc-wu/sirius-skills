@@ -27,8 +27,8 @@ def test_scaffold_defaults_to_docs_features(tmp_path, monkeypatch):
     assert run_cli(module, monkeypatch, "demo-feature") == 0
 
     target_dir = tmp_path / "docs" / "features" / "demo-feature"
-    assert (target_dir / "task-planning.md").exists()
-    assert (target_dir / "task-traceability.md").exists()
+    assert (target_dir / "slice-planning.md").exists()
+    assert (target_dir / "slice-traceability.md").exists()
 
 
 def test_scaffold_uses_planning_config_dir(tmp_path, monkeypatch):
@@ -45,8 +45,8 @@ def test_scaffold_uses_planning_config_dir(tmp_path, monkeypatch):
     assert run_cli(module, monkeypatch, "demo-feature") == 0
 
     target_dir = tmp_path / "planning" / "features" / "demo-feature"
-    assert (target_dir / "task-planning.md").exists()
-    assert (target_dir / "task-traceability.md").exists()
+    assert (target_dir / "slice-planning.md").exists()
+    assert (target_dir / "slice-traceability.md").exists()
 
 
 def test_scaffold_base_dir_flag_overrides_planning_config_dir(tmp_path, monkeypatch):
@@ -65,7 +65,7 @@ def test_scaffold_base_dir_flag_overrides_planning_config_dir(tmp_path, monkeypa
         == 0
     )
 
-    assert (tmp_path / "custom" / "planning" / "demo-feature" / "task-planning.md").exists()
+    assert (tmp_path / "custom" / "planning" / "demo-feature" / "slice-planning.md").exists()
     assert not (tmp_path / "planning" / "features" / "demo-feature").exists()
 
 
@@ -99,5 +99,5 @@ def test_scaffold_ignores_conventions_planning_dir(tmp_path, monkeypatch):
 
     assert run_cli(module, monkeypatch, "demo-feature") == 0
 
-    assert (tmp_path / "docs" / "features" / "demo-feature" / "task-planning.md").exists()
+    assert (tmp_path / "docs" / "features" / "demo-feature" / "slice-planning.md").exists()
     assert not (tmp_path / "legacy" / "features" / "demo-feature").exists()

@@ -6,7 +6,7 @@ Use this guide when a skill needs to teach a repeatable multi-step process rathe
 
 Choose a workflow-oriented skill when:
 
-- the task naturally happens in stages
+- the slice naturally happens in stages
 - later steps depend on earlier decisions
 - there are common failure points or branches
 - the user benefits from consistent sequencing
@@ -29,7 +29,7 @@ Use this when the same major steps happen every time.
 5. Summarize what changed
 ```
 
-This is the simplest pattern and works well for predictable tasks.
+This is the simplest pattern and works well for predictable slices.
 
 ### 2. Decision tree
 

@@ -10,8 +10,8 @@ from pathlib import Path
 SCRIPT_DIR = Path(__file__).resolve().parent
 SKILL_DIR = SCRIPT_DIR.parent
 ASSETS_DIR = SKILL_DIR / "assets"
-TASK_PLANNING_TEMPLATE = ASSETS_DIR / "task-planning-template.md"
-TASK_TRACEABILITY_TEMPLATE = ASSETS_DIR / "task-traceability-template.md"
+SLICE_PLANNING_TEMPLATE = ASSETS_DIR / "slice-planning-template.md"
+SLICE_TRACEABILITY_TEMPLATE = ASSETS_DIR / "slice-traceability-template.md"
 DEFAULT_BASE_DIR = Path("docs/features")
 PLANNING_CONFIG_FILE = Path(".skills") / "planning.json"
 PLANNING_DIR_FIELD = "planning_dir"
@@ -38,7 +38,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument(
         "--force",
         action="store_true",
-        help="Overwrite existing task-planning.md and task-traceability.md files.",
+        help="Overwrite existing slice-planning.md and slice-traceability.md files.",
     )
     return parser.parse_args()
 
@@ -105,13 +105,13 @@ def load_template(path: Path) -> str:
     return path.read_text(encoding="utf-8")
 
 
-def render_task_planning(feature_slug: str) -> str:
-    template = load_template(TASK_PLANNING_TEMPLATE)
+def render_slice_planning(feature_slug: str) -> str:
+    template = load_template(SLICE_PLANNING_TEMPLATE)
     return template.replace("- Feature:\n", f"- Feature: {feature_slug}\n", 1)
 
 
-def render_task_traceability() -> str:
-    return load_template(TASK_TRACEABILITY_TEMPLATE)
+def render_slice_traceability() -> str:
+    return load_template(SLICE_TRACEABILITY_TEMPLATE)
 
 
 def ensure_writable(paths: list[Path], force: bool) -> None:
@@ -126,14 +126,14 @@ def ensure_writable(paths: list[Path], force: bool) -> None:
 
 def scaffold(feature_slug: str, base_dir: Path, force: bool) -> Path:
     target_dir = base_dir / feature_slug
-    task_planning_path = target_dir / "task-planning.md"
-    task_traceability_path = target_dir / "task-traceability.md"
+    slice_planning_path = target_dir / "slice-planning.md"
+    slice_traceability_path = target_dir / "slice-traceability.md"
 
-    ensure_writable([task_planning_path, task_traceability_path], force=force)
+    ensure_writable([slice_planning_path, slice_traceability_path], force=force)
     target_dir.mkdir(parents=True, exist_ok=True)
 
-    task_planning_path.write_text(render_task_planning(feature_slug), encoding="utf-8")
-    task_traceability_path.write_text(render_task_traceability(), encoding="utf-8")
+    slice_planning_path.write_text(render_slice_planning(feature_slug), encoding="utf-8")
+    slice_traceability_path.write_text(render_slice_traceability(), encoding="utf-8")
     return target_dir
 
 
@@ -152,8 +152,8 @@ def main() -> int:
         return 1
 
     print(f"Success: scaffolded increment-ready breakdown files in {target_dir}")
-    print(f"- {target_dir / 'task-planning.md'}")
-    print(f"- {target_dir / 'task-traceability.md'}")
+    print(f"- {target_dir / 'slice-planning.md'}")
+    print(f"- {target_dir / 'slice-traceability.md'}")
     return 0
 
 

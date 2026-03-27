@@ -8,25 +8,25 @@ import sys
 from datetime import datetime
 from typing import Dict, List, Optional, Tuple
 
-DEFAULT_TRACKS_DIR = "tracks"
+DEFAULT_TRACKS_DIR = "slices"
 CONFIG_DIR = ".skills"
 CONFIG_FILE = os.path.join(CONFIG_DIR, "execution.json")
 CONVENTIONS_CONFIG_DIR = ".skills"
 CONVENTIONS_CONFIG_FILE = os.path.join(CONVENTIONS_CONFIG_DIR, "conventions.json")
 DEFAULT_PREFERRED_WORKFLOW = "TDD"
 REGISTRY_JSON_FILE = "registry.json"
-DEFAULT_GENERATED_TRACK_PREFIX = "SPC"
+DEFAULT_GENERATED_SLICE_PREFIX = "SPC"
 REGISTRY_HEADER = (
-    "# Track Registry\n\n"
+    "# Slice Registry\n\n"
     "| ID | Feature | Status | Updated | Closed | Path |\n"
     "|---|---|---|---|---|---|\n"
 )
-TRACK_METADATA_FILE = ".track-meta.json"
-TRACK_ID_PATTERN = re.compile(r"^[A-Za-z0-9][A-Za-z0-9._-]*$")
+SLICE_METADATA_FILE = ".slice-meta.json"
+SLICE_ID_PATTERN = re.compile(r"^[A-Za-z0-9][A-Za-z0-9._-]*$")
 STATUS_SEQUENCE = [
     "draft",
     "brief_ready",
-    "plan_ready",
+    "blueprint_ready",
     "execution_ready",
     "closed",
 ]
@@ -34,7 +34,7 @@ VALID_STATUSES = set(STATUS_SEQUENCE)
 STATUS_ALIASES = {
     "draft": "draft",
     "brief_ready": "brief_ready",
-    "plan_ready": "plan_ready",
+    "blueprint_ready": "blueprint_ready",
     "execution_ready": "execution_ready",
     "closed": "closed",
 }
@@ -80,27 +80,27 @@ def normalize_feature_name(value: str) -> str:
     return normalized.replace("|", "/")
 
 
-def normalize_track_dir(value: str) -> str:
+def normalize_slice_dir(value: str) -> str:
     normalized = value.strip()
     if not normalized:
-        raise ValueError("Track directory cannot be empty.")
+        raise ValueError("Slice directory cannot be empty.")
     if normalized in {".", "./"}:
-        raise ValueError("Track directory cannot be the repository root.")
+        raise ValueError("Slice directory cannot be the repository root.")
     normalized = normalized.rstrip("/")
     if normalized.startswith("./"):
         normalized = normalized[2:]
     return normalized
 
 
-def validate_track_id(value: str) -> str:
-    track_id = value.strip()
-    if not track_id:
-        raise ValueError("Track ID cannot be empty.")
-    if not TRACK_ID_PATTERN.fullmatch(track_id):
+def validate_slice_id(value: str) -> str:
+    slice_id = value.strip()
+    if not slice_id:
+        raise ValueError("Slice ID cannot be empty.")
+    if not SLICE_ID_PATTERN.fullmatch(slice_id):
         raise ValueError(
-            "Invalid track ID. Use only letters, numbers, dot, underscore, and hyphen."
+            "Invalid slice ID. Use only letters, numbers, dot, underscore, and hyphen."
         )
-    return track_id
+    return slice_id
 
 
 def normalize_status(value: str) -> str:
@@ -179,7 +179,7 @@ def normalize_relation(relation: object) -> Dict[str, object]:
 
     normalized = {
         "type": normalize_relation_type(str(relation.get("type", ""))),
-        "target_track": validate_track_id(str(relation.get("target_track", ""))),
+        "target_slice": validate_slice_id(str(relation.get("target_slice", ""))),
     }
 
     scope = normalize_relation_scope(relation.get("scope"))
@@ -205,14 +205,14 @@ def relation_key(relation: Dict[str, object]) -> Tuple[str, str, str]:
     scope = relation.get("scope", {})
     return (
         str(relation["type"]),
-        str(relation["target_track"]),
+        str(relation["target_slice"]),
         json.dumps(scope, sort_keys=True),
     )
 
 
 def build_relation(
     relation_type: str,
-    target_track: str,
+    target_slice: str,
     story_title: Optional[str] = None,
     requirement_ids: Optional[List[str]] = None,
     selector: Optional[str] = None,
@@ -228,7 +228,7 @@ def build_relation(
 
     relation: Dict[str, object] = {
         "type": normalize_relation_type(relation_type),
-        "target_track": validate_track_id(target_track),
+        "target_slice": validate_slice_id(target_slice),
         "recorded_at": recorded_at or now_timestamp(),
     }
     if scope:
@@ -236,7 +236,7 @@ def build_relation(
     return normalize_relation(relation)
 
 
-def normalize_track_path(path: str) -> str:
+def normalize_slice_path(path: str) -> str:
     normalized = path.rstrip("/")
     if normalized.startswith("./"):
         normalized = normalized[2:]
@@ -252,10 +252,10 @@ def normalize_registry_row(row: Dict[str, object]) -> Dict[str, object]:
         raise RuntimeError("Registry row field 'path' must be a string.")
 
     normalized = {
-        "id": validate_track_id(str(row.get("id", ""))),
+        "id": validate_slice_id(str(row.get("id", ""))),
         "feature": normalize_feature_name(feature_value),
         "status": normalize_status(str(row.get("status", ""))),
-        "path": normalize_track_path(path_value),
+        "path": normalize_slice_path(path_value),
         "updated_at": normalize_optional_timestamp(row.get("updated_at")),
         "closed_at": normalize_optional_timestamp(row.get("closed_at")),
     }
@@ -268,12 +268,12 @@ def load_config(required: bool = True) -> Dict[str, str]:
     if not os.path.exists(CONFIG_FILE):
         if required:
             raise RuntimeError(
-                "Track config not found at '.skills/execution.json'. "
-                "Ask the user where tracks should be created, then run "
-                "`manage_execution.py init <track-dir>`."
+                "Slice config not found at '.skills/execution.json'. "
+                "Ask the user where slices should be created, then run "
+                "`manage_execution.py init <slice-dir>`."
             )
         return {
-            "track_dir": DEFAULT_TRACKS_DIR,
+            "slice_dir": DEFAULT_TRACKS_DIR,
             "preferred_workflow": DEFAULT_PREFERRED_WORKFLOW,
         }
 
@@ -286,20 +286,20 @@ def load_config(required: bool = True) -> Dict[str, str]:
     if not isinstance(config, dict):
         raise RuntimeError("Execution config must be a JSON object.")
 
-    track_dir = config.get("track_dir", DEFAULT_TRACKS_DIR)
+    slice_dir = config.get("slice_dir", DEFAULT_TRACKS_DIR)
     preferred_workflow = config.get(
         "preferred_workflow", DEFAULT_PREFERRED_WORKFLOW
     )
 
-    if not isinstance(track_dir, str):
-        raise RuntimeError("Execution config field 'track_dir' must be a string.")
+    if not isinstance(slice_dir, str):
+        raise RuntimeError("Execution config field 'slice_dir' must be a string.")
     if not isinstance(preferred_workflow, str):
         raise RuntimeError(
             "Execution config field 'preferred_workflow' must be a string."
         )
 
     return {
-        "track_dir": normalize_track_dir(track_dir),
+        "slice_dir": normalize_slice_dir(slice_dir),
         "preferred_workflow": preferred_workflow,
     }
 
@@ -322,7 +322,7 @@ def load_conventions_config(required: bool = False) -> Dict[str, str]:
         raise RuntimeError("Conventions config must be a JSON object.")
 
     string_fields = (
-        "issue_tracker",
+        "issue_sliceer",
         "id_pattern",
         "branch_extract_pattern",
         "commit_format",
@@ -342,13 +342,13 @@ def load_conventions_config(required: bool = False) -> Dict[str, str]:
 
 
 def write_config(
-    track_dir: str, preferred_workflow: str = DEFAULT_PREFERRED_WORKFLOW
+    slice_dir: str, preferred_workflow: str = DEFAULT_PREFERRED_WORKFLOW
 ) -> None:
     os.makedirs(CONFIG_DIR, exist_ok=True)
     with open(CONFIG_FILE, "w", encoding="utf-8") as f:
         json.dump(
             {
-                "track_dir": normalize_track_dir(track_dir),
+                "slice_dir": normalize_slice_dir(slice_dir),
                 "preferred_workflow": preferred_workflow,
             },
             f,
@@ -359,7 +359,7 @@ def write_config(
 
 def get_registry_paths(required_config: bool = True) -> Tuple[str, str, str]:
     config = load_config(required=required_config)
-    specs_dir = normalize_track_dir(config["track_dir"])
+    specs_dir = normalize_slice_dir(config["slice_dir"])
     return (
         specs_dir,
         os.path.join(specs_dir, "README.md"),
@@ -400,17 +400,17 @@ def load_registry_json(registry_json_file: str) -> List[Dict[str, object]]:
         with open(registry_json_file, "r", encoding="utf-8") as f:
             payload = json.load(f)
     except json.JSONDecodeError as exc:
-        raise RuntimeError("Track registry JSON is not valid JSON.") from exc
+        raise RuntimeError("Slice registry JSON is not valid JSON.") from exc
 
     if isinstance(payload, list):
         raw_rows = payload
     elif isinstance(payload, dict):
-        raw_rows = payload.get("tracks")
+        raw_rows = payload.get("slices")
     else:
-        raise RuntimeError("Track registry JSON must be a JSON object or list.")
+        raise RuntimeError("Slice registry JSON must be a JSON object or list.")
 
     if not isinstance(raw_rows, list):
-        raise RuntimeError("Specs registry JSON field 'tracks' must be a list.")
+        raise RuntimeError("Specs registry JSON field 'slices' must be a list.")
 
     return [normalize_registry_row(row) for row in raw_rows]
 
@@ -441,7 +441,7 @@ def write_registry_json(registry_json_file: str, rows: List[Dict[str, object]]) 
             {
                 "version": 1,
                 "generated_at": now_timestamp(),
-                "tracks": rows,
+                "slices": rows,
             },
             f,
             indent=2,
@@ -486,12 +486,12 @@ def write_registry(rows: List[Dict[str, object]]) -> None:
     write_registry_json(registry_json_file, normalized_rows)
 
 
-def get_track_metadata_path(track_path: str) -> str:
-    return os.path.join(track_path, TRACK_METADATA_FILE)
+def get_slice_metadata_path(slice_path: str) -> str:
+    return os.path.join(slice_path, SLICE_METADATA_FILE)
 
 
-def load_track_metadata(track_path: str) -> Dict[str, object]:
-    metadata_path = get_track_metadata_path(track_path)
+def load_slice_metadata(slice_path: str) -> Dict[str, object]:
+    metadata_path = get_slice_metadata_path(slice_path)
     if not os.path.exists(metadata_path):
         return {}
 
@@ -499,23 +499,23 @@ def load_track_metadata(track_path: str) -> Dict[str, object]:
         with open(metadata_path, "r", encoding="utf-8") as f:
             metadata = json.load(f)
     except json.JSONDecodeError as exc:
-        raise RuntimeError(f"Track metadata is not valid JSON: {metadata_path}") from exc
+        raise RuntimeError(f"Slice metadata is not valid JSON: {metadata_path}") from exc
 
     if not isinstance(metadata, dict):
-        raise RuntimeError(f"Track metadata must be a JSON object: {metadata_path}")
+        raise RuntimeError(f"Slice metadata must be a JSON object: {metadata_path}")
     if "relations" in metadata:
         metadata["relations"] = normalize_relations(metadata.get("relations"))
     return metadata
 
 
-def write_track_metadata(track_path: str, metadata: Dict[str, object]) -> None:
-    metadata_path = get_track_metadata_path(track_path)
+def write_slice_metadata(slice_path: str, metadata: Dict[str, object]) -> None:
+    metadata_path = get_slice_metadata_path(slice_path)
     with open(metadata_path, "w", encoding="utf-8") as f:
         json.dump(metadata, f, indent=2)
         f.write("\n")
 
 
-def build_track_metadata(
+def build_slice_metadata(
     row: Dict[str, object],
     status: str,
     existing: Optional[Dict[str, object]] = None,
@@ -529,7 +529,7 @@ def build_track_metadata(
 
     metadata["updated_at"] = timestamp
     metadata["status"] = status
-    metadata["track_id"] = row["id"]
+    metadata["slice_id"] = row["id"]
     metadata["feature"] = row["feature"]
     metadata["path"] = row["path"]
     metadata["relations"] = normalize_relations(metadata.get("relations"))
@@ -553,11 +553,11 @@ def apply_metadata_to_row(
     return normalize_registry_row(updated)
 
 
-def sync_track_metadata(row: Dict[str, object], metadata: Dict[str, object]) -> None:
+def sync_slice_metadata(row: Dict[str, object], metadata: Dict[str, object]) -> None:
     updated_row = apply_metadata_to_row(row, metadata)
     row.clear()
     row.update(updated_row)
-    write_track_metadata(str(row["path"]).rstrip("/"), metadata)
+    write_slice_metadata(str(row["path"]).rstrip("/"), metadata)
 
 
 def upsert_relation_entry(
@@ -572,7 +572,7 @@ def upsert_relation_entry(
 
 def relation_display(relation: Dict[str, object]) -> str:
     scope = relation.get("scope", {})
-    parts = [f"{relation['type']} -> {relation['target_track']}"]
+    parts = [f"{relation['type']} -> {relation['target_slice']}"]
     if isinstance(scope, dict) and scope:
         scope_bits: List[str] = []
         story_title = scope.get("story_title")
@@ -591,90 +591,90 @@ def relation_display(relation: Dict[str, object]) -> str:
 
 def add_relation(
     rows: List[Dict[str, object]],
-    source_track: Dict[str, object],
+    source_slice: Dict[str, object],
     relation_type: str,
     target_selector: str,
     story_title: Optional[str] = None,
     requirement_ids: Optional[List[str]] = None,
     selector: Optional[str] = None,
 ) -> Tuple[bool, str]:
-    target_track = resolve_track(rows, target_selector)
-    if not target_track:
-        return False, f"Track not found: {target_selector}"
+    target_slice = resolve_slice(rows, target_selector)
+    if not target_slice:
+        return False, f"Slice not found: {target_selector}"
 
-    if source_track["id"] == target_track["id"]:
-        return False, "Track relations cannot target the same track."
+    if source_slice["id"] == target_slice["id"]:
+        return False, "Slice relations cannot target the same slice."
 
     relation = build_relation(
         relation_type,
-        str(target_track["id"]),
+        str(target_slice["id"]),
         story_title=story_title,
         requirement_ids=requirement_ids,
         selector=selector,
     )
     inverse_relation = build_relation(
         RELATION_INVERSES[relation["type"]],
-        str(source_track["id"]),
+        str(source_slice["id"]),
         story_title=story_title,
         requirement_ids=requirement_ids,
         selector=selector,
         recorded_at=str(relation.get("recorded_at") or now_timestamp()),
     )
 
-    source_metadata = build_track_metadata(
-        source_track,
-        normalize_status(str(source_track["status"])),
-        existing=load_track_metadata(str(source_track["path"]).rstrip("/")),
+    source_metadata = build_slice_metadata(
+        source_slice,
+        normalize_status(str(source_slice["status"])),
+        existing=load_slice_metadata(str(source_slice["path"]).rstrip("/")),
     )
     source_metadata["relations"] = upsert_relation_entry(
         normalize_relations(source_metadata.get("relations")), relation
     )
-    sync_track_metadata(source_track, source_metadata)
+    sync_slice_metadata(source_slice, source_metadata)
 
-    target_metadata = build_track_metadata(
-        target_track,
-        normalize_status(str(target_track["status"])),
-        existing=load_track_metadata(str(target_track["path"]).rstrip("/")),
+    target_metadata = build_slice_metadata(
+        target_slice,
+        normalize_status(str(target_slice["status"])),
+        existing=load_slice_metadata(str(target_slice["path"]).rstrip("/")),
     )
     target_metadata["relations"] = upsert_relation_entry(
         normalize_relations(target_metadata.get("relations")), inverse_relation
     )
-    sync_track_metadata(target_track, target_metadata)
+    sync_slice_metadata(target_slice, target_metadata)
 
     write_registry(rows)
     return True, f"Recorded relation {relation_display(relation)}"
 
 
 def audit_relations(
-    rows: List[Dict[str, object]], track_selector: Optional[str] = None
+    rows: List[Dict[str, object]], slice_selector: Optional[str] = None
 ) -> Dict[str, object]:
-    selected_tracks: List[Dict[str, object]]
-    if track_selector:
-        track = resolve_track(rows, track_selector)
-        if not track:
-            raise RuntimeError(f"Track not found: {track_selector}")
-        selected_tracks = [track]
+    selected_slices: List[Dict[str, object]]
+    if slice_selector:
+        slice = resolve_slice(rows, slice_selector)
+        if not slice:
+            raise RuntimeError(f"Slice not found: {slice_selector}")
+        selected_slices = [slice]
     else:
-        selected_tracks = rows
+        selected_slices = rows
 
     row_by_id = {str(row["id"]): row for row in rows}
     metadata_by_id = {
-        str(row["id"]): load_track_metadata(str(row["path"]).rstrip("/")) for row in rows
+        str(row["id"]): load_slice_metadata(str(row["path"]).rstrip("/")) for row in rows
     }
 
     issues: List[Dict[str, str]] = []
-    for row in selected_tracks:
-        track_id = str(row["id"])
-        relations = normalize_relations(metadata_by_id[track_id].get("relations"))
+    for row in selected_slices:
+        slice_id = str(row["id"])
+        relations = normalize_relations(metadata_by_id[slice_id].get("relations"))
         seen = set()
         for relation in relations:
             key = relation_key(relation)
             if key in seen:
                 issues.append(
                     {
-                        "track_id": track_id,
+                        "slice_id": slice_id,
                         "relation_type": str(relation["type"]),
-                        "target_track": str(relation["target_track"]),
+                        "target_slice": str(relation["target_slice"]),
                         "code": "duplicate_relation",
                         "message": "Duplicate relation entry detected.",
                     }
@@ -682,38 +682,38 @@ def audit_relations(
                 continue
             seen.add(key)
 
-            target_track = str(relation["target_track"])
-            if target_track == track_id:
+            target_slice = str(relation["target_slice"])
+            if target_slice == slice_id:
                 issues.append(
                     {
-                        "track_id": track_id,
+                        "slice_id": slice_id,
                         "relation_type": str(relation["type"]),
-                        "target_track": target_track,
+                        "target_slice": target_slice,
                         "code": "self_reference",
-                        "message": "Relation points back to the same track.",
+                        "message": "Relation points back to the same slice.",
                     }
                 )
                 continue
 
-            target_row = row_by_id.get(target_track)
+            target_row = row_by_id.get(target_slice)
             if not target_row:
                 issues.append(
                     {
-                        "track_id": track_id,
+                        "slice_id": slice_id,
                         "relation_type": str(relation["type"]),
-                        "target_track": target_track,
-                        "code": "missing_target_track",
-                        "message": "Relation target track does not exist in the registry.",
+                        "target_slice": target_slice,
+                        "code": "missing_target_slice",
+                        "message": "Relation target slice does not exist in the registry.",
                     }
                 )
                 continue
 
             target_relations = normalize_relations(
-                metadata_by_id[target_track].get("relations")
+                metadata_by_id[target_slice].get("relations")
             )
             expected_inverse = build_relation(
                 RELATION_INVERSES[str(relation["type"])],
-                track_id,
+                slice_id,
                 story_title=relation.get("scope", {}).get("story_title")
                 if isinstance(relation.get("scope"), dict)
                 else None,
@@ -729,20 +729,20 @@ def audit_relations(
             if not any(relation_key(item) == expected_key for item in target_relations):
                 issues.append(
                     {
-                        "track_id": track_id,
+                        "slice_id": slice_id,
                         "relation_type": str(relation["type"]),
-                        "target_track": target_track,
+                        "target_slice": target_slice,
                         "code": "missing_reciprocal_relation",
                         "message": (
                             "Expected reciprocal relation "
-                            f"{RELATION_INVERSES[str(relation['type'])]} -> {track_id} was not found."
+                            f"{RELATION_INVERSES[str(relation['type'])]} -> {slice_id} was not found."
                         ),
                     }
                 )
 
     return {
         "ok": len(issues) == 0,
-        "track_ids": [str(row["id"]) for row in selected_tracks],
+        "slice_ids": [str(row["id"]) for row in selected_slices],
         "issues": issues,
     }
 
@@ -765,8 +765,8 @@ def encode_base36(data: bytes, length: int) -> str:
     return encoded
 
 
-def resolve_generated_track_prefix() -> str:
-    return DEFAULT_GENERATED_TRACK_PREFIX
+def resolve_generated_slice_prefix() -> str:
+    return DEFAULT_GENERATED_SLICE_PREFIX
 
 
 def get_current_branch() -> Optional[str]:
@@ -812,7 +812,7 @@ def infer_id_from_branch(conventions_config: Optional[Dict[str, str]] = None) ->
             return match.group(0)
     return None
 
-def generate_hash_track_id(
+def generate_hash_slice_id(
     rows: List[Dict[str, object]],
     name: str,
     description: str = "",
@@ -822,7 +822,7 @@ def generate_hash_track_id(
     if not normalized_name:
         raise ValueError("Feature name cannot be empty.")
 
-    prefix = resolve_generated_track_prefix()
+    prefix = resolve_generated_slice_prefix()
     timestamp = created_at or datetime.now().isoformat()
     existing_ids = {row["id"] for row in rows}
 
@@ -835,10 +835,10 @@ def generate_hash_track_id(
             if candidate not in existing_ids:
                 return candidate
 
-    raise RuntimeError("Failed to generate a unique track ID.")
+    raise RuntimeError("Failed to generate a unique slice ID.")
 
 
-def resolve_track(rows: List[Dict[str, object]], selector: str) -> Optional[Dict[str, object]]:
+def resolve_slice(rows: List[Dict[str, object]], selector: str) -> Optional[Dict[str, object]]:
     selector = selector.strip().rstrip("/")
     for row in rows:
         row_path = str(row["path"]).rstrip("/")
@@ -849,8 +849,8 @@ def resolve_track(rows: List[Dict[str, object]], selector: str) -> Optional[Dict
     return None
 
 
-def find_active_track(rows: List[Dict[str, object]]) -> Optional[Dict[str, object]]:
-    priority = ["execution_ready", "plan_ready", "brief_ready", "draft"]
+def find_active_slice(rows: List[Dict[str, object]]) -> Optional[Dict[str, object]]:
+    priority = ["execution_ready", "blueprint_ready", "brief_ready", "draft"]
     for wanted in priority:
         matches = [r for r in rows if r["status"] == wanted]
         if matches:
@@ -859,33 +859,33 @@ def find_active_track(rows: List[Dict[str, object]]) -> Optional[Dict[str, objec
 
 
 def expected_status_for_files(
-    brief_exists: bool, requirements_exists: bool, plan_exists: bool, tasks_exists: bool
+    brief_exists: bool, requirements_exists: bool, plan_exists: bool, slices_exists: bool
 ) -> str:
-    del tasks_exists
+    del slices_exists
     if not brief_exists or not requirements_exists:
         return "draft"
     if not plan_exists:
         return "brief_ready"
-    return "plan_ready"
+    return "blueprint_ready"
 
 
-def validate_track(
+def validate_slice(
     row: Dict[str, object], skip_metadata_status_check: bool = False
 ) -> Tuple[bool, List[str], Dict[str, bool]]:
     issues: List[str] = []
     path = str(row["path"]).rstrip("/")
     brief = os.path.join(path, "brief.md")
     requirements = os.path.join(path, "checklists", "requirements.md")
-    plan = os.path.join(path, "plan.md")
-    tasks = os.path.join(path, "tasks.md")
-    metadata = load_track_metadata(path)
+    plan = os.path.join(path, "blueprint.md")
+    slices = os.path.join(path, "slices.md")
+    metadata = load_slice_metadata(path)
     checks = {
-        "track_dir_exists": os.path.isdir(path),
+        "slice_dir_exists": os.path.isdir(path),
         "metadata_exists": bool(metadata),
         "brief_exists": os.path.isfile(brief),
         "requirements_exists": os.path.isfile(requirements),
         "plan_exists": os.path.isfile(plan),
-        "tasks_exists": os.path.isfile(tasks),
+        "slices_exists": os.path.isfile(slices),
         "closed_at_recorded": isinstance(metadata.get("closed_at"), str),
     }
 
@@ -895,24 +895,24 @@ def validate_track(
         issues.append(f"invalid_status:{row['status']}")
         normalized_status = str(row["status"])
 
-    if not checks["track_dir_exists"]:
-        issues.append("missing_track_directory")
+    if not checks["slice_dir_exists"]:
+        issues.append("missing_slice_directory")
         return False, issues, checks
     if not checks["metadata_exists"]:
-        issues.append("missing_track_metadata")
+        issues.append("missing_slice_metadata")
 
     expected = expected_status_for_files(
         checks["brief_exists"],
         checks["requirements_exists"],
         checks["plan_exists"],
-        checks["tasks_exists"],
+        checks["slices_exists"],
     )
-    if normalized_status in {"draft", "brief_ready", "plan_ready"}:
+    if normalized_status in {"draft", "brief_ready", "blueprint_ready"}:
         if normalized_status != expected:
             issues.append(
                 f"status_mismatch:status={normalized_status} expected={expected} based_on_files"
             )
-    if normalized_status in {"brief_ready", "plan_ready", "execution_ready"} and not checks[
+    if normalized_status in {"brief_ready", "blueprint_ready", "execution_ready"} and not checks[
         "requirements_exists"
     ]:
         issues.append("missing_requirements_checklist")
@@ -944,19 +944,19 @@ def validate_track(
     return len(issues) == 0, issues, checks
 
 
-def create_track(
-    track_id: str, name: str, metadata: Optional[Dict[str, object]] = None
+def create_slice(
+    slice_id: str, name: str, metadata: Optional[Dict[str, object]] = None
 ) -> Tuple[str, bool]:
     specs_dir, _, _ = get_registry_paths()
     ensure_registry(specs_dir)
-    normalized_id = validate_track_id(track_id)
+    normalized_id = validate_slice_id(slice_id)
     normalized_name = normalize_feature_name(name)
     if not normalized_name:
         raise ValueError("Feature name cannot be empty.")
 
     slug = slugify(normalized_name)
     folder = f"{normalized_id}-{slug}"
-    track_path = os.path.join(specs_dir, folder)
+    slice_path = os.path.join(specs_dir, folder)
 
     rows = parse_registry()
     if any(
@@ -965,21 +965,21 @@ def create_track(
     ):
         return folder, False
 
-    os.makedirs(track_path, exist_ok=True)
+    os.makedirs(slice_path, exist_ok=True)
     row = normalize_registry_row(
         {
             "id": normalized_id,
             "feature": normalized_name,
             "status": "draft",
-            "path": normalize_track_path(track_path),
+            "path": normalize_slice_path(slice_path),
             "updated_at": now_timestamp(),
             "closed_at": None,
         }
     )
-    track_metadata = build_track_metadata(row, "draft", existing=metadata)
-    write_track_metadata(track_path, track_metadata)
+    slice_metadata = build_slice_metadata(row, "draft", existing=metadata)
+    write_slice_metadata(slice_path, slice_metadata)
 
-    rows.append(apply_metadata_to_row(row, track_metadata))
+    rows.append(apply_metadata_to_row(row, slice_metadata))
     write_registry(rows)
     return folder, True
 
@@ -994,12 +994,12 @@ def is_allowed_transition(current_status: str, target_status: str) -> bool:
     return target_index == current_index + 1
 
 
-def validate_track_for_status(
+def validate_slice_for_status(
     row: Dict[str, object], target_status: str
 ) -> Tuple[bool, List[str], Dict[str, bool]]:
     candidate = dict(row)
     candidate["status"] = target_status
-    ok, issues, checks = validate_track(candidate, skip_metadata_status_check=True)
+    ok, issues, checks = validate_slice(candidate, skip_metadata_status_check=True)
     if target_status == "closed":
         issues = [
             issue
@@ -1010,13 +1010,13 @@ def validate_track_for_status(
     return ok, issues, checks
 
 
-def update_track_status(
+def update_slice_status(
     rows: List[Dict[str, object]],
-    track: Dict[str, object],
+    slice: Dict[str, object],
     status: str,
     force: bool = False,
 ) -> Tuple[bool, str]:
-    current_status = normalize_status(str(track["status"]))
+    current_status = normalize_status(str(slice["status"]))
     if not force and not is_allowed_transition(current_status, status):
         return (
             False,
@@ -1024,33 +1024,33 @@ def update_track_status(
             f"{current_status} -> {status}. Use --force to override.",
         )
 
-    ok, issues, _ = validate_track_for_status(track, status)
+    ok, issues, _ = validate_slice_for_status(slice, status)
     if not ok and not force:
         return (
             False,
-            f"Cannot set {track['id']} to status '{status}': {', '.join(issues)}",
+            f"Cannot set {slice['id']} to status '{status}': {', '.join(issues)}",
         )
 
-    track_path = str(track["path"]).rstrip("/")
-    metadata = load_track_metadata(track_path)
-    updated_metadata = build_track_metadata(track, status, existing=metadata)
-    write_track_metadata(track_path, updated_metadata)
+    slice_path = str(slice["path"]).rstrip("/")
+    metadata = load_slice_metadata(slice_path)
+    updated_metadata = build_slice_metadata(slice, status, existing=metadata)
+    write_slice_metadata(slice_path, updated_metadata)
 
-    track["status"] = status
-    track["updated_at"] = normalize_optional_timestamp(updated_metadata.get("updated_at"))
-    track["closed_at"] = normalize_optional_timestamp(updated_metadata.get("closed_at"))
+    slice["status"] = status
+    slice["updated_at"] = normalize_optional_timestamp(updated_metadata.get("updated_at"))
+    slice["closed_at"] = normalize_optional_timestamp(updated_metadata.get("closed_at"))
     write_registry(rows)
-    return True, f"Updated {track['id']} to status '{status}'"
+    return True, f"Updated {slice['id']} to status '{status}'"
 
 
 def cmd_init(args: argparse.Namespace) -> int:
     config = load_config(required=False)
-    track_dir = (
-        normalize_track_dir(args.track_dir) if args.track_dir else config["track_dir"]
+    slice_dir = (
+        normalize_slice_dir(args.slice_dir) if args.slice_dir else config["slice_dir"]
     )
-    write_config(track_dir, preferred_workflow=config["preferred_workflow"])
-    ensure_registry(track_dir)
-    print(f"Initialized track registry and config in '{track_dir}/'.")
+    write_config(slice_dir, preferred_workflow=config["preferred_workflow"])
+    ensure_registry(slice_dir)
+    print(f"Initialized slice registry and config in '{slice_dir}/'.")
     return 0
 
 
@@ -1066,21 +1066,21 @@ def cmd_add(args: argparse.Namespace) -> int:
     if not id_to_use:
         conventions_config = load_conventions_config(required=False)
         rows = parse_registry()
-        id_to_use = infer_id_from_branch(conventions_config) or generate_hash_track_id(
+        id_to_use = infer_id_from_branch(conventions_config) or generate_hash_slice_id(
             rows, name
         )
 
     try:
-        folder, created = create_track(id_to_use, name)
+        folder, created = create_slice(id_to_use, name)
     except (RuntimeError, ValueError) as exc:
         print(str(exc), file=sys.stderr)
         return 2
 
     if not created:
-        print(f"Track already exists: {folder}")
+        print(f"Slice already exists: {folder}")
         return 0
 
-    print(f"Created track: {folder}")
+    print(f"Created slice: {folder}")
     return 0
 
 
@@ -1092,12 +1092,12 @@ def cmd_set_status(args: argparse.Namespace) -> int:
         return 2
 
     rows = parse_registry()
-    track = resolve_track(rows, args.track)
-    if not track:
-        print(f"Track not found: {args.track}", file=sys.stderr)
+    slice = resolve_slice(rows, args.slice)
+    if not slice:
+        print(f"Slice not found: {args.slice}", file=sys.stderr)
         return 2
 
-    success, message = update_track_status(rows, track, status, force=args.force)
+    success, message = update_slice_status(rows, slice, status, force=args.force)
     stream = sys.stdout if success else sys.stderr
     print(message, file=stream)
     return 0 if success else 2
@@ -1105,9 +1105,9 @@ def cmd_set_status(args: argparse.Namespace) -> int:
 
 def cmd_add_relation(args: argparse.Namespace) -> int:
     rows = parse_registry()
-    track = resolve_track(rows, args.track)
-    if not track:
-        print(f"Track not found: {args.track}", file=sys.stderr)
+    slice = resolve_slice(rows, args.slice)
+    if not slice:
+        print(f"Slice not found: {args.slice}", file=sys.stderr)
         return 2
 
     try:
@@ -1118,9 +1118,9 @@ def cmd_add_relation(args: argparse.Namespace) -> int:
 
     success, message = add_relation(
         rows,
-        track,
+        slice,
         relation_type,
-        args.target_track,
+        args.target_slice,
         story_title=args.story_title,
         requirement_ids=args.requirement_id,
         selector=args.selector,
@@ -1132,30 +1132,30 @@ def cmd_add_relation(args: argparse.Namespace) -> int:
 
 def cmd_get_active(_: argparse.Namespace) -> int:
     rows = parse_registry()
-    track = find_active_track(rows)
-    if not track:
-        print("No tracks found.", file=sys.stderr)
+    slice = find_active_slice(rows)
+    if not slice:
+        print("No slices found.", file=sys.stderr)
         return 1
-    print(json.dumps(track, indent=2))
+    print(json.dumps(slice, indent=2))
     return 0
 
 
-def cmd_validate_track(args: argparse.Namespace) -> int:
+def cmd_validate_slice(args: argparse.Namespace) -> int:
     rows = parse_registry()
-    track = resolve_track(rows, args.track)
-    if not track:
-        print(f"Track not found: {args.track}", file=sys.stderr)
+    slice = resolve_slice(rows, args.slice)
+    if not slice:
+        print(f"Slice not found: {args.slice}", file=sys.stderr)
         return 2
 
-    ok, issues, checks = validate_track(track)
-    result = {"track": track, "ok": ok, "checks": checks, "issues": issues}
+    ok, issues, checks = validate_slice(slice)
+    result = {"slice": slice, "ok": ok, "checks": checks, "issues": issues}
     print(json.dumps(result, indent=2))
     return 0 if ok else 3
 
 
 def cmd_audit_relations(args: argparse.Namespace) -> int:
     try:
-        result = audit_relations(parse_registry(), track_selector=args.track)
+        result = audit_relations(parse_registry(), slice_selector=args.slice)
     except RuntimeError as exc:
         print(str(exc), file=sys.stderr)
         return 2
@@ -1165,7 +1165,7 @@ def cmd_audit_relations(args: argparse.Namespace) -> int:
     else:
         for issue in result["issues"]:
             print(
-                f"{issue['track_id']}: {issue['code']} -> {issue['message']}",
+                f"{issue['slice_id']}: {issue['code']} -> {issue['message']}",
                 file=sys.stderr,
             )
     return 0 if result["ok"] else 3
@@ -1176,19 +1176,19 @@ def build_parser() -> argparse.ArgumentParser:
     subparsers = parser.add_subparsers(dest="command", required=True)
 
     init_p = subparsers.add_parser(
-        "init", help="Initialize the track registry and execution config"
+        "init", help="Initialize the slice registry and execution config"
     )
     init_p.add_argument(
-        "track_dir",
+        "slice_dir",
         nargs="?",
-        help="Track directory path (defaults to configured path or 'tracks')",
+        help="Slice directory path (defaults to configured path or 'slices')",
     )
 
-    add_p = subparsers.add_parser("add", help="Create a track from a name or explicit opaque ID")
+    add_p = subparsers.add_parser("add", help="Create a slice from a name or explicit opaque ID")
     add_p.add_argument("args", nargs="+", help="[ID] Name")
 
-    set_p = subparsers.add_parser("set-status", help="Update a track status")
-    set_p.add_argument("track", help="Track ID, folder name, or path")
+    set_p = subparsers.add_parser("set-status", help="Update a slice status")
+    set_p.add_argument("slice", help="Slice ID, folder name, or path")
     set_p.add_argument("status", help="New status")
     set_p.add_argument(
         "--force",
@@ -1197,11 +1197,11 @@ def build_parser() -> argparse.ArgumentParser:
     )
 
     relation_p = subparsers.add_parser(
-        "add-relation", help="Record an explicit track relation with reciprocal metadata"
+        "add-relation", help="Record an explicit slice relation with reciprocal metadata"
     )
-    relation_p.add_argument("track", help="Source track ID, folder name, or path")
+    relation_p.add_argument("slice", help="Source slice ID, folder name, or path")
     relation_p.add_argument("relation_type", help="Relation type, for example supersedes")
-    relation_p.add_argument("target_track", help="Target track ID, folder name, or path")
+    relation_p.add_argument("target_slice", help="Target slice ID, folder name, or path")
     relation_p.add_argument(
         "--story-title",
         help="Optional soft selector describing the affected story title.",
@@ -1217,18 +1217,18 @@ def build_parser() -> argparse.ArgumentParser:
         help="Optional freeform soft selector for fuzzy story or scope references.",
     )
 
-    subparsers.add_parser("get-active", help="Return the active track as JSON")
+    subparsers.add_parser("get-active", help="Return the active slice as JSON")
 
-    validate_p = subparsers.add_parser("validate-track", help="Validate track/file consistency")
-    validate_p.add_argument("track", help="Track ID, folder name, or path")
+    validate_p = subparsers.add_parser("validate-slice", help="Validate slice/file consistency")
+    validate_p.add_argument("slice", help="Slice ID, folder name, or path")
 
     audit_p = subparsers.add_parser(
         "audit-relations",
         help="Audit relation metadata for missing targets or missing reciprocal links",
     )
     audit_p.add_argument(
-        "--track",
-        help="Optional track ID, folder name, or path to audit a single track.",
+        "--slice",
+        help="Optional slice ID, folder name, or path to audit a single slice.",
     )
     audit_p.add_argument("--json", action="store_true", help="Emit JSON output.")
 
@@ -1249,8 +1249,8 @@ def main() -> int:
             return cmd_add_relation(args)
         if args.command == "get-active":
             return cmd_get_active(args)
-        if args.command == "validate-track":
-            return cmd_validate_track(args)
+        if args.command == "validate-slice":
+            return cmd_validate_slice(args)
         if args.command == "audit-relations":
             return cmd_audit_relations(args)
     except (RuntimeError, ValueError) as exc:

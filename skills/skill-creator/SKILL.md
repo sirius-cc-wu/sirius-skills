@@ -9,14 +9,14 @@ This skill provides guidance for creating effective skills.
 
 ## About Skills
 
-Skills are modular, self-contained packages that extend Gemini CLI's capabilities by providing specialized knowledge, workflows, and tools. Think of them as "onboarding guides" for specific domains or tasks—they transform Gemini CLI from a general-purpose agent into a specialized agent equipped with procedural knowledge that no model can fully possess.
+Skills are modular, self-contained packages that extend Gemini CLI's capabilities by providing specialized knowledge, workflows, and tools. Think of them as "onboarding guides" for specific domains or slices—they transform Gemini CLI from a general-purpose agent into a specialized agent equipped with procedural knowledge that no model can fully possess.
 
 ### What Skills Provide
 
 1. Specialized workflows - Multi-step procedures for specific domains
 2. Tool integrations - Instructions for working with specific file formats or APIs
 3. Domain expertise - Company-specific knowledge, schemas, business logic
-4. Bundled resources - Scripts, references, and assets for complex and repetitive tasks
+4. Bundled resources - Scripts, references, and assets for complex and repetitive slices
 
 ## Core Principles
 
@@ -30,7 +30,7 @@ Prefer concise examples over verbose explanations.
 
 ### Set Appropriate Degrees of Freedom
 
-Match the level of specificity to the task's fragility and variability:
+Match the level of specificity to the slice's fragility and variability:
 
 **High freedom (text-based instructions)**: Use when multiple approaches are valid, decisions depend on context, or heuristics guide the approach.
 
@@ -68,10 +68,10 @@ Every SKILL.md consists of:
 
 ##### Scripts (`scripts/`)
 
-Executable code (Node.js/Python/Bash/etc.) for tasks that require deterministic reliability or are repeatedly rewritten.
+Executable code (Node.js/Python/Bash/etc.) for slices that require deterministic reliability or are repeatedly rewritten.
 
 - **When to include**: When the same code is being rewritten repeatedly or deterministic reliability is needed
-- **Example**: `scripts/rotate_pdf.py` for PDF rotation tasks
+- **Example**: `scripts/rotate_pdf.py` for PDF rotation slices
 - **Benefits**: Token efficient, deterministic, may be executed without loading into context
 - **Agentic Ergonomics**: Scripts must output LLM-friendly stdout. Suppress standard tracebacks. Output clear, concise success/failure messages, and paginate or truncate outputs (e.g., "Success: First 50 lines of processed file...") to prevent context window overflow.
 - **Note**: Scripts may still need to be read by Gemini CLI for patching or environment-specific adjustments
@@ -244,7 +244,7 @@ Example: When building a `pdf-editor` skill to handle queries like "Help me rota
 1. Rotating a PDF requires re-writing the same code each time
 2. A `scripts/rotate_pdf.py` script would be helpful to store in the skill
 
-Example: When designing a `frontend-webapp-builder` skill for queries like "Build me a todo app" or "Build me a dashboard to track my steps," the analysis shows:
+Example: When designing a `frontend-webapp-builder` skill for queries like "Build me a todo app" or "Build me a dashboard to slice my steps," the analysis shows:
 
 1. Writing a frontend webapp requires the same boilerplate HTML/React each time
 2. An `assets/hello-world/` template containing the boilerplate HTML/React project files would be helpful to store in the skill
@@ -283,7 +283,7 @@ After initialization, customize or remove the generated SKILL.md and example fil
 
 ### Step 4: Edit the Skill
 
-When editing the (newly-generated or existing) skill, remember that the skill is being created for another instance of Gemini CLI to use. Include information that would be beneficial and non-obvious to Gemini CLI. Consider what procedural knowledge, domain-specific details, or reusable assets would help another Gemini CLI instance execute these tasks more effectively.
+When editing the (newly-generated or existing) skill, remember that the skill is being created for another instance of Gemini CLI to use. Include information that would be beneficial and non-obvious to Gemini CLI. Consider what procedural knowledge, domain-specific details, or reusable assets would help another Gemini CLI instance execute these slices more effectively.
 
 #### Learn Proven Design Patterns
 
@@ -379,7 +379,7 @@ After testing the skill, users may request improvements. Often this happens righ
 
 **Iteration workflow:**
 
-1. Use the skill on real tasks
+1. Use the skill on real slices
 2. For objectively verifiable skills, keep a lightweight local `evals/` folder with representative prompts, inputs, and expected outcomes
 3. Notice struggles or inefficiencies
 4. Generalize from the feedback instead of overfitting to one example

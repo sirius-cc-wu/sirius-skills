@@ -88,12 +88,12 @@ Avoid vague guidance like "make it good" when you can define the actual success 
 Use higher rigidity when:
 
 - downstream tools expect exact structure
-- the task is fragile or regulated
+- the slice is fragile or regulated
 - consistency is more valuable than stylistic variation
 
 Use lower rigidity when:
 
-- the task is exploratory
+- the slice is exploratory
 - multiple valid structures exist
 - the model needs room to adapt the answer to context
 
@@ -111,5 +111,5 @@ When writing output guidance for a skill:
 1. Decide what the user actually needs to receive.
 2. List the non-negotiable parts of the output.
 3. Show one concrete example.
-4. Add only as much rigidity as the task requires.
+4. Add only as much rigidity as the slice requires.
 5. Re-test on a real prompt to see whether the format is easy to follow.
