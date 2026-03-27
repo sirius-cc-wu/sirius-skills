@@ -97,7 +97,7 @@ When a slice tracker is available, use it as the execution tracker:
 
 - create one tracker slice per directly executable slice
 - group those slices under increment headings in `slice-planning.md` before creating them in the tracker
-- use parent-child relationships when a larger story needs grouped subtasks
+- use parent-child relationships when a larger story needs grouped sub-slices
 - record blockers as explicit dependency links in the tracker
 - reflect safe parallel lanes and integration checkpoints in `slice-planning.md`
 - keep mapping from repo story IDs to tracker slice IDs in `slice-traceability.md`

@@ -23,7 +23,7 @@ The repository offers a planning-layer workflow, but its value is distributed ac
 - Technical designer producing feature architecture.
 - Breakdown owner converting stories into slices and increments.
 - Planning reviewer validating readiness for execution handoff.
-- Slice tracker owner receiving execution-ready work items.
+- Execution owner receiving execution-ready work items.
 
 ## Constraints
 

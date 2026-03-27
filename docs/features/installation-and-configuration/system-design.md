@@ -50,7 +50,7 @@ component "execution-driver" as Execution
 component commit
 component "create-pr" as CreatePR
 component breakdown
-component "close-slice" as CloseTrack
+component "close-slice" as CloseSlice
 
 Maintainer --> Makefile : install / uninstall
 Planning --> "planning.json"
@@ -59,7 +59,7 @@ Execution --> "conventions.json"
 commit --> "conventions.json"
 CreatePR --> "conventions.json"
 breakdown --> "planning.json"
-CloseTrack --> "conventions.json"
-CloseTrack --> "plugins/"
+CloseSlice --> "conventions.json"
+CloseSlice --> "plugins/"
 @enduml
 ```

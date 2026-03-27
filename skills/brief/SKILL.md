@@ -35,7 +35,7 @@ Resolve `<slice_path>` through `execution-driver`.
 - Focus on user value, expected behavior, and outcomes.
 - Avoid implementation details.
 - Use reasonable defaults when details are missing.
-- Capture traceability back to the originating story, slice, or tracker slice when available.
+- Capture traceability back to the originating story, increment, or slice when available.
 - Record assumptions explicitly.
 - Keep unresolved clarifications to a maximum of 3, and only for critical decisions.
 

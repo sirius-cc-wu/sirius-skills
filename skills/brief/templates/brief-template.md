@@ -8,7 +8,7 @@
 ## 1. Work Item Summary
 
 - **Work Item**: [Short slice-scoped summary]
-- **Source Story / Slice / Slice**: [Originating story ID, slice ID, tracker slice, or "standalone"]
+- **Source Story / Increment / Slice**: [Originating story ID, slice ID, tracker slice, or "standalone"]
 - **Requested Outcome**: [As a / When / We want / Technical slice statement]
 - **Why this matters**: [Value of this work item]
 - **Independent Test**: [How this can be verified on its own]

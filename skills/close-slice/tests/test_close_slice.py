@@ -23,7 +23,7 @@ def run_cli(module, monkeypatch, *args):
     return module.main()
 
 
-def setup_execution_ready_slice(tmp_path, monkeypatch, include_tasks=True):
+def setup_execution_ready_slice(tmp_path, monkeypatch, include_legacy_slices=True):
     manage_execution = load_module(MANAGE_EXECUTION_PATH, "manage_execution")
     monkeypatch.chdir(tmp_path)
 
@@ -58,7 +58,7 @@ def setup_execution_ready_slice(tmp_path, monkeypatch, include_tasks=True):
         "- Regression checks: Existing slice artifacts remain in place\n",
         encoding="utf-8",
     )
-    if include_tasks:
+    if include_legacy_slices:
         (slice_dir / "slices.md").write_text(
             "# Slices: Demo Feature\n\n"
             "## 1. Execution Strategy\n\n"
@@ -133,9 +133,9 @@ def test_close_slice_uses_config_when_publish_target_not_passed(tmp_path, monkey
     assert metadata["publications"][0]["target_file"] == "docs/history.md"
 
 
-def test_close_slice_publishes_without_legacy_tasks_md(tmp_path, monkeypatch):
+def test_close_slice_publishes_without_legacy_slices_md(tmp_path, monkeypatch):
     close_slice = load_module(CLOSE_SLICE_PATH, "close_slice")
-    _, slice_dir = setup_execution_ready_slice(tmp_path, monkeypatch, include_tasks=False)
+    _, slice_dir = setup_execution_ready_slice(tmp_path, monkeypatch, include_legacy_slices=False)
 
     assert (
         run_cli(

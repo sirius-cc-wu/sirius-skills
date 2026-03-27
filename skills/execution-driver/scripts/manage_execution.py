@@ -8,7 +8,7 @@ import sys
 from datetime import datetime
 from typing import Dict, List, Optional, Tuple
 
-DEFAULT_TRACKS_DIR = "slices"
+DEFAULT_SLICES_DIR = "slices"
 CONFIG_DIR = ".skills"
 CONFIG_FILE = os.path.join(CONFIG_DIR, "execution.json")
 CONVENTIONS_CONFIG_DIR = ".skills"
@@ -273,7 +273,7 @@ def load_config(required: bool = True) -> Dict[str, str]:
                 "`manage_execution.py init <slice-dir>`."
             )
         return {
-            "slice_dir": DEFAULT_TRACKS_DIR,
+            "slice_dir": DEFAULT_SLICES_DIR,
             "preferred_workflow": DEFAULT_PREFERRED_WORKFLOW,
         }
 
@@ -286,7 +286,7 @@ def load_config(required: bool = True) -> Dict[str, str]:
     if not isinstance(config, dict):
         raise RuntimeError("Execution config must be a JSON object.")
 
-    slice_dir = config.get("slice_dir", DEFAULT_TRACKS_DIR)
+    slice_dir = config.get("slice_dir", DEFAULT_SLICES_DIR)
     preferred_workflow = config.get(
         "preferred_workflow", DEFAULT_PREFERRED_WORKFLOW
     )
