@@ -3,7 +3,7 @@ name: blueprint
 description: Produces an actionable implementation plan from a completed brief, including PlantUML detailed design when needed.
 ---
 
-# Plan
+# Blueprint
 
 Use this skill to convert `brief.md` into a concrete `blueprint.md`.
 For new slices, `blueprint.md` is the final execution artifact before implementation begins.
@@ -31,9 +31,9 @@ Resolve `<slice_path>` through `execution-driver`.
 
 ## Artifact Ownership
 
-`plan` owns the content of `<slice_path>/blueprint.md`.
+`blueprint` owns the content of `<slice_path>/blueprint.md`.
 
-`execution-driver` should route into planning and validate readiness, but it should not take over implementation-plan authoring that belongs to `plan`.
+`execution-driver` should route into planning and validate readiness, but it should not take over implementation-plan authoring that belongs to `blueprint`.
 
 ## Planning Rules
 

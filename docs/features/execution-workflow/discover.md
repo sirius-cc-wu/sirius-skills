@@ -36,14 +36,14 @@ The repository provides a slice-scoped execution workflow, but that workflow spa
 ## Confirmed Signals in Repo
 
 - `skills/execution-driver/scripts/manage_execution.py` manages registry, status updates, and relations.
-- `skills/define/templates/brief-template.md` defines the slice brief structure.
+- `skills/brief/templates/brief-template.md` defines the slice brief structure.
 - `skills/blueprint/templates/plan-template.md` defines implementation packets and validation mapping.
 - `skills/close-slice/scripts/close_slice.py` publishes non-destructive closure summaries.
 - `skills/commit/` and `skills/create-pr/` enforce conventions and checklist completion around execution work.
 
 ## Success Criteria
 
-- A maintainer can bootstrap, define, plan, review, and close a execution slice with durable metadata.
+- A maintainer can bootstrap, brief, blueprint, review, and close a execution slice with durable metadata.
 - Slice artifacts remain sufficient for later audit or historical publication after closure.
 - Execution workflow stays generic-first while allowing project-level conventions via config.
 

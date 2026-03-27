@@ -29,7 +29,7 @@ These core skills should remain tracker-agnostic by default:
 - `skills/configure-project/`
 - `skills/commit/`
 - `skills/create-pr/`
-- `skills/define/`
+- `skills/brief/`
 - `skills/planning-driver/`
 - `skills/execution-driver/`
 - `skills/blueprint/`
@@ -56,7 +56,7 @@ For repositories that use repo-first planning and a separate execution tracker, 
 These skills sit **before** the execution-slice skills:
 
 - planning layer: `planning-driver`, `discover`, `design`, `ui-flow`, `breakdown`, `review-planning`, `slice`
-- execution layer: `execution-driver`, `define`, `blueprint`, `review-execution`, `close-slice`
+- execution layer: `execution-driver`, `brief`, `blueprint`, `review-execution`, `close-slice`
 - execution tracker: your slice system or issue tracker
 
 Recommended boundary:
@@ -79,13 +79,13 @@ Preferred repo workflow:
 5. `breakdown` turns repo stories into directly executable work items and groups those slices into small demonstrable increments.
 6. `review-planning` reviews planning artifacts and slice definitions before execution slice bootstrap.
 7. `slice` bootstraps a slice-scoped execution slice and hands off to `execution-driver`.
-8. `execution-driver` routes slice-scoped execution through `define` to capture slice intent and acceptance, then through `blueprint` to produce the final execution artifact.
+8. `execution-driver` routes slice-scoped execution through `brief` to capture slice intent and acceptance, then through `blueprint` to produce the final execution artifact.
 9. `review-execution` checks implementation and validation outcomes against the slice-scoped execution artifacts before closure.
 10. `close-slice` closes completed execution slices and can optionally publish a project-local summary.
 
-In the repo-native flow, `planning-driver` owns feature-planning readiness and routing, `breakdown` owns repo-story decomposition, `review-planning` owns planning readiness review, `define` owns the slice-scoped `brief.md`, `blueprint` owns the final slice-scoped execution plan and validation checklist, and `review-execution` owns the final implementation-versus-brief review before closure.
+In the repo-native flow, `planning-driver` owns feature-planning readiness and routing, `breakdown` owns repo-story decomposition, `review-planning` owns planning readiness review, `brief` owns the slice-scoped `brief.md`, `blueprint` owns the final slice-scoped execution plan and validation checklist, and `review-execution` owns the final implementation-versus-brief review before closure.
 
-Execution follows the same pattern: `execution-driver` owns routing, readiness, and registry state, while `define`, `blueprint`, `review-execution`, and `close-slice` own their artifacts and outputs.
+Execution follows the same pattern: `execution-driver` owns routing, readiness, and registry state, while `brief`, `blueprint`, `review-execution`, and `close-slice` own their artifacts and outputs.
 
 By default, new execution slices are created under `slices/` unless `.skills/execution.json` overrides the location.
 

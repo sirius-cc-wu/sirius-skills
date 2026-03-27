@@ -7,7 +7,7 @@
   - `README.md`
   - `SKILLS_METHODOLOGY.md`
   - `skills/execution-driver/SKILL.md`
-  - `skills/define/SKILL.md`
+  - `skills/brief/SKILL.md`
   - `skills/blueprint/SKILL.md`
   - `skills/review-execution/SKILL.md`
   - `skills/close-slice/SKILL.md`
@@ -39,8 +39,8 @@
 | Slice ID | Story ID | Title | Summary | Target Area | Lane | Validation | Planned Tracker Action | Depends On | Slice Ready |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
 | EW-01-bootstrap | EW-01 | Bootstrap execution registry and slices | Manage config, slice registry, metadata, and slice creation. | `skills/execution-driver/scripts/manage_execution.py` | primary | `pytest -q skills/execution-driver/tests/test_manage_execution.py` | create slice |  | yes |
-| EW-02-brief | EW-02 | Author slice brief structure | Maintain `brief.md` structure, acceptance framing, and requirement sections. | `skills/define/SKILL.md`, `skills/define/templates/brief-template.md` | primary | Review generated brief against skill rules | create slice | EW-01-bootstrap | yes |
-| EW-02-checklist | EW-02 | Enforce requirement checklist readiness | Keep requirements checklist aligned with brief readiness gates. | `skills/define/SKILL.md`, `manage_execution.py` | primary | `pytest -q skills/execution-driver/tests/test_manage_execution.py` | create slice | EW-02-brief | yes |
+| EW-02-brief | EW-02 | Author slice brief structure | Maintain `brief.md` structure, acceptance framing, and requirement sections. | `skills/brief/SKILL.md`, `skills/brief/templates/brief-template.md` | primary | Review generated brief against skill rules | create slice | EW-01-bootstrap | yes |
+| EW-02-checklist | EW-02 | Enforce requirement checklist readiness | Keep requirements checklist aligned with brief readiness gates. | `skills/brief/SKILL.md`, `manage_execution.py` | primary | `pytest -q skills/execution-driver/tests/test_manage_execution.py` | create slice | EW-02-brief | yes |
 | EW-03-plan | EW-03 | Generate execution plan packets | Maintain `blueprint.md` structure with gates, packets, and traceability. | `skills/blueprint/SKILL.md`, `skills/blueprint/templates/plan-template.md` | primary | Review plan completeness and traceability | create slice | EW-02-checklist | yes |
 | EW-03-gates | EW-03 | Enforce plan readiness transitions | Validate plan presence and readiness state progression. | `skills/execution-driver/scripts/manage_execution.py` | primary | `pytest -q skills/execution-driver/tests/test_manage_execution.py` | create slice | EW-03-plan | yes |
 | EW-04-review | EW-04 | Review implementation against execution artifacts | Keep review guidance aligned with brief-to-implementation comparisons. | `skills/review-execution/SKILL.md` | primary | Review workflow docs for consistent review boundary | create slice | EW-03-gates | yes |
@@ -53,7 +53,7 @@
 - Explicit blockers: closure requires a fully ready execution artifact chain.
 - Parallel-safe slices: none recommended; the artifacts and state transitions are tightly coupled.
 - Increment ordering: I1 -> I2 -> I3.
-- Lane owners and handoffs: slice -> execution-driver -> define/plan -> review-execution -> close-slice.
+- Lane owners and handoffs: slice -> execution-driver -> brief/plan -> review-execution -> close-slice.
 - Integration checkpoints: validate-slice before review and before closure publication.
 
 ## 6. Bootstrap Order

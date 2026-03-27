@@ -2,7 +2,7 @@
 
 ## Overview
 
-The execution workflow is a centralized slice system. `execution-driver` manages slice registry state and readiness transitions, while `define`, `plan`, `review-execution`, and `close-slice` own the slice-scoped artifacts and review outcomes.
+The execution workflow is a centralized slice system. `execution-driver` manages slice registry state and readiness transitions, while `brief`, `plan`, `review-execution`, and `close-slice` own the slice-scoped artifacts and review outcomes.
 
 ## Key Components
 
@@ -17,8 +17,8 @@ The execution workflow is a centralized slice system. `execution-driver` manages
 
 - `manage_execution.py init` initializes `.skills/execution.json` and the slice registry.
 - `manage_execution.py add` creates a slice folder and metadata entry.
-- `define` owns `brief.md` and `checklists/requirements.md`.
-- `plan` owns `blueprint.md`, requirement traceability, and validation steps.
+- `brief` owns `brief.md` and `checklists/requirements.md`.
+- `blueprint` owns `blueprint.md`, requirement traceability, and validation steps.
 - `review-execution` compares implementation results with the brief and plan.
 - `close-slice` updates metadata and optionally publishes closure summaries.
 
@@ -40,8 +40,8 @@ The execution workflow is a centralized slice system. `execution-driver` manages
 @startuml
 package "Execution Layer" {
   [execution-driver]
-  [define]
-  [plan]
+  [brief]
+  [blueprint]
   [review-execution]
   [close-slice]
 }
@@ -55,13 +55,13 @@ file "requirements.md" as Requirements
 [slice] --> [execution-driver]
 [execution-driver] --> Registry
 [execution-driver] --> Meta
-[execution-driver] --> [define]
-[execution-driver] --> [plan]
+[execution-driver] --> [brief]
+[execution-driver] --> [blueprint]
 [execution-driver] --> [review-execution]
 [execution-driver] --> [close-slice]
-[define] --> Brief
-[define] --> Requirements
-[plan] --> PlanDoc
+[brief] --> Brief
+[brief] --> Requirements
+[blueprint] --> PlanDoc
 [review-execution] --> Brief
 [review-execution] --> PlanDoc
 [close-slice] --> Meta

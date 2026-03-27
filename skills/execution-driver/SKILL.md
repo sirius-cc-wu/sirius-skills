@@ -12,10 +12,10 @@ Use this skill to manage workflow state for slice readiness.
 1. Resolve or initialize the active slice.
 2. Verify required files, registry state, and slice metadata.
 3. Decide whether the request belongs in the planning layer or the slice-scoped execution layer.
-4. Route slice-scoped work to `define`, `plan`, `review-execution`, or `close-slice` as appropriate.
+4. Route slice-scoped work to `brief`, `blueprint`, `review-execution`, or `close-slice` as appropriate.
 5. Update slice status when a phase is complete.
 
-`execution-driver` owns orchestration only. It should not absorb artifact authoring that belongs to `define`, `plan`, `review-execution`, or `close-slice`.
+`execution-driver` owns orchestration only. It should not absorb artifact authoring that belongs to `brief`, `blueprint`, `review-execution`, or `close-slice`.
 
 ## Entry Decision Guide
 
@@ -95,10 +95,10 @@ Do not duplicate slice-execution states like `implementing`, `in progress`, or `
 ## Routing Rules
 
 1. If no `brief.md` or the slice brief is incomplete:
-    - Use `define` to create or update `brief.md`.
+    - Use `brief` to create or update `brief.md`.
     - Set status to `draft` during authoring and `brief_ready` when complete.
 2. If `brief.md` is complete and no `blueprint.md`:
-    - Use `plan` to produce `blueprint.md`.
+    - Use `blueprint` to produce `blueprint.md`.
     - Set status to `blueprint_ready` when complete.
 3. If `brief.md` and `blueprint.md` are complete:
     - Use `blueprint.md` as the final execution artifact for sequencing, validation, and checklist coverage.

@@ -23,7 +23,7 @@ MANAGED_SKILLS := \
 
 install:
 	npx skills add "$(REPO_ROOT)/skills/execution-driver" $(COMMON_FLAGS)
-	npx skills add "$(REPO_ROOT)/skills/define" $(COMMON_FLAGS)
+	npx skills add "$(REPO_ROOT)/skills/brief" $(COMMON_FLAGS)
 	npx skills add "$(REPO_ROOT)/skills/blueprint" $(COMMON_FLAGS)
 	npx skills add "$(REPO_ROOT)/skills/planning-driver" $(COMMON_FLAGS)
 	npx skills add "$(REPO_ROOT)/skills/discover" $(COMMON_FLAGS)

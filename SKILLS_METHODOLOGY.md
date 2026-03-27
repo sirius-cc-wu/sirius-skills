@@ -18,7 +18,7 @@ Use a **two-layer workflow**:
    - `slice`
 2. **Execution layer**
    - `execution-driver`
-   - `define`
+   - `brief`
    - `blueprint`
    - `review-execution`
    - `close-slice`
@@ -198,7 +198,7 @@ python3 skills/execution-driver/scripts/manage_execution.py add "<slice-id>" "<s
 After a slice exists, use the execution layer:
 
 1. `execution-driver`
-2. `define`
+2. `brief`
 3. `blueprint`
 
 This is where slice-scoped execution artifacts are created:
@@ -209,7 +209,7 @@ This is where slice-scoped execution artifacts are created:
 Within that execution layer:
 
 - `execution-driver` owns routing, readiness checks, and registry state
-- `define` creates the slice-scoped `brief.md` for one execution-ready work item, including acceptance and requirement context
+- `brief` creates the slice-scoped `brief.md` for one execution-ready work item, including acceptance and requirement context
 - `blueprint` converts that slice-scoped brief into the final implementation packets, traceability, validation steps, and PlantUML detailed design needed for execution
 - `review-execution` owns the explicit implementation-versus-brief review outcome
 - `close-slice` owns closure metadata and any optional publication output
@@ -218,7 +218,7 @@ Keep the boundary explicit:
 
 - `breakdown` owns repo-story decomposition and tracker-ready slices
 - `breakdown` also owns increment grouping at the repo-planning level
-- `define` owns `brief.md` and `checklists/requirements.md`
+- `brief` owns `brief.md` and `checklists/requirements.md`
 - `blueprint` owns the final slice-scoped execution checklist for new slices
 - `execution-driver` should validate handoffs and route work, not take over artifact authoring from the other execution skills
 

@@ -1,9 +1,9 @@
 ---
-name: define
+name: brief
 description: Creates and validates slice-scoped briefs.
 ---
 
-# Define
+# Brief
 
 Use this skill to turn one execution-ready work item into a complete `brief.md`.
 
@@ -23,12 +23,12 @@ Resolve `<slice_path>` through `execution-driver`.
 
 ## Artifact Ownership
 
-`define` owns the content of:
+`brief` owns the content of:
 
 - `<slice_path>/brief.md`
 - `<slice_path>/checklists/requirements.md`
 
-`execution-driver` should resolve the active slice and enforce readiness gates, but it should not take over brief authoring that belongs to `define`.
+`execution-driver` should resolve the active slice and enforce readiness gates, but it should not take over brief authoring that belongs to `brief`.
 
 ## Authoring Rules
 
