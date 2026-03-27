@@ -10,8 +10,6 @@ MANAGED_SKILLS := \
 	design \
 	discover \
 	planning-driver \
-	dioxus-stitch \
-	dioxus-ui-ux \
 	blueprint \
 	review-execution \
 	review-planning \
@@ -37,8 +35,6 @@ install:
 	npx skills add "$(REPO_ROOT)/skills/commit" $(COMMON_FLAGS)
 	npx skills add "$(REPO_ROOT)/skills/configure-project" $(COMMON_FLAGS)
 	npx skills add "$(REPO_ROOT)/skills/simplify" $(COMMON_FLAGS)
-	npx skills add "$(REPO_ROOT)/skills/dioxus-ui-ux" $(COMMON_FLAGS)
-	npx skills add "$(REPO_ROOT)/skills/dioxus-stitch" $(COMMON_FLAGS)
 
 uninstall:
 	@installed="$$(npx skills ls -g --json | python3 -c 'import json, sys; managed = set("$(MANAGED_SKILLS)".split()); installed = [item["name"] for item in json.load(sys.stdin) if item.get("name") in managed]; print("\n".join(installed))')"; \
