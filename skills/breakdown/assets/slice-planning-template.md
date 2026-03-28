@@ -16,16 +16,25 @@ Use this file to decompose repo stories into execution-ready slices before boots
 
 ## 2. Story Decisions
 
-| Story ID | Story Size | Decision | Reason | Output Slice Count |
-| --- | --- | --- | --- | --- |
-| AUTH-03 | L | split | Separate API and tests for cleaner verification | 2 |
-| <story-id> | <S/M/L/XL> | <keep|split|defer> | <reason> | <n> |
+| Story ID | Story Size | Story Risk | Decision | Reason | Output Slice Count |
+| --- | --- | --- | --- | --- | --- |
+| AUTH-03 | L | medium | split | Separate API and tests for cleaner verification and lower handoff risk | 2 |
+| <story-id> | <S/M/L/XL> | <low|medium|high> | <keep|split|defer> | <reason> | <n> |
 
 Decision rules:
 
 - `keep` means the story is already small enough to map to one executable slice.
 - `split` means the story fans out into multiple execution-ready slices.
 - `defer` means the story is not ready and should not be executed yet.
+- split any `XL` story before slice bootstrap
+- `S`/`M`/`L` stories may also split when risk, validation shape, coupling, or handoff complexity would make one packet brittle
+- record the main reason for the decision, not just the size label
+
+Risk rubric:
+
+- `low`: one cohesive packet with one clear validation path
+- `medium`: some coupling, multiple touchpoints, or moderate sequencing/handoff risk
+- `high`: cross-subsystem impact, migration/reconciliation, compatibility risk, or materially different validation paths
 
 ## 3. Increment Plan
 
