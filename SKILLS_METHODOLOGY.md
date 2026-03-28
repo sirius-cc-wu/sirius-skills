@@ -11,6 +11,7 @@ Use a **two-layer workflow**:
 
 1. **Planning layer**
    - `guide-planning`
+   - `evolve-feature`
    - `discover`
    - `design`
    - `ui-flow` (optional)
@@ -38,7 +39,7 @@ Its job is to:
 
 - resolve or initialize the feature planning folder
 - verify the current planning artifacts and metadata
-- decide whether the next step is `discover`, `design`, `ui-flow`, `breakdown`, `review-planning`, or `slice`
+- decide whether the next step is `evolve-feature`, `discover`, `design`, `ui-flow`, `breakdown`, `review-planning`, or `slice`
 - keep planning handoff decisions durable through explicit readiness states
 
 Expected planning states:
@@ -53,8 +54,10 @@ Expected planning states:
 Recommended handoff:
 
 ```text
-guide-planning -> discover/design/ui-flow/breakdown/review-planning/slice
+guide-planning -> evolve-feature/discover/design/ui-flow/breakdown/review-planning/slice
 ```
+
+If the request is changing an existing canonical feature instead of starting net-new planning work, route to `evolve-feature` first. That skill creates a feature-local change packet and keeps the canonical feature folder as the durable source of truth.
 
 ### 1. Discover the work
 

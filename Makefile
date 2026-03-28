@@ -9,6 +9,7 @@ MANAGED_SKILLS := \
 	configure-project \
 	design \
 	discover \
+	evolve-feature \
 	guide-planning \
 	blueprint \
 	review-execution \
@@ -24,6 +25,7 @@ install:
 	npx skills add "$(REPO_ROOT)/skills/blueprint" $(COMMON_FLAGS)
 	npx skills add "$(REPO_ROOT)/skills/guide-planning" $(COMMON_FLAGS)
 	npx skills add "$(REPO_ROOT)/skills/discover" $(COMMON_FLAGS)
+	npx skills add "$(REPO_ROOT)/skills/evolve-feature" $(COMMON_FLAGS)
 	npx skills add "$(REPO_ROOT)/skills/design" $(COMMON_FLAGS)
 	npx skills add "$(REPO_ROOT)/skills/ui-flow" $(COMMON_FLAGS)
 	npx skills add "$(REPO_ROOT)/skills/breakdown" $(COMMON_FLAGS)
