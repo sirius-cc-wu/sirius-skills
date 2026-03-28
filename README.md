@@ -26,7 +26,7 @@ The intended direction is:
 
 These core skills remain repository-centric and system-agnostic by default:
 
-- `skills/configure-project/`
+- `skills/bootstrap/`
 - `skills/commit/`
 - `skills/create-pr/`
 - `skills/brief/`
@@ -135,7 +135,7 @@ For a starting point, see `skills/close-slice/assets/spec-publish.example.json`.
 To keep relation metadata healthy over time, `skills/guide-execution/scripts/manage_execution.py` also provides `audit-relations`, which checks for missing targets and missing reciprocal links.
 ## Optional project configuration
 
-Use `skills/configure-project/` when you want an agent to bootstrap the repo's
+Use `skills/bootstrap/` when you want an agent to bootstrap the repo's
 supported `.skills/planning.json`, `.skills/execution.json`, and
 `.skills/conventions.json` files. The skill supports a generic `default` mode,
 a Jira-oriented `jira` mode, and an `ask` mode that makes the agent stop and

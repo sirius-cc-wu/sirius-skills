@@ -6,7 +6,7 @@ MANAGED_SKILLS := \
 	breakdown \
 	close-slice \
 	commit \
-	configure-project \
+	bootstrap \
 	design \
 	discover \
 	evolve-feature \
@@ -40,7 +40,7 @@ install:
 	npx skills add "$(REPO_ROOT)/skills/close-slice" $(COMMON_FLAGS)
 	npx skills add "$(REPO_ROOT)/skills/review-execution" $(COMMON_FLAGS)
 	npx skills add "$(REPO_ROOT)/skills/commit" $(COMMON_FLAGS)
-	npx skills add "$(REPO_ROOT)/skills/configure-project" $(COMMON_FLAGS)
+	npx skills add "$(REPO_ROOT)/skills/bootstrap" $(COMMON_FLAGS)
 	npx skills add "$(REPO_ROOT)/skills/simplify" $(COMMON_FLAGS)
 
 uninstall:

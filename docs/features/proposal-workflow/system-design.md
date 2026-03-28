@@ -73,7 +73,7 @@ user is deliberately repairing state.
   - proposal lifecycle metadata
 - `skills/guide-planning/SKILL.md`
   - routes speculative work to `propose`
-- `skills/configure-project/scripts/configure_project.py`
+- `skills/bootstrap/scripts/bootstrap.py`
   - writes default `proposal_dir`
 
 ## Validation Rules

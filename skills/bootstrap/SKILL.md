@@ -1,9 +1,9 @@
 ---
-name: configure-project
+name: bootstrap
 description: Bootstraps `.skills/planning.json`, `.skills/execution.json`, and `.skills/conventions.json` for a repository. Use when a user asks to configure a project, initialize `sirius-skills` settings, apply generic defaults, or add Jira-oriented conventions.
 ---
 
-# Configure Project
+# Bootstrap
 
 This skill configures the repository-local `.skills/` files used by `sirius-skills`.
 
@@ -60,13 +60,13 @@ If the user already gave a real Jira URL, use it instead of the placeholder.
 Use the bundled helper to create or update the files deterministically:
 
 ```bash
-python3 skills/configure-project/scripts/configure_project.py --mode default
+python3 skills/bootstrap/scripts/bootstrap.py --mode default
 ```
 
 Jira mode:
 
 ```bash
-python3 skills/configure-project/scripts/configure_project.py \
+python3 skills/bootstrap/scripts/bootstrap.py \
   --mode jira \
   --issue-url-template "https://jira.example.com/browse/{ID}"
 ```
@@ -74,7 +74,7 @@ python3 skills/configure-project/scripts/configure_project.py \
 If the user wants custom planning or execution layout, pass those values too:
 
 ```bash
-python3 skills/configure-project/scripts/configure_project.py \
+python3 skills/bootstrap/scripts/bootstrap.py \
   --mode default \
   --planning-dir planning/features \
   --proposal-dir planning/proposals \

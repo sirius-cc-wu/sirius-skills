@@ -4,11 +4,11 @@ import sys
 from pathlib import Path
 
 
-SCRIPT_PATH = Path(__file__).resolve().parents[1] / "scripts" / "configure_project.py"
+SCRIPT_PATH = Path(__file__).resolve().parents[1] / "scripts" / "bootstrap.py"
 
 
 def load_module():
-    spec = importlib.util.spec_from_file_location("configure_project", SCRIPT_PATH)
+    spec = importlib.util.spec_from_file_location("bootstrap", SCRIPT_PATH)
     module = importlib.util.module_from_spec(spec)
     assert spec.loader is not None
     spec.loader.exec_module(module)
@@ -16,7 +16,7 @@ def load_module():
 
 
 def run_cli(module, monkeypatch, *args):
-    monkeypatch.setattr(sys, "argv", ["configure_project.py", *args])
+    monkeypatch.setattr(sys, "argv", ["bootstrap.py", *args])
     return module.main()
 
 
