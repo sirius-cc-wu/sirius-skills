@@ -6,3 +6,4 @@
 | feature-evolution-workflow | planning_reviewed | 2026-03-28T23:26:17 | docs/features/feature-evolution-workflow/ |
 | installation-and-configuration | planning_reviewed | 2026-03-24T03:39:26 | docs/features/installation-and-configuration/ |
 | planning-workflow | planning_reviewed | 2026-03-24T03:39:26 | docs/features/planning-workflow/ |
+| proposal-workflow | planning_reviewed | 2026-03-29T00:32:50 | docs/features/proposal-workflow/ |

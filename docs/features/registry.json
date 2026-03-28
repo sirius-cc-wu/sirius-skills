@@ -23,6 +23,12 @@
       "status": "planning_reviewed",
       "updated_at": "2026-03-24T03:39:26",
       "path": "docs/features/planning-workflow/"
+    },
+    {
+      "feature": "proposal-workflow",
+      "status": "planning_reviewed",
+      "updated_at": "2026-03-29T00:32:50",
+      "path": "docs/features/proposal-workflow/"
     }
   ]
 }
