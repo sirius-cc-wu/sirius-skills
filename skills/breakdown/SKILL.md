@@ -23,6 +23,14 @@ docs/features/<feature-slug>/slice-traceability.md
 If `.skills/planning.json` defines `planning_dir`, the scaffold uses
 `<planning_dir>/<feature-slug>/` instead unless `--base-dir` is passed.
 
+For change-local breakdown work, you can also scaffold directly into an existing
+change packet path:
+
+```bash
+python3 skills/breakdown/scripts/scaffold_breakdown.py \
+  docs/features/<feature-slug>/changes/<change-id>
+```
+
 ## Responsibilities
 
 1. Validate that stories are concrete, scoped, and ready for decomposition.
@@ -36,7 +44,10 @@ If `.skills/planning.json` defines `planning_dir`, the scaffold uses
 - `<feature_path>/slice-planning.md`
 - `<feature_path>/slice-traceability.md`
 
-Resolve `<feature_path>` as `<planning_dir>/<feature-slug>/`.
+Resolve `<feature_path>` as either:
+
+- `<planning_dir>/<feature-slug>/` for canonical feature planning
+- `<planning_dir>/<feature-slug>/changes/<change-id>/` for a selected feature change packet
 
 - If `.skills/planning.json` defines `planning_dir`, use that as `<planning_dir>`.
 - Otherwise default to `docs/features`.
@@ -47,7 +58,7 @@ Preferred execution output when available:
 
 Use `assets/slice-planning-template.md` as the default starting point for `<feature_path>/slice-planning.md`.
 Use `assets/slice-traceability-template.md` as the default starting point for `<feature_path>/slice-traceability.md`.
-Use `scripts/scaffold_breakdown.py` when you want both files scaffolded together from a feature slug.
+Use `scripts/scaffold_breakdown.py` when you want both files scaffolded together from a feature slug or an explicit change packet path.
 
 ## Breakdown Rules
 

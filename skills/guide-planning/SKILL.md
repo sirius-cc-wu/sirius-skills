@@ -11,7 +11,7 @@ Use this skill as the planning-layer entrypoint when you need to decide the next
 
 1. Resolve or initialize the active feature planning folder.
 2. Verify required planning files, registry state, and feature metadata.
-3. Route feature-scoped work to `propose`, `evolve-feature`, `discover`, `design`, `ui-flow`, `breakdown`, `review-planning`, or `slice`.
+3. Route feature-scoped work to `propose`, `evolve-feature`, `assess`, `discover`, `design`, `ui-flow`, `breakdown`, `review-planning`, or `slice`.
 4. Update planning readiness state when a phase is complete.
 5. Keep planning handoff decisions durable in the repository instead of transient chat state.
 
@@ -22,6 +22,7 @@ Use `guide-planning` when you need to decide the next planning step before slice
 - If no feature planning folder exists yet, initialize one and route to `discover`.
 - If the work is still speculative, exploratory, or not yet accepted as a canonical feature, route to `propose`.
 - If the request changes an existing feature rather than starting a net-new feature, route to `evolve-feature`.
+- If an active feature change packet exists and the baseline impact is not yet explicit, route to `assess`.
 - If the problem, outcomes, or constraints are still being framed, route to `discover`.
 - If the architecture, interfaces, or validation strategy are still unresolved, route to `design`.
 - If UI or interaction flow remains material, route to `ui-flow`.
@@ -41,7 +42,7 @@ Use `guide-planning` when you need to decide the next planning step before slice
 Typical handoff:
 
 ```text
-guide-planning -> propose/evolve-feature/discover -> design -> ui-flow -> breakdown -> review-planning -> slice -> guide-execution
+guide-planning -> propose/evolve-feature/assess/discover -> design -> ui-flow -> breakdown -> review-planning -> slice -> guide-execution
 ```
 
 ## Lifecycle States

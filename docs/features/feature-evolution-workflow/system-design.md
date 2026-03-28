@@ -175,7 +175,7 @@ Reasoning:
   - creates one change packet and `.feature-change-meta.json`
   - seeds `discover.md` for the change
 
-- **`impact-analysis`** (new)
+- **`assess`** (new)
   - inspects canonical feature docs
   - identifies affected stories, requirements, increments, and slices
   - writes `impact-analysis.md`
@@ -204,7 +204,7 @@ Reasoning:
 
 ### MVP decisions confirmed during planning review
 
-- Keep **`impact-analysis` as a separate skill** in the first iteration so its
+- Keep **`assess` as a separate skill** in the first iteration so its
   artifact has a clear owner and an independently reviewable validation path.
 - Keep **change closure inside `reconcile-feature`** in the first iteration
   instead of creating a separate `close-feature-change` skill. This keeps the
@@ -355,11 +355,11 @@ package "Feature Change Layer" {
 [guide-planning] --> [evolve-feature]
 [evolve-feature] --> ChangeRegistry
 [evolve-feature] --> ChangeDiscover
-[impact-analysis] --> CanonDiscover
-[impact-analysis] --> CanonDesign
-[impact-analysis] --> CanonSlicePlan
-[impact-analysis] --> CanonTrace
-[impact-analysis] --> Impact
+[assess] --> CanonDiscover
+[assess] --> CanonDesign
+[assess] --> CanonSlicePlan
+[assess] --> CanonTrace
+[assess] --> Impact
 [design] --> ChangeDesign
 [breakdown] --> ChangeSlicePlan
 [breakdown] --> ChangeTrace

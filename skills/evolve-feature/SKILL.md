@@ -35,7 +35,7 @@ Use this skill when an existing canonical feature needs to change and you want a
 2. Create the change packet with `manage_feature_changes.py add <feature> <change-id>`.
 3. Write the changed intent in the change-local `discover.md`.
 4. Advance state only when the required artifacts exist.
-5. Hand off to `impact-analysis`, `design`, `breakdown`, and `review-planning` using the selected change packet.
+5. Hand off to `assess`, `design`, `breakdown`, and `review-planning` using the selected change packet.
 
 ## Source of Truth Rules
 

@@ -21,11 +21,17 @@ FEATURE_SLUG_PATTERN = re.compile(r"^[A-Za-z0-9][A-Za-z0-9._-]*$")
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(
         description=(
-            "Scaffold increment-ready breakdown planning files for a feature under "
-            "docs/features/<feature-slug>/ by default."
+            "Scaffold increment-ready breakdown planning files for a canonical "
+            "feature folder or a selected change packet path."
         )
     )
-    parser.add_argument("feature_slug", help="Feature slug, for example: pm-tool")
+    parser.add_argument(
+        "target",
+        help=(
+            "Feature slug by default, or an explicit planning folder path such as "
+            "docs/features/<feature>/changes/<change-id>"
+        ),
+    )
     parser.add_argument(
         "--base-dir",
         help=(
@@ -99,6 +105,15 @@ def resolve_default_base_dir() -> Path:
     return resolve_base_dir(configured_dir)
 
 
+def resolve_target_dir(target: str, base_dir: Path) -> Path:
+    stripped = target.strip()
+    if not stripped:
+        raise ValueError("Target cannot be empty.")
+    if "/" in stripped or "\\" in stripped:
+        return resolve_base_dir(stripped)
+    return base_dir / validate_feature_slug(stripped)
+
+
 def load_template(path: Path) -> str:
     if not path.exists():
         raise FileNotFoundError(f"Template not found: {path}")
@@ -124,15 +139,14 @@ def ensure_writable(paths: list[Path], force: bool) -> None:
         )
 
 
-def scaffold(feature_slug: str, base_dir: Path, force: bool) -> Path:
-    target_dir = base_dir / feature_slug
+def scaffold(target_dir: Path, label: str, force: bool) -> Path:
     slice_planning_path = target_dir / "slice-planning.md"
     slice_traceability_path = target_dir / "slice-traceability.md"
 
     ensure_writable([slice_planning_path, slice_traceability_path], force=force)
     target_dir.mkdir(parents=True, exist_ok=True)
 
-    slice_planning_path.write_text(render_slice_planning(feature_slug), encoding="utf-8")
+    slice_planning_path.write_text(render_slice_planning(label), encoding="utf-8")
     slice_traceability_path.write_text(render_slice_traceability(), encoding="utf-8")
     return target_dir
 
@@ -140,13 +154,14 @@ def scaffold(feature_slug: str, base_dir: Path, force: bool) -> Path:
 def main() -> int:
     args = parse_args()
     try:
-        feature_slug = validate_feature_slug(args.feature_slug)
         base_dir = (
             resolve_base_dir(args.base_dir)
             if args.base_dir is not None
             else resolve_default_base_dir()
         )
-        target_dir = scaffold(feature_slug, base_dir, force=args.force)
+        target_dir = resolve_target_dir(args.target, base_dir)
+        label = target_dir.name if ("/" in args.target or "\\" in args.target) else validate_feature_slug(args.target)
+        target_dir = scaffold(target_dir, label, force=args.force)
     except (FileExistsError, FileNotFoundError, OSError, ValueError) as exc:
         print(f"Failure: {exc}", file=sys.stderr)
         return 1

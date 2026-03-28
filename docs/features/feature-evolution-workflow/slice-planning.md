@@ -54,7 +54,7 @@ Rules:
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
 | FEW-01-registry | FEW-01 | Initialize feature change registry | Add per-feature `changes/README.md`, `registry.json`, and registry lifecycle management for change packets. | `skills/evolve-feature/scripts/manage_feature_changes.py` | primary | `pytest -q skills/evolve-feature/tests/test_manage_feature_changes.py` | create slice |  | yes |
 | FEW-01-initiate-change | FEW-01 | Bootstrap one feature change packet | Resolve canonical feature, create `changes/<change-id>/`, and seed change-local discovery artifacts. | `skills/evolve-feature/SKILL.md`, `skills/evolve-feature/scripts/manage_feature_changes.py` | primary | `pytest -q skills/evolve-feature/tests/test_manage_feature_changes.py` | create slice | FEW-01-registry | yes |
-| FEW-02-impact-analysis | FEW-02 | Produce impact analysis for changed features | Inspect canonical planning docs and write `impact-analysis.md` with affected stories, artifacts, and slice implications. | `skills/impact-analysis/SKILL.md`, `skills/impact-analysis/`, change packet docs | primary | Review generated `impact-analysis.md` plus `pytest -q skills/impact-analysis/tests/test_impact_analysis.py` | create slice | FEW-01-initiate-change | yes |
+| FEW-02-impact-analysis | FEW-02 | Produce impact analysis for changed features | Inspect canonical planning docs and write `impact-analysis.md` with affected stories, artifacts, and slice implications. | `skills/assess/SKILL.md`, `skills/assess/`, change packet docs | primary | Review generated `impact-analysis.md` plus `pytest -q skills/assess/tests/test_analyze_impact.py` | create slice | FEW-01-initiate-change | yes |
 | FEW-03-change-metadata | FEW-03 | Enforce feature-change state model | Add `.feature-change-meta.json` shape, state transitions, and artifact-gated validation for change packets. | `skills/evolve-feature/scripts/manage_feature_changes.py` | primary | `pytest -q skills/evolve-feature/tests/test_manage_feature_changes.py` | create slice | FEW-01-initiate-change | yes |
 | FEW-03-change-artifacts | FEW-03 | Support change-local design and breakdown artifacts | Extend planning path resolution so `design` and `breakdown` can operate on a selected change packet cleanly. | `skills/design/`, `skills/breakdown/`, path-resolution helpers | primary | Validate one change packet reaches `design_ready` / `breakdown_ready` using tooling or fixture tests | create slice | FEW-02-impact-analysis, FEW-03-change-metadata | yes |
 | FEW-04-change-breakdown | FEW-04 | Break change packets into execution-ready slices | Generate change-local `slice-planning.md` and `slice-traceability.md` that produce execution-ready slices from approved deltas. | `skills/breakdown/SKILL.md`, templates, change packet examples | primary | Review generated planning docs and add fixture coverage for change-local breakdown | create slice | FEW-03-change-artifacts | yes |
@@ -68,7 +68,7 @@ Rules:
 - Explicit blockers: reconciliation depends on reviewed change-local planning outputs and stable canonical update semantics.
 - Parallel-safe slices: none recommended in the first iteration because path resolution, state transitions, and reconciliation semantics are tightly coupled.
 - Increment ordering: I1 -> I2 -> I3 -> I4.
-- Lane owners and handoffs: `guide-planning` routes into `evolve-feature`; `impact-analysis`, `design`, and `breakdown` operate on the selected change packet; `review-planning` confirms readiness before slice bootstrap; `reconcile-feature` closes the planning delta loop.
+- Lane owners and handoffs: `guide-planning` routes into `evolve-feature`; `assess`, `design`, and `breakdown` operate on the selected change packet; `review-planning` confirms readiness before slice bootstrap; `reconcile-feature` closes the planning delta loop.
 - Integration checkpoints:
   - validate feature change creation and registry state after I1
   - validate one change packet reaches impact/design/breakdown readiness after I2
@@ -89,7 +89,7 @@ Rules:
 
 ## 7. Open Questions / Stop-and-Ask Items
 
-- Resolved for MVP: keep `impact-analysis` as a separate skill so the artifact has a distinct owner and review surface.
+- Resolved for MVP: keep `assess` as a separate skill so the artifact has a distinct owner and review surface.
 - Resolved for MVP: keep change closure inside `reconcile-feature` instead of adding a separate `close-feature-change` skill yet.
 - Resolved for MVP: allow one active open change per canonical feature; if a second change is requested, stop and ask whether to continue the active change or defer the new one.
 

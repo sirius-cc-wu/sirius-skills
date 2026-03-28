@@ -101,3 +101,16 @@ def test_scaffold_ignores_conventions_planning_dir(tmp_path, monkeypatch):
 
     assert (tmp_path / "docs" / "features" / "demo-feature" / "slice-planning.md").exists()
     assert not (tmp_path / "legacy" / "features" / "demo-feature").exists()
+
+
+def test_scaffold_accepts_explicit_change_packet_path(tmp_path, monkeypatch):
+    module = load_module()
+    monkeypatch.chdir(tmp_path)
+
+    target = "docs/features/demo-feature/changes/replace-legacy-flow"
+
+    assert run_cli(module, monkeypatch, target) == 0
+
+    target_dir = tmp_path / "docs" / "features" / "demo-feature" / "changes" / "replace-legacy-flow"
+    assert (target_dir / "slice-planning.md").exists()
+    assert (target_dir / "slice-traceability.md").exists()

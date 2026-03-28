@@ -13,6 +13,7 @@ Use a **two-layer workflow**:
    - `guide-planning`
    - `propose`
    - `evolve-feature`
+   - `assess`
    - `discover`
    - `design`
    - `ui-flow` (optional)
@@ -40,7 +41,7 @@ Its job is to:
 
 - resolve or initialize the feature planning folder
 - verify the current planning artifacts and metadata
-- decide whether the next step is `propose`, `evolve-feature`, `discover`, `design`, `ui-flow`, `breakdown`, `review-planning`, or `slice`
+- decide whether the next step is `propose`, `evolve-feature`, `assess`, `discover`, `design`, `ui-flow`, `breakdown`, `review-planning`, or `slice`
 - keep planning handoff decisions durable through explicit readiness states
 
 Expected planning states:
@@ -55,12 +56,31 @@ Expected planning states:
 Recommended handoff:
 
 ```text
-guide-planning -> propose/evolve-feature/discover/design/ui-flow/breakdown/review-planning/slice
+guide-planning -> propose/evolve-feature/assess/discover/design/ui-flow/breakdown/review-planning/slice
 ```
 
 If the request is still speculative, cross-cutting, or not yet accepted as a canonical feature, route to `propose` first. That keeps early exploration under `docs/proposals/` instead of polluting the canonical `docs/features/` registry too early.
 
 If the request is changing an existing canonical feature instead of starting net-new planning work, route to `evolve-feature` first. That skill creates a feature-local change packet and keeps the canonical feature folder as the durable source of truth.
+
+After a change packet exists, use `assess` before change-local design when you need an explicit record of affected baseline artifacts, stories, increments, and slices.
+
+### 0b. Assess existing-feature impact
+
+Use `assess` after `evolve-feature` and before change-local design or breakdown.
+
+Its job is to:
+
+- inspect the canonical feature baseline
+- write `impact-analysis.md` inside the selected change packet
+- record affected artifacts, story IDs, and slice IDs in `.feature-change-meta.json`
+- make the changed scope explicit before design starts
+
+Recommended handoff:
+
+```text
+guide-planning -> evolve-feature -> assess -> design -> breakdown
+```
 
 ### 0a. Capture speculative ideas with propose
 
