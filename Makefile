@@ -3,7 +3,9 @@
 REPO_ROOT := $(CURDIR)
 COMMON_FLAGS := --global --yes --agent github-copilot --agent codex --agent antigravity --agent gemini-cli
 MANAGED_SKILLS := \
+	brief \
 	breakdown \
+	create-pr \
 	close-slice \
 	commit \
 	bootstrap \
@@ -41,6 +43,7 @@ install:
 	npx skills add "$(REPO_ROOT)/skills/review-execution" $(COMMON_FLAGS)
 	npx skills add "$(REPO_ROOT)/skills/commit" $(COMMON_FLAGS)
 	npx skills add "$(REPO_ROOT)/skills/bootstrap" $(COMMON_FLAGS)
+	npx skills add "$(REPO_ROOT)/skills/create-pr" $(COMMON_FLAGS)
 	npx skills add "$(REPO_ROOT)/skills/simplify" $(COMMON_FLAGS)
 
 uninstall:

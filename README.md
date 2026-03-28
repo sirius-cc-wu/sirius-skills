@@ -24,22 +24,11 @@ The intended direction is:
 
 ## Generic-first workflow
 
-These core skills remain repository-centric and system-agnostic by default:
+The managed repo-first skill set is grouped into:
 
-- `skills/bootstrap/`
-- `skills/commit/`
-- `skills/create-pr/`
-- `skills/brief/`
-- `skills/propose/`
-- `skills/evolve-feature/`
-- `skills/assess/`
-- `skills/reconcile-feature/`
-- `skills/guide-planning/`
-- `skills/guide-execution/`
-- `skills/blueprint/`
-- `skills/review-planning/`
-- `skills/review-execution/`
-- `skills/close-slice/`
+- repo utilities: `skills/bootstrap/`, `skills/commit/`, `skills/create-pr/`, `skills/simplify/`
+- planning layer: `skills/guide-planning/`, `skills/propose/`, `skills/evolve-feature/`, `skills/assess/`, `skills/reconcile-feature/`, `skills/discover/`, `skills/design/`, `skills/ui-flow/`, `skills/breakdown/`, `skills/review-planning/`, `skills/slice/`
+- execution layer: `skills/guide-execution/`, `skills/brief/`, `skills/blueprint/`, `skills/review-execution/`, `skills/close-slice/`
 
 If a project has no extra configuration, these skills should still work with generic conventions.
 
