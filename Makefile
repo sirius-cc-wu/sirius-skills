@@ -11,6 +11,7 @@ MANAGED_SKILLS := \
 	discover \
 	evolve-feature \
 	guide-planning \
+	propose \
 	blueprint \
 	review-execution \
 	review-planning \
@@ -24,6 +25,7 @@ install:
 	npx skills add "$(REPO_ROOT)/skills/brief" $(COMMON_FLAGS)
 	npx skills add "$(REPO_ROOT)/skills/blueprint" $(COMMON_FLAGS)
 	npx skills add "$(REPO_ROOT)/skills/guide-planning" $(COMMON_FLAGS)
+	npx skills add "$(REPO_ROOT)/skills/propose" $(COMMON_FLAGS)
 	npx skills add "$(REPO_ROOT)/skills/discover" $(COMMON_FLAGS)
 	npx skills add "$(REPO_ROOT)/skills/evolve-feature" $(COMMON_FLAGS)
 	npx skills add "$(REPO_ROOT)/skills/design" $(COMMON_FLAGS)

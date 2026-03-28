@@ -40,6 +40,7 @@ Preserve unrelated keys in existing JSON files. This skill should only update th
 Use these defaults unless the user asked for different values:
 
 - `planning_dir`: `docs/features`
+- `proposal_dir`: `docs/proposals`
 - `slice_dir`: `slices`
 - `preferred_workflow`: `TDD`
 
@@ -76,6 +77,7 @@ If the user wants custom planning or execution layout, pass those values too:
 python3 skills/configure-project/scripts/configure_project.py \
   --mode default \
   --planning-dir planning/features \
+  --proposal-dir planning/proposals \
   --slice-dir specs \
   --workflow TDD
 ```

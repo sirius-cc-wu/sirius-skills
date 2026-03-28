@@ -11,6 +11,7 @@ Use a **two-layer workflow**:
 
 1. **Planning layer**
    - `guide-planning`
+   - `propose`
    - `evolve-feature`
    - `discover`
    - `design`
@@ -39,7 +40,7 @@ Its job is to:
 
 - resolve or initialize the feature planning folder
 - verify the current planning artifacts and metadata
-- decide whether the next step is `evolve-feature`, `discover`, `design`, `ui-flow`, `breakdown`, `review-planning`, or `slice`
+- decide whether the next step is `propose`, `evolve-feature`, `discover`, `design`, `ui-flow`, `breakdown`, `review-planning`, or `slice`
 - keep planning handoff decisions durable through explicit readiness states
 
 Expected planning states:
@@ -54,10 +55,37 @@ Expected planning states:
 Recommended handoff:
 
 ```text
-guide-planning -> evolve-feature/discover/design/ui-flow/breakdown/review-planning/slice
+guide-planning -> propose/evolve-feature/discover/design/ui-flow/breakdown/review-planning/slice
 ```
 
+If the request is still speculative, cross-cutting, or not yet accepted as a canonical feature, route to `propose` first. That keeps early exploration under `docs/proposals/` instead of polluting the canonical `docs/features/` registry too early.
+
 If the request is changing an existing canonical feature instead of starting net-new planning work, route to `evolve-feature` first. That skill creates a feature-local change packet and keeps the canonical feature folder as the durable source of truth.
+
+### 0a. Capture speculative ideas with propose
+
+Use `propose` when the request is still exploratory and should not become a real feature planning folder yet.
+
+Its job is to:
+
+- create and maintain proposal-scoped docs under `docs/proposals/<proposal-slug>/`
+- track proposal lifecycle state separately from canonical feature planning
+- keep speculative capability ideas out of the feature registry until accepted
+- promote accepted proposals into real feature folders when they are ready
+
+Expected outputs:
+
+- `discover.md`
+- optional `user-stories.md`
+- `.proposal-meta.json`
+
+Recommended handoff:
+
+```text
+guide-planning -> propose -> discover/design/breakdown
+```
+
+When a proposal is accepted, promote it into a canonical feature planning folder before continuing with the normal feature workflow.
 
 ### 1. Discover the work
 
@@ -177,7 +205,7 @@ Its job is to:
 Recommended handoff:
 
 ```text
-guide-planning -> discover -> design -> breakdown -> review-planning -> slice
+guide-planning -> propose/discover -> design -> breakdown -> review-planning -> slice
 ```
 
 ### 6. Bootstrap one execution slice per planned slice
@@ -311,6 +339,16 @@ Important closure rules:
 ```
 
 Keep discovery, design, and breakdown artifacts in a feature-local planning folder so the project context stays together. The planning folder is still a repository document area; it is not a slice-execution slice. By default, `planning_dir` is `docs/features`; projects can override it in `.skills/planning.json`.
+
+### Proposal staging
+
+```text
+<proposal_dir>/<proposal-slug>/
+  discover.md
+  user-stories.md          # optional
+```
+
+Use proposal folders for speculative or not-yet-accepted work. By default, `proposal_dir` is `docs/proposals`; projects can override that in `.skills/planning.json`.
 
 ### Slice-level execution
 

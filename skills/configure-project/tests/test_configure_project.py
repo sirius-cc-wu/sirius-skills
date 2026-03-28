@@ -36,7 +36,10 @@ def test_default_mode_writes_generic_config_files(tmp_path, monkeypatch):
         (tmp_path / ".skills" / "conventions.json").read_text(encoding="utf-8")
     )
 
-    assert planning == {"planning_dir": "docs/features"}
+    assert planning == {
+        "planning_dir": "docs/features",
+        "proposal_dir": "docs/proposals",
+    }
     assert execution == {"slice_dir": "slices", "preferred_workflow": "TDD"}
     assert conventions == {}
 

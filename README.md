@@ -30,6 +30,7 @@ These core skills remain repository-centric and system-agnostic by default:
 - `skills/commit/`
 - `skills/create-pr/`
 - `skills/brief/`
+- `skills/propose/`
 - `skills/evolve-feature/`
 - `skills/guide-planning/`
 - `skills/guide-execution/`
@@ -47,6 +48,7 @@ For the operational guide to using the skills together, see `SKILLS_METHODOLOGY.
 For repositories that use repo-first planning, the recommended short-name planning skills are:
 
 - `skills/guide-planning/`
+- `skills/propose/`
 - `skills/evolve-feature/`
 - `skills/discover/`
 - `skills/design/`
@@ -57,7 +59,7 @@ For repositories that use repo-first planning, the recommended short-name planni
 
 These skills sit **before** the execution-slice skills:
 
-- planning layer: `guide-planning`, `evolve-feature`, `discover`, `design`, `ui-flow`, `breakdown`, `review-planning`, `slice`
+- planning layer: `guide-planning`, `propose`, `evolve-feature`, `discover`, `design`, `ui-flow`, `breakdown`, `review-planning`, `slice`
 - execution layer: `guide-execution`, `brief`, `blueprint`, `review-execution`, `close-slice`
 
 
@@ -72,19 +74,23 @@ Recommended boundary:
 Feature-local planning defaults to `docs/features/<feature-slug>/` unless
 `.skills/planning.json` defines a different `planning_dir`.
 
+Proposal staging defaults to `docs/proposals/<proposal-slug>/` unless
+`.skills/planning.json` defines a different `proposal_dir`.
+
 Preferred repo workflow:
 
 1. `guide-planning` resolves the feature planning folder, validates planning readiness, and routes to the right planning skill.
-2. If the request changes an existing feature rather than starting a new one, `evolve-feature` creates a feature-local change packet under `docs/features/<feature>/changes/<change-id>/`.
-3. `discover` creates problem framing and initial story candidates.
-4. `design` turns that into architecture, interfaces, and risks.
-5. `ui-flow` adds optional UX or screen-flow artifacts.
-6. `breakdown` turns repo stories into directly executable work items and groups those slices into small demonstrable increments.
-7. `review-planning` reviews planning artifacts and slice definitions before execution slice bootstrap.
-8. `slice` validates execution-ready input, bootstraps a slice-scoped execution slice, and hands off to `guide-execution`.
-9. `guide-execution` routes slice-scoped execution through `brief` to capture slice intent and acceptance, then through `blueprint` to produce the final execution artifact.
-10. `review-execution` checks implementation and validation outcomes against the slice-scoped execution artifacts before closure.
-11. `close-slice` closes completed execution slices and can optionally publish a project-local summary.
+2. If the request is still speculative and should not become a canonical feature yet, `propose` creates a proposal folder under `docs/proposals/<proposal-slug>/`.
+3. If the request changes an existing feature rather than starting a new one, `evolve-feature` creates a feature-local change packet under `docs/features/<feature>/changes/<change-id>/`.
+4. `discover` creates problem framing and initial story candidates.
+5. `design` turns that into architecture, interfaces, and risks.
+6. `ui-flow` adds optional UX or screen-flow artifacts.
+7. `breakdown` turns repo stories into directly executable work items and groups those slices into small demonstrable increments.
+8. `review-planning` reviews planning artifacts and slice definitions before execution slice bootstrap.
+9. `slice` validates execution-ready input, bootstraps a slice-scoped execution slice, and hands off to `guide-execution`.
+10. `guide-execution` routes slice-scoped execution through `brief` to capture slice intent and acceptance, then through `blueprint` to produce the final execution artifact.
+11. `review-execution` checks implementation and validation outcomes against the slice-scoped execution artifacts before closure.
+12. `close-slice` closes completed execution slices and can optionally publish a project-local summary.
 
 In the repo-native flow, `guide-planning` owns feature-planning readiness and routing, `breakdown` owns repo-story decomposition, `review-planning` owns planning readiness review, `brief` owns the slice-scoped `brief.md`, `blueprint` owns the final slice-scoped execution plan and validation checklist, and `review-execution` owns the final implementation-versus-brief review before closure.
 
@@ -135,7 +141,8 @@ Example:
 
 ```json
 {
-  "planning_dir": "planning/features"
+  "planning_dir": "planning/features",
+  "proposal_dir": "planning/proposals"
 }
 ```
 
@@ -168,6 +175,7 @@ Example:
 Current Phase 1 usage:
 
 - planning-layer skills resolve `<feature_path>` from `.skills/planning.json` field `planning_dir` when the file is present, otherwise they default to `docs/features/<feature-slug>/`
+- `skills/propose/scripts/manage_proposals.py` reads `.skills/planning.json` field `proposal_dir` when present and otherwise defaults to `docs/proposals/<proposal-slug>/`
 - `skills/guide-planning/scripts/manage_planning.py` reads `.skills/planning.json` for `planning_dir` and maintains planning readiness metadata under `<feature_path>/.planning-meta.json`
 - `skills/breakdown/scripts/scaffold_breakdown.py` uses `.skills/planning.json` field `planning_dir` during scaffolding when the file is present
 - `skills/slice/scripts/bootstrap_slice.py` can initialize `.skills/execution.json` with the generic `slices/` default (or an explicit `--slice-dir`) before delegating to execution-layer tooling

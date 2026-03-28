@@ -1,0 +1,10 @@
+{
+  "proposals": [
+    {
+      "proposal": "workflow-capability-upgrades",
+      "status": "draft",
+      "updated_at": "2026-03-28T22:29:44",
+      "path": "docs/proposals/workflow-capability-upgrades/"
+    }
+  ]
+}

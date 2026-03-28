@@ -10,6 +10,7 @@ from typing import Any
 
 
 DEFAULT_PLANNING_DIR = "docs/features"
+DEFAULT_PROPOSAL_DIR = "docs/proposals"
 DEFAULT_SLICE_DIR = "slices"
 DEFAULT_WORKFLOW = "TDD"
 
@@ -42,6 +43,11 @@ def parse_args() -> argparse.Namespace:
         "--planning-dir",
         default=DEFAULT_PLANNING_DIR,
         help=f"Planning directory for .skills/planning.json (default: {DEFAULT_PLANNING_DIR}).",
+    )
+    parser.add_argument(
+        "--proposal-dir",
+        default=DEFAULT_PROPOSAL_DIR,
+        help=f"Proposal directory for .skills/planning.json (default: {DEFAULT_PROPOSAL_DIR}).",
     )
     parser.add_argument(
         "--slice-dir",
@@ -79,9 +85,12 @@ def write_json_file(path: Path, data: dict[str, Any]) -> None:
     path.write_text(json.dumps(data, indent=2) + "\n", encoding="utf-8")
 
 
-def build_planning_config(existing: dict[str, Any], planning_dir: str) -> dict[str, Any]:
+def build_planning_config(
+    existing: dict[str, Any], planning_dir: str, proposal_dir: str
+) -> dict[str, Any]:
     updated = dict(existing)
     updated["planning_dir"] = planning_dir
+    updated["proposal_dir"] = proposal_dir
     return updated
 
 
@@ -121,7 +130,9 @@ def main() -> int:
         print(f"Error: {exc}", file=sys.stderr)
         return 2
 
-    planning_config = build_planning_config(planning_existing, args.planning_dir)
+    planning_config = build_planning_config(
+        planning_existing, args.planning_dir, args.proposal_dir
+    )
     execution_config = build_execution_config(
         execution_existing, args.slice_dir, args.workflow
     )
