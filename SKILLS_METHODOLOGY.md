@@ -14,6 +14,7 @@ Use a **two-layer workflow**:
    - `propose`
    - `evolve-feature`
    - `assess`
+   - `reconcile-feature`
    - `discover`
    - `design`
    - `ui-flow` (optional)
@@ -41,7 +42,7 @@ Its job is to:
 
 - resolve or initialize the feature planning folder
 - verify the current planning artifacts and metadata
-- decide whether the next step is `propose`, `evolve-feature`, `assess`, `discover`, `design`, `ui-flow`, `breakdown`, `review-planning`, or `slice`
+- decide whether the next step is `propose`, `evolve-feature`, `assess`, `reconcile-feature`, `discover`, `design`, `ui-flow`, `breakdown`, `review-planning`, or `slice`
 - keep planning handoff decisions durable through explicit readiness states
 
 Expected planning states:
@@ -56,7 +57,7 @@ Expected planning states:
 Recommended handoff:
 
 ```text
-guide-planning -> propose/evolve-feature/assess/discover/design/ui-flow/breakdown/review-planning/slice
+guide-planning -> propose/evolve-feature/assess/reconcile-feature/discover/design/ui-flow/breakdown/review-planning/slice
 ```
 
 If the request is still speculative, cross-cutting, or not yet accepted as a canonical feature, route to `propose` first. That keeps early exploration under `docs/proposals/` instead of polluting the canonical `docs/features/` registry too early.
@@ -80,6 +81,24 @@ Recommended handoff:
 
 ```text
 guide-planning -> evolve-feature -> assess -> design -> breakdown
+```
+
+### 0c. Reconcile approved feature changes
+
+Use `reconcile-feature` after a reviewed feature change packet has been executed
+and the approved delta needs to be folded back into the canonical planning docs.
+
+Its job is to:
+
+- update canonical feature docs with stable reconciliation blocks and backlinks
+- write `reconciliation.md` inside the retained change packet
+- optionally publish feature-local change history
+- close the change packet through the existing feature-change lifecycle
+
+Recommended handoff:
+
+```text
+review-planning -> slice -> guide-execution -> brief -> blueprint -> review-execution -> close-slice -> reconcile-feature
 ```
 
 ### 0a. Capture speculative ideas with propose
@@ -178,6 +197,18 @@ python3 skills/breakdown/scripts/scaffold_breakdown.py <feature-slug>
 The helper uses `.skills/planning.json` field `planning_dir` when present and
 otherwise defaults to `docs/features`.
 
+For an existing feature change, scaffold directly into the selected change
+packet path instead:
+
+```bash
+python3 skills/breakdown/scripts/scaffold_breakdown.py \
+  docs/features/<feature-slug>/changes/<change-id>
+```
+
+When the target is a real change packet, the scaffold seeds change context from
+`.feature-change-meta.json` and `impact-analysis.md` so the breakdown artifacts
+stay tied to the affected canonical stories, slices, and baseline docs.
+
 Review checkpoint:
 
 - review the slices and increments for scope, sequencing, ownership, and demonstrability before bootstrapping planned slices
@@ -205,6 +236,8 @@ Recommended slice usage:
 - record real execution blockers as dependencies in `slice-planning.md`
 - keep repo story IDs in `slice-traceability.md`
 - keep slice IDs as the primary execution identifiers
+- for change packets, keep superseded canonical slice IDs in notes or dependency
+  fields instead of reusing them as new change-local slice IDs
 
 Review checkpoint:
 

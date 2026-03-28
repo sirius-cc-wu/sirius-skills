@@ -31,6 +31,11 @@ python3 skills/breakdown/scripts/scaffold_breakdown.py \
   docs/features/<feature-slug>/changes/<change-id>
 ```
 
+When the target path is a real change packet with `.feature-change-meta.json`,
+the scaffold seeds change context from the packet metadata and `impact-analysis.md`
+so the resulting breakdown artifacts stay anchored to the affected canonical
+stories, slices, and baseline docs.
+
 ## Responsibilities
 
 1. Validate that stories are concrete, scoped, and ready for decomposition.
@@ -179,6 +184,8 @@ Otherwise, use an opaque slice ID and keep the repo story ID in traceability met
 ## Workflow
 
 1. Read `discover.md`, `system-design.md`, optional `ui-design.md`, and `user-stories.md`.
+   For change packets, also read `impact-analysis.md` and the canonical feature's
+   `user-stories.md`, `slice-planning.md`, and `slice-traceability.md`.
 2. Validate that each story has scope, acceptance notes, an explicit size, and an explicit risk rating.
 3. Split oversized work into smaller execution packets and group them into increments with clear demo outcomes.
 4. Choose `single-agent` or `multi-agent` handling where relevant and record lane assumptions.
@@ -197,3 +204,6 @@ When generating `slice-traceability.md`, start from `assets/slice-traceability-t
 - Do not turn `slice-planning.md` into a slice-scoped execution checklist; that belongs to `guide-execution` and `blueprint` later.
 - Do not mark work as parallel-safe unless overlap and integration risk are genuinely low.
 - If a slice still needs major replanning, split it again before handoff.
+- For change packets, only plan the new or amended slices needed by the change;
+  keep references to superseded canonical slices in notes or dependencies rather
+  than reusing them as change-local slice IDs.

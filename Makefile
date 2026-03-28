@@ -11,6 +11,7 @@ MANAGED_SKILLS := \
 	discover \
 	evolve-feature \
 	assess \
+	reconcile-feature \
 	guide-planning \
 	propose \
 	blueprint \
@@ -30,6 +31,7 @@ install:
 	npx skills add "$(REPO_ROOT)/skills/discover" $(COMMON_FLAGS)
 	npx skills add "$(REPO_ROOT)/skills/evolve-feature" $(COMMON_FLAGS)
 	npx skills add "$(REPO_ROOT)/skills/assess" $(COMMON_FLAGS)
+	npx skills add "$(REPO_ROOT)/skills/reconcile-feature" $(COMMON_FLAGS)
 	npx skills add "$(REPO_ROOT)/skills/design" $(COMMON_FLAGS)
 	npx skills add "$(REPO_ROOT)/skills/ui-flow" $(COMMON_FLAGS)
 	npx skills add "$(REPO_ROOT)/skills/breakdown" $(COMMON_FLAGS)

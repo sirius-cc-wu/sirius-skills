@@ -33,6 +33,7 @@ These core skills remain repository-centric and system-agnostic by default:
 - `skills/propose/`
 - `skills/evolve-feature/`
 - `skills/assess/`
+- `skills/reconcile-feature/`
 - `skills/guide-planning/`
 - `skills/guide-execution/`
 - `skills/blueprint/`
@@ -52,6 +53,7 @@ For repositories that use repo-first planning, the recommended short-name planni
 - `skills/propose/`
 - `skills/evolve-feature/`
 - `skills/assess/`
+- `skills/reconcile-feature/`
 - `skills/discover/`
 - `skills/design/`
 - `skills/ui-flow/`
@@ -61,7 +63,7 @@ For repositories that use repo-first planning, the recommended short-name planni
 
 These skills sit **before** the execution-slice skills:
 
-- planning layer: `guide-planning`, `propose`, `evolve-feature`, `assess`, `discover`, `design`, `ui-flow`, `breakdown`, `review-planning`, `slice`
+- planning layer: `guide-planning`, `propose`, `evolve-feature`, `assess`, `reconcile-feature`, `discover`, `design`, `ui-flow`, `breakdown`, `review-planning`, `slice`
 - execution layer: `guide-execution`, `brief`, `blueprint`, `review-execution`, `close-slice`
 
 
@@ -94,6 +96,7 @@ Preferred repo workflow:
 11. `guide-execution` routes slice-scoped execution through `brief` to capture slice intent and acceptance, then through `blueprint` to produce the final execution artifact.
 12. `review-execution` checks implementation and validation outcomes against the slice-scoped execution artifacts before closure.
 13. `close-slice` closes completed execution slices and can optionally publish a project-local summary.
+14. `reconcile-feature` folds an approved feature change packet back into the canonical planning docs, writes `reconciliation.md`, publishes retained change history, and closes the change packet.
 
 In the repo-native flow, `guide-planning` owns feature-planning readiness and routing, `breakdown` owns repo-story decomposition, `review-planning` owns planning readiness review, `brief` owns the slice-scoped `brief.md`, `blueprint` owns the final slice-scoped execution plan and validation checklist, and `review-execution` owns the final implementation-versus-brief review before closure.
 
