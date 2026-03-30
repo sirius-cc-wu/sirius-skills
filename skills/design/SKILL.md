@@ -26,7 +26,10 @@ Optional companion output:
 
 ## Feature Path Resolution
 
-Resolve `<feature_path>` as `<planning_dir>/<feature-slug>/`.
+Resolve `<feature_path>` as either:
+
+- `<planning_dir>/<feature-slug>/` for canonical feature planning
+- `<planning_dir>/<feature-slug>/changes/<change-id>/` for a selected feature change packet
 
 - If `.skills/planning.json` defines `planning_dir`, use that as `<planning_dir>`.
 - Otherwise default to `docs/features`.
@@ -43,7 +46,7 @@ Resolve `<feature_path>` as `<planning_dir>/<feature-slug>/`.
 
 ## Workflow
 
-1. Read `discover.md` and any existing feature planning docs.
+1. Read `discover.md`, `impact-analysis.md` when present, and any existing feature planning docs.
 2. Inspect the relevant codebase or adjacent systems as needed.
 3. Write `system-design.md` with architecture, interfaces, constraints, validation notes, and PlantUML system-design diagrams.
 4. Refine story boundaries when the design changes implementation shape.

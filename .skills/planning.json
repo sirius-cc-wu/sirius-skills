@@ -1,3 +1,4 @@
 {
-  "planning_dir": "docs/features"
+  "planning_dir": "docs/features",
+  "proposal_dir": "docs/proposals"
 }

@@ -58,6 +58,38 @@ When you change a skill or helper:
 Favor additive changes, compatibility shims, and normalization over abrupt
 breaking changes. If you must break behavior, document it clearly.
 
+### Prefer action-oriented skill names
+
+Use short, imperative skill names by default.
+
+Rules:
+
+- prefer a verb when one clear verb exists
+- prefer short names over long noun phrases
+- use verb-noun forms only when the noun is needed for clarity, such as `evolve-feature` or `close-slice`
+- avoid noun-only skill names when the skill is performing an action
+
+Examples:
+
+- good: `propose`, `discover`, `design`, `assess`
+- acceptable when needed: `evolve-feature`, `guide-planning`, `review-planning`
+- avoid for skill names: `proposal`, `impact-analysis`
+
+Artifact and storage names may stay noun-based when they describe durable
+repository objects rather than actions.
+
+Examples:
+
+- `docs/proposals/`
+- `proposal_dir`
+- `impact-analysis.md`
+- `.proposal-meta.json`
+
+### Keep workflow naming boundaries clear
+
+- skills should sound like actions an agent takes
+- files, directories, registries, and metadata should sound like objects the workflow stores
+
 ## Working In This Repo
 
 ### Skills

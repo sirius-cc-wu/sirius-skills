@@ -23,6 +23,19 @@ docs/features/<feature-slug>/slice-traceability.md
 If `.skills/planning.json` defines `planning_dir`, the scaffold uses
 `<planning_dir>/<feature-slug>/` instead unless `--base-dir` is passed.
 
+For change-local breakdown work, you can also scaffold directly into an existing
+change packet path:
+
+```bash
+python3 skills/breakdown/scripts/scaffold_breakdown.py \
+  docs/features/<feature-slug>/changes/<change-id>
+```
+
+When the target path is a real change packet with `.feature-change-meta.json`,
+the scaffold seeds change context from the packet metadata and `impact-analysis.md`
+so the resulting breakdown artifacts stay anchored to the affected canonical
+stories, slices, and baseline docs.
+
 ## Responsibilities
 
 1. Validate that stories are concrete, scoped, and ready for decomposition.
@@ -36,7 +49,10 @@ If `.skills/planning.json` defines `planning_dir`, the scaffold uses
 - `<feature_path>/slice-planning.md`
 - `<feature_path>/slice-traceability.md`
 
-Resolve `<feature_path>` as `<planning_dir>/<feature-slug>/`.
+Resolve `<feature_path>` as either:
+
+- `<planning_dir>/<feature-slug>/` for canonical feature planning
+- `<planning_dir>/<feature-slug>/changes/<change-id>/` for a selected feature change packet
 
 - If `.skills/planning.json` defines `planning_dir`, use that as `<planning_dir>`.
 - Otherwise default to `docs/features`.
@@ -47,18 +63,39 @@ Preferred execution output when available:
 
 Use `assets/slice-planning-template.md` as the default starting point for `<feature_path>/slice-planning.md`.
 Use `assets/slice-traceability-template.md` as the default starting point for `<feature_path>/slice-traceability.md`.
-Use `scripts/scaffold_breakdown.py` when you want both files scaffolded together from a feature slug.
+Use `scripts/scaffold_breakdown.py` when you want both files scaffolded together from a feature slug or an explicit change packet path.
 
 ## Breakdown Rules
 
 - Keep stories and design in repo docs; keep executable slices in the repository's planning artifacts.
 - Prefer repository story sizes such as `S`, `M`, `L`, and `XL`.
+- Record an explicit story risk for decomposition decisions, using `low`, `medium`, or `high`.
 - Split any `XL` item before creating execution-ready slices.
+- Do not assume only `XL` stories may split. A smaller `S`/`M`/`L` story may still split when risk, coupling, or validation shape would make one packet brittle.
 - Every executable slice should be small enough to fit one slice-scoped execution slice.
 - Group related slices into small, demonstrable increments before bootstrapping slices.
 - Prefer execution packets that stay within one subsystem or a small set of files.
 - Every execution-ready slice should have concrete acceptance notes and a validation command or artifact check.
 - Preserve stable story identifiers so slice traceability is durable.
+
+## Sizing and Risk Heuristics
+
+Use size as the default signal and risk as the override signal.
+
+- `S` and `M` stories usually stay as one planned slice unless there is a clear reason to split.
+- `L` stories may stay whole when the work is cohesive and low-risk, but may split when the work naturally falls into independently verifiable packets.
+- `XL` stories should be split before they become execution-ready.
+- `high` risk can justify splitting even when the story is not `XL`.
+
+Treat risk as elevated when one or more of these are true:
+
+- the work crosses multiple subsystems or ownership boundaries
+- the work mixes separate validation paths that would be clearer in separate packets
+- the work includes migration, reconciliation, replacement, or compatibility impact
+- the work has high coupling, fragile sequencing, or non-trivial handoff risk
+- the acceptance path is ambiguous unless the work is decomposed further
+
+When you choose `keep`, `split`, or `defer`, record both the size and the risk and explain the primary reason in `slice-planning.md`.
 
 ## Increment Planning
 
@@ -86,7 +123,7 @@ Prefer `multi-agent` execution only when:
 
 When a story becomes execution-ready:
 
-- split it into small packets that can be executed without broad repo-wide context
+- split it into small packets when size or risk indicates the story would be brittle as one execution item
 - mark blockers and sequencing constraints explicitly
 - label only genuinely independent slices as parallel-safe
 - if using `multi-agent`, record lane ownership, handoff targets, and an integration checkpoint after each lane
@@ -147,7 +184,9 @@ Otherwise, use an opaque slice ID and keep the repo story ID in traceability met
 ## Workflow
 
 1. Read `discover.md`, `system-design.md`, optional `ui-design.md`, and `user-stories.md`.
-2. Validate that each story has scope, acceptance notes, and an explicit size.
+   For change packets, also read `impact-analysis.md` and the canonical feature's
+   `user-stories.md`, `slice-planning.md`, and `slice-traceability.md`.
+2. Validate that each story has scope, acceptance notes, an explicit size, and an explicit risk rating.
 3. Split oversized work into smaller execution packets and group them into increments with clear demo outcomes.
 4. Choose `single-agent` or `multi-agent` handling where relevant and record lane assumptions.
 5. Write `slice-planning.md` and `slice-traceability.md` with increment groupings, dependency notes, parallel-safe lanes, and integration checkpoints as needed.
@@ -165,3 +204,6 @@ When generating `slice-traceability.md`, start from `assets/slice-traceability-t
 - Do not turn `slice-planning.md` into a slice-scoped execution checklist; that belongs to `guide-execution` and `blueprint` later.
 - Do not mark work as parallel-safe unless overlap and integration risk are genuinely low.
 - If a slice still needs major replanning, split it again before handoff.
+- For change packets, only plan the new or amended slices needed by the change;
+  keep references to superseded canonical slices in notes or dependencies rather
+  than reusing them as change-local slice IDs.
