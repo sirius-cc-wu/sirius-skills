@@ -9,6 +9,9 @@ from datetime import datetime
 from typing import Dict, List, Optional, Tuple
 
 DEFAULT_PLANNING_DIR = "docs/features"
+DEFAULT_PROPOSAL_DIR = "docs/proposals"
+DEFAULT_DESIGN_DIAGRAM_MODE = "embedded"
+VALID_DESIGN_DIAGRAM_MODES = {"embedded", "linked_svg"}
 CONFIG_DIR = ".skills"
 CONFIG_FILE = os.path.join(CONFIG_DIR, "planning.json")
 REGISTRY_JSON_FILE = "registry.json"
@@ -55,6 +58,16 @@ def normalize_planning_dir(value: str) -> str:
     normalized = normalized.rstrip("/")
     if normalized.startswith("./"):
         normalized = normalized[2:]
+    return normalized
+
+
+def normalize_design_diagram_mode(value: str) -> str:
+    normalized = value.strip().lower()
+    if normalized not in VALID_DESIGN_DIAGRAM_MODES:
+        raise ValueError(
+            "Planning config field 'design_diagram_mode' must be one of "
+            f"{sorted(VALID_DESIGN_DIAGRAM_MODES)}."
+        )
     return normalized
 
 
@@ -117,7 +130,7 @@ def normalize_slice_ids(value: object) -> List[str]:
     return list(dict.fromkeys(normalized))
 
 
-def load_config(required: bool = False) -> Dict[str, str]:
+def load_raw_config(required: bool = False) -> Dict[str, object]:
     if not os.path.exists(CONFIG_FILE):
         if required:
             raise RuntimeError(
@@ -125,7 +138,7 @@ def load_config(required: bool = False) -> Dict[str, str]:
                 "Ask the user where planning docs should be created, then run "
                 "`manage_planning.py init <planning-dir>`."
             )
-        return {"planning_dir": DEFAULT_PLANNING_DIR}
+        return {}
 
     try:
         with open(CONFIG_FILE, "r", encoding="utf-8") as f:
@@ -136,17 +149,50 @@ def load_config(required: bool = False) -> Dict[str, str]:
     if not isinstance(config, dict):
         raise RuntimeError("Planning config must be a JSON object.")
 
+    return config
+
+
+def load_config(required: bool = False) -> Dict[str, str]:
+    config = load_raw_config(required=required)
+
     planning_dir = config.get("planning_dir", DEFAULT_PLANNING_DIR)
     if not isinstance(planning_dir, str):
         raise RuntimeError("Planning config field 'planning_dir' must be a string.")
 
-    return {"planning_dir": normalize_planning_dir(planning_dir)}
+    proposal_dir = config.get("proposal_dir", DEFAULT_PROPOSAL_DIR)
+    if not isinstance(proposal_dir, str):
+        raise RuntimeError("Planning config field 'proposal_dir' must be a string.")
+
+    design_diagram_mode = config.get(
+        "design_diagram_mode", DEFAULT_DESIGN_DIAGRAM_MODE
+    )
+    if not isinstance(design_diagram_mode, str):
+        raise RuntimeError(
+            "Planning config field 'design_diagram_mode' must be a string."
+        )
+
+    return {
+        "planning_dir": normalize_planning_dir(planning_dir),
+        "proposal_dir": normalize_planning_dir(proposal_dir),
+        "design_diagram_mode": normalize_design_diagram_mode(design_diagram_mode),
+    }
 
 
-def write_config(planning_dir: str) -> None:
+def write_config(
+    planning_dir: str,
+    proposal_dir: str,
+    design_diagram_mode: str,
+    existing: Optional[Dict[str, object]] = None,
+) -> None:
     os.makedirs(CONFIG_DIR, exist_ok=True)
+    updated: Dict[str, object] = dict(existing or {})
+    updated["planning_dir"] = normalize_planning_dir(planning_dir)
+    updated["proposal_dir"] = normalize_planning_dir(proposal_dir)
+    updated["design_diagram_mode"] = normalize_design_diagram_mode(
+        design_diagram_mode
+    )
     with open(CONFIG_FILE, "w", encoding="utf-8") as f:
-        json.dump({"planning_dir": normalize_planning_dir(planning_dir)}, f, indent=2)
+        json.dump(updated, f, indent=2)
         f.write("\n")
 
 
@@ -500,11 +546,17 @@ def validate_feature(feature: Dict[str, object]) -> Tuple[bool, List[str], List[
 
 
 def cmd_init(args: argparse.Namespace) -> int:
+    raw_config = load_raw_config(required=False)
     config = load_config(required=False)
     planning_dir = (
         normalize_planning_dir(args.planning_dir) if args.planning_dir else config["planning_dir"]
     )
-    write_config(planning_dir)
+    write_config(
+        planning_dir,
+        config["proposal_dir"],
+        config["design_diagram_mode"],
+        existing=raw_config,
+    )
     ensure_registry(planning_dir)
     print(f"Initialized planning registry and config in '{planning_dir}/'.")
     return 0

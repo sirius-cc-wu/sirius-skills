@@ -39,6 +39,7 @@ def test_default_mode_writes_generic_config_files(tmp_path, monkeypatch):
     assert planning == {
         "planning_dir": "docs/features",
         "proposal_dir": "docs/proposals",
+        "design_diagram_mode": "embedded",
     }
     assert execution == {
         "slice_dir": "slices",
@@ -103,6 +104,50 @@ def test_default_mode_preserves_existing_conventions_file(tmp_path, monkeypatch)
         (skills_dir / "conventions.json").read_text(encoding="utf-8")
     )
     assert conventions == {"commit_format": "{scope}: {summary}"}
+
+
+def test_bootstrap_writes_custom_design_diagram_mode(tmp_path, monkeypatch):
+    module = load_module()
+    monkeypatch.chdir(tmp_path)
+
+    assert (
+        run_cli(
+            module,
+            monkeypatch,
+            "--mode",
+            "default",
+            "--design-diagram-mode",
+            "linked_svg",
+        )
+        == 0
+    )
+
+    planning = json.loads(
+        (tmp_path / ".skills" / "planning.json").read_text(encoding="utf-8")
+    )
+
+    assert planning["design_diagram_mode"] == "linked_svg"
+
+
+def test_bootstrap_preserves_unrelated_existing_planning_keys(tmp_path, monkeypatch):
+    module = load_module()
+    monkeypatch.chdir(tmp_path)
+
+    skills_dir = tmp_path / ".skills"
+    skills_dir.mkdir()
+    (skills_dir / "planning.json").write_text(
+        json.dumps({"custom_key": "keep-me"}) + "\n",
+        encoding="utf-8",
+    )
+
+    assert run_cli(module, monkeypatch, "--mode", "default") == 0
+
+    planning = json.loads((skills_dir / "planning.json").read_text(encoding="utf-8"))
+
+    assert planning["custom_key"] == "keep-me"
+    assert planning["planning_dir"] == "docs/features"
+    assert planning["proposal_dir"] == "docs/proposals"
+    assert planning["design_diagram_mode"] == "embedded"
 
 
 def test_invalid_existing_json_returns_error(tmp_path, monkeypatch, capsys):

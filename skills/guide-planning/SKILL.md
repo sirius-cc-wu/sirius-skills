@@ -60,10 +60,11 @@ Use adjacent transitions by default and repair skipped states only deliberately.
 ## Preflight
 
 1. Resolve `<planning_dir>` from `.skills/planning.json`; default to `docs/features`.
-2. Ensure the planning registry exists.
-3. Resolve the active feature using tooling or a user-provided slug/path.
-4. Confirm the folder represents one coherent feature or capability.
-5. Check `discover.md`, `system-design.md`, optional `ui-design.md`, `slice-planning.md`, `slice-traceability.md`, and `.planning-meta.json` as appropriate for the current state.
+2. Resolve any planning-layer artifact conventions from `.skills/planning.json`, including `design_diagram_mode` for `system-design.md` diagram layout.
+3. Ensure the planning registry exists.
+4. Resolve the active feature using tooling or a user-provided slug/path.
+5. Confirm the folder represents one coherent feature or capability.
+6. Check `discover.md`, `system-design.md`, optional `ui-design.md`, `slice-planning.md`, `slice-traceability.md`, and `.planning-meta.json` as appropriate for the current state.
 
 ## Tooling
 

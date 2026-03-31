@@ -98,6 +98,8 @@ When UML diagrams are useful, use **PlantUML**:
 - `design` should produce feature-scoped system-design diagrams in `system-design.md`
 - `blueprint` should produce slice-scoped detailed-design diagrams in `blueprint.md`
 
+By default, `design` embeds PlantUML directly in `system-design.md`. If `.skills/planning.json` sets `"design_diagram_mode": "linked_svg"`, `design` should instead write `.puml` and `.svg` files under `<feature_path>/figures/` and link the SVGs from `system-design.md`.
+
 ## Execution slice source of truth
 
 The `guide-execution` workflow now keeps three complementary artifacts in sync:
@@ -137,7 +139,8 @@ Example:
 ```json
 {
   "planning_dir": "planning/features",
-  "proposal_dir": "planning/proposals"
+  "proposal_dir": "planning/proposals",
+  "design_diagram_mode": "embedded"
 }
 ```
 
@@ -173,6 +176,7 @@ Current Phase 1 usage:
 - planning-layer skills resolve `<feature_path>` from `.skills/planning.json` field `planning_dir` when the file is present, otherwise they default to `docs/features/<feature-slug>/`
 - `skills/propose/scripts/manage_proposals.py` reads `.skills/planning.json` field `proposal_dir` when present and otherwise defaults to `docs/proposals/<proposal-slug>/`
 - `skills/guide-planning/scripts/manage_planning.py` reads `.skills/planning.json` for `planning_dir` and maintains planning readiness metadata under `<feature_path>/.planning-meta.json`
+- `skills/design/SKILL.md` reads `.skills/planning.json` field `design_diagram_mode`; `embedded` keeps fenced PlantUML in `system-design.md`, while `linked_svg` writes `.puml` and `.svg` files under `<feature_path>/figures/` and links the SVGs from `system-design.md`
 - `skills/breakdown/scripts/scaffold_breakdown.py` uses `.skills/planning.json` field `planning_dir` during scaffolding when the file is present
 - `skills/slice/scripts/bootstrap_slice.py` can initialize `.skills/execution.json` with the generic `slices/` default (or an explicit `--slice-dir`) before delegating to execution-layer tooling
 - `skills/guide-execution/scripts/manage_execution.py` reads `.skills/execution.json` for `slice_dir`, `preferred_workflow`, and `auto_start_implementation`

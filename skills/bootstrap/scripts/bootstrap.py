@@ -11,9 +11,11 @@ from typing import Any
 
 DEFAULT_PLANNING_DIR = "docs/features"
 DEFAULT_PROPOSAL_DIR = "docs/proposals"
+DEFAULT_DESIGN_DIAGRAM_MODE = "embedded"
 DEFAULT_SLICE_DIR = "slices"
 DEFAULT_WORKFLOW = "TDD"
 DEFAULT_AUTO_START_IMPLEMENTATION = True
+VALID_DESIGN_DIAGRAM_MODES = ("embedded", "linked_svg")
 
 DEFAULT_JIRA_CONVENTIONS = {
     "issue_sliceer": "jira",
@@ -49,6 +51,15 @@ def parse_args() -> argparse.Namespace:
         "--proposal-dir",
         default=DEFAULT_PROPOSAL_DIR,
         help=f"Proposal directory for .skills/planning.json (default: {DEFAULT_PROPOSAL_DIR}).",
+    )
+    parser.add_argument(
+        "--design-diagram-mode",
+        choices=VALID_DESIGN_DIAGRAM_MODES,
+        default=DEFAULT_DESIGN_DIAGRAM_MODE,
+        help=(
+            "Diagram output mode for design artifacts in .skills/planning.json "
+            f"(default: {DEFAULT_DESIGN_DIAGRAM_MODE})."
+        ),
     )
     parser.add_argument(
         "--slice-dir",
@@ -96,11 +107,15 @@ def write_json_file(path: Path, data: dict[str, Any]) -> None:
 
 
 def build_planning_config(
-    existing: dict[str, Any], planning_dir: str, proposal_dir: str
+    existing: dict[str, Any],
+    planning_dir: str,
+    proposal_dir: str,
+    design_diagram_mode: str,
 ) -> dict[str, Any]:
     updated = dict(existing)
     updated["planning_dir"] = planning_dir
     updated["proposal_dir"] = proposal_dir
+    updated["design_diagram_mode"] = design_diagram_mode
     return updated
 
 
@@ -145,7 +160,10 @@ def main() -> int:
         return 2
 
     planning_config = build_planning_config(
-        planning_existing, args.planning_dir, args.proposal_dir
+        planning_existing,
+        args.planning_dir,
+        args.proposal_dir,
+        args.design_diagram_mode,
     )
     execution_config = build_execution_config(
         execution_existing,

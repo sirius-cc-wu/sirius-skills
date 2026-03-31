@@ -35,7 +35,40 @@ def test_init_defaults_to_docs_features_directory(tmp_path, monkeypatch):
     registry = json.loads((tmp_path / "docs" / "features" / "registry.json").read_text(encoding="utf-8"))
 
     assert config["planning_dir"] == "docs/features"
+    assert config["proposal_dir"] == "docs/proposals"
+    assert config["design_diagram_mode"] == "embedded"
     assert registry["features"] == []
+
+
+def test_init_preserves_existing_planning_config_keys(tmp_path, monkeypatch):
+    module = load_manage_planning_module()
+    monkeypatch.chdir(tmp_path)
+
+    skills_dir = tmp_path / ".skills"
+    skills_dir.mkdir()
+    (skills_dir / "planning.json").write_text(
+        json.dumps(
+            {
+                "planning_dir": "planning/features",
+                "proposal_dir": "planning/proposals",
+                "design_diagram_mode": "linked_svg",
+                "custom_key": "keep-me",
+            }
+        )
+        + "\n",
+        encoding="utf-8",
+    )
+
+    assert run_cli(module, monkeypatch, "init", "docs/features") == 0
+
+    config = json.loads((skills_dir / "planning.json").read_text(encoding="utf-8"))
+
+    assert config == {
+        "planning_dir": "docs/features",
+        "proposal_dir": "planning/proposals",
+        "design_diagram_mode": "linked_svg",
+        "custom_key": "keep-me",
+    }
 
 
 def test_add_creates_feature_metadata_and_registry_entries(tmp_path, monkeypatch):

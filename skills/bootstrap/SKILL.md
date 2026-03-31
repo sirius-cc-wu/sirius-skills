@@ -41,6 +41,7 @@ Use these defaults unless the user asked for different values:
 
 - `planning_dir`: `docs/features`
 - `proposal_dir`: `docs/proposals`
+- `design_diagram_mode`: `embedded`
 - `slice_dir`: `slices`
 - `preferred_workflow`: `TDD`
 - `auto_start_implementation`: `true`
@@ -79,6 +80,7 @@ python3 skills/bootstrap/scripts/bootstrap.py \
   --mode default \
   --planning-dir planning/features \
   --proposal-dir planning/proposals \
+  --design-diagram-mode linked_svg \
   --slice-dir specs \
   --workflow TDD \
   --auto-start-implementation
@@ -112,6 +114,8 @@ Successful runs should leave the repository with:
 - `.skills/planning.json`
 - `.skills/execution.json`
 - `.skills/conventions.json`
+
+When `.skills/planning.json` includes `design_diagram_mode: "linked_svg"`, planning/design skills should place diagram source and generated SVGs under `<feature_path>/figures/` and link the SVGs from `system-design.md`.
 
 In `default` mode, `.skills/conventions.json` may remain an empty object so the repo keeps its generic behavior explicit without inventing project-specific workflow rules.
 

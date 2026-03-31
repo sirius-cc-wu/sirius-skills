@@ -23,6 +23,7 @@ Optional companion output:
 
 - updates to `<feature_path>/discover.md`
 - updates to `<feature_path>/user-stories.md`
+- `<feature_path>/figures/*.puml` and `<feature_path>/figures/*.svg` when configured for linked SVG output
 
 ## Feature Path Resolution
 
@@ -33,6 +34,7 @@ Resolve `<feature_path>` as either:
 
 - If `.skills/planning.json` defines `planning_dir`, use that as `<planning_dir>`.
 - Otherwise default to `docs/features`.
+- If `.skills/planning.json` defines `design_diagram_mode`, honor it. Otherwise default to `embedded`.
 
 ## Design Rules
 
@@ -41,16 +43,20 @@ Resolve `<feature_path>` as either:
 - Document interfaces, dependencies, and operational constraints clearly.
 - Call out risks that should affect slice ordering or stop-and-ask gates.
 - Use PlantUML as the UML language whenever you include diagrams.
-- Include system-design diagrams directly in `system-design.md` with fenced `plantuml` blocks unless a separate adjacent `.puml` file is clearly better.
+- If `design_diagram_mode` is `embedded`, include system-design diagrams directly in `system-design.md` with fenced `plantuml` blocks.
+- If `design_diagram_mode` is `linked_svg`, write the PlantUML source files under `<feature_path>/figures/`, generate matching SVGs into the same directory, and link those SVGs from `system-design.md` with relative Markdown image links such as `![Component diagram](figures/component-diagram.svg)`.
+- In `linked_svg` mode, do not also embed the same diagram as a fenced `plantuml` block in `system-design.md`.
+- Use stable, descriptive figure names such as `component-diagram.puml`, `component-diagram.svg`, `sequence-diagram.puml`, and `sequence-diagram.svg`.
 - Prefer feature-level diagrams such as component, package, sequence, state, or deployment diagrams over low-level implementation detail.
 
 ## Workflow
 
 1. Read `discover.md`, `impact-analysis.md` when present, and any existing feature planning docs.
 2. Inspect the relevant codebase or adjacent systems as needed.
-3. Write `system-design.md` with architecture, interfaces, constraints, validation notes, and PlantUML system-design diagrams.
-4. Refine story boundaries when the design changes implementation shape.
-5. Stop when the work is concrete enough for `breakdown`.
+3. Read `.skills/planning.json` when present to determine whether diagrams stay embedded or are emitted under `<feature_path>/figures/`.
+4. Write `system-design.md` with architecture, interfaces, constraints, validation notes, and PlantUML system-design diagrams or linked SVG figures, depending on configuration.
+5. Refine story boundaries when the design changes implementation shape.
+6. Stop when the work is concrete enough for `breakdown`.
 
 ## Guardrails
 
