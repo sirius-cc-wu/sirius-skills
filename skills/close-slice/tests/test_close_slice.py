@@ -304,3 +304,54 @@ def test_close_slice_records_relations_and_publishes_them(tmp_path, monkeypatch)
     assert "supersedes `OLD` (story: Story 2 - Legacy checkout; requirements: FR-002; selector: legacy checkout path)" in content
     assert source_meta["relations"][0]["type"] == "supersedes"
     assert target_meta["relations"][0]["type"] == "superseded_by"
+
+
+def test_close_slice_can_archive_to_hidden_directory(tmp_path, monkeypatch):
+    close_slice = load_module(CLOSE_SLICE_PATH, "close_slice")
+    _, slice_dir = setup_execution_ready_slice(tmp_path, monkeypatch)
+
+    assert run_cli(close_slice, monkeypatch, "--slice", "DEMO", "--archive") == 0
+
+    archived_dir = tmp_path / "slices" / ".archived" / "DEMO-demo-feature"
+    registry = json.loads((tmp_path / "slices" / "registry.json").read_text(encoding="utf-8"))
+    metadata = json.loads((archived_dir / ".slice-meta.json").read_text(encoding="utf-8"))
+
+    assert not slice_dir.exists()
+    assert archived_dir.exists()
+    assert metadata["status"] == "closed"
+    assert metadata["archived_at"]
+    assert metadata["archived_from"] == "slices/DEMO-demo-feature/"
+    assert registry["slices"][0]["path"] == "slices/.archived/DEMO-demo-feature/"
+    assert registry["slices"][0]["archived_at"] == metadata["archived_at"]
+
+
+def test_close_slice_uses_archive_config_and_publishes_archived_paths(tmp_path, monkeypatch):
+    close_slice = load_module(CLOSE_SLICE_PATH, "close_slice")
+    _, slice_dir = setup_execution_ready_slice(tmp_path, monkeypatch)
+
+    plugins_dir = tmp_path / ".skills" / "plugins"
+    plugins_dir.mkdir(parents=True)
+    (plugins_dir / "spec-archive.json").write_text(
+        json.dumps({"target_dir": "slices/.retired"}) + "\n", encoding="utf-8"
+    )
+
+    assert (
+        run_cli(
+            close_slice,
+            monkeypatch,
+            "--slice",
+            "DEMO",
+            "--publish",
+            "docs/slice-history.md",
+        )
+        == 0
+    )
+
+    archived_dir = tmp_path / "slices" / ".retired" / "DEMO-demo-feature"
+    content = (tmp_path / "docs" / "slice-history.md").read_text(encoding="utf-8")
+    metadata = json.loads((archived_dir / ".slice-meta.json").read_text(encoding="utf-8"))
+
+    assert not slice_dir.exists()
+    assert archived_dir.exists()
+    assert "`slices/.retired/DEMO-demo-feature/brief.md`" in content
+    assert metadata["archived_at"]

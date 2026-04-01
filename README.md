@@ -106,13 +106,15 @@ The `guide-execution` workflow now keeps three complementary artifacts in sync:
 
 - `<slice_dir>/README.md` for a human-readable registry
 - `<slice_dir>/registry.json` for machine-readable registry/state
-- `<slice_path>/.slice-meta.json` for per-slice lifecycle metadata such as `created_at`, `updated_at`, and `closed_at`
+- `<slice_path>/.slice-meta.json` for per-slice lifecycle metadata such as `created_at`, `updated_at`, `closed_at`, and optional archive tracking
 
 The machine-readable metadata can also store explicit cross-slice relations such as `supersedes`, `invalidates`, `narrows`, and `replaces_partially`, with reciprocal backlinks and optional soft selectors for story titles, requirement IDs, or freeform selectors.
 
-Closed slices are retained in place. `sirius-skills` does not merge or delete the original `brief.md`/`blueprint.md` artifacts when a slice closes; instead it records closure durably and leaves project-specific publishing or rollup logic to local extensions.
+Closed slices are retained non-destructively. `sirius-skills` does not merge or delete the original `brief.md`/`blueprint.md` artifacts when a slice closes; instead it records closure durably and can optionally move the closed slice into a hidden archive directory while preserving its metadata and path in the registry.
 
 If a project wants a canonical rollup document, `skills/close-slice/` can optionally publish closed-slice summaries into a project-local history file such as `docs/slice-history.md`, driven by explicit command arguments or `.skills/plugins/spec-publish.json`.
+
+If a project wants closed slices out of the working set, `skills/close-slice/` can also optionally archive them into a hidden directory such as `<slice_dir>/.archived/`, driven by `--archive`, `--archive-dir`, or `.skills/plugins/spec-archive.json`.
 
 The published entry can include:
 

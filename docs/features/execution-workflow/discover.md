@@ -32,6 +32,7 @@ The repository provides a slice-scoped execution workflow, but that workflow spa
 - When `.skills/execution.json` sets `auto_start_implementation` to `true`, reaching `blueprint_ready` should immediately hand off into implementation and advance the slice to `execution_ready`.
 - `guide-execution` owns readiness and registry state; teams should not invent extra registry states for day-to-day progress.
 - Closed slices retain `brief.md`, `blueprint.md`, and any legacy `slices.md`.
+- Closed slices may be moved into a hidden archive directory, but their registry entry and metadata must still resolve them.
 - Relations such as `supersedes` and `replaces_partially` are durable metadata, not transient notes.
 
 ## Confirmed Signals in Repo
@@ -40,6 +41,7 @@ The repository provides a slice-scoped execution workflow, but that workflow spa
 - `skills/brief/templates/brief-template.md` defines the slice brief structure.
 - `skills/blueprint/templates/plan-template.md` defines implementation packets and validation mapping.
 - `skills/close-slice/scripts/close_slice.py` publishes non-destructive closure summaries.
+- `skills/close-slice/scripts/close_slice.py` can also archive closed slices into a hidden directory.
 - `skills/commit/` and `skills/create-pr/` enforce conventions and checklist completion around execution work.
 
 ## Success Criteria

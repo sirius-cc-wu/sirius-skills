@@ -130,6 +130,63 @@ def test_closing_slice_records_closed_at_and_updates_registry(tmp_path, monkeypa
     assert "| DEMO | Demo Feature | closed |" in readme
 
 
+def test_archive_slice_moves_closed_slice_and_updates_registry(tmp_path, monkeypatch):
+    module = load_manage_specs_module()
+    monkeypatch.chdir(tmp_path)
+
+    assert run_cli(module, monkeypatch, "init", "slices") == 0
+    assert run_cli(module, monkeypatch, "add", "DEMO", "Demo Feature") == 0
+
+    slice_dir = tmp_path / "slices" / "DEMO-demo-feature"
+    (slice_dir / "brief.md").write_text("# brief\n", encoding="utf-8")
+    (slice_dir / "checklists").mkdir()
+    (slice_dir / "checklists" / "requirements.md").write_text(
+        "- [x] requirements complete\n", encoding="utf-8"
+    )
+    assert run_cli(module, monkeypatch, "set-status", "DEMO", "brief_ready") == 0
+
+    (slice_dir / "blueprint.md").write_text("# plan\n", encoding="utf-8")
+    assert run_cli(module, monkeypatch, "set-status", "DEMO", "blueprint_ready") == 0
+    assert run_cli(module, monkeypatch, "set-status", "DEMO", "execution_ready") == 0
+    assert run_cli(module, monkeypatch, "set-status", "DEMO", "closed") == 0
+
+    rows = module.parse_registry()
+    slice = module.resolve_slice(rows, "DEMO")
+    assert slice is not None
+
+    success, _, archived_slice = module.archive_slice(rows, slice)
+    registry = json.loads((tmp_path / "slices" / "registry.json").read_text(encoding="utf-8"))
+    archived_dir = tmp_path / "slices" / ".archived" / "DEMO-demo-feature"
+    metadata = json.loads((archived_dir / ".slice-meta.json").read_text(encoding="utf-8"))
+
+    assert success is True
+    assert archived_dir.exists()
+    assert not (tmp_path / "slices" / "DEMO-demo-feature").exists()
+    assert metadata["archived_at"]
+    assert metadata["archived_from"] == "slices/DEMO-demo-feature/"
+    assert metadata["path"] == "slices/.archived/DEMO-demo-feature/"
+    assert archived_slice["path"] == "slices/.archived/DEMO-demo-feature/"
+    assert registry["slices"][0]["path"] == "slices/.archived/DEMO-demo-feature/"
+    assert registry["slices"][0]["archived_at"] == metadata["archived_at"]
+
+
+def test_archive_slice_requires_closed_status(tmp_path, monkeypatch):
+    module = load_manage_specs_module()
+    monkeypatch.chdir(tmp_path)
+
+    assert run_cli(module, monkeypatch, "init", "slices") == 0
+    assert run_cli(module, monkeypatch, "add", "DEMO", "Demo Feature") == 0
+
+    rows = module.parse_registry()
+    slice = module.resolve_slice(rows, "DEMO")
+    assert slice is not None
+
+    success, message, _ = module.archive_slice(rows, slice)
+
+    assert success is False
+    assert message == "Only closed slices can be archived."
+
+
 def test_blueprint_ready_auto_starts_execution_when_enabled(
     tmp_path, monkeypatch, capsys
 ):

@@ -8,6 +8,7 @@ The execution workflow is a centralized slice system. `guide-execution` manages 
 
 - **Execution registry**: `<slice_dir>/README.md` and `registry.json`
 - **Slice metadata**: `<slice_path>/.slice-meta.json`
+- **Hidden archive**: optional `<slice_dir>/.archived/` or configured archive target for closed slices
 - **Intent artifact**: `brief.md`
 - **Execution artifact**: `blueprint.md`
 - **Requirements checklist**: `checklists/requirements.md`
@@ -21,12 +22,12 @@ The execution workflow is a centralized slice system. `guide-execution` manages 
 - `brief` owns `brief.md` and `checklists/requirements.md`.
 - `blueprint` owns `blueprint.md`, requirement traceability, and validation steps.
 - `review-execution` compares implementation results with the brief and plan.
-- `close-slice` updates metadata and optionally publishes closure summaries.
+- `close-slice` updates metadata and optionally archives or publishes closure summaries.
 
 ## Constraints and Tradeoffs
 
 - Slice-scoped slices improve auditability but require stronger discipline to keep one work item per slice.
-- Closure is non-destructive, which preserves history at the cost of leaving more retained artifacts in the repo.
+- Closure is non-destructive, which preserves history at the cost of leaving more retained artifacts in the repo unless teams opt into hidden-directory archiving.
 - Day-to-day execution context stays intentionally lightweight, reducing workflow overhead but requiring careful handoff discipline.
 
 ## Validation Strategy
@@ -50,6 +51,7 @@ package "Execution Layer" {
 
 database "<slice_dir>/registry.json" as Registry
 file ".slice-meta.json" as Meta
+folder "<slice_dir>/.archived/" as Archive
 file "brief.md" as Brief
 file "blueprint.md" as PlanDoc
 file "requirements.md" as Requirements
@@ -68,5 +70,6 @@ file "requirements.md" as Requirements
 [review-execution] --> PlanDoc
 [close-slice] --> Meta
 [close-slice] --> Registry
+[close-slice] --> Archive
 @enduml
 ```

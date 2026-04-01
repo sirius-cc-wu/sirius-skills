@@ -3,12 +3,14 @@ import hashlib
 import json
 import os
 import re
+import shutil
 import subprocess
 import sys
 from datetime import datetime
 from typing import Dict, List, Optional, Tuple
 
 DEFAULT_SLICES_DIR = "slices"
+DEFAULT_ARCHIVE_DIRNAME = ".archived"
 CONFIG_DIR = ".skills"
 CONFIG_FILE = os.path.join(CONFIG_DIR, "execution.json")
 CONVENTIONS_CONFIG_DIR = ".skills"
@@ -244,6 +246,11 @@ def normalize_slice_path(path: str) -> str:
     return normalized + "/"
 
 
+def default_archive_dir(slice_dir: Optional[str] = None) -> str:
+    base_dir = normalize_slice_dir(slice_dir or get_registry_paths()[0])
+    return normalize_slice_dir(os.path.join(base_dir, DEFAULT_ARCHIVE_DIRNAME))
+
+
 def normalize_registry_row(row: Dict[str, object]) -> Dict[str, object]:
     feature_value = row.get("feature")
     path_value = row.get("path")
@@ -259,6 +266,7 @@ def normalize_registry_row(row: Dict[str, object]) -> Dict[str, object]:
         "path": normalize_slice_path(path_value),
         "updated_at": normalize_optional_timestamp(row.get("updated_at")),
         "closed_at": normalize_optional_timestamp(row.get("closed_at")),
+        "archived_at": normalize_optional_timestamp(row.get("archived_at")),
     }
     if "relations" in row:
         normalized["relations"] = normalize_relations(row.get("relations"))
@@ -544,6 +552,14 @@ def build_slice_metadata(
     metadata["feature"] = row["feature"]
     metadata["path"] = row["path"]
     metadata["relations"] = normalize_relations(metadata.get("relations"))
+    archived_at = metadata.get("archived_at")
+    if archived_at is not None:
+        metadata["archived_at"] = normalize_optional_timestamp(archived_at)
+    archived_from = metadata.get("archived_from")
+    if archived_from is not None:
+        if not isinstance(archived_from, str) or not archived_from.strip():
+            raise RuntimeError("Slice metadata field 'archived_from' must be a non-empty string.")
+        metadata["archived_from"] = normalize_slice_path(archived_from)
 
     if status == "closed":
         closed_at = metadata.get("closed_at")
@@ -560,6 +576,7 @@ def apply_metadata_to_row(
     updated = dict(row)
     updated["updated_at"] = normalize_optional_timestamp(metadata.get("updated_at"))
     updated["closed_at"] = normalize_optional_timestamp(metadata.get("closed_at"))
+    updated["archived_at"] = normalize_optional_timestamp(metadata.get("archived_at"))
     updated["relations"] = normalize_relations(metadata.get("relations"))
     return normalize_registry_row(updated)
 
@@ -569,6 +586,67 @@ def sync_slice_metadata(row: Dict[str, object], metadata: Dict[str, object]) -> 
     row.clear()
     row.update(updated_row)
     write_slice_metadata(str(row["path"]).rstrip("/"), metadata)
+
+
+def archive_slice(
+    rows: List[Dict[str, object]],
+    slice: Dict[str, object],
+    archive_dir: Optional[str] = None,
+) -> Tuple[bool, str, Dict[str, object]]:
+    current_status = normalize_status(str(slice["status"]))
+    if current_status != "closed":
+        return False, "Only closed slices can be archived.", slice
+
+    current_path = str(slice["path"]).rstrip("/")
+    current_folder = os.path.basename(current_path)
+    archive_root = normalize_slice_dir(archive_dir or default_archive_dir())
+    target_path = os.path.join(archive_root, current_folder)
+
+    current_abs = os.path.abspath(current_path)
+    archive_root_abs = os.path.abspath(archive_root)
+    if os.path.commonpath([current_abs, archive_root_abs]) == current_abs:
+        return (
+            False,
+            "Archive directory cannot be inside the slice being archived.",
+            slice,
+        )
+
+    current_normalized = normalize_slice_path(current_path)
+    target_normalized = normalize_slice_path(target_path)
+    metadata = load_slice_metadata(current_path)
+    if current_normalized == target_normalized:
+        if not isinstance(metadata.get("archived_at"), str):
+            metadata["archived_at"] = now_timestamp()
+        if not isinstance(metadata.get("archived_from"), str):
+            metadata["archived_from"] = current_normalized
+        updated_metadata = build_slice_metadata(slice, current_status, existing=metadata)
+        sync_slice_metadata(slice, updated_metadata)
+        write_registry(rows)
+        return True, f"Slice {slice['id']} is already archived at {target_normalized}", slice
+
+    if os.path.exists(target_path):
+        return False, f"Archive target already exists: {target_path}", slice
+
+    os.makedirs(archive_root, exist_ok=True)
+    shutil.move(current_path, target_path)
+
+    moved_metadata = load_slice_metadata(target_path)
+    moved_metadata["archived_at"] = (
+        moved_metadata["archived_at"]
+        if isinstance(moved_metadata.get("archived_at"), str)
+        else now_timestamp()
+    )
+    moved_metadata["archived_from"] = (
+        moved_metadata["archived_from"]
+        if isinstance(moved_metadata.get("archived_from"), str)
+        else current_normalized
+    )
+
+    slice["path"] = target_normalized
+    updated_metadata = build_slice_metadata(slice, current_status, existing=moved_metadata)
+    sync_slice_metadata(slice, updated_metadata)
+    write_registry(rows)
+    return True, f"Archived {slice['id']} to {target_normalized}", slice
 
 
 def upsert_relation_entry(
@@ -898,6 +976,7 @@ def validate_slice(
         "plan_exists": os.path.isfile(plan),
         "slices_exists": os.path.isfile(slices),
         "closed_at_recorded": isinstance(metadata.get("closed_at"), str),
+        "archived_at_recorded": isinstance(metadata.get("archived_at"), str),
     }
 
     try:

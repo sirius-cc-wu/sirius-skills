@@ -366,7 +366,8 @@ After implementation is complete and the execution slice is finished, use `close
 Its job is to:
 
 - validate that the slice is ready to close
-- record durable closure metadata without moving or deleting the original artifacts
+- record durable closure metadata without deleting the original artifacts
+- optionally archive the closed slice into a hidden directory while keeping the registry path current
 - optionally publish a project-local summary entry such as `docs/slice-history.md` or `CHANGELOG.md`
 - capture durable feedback that should improve future briefs, prompts, or validation harnesses
 
@@ -379,7 +380,7 @@ review-execution complete -> close-slice
 Important closure rules:
 
 - closing a slice should happen after required review, validation, and brief feedback loops are complete
-- closing a slice does not merge or delete the original `brief.md` or `blueprint.md`; older slices may also retain `slices.md`
+- closing a slice does not merge or delete the original `brief.md` or `blueprint.md`; older slices may also retain `slices.md`, and optional archiving should relocate the folder without rewriting those artifacts
 - publishing is optional and project-local
 - closure metadata belongs in the slice system itself
 

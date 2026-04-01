@@ -9,6 +9,7 @@ from typing import Dict, List, Optional, Tuple
 
 
 DEFAULT_CONFIG_PATH = Path(".skills/plugins/spec-publish.json")
+DEFAULT_ARCHIVE_CONFIG_PATH = Path(".skills/plugins/spec-archive.json")
 DEFAULT_DOCUMENT_TITLE = "Execution Slice History"
 DEFAULT_SECTION_TITLE = "Closed Slices"
 OUTGOING_RELATION_TYPES = {
@@ -60,6 +61,27 @@ def load_publish_config(config_path: Path) -> Dict[str, str]:
                 f"Publish config field '{field}' must be a non-empty string."
             )
         normalized[field] = value.strip()
+    return normalized
+
+
+def load_archive_config(config_path: Path) -> Dict[str, str]:
+    if not config_path.exists():
+        return {}
+
+    try:
+        payload = json.loads(config_path.read_text(encoding="utf-8"))
+    except json.JSONDecodeError as exc:
+        raise RuntimeError(f"Archive config is not valid JSON: {config_path}") from exc
+
+    if not isinstance(payload, dict):
+        raise RuntimeError(f"Archive config must be a JSON object: {config_path}")
+
+    normalized: Dict[str, str] = {}
+    target_dir = payload.get("target_dir")
+    if target_dir is not None:
+        if not isinstance(target_dir, str) or not target_dir.strip():
+            raise RuntimeError("Archive config field 'target_dir' must be a non-empty string.")
+        normalized["target_dir"] = target_dir.strip()
     return normalized
 
 
@@ -448,6 +470,13 @@ def build_result(
         "path": slice["path"],
         "closed_at": slice.get("closed_at"),
     }
+    archived_at = metadata.get("archived_at")
+    if isinstance(archived_at, str):
+        result["archived_at"] = archived_at
+        result["archived_to"] = slice["path"]
+    archived_from = metadata.get("archived_from")
+    if isinstance(archived_from, str):
+        result["archived_from"] = archived_from
     if published_to is not None:
         result["published_to"] = str(published_to)
     relations = metadata.get("relations")
@@ -501,6 +530,20 @@ def build_parser() -> argparse.ArgumentParser:
         "--config",
         default=str(DEFAULT_CONFIG_PATH),
         help="Path to optional publish config JSON.",
+    )
+    parser.add_argument(
+        "--archive",
+        action="store_true",
+        help="Move the closed slice into the configured hidden archive directory.",
+    )
+    parser.add_argument(
+        "--archive-dir",
+        help="Archive directory override. Implies --archive.",
+    )
+    parser.add_argument(
+        "--no-archive",
+        action="store_true",
+        help="Close the slice without moving it into an archive directory.",
     )
     parser.add_argument(
         "--document-title",
@@ -577,6 +620,33 @@ def main() -> int:
             slice_path = Path(str(slice["path"]).rstrip("/"))
             metadata = module.load_slice_metadata(str(slice_path))
 
+        archive_config = load_archive_config(DEFAULT_ARCHIVE_CONFIG_PATH)
+        archive_dir_value: Optional[str] = None
+        should_archive = False
+        if not args.no_archive:
+            if args.archive_dir:
+                archive_dir_value = args.archive_dir
+                should_archive = True
+            elif args.archive:
+                archive_dir_value = archive_config.get("target_dir")
+                should_archive = True
+            elif archive_config:
+                archive_dir_value = archive_config.get("target_dir")
+                should_archive = True
+
+        if should_archive:
+            success, message, slice = module.archive_slice(
+                rows, slice, archive_dir=archive_dir_value
+            )
+            if not success:
+                raise RuntimeError(message)
+            rows = module.parse_registry()
+            slice = module.resolve_slice(rows, str(slice["id"]))
+            if not slice:
+                raise RuntimeError("Slice disappeared after archive.")
+            slice_path = Path(str(slice["path"]).rstrip("/"))
+            metadata = module.load_slice_metadata(str(slice_path))
+
         publish_config = load_publish_config(Path(args.config))
         target_file_value = None if args.no_publish else (args.publish or publish_config.get("target_file"))
         published_to: Optional[Path] = None
@@ -631,14 +701,21 @@ def main() -> int:
         result = build_result(slice, published_to, metadata)
         if args.json:
             print(json.dumps(result, indent=2))
+        elif published_to is not None and should_archive:
+            print(
+                f"Closed slice {slice['id']}, archived it to {slice['path']}, "
+                f"and published to {published_to}"
+            )
         elif published_to is not None:
             print(
                 f"Closed slice {slice['id']} and published to {published_to}"
             )
+        elif should_archive:
+            print(f"Closed slice {slice['id']} and archived it to {slice['path']}")
         else:
             print(f"Closed slice {slice['id']}")
         return 0
-    except RuntimeError as exc:
+    except (RuntimeError, OSError) as exc:
         print(str(exc), file=sys.stderr)
         return 2
 
