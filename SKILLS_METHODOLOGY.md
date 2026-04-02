@@ -110,7 +110,7 @@ Its job is to:
 - create and maintain proposal-scoped docs under `docs/proposals/<proposal-slug>/`
 - track proposal lifecycle state separately from canonical feature planning
 - keep speculative capability ideas out of the feature registry until accepted
-- promote accepted proposals into real feature folders when they are ready
+- stop at accepted proposal state and hand accepted proposals back to `guide-planning` for canonical promotion
 
 Expected outputs:
 
@@ -121,10 +121,10 @@ Expected outputs:
 Recommended handoff:
 
 ```text
-guide-planning -> propose -> discover/design/breakdown
+guide-planning -> propose -> guide-planning -> discover/design/breakdown
 ```
 
-When a proposal is accepted, promote it into a canonical feature planning folder before continuing with the normal feature workflow.
+When a proposal is accepted and the user wants planning to continue, `guide-planning` should promote it into a canonical feature planning folder before continuing with the normal feature workflow.
 
 ### 1. Discover the work
 

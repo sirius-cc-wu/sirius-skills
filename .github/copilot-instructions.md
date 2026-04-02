@@ -41,7 +41,8 @@ This project follows a **Spec-Driven Development (SDD)** lifecycle:
 
 When a planning skill is active, do not advance to the next lifecycle stage unless the user explicitly requests the handoff.
 
-- `propose` ends in `docs/proposals/` unless the user explicitly asks to review, accept, reject, or promote the proposal.
+- `propose` ends in `docs/proposals/` unless the user explicitly asks to review, accept, or reject the proposal.
+- Promotion from an accepted proposal into `docs/features/` belongs to `guide-planning`, not `propose`.
 - Proposal work must not automatically create or update canonical planning in `docs/features/`.
 - Planning skills must not automatically bootstrap breakdown, slice, tracking, or execution work.
 - Execution or implementation must never start from a proposal-only request.

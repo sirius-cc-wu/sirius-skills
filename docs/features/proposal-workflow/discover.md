@@ -11,7 +11,7 @@ instances operationally while lacking a durable feature-level record for:
 
 - why speculative work should stay out of `docs/features/`
 - how proposal lifecycle state differs from feature lifecycle state
-- how accepted proposals promote into canonical feature planning
+- how accepted proposals are promoted by `guide-planning` into canonical feature planning
 - what routing rules `guide-planning` should use before discovery starts
 - how configuration such as `proposal_dir` shapes proposal storage
 
@@ -36,7 +36,7 @@ That makes the capability harder to evolve intentionally over time.
 
 - Repository maintainer shaping the planning workflow.
 - Planner deciding whether an idea is speculative or already feature-ready.
-- Reviewer checking whether a proposal should be accepted, rejected, or promoted.
+- Reviewer or planning entrypoint deciding whether a proposal should be accepted, rejected, or promoted.
 - Project adopter configuring proposal storage with `.skills/planning.json`.
 
 ## Constraints

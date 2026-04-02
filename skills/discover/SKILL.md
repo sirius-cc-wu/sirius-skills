@@ -49,5 +49,6 @@ Resolve `<feature_path>` from the repository planning layout:
 ## Guardrails
 
 - Do not create slice-scoped execution slices.
+- Do not promote proposals into canonical feature folders; use `guide-planning` for that transition first.
 - Do not move directly into implementation planning.
 - If the request is already architecture-focused, hand off to `design`.

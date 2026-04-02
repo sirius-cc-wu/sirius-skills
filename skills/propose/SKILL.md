@@ -1,6 +1,6 @@
 ---
 name: propose
-description: Creates and manages speculative repo-native proposals only; stops before canonical planning or implementation unless explicitly requested.
+description: Creates and manages speculative repo-native proposals only, then hands accepted proposals back to guide-planning for canonical planning.
 ---
 
 # Propose
@@ -25,7 +25,6 @@ Only continue beyond proposal work if the user explicitly asks to:
 
 - review the proposal
 - accept or reject it
-- promote it into canonical planning
 - start planning
 - start implementation
 
@@ -35,7 +34,7 @@ Only continue beyond proposal work if the user explicitly asks to:
 2. Keep speculative work out of the canonical feature registry until it is accepted.
 3. Track proposal lifecycle state in machine-readable metadata.
 4. Preserve early discovery and optional story artifacts in a durable repo location.
-5. Promote accepted proposals into canonical feature planning folders only when the user explicitly asks for promotion.
+5. Hand accepted proposals back to `guide-planning` when the user wants canonical feature planning to begin.
 
 ## Preferred Input
 
@@ -55,7 +54,7 @@ Only continue beyond proposal work if the user explicitly asks to:
 - the work is still a candidate capability rather than an approved feature
 - the idea is umbrella-scoped and may split into multiple real features later
 - you want durable repo-native exploration without polluting `docs/features/`
-- you need an explicit accept/reject/promote step before normal planning starts
+- you need an explicit accept/reject step before normal planning starts
 
 ## Workflow
 
@@ -63,15 +62,16 @@ Only continue beyond proposal work if the user explicitly asks to:
 2. Create a proposal with `manage_proposals.py add <proposal-slug>`.
 3. Capture the problem framing in `discover.md` and optional candidate stories in `user-stories.md`.
 4. Optionally review the proposal and record the decision with `set-status` only if the user asked for review or a lifecycle update.
-5. If and only if the user explicitly asks to accept or promote the proposal, run `set-status` and `promote` to create the canonical feature planning folder.
-6. Otherwise stop after updating proposal artifacts and summarizing the proposal state.
+5. If the user explicitly asks to accept the proposal, update proposal status to `accepted`.
+6. If the user explicitly asks to promote the accepted proposal or start planning, stop proposal work and hand off to `guide-planning`, which owns the proposal-to-feature transition.
+7. Otherwise stop after updating proposal artifacts and summarizing the proposal state.
 
 ## Source of Truth Rules
 
 - Keep speculative work in `<proposal_dir>/` until the team accepts it as real feature planning work.
 - Do not register proposals in `<planning_dir>/registry.json`.
 - Do not skip directly from exploratory notes to canonical feature planning when the work is still uncertain.
-- Promotion should create a feature planning folder, not silently overwrite one that already exists.
+- Promotion into canonical planning belongs to `guide-planning`, not this skill.
 - Do not interpret use of this skill as permission to start the next lifecycle stage.
 - This skill overrides generic autonomy defaults that would otherwise continue into planning or implementation.
 
@@ -87,9 +87,6 @@ python3 skills/propose/scripts/manage_proposals.py add "workflow-capability-upgr
 # Mark a proposal as reviewed or accepted
 python3 skills/propose/scripts/manage_proposals.py set-status "workflow-capability-upgrades" reviewed --review-note "Scoped as a capability candidate."
 
-# Promote an accepted proposal into feature planning
-python3 skills/propose/scripts/manage_proposals.py promote "workflow-capability-upgrades" --feature-slug "workflow-capability-upgrades"
-
 # Validate one proposal packet
 python3 skills/propose/scripts/manage_proposals.py validate-proposal "workflow-capability-upgrades"
 ```
@@ -98,9 +95,8 @@ python3 skills/propose/scripts/manage_proposals.py validate-proposal "workflow-c
 
 - Do not use this skill for an existing canonical feature change; use `evolve-feature` for that.
 - Do not treat proposal folders as execution slices.
-- Do not promote a proposal into an already-existing feature folder unless the user is explicitly repairing state.
 - Do not keep unaccepted ideas in `docs/features/`.
 - Do not interpret "use the propose skill" as permission to plan or implement.
-- Do not promote automatically just because the proposal looks ready.
-- Do not create or update `docs/features/` unless the user explicitly asks for promotion.
+- Do not promote a proposal from this skill, even if the user asks for promotion; hand off to `guide-planning`.
+- Do not create or update `docs/features/` from this skill.
 - Do not route into execution from this skill.

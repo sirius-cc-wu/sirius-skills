@@ -5,10 +5,21 @@ from pathlib import Path
 
 
 SCRIPT_PATH = Path(__file__).resolve().parents[1] / "scripts" / "manage_planning.py"
+PROPOSAL_SCRIPT_PATH = (
+    Path(__file__).resolve().parents[2] / "propose" / "scripts" / "manage_proposals.py"
+)
 
 
 def load_manage_planning_module():
     spec = importlib.util.spec_from_file_location("manage_planning", SCRIPT_PATH)
+    module = importlib.util.module_from_spec(spec)
+    assert spec.loader is not None
+    spec.loader.exec_module(module)
+    return module
+
+
+def load_manage_proposals_module():
+    spec = importlib.util.spec_from_file_location("manage_proposals", PROPOSAL_SCRIPT_PATH)
     module = importlib.util.module_from_spec(spec)
     assert spec.loader is not None
     spec.loader.exec_module(module)
@@ -222,3 +233,85 @@ def test_validate_feature_reports_success_for_ready_feature(tmp_path, monkeypatc
     monkeypatch.setattr(sys, "argv", ["manage_planning.py", "validate-feature", "habit-tracker"])
     exit_code = module.main()
     assert exit_code == 0
+
+
+def test_promote_proposal_creates_feature_and_copies_docs(tmp_path, monkeypatch):
+    planning_module = load_manage_planning_module()
+    proposal_module = load_manage_proposals_module()
+    monkeypatch.chdir(tmp_path)
+
+    assert run_cli(planning_module, monkeypatch, "init") == 0
+    assert run_cli(proposal_module, monkeypatch, "add", "workflow-capability-upgrades") == 0
+
+    proposal_dir = tmp_path / "docs" / "proposals" / "workflow-capability-upgrades"
+    write_file(proposal_dir / "discover.md", "# Discover\n")
+    write_file(proposal_dir / "user-stories.md", "# Stories\n")
+
+    assert (
+        run_cli(
+            proposal_module,
+            monkeypatch,
+            "set-status",
+            "workflow-capability-upgrades",
+            "reviewed",
+            "--review-note",
+            "Proposal scoped and ready for decision.",
+        )
+        == 0
+    )
+    assert (
+        run_cli(
+            proposal_module,
+            monkeypatch,
+            "set-status",
+            "workflow-capability-upgrades",
+            "accepted",
+            "--review-note",
+            "Accepted for canonical planning.",
+            "--target-feature",
+            "workflow-capability-upgrades",
+        )
+        == 0
+    )
+
+    assert (
+        run_cli(
+            planning_module,
+            monkeypatch,
+            "promote-proposal",
+            "workflow-capability-upgrades",
+            "--feature-slug",
+            "workflow-capability-upgrades",
+        )
+        == 0
+    )
+
+    feature_dir = tmp_path / "docs" / "features" / "workflow-capability-upgrades"
+    feature_meta = json.loads((feature_dir / ".planning-meta.json").read_text(encoding="utf-8"))
+    proposal_meta = json.loads((proposal_dir / ".proposal-meta.json").read_text(encoding="utf-8"))
+
+    assert feature_meta["feature_slug"] == "workflow-capability-upgrades"
+    assert (feature_dir / "discover.md").read_text(encoding="utf-8") == "# Discover\n"
+    assert (feature_dir / "user-stories.md").read_text(encoding="utf-8") == "# Stories\n"
+    assert proposal_meta["status"] == "promoted"
+    assert proposal_meta["promoted_feature"] == "workflow-capability-upgrades"
+
+
+def test_promote_proposal_requires_accepted_status(tmp_path, monkeypatch, capsys):
+    planning_module = load_manage_planning_module()
+    proposal_module = load_manage_proposals_module()
+    monkeypatch.chdir(tmp_path)
+
+    assert run_cli(planning_module, monkeypatch, "init") == 0
+    assert run_cli(proposal_module, monkeypatch, "add", "workflow-capability-upgrades") == 0
+
+    exit_code = run_cli(
+        planning_module,
+        monkeypatch,
+        "promote-proposal",
+        "workflow-capability-upgrades",
+    )
+    captured = capsys.readouterr()
+
+    assert exit_code == 2
+    assert "Only accepted proposals can be promoted." in captured.err

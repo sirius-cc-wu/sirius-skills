@@ -1,9 +1,11 @@
 #!/usr/bin/env python3
 
 import argparse
+import importlib.util
 import json
 import os
 import re
+import shutil
 import sys
 from datetime import datetime
 from typing import Dict, List, Optional, Tuple
@@ -545,6 +547,82 @@ def validate_feature(feature: Dict[str, object]) -> Tuple[bool, List[str], List[
     return validate_feature_state(feature_dir, metadata)
 
 
+def load_manage_proposals_module():
+    script_path = os.path.join(
+        os.path.dirname(os.path.dirname(os.path.dirname(__file__))),
+        "propose",
+        "scripts",
+        "manage_proposals.py",
+    )
+    spec = importlib.util.spec_from_file_location("manage_proposals", script_path)
+    if spec is None or spec.loader is None:
+        raise RuntimeError("Unable to load proposal management helpers.")
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    return module
+
+
+def promote_proposal_to_feature(
+    proposal_selector: str,
+    feature_slug: Optional[str],
+    require_ui_flow: bool = False,
+    force: bool = False,
+) -> Tuple[bool, str]:
+    manage_proposals = load_manage_proposals_module()
+    proposal_rows = manage_proposals.load_registry()
+    proposal = manage_proposals.find_proposal(proposal_rows, proposal_selector)
+    if not proposal:
+        return False, f"Proposal not found: {proposal_selector}"
+
+    proposal_dir = manage_proposals.proposal_dir_for_row(proposal)
+    proposal_metadata = manage_proposals.read_metadata(proposal_dir)
+    current_status = str(proposal_metadata["status"])
+    if current_status != "accepted" and not force:
+        return False, "Only accepted proposals can be promoted."
+
+    target_feature = (
+        feature_slug or proposal_metadata.get("target_feature") or proposal["proposal"]
+    )
+    try:
+        normalized_feature = validate_feature_slug(str(target_feature))
+        feature_dir, created = create_feature(
+            normalized_feature, requires_ui_flow=require_ui_flow
+        )
+    except (RuntimeError, ValueError) as exc:
+        return False, str(exc)
+
+    if not created and not force:
+        return False, f"Canonical feature planning folder already exists: {feature_dir}"
+
+    copied_files: List[str] = []
+    for filename in [manage_proposals.DISCOVER_FILE, manage_proposals.USER_STORIES_FILE]:
+        source = os.path.join(proposal_dir, filename)
+        target = os.path.join(feature_dir, filename)
+        if os.path.exists(source) and not os.path.exists(target):
+            shutil.copyfile(source, target)
+            copied_files.append(filename)
+
+    timestamp = now_timestamp()
+    updated_metadata = dict(proposal_metadata)
+    updated_metadata["status"] = "promoted"
+    updated_metadata["updated_at"] = timestamp
+    updated_metadata["target_feature"] = normalized_feature
+    updated_metadata["promoted_feature"] = normalized_feature
+    updated_metadata["promoted_at"] = timestamp
+    manage_proposals.write_metadata(proposal_dir, updated_metadata)
+
+    proposal["status"] = "promoted"
+    proposal["updated_at"] = timestamp
+    manage_proposals.write_registry(proposal_rows)
+
+    copied_text = ", ".join(copied_files) if copied_files else "no proposal docs copied"
+    return (
+        True,
+        f"Promoted proposal '{proposal['proposal']}' to feature '{normalized_feature}' "
+        f"({copied_text}).",
+    )
+
+
 def cmd_init(args: argparse.Namespace) -> int:
     raw_config = load_raw_config(required=False)
     config = load_config(required=False)
@@ -638,6 +716,18 @@ def cmd_validate_feature(args: argparse.Namespace) -> int:
     return 0 if ok else 3
 
 
+def cmd_promote_proposal(args: argparse.Namespace) -> int:
+    success, message = promote_proposal_to_feature(
+        args.proposal,
+        feature_slug=args.feature_slug,
+        require_ui_flow=args.require_ui_flow,
+        force=args.force,
+    )
+    stream = sys.stdout if success else sys.stderr
+    print(message, file=stream)
+    return 0 if success else 2
+
+
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser()
     subparsers = parser.add_subparsers(dest="command", required=True)
@@ -698,6 +788,26 @@ def build_parser() -> argparse.ArgumentParser:
     )
     validate_p.add_argument("feature", help="Feature slug, folder name, or path")
 
+    promote_p = subparsers.add_parser(
+        "promote-proposal",
+        help="Promote an accepted proposal into canonical feature planning",
+    )
+    promote_p.add_argument("proposal", help="Proposal slug, folder name, or path")
+    promote_p.add_argument(
+        "--feature-slug",
+        help="Canonical feature slug to create. Defaults to target_feature or proposal slug.",
+    )
+    promote_p.add_argument(
+        "--require-ui-flow",
+        action="store_true",
+        help="Mark UI flow as required when the canonical feature is created.",
+    )
+    promote_p.add_argument(
+        "--force",
+        action="store_true",
+        help="Override promotion safeguards during manual repair.",
+    )
+
     return parser
 
 
@@ -715,6 +825,8 @@ def main() -> int:
             return cmd_get_active(args)
         if args.command == "validate-feature":
             return cmd_validate_feature(args)
+        if args.command == "promote-proposal":
+            return cmd_promote_proposal(args)
     except (RuntimeError, ValueError) as exc:
         print(str(exc), file=sys.stderr)
         return 2

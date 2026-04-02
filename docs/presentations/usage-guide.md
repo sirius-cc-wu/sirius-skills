@@ -83,7 +83,7 @@ Stored in `slices/<slice-id>-<slug>/`
 ## 7. The Handoff Lifecycle
 
 1.  **Propose**: `propose` captures speculative or not-yet-accepted work.
-2.  **Hand Off to Planning**: accepted proposal artifacts move into canonical feature planning and hand off to `guide-planning`.
+2.  **Hand Off to Planning**: `guide-planning` promotes accepted proposal artifacts into canonical feature planning and then continues the planning workflow.
 3.  **Plan a Net-New Feature**: `guide-planning` -> `discover` -> `design` -> `breakdown`.
 4.  **Evolve an Existing Feature**: `guide-planning` -> `evolve-feature` -> `assess` -> `design` -> `breakdown`.
 5.  **Review**: `review-planning` confirms the plan or change packet is ready.

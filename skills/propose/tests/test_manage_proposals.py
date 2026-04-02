@@ -87,7 +87,7 @@ def test_reviewed_requires_review_note(tmp_path, monkeypatch, capsys):
     assert "Proposal review requires a non-empty review note." in captured.err
 
 
-def test_promote_creates_feature_and_copies_docs(tmp_path, monkeypatch):
+def test_accepted_proposal_remains_proposal_scoped(tmp_path, monkeypatch):
     module = load_module()
     monkeypatch.chdir(tmp_path)
 
@@ -125,30 +125,15 @@ def test_promote_creates_feature_and_copies_docs(tmp_path, monkeypatch):
         == 0
     )
 
-    assert (
-        run_cli(
-            module,
-            monkeypatch,
-            "promote",
-            "workflow-capability-upgrades",
-            "--feature-slug",
-            "workflow-capability-upgrades",
-        )
-        == 0
-    )
-
-    feature_dir = tmp_path / "docs" / "features" / "workflow-capability-upgrades"
-    feature_meta = json.loads((feature_dir / ".planning-meta.json").read_text(encoding="utf-8"))
     proposal_meta = json.loads((proposal_dir / ".proposal-meta.json").read_text(encoding="utf-8"))
 
-    assert feature_meta["feature_slug"] == "workflow-capability-upgrades"
-    assert (feature_dir / "discover.md").read_text(encoding="utf-8") == "# Discover\n"
-    assert (feature_dir / "user-stories.md").read_text(encoding="utf-8") == "# Stories\n"
-    assert proposal_meta["status"] == "promoted"
-    assert proposal_meta["promoted_feature"] == "workflow-capability-upgrades"
+    assert proposal_meta["status"] == "accepted"
+    assert proposal_meta["target_feature"] == "workflow-capability-upgrades"
+    assert proposal_meta["promoted_feature"] is None
+    assert not (tmp_path / "docs" / "features" / "workflow-capability-upgrades").exists()
 
 
-def test_validate_proposal_reports_success_for_promoted_proposal(tmp_path, monkeypatch):
+def test_validate_proposal_reports_success_for_accepted_proposal(tmp_path, monkeypatch):
     module = load_module()
     monkeypatch.chdir(tmp_path)
 
@@ -181,7 +166,6 @@ def test_validate_proposal_reports_success_for_promoted_proposal(tmp_path, monke
         )
         == 0
     )
-    assert run_cli(module, monkeypatch, "promote", "workflow-capability-upgrades") == 0
 
     monkeypatch.setattr(
         sys,
