@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "generated_at": "2026-04-04T03:33:16",
+  "generated_at": "2026-04-04T03:42:38",
   "slices": [
     {
       "id": "HSS-01-root-fallback",
@@ -9,6 +9,16 @@
       "path": "slices/HSS-01-root-fallback-add-scope-runtime-with-root-fallback/",
       "updated_at": "2026-04-04T03:33:16",
       "closed_at": "2026-04-04T03:33:16",
+      "archived_at": null,
+      "relations": []
+    },
+    {
+      "id": "HSS-02-local-registries",
+      "feature": "Keep planning and proposal registries local to each scope",
+      "status": "closed",
+      "path": "slices/HSS-02-local-registries-keep-planning-and-proposal-registries-local-to-each-scope/",
+      "updated_at": "2026-04-04T03:42:38",
+      "closed_at": "2026-04-04T03:42:38",
       "archived_at": null,
       "relations": []
     }

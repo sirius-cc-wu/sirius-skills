@@ -25,6 +25,21 @@ def write_file(path: Path, content: str = "# doc\n"):
     path.write_text(content, encoding="utf-8")
 
 
+def write_planning_config(scope_root: Path):
+    skills_dir = scope_root / ".skills"
+    skills_dir.mkdir(parents=True, exist_ok=True)
+    (skills_dir / "planning.json").write_text(
+        json.dumps(
+            {
+                "planning_dir": "docs/features",
+                "proposal_dir": "docs/proposals",
+            }
+        )
+        + "\n",
+        encoding="utf-8",
+    )
+
+
 def test_init_defaults_to_docs_proposals_directory(tmp_path, monkeypatch):
     module = load_module()
     monkeypatch.chdir(tmp_path)
@@ -85,18 +100,7 @@ def test_add_creates_proposal_metadata_and_registry_entries(tmp_path, monkeypatc
 def test_add_from_nested_directory_uses_root_scope_registry(tmp_path, monkeypatch):
     module = load_module()
 
-    skills_dir = tmp_path / ".skills"
-    skills_dir.mkdir()
-    (skills_dir / "planning.json").write_text(
-        json.dumps(
-            {
-                "planning_dir": "docs/features",
-                "proposal_dir": "docs/proposals",
-            }
-        )
-        + "\n",
-        encoding="utf-8",
-    )
+    write_planning_config(tmp_path)
 
     nested = tmp_path / "apps" / "payments"
     nested.mkdir(parents=True)
@@ -118,6 +122,64 @@ def test_add_from_nested_directory_uses_root_scope_registry(tmp_path, monkeypatc
         / "workflow-capability-upgrades"
         / ".proposal-meta.json"
     ).exists()
+
+
+def test_child_scope_proposal_registry_stays_local(tmp_path, monkeypatch):
+    module = load_module()
+    write_planning_config(tmp_path)
+
+    child_scope = tmp_path / "apps" / "payments"
+    write_planning_config(child_scope)
+
+    monkeypatch.chdir(tmp_path)
+    assert run_cli(module, monkeypatch, "add", "workflow-capability-upgrades") == 0
+
+    monkeypatch.chdir(child_scope)
+    assert run_cli(module, monkeypatch, "add", "workflow-capability-upgrades") == 0
+    assert (
+        run_cli(
+            module,
+            monkeypatch,
+            "set-status",
+            "workflow-capability-upgrades",
+            "reviewed",
+            "--review-note",
+            "Child scope proposal reviewed.",
+        )
+        == 0
+    )
+
+    root_proposal_dir = tmp_path / "docs" / "proposals" / "workflow-capability-upgrades"
+    child_proposal_dir = child_scope / "docs" / "proposals" / "workflow-capability-upgrades"
+    root_meta = json.loads((root_proposal_dir / ".proposal-meta.json").read_text(encoding="utf-8"))
+    child_meta = json.loads(
+        (child_proposal_dir / ".proposal-meta.json").read_text(encoding="utf-8")
+    )
+    root_registry = json.loads(
+        (tmp_path / "docs" / "proposals" / "registry.json").read_text(encoding="utf-8")
+    )
+    child_registry = json.loads(
+        (child_scope / "docs" / "proposals" / "registry.json").read_text(encoding="utf-8")
+    )
+
+    assert root_meta["status"] == "draft"
+    assert child_meta["status"] == "reviewed"
+    assert root_registry["proposals"] == [
+        {
+            "proposal": "workflow-capability-upgrades",
+            "status": "draft",
+            "updated_at": root_meta["updated_at"],
+            "path": "docs/proposals/workflow-capability-upgrades/",
+        }
+    ]
+    assert child_registry["proposals"] == [
+        {
+            "proposal": "workflow-capability-upgrades",
+            "status": "reviewed",
+            "updated_at": child_meta["updated_at"],
+            "path": "docs/proposals/workflow-capability-upgrades/",
+        }
+    ]
 
 
 def test_reviewed_requires_review_note(tmp_path, monkeypatch, capsys):

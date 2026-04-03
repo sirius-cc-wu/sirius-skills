@@ -36,6 +36,22 @@ def write_file(path: Path, content: str = "# doc\n"):
     path.write_text(content, encoding="utf-8")
 
 
+def write_planning_config(scope_root: Path):
+    skills_dir = scope_root / ".skills"
+    skills_dir.mkdir(parents=True, exist_ok=True)
+    (skills_dir / "planning.json").write_text(
+        json.dumps(
+            {
+                "planning_dir": "docs/features",
+                "proposal_dir": "docs/proposals",
+                "design_diagram_mode": "embedded",
+            }
+        )
+        + "\n",
+        encoding="utf-8",
+    )
+
+
 def test_init_defaults_to_docs_features_directory(tmp_path, monkeypatch):
     module = load_manage_planning_module()
     monkeypatch.chdir(tmp_path)
@@ -117,19 +133,7 @@ def test_add_creates_feature_metadata_and_registry_entries(tmp_path, monkeypatch
 def test_add_from_nested_directory_uses_root_scope_registry(tmp_path, monkeypatch):
     module = load_manage_planning_module()
 
-    skills_dir = tmp_path / ".skills"
-    skills_dir.mkdir()
-    (skills_dir / "planning.json").write_text(
-        json.dumps(
-            {
-                "planning_dir": "docs/features",
-                "proposal_dir": "docs/proposals",
-                "design_diagram_mode": "embedded",
-            }
-        )
-        + "\n",
-        encoding="utf-8",
-    )
+    write_planning_config(tmp_path)
 
     nested = tmp_path / "apps" / "payments"
     nested.mkdir(parents=True)
@@ -139,6 +143,53 @@ def test_add_from_nested_directory_uses_root_scope_registry(tmp_path, monkeypatc
 
     assert (tmp_path / "docs" / "features" / "habit-tracker" / ".planning-meta.json").exists()
     assert not (nested / "docs" / "features" / "habit-tracker" / ".planning-meta.json").exists()
+
+
+def test_child_scope_feature_registry_stays_local(tmp_path, monkeypatch):
+    module = load_manage_planning_module()
+    write_planning_config(tmp_path)
+
+    child_scope = tmp_path / "apps" / "payments"
+    write_planning_config(child_scope)
+
+    monkeypatch.chdir(tmp_path)
+    assert run_cli(module, monkeypatch, "add", "habit-tracker") == 0
+
+    monkeypatch.chdir(child_scope)
+    assert run_cli(module, monkeypatch, "add", "habit-tracker") == 0
+
+    child_feature_dir = child_scope / "docs" / "features" / "habit-tracker"
+    write_file(child_feature_dir / "discover.md")
+    assert run_cli(module, monkeypatch, "set-status", "habit-tracker", "discovery_ready") == 0
+
+    root_feature_dir = tmp_path / "docs" / "features" / "habit-tracker"
+    root_meta = json.loads((root_feature_dir / ".planning-meta.json").read_text(encoding="utf-8"))
+    child_meta = json.loads((child_feature_dir / ".planning-meta.json").read_text(encoding="utf-8"))
+    root_registry = json.loads(
+        (tmp_path / "docs" / "features" / "registry.json").read_text(encoding="utf-8")
+    )
+    child_registry = json.loads(
+        (child_scope / "docs" / "features" / "registry.json").read_text(encoding="utf-8")
+    )
+
+    assert root_meta["status"] == "discovery_pending"
+    assert child_meta["status"] == "discovery_ready"
+    assert root_registry["features"] == [
+        {
+            "feature": "habit-tracker",
+            "status": "discovery_pending",
+            "updated_at": root_meta["updated_at"],
+            "path": "docs/features/habit-tracker/",
+        }
+    ]
+    assert child_registry["features"] == [
+        {
+            "feature": "habit-tracker",
+            "status": "discovery_ready",
+            "updated_at": child_meta["updated_at"],
+            "path": "docs/features/habit-tracker/",
+        }
+    ]
 
 
 def test_discovery_ready_requires_discover_file(tmp_path, monkeypatch, capsys):
