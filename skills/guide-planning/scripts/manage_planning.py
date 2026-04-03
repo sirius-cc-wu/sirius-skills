@@ -145,8 +145,12 @@ def normalize_slice_ids(value: object) -> List[str]:
     return list(dict.fromkeys(normalized))
 
 
-def load_raw_config(required: bool = False) -> Dict[str, object]:
-    config_file = str(SCOPE_RUNTIME.resolve_scope_context().planning_config_path)
+def load_raw_config(
+    required: bool = False, scope_context: Optional[object] = None
+) -> Dict[str, object]:
+    if scope_context is None:
+        scope_context = SCOPE_RUNTIME.resolve_scope_context()
+    config_file = str(scope_context.planning_config_path)
     if not os.path.exists(config_file):
         if required:
             raise RuntimeError(
@@ -168,8 +172,10 @@ def load_raw_config(required: bool = False) -> Dict[str, object]:
     return config
 
 
-def load_config(required: bool = False) -> Dict[str, str]:
-    config = load_raw_config(required=required)
+def load_config(
+    required: bool = False, scope_context: Optional[object] = None
+) -> Dict[str, str]:
+    config = load_raw_config(required=required, scope_context=scope_context)
 
     planning_dir = config.get("planning_dir", DEFAULT_PLANNING_DIR)
     if not isinstance(planning_dir, str):
@@ -213,9 +219,12 @@ def write_config(
         f.write("\n")
 
 
-def get_registry_paths(required_config: bool = False) -> Tuple[str, str, str]:
-    scope_context = SCOPE_RUNTIME.resolve_scope_context()
-    config = load_config(required=required_config)
+def get_registry_paths(
+    required_config: bool = False, scope_context: Optional[object] = None
+) -> Tuple[str, str, str]:
+    if scope_context is None:
+        scope_context = SCOPE_RUNTIME.resolve_scope_context()
+    config = load_config(required=required_config, scope_context=scope_context)
     planning_dir = SCOPE_RUNTIME.resolve_scope_path(
         scope_context.scope_root,
         normalize_planning_dir(config["planning_dir"]),
@@ -306,8 +315,10 @@ def load_registry_json(registry_json_file: str) -> List[Dict[str, object]]:
     return [normalize_registry_row(row) for row in raw_rows]
 
 
-def write_registry(rows: List[Dict[str, object]]) -> None:
-    planning_dir, index_file, registry_json_file = get_registry_paths(required_config=False)
+def write_registry(rows: List[Dict[str, object]], scope_context: Optional[object] = None) -> None:
+    planning_dir, index_file, registry_json_file = get_registry_paths(
+        required_config=False, scope_context=scope_context
+    )
     ensure_registry(planning_dir)
 
     sorted_rows = sorted(rows, key=lambda row: (row["feature"], row.get("updated_at") or ""))
@@ -325,13 +336,15 @@ def write_registry(rows: List[Dict[str, object]]) -> None:
         f.write("\n")
 
 
-def parse_registry() -> List[Dict[str, object]]:
-    planning_dir, index_file, registry_json_file = get_registry_paths(required_config=False)
+def parse_registry(scope_context: Optional[object] = None) -> List[Dict[str, object]]:
+    planning_dir, index_file, registry_json_file = get_registry_paths(
+        required_config=False, scope_context=scope_context
+    )
     ensure_registry(planning_dir)
     if os.path.exists(registry_json_file):
         return load_registry_json(registry_json_file)
     rows = parse_registry_markdown(index_file)
-    write_registry(rows)
+    write_registry(rows, scope_context=scope_context)
     return rows
 
 
@@ -394,14 +407,22 @@ def write_metadata(feature_dir: str, metadata: Dict[str, object]) -> None:
         f.write("\n")
 
 
-def feature_dir_for_row(row: Dict[str, object]) -> str:
+def feature_dir_for_row(
+    row: Dict[str, object], scope_context: Optional[object] = None
+) -> str:
+    if scope_context is None:
+        scope_context = SCOPE_RUNTIME.resolve_scope_context()
     return SCOPE_RUNTIME.resolve_scope_path(
-        SCOPE_RUNTIME.resolve_scope_context().scope_root,
+        scope_context.scope_root,
         str(row["path"]).rstrip("/"),
     )
 
 
-def find_feature(rows: List[Dict[str, object]], selector: str) -> Optional[Dict[str, object]]:
+def find_feature(
+    rows: List[Dict[str, object]],
+    selector: str,
+    scope_context: Optional[object] = None,
+) -> Optional[Dict[str, object]]:
     normalized_selector = selector.rstrip("/")
     if normalized_selector.startswith("./"):
         normalized_selector = normalized_selector[2:]
@@ -412,7 +433,7 @@ def find_feature(rows: List[Dict[str, object]], selector: str) -> Optional[Dict[
         path_value = str(row["path"]).rstrip("/")
         if path_value == normalized_selector:
             return row
-        absolute_path = feature_dir_for_row(row).rstrip("/")
+        absolute_path = feature_dir_for_row(row, scope_context=scope_context).rstrip("/")
         if absolute_path == normalized_selector:
             return row
         if os.path.basename(path_value) == normalized_selector:
@@ -420,6 +441,85 @@ def find_feature(rows: List[Dict[str, object]], selector: str) -> Optional[Dict[
         if os.path.basename(absolute_path) == normalized_selector:
             return row
     return None
+
+
+def is_slug_selector(selector: str) -> bool:
+    normalized_selector = selector.strip()
+    if not normalized_selector:
+        return False
+    if os.path.isabs(normalized_selector):
+        return False
+    if normalized_selector.startswith("./"):
+        return False
+    return "/" not in normalized_selector and "\\" not in normalized_selector
+
+
+def scope_label(scope_root: str, repo_root: str) -> str:
+    scope_path = Path(scope_root).resolve()
+    repo_path = Path(repo_root).resolve()
+    try:
+        relative = scope_path.relative_to(repo_path)
+    except ValueError:
+        return str(scope_path)
+    return "." if str(relative) == "." else str(relative)
+
+
+def list_plausible_scope_contexts(scope_context: object) -> List[object]:
+    contexts = [scope_context]
+    for nested_scope_root in SCOPE_RUNTIME.list_nested_scope_roots(scope_context.scope_root):
+        contexts.append(
+            SCOPE_RUNTIME.resolve_scope_context(
+                start_path=scope_context.start_dir, explicit_scope=nested_scope_root
+            )
+        )
+    return contexts
+
+
+def resolve_feature_lookup(
+    selector: str, explicit_scope: Optional[str] = None
+) -> Tuple[List[Dict[str, object]], Optional[Dict[str, object]], object]:
+    scope_context = SCOPE_RUNTIME.resolve_scope_context(explicit_scope=explicit_scope)
+    rows = parse_registry(scope_context=scope_context)
+
+    if explicit_scope is not None or not is_slug_selector(selector):
+        return rows, find_feature(rows, selector, scope_context=scope_context), scope_context
+
+    matches: List[Tuple[object, List[Dict[str, object]], Dict[str, object]]] = []
+    for candidate_scope_context in list_plausible_scope_contexts(scope_context):
+        candidate_rows = parse_registry(scope_context=candidate_scope_context)
+        feature = find_feature(
+            candidate_rows, selector, scope_context=candidate_scope_context
+        )
+        if feature:
+            matches.append((candidate_scope_context, candidate_rows, feature))
+
+    if not matches:
+        return rows, None, scope_context
+
+    if len(matches) == 1:
+        candidate_scope_context, candidate_rows, feature = matches[0]
+        if candidate_scope_context.scope_root != scope_context.scope_root:
+            raise RuntimeError(
+                f"Planning feature not found in active scope "
+                f"'{scope_label(scope_context.scope_root, scope_context.repo_root)}'. "
+                f"Found matching feature in scope "
+                f"'{scope_label(candidate_scope_context.scope_root, scope_context.repo_root)}'. "
+                "Re-run with --scope <path>."
+            )
+        return candidate_rows, feature, candidate_scope_context
+
+    candidate_labels = sorted(
+        {
+            scope_label(
+                candidate_scope_context.scope_root, candidate_scope_context.repo_root
+            )
+            for candidate_scope_context, _, _ in matches
+        }
+    )
+    raise RuntimeError(
+        f"Ambiguous planning feature selector '{selector}'. Matching scopes: "
+        f"{', '.join(candidate_labels)}. Re-run with --scope <path>."
+    )
 
 
 def find_active_feature(rows: List[Dict[str, object]]) -> Optional[Dict[str, object]]:
@@ -497,14 +597,22 @@ def validate_feature_state(feature_dir: str, metadata: Dict[str, object]) -> Tup
     return not issues, issues, checks
 
 
-def create_feature(feature_slug: str, requires_ui_flow: bool = False) -> Tuple[str, bool]:
-    rows = parse_registry()
-    existing = find_feature(rows, feature_slug)
+def create_feature(
+    feature_slug: str,
+    requires_ui_flow: bool = False,
+    scope_context: Optional[object] = None,
+) -> Tuple[str, bool]:
+    if scope_context is None:
+        scope_context = SCOPE_RUNTIME.resolve_scope_context()
+    rows = parse_registry(scope_context=scope_context)
+    existing = find_feature(rows, feature_slug, scope_context=scope_context)
     if existing:
-        return feature_dir_for_row(existing), False
+        return feature_dir_for_row(existing, scope_context=scope_context), False
 
-    config = load_config(required=False)
-    planning_dir, _, _ = get_registry_paths(required_config=False)
+    config = load_config(required=False, scope_context=scope_context)
+    planning_dir, _, _ = get_registry_paths(
+        required_config=False, scope_context=scope_context
+    )
     ensure_registry(planning_dir)
     feature_dir = os.path.join(planning_dir, feature_slug)
     metadata = build_metadata(feature_slug, requires_ui_flow=requires_ui_flow)
@@ -521,7 +629,7 @@ def create_feature(feature_slug: str, requires_ui_flow: bool = False) -> Tuple[s
             "path": row_path,
         }
     )
-    write_registry(rows)
+    write_registry(rows, scope_context=scope_context)
     return feature_dir, True
 
 
@@ -539,8 +647,9 @@ def update_feature_status(
     review_note: Optional[str] = None,
     slice_ids: Optional[List[str]] = None,
     requires_ui_flow: Optional[bool] = None,
+    scope_context: Optional[object] = None,
 ) -> Tuple[bool, str]:
-    feature_dir = feature_dir_for_row(feature)
+    feature_dir = feature_dir_for_row(feature, scope_context=scope_context)
     metadata = read_metadata(feature_dir)
     current_status = str(metadata["status"])
 
@@ -568,12 +677,14 @@ def update_feature_status(
     write_metadata(feature_dir, updated_metadata)
     feature["status"] = status
     feature["updated_at"] = updated_metadata["updated_at"]
-    write_registry(rows)
+    write_registry(rows, scope_context=scope_context)
     return True, f"Updated {feature['feature']} to status '{status}'"
 
 
-def validate_feature(feature: Dict[str, object]) -> Tuple[bool, List[str], List[Dict[str, object]]]:
-    feature_dir = feature_dir_for_row(feature)
+def validate_feature(
+    feature: Dict[str, object], scope_context: Optional[object] = None
+) -> Tuple[bool, List[str], List[Dict[str, object]]]:
+    feature_dir = feature_dir_for_row(feature, scope_context=scope_context)
     metadata = read_metadata(feature_dir)
     return validate_feature_state(feature_dir, metadata)
 
@@ -598,14 +709,23 @@ def promote_proposal_to_feature(
     feature_slug: Optional[str],
     require_ui_flow: bool = False,
     force: bool = False,
+    scope: Optional[str] = None,
 ) -> Tuple[bool, str]:
     manage_proposals = load_manage_proposals_module()
-    proposal_rows = manage_proposals.load_registry()
-    proposal = manage_proposals.find_proposal(proposal_rows, proposal_selector)
+    try:
+        proposal_rows, proposal, proposal_scope_context = (
+            manage_proposals.resolve_proposal_lookup(
+                proposal_selector, explicit_scope=scope
+            )
+        )
+    except RuntimeError as exc:
+        return False, str(exc)
     if not proposal:
         return False, f"Proposal not found: {proposal_selector}"
 
-    proposal_dir = manage_proposals.proposal_dir_for_row(proposal)
+    proposal_dir = manage_proposals.proposal_dir_for_row(
+        proposal, scope_context=proposal_scope_context
+    )
     proposal_metadata = manage_proposals.read_metadata(proposal_dir)
     current_status = str(proposal_metadata["status"])
     if current_status != "accepted" and not force:
@@ -617,7 +737,9 @@ def promote_proposal_to_feature(
     try:
         normalized_feature = validate_feature_slug(str(target_feature))
         feature_dir, created = create_feature(
-            normalized_feature, requires_ui_flow=require_ui_flow
+            normalized_feature,
+            requires_ui_flow=require_ui_flow,
+            scope_context=proposal_scope_context,
         )
     except (RuntimeError, ValueError) as exc:
         return False, str(exc)
@@ -644,7 +766,7 @@ def promote_proposal_to_feature(
 
     proposal["status"] = "promoted"
     proposal["updated_at"] = timestamp
-    manage_proposals.write_registry(proposal_rows)
+    manage_proposals.write_registry(proposal_rows, scope_context=proposal_scope_context)
 
     copied_text = ", ".join(copied_files) if copied_files else "no proposal docs copied"
     return (
@@ -693,12 +815,16 @@ def cmd_add(args: argparse.Namespace) -> int:
 def cmd_set_status(args: argparse.Namespace) -> int:
     try:
         status = normalize_status(args.status)
+        rows, feature, scope_context = resolve_feature_lookup(
+            args.feature, explicit_scope=args.scope
+        )
+    except RuntimeError as exc:
+        print(str(exc), file=sys.stderr)
+        return 2
     except ValueError as exc:
         print(str(exc), file=sys.stderr)
         return 2
 
-    rows = parse_registry()
-    feature = find_feature(rows, args.feature)
     if not feature:
         print(f"Planning feature not found: {args.feature}", file=sys.stderr)
         return 2
@@ -719,6 +845,7 @@ def cmd_set_status(args: argparse.Namespace) -> int:
         review_note=args.review_note,
         slice_ids=args.slice_id if args.slice_id else None,
         requires_ui_flow=requires_ui_flow,
+        scope_context=scope_context,
     )
     stream = sys.stdout if success else sys.stderr
     print(message, file=stream)
@@ -736,13 +863,18 @@ def cmd_get_active(_: argparse.Namespace) -> int:
 
 
 def cmd_validate_feature(args: argparse.Namespace) -> int:
-    rows = parse_registry()
-    feature = find_feature(rows, args.feature)
+    try:
+        _, feature, scope_context = resolve_feature_lookup(
+            args.feature, explicit_scope=args.scope
+        )
+    except RuntimeError as exc:
+        print(str(exc), file=sys.stderr)
+        return 2
     if not feature:
         print(f"Planning feature not found: {args.feature}", file=sys.stderr)
         return 2
 
-    ok, issues, checks = validate_feature(feature)
+    ok, issues, checks = validate_feature(feature, scope_context=scope_context)
     result = {"feature": feature, "ok": ok, "checks": checks, "issues": issues}
     print(json.dumps(result, indent=2))
     return 0 if ok else 3
@@ -754,6 +886,7 @@ def cmd_promote_proposal(args: argparse.Namespace) -> int:
         feature_slug=args.feature_slug,
         require_ui_flow=args.require_ui_flow,
         force=args.force,
+        scope=args.scope,
     )
     stream = sys.stdout if success else sys.stderr
     print(message, file=stream)
@@ -812,6 +945,10 @@ def build_parser() -> argparse.ArgumentParser:
         action="store_true",
         help="Override transition and validation safeguards during manual repair.",
     )
+    set_p.add_argument(
+        "--scope",
+        help="Explicit scope path to use for feature lookup.",
+    )
 
     subparsers.add_parser("get-active", help="Return the active planning feature as JSON")
 
@@ -819,6 +956,10 @@ def build_parser() -> argparse.ArgumentParser:
         "validate-feature", help="Validate planning feature/file consistency"
     )
     validate_p.add_argument("feature", help="Feature slug, folder name, or path")
+    validate_p.add_argument(
+        "--scope",
+        help="Explicit scope path to use for feature lookup.",
+    )
 
     promote_p = subparsers.add_parser(
         "promote-proposal",
@@ -838,6 +979,10 @@ def build_parser() -> argparse.ArgumentParser:
         "--force",
         action="store_true",
         help="Override promotion safeguards during manual repair.",
+    )
+    promote_p.add_argument(
+        "--scope",
+        help="Explicit scope path to use for proposal lookup.",
     )
 
     return parser

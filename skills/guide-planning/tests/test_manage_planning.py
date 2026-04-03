@@ -241,6 +241,59 @@ def test_nested_child_directory_uses_nearest_scope_and_sibling_path_falls_back_t
     assert not (child_scope / "docs" / "features" / "root-feature").exists()
 
 
+def test_ambiguous_feature_lookup_requires_explicit_scope(tmp_path, monkeypatch, capsys):
+    module = load_manage_planning_module()
+    write_planning_config(tmp_path)
+
+    child_scope = tmp_path / "apps" / "payments"
+    write_planning_config(child_scope)
+
+    monkeypatch.chdir(tmp_path)
+    assert run_cli(module, monkeypatch, "add", "habit-tracker") == 0
+
+    monkeypatch.chdir(child_scope)
+    assert run_cli(module, monkeypatch, "add", "habit-tracker") == 0
+
+    write_file(tmp_path / "docs" / "features" / "habit-tracker" / "discover.md")
+    write_file(child_scope / "docs" / "features" / "habit-tracker" / "discover.md")
+
+    monkeypatch.chdir(tmp_path)
+    exit_code = run_cli(module, monkeypatch, "set-status", "habit-tracker", "discovery_ready")
+    captured = capsys.readouterr()
+
+    assert exit_code == 2
+    assert "Ambiguous planning feature selector 'habit-tracker'" in captured.err
+    assert "." in captured.err
+    assert "apps/payments" in captured.err
+
+    assert (
+        run_cli(
+            module,
+            monkeypatch,
+            "set-status",
+            "habit-tracker",
+            "discovery_ready",
+            "--scope",
+            str(child_scope),
+        )
+        == 0
+    )
+
+    root_meta = json.loads(
+        (tmp_path / "docs" / "features" / "habit-tracker" / ".planning-meta.json").read_text(
+            encoding="utf-8"
+        )
+    )
+    child_meta = json.loads(
+        (
+            child_scope / "docs" / "features" / "habit-tracker" / ".planning-meta.json"
+        ).read_text(encoding="utf-8")
+    )
+
+    assert root_meta["status"] == "discovery_pending"
+    assert child_meta["status"] == "discovery_ready"
+
+
 def test_discovery_ready_requires_discover_file(tmp_path, monkeypatch, capsys):
     module = load_manage_planning_module()
     monkeypatch.chdir(tmp_path)

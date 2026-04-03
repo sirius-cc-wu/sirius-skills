@@ -116,8 +116,12 @@ def normalize_path(path: str) -> str:
     return normalized + "/"
 
 
-def load_config(required: bool = False) -> Dict[str, str]:
-    config_file = str(SCOPE_RUNTIME.resolve_scope_context().planning_config_path)
+def load_config(
+    required: bool = False, scope_context: Optional[object] = None
+) -> Dict[str, str]:
+    if scope_context is None:
+        scope_context = SCOPE_RUNTIME.resolve_scope_context()
+    config_file = str(scope_context.planning_config_path)
     if not os.path.exists(config_file):
         if required:
             raise RuntimeError(
@@ -167,9 +171,12 @@ def write_config(planning_dir: str, proposal_dir: str) -> None:
         f.write("\n")
 
 
-def get_registry_paths(required_config: bool = False) -> Tuple[str, str, str]:
-    scope_context = SCOPE_RUNTIME.resolve_scope_context()
-    config = load_config(required=required_config)
+def get_registry_paths(
+    required_config: bool = False, scope_context: Optional[object] = None
+) -> Tuple[str, str, str]:
+    if scope_context is None:
+        scope_context = SCOPE_RUNTIME.resolve_scope_context()
+    config = load_config(required=required_config, scope_context=scope_context)
     proposal_dir = SCOPE_RUNTIME.resolve_scope_path(
         scope_context.scope_root,
         normalize_dir(config["proposal_dir"], "Proposal directory"),
@@ -211,8 +218,10 @@ def normalize_registry_row(row: Dict[str, object]) -> Dict[str, object]:
     }
 
 
-def load_registry() -> List[Dict[str, object]]:
-    proposal_dir, _, registry_json_file = get_registry_paths(required_config=False)
+def load_registry(scope_context: Optional[object] = None) -> List[Dict[str, object]]:
+    proposal_dir, _, registry_json_file = get_registry_paths(
+        required_config=False, scope_context=scope_context
+    )
     ensure_registry(proposal_dir)
     try:
         with open(registry_json_file, "r", encoding="utf-8") as f:
@@ -234,8 +243,10 @@ def load_registry() -> List[Dict[str, object]]:
     return [normalize_registry_row(row) for row in raw_rows]
 
 
-def write_registry(rows: List[Dict[str, object]]) -> None:
-    proposal_dir, index_file, registry_json_file = get_registry_paths(required_config=False)
+def write_registry(rows: List[Dict[str, object]], scope_context: Optional[object] = None) -> None:
+    proposal_dir, index_file, registry_json_file = get_registry_paths(
+        required_config=False, scope_context=scope_context
+    )
     ensure_registry(proposal_dir)
 
     sorted_rows = sorted(rows, key=lambda row: (row["proposal"], row.get("updated_at") or ""))
@@ -252,10 +263,14 @@ def write_registry(rows: List[Dict[str, object]]) -> None:
         f.write("\n")
 
 
-def get_proposal_root(proposal_slug: str) -> str:
-    config = load_config()
+def get_proposal_root(
+    proposal_slug: str, scope_context: Optional[object] = None
+) -> str:
+    if scope_context is None:
+        scope_context = SCOPE_RUNTIME.resolve_scope_context()
+    config = load_config(scope_context=scope_context)
     proposal_dir = SCOPE_RUNTIME.resolve_scope_path(
-        SCOPE_RUNTIME.resolve_scope_context().scope_root,
+        scope_context.scope_root,
         normalize_dir(config["proposal_dir"], "Proposal directory"),
     )
     return os.path.join(proposal_dir, validate_slug(proposal_slug, "Proposal slug"))
@@ -338,14 +353,22 @@ def write_metadata(proposal_dir: str, metadata: Dict[str, object]) -> None:
         f.write("\n")
 
 
-def proposal_dir_for_row(row: Dict[str, object]) -> str:
+def proposal_dir_for_row(
+    row: Dict[str, object], scope_context: Optional[object] = None
+) -> str:
+    if scope_context is None:
+        scope_context = SCOPE_RUNTIME.resolve_scope_context()
     return SCOPE_RUNTIME.resolve_scope_path(
-        SCOPE_RUNTIME.resolve_scope_context().scope_root,
+        scope_context.scope_root,
         str(row["path"]).rstrip("/"),
     )
 
 
-def find_proposal(rows: List[Dict[str, object]], selector: str) -> Optional[Dict[str, object]]:
+def find_proposal(
+    rows: List[Dict[str, object]],
+    selector: str,
+    scope_context: Optional[object] = None,
+) -> Optional[Dict[str, object]]:
     normalized_selector = selector.rstrip("/")
     if normalized_selector.startswith("./"):
         normalized_selector = normalized_selector[2:]
@@ -356,7 +379,7 @@ def find_proposal(rows: List[Dict[str, object]], selector: str) -> Optional[Dict
         path_value = str(row["path"]).rstrip("/")
         if path_value == normalized_selector:
             return row
-        absolute_path = proposal_dir_for_row(row).rstrip("/")
+        absolute_path = proposal_dir_for_row(row, scope_context=scope_context).rstrip("/")
         if absolute_path == normalized_selector:
             return row
         if os.path.basename(path_value) == normalized_selector:
@@ -364,6 +387,85 @@ def find_proposal(rows: List[Dict[str, object]], selector: str) -> Optional[Dict
         if os.path.basename(absolute_path) == normalized_selector:
             return row
     return None
+
+
+def is_slug_selector(selector: str) -> bool:
+    normalized_selector = selector.strip()
+    if not normalized_selector:
+        return False
+    if os.path.isabs(normalized_selector):
+        return False
+    if normalized_selector.startswith("./"):
+        return False
+    return "/" not in normalized_selector and "\\" not in normalized_selector
+
+
+def scope_label(scope_root: str, repo_root: str) -> str:
+    scope_path = Path(scope_root).resolve()
+    repo_path = Path(repo_root).resolve()
+    try:
+        relative = scope_path.relative_to(repo_path)
+    except ValueError:
+        return str(scope_path)
+    return "." if str(relative) == "." else str(relative)
+
+
+def list_plausible_scope_contexts(scope_context: object) -> List[object]:
+    contexts = [scope_context]
+    for nested_scope_root in SCOPE_RUNTIME.list_nested_scope_roots(scope_context.scope_root):
+        contexts.append(
+            SCOPE_RUNTIME.resolve_scope_context(
+                start_path=scope_context.start_dir, explicit_scope=nested_scope_root
+            )
+        )
+    return contexts
+
+
+def resolve_proposal_lookup(
+    selector: str, explicit_scope: Optional[str] = None
+) -> Tuple[List[Dict[str, object]], Optional[Dict[str, object]], object]:
+    scope_context = SCOPE_RUNTIME.resolve_scope_context(explicit_scope=explicit_scope)
+    rows = load_registry(scope_context=scope_context)
+
+    if explicit_scope is not None or not is_slug_selector(selector):
+        return rows, find_proposal(rows, selector, scope_context=scope_context), scope_context
+
+    matches: List[Tuple[object, List[Dict[str, object]], Dict[str, object]]] = []
+    for candidate_scope_context in list_plausible_scope_contexts(scope_context):
+        candidate_rows = load_registry(scope_context=candidate_scope_context)
+        proposal = find_proposal(
+            candidate_rows, selector, scope_context=candidate_scope_context
+        )
+        if proposal:
+            matches.append((candidate_scope_context, candidate_rows, proposal))
+
+    if not matches:
+        return rows, None, scope_context
+
+    if len(matches) == 1:
+        candidate_scope_context, candidate_rows, proposal = matches[0]
+        if candidate_scope_context.scope_root != scope_context.scope_root:
+            raise RuntimeError(
+                f"Proposal not found in active scope "
+                f"'{scope_label(scope_context.scope_root, scope_context.repo_root)}'. "
+                f"Found matching proposal in scope "
+                f"'{scope_label(candidate_scope_context.scope_root, scope_context.repo_root)}'. "
+                "Re-run with --scope <path>."
+            )
+        return candidate_rows, proposal, candidate_scope_context
+
+    candidate_labels = sorted(
+        {
+            scope_label(
+                candidate_scope_context.scope_root, candidate_scope_context.repo_root
+            )
+            for candidate_scope_context, _, _ in matches
+        }
+    )
+    raise RuntimeError(
+        f"Ambiguous proposal selector '{selector}'. Matching scopes: "
+        f"{', '.join(candidate_labels)}. Re-run with --scope <path>."
+    )
 
 
 def find_active_proposal(rows: List[Dict[str, object]]) -> Optional[Dict[str, object]]:
@@ -462,19 +564,22 @@ def create_proposal(
     proposal_slug: str,
     summary: Optional[str] = None,
     target_feature: Optional[str] = None,
+    scope_context: Optional[object] = None,
 ) -> Tuple[str, bool]:
-    rows = load_registry()
-    existing = find_proposal(rows, proposal_slug)
+    if scope_context is None:
+        scope_context = SCOPE_RUNTIME.resolve_scope_context()
+    rows = load_registry(scope_context=scope_context)
+    existing = find_proposal(rows, proposal_slug, scope_context=scope_context)
     if existing:
-        return proposal_dir_for_row(existing), False
+        return proposal_dir_for_row(existing, scope_context=scope_context), False
 
-    proposal_dir = get_proposal_root(proposal_slug)
+    proposal_dir = get_proposal_root(proposal_slug, scope_context=scope_context)
     metadata = build_metadata(
         proposal_slug, summary=summary, target_feature=target_feature
     )
     write_metadata(proposal_dir, metadata)
     write_discover_stub(proposal_dir, proposal_slug, summary)
-    config = load_config(required=False)
+    config = load_config(required=False, scope_context=scope_context)
     row_path = normalize_path(
         os.path.join(
             normalize_dir(config["proposal_dir"], "Proposal directory"),
@@ -490,7 +595,7 @@ def create_proposal(
             "path": row_path,
         }
     )
-    write_registry(rows)
+    write_registry(rows, scope_context=scope_context)
     return proposal_dir, True
 
 
@@ -515,8 +620,9 @@ def update_proposal_status(
     review_note: Optional[str] = None,
     summary: Optional[str] = None,
     target_feature: Optional[str] = None,
+    scope_context: Optional[object] = None,
 ) -> Tuple[bool, str]:
-    proposal_dir = proposal_dir_for_row(proposal)
+    proposal_dir = proposal_dir_for_row(proposal, scope_context=scope_context)
     metadata = read_metadata(proposal_dir)
     current_status = str(metadata["status"])
 
@@ -548,14 +654,14 @@ def update_proposal_status(
     write_metadata(proposal_dir, updated_metadata)
     proposal["status"] = status
     proposal["updated_at"] = updated_metadata["updated_at"]
-    write_registry(rows)
+    write_registry(rows, scope_context=scope_context)
     return True, f"Updated {proposal['proposal']} to status '{status}'"
 
 
 def validate_proposal(
-    proposal: Dict[str, object]
+    proposal: Dict[str, object], scope_context: Optional[object] = None
 ) -> Tuple[bool, List[str], List[Dict[str, object]]]:
-    proposal_dir = proposal_dir_for_row(proposal)
+    proposal_dir = proposal_dir_for_row(proposal, scope_context=scope_context)
     metadata = read_metadata(proposal_dir)
     return validate_proposal_state(proposal_dir, metadata)
 
@@ -579,7 +685,9 @@ def cmd_add(args: argparse.Namespace) -> int:
     try:
         proposal_slug = validate_slug(args.proposal_slug, "Proposal slug")
         proposal_dir, created = create_proposal(
-            proposal_slug, summary=args.summary, target_feature=args.target_feature
+            proposal_slug,
+            summary=args.summary,
+            target_feature=args.target_feature,
         )
     except (RuntimeError, ValueError) as exc:
         print(str(exc), file=sys.stderr)
@@ -596,12 +704,16 @@ def cmd_add(args: argparse.Namespace) -> int:
 def cmd_set_status(args: argparse.Namespace) -> int:
     try:
         status = normalize_status(args.status)
+        rows, proposal, scope_context = resolve_proposal_lookup(
+            args.proposal, explicit_scope=args.scope
+        )
+    except RuntimeError as exc:
+        print(str(exc), file=sys.stderr)
+        return 2
     except ValueError as exc:
         print(str(exc), file=sys.stderr)
         return 2
 
-    rows = load_registry()
-    proposal = find_proposal(rows, args.proposal)
     if not proposal:
         print(f"Proposal not found: {args.proposal}", file=sys.stderr)
         return 2
@@ -614,6 +726,7 @@ def cmd_set_status(args: argparse.Namespace) -> int:
         review_note=args.review_note,
         summary=args.summary,
         target_feature=args.target_feature,
+        scope_context=scope_context,
     )
     stream = sys.stdout if success else sys.stderr
     print(message, file=stream)
@@ -631,13 +744,18 @@ def cmd_get_active(_: argparse.Namespace) -> int:
 
 
 def cmd_validate_proposal(args: argparse.Namespace) -> int:
-    rows = load_registry()
-    proposal = find_proposal(rows, args.proposal)
+    try:
+        _, proposal, scope_context = resolve_proposal_lookup(
+            args.proposal, explicit_scope=args.scope
+        )
+    except RuntimeError as exc:
+        print(str(exc), file=sys.stderr)
+        return 2
     if not proposal:
         print(f"Proposal not found: {args.proposal}", file=sys.stderr)
         return 2
 
-    ok, issues, checks = validate_proposal(proposal)
+    ok, issues, checks = validate_proposal(proposal, scope_context=scope_context)
     result = {"proposal": proposal, "ok": ok, "checks": checks, "issues": issues}
     print(json.dumps(result, indent=2))
     return 0 if ok else 3
@@ -681,6 +799,10 @@ def build_parser() -> argparse.ArgumentParser:
         action="store_true",
         help="Override transition and validation safeguards during manual repair.",
     )
+    set_p.add_argument(
+        "--scope",
+        help="Explicit scope path to use for proposal lookup.",
+    )
 
     subparsers.add_parser("get-active", help="Return the active proposal as JSON")
 
@@ -688,6 +810,10 @@ def build_parser() -> argparse.ArgumentParser:
         "validate-proposal", help="Validate proposal/file consistency"
     )
     validate_p.add_argument("proposal", help="Proposal slug, folder name, or path")
+    validate_p.add_argument(
+        "--scope",
+        help="Explicit scope path to use for proposal lookup.",
+    )
 
     return parser
 

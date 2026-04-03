@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "generated_at": "2026-04-04T03:47:16",
+  "generated_at": "2026-04-04T03:59:57",
   "slices": [
     {
       "id": "HSS-01-root-fallback",
@@ -29,6 +29,16 @@
       "path": "slices/HSS-03-nearest-scope-default-cli-operations-to-the-nearest-enclosing-scope/",
       "updated_at": "2026-04-04T03:47:16",
       "closed_at": "2026-04-04T03:47:16",
+      "archived_at": null,
+      "relations": []
+    },
+    {
+      "id": "HSS-04-scope-selection",
+      "feature": "Require explicit scope selection for ambiguous lookups",
+      "status": "closed",
+      "path": "slices/HSS-04-scope-selection-require-explicit-scope-selection-for-ambiguous-lookups/",
+      "updated_at": "2026-04-04T03:59:57",
+      "closed_at": "2026-04-04T03:59:57",
       "archived_at": null,
       "relations": []
     }

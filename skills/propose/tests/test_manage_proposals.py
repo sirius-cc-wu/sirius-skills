@@ -231,6 +231,70 @@ def test_nested_child_directory_uses_nearest_scope_and_sibling_path_falls_back_t
     assert not (child_scope / "docs" / "proposals" / "root-proposal").exists()
 
 
+def test_ambiguous_proposal_lookup_requires_explicit_scope(tmp_path, monkeypatch, capsys):
+    module = load_module()
+    write_planning_config(tmp_path)
+
+    child_scope = tmp_path / "apps" / "payments"
+    write_planning_config(child_scope)
+
+    monkeypatch.chdir(tmp_path)
+    assert run_cli(module, monkeypatch, "add", "workflow-capability-upgrades") == 0
+
+    monkeypatch.chdir(child_scope)
+    assert run_cli(module, monkeypatch, "add", "workflow-capability-upgrades") == 0
+
+    monkeypatch.chdir(tmp_path)
+    exit_code = run_cli(
+        module,
+        monkeypatch,
+        "set-status",
+        "workflow-capability-upgrades",
+        "reviewed",
+        "--review-note",
+        "Reviewed from the active scope.",
+    )
+    captured = capsys.readouterr()
+
+    assert exit_code == 2
+    assert "Ambiguous proposal selector 'workflow-capability-upgrades'" in captured.err
+    assert "." in captured.err
+    assert "apps/payments" in captured.err
+
+    assert (
+        run_cli(
+            module,
+            monkeypatch,
+            "set-status",
+            "workflow-capability-upgrades",
+            "reviewed",
+            "--review-note",
+            "Child scope proposal reviewed.",
+            "--scope",
+            str(child_scope),
+        )
+        == 0
+    )
+
+    root_meta = json.loads(
+        (
+            tmp_path / "docs" / "proposals" / "workflow-capability-upgrades" / ".proposal-meta.json"
+        ).read_text(encoding="utf-8")
+    )
+    child_meta = json.loads(
+        (
+            child_scope
+            / "docs"
+            / "proposals"
+            / "workflow-capability-upgrades"
+            / ".proposal-meta.json"
+        ).read_text(encoding="utf-8")
+    )
+
+    assert root_meta["status"] == "draft"
+    assert child_meta["status"] == "reviewed"
+
+
 def test_reviewed_requires_review_note(tmp_path, monkeypatch, capsys):
     module = load_module()
     monkeypatch.chdir(tmp_path)
