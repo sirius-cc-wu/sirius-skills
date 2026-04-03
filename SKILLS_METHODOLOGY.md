@@ -10,6 +10,7 @@ This document explains **how to use the skills together**.
 Use a **two-layer workflow**:
 
 1. **Planning layer**
+   - `guide-scope` (optional scope-aware entrypoint)
    - `guide-planning`
    - `propose`
    - `evolve-feature`
@@ -34,7 +35,29 @@ The execution layer works one implementation-ready slice at a time.
 
 ## Recommended Workflow
 
-### 0. Route planning with guide-planning
+### 0. Resolve scope with guide-scope when needed
+
+Use `guide-scope` as the optional entrypoint when the repository may contain
+multiple explicit scopes and the user should not have to remember whether the
+next handoff belongs to planning, execution, or bootstrap.
+
+Its job is to:
+
+- resolve the active scope from the current working directory
+- stop for explicit selection when multiple scopes are plausible
+- route to `guide-planning`, `guide-execution`, or `bootstrap`
+- keep downstream ownership boundaries intact instead of duplicating their state
+
+Recommended handoff:
+
+```text
+guide-scope -> guide-planning/guide-execution/bootstrap
+```
+
+If the repository effectively has one scope, `guide-scope` remains optional and
+you can still enter directly through `guide-planning` or `guide-execution`.
+
+### 1. Route planning with guide-planning
 
 Use `guide-planning` as the planning-layer entrypoint when you need to decide what should happen next for a feature.
 
@@ -57,7 +80,7 @@ Expected planning states:
 Recommended handoff:
 
 ```text
-guide-planning -> propose/evolve-feature/assess/reconcile-feature/discover/design/ui-flow/breakdown/review-planning/slice
+guide-scope -> guide-planning -> propose/evolve-feature/assess/reconcile-feature/discover/design/ui-flow/breakdown/review-planning/slice
 ```
 
 If the request is still speculative, cross-cutting, or not yet accepted as a canonical feature, route to `propose` first. That keeps early exploration under `docs/proposals/` instead of polluting the canonical `docs/features/` registry too early.

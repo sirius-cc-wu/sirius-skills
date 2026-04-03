@@ -27,7 +27,7 @@ The intended direction is:
 The managed repo-first skill set is grouped into:
 
 - repo utilities: `skills/bootstrap/`, `skills/commit/`, `skills/create-pr/`, `skills/simplify/`
-- planning layer: `skills/guide-planning/`, `skills/propose/`, `skills/evolve-feature/`, `skills/assess/`, `skills/reconcile-feature/`, `skills/discover/`, `skills/design/`, `skills/ui-flow/`, `skills/breakdown/`, `skills/review-planning/`, `skills/slice/`
+- planning layer: `skills/guide-scope/`, `skills/guide-planning/`, `skills/propose/`, `skills/evolve-feature/`, `skills/assess/`, `skills/reconcile-feature/`, `skills/discover/`, `skills/design/`, `skills/ui-flow/`, `skills/breakdown/`, `skills/review-planning/`, `skills/slice/`
 - execution layer: `skills/guide-execution/`, `skills/brief/`, `skills/blueprint/`, `skills/review-execution/`, `skills/close-slice/`
 
 If a project has no extra configuration, these skills should still work with generic conventions.
@@ -38,6 +38,7 @@ For the operational guide to using the skills together, see `SKILLS_METHODOLOGY.
 
 For repositories that use repo-first planning, the recommended short-name planning skills are:
 
+- `skills/guide-scope/`
 - `skills/guide-planning/`
 - `skills/propose/`
 - `skills/evolve-feature/`
@@ -52,7 +53,7 @@ For repositories that use repo-first planning, the recommended short-name planni
 
 These skills sit **before** the execution-slice skills:
 
-- planning layer: `guide-planning`, `propose`, `evolve-feature`, `assess`, `reconcile-feature`, `discover`, `design`, `ui-flow`, `breakdown`, `review-planning`, `slice`
+- planning layer: `guide-scope`, `guide-planning`, `propose`, `evolve-feature`, `assess`, `reconcile-feature`, `discover`, `design`, `ui-flow`, `breakdown`, `review-planning`, `slice`
 - execution layer: `guide-execution`, `brief`, `blueprint`, `review-execution`, `close-slice`
 
 
@@ -61,6 +62,7 @@ Recommended boundary:
 - keep goals, design, stories, decomposition, and increment plans in repo documents
 - keep executable slices and dependency tracking in the repository planning artifacts
 - bootstrap one execution slice per executable slice
+- use `guide-scope` as the optional scope-aware entrypoint when multi-scope routing or explicit scope choice matters
 - let `guide-planning` own feature-planning readiness and routing inside the planning layer
 - let `guide-execution` own slice readiness and state transitions within the execution layer
 
@@ -76,20 +78,21 @@ the active planning scope's `.skills/planning.json` defines a different
 
 Preferred repo workflow:
 
-1. `guide-planning` resolves the feature planning folder, validates planning readiness, and routes to the right planning skill.
-2. If the request is still speculative and should not become a canonical feature yet, `propose` creates a proposal folder under `docs/proposals/<proposal-slug>/`.
-3. If the request changes an existing feature rather than starting a new one, `evolve-feature` creates a feature-local change packet under `docs/features/<feature>/changes/<change-id>/`.
-4. `assess` inspects the canonical feature and writes change-scoped `impact-analysis.md` before change-local design starts.
-5. `discover` creates problem framing and initial story candidates.
-6. `design` turns that into architecture, interfaces, and risks.
-7. `ui-flow` adds optional UX or screen-flow artifacts.
-8. `breakdown` turns repo stories into directly executable work items and groups those slices into small demonstrable increments.
-9. `review-planning` reviews planning artifacts and slice definitions before execution slice bootstrap.
-10. `slice` validates execution-ready input, bootstraps a slice-scoped execution slice, and hands off to `guide-execution`.
-11. `guide-execution` routes slice-scoped execution through `brief` to capture slice intent and acceptance, then through `blueprint` to produce the final execution artifact. When `.skills/execution.json` enables `auto_start_implementation`, that handoff continues directly into implementation after the blueprint is marked ready.
-12. `review-execution` checks implementation and validation outcomes against the slice-scoped execution artifacts before closure.
-13. `close-slice` closes completed execution slices and records durable closure metadata.
-14. `reconcile-feature` folds an approved feature change packet back into canonical feature docs, verifies planned slices are complete, removes completed execution slices, removes the completed change packet, and leaves the canonical feature docs as the durable specification.
+1. In multi-scope repositories, `guide-scope` can resolve the active scope, stop on ambiguity, and hand off to `guide-planning`, `guide-execution`, or `bootstrap` without changing their ownership rules. In single-scope repositories it remains optional.
+2. `guide-planning` resolves the feature planning folder, validates planning readiness, and routes to the right planning skill.
+3. If the request is still speculative and should not become a canonical feature yet, `propose` creates a proposal folder under `docs/proposals/<proposal-slug>/`.
+4. If the request changes an existing feature rather than starting a new one, `evolve-feature` creates a feature-local change packet under `docs/features/<feature>/changes/<change-id>/`.
+5. `assess` inspects the canonical feature and writes change-scoped `impact-analysis.md` before change-local design starts.
+6. `discover` creates problem framing and initial story candidates.
+7. `design` turns that into architecture, interfaces, and risks.
+8. `ui-flow` adds optional UX or screen-flow artifacts.
+9. `breakdown` turns repo stories into directly executable work items and groups those slices into small demonstrable increments.
+10. `review-planning` reviews planning artifacts and slice definitions before execution slice bootstrap.
+11. `slice` validates execution-ready input, bootstraps a slice-scoped execution slice, and hands off to `guide-execution`.
+12. `guide-execution` routes slice-scoped execution through `brief` to capture slice intent and acceptance, then through `blueprint` to produce the final execution artifact. When `.skills/execution.json` enables `auto_start_implementation`, that handoff continues directly into implementation after the blueprint is marked ready.
+13. `review-execution` checks implementation and validation outcomes against the slice-scoped execution artifacts before closure.
+14. `close-slice` closes completed execution slices and records durable closure metadata.
+15. `reconcile-feature` folds an approved feature change packet back into canonical feature docs, verifies planned slices are complete, removes completed execution slices, removes the completed change packet, and leaves the canonical feature docs as the durable specification.
 
 In the repo-native flow, `guide-planning` owns feature-planning readiness and routing, `breakdown` owns repo-story decomposition, `review-planning` owns planning readiness review, `brief` owns the slice-scoped `brief.md`, `blueprint` owns the final slice-scoped execution plan and validation checklist, and `review-execution` owns the final implementation-versus-brief review before closure.
 
@@ -168,13 +171,14 @@ Example:
 
 Current Phase 1 usage:
 
+- `skills/guide-scope/SKILL.md` documents the optional scope-aware entrypoint for routing multi-scope work into planning, execution, or bootstrap
 - planning-layer skills resolve `.skills/planning.json` from the nearest scope, then fall back to the repository root when inside a Git worktree; `planning_dir` still defaults to `docs/features/<feature-slug>/`
 - `skills/propose/scripts/manage_proposals.py` reads the active scope's `.skills/planning.json` field `proposal_dir` when present and otherwise defaults to `docs/proposals/<proposal-slug>/`
 - `skills/guide-planning/scripts/manage_planning.py` reads the active scope's `.skills/planning.json` for `planning_dir` and maintains planning readiness metadata under `<feature_path>/.planning-meta.json`
 - `skills/design/SKILL.md` reads `.skills/planning.json` field `design_diagram_mode`; `embedded` keeps fenced PlantUML in `system-design.md`, while `linked_svg` writes `.puml` and `.svg` files under `<feature_path>/figures/` and links the SVGs from `system-design.md`
 - `skills/breakdown/scripts/scaffold_breakdown.py` uses `.skills/planning.json` field `planning_dir` during scaffolding when the file is present
-- `skills/slice/scripts/bootstrap_slice.py` can initialize `.skills/execution.json` with the generic `slices/` default (or an explicit `--slice-dir`) before delegating to execution-layer tooling
-- `skills/guide-execution/scripts/manage_execution.py` reads `.skills/execution.json` for `slice_dir`, `preferred_workflow`, and `auto_start_implementation`
+- `skills/slice/scripts/bootstrap_slice.py` resolves the nearest execution scope, reuses inherited scoped execution config when present, and only initializes `.skills/execution.json` locally when no execution config exists in the scope chain
+- `skills/guide-execution/scripts/manage_execution.py` resolves `.skills/execution.json`, `.skills/conventions.json`, and `slice_dir` from the active execution scope so nested scopes keep local slice registries and folders
 - when `auto_start_implementation` is `true`, `skills/guide-execution/scripts/manage_execution.py set-status <slice> blueprint_ready` auto-advances the slice into `execution_ready`
 - `skills/guide-execution/scripts/manage_execution.py` uses `branch_extract_pattern` during `add` when the file is present
 - `skills/commit/SKILL.md` documents how `commit_format` can override the generic default

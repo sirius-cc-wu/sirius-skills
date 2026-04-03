@@ -9,3 +9,4 @@
 | HSS-04-promotion-targeting | Support explicit cross-scope promotion targets | closed | 2026-04-04T04:03:51 | 2026-04-04T04:03:51 | slices/HSS-04-promotion-targeting-support-explicit-cross-scope-promotion-targets/ |
 | HSS-06-config-inheritance | Merge parent and child .skills config by scope | closed | 2026-04-04T04:22:07 | 2026-04-04T04:22:07 | slices/HSS-06-config-inheritance-merge-parent-and-child-skills-config-by-scope/ |
 | HSS-06-scoped-execution | Keep slices and execution registries local to the resolved scope | closed | 2026-04-04T04:37:40 | 2026-04-04T04:37:40 | slices/HSS-06-scoped-execution-keep-slices-and-execution-registries-local-to-the-resolved-scope/ |
+| HSS-05-guide-scope | Add one scope-aware entry skill | closed | 2026-04-04T04:45:19 | 2026-04-04T04:45:19 | slices/HSS-05-guide-scope-add-one-scope-aware-entry-skill/ |

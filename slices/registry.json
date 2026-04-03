@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "generated_at": "2026-04-04T04:37:40",
+  "generated_at": "2026-04-04T04:45:19",
   "slices": [
     {
       "id": "HSS-01-root-fallback",
@@ -69,6 +69,16 @@
       "path": "slices/HSS-06-scoped-execution-keep-slices-and-execution-registries-local-to-the-resolved-scope/",
       "updated_at": "2026-04-04T04:37:40",
       "closed_at": "2026-04-04T04:37:40",
+      "archived_at": null,
+      "relations": []
+    },
+    {
+      "id": "HSS-05-guide-scope",
+      "feature": "Add one scope-aware entry skill",
+      "status": "closed",
+      "path": "slices/HSS-05-guide-scope-add-one-scope-aware-entry-skill/",
+      "updated_at": "2026-04-04T04:45:19",
+      "closed_at": "2026-04-04T04:45:19",
       "archived_at": null,
       "relations": []
     }
