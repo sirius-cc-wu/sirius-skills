@@ -86,6 +86,7 @@ def test_add_creates_change_packet_and_metadata(tmp_path, monkeypatch):
     change_dir = feature_dir / "changes" / "replace-legacy-flow"
     metadata = json.loads((change_dir / ".feature-change-meta.json").read_text(encoding="utf-8"))
     registry = json.loads((feature_dir / "changes" / "registry.json").read_text(encoding="utf-8"))
+    discover = (change_dir / "discover.md").read_text(encoding="utf-8")
 
     assert metadata["change_id"] == "replace-legacy-flow"
     assert metadata["feature_slug"] == "checkout"
@@ -95,6 +96,9 @@ def test_add_creates_change_packet_and_metadata(tmp_path, monkeypatch):
     assert metadata["active_change"] is True
     assert (change_dir / "discover.md").exists()
     assert registry["changes"][0]["change_id"] == "replace-legacy-flow"
+    assert "## Change-local Execution Planning" in discover
+    assert "- Add or update `slice-planning.md` and `slice-traceability.md`" in discover
+    assert "- `slice-planning.md`\n- `slice-traceability.md`\n\n## Risks and Open Questions" not in discover
 
 
 def test_add_rejects_second_active_open_change(tmp_path, monkeypatch, capsys):

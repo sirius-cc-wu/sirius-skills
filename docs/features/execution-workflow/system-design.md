@@ -8,7 +8,7 @@ The execution workflow is a centralized slice system. `guide-execution` manages 
 
 - **Execution registry**: `<slice_dir>/README.md` and `registry.json`
 - **Slice metadata**: `<slice_path>/.slice-meta.json`
-- **Hidden archive**: `<slice_dir>/.archived/` used during feature completion for closed slices
+- **Hidden archive**: `<slice_dir>/.archived/` used during reviewed change completion for closed slices
 - **Intent artifact**: `brief.md`
 - **Execution artifact**: `blueprint.md`
 - **Requirements checklist**: `checklists/requirements.md`
@@ -27,7 +27,7 @@ The execution workflow is a centralized slice system. `guide-execution` manages 
 ## Constraints and Tradeoffs
 
 - Slice-scoped slices improve auditability but require stronger discipline to keep one work item per slice.
-- Closure is non-destructive, which preserves history at the cost of requiring a later feature-completion step to archive finished planning and slice artifacts.
+- Closure is non-destructive, which preserves history at the cost of requiring a later reconciliation step to archive finished slice artifacts.
 - Day-to-day execution context stays intentionally lightweight, reducing workflow overhead but requiring careful handoff discipline.
 
 ## Validation Strategy

@@ -216,8 +216,6 @@ def render_slice_planning(feature_slug: str, change_context: dict[str, object] |
         "  - `system-design.md`\n"
         "  - `ui-design.md` (if applicable)\n"
         f"  - canonical `{change_context['canonical_feature_path']}/user-stories.md`\n"
-        f"  - canonical `{change_context['canonical_feature_path']}/slice-planning.md`\n"
-        f"  - canonical `{change_context['canonical_feature_path']}/slice-traceability.md`\n"
     )
     template = template.replace(
         "- Planning sources:\n"
@@ -233,6 +231,7 @@ def render_slice_planning(feature_slug: str, change_context: dict[str, object] |
         "- Notes:\n"
         f"  - This is change-local breakdown for `{change_context['change_id']}` against canonical feature `{change_context['feature_slug']}`.\n"
         "  - Plan only the new or amended slices required by this change packet.\n"
+        "  - Keep this packet's `slice-planning.md` and `slice-traceability.md` as the execution-planning source of truth for the change.\n"
         "  - When a change supersedes existing canonical slices, record the affected baseline slice IDs in dependency or notes fields instead of reusing them as change-local slice IDs.\n",
         1,
     )
@@ -254,6 +253,7 @@ def render_slice_traceability(change_context: dict[str, object] | None = None) -
         f"- Change ID: `{change_context['change_id']}`\n"
         f"- Change type: `{change_context['change_type']}`\n"
         "- Use `Planned Slice IDs` for the new or amended slices defined by this change packet.\n"
+        "- Keep change-local traceability in this packet instead of reconciling it back into canonical feature breakdown docs.\n"
         "- Record superseded or narrowed canonical slice IDs in `Notes`, not `Execution Slice IDs`.\n"
     )
     return template.replace("## Conventions\n\n", notes + "\n## Conventions\n\n", 1)

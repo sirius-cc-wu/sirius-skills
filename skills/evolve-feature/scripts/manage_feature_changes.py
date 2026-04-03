@@ -413,7 +413,7 @@ def write_discover_stub(change_dir: str, feature_slug: str, change_id: str, chan
 
     title = change_id.replace("-", " ").strip().title()
     summary_line = summary or "Describe why the canonical feature needs to change."
-    content = f"# Discover: {title}\n\n## Target Feature\n\n- Feature: `{feature_slug}`\n- Change ID: `{change_id}`\n- Change Type: `{change_type}`\n\n## Problem\n\n{summary_line}\n\n## Requested Change\n\n- Describe the new or changed behavior.\n- Note whether this is additive, narrowing, superseding, or replacement work.\n\n## Affected Baseline Artifacts\n\n- `discover.md`\n- `system-design.md`\n- `slice-planning.md`\n- `slice-traceability.md`\n\n## Risks and Open Questions\n\n- What existing stories, slices, or validation paths might this change affect?\n"  # noqa: E501
+    content = f"# Discover: {title}\n\n## Target Feature\n\n- Feature: `{feature_slug}`\n- Change ID: `{change_id}`\n- Change Type: `{change_type}`\n\n## Problem\n\n{summary_line}\n\n## Requested Change\n\n- Describe the new or changed behavior.\n- Note whether this is additive, narrowing, superseding, or replacement work.\n\n## Affected Baseline Artifacts\n\n- `discover.md`\n- `system-design.md`\n\n## Change-local Execution Planning\n\n- Add or update `slice-planning.md` and `slice-traceability.md` inside this change packet for any new execution work.\n- Treat canonical feature breakdown docs as historical context unless impact analysis explicitly says they must change.\n\n## Risks and Open Questions\n\n- What existing stories, slices, or validation paths might this change affect?\n"  # noqa: E501
     with open(discover_path, "w", encoding="utf-8") as f:
         f.write(content)
 

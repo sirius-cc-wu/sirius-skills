@@ -196,6 +196,8 @@ Reasoning:
 - **`reconcile-feature`** (new)
   - updates canonical feature docs explicitly
   - records backlinks to the closed change packet
+  - keeps change-local `slice-planning.md` and `slice-traceability.md` in the
+    retained packet instead of reconciling them into canonical breakdown docs
   - optionally appends to a feature-local change history section or file
 
 - **`slice` / `guide-execution`**
@@ -369,8 +371,6 @@ package "Feature Change Layer" {
 [reconcile-feature] --> Reconcile
 [reconcile-feature] --> CanonDiscover
 [reconcile-feature] --> CanonDesign
-[reconcile-feature] --> CanonSlicePlan
-[reconcile-feature] --> CanonTrace
 [slice] --> [guide-execution]
 
 ChangeRegistry --> ChangeMeta

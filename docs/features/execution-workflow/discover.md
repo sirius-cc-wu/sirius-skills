@@ -40,7 +40,7 @@ The repository provides a slice-scoped execution workflow, but that workflow spa
 - `skills/brief/templates/brief-template.md` defines the slice brief structure.
 - `skills/blueprint/templates/plan-template.md` defines implementation packets and validation mapping.
 - `skills/close-slice/scripts/close_slice.py` closes slices and records durable closure metadata.
-- `skills/reconcile-feature/scripts/reconcile_feature_change.py` is the feature-level point that can archive completed slices and publish retained history once planned slices are done.
+- `skills/reconcile-feature/scripts/reconcile_feature_change.py` is the feature-level point that can archive completed slices and publish retained history once a reviewed change packet's planned slices are done.
 - `skills/commit/` and `skills/create-pr/` enforce conventions and checklist completion around execution work.
 
 ## Success Criteria

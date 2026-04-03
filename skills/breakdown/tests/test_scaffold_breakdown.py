@@ -216,10 +216,20 @@ def test_scaffold_change_packet_seeds_change_context(tmp_path, monkeypatch):
     assert "- `docs/features/checkout/discover.md`" in slice_planning
     assert "canonical `docs/features/checkout/user-stories.md`" in slice_planning
     assert "Plan only the new or amended slices required by this change packet." in slice_planning
+    assert (
+        "Keep this packet's `slice-planning.md` and `slice-traceability.md` as the execution-planning source of truth for the change."
+        in slice_planning
+    )
+    assert "canonical `docs/features/checkout/slice-planning.md`" not in slice_planning
+    assert "canonical `docs/features/checkout/slice-traceability.md`" not in slice_planning
 
     assert "## Change Context" in slice_traceability
     assert "- Canonical feature: `checkout`" in slice_traceability
     assert "- Change ID: `replace-legacy-flow`" in slice_traceability
+    assert (
+        "Keep change-local traceability in this packet instead of reconciling it back into canonical feature breakdown docs."
+        in slice_traceability
+    )
     assert "Record superseded or narrowed canonical slice IDs in `Notes`" in slice_traceability
 
 

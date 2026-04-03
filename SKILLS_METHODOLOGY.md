@@ -86,12 +86,13 @@ guide-planning -> evolve-feature -> assess -> design -> breakdown
 ### 0c. Reconcile approved feature changes
 
 Use `reconcile-feature` after a reviewed feature change packet has been executed
-and the approved delta needs to be folded back into the canonical planning docs.
+and the approved delta needs to be folded back into the canonical feature docs.
 
 Its job is to:
 
 - update canonical feature docs with stable reconciliation blocks and backlinks
 - write `reconciliation.md` inside the retained change packet
+- keep change-local breakdown artifacts in the packet as the durable execution-planning record for that change
 - optionally publish feature-local change history after planned slices are complete
 - close the change packet through the existing feature-change lifecycle
 
@@ -213,6 +214,8 @@ python3 skills/breakdown/scripts/scaffold_breakdown.py \
 When the target is a real change packet, the scaffold seeds change context from
 `.feature-change-meta.json` and `impact-analysis.md` so the breakdown artifacts
 stay tied to the affected canonical stories, slices, and baseline docs.
+Those breakdown artifacts remain change-local; they are not default reconciliation
+targets for the canonical feature's `slice-planning.md` or `slice-traceability.md`.
 
 Review checkpoint:
 
@@ -382,7 +385,7 @@ Important closure rules:
 - closing a slice does not merge or delete the original `brief.md` or `blueprint.md`; older slices may also retain `slices.md`
 - closure metadata belongs in the slice system itself
 
-Feature-level cleanup happens later. Once all slices listed in planning are closed, `reconcile-feature` can archive those slices, archive detailed planning docs, and publish retained feature history as part of feature completion.
+Feature-level cleanup happens later. Once all slices listed in a reviewed change packet are closed, `reconcile-feature` can archive those slices and publish retained feature history while leaving the change-local planning docs in place.
 
 ## Recommended Repository Layout
 

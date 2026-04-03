@@ -107,7 +107,7 @@ that never reconcile back into the repository planning model.
 - `guide-execution` and `close-slice` already support durable execution closure
   and relation tracking at the slice layer.
 - `reconcile-feature` is the feature-level place where retained history and
-  feature-completion cleanup can happen without deleting source artifacts.
+  reviewed-change cleanup can happen without deleting source artifacts.
 
 ## Assumptions
 
