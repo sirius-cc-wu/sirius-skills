@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "generated_at": "2026-04-04T03:42:38",
+  "generated_at": "2026-04-04T03:47:16",
   "slices": [
     {
       "id": "HSS-01-root-fallback",
@@ -19,6 +19,16 @@
       "path": "slices/HSS-02-local-registries-keep-planning-and-proposal-registries-local-to-each-scope/",
       "updated_at": "2026-04-04T03:42:38",
       "closed_at": "2026-04-04T03:42:38",
+      "archived_at": null,
+      "relations": []
+    },
+    {
+      "id": "HSS-03-nearest-scope",
+      "feature": "Default CLI operations to the nearest enclosing scope",
+      "status": "closed",
+      "path": "slices/HSS-03-nearest-scope-default-cli-operations-to-the-nearest-enclosing-scope/",
+      "updated_at": "2026-04-04T03:47:16",
+      "closed_at": "2026-04-04T03:47:16",
       "archived_at": null,
       "relations": []
     }

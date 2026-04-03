@@ -192,6 +192,55 @@ def test_child_scope_feature_registry_stays_local(tmp_path, monkeypatch):
     ]
 
 
+def test_nested_child_directory_uses_nearest_scope_and_sibling_path_falls_back_to_root(
+    tmp_path, monkeypatch
+):
+    module = load_manage_planning_module()
+    write_planning_config(tmp_path)
+
+    child_scope = tmp_path / "apps" / "payments"
+    write_planning_config(child_scope)
+
+    child_workspace = child_scope / "src" / "ui"
+    child_workspace.mkdir(parents=True)
+    sibling_workspace = tmp_path / "apps" / "ops"
+    sibling_workspace.mkdir(parents=True)
+
+    monkeypatch.chdir(child_workspace)
+    assert run_cli(module, monkeypatch, "add", "child-feature") == 0
+
+    monkeypatch.chdir(sibling_workspace)
+    assert run_cli(module, monkeypatch, "add", "root-feature") == 0
+
+    child_registry = json.loads(
+        (child_scope / "docs" / "features" / "registry.json").read_text(encoding="utf-8")
+    )
+    root_registry = json.loads(
+        (tmp_path / "docs" / "features" / "registry.json").read_text(encoding="utf-8")
+    )
+
+    assert child_registry["features"] == [
+        {
+            "feature": "child-feature",
+            "status": "discovery_pending",
+            "updated_at": child_registry["features"][0]["updated_at"],
+            "path": "docs/features/child-feature/",
+        }
+    ]
+    assert root_registry["features"] == [
+        {
+            "feature": "root-feature",
+            "status": "discovery_pending",
+            "updated_at": root_registry["features"][0]["updated_at"],
+            "path": "docs/features/root-feature/",
+        }
+    ]
+    assert (child_scope / "docs" / "features" / "child-feature" / ".planning-meta.json").exists()
+    assert (tmp_path / "docs" / "features" / "root-feature" / ".planning-meta.json").exists()
+    assert not (tmp_path / "docs" / "features" / "child-feature").exists()
+    assert not (child_scope / "docs" / "features" / "root-feature").exists()
+
+
 def test_discovery_ready_requires_discover_file(tmp_path, monkeypatch, capsys):
     module = load_manage_planning_module()
     monkeypatch.chdir(tmp_path)

@@ -182,6 +182,55 @@ def test_child_scope_proposal_registry_stays_local(tmp_path, monkeypatch):
     ]
 
 
+def test_nested_child_directory_uses_nearest_scope_and_sibling_path_falls_back_to_root(
+    tmp_path, monkeypatch
+):
+    module = load_module()
+    write_planning_config(tmp_path)
+
+    child_scope = tmp_path / "apps" / "payments"
+    write_planning_config(child_scope)
+
+    child_workspace = child_scope / "src" / "ui"
+    child_workspace.mkdir(parents=True)
+    sibling_workspace = tmp_path / "apps" / "ops"
+    sibling_workspace.mkdir(parents=True)
+
+    monkeypatch.chdir(child_workspace)
+    assert run_cli(module, monkeypatch, "add", "child-proposal") == 0
+
+    monkeypatch.chdir(sibling_workspace)
+    assert run_cli(module, monkeypatch, "add", "root-proposal") == 0
+
+    child_registry = json.loads(
+        (child_scope / "docs" / "proposals" / "registry.json").read_text(encoding="utf-8")
+    )
+    root_registry = json.loads(
+        (tmp_path / "docs" / "proposals" / "registry.json").read_text(encoding="utf-8")
+    )
+
+    assert child_registry["proposals"] == [
+        {
+            "proposal": "child-proposal",
+            "status": "draft",
+            "updated_at": child_registry["proposals"][0]["updated_at"],
+            "path": "docs/proposals/child-proposal/",
+        }
+    ]
+    assert root_registry["proposals"] == [
+        {
+            "proposal": "root-proposal",
+            "status": "draft",
+            "updated_at": root_registry["proposals"][0]["updated_at"],
+            "path": "docs/proposals/root-proposal/",
+        }
+    ]
+    assert (child_scope / "docs" / "proposals" / "child-proposal" / ".proposal-meta.json").exists()
+    assert (tmp_path / "docs" / "proposals" / "root-proposal" / ".proposal-meta.json").exists()
+    assert not (tmp_path / "docs" / "proposals" / "child-proposal").exists()
+    assert not (child_scope / "docs" / "proposals" / "root-proposal").exists()
+
+
 def test_reviewed_requires_review_note(tmp_path, monkeypatch, capsys):
     module = load_module()
     monkeypatch.chdir(tmp_path)
