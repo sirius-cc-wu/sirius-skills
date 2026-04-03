@@ -67,7 +67,7 @@ Stored in `docs/features/<feature-slug>/`
 - `brief`: Captures slice-scoped acceptance criteria and requirements.
 - `blueprint`: Detailed design, implementation packets, and validation steps.
 - `review-execution`: Validates implementation against the brief/blueprint.
-- `close-slice`: Records closure metadata and (optionally) publishes history.
+- `close-slice`: Records closure metadata for one execution slice.
 
 ---
 
@@ -90,7 +90,7 @@ Stored in `slices/<slice-id>-<slug>/`
 6.  **Bootstrap**: `slice` creates the execution folder.
 7.  **Execute**: `brief` -> `blueprint` -> (Code) -> `review-execution`.
 8.  **Close**: `close-slice` marks the slice done and preserves the execution context.
-9.  **Reconcile Feature Changes**: `reconcile-feature` folds approved change-packet results back into the canonical feature docs.
+9.  **Reconcile Feature Changes**: `reconcile-feature` folds approved change-packet results back into the canonical feature docs, then handles feature-level archive/publish work once all planned slices are closed.
 
 ---
 

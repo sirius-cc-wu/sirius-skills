@@ -100,8 +100,8 @@ skill-first, generic-first, and agent-neutral direction.
   plugin system.
 - `review-planning` already provides a planning-readiness checkpoint, so new
   verification behavior should complement it rather than duplicate it.
-- `close-slice` already contains an example of optional publishing behavior,
-  which is useful precedent for opt-in artifact rollup or sync patterns.
+- `reconcile-feature` now provides the feature-level precedent for retained
+  history publication and post-completion artifact cleanup.
 
 ## Assumptions
 

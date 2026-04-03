@@ -84,12 +84,12 @@ Preferred repo workflow:
 10. `slice` validates execution-ready input, bootstraps a slice-scoped execution slice, and hands off to `guide-execution`.
 11. `guide-execution` routes slice-scoped execution through `brief` to capture slice intent and acceptance, then through `blueprint` to produce the final execution artifact. When `.skills/execution.json` enables `auto_start_implementation`, that handoff continues directly into implementation after the blueprint is marked ready.
 12. `review-execution` checks implementation and validation outcomes against the slice-scoped execution artifacts before closure.
-13. `close-slice` closes completed execution slices and can optionally publish a project-local summary.
-14. `reconcile-feature` folds an approved feature change packet back into the canonical planning docs, writes `reconciliation.md`, publishes retained change history, and closes the change packet.
+13. `close-slice` closes completed execution slices and records durable closure metadata.
+14. `reconcile-feature` folds an approved feature change packet back into the canonical planning docs, verifies planned slices are complete, archives completed execution/planning artifacts, writes `reconciliation.md`, publishes retained change history, and closes the change packet.
 
 In the repo-native flow, `guide-planning` owns feature-planning readiness and routing, `breakdown` owns repo-story decomposition, `review-planning` owns planning readiness review, `brief` owns the slice-scoped `brief.md`, `blueprint` owns the final slice-scoped execution plan and validation checklist, and `review-execution` owns the final implementation-versus-brief review before closure.
 
-Execution follows the same pattern: `guide-execution` owns routing, readiness, and registry state, while `brief`, `blueprint`, `review-execution`, and `close-slice` own their artifacts and outputs. With `auto_start_implementation`, `guide-execution` can promote a slice from `blueprint_ready` to `execution_ready` as the signal to begin coding immediately.
+Execution follows the same pattern: `guide-execution` owns routing, readiness, and registry state, while `brief`, `blueprint`, `review-execution`, and `close-slice` own slice-scoped artifacts and closure metadata. With `auto_start_implementation`, `guide-execution` can promote a slice from `blueprint_ready` to `execution_ready` as the signal to begin coding immediately.
 
 By default, new execution slices are created under `slices/` unless `.skills/execution.json` overrides the location.
 
@@ -110,20 +110,9 @@ The `guide-execution` workflow now keeps three complementary artifacts in sync:
 
 The machine-readable metadata can also store explicit cross-slice relations such as `supersedes`, `invalidates`, `narrows`, and `replaces_partially`, with reciprocal backlinks and optional soft selectors for story titles, requirement IDs, or freeform selectors.
 
-Closed slices are retained non-destructively. `sirius-skills` does not merge or delete the original `brief.md`/`blueprint.md` artifacts when a slice closes; instead it records closure durably and can optionally move the closed slice into a hidden archive directory while preserving its metadata and path in the registry.
+Closed slices are retained non-destructively. `sirius-skills` does not merge or delete the original `brief.md`/`blueprint.md` artifacts when a slice closes; instead it records closure durably in the slice registry and metadata.
 
-If a project wants a canonical rollup document, `skills/close-slice/` can optionally publish closed-slice summaries into a project-local history file such as `docs/slice-history.md`, driven by explicit command arguments or `.skills/plugins/spec-publish.json`.
-
-If a project wants closed slices out of the working set, `skills/close-slice/` can also optionally archive them into a hidden directory such as `<slice_dir>/.archived/`, driven by `--archive`, `--archive-dir`, or `.skills/plugins/spec-archive.json`.
-
-The published entry can include:
-
-- backlinks to the retained `brief.md` / `blueprint.md` artifacts, plus any legacy `slices.md`
-- explicit relation summaries such as which older slice or story scope is superseded
-- source issue links when `.slice-meta.json` and `.skills/conventions.json` provide them
-- implementation verification highlights inferred from `blueprint.md` and any legacy `slices.md`
-
-For a starting point, see `skills/close-slice/assets/spec-publish.example.json`.
+Archive or publish decisions belong to feature completion, not to per-slice closure. `reconcile-feature` is the feature-level step that can verify every planned slice is closed, archive those slices into the hidden slice archive, condense `slice-planning.md` / `slice-traceability.md` into archived copies plus concise stubs, and publish retained feature-local history.
 
 To keep relation metadata healthy over time, `skills/guide-execution/scripts/manage_execution.py` also provides `audit-relations`, which checks for missing targets and missing reciprocal links.
 ## Optional project configuration

@@ -2,17 +2,17 @@
 
 ## Overview
 
-The execution workflow is a centralized slice system. `guide-execution` manages slice registry state and readiness transitions, while `brief`, `plan`, `review-execution`, and `close-slice` own the slice-scoped artifacts and review outcomes.
+The execution workflow is a centralized slice system. `guide-execution` manages slice registry state and readiness transitions, while `brief`, `plan`, `review-execution`, and `close-slice` own the slice-scoped artifacts and review outcomes. Feature-level archive and publish behavior happens later during reconciliation once planned slices are complete.
 
 ## Key Components
 
 - **Execution registry**: `<slice_dir>/README.md` and `registry.json`
 - **Slice metadata**: `<slice_path>/.slice-meta.json`
-- **Hidden archive**: optional `<slice_dir>/.archived/` or configured archive target for closed slices
+- **Hidden archive**: `<slice_dir>/.archived/` used during feature completion for closed slices
 - **Intent artifact**: `brief.md`
 - **Execution artifact**: `blueprint.md`
 - **Requirements checklist**: `checklists/requirements.md`
-- **Closure publisher**: `close_slice.py` with optional project-local publish target
+- **Feature completion publisher**: `reconcile_feature_change.py` with retained feature-local history output
 
 ## Interfaces and Responsibilities
 
@@ -22,19 +22,19 @@ The execution workflow is a centralized slice system. `guide-execution` manages 
 - `brief` owns `brief.md` and `checklists/requirements.md`.
 - `blueprint` owns `blueprint.md`, requirement traceability, and validation steps.
 - `review-execution` compares implementation results with the brief and plan.
-- `close-slice` updates metadata and optionally archives or publishes closure summaries.
+- `close-slice` updates closure metadata.
 
 ## Constraints and Tradeoffs
 
 - Slice-scoped slices improve auditability but require stronger discipline to keep one work item per slice.
-- Closure is non-destructive, which preserves history at the cost of leaving more retained artifacts in the repo unless teams opt into hidden-directory archiving.
+- Closure is non-destructive, which preserves history at the cost of requiring a later feature-completion step to archive finished planning and slice artifacts.
 - Day-to-day execution context stays intentionally lightweight, reducing workflow overhead but requiring careful handoff discipline.
 
 ## Validation Strategy
 
 - Use `skills/slice/tests/test_bootstrap_slice.py` for slice bootstrap behavior.
 - Use `skills/guide-execution/tests/test_manage_execution.py` for execution lifecycle behavior.
-- Use `skills/close-slice/tests/test_close_slice.py` for publication and relation behavior.
+- Use `skills/close-slice/tests/test_close_slice.py` for closure and relation behavior.
 - Validate slices with `python3 skills/guide-execution/scripts/manage_execution.py validate-slice <slice-id>`.
 
 ## PlantUML
@@ -47,6 +47,7 @@ package "Execution Layer" {
   [blueprint]
   [review-execution]
   [close-slice]
+  [reconcile-feature]
 }
 
 database "<slice_dir>/registry.json" as Registry
@@ -63,6 +64,7 @@ file "requirements.md" as Requirements
 [guide-execution] --> [blueprint]
 [guide-execution] --> [review-execution]
 [guide-execution] --> [close-slice]
+[close-slice] --> [reconcile-feature]
 [brief] --> Brief
 [brief] --> Requirements
 [blueprint] --> PlanDoc
@@ -70,6 +72,6 @@ file "requirements.md" as Requirements
 [review-execution] --> PlanDoc
 [close-slice] --> Meta
 [close-slice] --> Registry
-[close-slice] --> Archive
+[reconcile-feature] --> Archive
 @enduml
 ```

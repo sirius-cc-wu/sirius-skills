@@ -32,7 +32,7 @@
 | --- | --- | --- | --- | --- | --- |
 | I1 | Execution slice bootstrap | EW-01, EW-02 | EW-01-bootstrap, EW-02-brief, EW-02-checklist | A new work item can produce a valid slice, `brief.md`, and requirements checklist. | Simplest executable path |
 | I2 | Ready-to-code execution plan | EW-03 | EW-03-plan, EW-03-gates | A slice can advance to `execution_ready` with traceable packets and validation steps. | Depends on I1 |
-| I3 | Durable review and closure | EW-04 | EW-04-review, EW-04-relations, EW-04-close | A completed slice can be reviewed, related to older slices, and published non-destructively. | Depends on I2 |
+| I3 | Durable review and closure | EW-04 | EW-04-review, EW-04-relations, EW-04-close | A completed slice can be reviewed, related to older slices, and closed with durable metadata. | Depends on I2 |
 
 ## 4. Execution Slice Backlog
 
@@ -45,7 +45,7 @@
 | EW-03-gates | EW-03 | Enforce plan readiness transitions | Validate plan presence and readiness state progression. | `skills/guide-execution/scripts/manage_execution.py` | primary | `pytest -q skills/guide-execution/tests/test_manage_execution.py` | create slice | EW-03-plan | yes |
 | EW-04-review | EW-04 | Review implementation against execution artifacts | Keep review guidance aligned with brief-to-implementation comparisons. | `skills/review-execution/SKILL.md` | primary | Review workflow docs for consistent review boundary | create slice | EW-03-gates | yes |
 | EW-04-relations | EW-04 | Record durable slice relations | Maintain relation types, scoping, and reciprocal integrity. | `skills/guide-execution/scripts/manage_execution.py` | primary | `pytest -q skills/guide-execution/tests/test_manage_execution.py` | create slice | EW-04-review | yes |
-| EW-04-close | EW-04 | Close and publish slices non-destructively | Record closure metadata and optional publication output. | `skills/close-slice/scripts/close_slice.py` | primary | `pytest -q skills/close-slice/tests/test_close_slice.py` | create slice | EW-04-relations | yes |
+| EW-04-close | EW-04 | Close slices with durable metadata | Record closure metadata and relation-safe completion output. | `skills/close-slice/scripts/close_slice.py` | primary | `pytest -q skills/close-slice/tests/test_close_slice.py` | create slice | EW-04-relations | yes |
 
 ## 5. Dependency Notes
 
@@ -54,7 +54,7 @@
 - Parallel-safe slices: none recommended; the artifacts and state transitions are tightly coupled.
 - Increment ordering: I1 -> I2 -> I3.
 - Lane owners and handoffs: slice -> guide-execution -> brief/plan -> review-execution -> close-slice.
-- Integration checkpoints: validate-slice before review and before closure publication.
+- Integration checkpoints: validate-slice before review and before final slice closure.
 
 ## 6. Bootstrap Order
 

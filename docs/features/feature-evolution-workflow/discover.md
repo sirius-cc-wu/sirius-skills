@@ -106,8 +106,8 @@ that never reconcile back into the repository planning model.
   repository planning artifacts.
 - `guide-execution` and `close-slice` already support durable execution closure
   and relation tracking at the slice layer.
-- `close-slice` provides precedent for optional publishing and history-oriented
-  output without deleting source artifacts.
+- `reconcile-feature` is the feature-level place where retained history and
+  feature-completion cleanup can happen without deleting source artifacts.
 
 ## Assumptions
 

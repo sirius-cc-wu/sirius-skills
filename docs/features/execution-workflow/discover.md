@@ -9,7 +9,7 @@ The repository provides a slice-scoped execution workflow, but that workflow spa
 - Bootstrap one slice per execution-ready work item.
 - Capture slice intent in `brief.md` and make execution sequencing explicit in `blueprint.md`.
 - Keep slice readiness separate from day-to-day implementation progress.
-- Preserve non-destructive closure and relation metadata for auditing and historical publishing.
+- Preserve non-destructive closure and relation metadata for later feature-level archival and historical publishing.
 
 ## Non-Goals
 
@@ -23,7 +23,7 @@ The repository provides a slice-scoped execution workflow, but that workflow spa
 - Slice planner producing implementation packets and validation.
 - Implementation agent executing a ready slice.
 - Reviewer checking brief-to-implementation alignment.
-- Closure owner publishing or recording slice closure.
+- Closure owner recording slice closure.
 
 ## Constraints
 
@@ -32,7 +32,6 @@ The repository provides a slice-scoped execution workflow, but that workflow spa
 - When `.skills/execution.json` sets `auto_start_implementation` to `true`, reaching `blueprint_ready` should immediately hand off into implementation and advance the slice to `execution_ready`.
 - `guide-execution` owns readiness and registry state; teams should not invent extra registry states for day-to-day progress.
 - Closed slices retain `brief.md`, `blueprint.md`, and any legacy `slices.md`.
-- Closed slices may be moved into a hidden archive directory, but their registry entry and metadata must still resolve them.
 - Relations such as `supersedes` and `replaces_partially` are durable metadata, not transient notes.
 
 ## Confirmed Signals in Repo
@@ -40,8 +39,8 @@ The repository provides a slice-scoped execution workflow, but that workflow spa
 - `skills/guide-execution/scripts/manage_execution.py` manages registry, status updates, and relations.
 - `skills/brief/templates/brief-template.md` defines the slice brief structure.
 - `skills/blueprint/templates/plan-template.md` defines implementation packets and validation mapping.
-- `skills/close-slice/scripts/close_slice.py` publishes non-destructive closure summaries.
-- `skills/close-slice/scripts/close_slice.py` can also archive closed slices into a hidden directory.
+- `skills/close-slice/scripts/close_slice.py` closes slices and records durable closure metadata.
+- `skills/reconcile-feature/scripts/reconcile_feature_change.py` is the feature-level point that can archive completed slices and publish retained history once planned slices are done.
 - `skills/commit/` and `skills/create-pr/` enforce conventions and checklist completion around execution work.
 
 ## Success Criteria

@@ -92,7 +92,7 @@ Its job is to:
 
 - update canonical feature docs with stable reconciliation blocks and backlinks
 - write `reconciliation.md` inside the retained change packet
-- optionally publish feature-local change history
+- optionally publish feature-local change history after planned slices are complete
 - close the change packet through the existing feature-change lifecycle
 
 Recommended handoff:
@@ -308,7 +308,8 @@ Within that execution layer:
 - `blueprint` converts that slice-scoped brief into the final implementation packets, traceability, validation steps, and PlantUML detailed design needed for execution
 - when `.skills/execution.json` sets `auto_start_implementation` to `true`, marking the blueprint ready should immediately advance the slice into `execution_ready` and continue into repository implementation work
 - `review-execution` owns the explicit implementation-versus-brief review outcome
-- `close-slice` owns closure metadata and any optional publication output
+- `close-slice` owns slice closure metadata
+- `reconcile-feature` owns feature-level archive/publish behavior after all planned slices are done
 
 Keep the boundary explicit:
 
@@ -367,8 +368,6 @@ Its job is to:
 
 - validate that the slice is ready to close
 - record durable closure metadata without deleting the original artifacts
-- optionally archive the closed slice into a hidden directory while keeping the registry path current
-- optionally publish a project-local summary entry such as `docs/slice-history.md` or `CHANGELOG.md`
 - capture durable feedback that should improve future briefs, prompts, or validation harnesses
 
 Recommended handoff:
@@ -380,9 +379,10 @@ review-execution complete -> close-slice
 Important closure rules:
 
 - closing a slice should happen after required review, validation, and brief feedback loops are complete
-- closing a slice does not merge or delete the original `brief.md` or `blueprint.md`; older slices may also retain `slices.md`, and optional archiving should relocate the folder without rewriting those artifacts
-- publishing is optional and project-local
+- closing a slice does not merge or delete the original `brief.md` or `blueprint.md`; older slices may also retain `slices.md`
 - closure metadata belongs in the slice system itself
+
+Feature-level cleanup happens later. Once all slices listed in planning are closed, `reconcile-feature` can archive those slices, archive detailed planning docs, and publish retained feature history as part of feature completion.
 
 ## Recommended Repository Layout
 
