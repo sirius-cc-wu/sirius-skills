@@ -263,6 +263,16 @@ Its job is to:
 - record durable findings in the planning docs already used by the team
 - confirm whether the work is ready for `slice` or needs another planning pass
 
+It can review either canonical feature planning or a selected feature change packet.
+For change packets, the review should center on the change-local `discover.md`,
+optional `impact-analysis.md`, `system-design.md`, `slice-planning.md`, and
+`slice-traceability.md`, while using the canonical feature docs only as baseline
+context for the delta.
+
+When the review target is a change packet, write findings back into the
+change-local docs and confirm the planned slices represent only the new or
+amended work required by that change.
+
 Recommended handoff:
 
 ```text

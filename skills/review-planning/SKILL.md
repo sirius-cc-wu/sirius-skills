@@ -1,11 +1,16 @@
 ---
 name: review-planning
-description: Reviews discovery, design, and breakdown artifacts for readiness before execution slice bootstrap.
+description: Reviews discovery, design, and breakdown artifacts for readiness before execution slice bootstrap, including change-packet planning.
 ---
 
 # Review Planning
 
 Use this skill after `discover`, `design`, or `breakdown` when the planning artifacts need an explicit readiness review before bootstrapping slice-scoped execution slices.
+
+It applies to both:
+
+- canonical feature planning under `<planning_dir>/<feature-slug>/`
+- a selected feature change packet under `<planning_dir>/<feature-slug>/changes/<change-id>/`
 
 ## Responsibilities
 
@@ -17,16 +22,18 @@ Use this skill after `discover`, `design`, or `breakdown` when the planning arti
 ## Preferred Input
 
 - `<feature_path>/discover.md`
+- optional `<feature_path>/impact-analysis.md` when reviewing a change packet
 - `<feature_path>/system-design.md`
 - optional `<feature_path>/ui-design.md`
 - `<feature_path>/slice-planning.md`
 - `<feature_path>/slice-traceability.md`
 - linked backlog context when available
 
-Resolve `<feature_path>` from the repository planning layout:
+Resolve `<feature_path>` as either:
 
 ```text
 <planning_dir>/<feature-slug>/
+<planning_dir>/<feature-slug>/changes/<change-id>/
 ```
 
 - If `.skills/planning.json` defines `planning_dir`, use that as `<planning_dir>`.
@@ -44,17 +51,21 @@ Resolve `<feature_path>` from the repository planning layout:
 - Make sure every execution-ready slice is small enough for one execution slice and has a concrete validation path.
 - Verify dependencies, sequencing, parallel-safe lanes, and integration checkpoints are explicit where they matter.
 - Distinguish blocking findings from follow-up improvements so handoff decisions stay clear.
+- For change packets, review the change-local planning docs against `impact-analysis.md` and the intended delta rather than treating canonical feature breakdown as the execution backlog for the change.
+- For change packets, confirm the planned slices represent only the new or amended work required by the change and keep superseded canonical slice IDs in notes or dependency references.
 
 ## Workflow
 
-1. Read the current planning artifacts and any linked backlog context.
-2. Compare discovery intent, design direction, and breakdown outputs for contradictions or missing handoff details.
-3. Record findings directly in the planning docs already used by the team.
-4. Update the affected planning artifacts so the reviewed state is durable.
-5. Stop when the work is ready for `slice` or return it to `discover`, `design`, or `breakdown` as needed.
+1. Resolve whether the review target is canonical feature planning or a selected feature change packet.
+2. Read the current planning artifacts and any linked backlog context. For change packets, also read `impact-analysis.md` and the canonical feature context needed to evaluate the delta.
+3. Compare discovery intent, design direction, and breakdown outputs for contradictions or missing handoff details.
+4. Record findings directly in the planning docs already used by the team. For change packets, write those findings back into the change-local docs under the packet.
+5. Update the affected planning artifacts so the reviewed state is durable.
+6. Stop when the work is ready for `slice` or return it to `discover`, `design`, or `breakdown` as needed.
 
 ## Guardrails
 
 - Do not create slice-scoped execution slices directly; hand off to `slice` when ready.
 - Do not invent new lifecycle states for review; use findings and explicit readiness notes instead.
 - Do not leave blocking review outcomes only in chat or transient notes.
+- When reviewing a change packet, do not move the review outcome into canonical `slice-planning.md` or `slice-traceability.md` unless the planning change intentionally belongs in the canonical feature docs.
