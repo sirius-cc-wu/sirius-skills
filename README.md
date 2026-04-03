@@ -65,10 +65,14 @@ Recommended boundary:
 - let `guide-execution` own slice readiness and state transitions within the execution layer
 
 Feature-local planning defaults to `docs/features/<feature-slug>/` unless
-`.skills/planning.json` defines a different `planning_dir`.
+the active planning scope's `.skills/planning.json` defines a different
+`planning_dir`. Planning-layer helpers first look for the nearest
+`.skills/planning.json` in ancestor directories, then fall back to the
+repository root when inside a Git worktree.
 
 Proposal staging defaults to `docs/proposals/<proposal-slug>/` unless
-`.skills/planning.json` defines a different `proposal_dir`.
+the active planning scope's `.skills/planning.json` defines a different
+`proposal_dir`.
 
 Preferred repo workflow:
 
@@ -164,9 +168,9 @@ Example:
 
 Current Phase 1 usage:
 
-- planning-layer skills resolve `<feature_path>` from `.skills/planning.json` field `planning_dir` when the file is present, otherwise they default to `docs/features/<feature-slug>/`
-- `skills/propose/scripts/manage_proposals.py` reads `.skills/planning.json` field `proposal_dir` when present and otherwise defaults to `docs/proposals/<proposal-slug>/`
-- `skills/guide-planning/scripts/manage_planning.py` reads `.skills/planning.json` for `planning_dir` and maintains planning readiness metadata under `<feature_path>/.planning-meta.json`
+- planning-layer skills resolve `.skills/planning.json` from the nearest scope, then fall back to the repository root when inside a Git worktree; `planning_dir` still defaults to `docs/features/<feature-slug>/`
+- `skills/propose/scripts/manage_proposals.py` reads the active scope's `.skills/planning.json` field `proposal_dir` when present and otherwise defaults to `docs/proposals/<proposal-slug>/`
+- `skills/guide-planning/scripts/manage_planning.py` reads the active scope's `.skills/planning.json` for `planning_dir` and maintains planning readiness metadata under `<feature_path>/.planning-meta.json`
 - `skills/design/SKILL.md` reads `.skills/planning.json` field `design_diagram_mode`; `embedded` keeps fenced PlantUML in `system-design.md`, while `linked_svg` writes `.puml` and `.svg` files under `<feature_path>/figures/` and links the SVGs from `system-design.md`
 - `skills/breakdown/scripts/scaffold_breakdown.py` uses `.skills/planning.json` field `planning_dir` during scaffolding when the file is present
 - `skills/slice/scripts/bootstrap_slice.py` can initialize `.skills/execution.json` with the generic `slices/` default (or an explicit `--slice-dir`) before delegating to execution-layer tooling

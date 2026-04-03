@@ -82,6 +82,21 @@ def test_init_preserves_existing_planning_config_keys(tmp_path, monkeypatch):
     }
 
 
+def test_init_from_nested_directory_uses_repo_root_config_location(tmp_path, monkeypatch):
+    module = load_manage_planning_module()
+    nested = tmp_path / "apps" / "payments"
+    nested.mkdir(parents=True)
+    (tmp_path / ".git").mkdir()
+    monkeypatch.chdir(nested)
+
+    assert run_cli(module, monkeypatch, "init") == 0
+
+    assert (tmp_path / ".skills" / "planning.json").exists()
+    assert (tmp_path / "docs" / "features" / "registry.json").exists()
+    assert not (nested / ".skills" / "planning.json").exists()
+    assert not (nested / "docs" / "features" / "registry.json").exists()
+
+
 def test_add_creates_feature_metadata_and_registry_entries(tmp_path, monkeypatch):
     module = load_manage_planning_module()
     monkeypatch.chdir(tmp_path)
@@ -97,6 +112,33 @@ def test_add_creates_feature_metadata_and_registry_entries(tmp_path, monkeypatch
     assert metadata["status"] == "discovery_pending"
     assert metadata["requires_ui_flow"] is False
     assert registry["features"][0]["feature"] == "habit-tracker"
+
+
+def test_add_from_nested_directory_uses_root_scope_registry(tmp_path, monkeypatch):
+    module = load_manage_planning_module()
+
+    skills_dir = tmp_path / ".skills"
+    skills_dir.mkdir()
+    (skills_dir / "planning.json").write_text(
+        json.dumps(
+            {
+                "planning_dir": "docs/features",
+                "proposal_dir": "docs/proposals",
+                "design_diagram_mode": "embedded",
+            }
+        )
+        + "\n",
+        encoding="utf-8",
+    )
+
+    nested = tmp_path / "apps" / "payments"
+    nested.mkdir(parents=True)
+    monkeypatch.chdir(nested)
+
+    assert run_cli(module, monkeypatch, "add", "habit-tracker") == 0
+
+    assert (tmp_path / "docs" / "features" / "habit-tracker" / ".planning-meta.json").exists()
+    assert not (nested / "docs" / "features" / "habit-tracker" / ".planning-meta.json").exists()
 
 
 def test_discovery_ready_requires_discover_file(tmp_path, monkeypatch, capsys):

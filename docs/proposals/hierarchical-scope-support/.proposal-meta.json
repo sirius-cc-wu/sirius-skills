@@ -1,0 +1,11 @@
+{
+  "proposal_slug": "hierarchical-scope-support",
+  "status": "promoted",
+  "created_at": "2026-04-04T02:00:41",
+  "updated_at": "2026-04-04T02:18:05",
+  "summary": "Support repository-level and nested subproject planning scopes with project-local .skills, features, and proposals.",
+  "review_note": "Proposal reviewed and approved for canonical feature planning.",
+  "target_feature": "hierarchical-scope-support",
+  "promoted_feature": "hierarchical-scope-support",
+  "promoted_at": "2026-04-04T02:18:05"
+}

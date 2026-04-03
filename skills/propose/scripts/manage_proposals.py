@@ -1,17 +1,22 @@
 #!/usr/bin/env python3
 
 import argparse
+import importlib.util
 import json
 import os
 import re
 import sys
 from datetime import datetime
+from pathlib import Path
 from typing import Dict, List, Optional, Tuple
 
 DEFAULT_PLANNING_DIR = "docs/features"
 DEFAULT_PROPOSAL_DIR = "docs/proposals"
 CONFIG_DIR = ".skills"
 CONFIG_FILE = os.path.join(CONFIG_DIR, "planning.json")
+SCOPE_RUNTIME_PATH = (
+    Path(__file__).resolve().parents[2] / "guide-planning" / "scripts" / "scope_runtime.py"
+)
 REGISTRY_JSON_FILE = "registry.json"
 REGISTRY_HEADER = (
     "# Proposal Registry\n\n"
@@ -40,6 +45,17 @@ TERMINAL_STATUSES = {"rejected", "promoted"}
 
 def now_timestamp() -> str:
     return datetime.now().isoformat(timespec="seconds")
+
+
+def load_scope_runtime_module():
+    spec = importlib.util.spec_from_file_location("scope_runtime", SCOPE_RUNTIME_PATH)
+    module = importlib.util.module_from_spec(spec)
+    assert spec.loader is not None
+    spec.loader.exec_module(module)
+    return module
+
+
+SCOPE_RUNTIME = load_scope_runtime_module()
 
 
 def normalize_dir(value: str, field_name: str) -> str:
@@ -101,10 +117,11 @@ def normalize_path(path: str) -> str:
 
 
 def load_config(required: bool = False) -> Dict[str, str]:
-    if not os.path.exists(CONFIG_FILE):
+    config_file = str(SCOPE_RUNTIME.resolve_scope_context().planning_config_path)
+    if not os.path.exists(config_file):
         if required:
             raise RuntimeError(
-                "Planning config not found at '.skills/planning.json'. "
+                f"Planning config not found at '{config_file}'. "
                 "Ask the user where planning and proposal docs should be created, then run "
                 "`manage_proposals.py init`."
             )
@@ -114,7 +131,7 @@ def load_config(required: bool = False) -> Dict[str, str]:
         }
 
     try:
-        with open(CONFIG_FILE, "r", encoding="utf-8") as f:
+        with open(config_file, "r", encoding="utf-8") as f:
             config = json.load(f)
     except json.JSONDecodeError as exc:
         raise RuntimeError("Planning config is not valid JSON.") from exc
@@ -136,8 +153,9 @@ def load_config(required: bool = False) -> Dict[str, str]:
 
 
 def write_config(planning_dir: str, proposal_dir: str) -> None:
-    os.makedirs(CONFIG_DIR, exist_ok=True)
-    with open(CONFIG_FILE, "w", encoding="utf-8") as f:
+    config_file = SCOPE_RUNTIME.resolve_scope_context().planning_config_path
+    os.makedirs(config_file.parent, exist_ok=True)
+    with open(config_file, "w", encoding="utf-8") as f:
         json.dump(
             {
                 "planning_dir": normalize_dir(planning_dir, "Planning directory"),
@@ -150,8 +168,12 @@ def write_config(planning_dir: str, proposal_dir: str) -> None:
 
 
 def get_registry_paths(required_config: bool = False) -> Tuple[str, str, str]:
+    scope_context = SCOPE_RUNTIME.resolve_scope_context()
     config = load_config(required=required_config)
-    proposal_dir = normalize_dir(config["proposal_dir"], "Proposal directory")
+    proposal_dir = SCOPE_RUNTIME.resolve_scope_path(
+        scope_context.scope_root,
+        normalize_dir(config["proposal_dir"], "Proposal directory"),
+    )
     return (
         proposal_dir,
         os.path.join(proposal_dir, "README.md"),
@@ -231,7 +253,11 @@ def write_registry(rows: List[Dict[str, object]]) -> None:
 
 
 def get_proposal_root(proposal_slug: str) -> str:
-    proposal_dir = load_config()["proposal_dir"]
+    config = load_config()
+    proposal_dir = SCOPE_RUNTIME.resolve_scope_path(
+        SCOPE_RUNTIME.resolve_scope_context().scope_root,
+        normalize_dir(config["proposal_dir"], "Proposal directory"),
+    )
     return os.path.join(proposal_dir, validate_slug(proposal_slug, "Proposal slug"))
 
 
@@ -313,7 +339,10 @@ def write_metadata(proposal_dir: str, metadata: Dict[str, object]) -> None:
 
 
 def proposal_dir_for_row(row: Dict[str, object]) -> str:
-    return str(row["path"]).rstrip("/")
+    return SCOPE_RUNTIME.resolve_scope_path(
+        SCOPE_RUNTIME.resolve_scope_context().scope_root,
+        str(row["path"]).rstrip("/"),
+    )
 
 
 def find_proposal(rows: List[Dict[str, object]], selector: str) -> Optional[Dict[str, object]]:
@@ -327,7 +356,12 @@ def find_proposal(rows: List[Dict[str, object]], selector: str) -> Optional[Dict
         path_value = str(row["path"]).rstrip("/")
         if path_value == normalized_selector:
             return row
+        absolute_path = proposal_dir_for_row(row).rstrip("/")
+        if absolute_path == normalized_selector:
+            return row
         if os.path.basename(path_value) == normalized_selector:
+            return row
+        if os.path.basename(absolute_path) == normalized_selector:
             return row
     return None
 
@@ -440,13 +474,20 @@ def create_proposal(
     )
     write_metadata(proposal_dir, metadata)
     write_discover_stub(proposal_dir, proposal_slug, summary)
+    config = load_config(required=False)
+    row_path = normalize_path(
+        os.path.join(
+            normalize_dir(config["proposal_dir"], "Proposal directory"),
+            proposal_slug,
+        )
+    )
 
     rows.append(
         {
             "proposal": proposal_slug,
             "status": metadata["status"],
             "updated_at": metadata["updated_at"],
-            "path": normalize_path(proposal_dir),
+            "path": row_path,
         }
     )
     write_registry(rows)
@@ -521,6 +562,7 @@ def validate_proposal(
 
 def cmd_init(args: argparse.Namespace) -> int:
     config = load_config(required=False)
+    scope_context = SCOPE_RUNTIME.resolve_scope_context()
     planning_dir = config["planning_dir"]
     proposal_dir = (
         normalize_dir(args.proposal_dir, "Proposal directory")
@@ -528,7 +570,7 @@ def cmd_init(args: argparse.Namespace) -> int:
         else config["proposal_dir"]
     )
     write_config(planning_dir, proposal_dir)
-    ensure_registry(proposal_dir)
+    ensure_registry(SCOPE_RUNTIME.resolve_scope_path(scope_context.scope_root, proposal_dir))
     print(f"Initialized proposal registry and config in '{proposal_dir}/'.")
     return 0
 

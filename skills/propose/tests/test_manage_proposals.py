@@ -39,6 +39,21 @@ def test_init_defaults_to_docs_proposals_directory(tmp_path, monkeypatch):
     assert registry["proposals"] == []
 
 
+def test_init_from_nested_directory_uses_repo_root_config_location(tmp_path, monkeypatch):
+    module = load_module()
+    nested = tmp_path / "apps" / "payments"
+    nested.mkdir(parents=True)
+    (tmp_path / ".git").mkdir()
+    monkeypatch.chdir(nested)
+
+    assert run_cli(module, monkeypatch, "init") == 0
+
+    assert (tmp_path / ".skills" / "planning.json").exists()
+    assert (tmp_path / "docs" / "proposals" / "registry.json").exists()
+    assert not (nested / ".skills" / "planning.json").exists()
+    assert not (nested / "docs" / "proposals" / "registry.json").exists()
+
+
 def test_add_creates_proposal_metadata_and_registry_entries(tmp_path, monkeypatch):
     module = load_module()
     monkeypatch.chdir(tmp_path)
@@ -65,6 +80,44 @@ def test_add_creates_proposal_metadata_and_registry_entries(tmp_path, monkeypatc
     assert metadata["summary"] == "Improve planning capabilities."
     assert (proposal_dir / "discover.md").exists()
     assert registry["proposals"][0]["proposal"] == "workflow-capability-upgrades"
+
+
+def test_add_from_nested_directory_uses_root_scope_registry(tmp_path, monkeypatch):
+    module = load_module()
+
+    skills_dir = tmp_path / ".skills"
+    skills_dir.mkdir()
+    (skills_dir / "planning.json").write_text(
+        json.dumps(
+            {
+                "planning_dir": "docs/features",
+                "proposal_dir": "docs/proposals",
+            }
+        )
+        + "\n",
+        encoding="utf-8",
+    )
+
+    nested = tmp_path / "apps" / "payments"
+    nested.mkdir(parents=True)
+    monkeypatch.chdir(nested)
+
+    assert run_cli(module, monkeypatch, "add", "workflow-capability-upgrades") == 0
+
+    assert (
+        tmp_path
+        / "docs"
+        / "proposals"
+        / "workflow-capability-upgrades"
+        / ".proposal-meta.json"
+    ).exists()
+    assert not (
+        nested
+        / "docs"
+        / "proposals"
+        / "workflow-capability-upgrades"
+        / ".proposal-meta.json"
+    ).exists()
 
 
 def test_reviewed_requires_review_note(tmp_path, monkeypatch, capsys):

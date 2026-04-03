@@ -1,6 +1,12 @@
 {
   "proposals": [
     {
+      "proposal": "hierarchical-scope-support",
+      "status": "promoted",
+      "updated_at": "2026-04-04T02:18:05",
+      "path": "docs/proposals/hierarchical-scope-support/"
+    },
+    {
       "proposal": "workflow-capability-upgrades",
       "status": "draft",
       "updated_at": "2026-03-28T22:29:44",

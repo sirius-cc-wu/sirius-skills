@@ -1,0 +1,16 @@
+{
+  "version": 1,
+  "generated_at": "2026-04-04T03:33:16",
+  "slices": [
+    {
+      "id": "HSS-01-root-fallback",
+      "feature": "Add scope runtime with root fallback",
+      "status": "closed",
+      "path": "slices/HSS-01-root-fallback-add-scope-runtime-with-root-fallback/",
+      "updated_at": "2026-04-04T03:33:16",
+      "closed_at": "2026-04-04T03:33:16",
+      "archived_at": null,
+      "relations": []
+    }
+  ]
+}

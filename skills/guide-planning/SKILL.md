@@ -62,7 +62,7 @@ Use adjacent transitions by default and repair skipped states only deliberately.
 
 ## Preflight
 
-1. Resolve `<planning_dir>` from `.skills/planning.json`; default to `docs/features`.
+1. Resolve the active planning scope from the nearest `.skills/planning.json`; if none exists in ancestor directories, fall back to the repository root when inside a Git worktree, then default `<planning_dir>` to `docs/features`.
 2. Resolve any planning-layer artifact conventions from `.skills/planning.json`, including `design_diagram_mode` for `system-design.md` diagram layout.
 3. Ensure the planning registry exists.
 4. Resolve the active feature using tooling or a user-provided slug/path.

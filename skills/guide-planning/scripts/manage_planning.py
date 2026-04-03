@@ -8,6 +8,7 @@ import re
 import shutil
 import sys
 from datetime import datetime
+from pathlib import Path
 from typing import Dict, List, Optional, Tuple
 
 DEFAULT_PLANNING_DIR = "docs/features"
@@ -16,6 +17,7 @@ DEFAULT_DESIGN_DIAGRAM_MODE = "embedded"
 VALID_DESIGN_DIAGRAM_MODES = {"embedded", "linked_svg"}
 CONFIG_DIR = ".skills"
 CONFIG_FILE = os.path.join(CONFIG_DIR, "planning.json")
+SCOPE_RUNTIME_PATH = Path(__file__).resolve().with_name("scope_runtime.py")
 REGISTRY_JSON_FILE = "registry.json"
 REGISTRY_HEADER = (
     "# Planning Registry\n\n"
@@ -49,6 +51,17 @@ STATUS_ALIASES = {
 
 def now_timestamp() -> str:
     return datetime.now().isoformat(timespec="seconds")
+
+
+def load_scope_runtime_module():
+    spec = importlib.util.spec_from_file_location("scope_runtime", SCOPE_RUNTIME_PATH)
+    module = importlib.util.module_from_spec(spec)
+    assert spec.loader is not None
+    spec.loader.exec_module(module)
+    return module
+
+
+SCOPE_RUNTIME = load_scope_runtime_module()
 
 
 def normalize_planning_dir(value: str) -> str:
@@ -133,17 +146,18 @@ def normalize_slice_ids(value: object) -> List[str]:
 
 
 def load_raw_config(required: bool = False) -> Dict[str, object]:
-    if not os.path.exists(CONFIG_FILE):
+    config_file = str(SCOPE_RUNTIME.resolve_scope_context().planning_config_path)
+    if not os.path.exists(config_file):
         if required:
             raise RuntimeError(
-                "Planning config not found at '.skills/planning.json'. "
+                f"Planning config not found at '{config_file}'. "
                 "Ask the user where planning docs should be created, then run "
                 "`manage_planning.py init <planning-dir>`."
             )
         return {}
 
     try:
-        with open(CONFIG_FILE, "r", encoding="utf-8") as f:
+        with open(config_file, "r", encoding="utf-8") as f:
             config = json.load(f)
     except json.JSONDecodeError as exc:
         raise RuntimeError("Planning config is not valid JSON.") from exc
@@ -186,21 +200,26 @@ def write_config(
     design_diagram_mode: str,
     existing: Optional[Dict[str, object]] = None,
 ) -> None:
-    os.makedirs(CONFIG_DIR, exist_ok=True)
+    config_file = SCOPE_RUNTIME.resolve_scope_context().planning_config_path
+    os.makedirs(config_file.parent, exist_ok=True)
     updated: Dict[str, object] = dict(existing or {})
     updated["planning_dir"] = normalize_planning_dir(planning_dir)
     updated["proposal_dir"] = normalize_planning_dir(proposal_dir)
     updated["design_diagram_mode"] = normalize_design_diagram_mode(
         design_diagram_mode
     )
-    with open(CONFIG_FILE, "w", encoding="utf-8") as f:
+    with open(config_file, "w", encoding="utf-8") as f:
         json.dump(updated, f, indent=2)
         f.write("\n")
 
 
 def get_registry_paths(required_config: bool = False) -> Tuple[str, str, str]:
+    scope_context = SCOPE_RUNTIME.resolve_scope_context()
     config = load_config(required=required_config)
-    planning_dir = normalize_planning_dir(config["planning_dir"])
+    planning_dir = SCOPE_RUNTIME.resolve_scope_path(
+        scope_context.scope_root,
+        normalize_planning_dir(config["planning_dir"]),
+    )
     return (
         planning_dir,
         os.path.join(planning_dir, "README.md"),
@@ -376,7 +395,10 @@ def write_metadata(feature_dir: str, metadata: Dict[str, object]) -> None:
 
 
 def feature_dir_for_row(row: Dict[str, object]) -> str:
-    return str(row["path"]).rstrip("/")
+    return SCOPE_RUNTIME.resolve_scope_path(
+        SCOPE_RUNTIME.resolve_scope_context().scope_root,
+        str(row["path"]).rstrip("/"),
+    )
 
 
 def find_feature(rows: List[Dict[str, object]], selector: str) -> Optional[Dict[str, object]]:
@@ -390,7 +412,12 @@ def find_feature(rows: List[Dict[str, object]], selector: str) -> Optional[Dict[
         path_value = str(row["path"]).rstrip("/")
         if path_value == normalized_selector:
             return row
+        absolute_path = feature_dir_for_row(row).rstrip("/")
+        if absolute_path == normalized_selector:
+            return row
         if os.path.basename(path_value) == normalized_selector:
+            return row
+        if os.path.basename(absolute_path) == normalized_selector:
             return row
     return None
 
@@ -476,18 +503,22 @@ def create_feature(feature_slug: str, requires_ui_flow: bool = False) -> Tuple[s
     if existing:
         return feature_dir_for_row(existing), False
 
+    config = load_config(required=False)
     planning_dir, _, _ = get_registry_paths(required_config=False)
     ensure_registry(planning_dir)
     feature_dir = os.path.join(planning_dir, feature_slug)
     metadata = build_metadata(feature_slug, requires_ui_flow=requires_ui_flow)
     write_metadata(feature_dir, metadata)
+    row_path = normalize_feature_path(
+        os.path.join(normalize_planning_dir(config["planning_dir"]), feature_slug)
+    )
 
     rows.append(
         {
             "feature": feature_slug,
             "status": metadata["status"],
             "updated_at": metadata["updated_at"],
-            "path": normalize_feature_path(feature_dir),
+            "path": row_path,
         }
     )
     write_registry(rows)
@@ -626,6 +657,7 @@ def promote_proposal_to_feature(
 def cmd_init(args: argparse.Namespace) -> int:
     raw_config = load_raw_config(required=False)
     config = load_config(required=False)
+    scope_context = SCOPE_RUNTIME.resolve_scope_context()
     planning_dir = (
         normalize_planning_dir(args.planning_dir) if args.planning_dir else config["planning_dir"]
     )
@@ -635,7 +667,7 @@ def cmd_init(args: argparse.Namespace) -> int:
         config["design_diagram_mode"],
         existing=raw_config,
     )
-    ensure_registry(planning_dir)
+    ensure_registry(SCOPE_RUNTIME.resolve_scope_path(scope_context.scope_root, planning_dir))
     print(f"Initialized planning registry and config in '{planning_dir}/'.")
     return 0
 

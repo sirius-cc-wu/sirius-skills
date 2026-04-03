@@ -1,0 +1,11 @@
+{
+  "feature_slug": "hierarchical-scope-support",
+  "status": "slice_ready",
+  "created_at": "2026-04-04T02:18:05",
+  "updated_at": "2026-04-04T02:56:28",
+  "requires_ui_flow": false,
+  "review_note": "Reviewed discovery, design, and breakdown artifacts; scope model, sequencing, and validation plan are coherent and ready for slice bootstrap.",
+  "ready_slice_ids": [
+    "HSS-01-root-fallback"
+  ]
+}
