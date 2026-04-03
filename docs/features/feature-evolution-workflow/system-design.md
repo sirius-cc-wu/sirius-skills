@@ -23,7 +23,7 @@ This keeps the repository's current planning and execution boundaries intact:
 - canonical feature docs remain durable
 - change intent and impact are reviewable without overwriting the baseline
 - execution still flows through slices
-- reconciliation is explicit and non-destructive
+- reconciliation is explicit and cleans up temporary change artifacts once canonical docs are updated
 
 The design deliberately borrows the discipline behind OpenSpec's change/archive
 workflow without adopting its temporary-folder model as the primary source of
@@ -74,7 +74,6 @@ Recommended artifact set for a change packet:
 - optional `ui-design.md` when UX flow is materially affected
 - `slice-planning.md` for new or amended execution-ready slices
 - `slice-traceability.md` for feature-story to change-slice mapping
-- `reconciliation.md` for canonical-doc update outcomes and backlinks
 - `.feature-change-meta.json` for machine-readable state
 
 Reasoning:
@@ -121,14 +120,14 @@ Instead, a reconciliation step:
 
 1. updates canonical docs deliberately
 2. records what changed and which change packet caused it
-3. leaves the original change packet in place for history
-4. writes durable backlinks into canonical and change-local artifacts
+3. removes the completed change packet after canonical reconciliation finishes
+4. rewrites canonical artifacts directly instead of keeping durable backlinks
 
 Reasoning:
 
-- preserves auditability
-- matches the non-destructive closure style already used by `close-slice`
-- avoids "archive means delete the working area" semantics
+- keeps canonical feature docs as the only long-term product specification
+- matches the human-owned reconcile handoff
+- avoids retained history that points at deleted temporary artifacts
 
 ## Key Components
 
@@ -155,10 +154,9 @@ Reasoning:
   - identifies affected stories, canonical docs, planned increments, slice IDs,
     and relation type such as additive, superseding, narrowing, or replacement
 
-- **Reconciliation artifact**
-  - `reconciliation.md`
-  - records what canonical files were updated, what remained unchanged, and what
-    change history entry now references the closed packet
+- **Reconciliation cleanup**
+  - rewrites canonical docs directly
+  - removes temporary execution slices and the completed change packet
 
 ## Interfaces and Responsibilities
 
@@ -287,7 +285,6 @@ docs/features/<feature-slug>/
         ├── system-design.md
         ├── slice-planning.md
         ├── slice-traceability.md
-        ├── reconciliation.md
         └── .feature-change-meta.json
 ```
 
@@ -350,7 +347,6 @@ package "Feature Change Layer" {
   file "changes/<change-id>/system-design.md" as ChangeDesign
   file "changes/<change-id>/slice-planning.md" as ChangeSlicePlan
   file "changes/<change-id>/slice-traceability.md" as ChangeTrace
-  file "changes/<change-id>/reconciliation.md" as Reconcile
   file ".feature-change-meta.json" as ChangeMeta
 }
 

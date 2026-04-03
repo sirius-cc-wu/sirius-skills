@@ -91,12 +91,12 @@ that never reconcile back into the repository planning model.
 - **Reconciliation**
   - Provide an explicit step that merges approved changes back into canonical
     feature docs.
-  - Preserve backlinks to closed change history after reconciliation.
+  - Remove temporary change artifacts after the canonical update is complete.
 
 - **History and closure**
-  - Keep a durable index of closed feature changes and their outcomes.
-  - Reuse the repository's existing ideas around explicit closure instead of
-    copying OpenSpec's archive mechanics literally.
+  - Keep canonical feature docs as the durable source of truth.
+  - Use explicit reconciliation cleanup instead of archive-style retained
+    history.
 
 ## Confirmed Signals in Repo
 
@@ -106,8 +106,9 @@ that never reconcile back into the repository planning model.
   repository planning artifacts.
 - `guide-execution` and `close-slice` already support durable execution closure
   and relation tracking at the slice layer.
-- `reconcile-feature` is the feature-level place where retained history and
-  reviewed-change cleanup can happen without deleting source artifacts.
+- `reconcile-feature` is the feature-level place where canonical updates and
+  reviewed-change cleanup can happen, including deleting temporary source
+  artifacts after reconciliation.
 
 ## Assumptions
 

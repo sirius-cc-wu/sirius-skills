@@ -187,6 +187,51 @@ def test_archive_slice_requires_closed_status(tmp_path, monkeypatch):
     assert message == "Only closed slices can be archived."
 
 
+def test_delete_slice_removes_registry_entry_and_relation_backlinks(tmp_path, monkeypatch):
+    module = load_manage_specs_module()
+    monkeypatch.chdir(tmp_path)
+
+    assert run_cli(module, monkeypatch, "init", "slices") == 0
+    assert run_cli(module, monkeypatch, "add", "OLD", "Old Feature") == 0
+    assert run_cli(module, monkeypatch, "add", "NEW", "New Feature") == 0
+
+    new_dir = tmp_path / "slices" / "NEW-new-feature"
+    (new_dir / "brief.md").write_text("# brief\n", encoding="utf-8")
+    (new_dir / "checklists").mkdir()
+    (new_dir / "checklists" / "requirements.md").write_text(
+        "- [x] requirements complete\n", encoding="utf-8"
+    )
+    assert run_cli(module, monkeypatch, "set-status", "NEW", "brief_ready") == 0
+    (new_dir / "blueprint.md").write_text("# plan\n", encoding="utf-8")
+    assert run_cli(module, monkeypatch, "set-status", "NEW", "blueprint_ready") == 0
+    assert run_cli(module, monkeypatch, "set-status", "NEW", "execution_ready") == 0
+    assert run_cli(module, monkeypatch, "set-status", "NEW", "closed") == 0
+
+    rows = module.parse_registry()
+    new_slice = module.resolve_slice(rows, "NEW")
+    assert new_slice is not None
+    success, _ = module.add_relation(rows, new_slice, "supersedes", "OLD")
+    assert success is True
+
+    rows = module.parse_registry()
+    new_slice = module.resolve_slice(rows, "NEW")
+    assert new_slice is not None
+    success, message, _ = module.delete_slice(rows, new_slice)
+
+    old_meta = json.loads(
+        (tmp_path / "slices" / "OLD-old-feature" / ".slice-meta.json").read_text(
+            encoding="utf-8"
+        )
+    )
+    registry = json.loads((tmp_path / "slices" / "registry.json").read_text(encoding="utf-8"))
+
+    assert success is True
+    assert message == "Removed closed slice NEW"
+    assert not new_dir.exists()
+    assert old_meta["relations"] == []
+    assert [row["id"] for row in registry["slices"]] == ["OLD"]
+
+
 def test_blueprint_ready_auto_starts_execution_when_enabled(
     tmp_path, monkeypatch, capsys
 ):

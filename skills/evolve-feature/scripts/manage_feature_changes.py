@@ -4,6 +4,7 @@ import argparse
 import json
 import os
 import re
+import shutil
 import sys
 from datetime import datetime
 from typing import Dict, List, Optional, Tuple
@@ -478,8 +479,6 @@ def validate_change_state(change_dir: str, metadata: Dict[str, object]) -> Tuple
         )
 
     if status_index >= STATUS_SEQUENCE.index("reconciled"):
-        ok, detail = validate_required_file(change_dir, RECONCILIATION_FILE)
-        record_check("reconciliation", ok, detail)
         reconciled_files = metadata.get("reconciled_files")
         ok = isinstance(reconciled_files, list) and len(reconciled_files) > 0
         record_check(
@@ -608,6 +607,25 @@ def update_change_status(
     selected["updated_at"] = updated_metadata["updated_at"]
     write_registry(feature_dir, rows)
     return True, f"Updated {selected['change_id']} to status '{status}'"
+
+
+def delete_change(feature_dir: str, change: Dict[str, object]) -> Tuple[bool, str]:
+    rows = load_registry(feature_dir)
+    selected = find_change(rows, str(change["change_id"]))
+    if not selected:
+        return False, f"Feature change not found: {change['change_id']}"
+
+    if normalize_status(str(selected["status"])) != "closed":
+        return False, "Only closed feature changes can be removed."
+
+    change_dir = change_dir_for_row(selected)
+    if not os.path.isdir(change_dir):
+        return False, f"Feature change directory not found: {change_dir}"
+
+    shutil.rmtree(change_dir)
+    rows = [row for row in rows if row["change_id"] != selected["change_id"]]
+    write_registry(feature_dir, rows)
+    return True, f"Removed feature change {selected['change_id']}"
 
 
 def cmd_init_feature(args: argparse.Namespace) -> int:

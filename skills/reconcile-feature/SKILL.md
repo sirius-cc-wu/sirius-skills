@@ -1,42 +1,40 @@
 ---
 name: reconcile-feature
-description: Reconciles an approved feature change packet back into canonical feature docs, verifies the planned slices are complete, archives completed execution slices, and closes the change with retained history.
+description: Reconciles an approved feature change packet back into canonical feature docs, verifies the planned slices are complete, removes completed execution slices, and removes the completed change packet.
 ---
 
 # Reconcile Feature
 
 Use this skill after a feature change packet has been reviewed and the approved
-delta needs to be folded back into the canonical feature docs without deleting
-the original change packet.
+delta needs to be folded back into the canonical feature docs and a human has
+explicitly requested final reconcile/cleanup.
 
 ## Responsibilities
 
 1. Resolve the canonical feature and selected change packet.
-2. Reconcile approved change-local discovery or design docs back into canonical feature docs.
-3. Record durable backlinks from the canonical docs to the retained change packet.
-4. Verify that all slices planned for the change are closed before feature-level archive/publish work.
-5. Archive completed execution slices when the reviewed change is done.
-6. Publish optional feature-local change history.
-7. Close the change packet cleanly through the existing feature-change state model.
+2. Reconcile approved change-local discovery, design, or UI docs back into canonical feature docs.
+3. Copy any durable figures needed by the canonical feature docs.
+4. Verify that all slices planned for the change are closed before cleanup.
+5. Remove completed execution slices for that reviewed change.
+6. Close the change packet cleanly through the existing feature-change state model.
+7. Remove the completed change packet after canonical reconciliation is done.
 
 ## Required Output
 
 - updates to canonical feature docs under `<planning_dir>/<feature-slug>/`
-- `<change_path>/reconciliation.md`
-- retained change-local `slice-planning.md` / `slice-traceability.md` inside the change packet
-- optional `<feature_path>/changes/history.md`
-- updated `<change_path>/.feature-change-meta.json`
+- optional updates to `<feature_path>/figures/`
+- updated `<feature_path>/.planning-meta.json`
 
 ## Workflow
 
-1. Confirm the selected change packet is already `reviewed`.
+1. Confirm a human explicitly requested `reconcile-feature` for the selected reviewed change packet.
 2. Verify that all slices listed in the change packet's `slice-planning.md` are closed, unless force is explicitly used for repair.
 3. Select the supported change-local docs that should reconcile into the canonical feature.
-4. Append or refresh stable reconciliation blocks inside the canonical docs with backlinks to the change packet.
-5. Archive the closed execution slices into the hidden slice archive while leaving the change-local breakdown artifacts in the packet.
-6. Write `reconciliation.md` in the change packet with the canonical targets and completion outputs.
-7. Publish retained history when configured or requested.
-8. Advance the change through `reconciled` and `closed`.
+4. Rewrite the canonical docs directly with the approved change content; do not keep surviving change-packet markers or backlinks.
+5. Copy any durable `figures/` assets needed by the rewritten canonical docs.
+6. Advance the change through `reconciled` and `closed`.
+7. Remove the closed execution slices from the execution registry and filesystem.
+8. Remove the completed change packet from the feature-change registry and filesystem.
 
 ## Tooling
 
@@ -49,19 +47,15 @@ python3 skills/reconcile-feature/scripts/reconcile_feature_change.py \
 python3 skills/reconcile-feature/scripts/reconcile_feature_change.py \
   "checkout" "replace-legacy-flow" \
   --canonical-file discover.md \
-  --canonical-file system-design.md
-
-# Reconcile without publishing feature-local history
-python3 skills/reconcile-feature/scripts/reconcile_feature_change.py \
-  "checkout" "replace-legacy-flow" \
-  --no-history
+  --canonical-file system-design.md \
+  --canonical-file ui-design.md
 ```
 
 ## Guardrails
 
+- Do not invoke this skill autonomously after review or closure; `reconcile-feature` is human-owned and should run only when a human explicitly requests it.
 - Do not use this skill before planning review has marked the change packet `reviewed`, unless you are deliberately repairing state with `--force`.
-- Do not delete or move the original change packet; reconciliation is additive and keeps the retained change history in place.
 - Do not reconcile a feature change as complete while planned slices are still open unless you are deliberately repairing state with `--force`.
-- Do not silently overwrite canonical docs with hidden merges; keep stable reconciliation blocks and explicit backlinks.
-- Archive/publish belongs to reviewed change completion here, not to per-slice closure.
-- Do not reconcile change-local `slice-planning.md` or `slice-traceability.md` back into canonical feature planning by default; keep them in the retained change packet.
+- Do not keep surviving change-packet backlinks, `reconciliation.md`, or feature-local history files after cleanup.
+- Cleanup belongs to reviewed change completion here, not to per-slice closure.
+- Do not reconcile change-local `slice-planning.md` or `slice-traceability.md` back into canonical feature planning.

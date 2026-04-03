@@ -85,7 +85,7 @@ Preferred repo workflow:
 11. `guide-execution` routes slice-scoped execution through `brief` to capture slice intent and acceptance, then through `blueprint` to produce the final execution artifact. When `.skills/execution.json` enables `auto_start_implementation`, that handoff continues directly into implementation after the blueprint is marked ready.
 12. `review-execution` checks implementation and validation outcomes against the slice-scoped execution artifacts before closure.
 13. `close-slice` closes completed execution slices and records durable closure metadata.
-14. `reconcile-feature` folds an approved feature change packet back into canonical feature docs, verifies planned slices are complete, archives completed execution slices, retains change-local breakdown artifacts in the packet, writes `reconciliation.md`, publishes retained change history, and closes the change packet.
+14. `reconcile-feature` folds an approved feature change packet back into canonical feature docs, verifies planned slices are complete, removes completed execution slices, removes the completed change packet, and leaves the canonical feature docs as the durable specification.
 
 In the repo-native flow, `guide-planning` owns feature-planning readiness and routing, `breakdown` owns repo-story decomposition, `review-planning` owns planning readiness review, `brief` owns the slice-scoped `brief.md`, `blueprint` owns the final slice-scoped execution plan and validation checklist, and `review-execution` owns the final implementation-versus-brief review before closure.
 
@@ -106,13 +106,13 @@ The `guide-execution` workflow now keeps three complementary artifacts in sync:
 
 - `<slice_dir>/README.md` for a human-readable registry
 - `<slice_dir>/registry.json` for machine-readable registry/state
-- `<slice_path>/.slice-meta.json` for per-slice lifecycle metadata such as `created_at`, `updated_at`, `closed_at`, and optional archive tracking
+- `<slice_path>/.slice-meta.json` for per-slice lifecycle metadata such as `created_at`, `updated_at`, `closed_at`, and explicit relation metadata
 
 The machine-readable metadata can also store explicit cross-slice relations such as `supersedes`, `invalidates`, `narrows`, and `replaces_partially`, with reciprocal backlinks and optional soft selectors for story titles, requirement IDs, or freeform selectors.
 
 Closed slices are retained non-destructively. `sirius-skills` does not merge or delete the original `brief.md`/`blueprint.md` artifacts when a slice closes; instead it records closure durably in the slice registry and metadata.
 
-Archive or publish decisions belong to reviewed change completion, not to per-slice closure. `reconcile-feature` is the feature-level step that can verify every planned slice is closed, archive those slices into the hidden slice archive, keep change-local `slice-planning.md` / `slice-traceability.md` inside the retained change packet, and publish retained feature-local history.
+Feature-level cleanup belongs to reviewed change completion, not to per-slice closure. `reconcile-feature` is the human-invoked feature-level step that can verify every planned slice is closed, rewrite canonical feature docs directly, remove the temporary execution slices created for that change, and remove the completed change packet.
 
 To keep relation metadata healthy over time, `skills/guide-execution/scripts/manage_execution.py` also provides `audit-relations`, which checks for missing targets and missing reciprocal links.
 ## Optional project configuration

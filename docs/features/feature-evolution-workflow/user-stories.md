@@ -13,9 +13,9 @@
   the canonical feature folder.
 
 - **FEW-04 (L)**: As a planner, I want an explicit reconciliation step so that
-  approved changes update canonical feature docs with durable backlinks to the
-  closed change history.
+  approved changes rewrite the canonical feature docs cleanly before temporary
+  change artifacts are removed.
 
-- **FEW-05 (L)**: As a maintainer, I want feature-change closure and history
-  patterns that borrow the discipline of archive workflows without making the
-  canonical feature folder temporary.
+- **FEW-05 (L)**: As a maintainer, I want feature-change closure and cleanup
+  patterns that keep the canonical feature folder as the only long-term product
+  specification.

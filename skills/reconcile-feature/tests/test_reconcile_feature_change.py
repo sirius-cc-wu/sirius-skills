@@ -57,6 +57,7 @@ def setup_feature(tmp_path: Path) -> Path:
     )
     write_file(feature_dir / "discover.md", "# Discover\n\nCanonical discovery baseline.\n")
     write_file(feature_dir / "system-design.md", "# System Design\n\nCanonical design baseline.\n")
+    write_file(feature_dir / "ui-design.md", "# UI Design\n\nCanonical UI baseline.\n")
     write_file(feature_dir / "slice-planning.md", "# Slice Planning\n\nCanonical slice planning baseline.\n")
     write_file(
         feature_dir / "slice-traceability.md",
@@ -135,8 +136,11 @@ def prepare_reviewed_change(tmp_path: Path, monkeypatch):
     ) == 0
 
     change_dir = feature_dir / "changes" / "replace-legacy-flow"
+    write_file(change_dir / "discover.md", "# Discover\n\nAdopt the new checkout flow.\n")
     write_file(change_dir / "impact-analysis.md", "# Impact Analysis\n\nChange impacts checkout.\n")
     write_file(change_dir / "system-design.md", "# System Design\n\nAdopt the new checkout design.\n")
+    write_file(change_dir / "ui-design.md", "# UI Design\n\nAdopt the new checkout screens.\n")
+    write_file(change_dir / "figures" / "checkout-flow.svg", "<svg>checkout</svg>\n")
     write_file(
         change_dir / "slice-planning.md",
         "# Slice Planning\n\n"
@@ -200,7 +204,7 @@ def prepare_reviewed_change(tmp_path: Path, monkeypatch):
     return reconcile_module, change_module, feature_dir, change_dir
 
 
-def test_reconcile_archives_completed_feature_artifacts_and_closes_change(
+def test_reconcile_rewrites_canonical_docs_and_removes_temporary_artifacts(
     tmp_path, monkeypatch
 ):
     monkeypatch.chdir(tmp_path)
@@ -220,31 +224,28 @@ def test_reconcile_archives_completed_feature_artifacts_and_closes_change(
 
     canonical_discover = (feature_dir / "discover.md").read_text(encoding="utf-8")
     canonical_design = (feature_dir / "system-design.md").read_text(encoding="utf-8")
+    canonical_ui = (feature_dir / "ui-design.md").read_text(encoding="utf-8")
     canonical_planning = (feature_dir / "slice-planning.md").read_text(encoding="utf-8")
-    archived_slice_dir = tmp_path / "slices" / ".archived" / "CHK-101-checkout-flow"
-    reconciliation = (change_dir / "reconciliation.md").read_text(encoding="utf-8")
-    history = (feature_dir / "changes" / "history.md").read_text(encoding="utf-8")
-    change_meta = json.loads((change_dir / ".feature-change-meta.json").read_text(encoding="utf-8"))
+    slice_dir = tmp_path / "slices" / "CHK-101-checkout-flow"
+    registry = json.loads((tmp_path / "slices" / "registry.json").read_text(encoding="utf-8"))
+    change_registry = json.loads((feature_dir / "changes" / "registry.json").read_text(encoding="utf-8"))
     planning_meta = json.loads((feature_dir / ".planning-meta.json").read_text(encoding="utf-8"))
 
-    assert "## Reconciled Change Packet: replace-legacy-flow" in canonical_discover
-    assert "## Reconciled Change Packet: replace-legacy-flow" in canonical_design
+    assert canonical_discover == "# Discover\n\nAdopt the new checkout flow.\n"
+    assert canonical_design == "# System Design\n\nAdopt the new checkout design.\n"
+    assert canonical_ui == "# UI Design\n\nAdopt the new checkout screens.\n"
     assert "Canonical slice planning baseline." in canonical_planning
-    assert archived_slice_dir.exists()
-    assert "### Closed Change Slices" in history
-    assert "`CHK-101`" in history
-    assert "### Retained Change-local Breakdown" in history
-    assert "changes/replace-legacy-flow/slice-planning.md" in history
-    assert "slices/.archived/CHK-101-checkout-flow/" in history
-    assert "## Retained Change-local Breakdown" in reconciliation
-    assert "changes/replace-legacy-flow/slice-traceability.md" in reconciliation
-    assert change_meta["status"] == "closed"
-    assert "planning_archive_targets" not in change_meta
-    assert change_meta["archived_slice_paths"] == ["slices/.archived/CHK-101-checkout-flow/"]
+    assert (feature_dir / "figures" / "checkout-flow.svg").read_text(encoding="utf-8") == "<svg>checkout</svg>\n"
+    assert not slice_dir.exists()
+    assert registry["slices"] == []
+    assert not change_dir.exists()
+    assert change_registry["changes"] == []
+    assert not (feature_dir / "changes" / "history.md").exists()
     assert planning_meta["last_reconciled_at"]
     assert "planning_archive_targets" not in planning_meta
     assert "feature_completed_at" not in planning_meta
-    assert planning_meta["archived_slice_paths"] == ["slices/.archived/CHK-101-checkout-flow/"]
+    assert "archived_slice_paths" not in planning_meta
+    assert "history_targets" not in planning_meta
 
 
 def test_reconcile_requires_planned_slices_to_be_closed(tmp_path, monkeypatch, capsys):

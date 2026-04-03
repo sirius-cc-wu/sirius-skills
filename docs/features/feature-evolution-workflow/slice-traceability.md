@@ -15,7 +15,7 @@
 | FEW-02 | M | Produce explicit impact analysis before new work is bootstrapped | I2 | FEW-203 | Impact analysis | FEW-202 |  | Single coherent packet centered on `impact-analysis.md` |
 | FEW-03 | L | Support change-local planning artifacts and state transitions | I1, I2 | FEW-204, FEW-205 | State model, Change-local artifact support | FEW-202, FEW-203 |  | Separates metadata/state enforcement from path-aware artifact reuse |
 | FEW-04 | L | Reconcile approved changes into canonical feature docs | I3 | FEW-206, FEW-207 | Change breakdown, Reconciliation | FEW-205 |  | Keeps change-local decomposition separate from canonical update logic |
-| FEW-05 | L | Close feature changes with retained history and clear routing | I4 | FEW-208, FEW-209 | History closure, Routing docs | FEW-207 |  | Closure/history semantics remain additive and non-destructive |
+| FEW-05 | L | Close feature changes with cleanup and clear routing | I4 | FEW-208, FEW-209 | Cleanup closure, Routing docs | FEW-207 |  | Reconciliation should leave only canonical feature artifacts as the durable record |
 
 ## Notes
 

@@ -90,11 +90,11 @@ and the approved delta needs to be folded back into the canonical feature docs.
 
 Its job is to:
 
-- update canonical feature docs with stable reconciliation blocks and backlinks
-- write `reconciliation.md` inside the retained change packet
-- keep change-local breakdown artifacts in the packet as the durable execution-planning record for that change
-- optionally publish feature-local change history after planned slices are complete
-- close the change packet through the existing feature-change lifecycle
+- rewrite canonical feature docs directly with the approved change content
+- copy any durable figures needed by the canonical docs
+- remove the temporary execution slices created for that reviewed change
+- remove the completed change packet after reconciliation is done
+- close the change packet through the existing feature-change lifecycle before cleanup
 
 Recommended handoff:
 
@@ -322,7 +322,7 @@ Within that execution layer:
 - when `.skills/execution.json` sets `auto_start_implementation` to `true`, marking the blueprint ready should immediately advance the slice into `execution_ready` and continue into repository implementation work
 - `review-execution` owns the explicit implementation-versus-brief review outcome
 - `close-slice` owns slice closure metadata
-- `reconcile-feature` owns feature-level archive/publish behavior after all planned slices are done
+- `reconcile-feature` owns human-invoked feature-level cleanup after all planned slices are done
 
 Keep the boundary explicit:
 
@@ -395,7 +395,7 @@ Important closure rules:
 - closing a slice does not merge or delete the original `brief.md` or `blueprint.md`; older slices may also retain `slices.md`
 - closure metadata belongs in the slice system itself
 
-Feature-level cleanup happens later. Once all slices listed in a reviewed change packet are closed, `reconcile-feature` can archive those slices and publish retained feature history while leaving the change-local planning docs in place.
+Feature-level cleanup happens later. Once all slices listed in a reviewed change packet are closed, a human can request `reconcile-feature` to rewrite canonical feature docs, remove those temporary slices, and remove the completed change packet.
 
 ## Recommended Repository Layout
 

@@ -3,7 +3,7 @@
 import argparse
 import importlib.util
 import json
-import re
+import shutil
 import sys
 from datetime import datetime
 from pathlib import Path
@@ -13,11 +13,11 @@ SCRIPT_DIR = Path(__file__).resolve().parent
 REPO_ROOT = SCRIPT_DIR.parents[2]
 EVOLVE_SCRIPT = REPO_ROOT / "skills" / "evolve-feature" / "scripts" / "manage_feature_changes.py"
 EXECUTION_SCRIPT = REPO_ROOT / "skills" / "guide-execution" / "scripts" / "manage_execution.py"
-RECONCILIATION_FILE = "reconciliation.md"
-DEFAULT_HISTORY_FILE = "changes/history.md"
+FIGURES_DIR = "figures"
 RECONCILABLE_FILES = [
     "discover.md",
     "system-design.md",
+    "ui-design.md",
 ]
 
 
@@ -45,7 +45,8 @@ def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(
         description=(
             "Reconcile an approved feature change packet back into the canonical "
-            "feature docs, publish retained history, and close the change."
+            "feature docs, remove completed execution slices, and remove the "
+            "completed change packet."
         )
     )
     parser.add_argument("feature", help="Feature slug, folder name, or path")
@@ -61,16 +62,13 @@ def parse_args() -> argparse.Namespace:
     )
     parser.add_argument(
         "--history-file",
-        default=DEFAULT_HISTORY_FILE,
-        help=(
-            "Feature-local history file, relative to the canonical feature root. "
-            f"Defaults to '{DEFAULT_HISTORY_FILE}'."
-        ),
+        default=None,
+        help="Deprecated and ignored. Reconciliation no longer publishes history files.",
     )
     parser.add_argument(
         "--no-history",
         action="store_true",
-        help="Close without publishing a feature-local history entry.",
+        help="Deprecated no-op. Reconciliation no longer publishes history files.",
     )
     parser.add_argument(
         "--force",
@@ -88,24 +86,6 @@ def relative_to_cwd(path: Path) -> str:
         if text.startswith("./"):
             return text[2:]
         return text
-
-
-def format_code_list(items: list[str], empty: str) -> str:
-    if not items:
-        return f"- {empty}"
-    return "\n".join(f"- `{item}`" for item in items)
-
-
-def normalize_history_file(value: str) -> str:
-    normalized = value.strip()
-    if not normalized:
-        raise RuntimeError("History file cannot be empty.")
-    normalized = normalized.rstrip("/")
-    if normalized.startswith("./"):
-        normalized = normalized[2:]
-    if Path(normalized).is_absolute():
-        raise RuntimeError("History file must be relative to the canonical feature root.")
-    return normalized
 
 
 def normalize_requested_filename(value: str) -> str:
@@ -179,7 +159,6 @@ def extract_slice_ids_from_planning_text(markdown: str) -> list[str]:
             continue
         if not in_slice_table or first.startswith("---"):
             continue
-
         if first:
             collected.append(first)
 
@@ -233,16 +212,41 @@ def require_feature_complete(
             problems.append("open slices: " + ", ".join(not_closed))
         raise RuntimeError(
             "Feature reconciliation requires all planned slices in slice-planning.md "
-            "to be closed before reconciliation can archive/publish: " + "; ".join(problems)
+            "to be closed before reconciliation can clean them up: " + "; ".join(problems)
         )
 
     return missing, not_closed
 
 
-def archive_completed_slices(manage_execution, slice_ids: list[str]) -> list[str]:
-    archived_paths: list[str] = []
+def rewrite_canonical_file(source_path: Path, canonical_path: Path) -> None:
+    source_rel = relative_to_cwd(source_path)
+    source_content = source_path.read_text(encoding="utf-8")
+    if not source_content.strip():
+        raise RuntimeError(f"Cannot reconcile empty change-local file '{source_rel}'.")
+    canonical_path.parent.mkdir(parents=True, exist_ok=True)
+    canonical_path.write_text(source_content, encoding="utf-8")
+
+
+def sync_figures(source_dir: Path, target_dir: Path) -> list[str]:
+    if not source_dir.exists():
+        return []
+
+    copied: list[str] = []
+    for source_path in sorted(source_dir.rglob("*")):
+        if source_path.is_dir():
+            continue
+        relative_path = source_path.relative_to(source_dir)
+        target_path = target_dir / relative_path
+        target_path.parent.mkdir(parents=True, exist_ok=True)
+        shutil.copy2(source_path, target_path)
+        copied.append(relative_to_cwd(target_path))
+    return copied
+
+
+def delete_completed_slices(manage_execution, slice_ids: list[str]) -> list[str]:
+    removed_paths: list[str] = []
     if not slice_ids:
-        return archived_paths
+        return removed_paths
 
     rows = manage_execution.parse_registry()
     for slice_id in slice_ids:
@@ -251,21 +255,16 @@ def archive_completed_slices(manage_execution, slice_ids: list[str]) -> list[str
             continue
         if manage_execution.normalize_status(str(row["status"])) != "closed":
             continue
-        success, message, updated = manage_execution.archive_slice(rows, row)
+        removed_paths.append(str(row["path"]))
+        success, message, _ = manage_execution.delete_slice(rows, row)
         if not success:
             raise RuntimeError(message)
-        archived_paths.append(str(updated["path"]))
         rows = manage_execution.parse_registry()
 
-    return dedupe_preserve_order(archived_paths)
+    return dedupe_preserve_order(removed_paths)
 
 
-def update_feature_reconciliation_metadata(
-    feature_dir: Path,
-    reconciled_at: str,
-    archived_slice_paths: list[str],
-    history_targets: list[str],
-) -> None:
+def update_feature_reconciliation_metadata(feature_dir: Path, reconciled_at: str) -> None:
     metadata_path = feature_dir / ".planning-meta.json"
     payload: dict[str, object] = {}
     if metadata_path.exists():
@@ -273,178 +272,10 @@ def update_feature_reconciliation_metadata(
 
     payload.pop("feature_completed_at", None)
     payload.pop("planning_archive_targets", None)
+    payload.pop("archived_slice_paths", None)
+    payload.pop("history_targets", None)
     payload["last_reconciled_at"] = reconciled_at
-    payload["archived_slice_paths"] = archived_slice_paths
-    payload["history_targets"] = history_targets
     metadata_path.write_text(json.dumps(payload, indent=2) + "\n", encoding="utf-8")
-
-
-def update_change_completion_metadata(
-    manage_feature_changes,
-    change_dir: Path,
-    archived_slice_paths: list[str],
-) -> None:
-    metadata_path = Path(manage_feature_changes.metadata_path_for(str(change_dir)))
-    metadata = json.loads(metadata_path.read_text(encoding="utf-8"))
-    metadata.pop("planning_archive_targets", None)
-    metadata["archived_slice_paths"] = archived_slice_paths
-    metadata_path.write_text(json.dumps(metadata, indent=2) + "\n", encoding="utf-8")
-
-
-def strip_top_heading(text: str) -> str:
-    lines = text.strip().splitlines()
-    if lines and lines[0].startswith("# "):
-        lines = lines[1:]
-        while lines and not lines[0].strip():
-            lines = lines[1:]
-    return "\n".join(lines).strip()
-
-
-def title_for_filename(filename: str) -> str:
-    stem = filename.replace(".md", "").replace("-", " ")
-    return "# " + stem.title()
-
-
-def upsert_marked_block(content: str, start_marker: str, end_marker: str, block: str) -> str:
-    pattern = re.compile(re.escape(start_marker) + r".*?" + re.escape(end_marker), re.DOTALL)
-    if pattern.search(content):
-        updated = pattern.sub(block, content)
-    else:
-        base = content.rstrip()
-        updated = (base + "\n\n" if base else "") + block
-    return updated.rstrip() + "\n"
-
-
-def append_reconciliation_block(
-    canonical_path: Path,
-    change_id: str,
-    change_type: str,
-    review_note: str,
-    source_path: Path,
-    reconciled_at: str,
-) -> None:
-    source_rel = relative_to_cwd(source_path)
-    source_content = strip_top_heading(source_path.read_text(encoding="utf-8"))
-    if not source_content:
-        raise RuntimeError(f"Cannot reconcile empty change-local file '{source_rel}'.")
-
-    start_marker = f"<!-- reconcile-feature:start {change_id} {canonical_path.name} -->"
-    end_marker = f"<!-- reconcile-feature:end {change_id} {canonical_path.name} -->"
-    block = (
-        f"{start_marker}\n"
-        f"## Reconciled Change Packet: {change_id}\n\n"
-        f"- Reconciled at: `{reconciled_at}`\n"
-        f"- Change type: `{change_type}`\n"
-        f"- Source change doc: `{source_rel}`\n"
-        f"- Review note: {review_note}\n\n"
-        "### Adopted Change Content\n\n"
-        f"{source_content}\n"
-        f"{end_marker}"
-    )
-
-    if canonical_path.exists():
-        existing = canonical_path.read_text(encoding="utf-8")
-    else:
-        existing = title_for_filename(canonical_path.name) + "\n"
-    canonical_path.write_text(
-        upsert_marked_block(existing, start_marker, end_marker, block),
-        encoding="utf-8",
-    )
-
-
-def retained_change_breakdown_paths(change_dir: Path) -> list[str]:
-    retained_paths: list[str] = []
-    for filename in ("slice-planning.md", "slice-traceability.md"):
-        path = change_dir / filename
-        if path.exists():
-            retained_paths.append(relative_to_cwd(path))
-    return retained_paths
-
-
-def write_reconciliation_summary(
-    change_dir: Path,
-    feature_slug: str,
-    change_id: str,
-    change_type: str,
-    review_note: str,
-    reconciled_files: list[str],
-    retained_breakdown_paths: list[str],
-    history_targets: list[str],
-    archived_slice_paths: list[str],
-    reconciled_at: str,
-) -> Path:
-    reconciliation_path = change_dir / RECONCILIATION_FILE
-    content = (
-        f"# Reconciliation: {change_id}\n\n"
-        "## Target Feature\n\n"
-        f"- Feature: `{feature_slug}`\n"
-        f"- Change ID: `{change_id}`\n"
-        f"- Change type: `{change_type}`\n"
-        f"- Reconciled at: `{reconciled_at}`\n\n"
-        "## Canonical Files Updated\n\n"
-        f"{format_code_list(reconciled_files, 'No canonical files were updated.')}\n\n"
-        "## Retained Change-local Breakdown\n\n"
-        f"{format_code_list(retained_breakdown_paths, 'No change-local breakdown files were retained.')}\n\n"
-        "## Archived Execution Slices\n\n"
-        f"{format_code_list(archived_slice_paths, 'No execution slices were archived.')}\n\n"
-        "## Review Note\n\n"
-        f"{review_note}\n\n"
-        "## History Targets\n\n"
-        f"{format_code_list(history_targets, 'No feature-local history file was updated.')}\n"
-    )
-    reconciliation_path.write_text(content, encoding="utf-8")
-    return reconciliation_path
-
-
-def publish_history(
-    feature_dir: Path,
-    change_dir: Path,
-    feature_slug: str,
-    change_id: str,
-    change_type: str,
-    review_note: str,
-    reconciled_files: list[str],
-    history_file: str,
-    planned_slice_ids: list[str],
-    retained_breakdown_paths: list[str],
-    archived_slice_paths: list[str],
-    reconciled_at: str,
-) -> Path:
-    history_path = feature_dir / history_file
-    history_path.parent.mkdir(parents=True, exist_ok=True)
-
-    if history_path.exists():
-        existing = history_path.read_text(encoding="utf-8")
-    else:
-        existing = "# Feature Change History\n\n"
-
-    change_rel = relative_to_cwd(change_dir)
-    start_marker = f"<!-- reconcile-feature:history:start {change_id} -->"
-    end_marker = f"<!-- reconcile-feature:history:end {change_id} -->"
-    block = (
-        f"{start_marker}\n"
-        f"## Closed Change: {change_id}\n\n"
-        f"- Closed at: `{reconciled_at}`\n"
-        f"- Feature: `{feature_slug}`\n"
-        f"- Change type: `{change_type}`\n"
-        f"- Change packet: `{change_rel}/`\n\n"
-        "### Canonical Files Updated\n\n"
-        f"{format_code_list(reconciled_files, 'No canonical files were updated.')}\n\n"
-        "### Closed Change Slices\n\n"
-        f"{format_code_list(planned_slice_ids, 'No planned slices were declared.')}\n\n"
-        "### Retained Change-local Breakdown\n\n"
-        f"{format_code_list(retained_breakdown_paths, 'No change-local breakdown files were retained.')}\n\n"
-        "### Archived Execution Slices\n\n"
-        f"{format_code_list(archived_slice_paths, 'No execution slices were archived.')}\n\n"
-        "### Review Note\n\n"
-        f"{review_note}\n"
-        f"{end_marker}"
-    )
-    history_path.write_text(
-        upsert_marked_block(existing, start_marker, end_marker, block),
-        encoding="utf-8",
-    )
-    return history_path
 
 
 def main() -> int:
@@ -476,61 +307,17 @@ def main() -> int:
         planned_ids = planned_slice_ids(change_dir, metadata)
         require_feature_complete(manage_execution, planned_ids, force=args.force)
         selected_files = select_reconciled_files(change_dir, args.canonical_file)
-        retained_breakdown_paths = retained_change_breakdown_paths(change_dir)
+
         reconciled_files: list[str] = []
         for filename in selected_files:
             source_path = change_dir / filename
             canonical_path = feature_dir / filename
-            append_reconciliation_block(
-                canonical_path=canonical_path,
-                change_id=str(metadata["change_id"]),
-                change_type=str(metadata["change_type"]),
-                review_note=review_note or "No review note recorded.",
-                source_path=source_path,
-                reconciled_at=reconciled_at,
-            )
+            rewrite_canonical_file(source_path, canonical_path)
             reconciled_files.append(relative_to_cwd(canonical_path))
 
-        archived_slice_paths: list[str] = []
-        if planned_ids:
-            archived_slice_paths = archive_completed_slices(manage_execution, planned_ids)
-
-        history_targets: list[str] = []
-        if not args.no_history:
-            history_path = publish_history(
-                feature_dir=feature_dir,
-                change_dir=change_dir,
-                feature_slug=feature_slug,
-                change_id=str(metadata["change_id"]),
-                change_type=str(metadata["change_type"]),
-                review_note=review_note or "No review note recorded.",
-                reconciled_files=reconciled_files,
-                history_file=normalize_history_file(args.history_file),
-                planned_slice_ids=planned_ids,
-                retained_breakdown_paths=retained_breakdown_paths,
-                archived_slice_paths=archived_slice_paths,
-                reconciled_at=reconciled_at,
-            )
-            history_targets.append(relative_to_cwd(history_path))
-
-        update_feature_reconciliation_metadata(
-            feature_dir=feature_dir,
-            reconciled_at=reconciled_at,
-            archived_slice_paths=archived_slice_paths,
-            history_targets=history_targets,
-        )
-        write_reconciliation_summary(
-            change_dir=change_dir,
-            feature_slug=feature_slug,
-            change_id=str(metadata["change_id"]),
-            change_type=str(metadata["change_type"]),
-            review_note=review_note or "No review note recorded.",
-            reconciled_files=reconciled_files,
-            retained_breakdown_paths=retained_breakdown_paths,
-            history_targets=history_targets,
-            archived_slice_paths=archived_slice_paths,
-            reconciled_at=reconciled_at,
-        )
+        if {"system-design.md", "ui-design.md"} & set(selected_files):
+            copied_figures = sync_figures(change_dir / FIGURES_DIR, feature_dir / FIGURES_DIR)
+            reconciled_files.extend(copied_figures)
 
         success, message = manage_feature_changes.update_change_status(
             feature_dir_str,
@@ -552,29 +339,31 @@ def main() -> int:
             refreshed_change,
             "closed",
             force=args.force,
-            history_targets=history_targets,
         )
         if not success:
             raise RuntimeError(close_message)
 
-        update_change_completion_metadata(
-            manage_feature_changes=manage_feature_changes,
-            change_dir=change_dir,
-            archived_slice_paths=archived_slice_paths,
-        )
+        removed_slice_paths = delete_completed_slices(manage_execution, planned_ids)
+        update_feature_reconciliation_metadata(feature_dir=feature_dir, reconciled_at=reconciled_at)
+
+        closed_rows = manage_feature_changes.load_registry(feature_dir_str)
+        closed_change = manage_feature_changes.find_change(closed_rows, str(metadata["change_id"]))
+        if not closed_change:
+            raise RuntimeError(f"Feature change disappeared from registry: {metadata['change_id']}")
+        success, delete_message = manage_feature_changes.delete_change(feature_dir_str, closed_change)
+        if not success:
+            raise RuntimeError(delete_message)
     except RuntimeError as exc:
         print(str(exc), file=sys.stderr)
         return 2
 
-    print(f"Reconciled change packet: {relative_to_cwd(change_dir)}")
+    print(f"Reconciled feature change: {relative_to_cwd(change_dir)}")
     for path in reconciled_files:
-        print(f"- updated canonical doc: {path}")
-    for path in archived_slice_paths:
-        print(f"- archived execution slice: {path}")
-    if history_targets:
-        for path in history_targets:
-            print(f"- updated history: {path}")
-    print(f"- change status: closed")
+        print(f"- updated canonical artifact: {path}")
+    for path in removed_slice_paths:
+        print(f"- removed execution slice: {path}")
+    print(f"- removed completed change packet: {relative_to_cwd(change_dir)}")
+    print("- change status: closed and removed")
     return 0
 
 

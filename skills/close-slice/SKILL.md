@@ -1,6 +1,6 @@
 ---
 name: close-slice
-description: Closes the active execution slice with validation and records durable closure metadata without handling feature-level archive or publish steps.
+description: Closes the active execution slice with validation and records durable closure metadata without handling feature-level reconcile cleanup.
 ---
 
 # Close Slice
@@ -16,7 +16,7 @@ Use this skill when implementation is complete and you want to close an executio
 
 ## Source of Truth Rules
 
-- Keep the original slice artifacts intact. `close-slice` records closure only; archive or publish decisions belong to the reviewed change completion step after all planned slices are done.
+- Keep the original slice artifacts intact. `close-slice` records closure only; feature-level cleanup belongs to the reviewed change completion step after all planned slices are done and a human requests `reconcile-feature`.
 - Treat `<slice_dir>/README.md`, `<slice_dir>/registry.json`, and `<slice_path>/.slice-meta.json` as the canonical closure records.
 
 ## Artifact Ownership
@@ -54,4 +54,4 @@ python3 <path-to-close-slice>/scripts/close_slice.py --json
 
 Use `--confirm-impact` when closure also changes the semantic validity of older execution slices. Use `--force` only for deliberate repair when the slice lifecycle is temporarily inconsistent and you have already verified the intent with the user.
 
-Feature-level archive or publish actions should happen later, during reviewed change completion, after all slices listed in the change packet's planning are done.
+Feature-level reconcile cleanup should happen later, during reviewed change completion, after all slices listed in the change packet's planning are done and a human explicitly requests it.

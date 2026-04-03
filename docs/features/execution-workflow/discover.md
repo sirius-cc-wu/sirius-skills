@@ -40,13 +40,13 @@ The repository provides a slice-scoped execution workflow, but that workflow spa
 - `skills/brief/templates/brief-template.md` defines the slice brief structure.
 - `skills/blueprint/templates/plan-template.md` defines implementation packets and validation mapping.
 - `skills/close-slice/scripts/close_slice.py` closes slices and records durable closure metadata.
-- `skills/reconcile-feature/scripts/reconcile_feature_change.py` is the feature-level point that can archive completed slices and publish retained history once a reviewed change packet's planned slices are done.
+- `skills/reconcile-feature/scripts/reconcile_feature_change.py` is the human-invoked feature-level point that rewrites canonical feature docs and removes temporary slices/change packets once a reviewed change packet's planned slices are done.
 - `skills/commit/` and `skills/create-pr/` enforce conventions and checklist completion around execution work.
 
 ## Success Criteria
 
 - A maintainer can bootstrap, brief, blueprint, review, and close a execution slice with durable metadata.
-- Slice artifacts remain sufficient for later audit or historical publication after closure.
+- Slice artifacts remain sufficient for later audit until a human requests final feature-level reconciliation cleanup.
 - Execution workflow stays generic-first while allowing project-level conventions via config.
 
 ## Risks and Open Questions

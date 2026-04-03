@@ -25,7 +25,7 @@ Use `guide-planning` when you need to decide the next planning step before slice
 - If the user wants an accepted proposal promoted into canonical planning, perform that promotion here and then route to `discover`.
 - If the request changes an existing feature rather than starting a net-new feature, route to `evolve-feature`.
 - If an active feature change packet exists and the baseline impact is not yet explicit, route to `assess`.
-- If an approved feature change packet now needs canonical docs updated and retained history recorded, route to `reconcile-feature`.
+- If an approved feature change packet now needs canonical docs updated and temporary execution/change artifacts cleaned up, route to `reconcile-feature` only when the user explicitly asks for that final handoff.
 - If the problem, outcomes, or constraints are still being framed, route to `discover`.
 - If the architecture, interfaces, or validation strategy are still unresolved, route to `design`.
 - If UI or interaction flow remains material, route to `ui-flow`.

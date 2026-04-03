@@ -219,7 +219,6 @@ def test_reviewed_requires_review_note_and_closed_allows_new_change(tmp_path, mo
         "--review-note",
         "Reviewed and ready for reconciliation planning.",
     ) == 0
-    write_file(change_dir / "reconciliation.md")
     assert run_cli(
         module,
         monkeypatch,
@@ -257,7 +256,6 @@ def test_validate_reports_success_for_closed_change(tmp_path, monkeypatch):
     write_file(change_dir / "system-design.md")
     write_file(change_dir / "slice-planning.md")
     write_file(change_dir / "slice-traceability.md")
-    write_file(change_dir / "reconciliation.md")
 
     assert run_cli(module, monkeypatch, "set-status", "checkout", "replace-legacy-flow", "impact_ready") == 0
     assert run_cli(module, monkeypatch, "set-status", "checkout", "replace-legacy-flow", "design_ready") == 0
@@ -297,3 +295,60 @@ def test_validate_reports_success_for_closed_change(tmp_path, monkeypatch):
         ["manage_feature_changes.py", "validate", "checkout", "replace-legacy-flow"],
     )
     assert module.main() == 0
+
+
+def test_delete_change_removes_closed_packet_and_registry_entry(tmp_path, monkeypatch):
+    module = load_module()
+    monkeypatch.chdir(tmp_path)
+    feature_dir = setup_feature(tmp_path)
+
+    assert run_cli(module, monkeypatch, "add", "checkout", "replace-legacy-flow") == 0
+    change_dir = feature_dir / "changes" / "replace-legacy-flow"
+    write_file(change_dir / "impact-analysis.md")
+    write_file(change_dir / "system-design.md")
+    write_file(change_dir / "slice-planning.md")
+    write_file(change_dir / "slice-traceability.md")
+
+    assert run_cli(module, monkeypatch, "set-status", "checkout", "replace-legacy-flow", "impact_ready") == 0
+    assert run_cli(module, monkeypatch, "set-status", "checkout", "replace-legacy-flow", "design_ready") == 0
+    assert run_cli(module, monkeypatch, "set-status", "checkout", "replace-legacy-flow", "breakdown_ready") == 0
+    assert run_cli(
+        module,
+        monkeypatch,
+        "set-status",
+        "checkout",
+        "replace-legacy-flow",
+        "reviewed",
+        "--review-note",
+        "Reviewed and ready for reconciliation planning.",
+    ) == 0
+    assert run_cli(
+        module,
+        monkeypatch,
+        "set-status",
+        "checkout",
+        "replace-legacy-flow",
+        "reconciled",
+        "--reconciled-file",
+        "docs/features/checkout/system-design.md",
+    ) == 0
+    assert run_cli(
+        module,
+        monkeypatch,
+        "set-status",
+        "checkout",
+        "replace-legacy-flow",
+        "closed",
+    ) == 0
+
+    rows = module.load_registry(str(feature_dir))
+    change = module.find_change(rows, "replace-legacy-flow")
+    assert change is not None
+
+    success, message = module.delete_change(str(feature_dir), change)
+    registry = json.loads((feature_dir / "changes" / "registry.json").read_text(encoding="utf-8"))
+
+    assert success is True
+    assert "Removed feature change replace-legacy-flow" == message
+    assert not change_dir.exists()
+    assert registry["changes"] == []

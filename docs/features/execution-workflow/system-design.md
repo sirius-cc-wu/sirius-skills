@@ -2,17 +2,16 @@
 
 ## Overview
 
-The execution workflow is a centralized slice system. `guide-execution` manages slice registry state and readiness transitions, while `brief`, `plan`, `review-execution`, and `close-slice` own the slice-scoped artifacts and review outcomes. Feature-level archive and publish behavior happens later during reconciliation once planned slices are complete.
+The execution workflow is a centralized slice system. `guide-execution` manages slice registry state and readiness transitions, while `brief`, `plan`, `review-execution`, and `close-slice` own the slice-scoped artifacts and review outcomes. Feature-level cleanup happens later during human-requested reconciliation once planned slices are complete.
 
 ## Key Components
 
 - **Execution registry**: `<slice_dir>/README.md` and `registry.json`
 - **Slice metadata**: `<slice_path>/.slice-meta.json`
-- **Hidden archive**: `<slice_dir>/.archived/` used during reviewed change completion for closed slices
 - **Intent artifact**: `brief.md`
 - **Execution artifact**: `blueprint.md`
 - **Requirements checklist**: `checklists/requirements.md`
-- **Feature completion publisher**: `reconcile_feature_change.py` with retained feature-local history output
+- **Feature cleanup tooling**: `reconcile_feature_change.py` for canonical rewrite plus temporary slice/change cleanup
 
 ## Interfaces and Responsibilities
 
@@ -27,7 +26,7 @@ The execution workflow is a centralized slice system. `guide-execution` manages 
 ## Constraints and Tradeoffs
 
 - Slice-scoped slices improve auditability but require stronger discipline to keep one work item per slice.
-- Closure is non-destructive, which preserves history at the cost of requiring a later reconciliation step to archive finished slice artifacts.
+- Closure is non-destructive, which preserves execution context until a later reconciliation step removes the temporary slice artifacts after canonical feature docs are updated.
 - Day-to-day execution context stays intentionally lightweight, reducing workflow overhead but requiring careful handoff discipline.
 
 ## Validation Strategy
@@ -52,7 +51,6 @@ package "Execution Layer" {
 
 database "<slice_dir>/registry.json" as Registry
 file ".slice-meta.json" as Meta
-folder "<slice_dir>/.archived/" as Archive
 file "brief.md" as Brief
 file "blueprint.md" as PlanDoc
 file "requirements.md" as Requirements
@@ -72,6 +70,7 @@ file "requirements.md" as Requirements
 [review-execution] --> PlanDoc
 [close-slice] --> Meta
 [close-slice] --> Registry
-[reconcile-feature] --> Archive
+[reconcile-feature] --> Registry
+[reconcile-feature] --> Meta
 @enduml
 ```

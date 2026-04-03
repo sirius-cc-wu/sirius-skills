@@ -649,6 +649,45 @@ def archive_slice(
     return True, f"Archived {slice['id']} to {target_normalized}", slice
 
 
+def delete_slice(
+    rows: List[Dict[str, object]], slice: Dict[str, object]
+) -> Tuple[bool, str, Dict[str, object]]:
+    current_status = normalize_status(str(slice["status"]))
+    if current_status != "closed":
+        return False, "Only closed slices can be removed.", slice
+
+    current_path = str(slice["path"]).rstrip("/")
+    if not os.path.isdir(current_path):
+        return False, f"Slice directory not found: {current_path}", slice
+
+    deleted_slice_id = str(slice["id"])
+    for row in rows:
+        if str(row["id"]) == deleted_slice_id:
+            continue
+        row_path = str(row["path"]).rstrip("/")
+        metadata = load_slice_metadata(row_path)
+        if not metadata:
+            continue
+        relations = normalize_relations(metadata.get("relations"))
+        retained_relations = [
+            relation
+            for relation in relations
+            if str(relation["target_slice"]) != deleted_slice_id
+        ]
+        if len(retained_relations) == len(relations):
+            continue
+        metadata["relations"] = retained_relations
+        updated_metadata = build_slice_metadata(
+            row, normalize_status(str(row["status"])), existing=metadata
+        )
+        sync_slice_metadata(row, updated_metadata)
+
+    shutil.rmtree(current_path)
+    rows[:] = [row for row in rows if str(row["id"]) != deleted_slice_id]
+    write_registry(rows)
+    return True, f"Removed closed slice {deleted_slice_id}", slice
+
+
 def upsert_relation_entry(
     relations: List[Dict[str, object]], relation: Dict[str, object]
 ) -> List[Dict[str, object]]:
