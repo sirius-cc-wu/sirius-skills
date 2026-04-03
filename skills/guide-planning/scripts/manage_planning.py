@@ -710,6 +710,7 @@ def promote_proposal_to_feature(
     require_ui_flow: bool = False,
     force: bool = False,
     scope: Optional[str] = None,
+    target_scope: Optional[str] = None,
 ) -> Tuple[bool, str]:
     manage_proposals = load_manage_proposals_module()
     try:
@@ -734,12 +735,21 @@ def promote_proposal_to_feature(
     target_feature = (
         feature_slug or proposal_metadata.get("target_feature") or proposal["proposal"]
     )
+    target_scope_context = proposal_scope_context
+    if target_scope is not None:
+        try:
+            target_scope_context = SCOPE_RUNTIME.resolve_scope_context(
+                start_path=proposal_scope_context.start_dir,
+                explicit_scope=target_scope,
+            )
+        except ValueError as exc:
+            return False, str(exc)
     try:
         normalized_feature = validate_feature_slug(str(target_feature))
         feature_dir, created = create_feature(
             normalized_feature,
             requires_ui_flow=require_ui_flow,
-            scope_context=proposal_scope_context,
+            scope_context=target_scope_context,
         )
     except (RuntimeError, ValueError) as exc:
         return False, str(exc)
@@ -887,6 +897,7 @@ def cmd_promote_proposal(args: argparse.Namespace) -> int:
         require_ui_flow=args.require_ui_flow,
         force=args.force,
         scope=args.scope,
+        target_scope=args.target_scope,
     )
     stream = sys.stdout if success else sys.stderr
     print(message, file=stream)
@@ -983,6 +994,10 @@ def build_parser() -> argparse.ArgumentParser:
     promote_p.add_argument(
         "--scope",
         help="Explicit scope path to use for proposal lookup.",
+    )
+    promote_p.add_argument(
+        "--target-scope",
+        help="Explicit scope path to use for canonical feature creation.",
     )
 
     return parser

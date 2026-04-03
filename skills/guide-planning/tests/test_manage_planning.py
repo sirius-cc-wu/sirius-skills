@@ -510,3 +510,181 @@ def test_promote_proposal_requires_accepted_status(tmp_path, monkeypatch, capsys
 
     assert exit_code == 2
     assert "Only accepted proposals can be promoted." in captured.err
+
+
+def test_promote_proposal_defaults_to_proposal_scope_without_target_scope(
+    tmp_path, monkeypatch
+):
+    planning_module = load_manage_planning_module()
+    proposal_module = load_manage_proposals_module()
+    write_planning_config(tmp_path)
+    child_scope = tmp_path / "apps" / "payments"
+    write_planning_config(child_scope)
+
+    monkeypatch.chdir(child_scope)
+    assert run_cli(proposal_module, monkeypatch, "add", "workflow-capability-upgrades") == 0
+
+    proposal_dir = child_scope / "docs" / "proposals" / "workflow-capability-upgrades"
+    write_file(proposal_dir / "discover.md", "# Discover\n")
+    write_file(proposal_dir / "user-stories.md", "# Stories\n")
+
+    assert (
+        run_cli(
+            proposal_module,
+            monkeypatch,
+            "set-status",
+            "workflow-capability-upgrades",
+            "reviewed",
+            "--review-note",
+            "Proposal scoped and ready for decision.",
+        )
+        == 0
+    )
+    assert (
+        run_cli(
+            proposal_module,
+            monkeypatch,
+            "set-status",
+            "workflow-capability-upgrades",
+            "accepted",
+            "--review-note",
+            "Accepted for canonical planning.",
+        )
+        == 0
+    )
+
+    monkeypatch.chdir(tmp_path)
+    assert (
+        run_cli(
+            planning_module,
+            monkeypatch,
+            "promote-proposal",
+            "workflow-capability-upgrades",
+            "--scope",
+            str(child_scope),
+        )
+        == 0
+    )
+
+    assert (
+        child_scope / "docs" / "features" / "workflow-capability-upgrades" / ".planning-meta.json"
+    ).exists()
+    assert not (tmp_path / "docs" / "features" / "workflow-capability-upgrades").exists()
+
+
+def test_promote_proposal_supports_explicit_target_scope(tmp_path, monkeypatch):
+    planning_module = load_manage_planning_module()
+    proposal_module = load_manage_proposals_module()
+    write_planning_config(tmp_path)
+    child_scope = tmp_path / "apps" / "payments"
+    write_planning_config(child_scope)
+
+    monkeypatch.chdir(child_scope)
+    assert run_cli(proposal_module, monkeypatch, "add", "workflow-capability-upgrades") == 0
+
+    proposal_dir = child_scope / "docs" / "proposals" / "workflow-capability-upgrades"
+    write_file(proposal_dir / "discover.md", "# Discover\n")
+    write_file(proposal_dir / "user-stories.md", "# Stories\n")
+
+    assert (
+        run_cli(
+            proposal_module,
+            monkeypatch,
+            "set-status",
+            "workflow-capability-upgrades",
+            "reviewed",
+            "--review-note",
+            "Proposal scoped and ready for decision.",
+        )
+        == 0
+    )
+    assert (
+        run_cli(
+            proposal_module,
+            monkeypatch,
+            "set-status",
+            "workflow-capability-upgrades",
+            "accepted",
+            "--review-note",
+            "Accepted for canonical planning.",
+        )
+        == 0
+    )
+
+    monkeypatch.chdir(tmp_path)
+    assert (
+        run_cli(
+            planning_module,
+            monkeypatch,
+            "promote-proposal",
+            "workflow-capability-upgrades",
+            "--scope",
+            str(child_scope),
+            "--target-scope",
+            str(tmp_path),
+        )
+        == 0
+    )
+
+    assert (tmp_path / "docs" / "features" / "workflow-capability-upgrades" / ".planning-meta.json").exists()
+    assert not (child_scope / "docs" / "features" / "workflow-capability-upgrades").exists()
+
+
+def test_promote_proposal_rejects_target_scope_outside_repo(tmp_path, monkeypatch, capsys):
+    planning_module = load_manage_planning_module()
+    proposal_module = load_manage_proposals_module()
+    write_planning_config(tmp_path)
+    child_scope = tmp_path / "apps" / "payments"
+    write_planning_config(child_scope)
+
+    monkeypatch.chdir(child_scope)
+    assert run_cli(proposal_module, monkeypatch, "add", "workflow-capability-upgrades") == 0
+
+    proposal_dir = child_scope / "docs" / "proposals" / "workflow-capability-upgrades"
+    write_file(proposal_dir / "discover.md", "# Discover\n")
+    write_file(proposal_dir / "user-stories.md", "# Stories\n")
+
+    assert (
+        run_cli(
+            proposal_module,
+            monkeypatch,
+            "set-status",
+            "workflow-capability-upgrades",
+            "reviewed",
+            "--review-note",
+            "Proposal scoped and ready for decision.",
+        )
+        == 0
+    )
+    assert (
+        run_cli(
+            proposal_module,
+            monkeypatch,
+            "set-status",
+            "workflow-capability-upgrades",
+            "accepted",
+            "--review-note",
+            "Accepted for canonical planning.",
+        )
+        == 0
+    )
+
+    outside_scope = tmp_path.parent / "outside-scope"
+    outside_scope.mkdir()
+
+    monkeypatch.chdir(tmp_path)
+    exit_code = run_cli(
+        planning_module,
+        monkeypatch,
+        "promote-proposal",
+        "workflow-capability-upgrades",
+        "--scope",
+        str(child_scope),
+        "--target-scope",
+        str(outside_scope),
+    )
+    captured = capsys.readouterr()
+
+    assert exit_code == 2
+    assert "outside repository root" in captured.err
+    assert not (tmp_path / "docs" / "features" / "workflow-capability-upgrades").exists()

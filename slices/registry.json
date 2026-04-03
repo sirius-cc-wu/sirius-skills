@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "generated_at": "2026-04-04T03:59:57",
+  "generated_at": "2026-04-04T04:03:51",
   "slices": [
     {
       "id": "HSS-01-root-fallback",
@@ -39,6 +39,16 @@
       "path": "slices/HSS-04-scope-selection-require-explicit-scope-selection-for-ambiguous-lookups/",
       "updated_at": "2026-04-04T03:59:57",
       "closed_at": "2026-04-04T03:59:57",
+      "archived_at": null,
+      "relations": []
+    },
+    {
+      "id": "HSS-04-promotion-targeting",
+      "feature": "Support explicit cross-scope promotion targets",
+      "status": "closed",
+      "path": "slices/HSS-04-promotion-targeting-support-explicit-cross-scope-promotion-targets/",
+      "updated_at": "2026-04-04T04:03:51",
+      "closed_at": "2026-04-04T04:03:51",
       "archived_at": null,
       "relations": []
     }
