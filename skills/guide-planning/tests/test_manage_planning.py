@@ -36,12 +36,14 @@ def write_file(path: Path, content: str = "# doc\n"):
     path.write_text(content, encoding="utf-8")
 
 
-def write_planning_config(scope_root: Path):
+def write_planning_config(scope_root: Path, config: dict | None = None):
     skills_dir = scope_root / ".skills"
     skills_dir.mkdir(parents=True, exist_ok=True)
     (skills_dir / "planning.json").write_text(
         json.dumps(
-            {
+            config
+            if config is not None
+            else {
                 "planning_dir": "docs/features",
                 "proposal_dir": "docs/proposals",
                 "design_diagram_mode": "embedded",
@@ -239,6 +241,45 @@ def test_nested_child_directory_uses_nearest_scope_and_sibling_path_falls_back_t
     assert (tmp_path / "docs" / "features" / "root-feature" / ".planning-meta.json").exists()
     assert not (tmp_path / "docs" / "features" / "child-feature").exists()
     assert not (child_scope / "docs" / "features" / "root-feature").exists()
+
+
+def test_child_scope_inherits_parent_planning_config_and_keeps_child_overrides(
+    tmp_path, monkeypatch
+):
+    module = load_manage_planning_module()
+    (tmp_path / ".git").mkdir()
+    write_planning_config(
+        tmp_path,
+        {
+            "planning_dir": "planning/features",
+            "proposal_dir": "planning/proposals",
+            "design_diagram_mode": "linked_svg",
+            "custom_key": "keep-me",
+        },
+    )
+
+    child_scope = tmp_path / "apps" / "payments"
+    write_planning_config(
+        child_scope,
+        {
+            "design_diagram_mode": "embedded",
+            "custom_child": "keep-child",
+        },
+    )
+
+    monkeypatch.chdir(child_scope)
+    config = module.load_raw_config()
+
+    assert config["planning_dir"] == "planning/features"
+    assert config["proposal_dir"] == "planning/proposals"
+    assert config["design_diagram_mode"] == "embedded"
+    assert config["custom_key"] == "keep-me"
+    assert config["custom_child"] == "keep-child"
+
+    assert run_cli(module, monkeypatch, "add", "child-feature") == 0
+
+    assert (child_scope / "planning" / "features" / "child-feature" / ".planning-meta.json").exists()
+    assert not (tmp_path / "planning" / "features" / "child-feature").exists()
 
 
 def test_ambiguous_feature_lookup_requires_explicit_scope(tmp_path, monkeypatch, capsys):

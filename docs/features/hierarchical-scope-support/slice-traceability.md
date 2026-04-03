@@ -20,7 +20,7 @@ Use this file to map repo story IDs to execution slices without moving story own
 | HSS-03 | M | Default to the nearest enclosing scope from the working directory | I1 | HSS-03-nearest-scope | CLI scope resolution | HSS-01-root-fallback, HSS-02-local-registries | HSS-03-nearest-scope | Depends on both the shared resolver and local registry ownership semantics. |
 | HSS-04 | M | Stop for explicit scope selection when multi-scope lookups are ambiguous | I2 | HSS-04-scope-selection, HSS-04-promotion-targeting | Ambiguity guards, Promotion routing | HSS-03-nearest-scope | HSS-04-scope-selection, HSS-04-promotion-targeting | Split between generic lookup ambiguity and the explicit cross-scope promotion contract. |
 | HSS-05 | L | Add one scope-entry skill instead of duplicating workflows | I4 | HSS-05-guide-scope | Scope routing, Skill docs | HSS-04-promotion-targeting, HSS-06-scoped-execution |  | Depends on stable planning and execution scope contracts before documenting user-facing routing. |
-| HSS-06 | L | Let child scopes override parent config and keep execution local | I2, I3 | HSS-06-config-inheritance, HSS-06-scoped-execution | Config merge, Execution and slices | HSS-03-nearest-scope |  | Separates config precedence from scope-local execution integration because the validation paths differ materially. |
+| HSS-06 | L | Let child scopes override parent config and keep execution local | I2, I3 | HSS-06-config-inheritance, HSS-06-scoped-execution | Config merge, Execution and slices | HSS-03-nearest-scope | HSS-06-config-inheritance | Separates config precedence from scope-local execution integration because the validation paths differ materially. |
 
 ## Notes
 

@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import argparse
+import importlib.util
 import json
 import sys
 from pathlib import Path
@@ -27,6 +28,24 @@ DEFAULT_JIRA_CONVENTIONS = {
 }
 
 
+def load_scope_runtime_module():
+    runtime_path = (
+        Path(__file__).resolve().parents[2]
+        / "guide-planning"
+        / "scripts"
+        / "scope_runtime.py"
+    )
+    spec = importlib.util.spec_from_file_location("scope_runtime", runtime_path)
+    if spec is None or spec.loader is None:
+        raise RuntimeError(f"Unable to load scope runtime from {runtime_path}.")
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    return module
+
+
+SCOPE_RUNTIME = load_scope_runtime_module()
+
+
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(
         description="Create or update sirius-skills project configuration files."
@@ -44,18 +63,24 @@ def parse_args() -> argparse.Namespace:
     )
     parser.add_argument(
         "--planning-dir",
-        default=DEFAULT_PLANNING_DIR,
-        help=f"Planning directory for .skills/planning.json (default: {DEFAULT_PLANNING_DIR}).",
+        default=None,
+        help=(
+            "Planning directory for .skills/planning.json "
+            f"(default: {DEFAULT_PLANNING_DIR})."
+        ),
     )
     parser.add_argument(
         "--proposal-dir",
-        default=DEFAULT_PROPOSAL_DIR,
-        help=f"Proposal directory for .skills/planning.json (default: {DEFAULT_PROPOSAL_DIR}).",
+        default=None,
+        help=(
+            "Proposal directory for .skills/planning.json "
+            f"(default: {DEFAULT_PROPOSAL_DIR})."
+        ),
     )
     parser.add_argument(
         "--design-diagram-mode",
         choices=VALID_DESIGN_DIAGRAM_MODES,
-        default=DEFAULT_DESIGN_DIAGRAM_MODE,
+        default=None,
         help=(
             "Diagram output mode for design artifacts in .skills/planning.json "
             f"(default: {DEFAULT_DESIGN_DIAGRAM_MODE})."
@@ -63,18 +88,18 @@ def parse_args() -> argparse.Namespace:
     )
     parser.add_argument(
         "--slice-dir",
-        default=DEFAULT_SLICE_DIR,
+        default=None,
         help=f"Slice directory for .skills/execution.json (default: {DEFAULT_SLICE_DIR}).",
     )
     parser.add_argument(
         "--workflow",
-        default=DEFAULT_WORKFLOW,
+        default=None,
         help=f"Preferred workflow for .skills/execution.json (default: {DEFAULT_WORKFLOW}).",
     )
     parser.add_argument(
         "--auto-start-implementation",
         action=argparse.BooleanOptionalAction,
-        default=DEFAULT_AUTO_START_IMPLEMENTATION,
+        default=None,
         help=(
             "Whether guide-execution should auto-advance from blueprint_ready into "
             "execution_ready and begin implementation."
@@ -82,7 +107,7 @@ def parse_args() -> argparse.Namespace:
     )
     parser.add_argument(
         "--issue-url-template",
-        default=DEFAULT_JIRA_CONVENTIONS["issue_url_template"],
+        default=None,
         help="Issue URL template for jira mode.",
     )
     return parser.parse_args()
@@ -106,39 +131,99 @@ def write_json_file(path: Path, data: dict[str, Any]) -> None:
     path.write_text(json.dumps(data, indent=2) + "\n", encoding="utf-8")
 
 
+def inherited_or_default(
+    existing: dict[str, Any], key: str, override: Any, default: Any
+) -> Any:
+    if override is not None:
+        return override
+    return existing.get(key, default)
+
+
+def iter_scope_chain_for_target(target_root: Path) -> list[Path]:
+    target_root = target_root.resolve()
+    repo_root = SCOPE_RUNTIME.find_repo_root(target_root) or target_root
+    chain: list[Path] = []
+
+    current = target_root
+    while True:
+        chain.append(current)
+        if current == repo_root or current.parent == current:
+            break
+        current = current.parent
+
+    ordered = list(reversed(chain))
+    scope_chain: list[Path] = []
+    for candidate in ordered:
+        if (
+            candidate == repo_root
+            or candidate == target_root
+            or (candidate / ".skills" / "planning.json").exists()
+        ):
+            scope_chain.append(candidate)
+    return scope_chain
+
+
+def load_merged_config_for_target(target_root: Path, filename: str) -> dict[str, Any]:
+    merged: dict[str, Any] = {}
+    for scope_root in iter_scope_chain_for_target(target_root):
+        config_path = scope_root / ".skills" / filename
+        merged.update(load_json_file(config_path))
+    return merged
+
+
 def build_planning_config(
     existing: dict[str, Any],
-    planning_dir: str,
-    proposal_dir: str,
-    design_diagram_mode: str,
+    planning_dir: str | None,
+    proposal_dir: str | None,
+    design_diagram_mode: str | None,
 ) -> dict[str, Any]:
     updated = dict(existing)
-    updated["planning_dir"] = planning_dir
-    updated["proposal_dir"] = proposal_dir
-    updated["design_diagram_mode"] = design_diagram_mode
+    updated["planning_dir"] = inherited_or_default(
+        existing, "planning_dir", planning_dir, DEFAULT_PLANNING_DIR
+    )
+    updated["proposal_dir"] = inherited_or_default(
+        existing, "proposal_dir", proposal_dir, DEFAULT_PROPOSAL_DIR
+    )
+    updated["design_diagram_mode"] = inherited_or_default(
+        existing,
+        "design_diagram_mode",
+        design_diagram_mode,
+        DEFAULT_DESIGN_DIAGRAM_MODE,
+    )
     return updated
 
 
 def build_execution_config(
     existing: dict[str, Any],
-    slice_dir: str,
-    workflow: str,
-    auto_start_implementation: bool,
+    slice_dir: str | None,
+    workflow: str | None,
+    auto_start_implementation: bool | None,
 ) -> dict[str, Any]:
     updated = dict(existing)
-    updated["slice_dir"] = slice_dir
-    updated["preferred_workflow"] = workflow
-    updated["auto_start_implementation"] = auto_start_implementation
+    updated["slice_dir"] = inherited_or_default(
+        existing, "slice_dir", slice_dir, DEFAULT_SLICE_DIR
+    )
+    updated["preferred_workflow"] = inherited_or_default(
+        existing, "preferred_workflow", workflow, DEFAULT_WORKFLOW
+    )
+    updated["auto_start_implementation"] = inherited_or_default(
+        existing,
+        "auto_start_implementation",
+        auto_start_implementation,
+        DEFAULT_AUTO_START_IMPLEMENTATION,
+    )
     return updated
 
 
 def build_conventions_config(
-    existing: dict[str, Any], mode: str, issue_url_template: str
+    existing: dict[str, Any], mode: str, issue_url_template: str | None
 ) -> dict[str, Any]:
     updated = dict(existing)
     if mode == "jira":
         updated.update(DEFAULT_JIRA_CONVENTIONS)
-        updated["issue_url_template"] = issue_url_template
+        updated["issue_url_template"] = (
+            issue_url_template or updated["issue_url_template"]
+        )
     return updated
 
 
@@ -152,9 +237,11 @@ def main() -> int:
     conventions_path = skills_dir / "conventions.json"
 
     try:
-        planning_existing = load_json_file(planning_path)
-        execution_existing = load_json_file(execution_path)
-        conventions_existing = load_json_file(conventions_path)
+        planning_existing = load_merged_config_for_target(repo_root, "planning.json")
+        execution_existing = load_merged_config_for_target(repo_root, "execution.json")
+        conventions_existing = load_merged_config_for_target(
+            repo_root, "conventions.json"
+        )
     except ValueError as exc:
         print(f"Error: {exc}", file=sys.stderr)
         return 2

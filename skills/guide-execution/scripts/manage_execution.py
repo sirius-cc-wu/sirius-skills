@@ -1,5 +1,6 @@
 import argparse
 import hashlib
+import importlib.util
 import json
 import os
 import re
@@ -7,6 +8,7 @@ import shutil
 import subprocess
 import sys
 from datetime import datetime
+from pathlib import Path
 from typing import Dict, List, Optional, Tuple
 
 DEFAULT_SLICES_DIR = "slices"
@@ -66,6 +68,24 @@ RELATION_INVERSES = {
     "replaces_partially": "replaced_partially_by",
     "replaced_partially_by": "replaces_partially",
 }
+
+
+def load_scope_runtime_module():
+    runtime_path = (
+        Path(__file__).resolve().parents[2]
+        / "guide-planning"
+        / "scripts"
+        / "scope_runtime.py"
+    )
+    spec = importlib.util.spec_from_file_location("scope_runtime", runtime_path)
+    if spec is None or spec.loader is None:
+        raise RuntimeError(f"Unable to load scope runtime from {runtime_path}.")
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    return module
+
+
+SCOPE_RUNTIME = load_scope_runtime_module()
 
 
 def now_timestamp() -> str:
@@ -273,8 +293,23 @@ def normalize_registry_row(row: Dict[str, object]) -> Dict[str, object]:
     return normalized
 
 
-def load_config(required: bool = True) -> Dict[str, object]:
-    if not os.path.exists(CONFIG_FILE):
+def load_raw_config(
+    required: bool = True, scope_context: Optional[object] = None
+) -> Dict[str, object]:
+    if scope_context is not None:
+        config = SCOPE_RUNTIME.load_merged_config(scope_context, "execution")
+        if config:
+            return config
+        config_file = str(
+            SCOPE_RUNTIME.resolve_scope_path(
+                scope_context.scope_root,
+                SCOPE_RUNTIME.config_relative_path("execution"),
+            )
+        )
+    else:
+        config_file = CONFIG_FILE
+
+    if not os.path.exists(config_file):
         if required:
             raise RuntimeError(
                 "Slice config not found at '.skills/execution.json'. "
@@ -288,19 +323,28 @@ def load_config(required: bool = True) -> Dict[str, object]:
         }
 
     try:
-        with open(CONFIG_FILE, "r", encoding="utf-8") as f:
+        with open(config_file, "r", encoding="utf-8") as f:
             config = json.load(f)
     except json.JSONDecodeError as exc:
         raise RuntimeError("Execution config is not valid JSON.") from exc
 
     if not isinstance(config, dict):
         raise RuntimeError("Execution config must be a JSON object.")
+    return config
+
+
+def load_config(
+    required: bool = True, scope_context: Optional[object] = None
+) -> Dict[str, object]:
+    config = load_raw_config(required=required, scope_context=scope_context)
 
     slice_dir = config.get("slice_dir", DEFAULT_SLICES_DIR)
     preferred_workflow = config.get(
         "preferred_workflow", DEFAULT_PREFERRED_WORKFLOW
     )
-    auto_start_implementation = config.get("auto_start_implementation", False)
+    auto_start_implementation = config.get(
+        "auto_start_implementation", False
+    )
 
     if not isinstance(slice_dir, str):
         raise RuntimeError("Execution config field 'slice_dir' must be a string.")
@@ -320,19 +364,37 @@ def load_config(required: bool = True) -> Dict[str, object]:
     }
 
 
-def load_conventions_config(required: bool = False) -> Dict[str, str]:
-    if not os.path.exists(CONVENTIONS_CONFIG_FILE):
+def load_conventions_config(
+    required: bool = False, scope_context: Optional[object] = None
+) -> Dict[str, str]:
+    if scope_context is not None:
+        config = SCOPE_RUNTIME.load_merged_config(scope_context, "conventions")
+        if not config:
+            config_file = str(
+                SCOPE_RUNTIME.resolve_scope_path(
+                    scope_context.scope_root,
+                    SCOPE_RUNTIME.config_relative_path("conventions"),
+                )
+            )
+        else:
+            config_file = None
+    else:
+        config = None
+        config_file = CONVENTIONS_CONFIG_FILE
+
+    if config is None and not os.path.exists(config_file):
         if required:
             raise RuntimeError(
                 "Conventions config not found at '.skills/conventions.json'."
             )
         return {}
 
-    try:
-        with open(CONVENTIONS_CONFIG_FILE, "r", encoding="utf-8") as f:
-            config = json.load(f)
-    except json.JSONDecodeError as exc:
-        raise RuntimeError("Conventions config is not valid JSON.") from exc
+    if config is None:
+        try:
+            with open(config_file, "r", encoding="utf-8") as f:
+                config = json.load(f)
+        except json.JSONDecodeError as exc:
+            raise RuntimeError("Conventions config is not valid JSON.") from exc
 
     if not isinstance(config, dict):
         raise RuntimeError("Conventions config must be a JSON object.")

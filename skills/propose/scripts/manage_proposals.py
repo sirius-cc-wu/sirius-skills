@@ -121,8 +121,9 @@ def load_config(
 ) -> Dict[str, str]:
     if scope_context is None:
         scope_context = SCOPE_RUNTIME.resolve_scope_context()
-    config_file = str(scope_context.planning_config_path)
-    if not os.path.exists(config_file):
+    config = SCOPE_RUNTIME.load_merged_config(scope_context, "planning")
+    if not config:
+        config_file = str(scope_context.planning_config_path)
         if required:
             raise RuntimeError(
                 f"Planning config not found at '{config_file}'. "
@@ -133,15 +134,6 @@ def load_config(
             "planning_dir": DEFAULT_PLANNING_DIR,
             "proposal_dir": DEFAULT_PROPOSAL_DIR,
         }
-
-    try:
-        with open(config_file, "r", encoding="utf-8") as f:
-            config = json.load(f)
-    except json.JSONDecodeError as exc:
-        raise RuntimeError("Planning config is not valid JSON.") from exc
-
-    if not isinstance(config, dict):
-        raise RuntimeError("Planning config must be a JSON object.")
 
     planning_dir = config.get("planning_dir", DEFAULT_PLANNING_DIR)
     proposal_dir = config.get("proposal_dir", DEFAULT_PROPOSAL_DIR)

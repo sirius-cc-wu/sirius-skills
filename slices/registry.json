@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "generated_at": "2026-04-04T04:03:51",
+  "generated_at": "2026-04-04T04:22:07",
   "slices": [
     {
       "id": "HSS-01-root-fallback",
@@ -49,6 +49,16 @@
       "path": "slices/HSS-04-promotion-targeting-support-explicit-cross-scope-promotion-targets/",
       "updated_at": "2026-04-04T04:03:51",
       "closed_at": "2026-04-04T04:03:51",
+      "archived_at": null,
+      "relations": []
+    },
+    {
+      "id": "HSS-06-config-inheritance",
+      "feature": "Merge parent and child .skills config by scope",
+      "status": "closed",
+      "path": "slices/HSS-06-config-inheritance-merge-parent-and-child-skills-config-by-scope/",
+      "updated_at": "2026-04-04T04:22:07",
+      "closed_at": "2026-04-04T04:22:07",
       "archived_at": null,
       "relations": []
     }

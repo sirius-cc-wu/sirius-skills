@@ -25,12 +25,14 @@ def write_file(path: Path, content: str = "# doc\n"):
     path.write_text(content, encoding="utf-8")
 
 
-def write_planning_config(scope_root: Path):
+def write_planning_config(scope_root: Path, config: dict | None = None):
     skills_dir = scope_root / ".skills"
     skills_dir.mkdir(parents=True, exist_ok=True)
     (skills_dir / "planning.json").write_text(
         json.dumps(
-            {
+            config
+            if config is not None
+            else {
                 "planning_dir": "docs/features",
                 "proposal_dir": "docs/proposals",
             }
@@ -229,6 +231,35 @@ def test_nested_child_directory_uses_nearest_scope_and_sibling_path_falls_back_t
     assert (tmp_path / "docs" / "proposals" / "root-proposal" / ".proposal-meta.json").exists()
     assert not (tmp_path / "docs" / "proposals" / "child-proposal").exists()
     assert not (child_scope / "docs" / "proposals" / "root-proposal").exists()
+
+
+def test_child_scope_inherits_parent_proposal_dir_for_proposal_creation(
+    tmp_path, monkeypatch
+):
+    module = load_module()
+    (tmp_path / ".git").mkdir()
+    write_planning_config(
+        tmp_path,
+        {
+            "planning_dir": "planning/features",
+            "proposal_dir": "planning/proposals",
+        },
+    )
+
+    child_scope = tmp_path / "apps" / "payments"
+    write_planning_config(child_scope, {})
+
+    monkeypatch.chdir(child_scope)
+    assert run_cli(module, monkeypatch, "add", "child-proposal") == 0
+
+    assert (
+        child_scope
+        / "planning"
+        / "proposals"
+        / "child-proposal"
+        / ".proposal-meta.json"
+    ).exists()
+    assert not (tmp_path / "planning" / "proposals" / "child-proposal").exists()
 
 
 def test_ambiguous_proposal_lookup_requires_explicit_scope(tmp_path, monkeypatch, capsys):

@@ -20,6 +20,12 @@ def run_cli(module, monkeypatch, *args):
     return module.main()
 
 
+def write_scope_config(scope_root: Path, filename: str, data: dict):
+    skills_dir = scope_root / ".skills"
+    skills_dir.mkdir(parents=True, exist_ok=True)
+    (skills_dir / filename).write_text(json.dumps(data) + "\n", encoding="utf-8")
+
+
 def test_default_mode_writes_generic_config_files(tmp_path, monkeypatch):
     module = load_module()
     monkeypatch.chdir(tmp_path)
@@ -148,6 +154,87 @@ def test_bootstrap_preserves_unrelated_existing_planning_keys(tmp_path, monkeypa
     assert planning["planning_dir"] == "docs/features"
     assert planning["proposal_dir"] == "docs/proposals"
     assert planning["design_diagram_mode"] == "embedded"
+
+
+def test_bootstrap_child_scope_inherits_parent_configs_before_applying_overrides(
+    tmp_path, monkeypatch
+):
+    module = load_module()
+    monkeypatch.chdir(tmp_path)
+    (tmp_path / ".git").mkdir()
+
+    write_scope_config(
+        tmp_path,
+        "planning.json",
+        {
+            "planning_dir": "planning/features",
+            "proposal_dir": "planning/proposals",
+            "design_diagram_mode": "linked_svg",
+            "custom_key": "keep-me",
+        },
+    )
+    write_scope_config(
+        tmp_path,
+        "execution.json",
+        {
+            "slice_dir": "root-slices",
+            "preferred_workflow": "BDD",
+            "auto_start_implementation": False,
+            "custom_exec": "keep-exec",
+        },
+    )
+    write_scope_config(
+        tmp_path,
+        "conventions.json",
+        {
+            "commit_format": "{scope}: {summary}",
+            "custom_conv": "keep-conv",
+        },
+    )
+
+    child_scope = tmp_path / "apps" / "payments"
+    child_scope.mkdir(parents=True)
+
+    assert (
+        run_cli(
+            module,
+            monkeypatch,
+            "--mode",
+            "default",
+            "--repo-root",
+            str(child_scope),
+            "--slice-dir",
+            "team-slices",
+        )
+        == 0
+    )
+
+    planning = json.loads(
+        (child_scope / ".skills" / "planning.json").read_text(encoding="utf-8")
+    )
+    execution = json.loads(
+        (child_scope / ".skills" / "execution.json").read_text(encoding="utf-8")
+    )
+    conventions = json.loads(
+        (child_scope / ".skills" / "conventions.json").read_text(encoding="utf-8")
+    )
+
+    assert planning == {
+        "planning_dir": "planning/features",
+        "proposal_dir": "planning/proposals",
+        "design_diagram_mode": "linked_svg",
+        "custom_key": "keep-me",
+    }
+    assert execution == {
+        "slice_dir": "team-slices",
+        "preferred_workflow": "BDD",
+        "auto_start_implementation": False,
+        "custom_exec": "keep-exec",
+    }
+    assert conventions == {
+        "commit_format": "{scope}: {summary}",
+        "custom_conv": "keep-conv",
+    }
 
 
 def test_invalid_existing_json_returns_error(tmp_path, monkeypatch, capsys):

@@ -20,6 +20,12 @@ def run_cli(module, monkeypatch, *args):
     return module.main()
 
 
+def write_scope_config(scope_root: Path, filename: str, data: dict):
+    skills_dir = scope_root / ".skills"
+    skills_dir.mkdir(parents=True, exist_ok=True)
+    (skills_dir / filename).write_text(json.dumps(data) + "\n", encoding="utf-8")
+
+
 def test_init_creates_human_and_machine_registry(tmp_path, monkeypatch):
     module = load_manage_specs_module()
     monkeypatch.chdir(tmp_path)
@@ -66,6 +72,57 @@ def test_add_creates_slice_metadata_and_registry_entries(tmp_path, monkeypatch):
     assert registry["slices"][0]["id"] == "DEMO"
     assert registry["slices"][0]["updated_at"] == metadata["updated_at"]
     assert registry["slices"][0]["closed_at"] is None
+
+
+def test_scope_aware_loaders_merge_parent_and_child_execution_configs(tmp_path):
+    module = load_manage_specs_module()
+    (tmp_path / ".git").mkdir()
+    write_scope_config(
+        tmp_path,
+        "planning.json",
+        {"planning_dir": "docs/features", "proposal_dir": "docs/proposals"},
+    )
+    write_scope_config(
+        tmp_path,
+        "execution.json",
+        {
+            "slice_dir": "team-slices",
+            "preferred_workflow": "BDD",
+            "auto_start_implementation": False,
+        },
+    )
+    write_scope_config(
+        tmp_path,
+        "conventions.json",
+        {
+            "commit_format": "{scope}: {summary}",
+            "id_pattern": r"^[A-Z]+-[0-9]+$",
+        },
+    )
+
+    child_scope = tmp_path / "apps" / "payments"
+    write_scope_config(child_scope, "planning.json", {})
+    write_scope_config(child_scope, "execution.json", {"preferred_workflow": "Kanban"})
+    write_scope_config(
+        child_scope,
+        "conventions.json",
+        {"issue_url_template": "https://jira.example.test/browse/{ID}"},
+    )
+
+    scope_context = module.SCOPE_RUNTIME.resolve_scope_context(start_path=child_scope)
+    execution_config = module.load_config(scope_context=scope_context)
+    conventions = module.load_conventions_config(scope_context=scope_context)
+
+    assert execution_config == {
+        "slice_dir": "team-slices",
+        "preferred_workflow": "Kanban",
+        "auto_start_implementation": False,
+    }
+    assert conventions == {
+        "commit_format": "{scope}: {summary}",
+        "id_pattern": r"^[A-Z]+-[0-9]+$",
+        "issue_url_template": "https://jira.example.test/browse/{ID}",
+    }
 
 
 def test_set_status_blocks_invalid_transition(tmp_path, monkeypatch, capsys):
