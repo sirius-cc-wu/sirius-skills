@@ -20,6 +20,12 @@ def run_cli(module, monkeypatch, *args):
     return module.main()
 
 
+def write_scope_config(scope_root: Path, filename: str, data: dict):
+    skills_dir = scope_root / ".skills"
+    skills_dir.mkdir(parents=True, exist_ok=True)
+    (skills_dir / filename).write_text(json.dumps(data) + "\n", encoding="utf-8")
+
+
 def test_bootstrap_initializes_default_execution_registry(tmp_path, monkeypatch):
     module = load_module()
     monkeypatch.chdir(tmp_path)
@@ -92,3 +98,35 @@ def test_bootstrap_reuses_existing_execution_config_and_deduplicates(tmp_path, m
     assert len(registry["slices"]) == 1
     assert registry["slices"][0]["id"] == "DEMO"
     assert execution == {"slice_dir": "custom-slices", "preferred_workflow": "BDD"}
+
+
+def test_bootstrap_uses_child_scope_registry_with_inherited_execution_config(
+    tmp_path, monkeypatch
+):
+    module = load_module()
+    (tmp_path / ".git").mkdir()
+    write_scope_config(
+        tmp_path,
+        "planning.json",
+        {"planning_dir": "docs/features", "proposal_dir": "docs/proposals"},
+    )
+    write_scope_config(
+        tmp_path,
+        "execution.json",
+        {"slice_dir": "team-slices", "preferred_workflow": "BDD"},
+    )
+
+    child_scope = tmp_path / "apps" / "payments"
+    write_scope_config(child_scope, "planning.json", {})
+
+    monkeypatch.chdir(child_scope)
+    assert run_cli(module, monkeypatch, "DEMO", "Demo Feature") == 0
+
+    registry = json.loads(
+        (child_scope / "team-slices" / "registry.json").read_text(encoding="utf-8")
+    )
+
+    assert registry["slices"][0]["id"] == "DEMO"
+    assert (child_scope / "team-slices" / "DEMO-demo-feature" / ".slice-meta.json").exists()
+    assert not (child_scope / ".skills" / "execution.json").exists()
+    assert not (tmp_path / "team-slices" / "DEMO-demo-feature").exists()

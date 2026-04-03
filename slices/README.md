@@ -8,3 +8,4 @@
 | HSS-04-scope-selection | Require explicit scope selection for ambiguous lookups | closed | 2026-04-04T03:59:57 | 2026-04-04T03:59:57 | slices/HSS-04-scope-selection-require-explicit-scope-selection-for-ambiguous-lookups/ |
 | HSS-04-promotion-targeting | Support explicit cross-scope promotion targets | closed | 2026-04-04T04:03:51 | 2026-04-04T04:03:51 | slices/HSS-04-promotion-targeting-support-explicit-cross-scope-promotion-targets/ |
 | HSS-06-config-inheritance | Merge parent and child .skills config by scope | closed | 2026-04-04T04:22:07 | 2026-04-04T04:22:07 | slices/HSS-06-config-inheritance-merge-parent-and-child-skills-config-by-scope/ |
+| HSS-06-scoped-execution | Keep slices and execution registries local to the resolved scope | closed | 2026-04-04T04:37:40 | 2026-04-04T04:37:40 | slices/HSS-06-scoped-execution-keep-slices-and-execution-registries-local-to-the-resolved-scope/ |

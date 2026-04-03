@@ -125,6 +125,60 @@ def test_scope_aware_loaders_merge_parent_and_child_execution_configs(tmp_path):
     }
 
 
+def test_nested_scope_add_uses_local_registry_with_inherited_slice_dir(tmp_path, monkeypatch):
+    module = load_manage_specs_module()
+    (tmp_path / ".git").mkdir()
+    write_scope_config(
+        tmp_path,
+        "planning.json",
+        {"planning_dir": "docs/features", "proposal_dir": "docs/proposals"},
+    )
+    write_scope_config(
+        tmp_path,
+        "execution.json",
+        {"slice_dir": "team-slices", "preferred_workflow": "BDD"},
+    )
+
+    child_scope = tmp_path / "apps" / "payments"
+    write_scope_config(child_scope, "planning.json", {})
+    workspace = child_scope / "src" / "ui"
+    workspace.mkdir(parents=True)
+
+    monkeypatch.chdir(workspace)
+    assert run_cli(module, monkeypatch, "add", "DEMO", "Demo Feature") == 0
+
+    child_registry = json.loads(
+        (child_scope / "team-slices" / "registry.json").read_text(encoding="utf-8")
+    )
+
+    assert (child_scope / "team-slices" / "DEMO-demo-feature" / ".slice-meta.json").exists()
+    assert child_registry["slices"][0]["path"] == "team-slices/DEMO-demo-feature/"
+    assert not (tmp_path / "team-slices" / "DEMO-demo-feature").exists()
+
+
+def test_init_in_nested_scope_writes_local_execution_config(tmp_path, monkeypatch):
+    module = load_manage_specs_module()
+    (tmp_path / ".git").mkdir()
+    write_scope_config(
+        tmp_path,
+        "planning.json",
+        {"planning_dir": "docs/features", "proposal_dir": "docs/proposals"},
+    )
+    child_scope = tmp_path / "apps" / "payments"
+    write_scope_config(child_scope, "planning.json", {})
+
+    monkeypatch.chdir(child_scope)
+    assert run_cli(module, monkeypatch, "init", "team-slices") == 0
+
+    execution = json.loads(
+        (child_scope / ".skills" / "execution.json").read_text(encoding="utf-8")
+    )
+
+    assert execution["slice_dir"] == "team-slices"
+    assert (child_scope / "team-slices" / "registry.json").exists()
+    assert not (tmp_path / ".skills" / "execution.json").exists()
+
+
 def test_set_status_blocks_invalid_transition(tmp_path, monkeypatch, capsys):
     module = load_manage_specs_module()
     monkeypatch.chdir(tmp_path)

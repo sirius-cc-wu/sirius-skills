@@ -266,8 +266,48 @@ def normalize_slice_path(path: str) -> str:
     return normalized + "/"
 
 
-def default_archive_dir(slice_dir: Optional[str] = None) -> str:
-    base_dir = normalize_slice_dir(slice_dir or get_registry_paths()[0])
+def resolve_execution_scope_context(scope_context: Optional[object] = None) -> object:
+    return scope_context or SCOPE_RUNTIME.resolve_scope_context()
+
+
+def execution_config_path(scope_context: Optional[object] = None) -> str:
+    resolved_scope = resolve_execution_scope_context(scope_context)
+    return str(
+        SCOPE_RUNTIME.resolve_scope_path(
+            resolved_scope.scope_root,
+            SCOPE_RUNTIME.config_relative_path("execution"),
+        )
+    )
+
+
+def conventions_config_path(scope_context: Optional[object] = None) -> str:
+    resolved_scope = resolve_execution_scope_context(scope_context)
+    return str(
+        SCOPE_RUNTIME.resolve_scope_path(
+            resolved_scope.scope_root,
+            SCOPE_RUNTIME.config_relative_path("conventions"),
+        )
+    )
+
+
+def slice_path_for_row(row: Dict[str, object], scope_context: Optional[object] = None) -> str:
+    resolved_scope = resolve_execution_scope_context(scope_context)
+    return str(
+        SCOPE_RUNTIME.resolve_scope_path(
+            resolved_scope.scope_root,
+            str(row["path"]).rstrip("/"),
+        )
+    )
+
+
+def default_archive_dir(
+    slice_dir: Optional[str] = None, scope_context: Optional[object] = None
+) -> str:
+    if slice_dir:
+        base_dir = normalize_slice_dir(slice_dir)
+    else:
+        config = load_config(required=True, scope_context=scope_context)
+        base_dir = normalize_slice_dir(str(config["slice_dir"]))
     return normalize_slice_dir(os.path.join(base_dir, DEFAULT_ARCHIVE_DIRNAME))
 
 
@@ -296,18 +336,11 @@ def normalize_registry_row(row: Dict[str, object]) -> Dict[str, object]:
 def load_raw_config(
     required: bool = True, scope_context: Optional[object] = None
 ) -> Dict[str, object]:
-    if scope_context is not None:
-        config = SCOPE_RUNTIME.load_merged_config(scope_context, "execution")
-        if config:
-            return config
-        config_file = str(
-            SCOPE_RUNTIME.resolve_scope_path(
-                scope_context.scope_root,
-                SCOPE_RUNTIME.config_relative_path("execution"),
-            )
-        )
-    else:
-        config_file = CONFIG_FILE
+    resolved_scope = resolve_execution_scope_context(scope_context)
+    config = SCOPE_RUNTIME.load_merged_config(resolved_scope, "execution")
+    if config:
+        return config
+    config_file = execution_config_path(resolved_scope)
 
     if not os.path.exists(config_file):
         if required:
@@ -367,20 +400,9 @@ def load_config(
 def load_conventions_config(
     required: bool = False, scope_context: Optional[object] = None
 ) -> Dict[str, str]:
-    if scope_context is not None:
-        config = SCOPE_RUNTIME.load_merged_config(scope_context, "conventions")
-        if not config:
-            config_file = str(
-                SCOPE_RUNTIME.resolve_scope_path(
-                    scope_context.scope_root,
-                    SCOPE_RUNTIME.config_relative_path("conventions"),
-                )
-            )
-        else:
-            config_file = None
-    else:
-        config = None
-        config_file = CONVENTIONS_CONFIG_FILE
+    resolved_scope = resolve_execution_scope_context(scope_context)
+    config = SCOPE_RUNTIME.load_merged_config(resolved_scope, "conventions")
+    config_file = None if config else conventions_config_path(resolved_scope)
 
     if config is None and not os.path.exists(config_file):
         if required:
@@ -423,9 +445,11 @@ def write_config(
     slice_dir: str,
     preferred_workflow: str = DEFAULT_PREFERRED_WORKFLOW,
     auto_start_implementation: bool = DEFAULT_AUTO_START_IMPLEMENTATION,
+    scope_context: Optional[object] = None,
 ) -> None:
-    os.makedirs(CONFIG_DIR, exist_ok=True)
-    with open(CONFIG_FILE, "w", encoding="utf-8") as f:
+    config_file = execution_config_path(scope_context)
+    os.makedirs(os.path.dirname(config_file), exist_ok=True)
+    with open(config_file, "w", encoding="utf-8") as f:
         json.dump(
             {
                 "slice_dir": normalize_slice_dir(slice_dir),
@@ -438,9 +462,17 @@ def write_config(
         f.write("\n")
 
 
-def get_registry_paths(required_config: bool = True) -> Tuple[str, str, str]:
-    config = load_config(required=required_config)
-    specs_dir = normalize_slice_dir(config["slice_dir"])
+def get_registry_paths(
+    required_config: bool = True, scope_context: Optional[object] = None
+) -> Tuple[str, str, str]:
+    resolved_scope = resolve_execution_scope_context(scope_context)
+    config = load_config(required=required_config, scope_context=resolved_scope)
+    specs_dir = str(
+        SCOPE_RUNTIME.resolve_scope_path(
+            resolved_scope.scope_root,
+            normalize_slice_dir(str(config["slice_dir"])),
+        )
+    )
     return (
         specs_dir,
         os.path.join(specs_dir, "README.md"),
@@ -551,16 +583,16 @@ def ensure_registry(specs_dir: str) -> None:
     write_registry_json(registry_json_file, [])
 
 
-def parse_registry() -> List[Dict[str, object]]:
-    specs_dir, index_file, registry_json_file = get_registry_paths()
+def parse_registry(scope_context: Optional[object] = None) -> List[Dict[str, object]]:
+    specs_dir, index_file, registry_json_file = get_registry_paths(scope_context=scope_context)
     ensure_registry(specs_dir)
     if os.path.exists(registry_json_file):
         return load_registry_json(registry_json_file)
     return parse_registry_markdown(index_file)
 
 
-def write_registry(rows: List[Dict[str, object]]) -> None:
-    specs_dir, index_file, registry_json_file = get_registry_paths()
+def write_registry(rows: List[Dict[str, object]], scope_context: Optional[object] = None) -> None:
+    specs_dir, index_file, registry_json_file = get_registry_paths(scope_context=scope_context)
     ensure_registry(specs_dir)
     normalized_rows = [normalize_registry_row(row) for row in rows]
     write_registry_markdown(index_file, normalized_rows)
@@ -647,25 +679,32 @@ def sync_slice_metadata(row: Dict[str, object], metadata: Dict[str, object]) -> 
     updated_row = apply_metadata_to_row(row, metadata)
     row.clear()
     row.update(updated_row)
-    write_slice_metadata(str(row["path"]).rstrip("/"), metadata)
+    write_slice_metadata(slice_path_for_row(row), metadata)
 
 
 def archive_slice(
     rows: List[Dict[str, object]],
     slice: Dict[str, object],
     archive_dir: Optional[str] = None,
+    scope_context: Optional[object] = None,
 ) -> Tuple[bool, str, Dict[str, object]]:
     current_status = normalize_status(str(slice["status"]))
     if current_status != "closed":
         return False, "Only closed slices can be archived.", slice
 
+    resolved_scope = resolve_execution_scope_context(scope_context)
     current_path = str(slice["path"]).rstrip("/")
+    current_abs = slice_path_for_row(slice, resolved_scope)
     current_folder = os.path.basename(current_path)
-    archive_root = normalize_slice_dir(archive_dir or default_archive_dir())
+    archive_root = normalize_slice_dir(
+        archive_dir or default_archive_dir(scope_context=resolved_scope)
+    )
     target_path = os.path.join(archive_root, current_folder)
+    target_abs = str(SCOPE_RUNTIME.resolve_scope_path(resolved_scope.scope_root, target_path))
 
-    current_abs = os.path.abspath(current_path)
-    archive_root_abs = os.path.abspath(archive_root)
+    archive_root_abs = str(
+        SCOPE_RUNTIME.resolve_scope_path(resolved_scope.scope_root, archive_root)
+    )
     if os.path.commonpath([current_abs, archive_root_abs]) == current_abs:
         return (
             False,
@@ -675,7 +714,7 @@ def archive_slice(
 
     current_normalized = normalize_slice_path(current_path)
     target_normalized = normalize_slice_path(target_path)
-    metadata = load_slice_metadata(current_path)
+    metadata = load_slice_metadata(current_abs)
     if current_normalized == target_normalized:
         if not isinstance(metadata.get("archived_at"), str):
             metadata["archived_at"] = now_timestamp()
@@ -683,16 +722,16 @@ def archive_slice(
             metadata["archived_from"] = current_normalized
         updated_metadata = build_slice_metadata(slice, current_status, existing=metadata)
         sync_slice_metadata(slice, updated_metadata)
-        write_registry(rows)
+        write_registry(rows, scope_context=resolved_scope)
         return True, f"Slice {slice['id']} is already archived at {target_normalized}", slice
 
-    if os.path.exists(target_path):
-        return False, f"Archive target already exists: {target_path}", slice
+    if os.path.exists(target_abs):
+        return False, f"Archive target already exists: {target_abs}", slice
 
-    os.makedirs(archive_root, exist_ok=True)
-    shutil.move(current_path, target_path)
+    os.makedirs(archive_root_abs, exist_ok=True)
+    shutil.move(current_abs, target_abs)
 
-    moved_metadata = load_slice_metadata(target_path)
+    moved_metadata = load_slice_metadata(target_abs)
     moved_metadata["archived_at"] = (
         moved_metadata["archived_at"]
         if isinstance(moved_metadata.get("archived_at"), str)
@@ -707,18 +746,19 @@ def archive_slice(
     slice["path"] = target_normalized
     updated_metadata = build_slice_metadata(slice, current_status, existing=moved_metadata)
     sync_slice_metadata(slice, updated_metadata)
-    write_registry(rows)
+    write_registry(rows, scope_context=resolved_scope)
     return True, f"Archived {slice['id']} to {target_normalized}", slice
 
 
 def delete_slice(
-    rows: List[Dict[str, object]], slice: Dict[str, object]
+    rows: List[Dict[str, object]], slice: Dict[str, object], scope_context: Optional[object] = None
 ) -> Tuple[bool, str, Dict[str, object]]:
     current_status = normalize_status(str(slice["status"]))
     if current_status != "closed":
         return False, "Only closed slices can be removed.", slice
 
-    current_path = str(slice["path"]).rstrip("/")
+    resolved_scope = resolve_execution_scope_context(scope_context)
+    current_path = slice_path_for_row(slice, resolved_scope)
     if not os.path.isdir(current_path):
         return False, f"Slice directory not found: {current_path}", slice
 
@@ -726,7 +766,7 @@ def delete_slice(
     for row in rows:
         if str(row["id"]) == deleted_slice_id:
             continue
-        row_path = str(row["path"]).rstrip("/")
+        row_path = slice_path_for_row(row, resolved_scope)
         metadata = load_slice_metadata(row_path)
         if not metadata:
             continue
@@ -746,7 +786,7 @@ def delete_slice(
 
     shutil.rmtree(current_path)
     rows[:] = [row for row in rows if str(row["id"]) != deleted_slice_id]
-    write_registry(rows)
+    write_registry(rows, scope_context=resolved_scope)
     return True, f"Removed closed slice {deleted_slice_id}", slice
 
 
@@ -814,7 +854,7 @@ def add_relation(
     source_metadata = build_slice_metadata(
         source_slice,
         normalize_status(str(source_slice["status"])),
-        existing=load_slice_metadata(str(source_slice["path"]).rstrip("/")),
+        existing=load_slice_metadata(slice_path_for_row(source_slice)),
     )
     source_metadata["relations"] = upsert_relation_entry(
         normalize_relations(source_metadata.get("relations")), relation
@@ -824,7 +864,7 @@ def add_relation(
     target_metadata = build_slice_metadata(
         target_slice,
         normalize_status(str(target_slice["status"])),
-        existing=load_slice_metadata(str(target_slice["path"]).rstrip("/")),
+        existing=load_slice_metadata(slice_path_for_row(target_slice)),
     )
     target_metadata["relations"] = upsert_relation_entry(
         normalize_relations(target_metadata.get("relations")), inverse_relation
@@ -849,7 +889,7 @@ def audit_relations(
 
     row_by_id = {str(row["id"]): row for row in rows}
     metadata_by_id = {
-        str(row["id"]): load_slice_metadata(str(row["path"]).rstrip("/")) for row in rows
+        str(row["id"]): load_slice_metadata(slice_path_for_row(row)) for row in rows
     }
 
     issues: List[Dict[str, str]] = []
@@ -1063,7 +1103,7 @@ def validate_slice(
     row: Dict[str, object], skip_metadata_status_check: bool = False
 ) -> Tuple[bool, List[str], Dict[str, bool]]:
     issues: List[str] = []
-    path = str(row["path"]).rstrip("/")
+    path = slice_path_for_row(row)
     brief = os.path.join(path, "brief.md")
     requirements = os.path.join(path, "checklists", "requirements.md")
     plan = os.path.join(path, "blueprint.md")
@@ -1136,9 +1176,14 @@ def validate_slice(
 
 
 def create_slice(
-    slice_id: str, name: str, metadata: Optional[Dict[str, object]] = None
+    slice_id: str,
+    name: str,
+    metadata: Optional[Dict[str, object]] = None,
+    scope_context: Optional[object] = None,
 ) -> Tuple[str, bool]:
-    specs_dir, _, _ = get_registry_paths()
+    resolved_scope = resolve_execution_scope_context(scope_context)
+    specs_dir, _, _ = get_registry_paths(scope_context=resolved_scope)
+    config = load_config(required=True, scope_context=resolved_scope)
     ensure_registry(specs_dir)
     normalized_id = validate_slice_id(slice_id)
     normalized_name = normalize_feature_name(name)
@@ -1148,8 +1193,11 @@ def create_slice(
     slug = slugify(normalized_name)
     folder = f"{normalized_id}-{slug}"
     slice_path = os.path.join(specs_dir, folder)
+    row_path = normalize_slice_path(
+        os.path.join(normalize_slice_dir(str(config["slice_dir"])), folder)
+    )
 
-    rows = parse_registry()
+    rows = parse_registry(scope_context=resolved_scope)
     if any(
         r["id"] == normalized_id or str(r["path"]).rstrip("/").endswith(folder)
         for r in rows
@@ -1162,7 +1210,7 @@ def create_slice(
             "id": normalized_id,
             "feature": normalized_name,
             "status": "draft",
-            "path": normalize_slice_path(slice_path),
+            "path": row_path,
             "updated_at": now_timestamp(),
             "closed_at": None,
         }
@@ -1171,7 +1219,7 @@ def create_slice(
     write_slice_metadata(slice_path, slice_metadata)
 
     rows.append(apply_metadata_to_row(row, slice_metadata))
-    write_registry(rows)
+    write_registry(rows, scope_context=resolved_scope)
     return folder, True
 
 
@@ -1237,7 +1285,7 @@ def update_slice_status(
             final_status = "execution_ready"
             auto_started = True
 
-    slice_path = str(slice["path"]).rstrip("/")
+    slice_path = slice_path_for_row(slice)
     metadata = load_slice_metadata(slice_path)
     updated_metadata = build_slice_metadata(slice, final_status, existing=metadata)
     write_slice_metadata(slice_path, updated_metadata)
@@ -1256,7 +1304,8 @@ def update_slice_status(
 
 
 def cmd_init(args: argparse.Namespace) -> int:
-    config = load_config(required=False)
+    scope_context = resolve_execution_scope_context()
+    config = load_config(required=False, scope_context=scope_context)
     slice_dir = (
         normalize_slice_dir(args.slice_dir) if args.slice_dir else config["slice_dir"]
     )
@@ -1264,8 +1313,11 @@ def cmd_init(args: argparse.Namespace) -> int:
         str(slice_dir),
         preferred_workflow=str(config["preferred_workflow"]),
         auto_start_implementation=bool(config["auto_start_implementation"]),
+        scope_context=scope_context,
     )
-    ensure_registry(slice_dir)
+    ensure_registry(
+        str(SCOPE_RUNTIME.resolve_scope_path(scope_context.scope_root, str(slice_dir)))
+    )
     print(f"Initialized slice registry and config in '{slice_dir}/'.")
     return 0
 

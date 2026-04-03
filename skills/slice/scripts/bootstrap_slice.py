@@ -41,19 +41,25 @@ def parse_bootstrap_args(
 
 
 def ensure_execution_registry(module, requested_slice_dir: Optional[str]) -> Optional[str]:
-    config_path = Path(module.CONFIG_FILE)
-    if config_path.exists():
-        config = module.load_config(required=True)
-        module.ensure_registry(config["slice_dir"])
+    scope_context = module.resolve_execution_scope_context()
+    merged_config = module.SCOPE_RUNTIME.load_merged_config(scope_context, "execution")
+    if merged_config:
+        module.ensure_registry(
+            module.get_registry_paths(required_config=True, scope_context=scope_context)[0]
+        )
         return None
 
     slice_dir = module.normalize_slice_dir(
         requested_slice_dir or module.DEFAULT_SLICES_DIR
     )
     module.write_config(
-        slice_dir, preferred_workflow=module.DEFAULT_PREFERRED_WORKFLOW
+        slice_dir,
+        preferred_workflow=module.DEFAULT_PREFERRED_WORKFLOW,
+        scope_context=scope_context,
     )
-    module.ensure_registry(slice_dir)
+    module.ensure_registry(
+        module.get_registry_paths(required_config=True, scope_context=scope_context)[0]
+    )
     return slice_dir
 
 

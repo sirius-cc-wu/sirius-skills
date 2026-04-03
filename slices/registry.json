@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "generated_at": "2026-04-04T04:22:07",
+  "generated_at": "2026-04-04T04:37:40",
   "slices": [
     {
       "id": "HSS-01-root-fallback",
@@ -59,6 +59,16 @@
       "path": "slices/HSS-06-config-inheritance-merge-parent-and-child-skills-config-by-scope/",
       "updated_at": "2026-04-04T04:22:07",
       "closed_at": "2026-04-04T04:22:07",
+      "archived_at": null,
+      "relations": []
+    },
+    {
+      "id": "HSS-06-scoped-execution",
+      "feature": "Keep slices and execution registries local to the resolved scope",
+      "status": "closed",
+      "path": "slices/HSS-06-scoped-execution-keep-slices-and-execution-registries-local-to-the-resolved-scope/",
+      "updated_at": "2026-04-04T04:37:40",
+      "closed_at": "2026-04-04T04:37:40",
       "archived_at": null,
       "relations": []
     }
