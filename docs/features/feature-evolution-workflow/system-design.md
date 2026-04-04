@@ -120,8 +120,9 @@ Instead, a reconciliation step:
 
 1. updates canonical docs deliberately
 2. records what changed and which change packet caused it
-3. removes the completed change packet after canonical reconciliation finishes
-4. rewrites canonical artifacts directly instead of keeping durable backlinks
+3. marks the canonical feature as `implemented` once reconciliation confirms execution-backed completion
+4. removes the completed change packet after canonical reconciliation finishes
+5. rewrites canonical artifacts directly instead of keeping durable backlinks
 
 Reasoning:
 
@@ -193,6 +194,7 @@ Reasoning:
 
 - **`reconcile-feature`** (new)
   - updates canonical feature docs explicitly
+  - restores the canonical feature to `implemented` after successful reconciliation
   - records backlinks to the closed change packet
   - keeps change-local `slice-planning.md` and `slice-traceability.md` in the
     retained packet instead of reconciling them into canonical breakdown docs

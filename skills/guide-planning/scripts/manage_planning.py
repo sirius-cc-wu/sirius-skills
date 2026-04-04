@@ -33,6 +33,7 @@ STATUS_SEQUENCE = [
     "breakdown_ready",
     "planning_reviewed",
     "slice_ready",
+    "implemented",
 ]
 VALID_STATUSES = set(STATUS_SEQUENCE)
 STATUS_ALIASES = {
@@ -46,6 +47,7 @@ STATUS_ALIASES = {
     "planning_reviewed": "planning_reviewed",
     "reviewed": "planning_reviewed",
     "slice_ready": "slice_ready",
+    "implemented": "implemented",
 }
 
 
@@ -516,7 +518,7 @@ def resolve_feature_lookup(
 def find_active_feature(rows: List[Dict[str, object]]) -> Optional[Dict[str, object]]:
     if not rows:
         return None
-    open_rows = [row for row in rows if row["status"] != "slice_ready"]
+    open_rows = [row for row in rows if row["status"] not in {"slice_ready", "implemented"}]
     candidates = open_rows or rows
     return max(candidates, key=lambda row: (row.get("updated_at") or "", row["feature"]))
 
@@ -574,7 +576,7 @@ def validate_feature_state(feature_dir: str, metadata: Dict[str, object]) -> Tup
             "Planning review note recorded." if ok else "Planning review requires a non-empty review note.",
         )
 
-    if status_index >= STATUS_SEQUENCE.index("slice_ready"):
+    if status == "slice_ready":
         slice_ids = metadata.get("ready_slice_ids")
         ok = isinstance(slice_ids, list) and len(slice_ids) > 0
         record_check(

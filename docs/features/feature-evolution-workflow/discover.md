@@ -30,6 +30,7 @@ that never reconcile back into the repository planning model.
   updated slices, and closed work.
 - Make impact analysis explicit before new execution slices are bootstrapped.
 - Support reconciliation of approved changes back into canonical feature docs.
+- Preserve or restore the canonical feature's implemented state after reviewed changes reconcile successfully.
 
 ## Non-Goals
 

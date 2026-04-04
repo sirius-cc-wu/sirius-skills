@@ -76,6 +76,7 @@ Expected planning states:
 - `breakdown_ready`
 - `planning_reviewed`
 - `slice_ready`
+- `implemented`
 
 Recommended handoff:
 

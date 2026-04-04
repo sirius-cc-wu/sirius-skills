@@ -54,6 +54,36 @@ def write_planning_config(scope_root: Path, config: dict | None = None):
     )
 
 
+def advance_feature_to_slice_ready(module, monkeypatch, feature_slug: str, slice_id: str):
+    assert run_cli(module, monkeypatch, "set-status", feature_slug, "discovery_ready") == 0
+    assert run_cli(module, monkeypatch, "set-status", feature_slug, "design_ready") == 0
+    assert run_cli(module, monkeypatch, "set-status", feature_slug, "breakdown_ready") == 0
+    assert (
+        run_cli(
+            module,
+            monkeypatch,
+            "set-status",
+            feature_slug,
+            "planning_reviewed",
+            "--review-note",
+            "Reviewed for scope, sequencing, and validation readiness.",
+        )
+        == 0
+    )
+    assert (
+        run_cli(
+            module,
+            monkeypatch,
+            "set-status",
+            feature_slug,
+            "slice_ready",
+            "--slice-id",
+            slice_id,
+        )
+        == 0
+    )
+
+
 def test_init_defaults_to_docs_features_directory(tmp_path, monkeypatch):
     module = load_manage_planning_module()
     monkeypatch.chdir(tmp_path)
@@ -438,37 +468,69 @@ def test_validate_feature_reports_success_for_ready_feature(tmp_path, monkeypatc
     write_file(feature_dir / "slice-planning.md")
     write_file(feature_dir / "slice-traceability.md")
 
-    assert run_cli(module, monkeypatch, "set-status", "habit-tracker", "discovery_ready") == 0
-    assert run_cli(module, monkeypatch, "set-status", "habit-tracker", "design_ready") == 0
-    assert run_cli(module, monkeypatch, "set-status", "habit-tracker", "breakdown_ready") == 0
-    assert (
-        run_cli(
-            module,
-            monkeypatch,
-            "set-status",
-            "habit-tracker",
-            "planning_reviewed",
-            "--review-note",
-            "Reviewed for scope, sequencing, and validation readiness.",
-        )
-        == 0
-    )
-    assert (
-        run_cli(
-            module,
-            monkeypatch,
-            "set-status",
-            "habit-tracker",
-            "slice_ready",
-            "--slice-id",
-            "HAB-101",
-        )
-        == 0
+    advance_feature_to_slice_ready(module, monkeypatch, "habit-tracker", "HAB-101")
+
+    monkeypatch.setattr(sys, "argv", ["manage_planning.py", "validate-feature", "habit-tracker"])
+    exit_code = module.main()
+    assert exit_code == 0
+
+
+def test_implemented_is_terminal_and_does_not_require_ready_slice_ids(
+    tmp_path, monkeypatch
+):
+    module = load_manage_planning_module()
+    monkeypatch.chdir(tmp_path)
+
+    assert run_cli(module, monkeypatch, "init") == 0
+    assert run_cli(module, monkeypatch, "add", "habit-tracker") == 0
+
+    feature_dir = tmp_path / "docs" / "features" / "habit-tracker"
+    write_file(feature_dir / "discover.md")
+    write_file(feature_dir / "system-design.md")
+    write_file(feature_dir / "slice-planning.md")
+    write_file(feature_dir / "slice-traceability.md")
+
+    advance_feature_to_slice_ready(module, monkeypatch, "habit-tracker", "HAB-101")
+    assert run_cli(module, monkeypatch, "set-status", "habit-tracker", "implemented") == 0
+
+    metadata = json.loads((feature_dir / ".planning-meta.json").read_text(encoding="utf-8"))
+    metadata["ready_slice_ids"] = []
+    (feature_dir / ".planning-meta.json").write_text(
+        json.dumps(metadata, indent=2) + "\n",
+        encoding="utf-8",
     )
 
     monkeypatch.setattr(sys, "argv", ["manage_planning.py", "validate-feature", "habit-tracker"])
     exit_code = module.main()
     assert exit_code == 0
+
+
+def test_find_active_feature_skips_terminal_ready_and_implemented_rows():
+    module = load_manage_planning_module()
+
+    rows = [
+        {
+            "feature": "implemented-feature",
+            "status": "implemented",
+            "updated_at": "2026-04-04T04:00:00",
+            "path": "docs/features/implemented-feature/",
+        },
+        {
+            "feature": "slice-ready-feature",
+            "status": "slice_ready",
+            "updated_at": "2026-04-04T04:01:00",
+            "path": "docs/features/slice-ready-feature/",
+        },
+        {
+            "feature": "active-feature",
+            "status": "planning_reviewed",
+            "updated_at": "2026-04-04T03:59:00",
+            "path": "docs/features/active-feature/",
+        },
+    ]
+
+    feature = module.find_active_feature(rows)
+    assert feature["feature"] == "active-feature"
 
 
 def test_promote_proposal_creates_feature_and_copies_docs(tmp_path, monkeypatch):

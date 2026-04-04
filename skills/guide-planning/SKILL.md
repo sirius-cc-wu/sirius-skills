@@ -57,6 +57,7 @@ guide-planning -> propose/evolve-feature/assess/reconcile-feature/discover -> de
 - `breakdown_ready`
 - `planning_reviewed`
 - `slice_ready`
+- `implemented`
 
 Use adjacent transitions by default and repair skipped states only deliberately.
 

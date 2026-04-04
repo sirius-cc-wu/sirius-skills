@@ -43,7 +43,7 @@
 | PW-03-templates | PW-03 | Maintain breakdown scaffolding | Keep breakdown templates and scaffold behavior aligned with planning needs. | `skills/breakdown/assets`, `skills/breakdown/scripts` | primary | `pytest -q skills/breakdown/tests/test_scaffold_breakdown.py` | create slice | PW-02-routing | yes |
 | PW-03-breakdown-guidance | PW-03 | Produce execution-ready slice guidance | Ensure decomposition guidance yields traceable, demonstrable increments. | `skills/breakdown/SKILL.md`, templates | primary | Review generated artifacts for coherent increments and slice IDs | create slice | PW-03-templates | yes |
 | PW-04-review-readiness | PW-04 | Record planning review readiness | Require review notes and validate reviewed state before handoff. | `skills/review-planning/`, `manage_planning.py` | primary | `pytest -q skills/guide-planning/tests/test_manage_planning.py` | create slice | PW-03-breakdown-guidance | yes |
-| PW-04-slice-handoff | PW-04 | Bootstrap execution from reviewed planning output | Pass ready slice IDs to `slice` without moving execution logic into planning. | `skills/slice/SKILL.md`, planning docs | primary | Validate `slice_ready` with `--slice-id` using `manage_planning.py` | create slice | PW-04-review-readiness | yes |
+| PW-04-slice-handoff | PW-04 | Bootstrap execution from reviewed planning output | Pass ready slice IDs to `slice` without moving execution logic into planning, then allow canonical features to advance to `implemented` after execution-backed completion. | `skills/slice/SKILL.md`, planning docs | primary | Validate `slice_ready` with `--slice-id` using `manage_planning.py` | create slice | PW-04-review-readiness | yes |
 
 ## 5. Dependency Notes
 

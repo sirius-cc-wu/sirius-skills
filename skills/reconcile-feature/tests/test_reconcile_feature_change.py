@@ -13,8 +13,6 @@ CHANGE_SCRIPT = (
 EXECUTION_SCRIPT = (
     Path(__file__).resolve().parents[2] / "guide-execution" / "scripts" / "manage_execution.py"
 )
-
-
 def load_module(path: Path, name: str):
     spec = importlib.util.spec_from_file_location(name, path)
     module = importlib.util.module_from_spec(spec)
@@ -50,6 +48,30 @@ def setup_feature(tmp_path: Path) -> Path:
                 "requires_ui_flow": False,
                 "review_note": "ready",
                 "ready_slice_ids": ["CHK-101"],
+            }
+        )
+        + "\n",
+        encoding="utf-8",
+    )
+    (tmp_path / "docs" / "features").mkdir(parents=True, exist_ok=True)
+    (tmp_path / "docs" / "features" / "README.md").write_text(
+        "# Planning Registry\n\n"
+        "| Feature | Status | Updated | Path |\n"
+        "|---|---|---|---|\n"
+        "| checkout | planning_reviewed | 2026-01-01T00:00:00 | docs/features/checkout/ |\n",
+        encoding="utf-8",
+    )
+    (tmp_path / "docs" / "features" / "registry.json").write_text(
+        json.dumps(
+            {
+                "features": [
+                    {
+                        "feature": "checkout",
+                        "status": "planning_reviewed",
+                        "updated_at": "2026-01-01T00:00:00",
+                        "path": "docs/features/checkout/",
+                    }
+                ]
             }
         )
         + "\n",
@@ -230,6 +252,10 @@ def test_reconcile_rewrites_canonical_docs_and_removes_temporary_artifacts(
     registry = json.loads((tmp_path / "slices" / "registry.json").read_text(encoding="utf-8"))
     change_registry = json.loads((feature_dir / "changes" / "registry.json").read_text(encoding="utf-8"))
     planning_meta = json.loads((feature_dir / ".planning-meta.json").read_text(encoding="utf-8"))
+    planning_registry = json.loads(
+        (tmp_path / "docs" / "features" / "registry.json").read_text(encoding="utf-8")
+    )
+    planning_readme = (tmp_path / "docs" / "features" / "README.md").read_text(encoding="utf-8")
 
     assert canonical_discover == "# Discover\n\nAdopt the new checkout flow.\n"
     assert canonical_design == "# System Design\n\nAdopt the new checkout design.\n"
@@ -241,9 +267,12 @@ def test_reconcile_rewrites_canonical_docs_and_removes_temporary_artifacts(
     assert not change_dir.exists()
     assert change_registry["changes"] == []
     assert not (feature_dir / "changes" / "history.md").exists()
+    assert planning_meta["status"] == "implemented"
     assert planning_meta["last_reconciled_at"]
+    assert planning_meta["feature_completed_at"]
+    assert planning_registry["features"][0]["status"] == "implemented"
+    assert "| checkout | implemented |" in planning_readme
     assert "planning_archive_targets" not in planning_meta
-    assert "feature_completed_at" not in planning_meta
     assert "archived_slice_paths" not in planning_meta
     assert "history_targets" not in planning_meta
 

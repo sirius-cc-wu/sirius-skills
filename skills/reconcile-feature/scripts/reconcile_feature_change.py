@@ -13,6 +13,7 @@ SCRIPT_DIR = Path(__file__).resolve().parent
 REPO_ROOT = SCRIPT_DIR.parents[2]
 EVOLVE_SCRIPT = REPO_ROOT / "skills" / "evolve-feature" / "scripts" / "manage_feature_changes.py"
 EXECUTION_SCRIPT = REPO_ROOT / "skills" / "guide-execution" / "scripts" / "manage_execution.py"
+PLANNING_SCRIPT = REPO_ROOT / "skills" / "guide-planning" / "scripts" / "manage_planning.py"
 FIGURES_DIR = "figures"
 RECONCILABLE_FILES = [
     "discover.md",
@@ -25,16 +26,8 @@ def now_timestamp() -> str:
     return datetime.now().isoformat(timespec="seconds")
 
 
-def load_manage_feature_changes_module():
-    spec = importlib.util.spec_from_file_location("manage_feature_changes", EVOLVE_SCRIPT)
-    module = importlib.util.module_from_spec(spec)
-    assert spec.loader is not None
-    spec.loader.exec_module(module)
-    return module
-
-
-def load_manage_execution_module():
-    spec = importlib.util.spec_from_file_location("manage_execution", EXECUTION_SCRIPT)
+def load_module(path: Path, name: str):
+    spec = importlib.util.spec_from_file_location(name, path)
     module = importlib.util.module_from_spec(spec)
     assert spec.loader is not None
     spec.loader.exec_module(module)
@@ -264,13 +257,32 @@ def delete_completed_slices(manage_execution, slice_ids: list[str]) -> list[str]
     return dedupe_preserve_order(removed_paths)
 
 
-def update_feature_reconciliation_metadata(feature_dir: Path, reconciled_at: str) -> None:
+def update_feature_reconciliation_metadata(
+    feature_dir: Path,
+    feature_slug: str,
+    reconciled_at: str,
+    manage_planning,
+) -> None:
+    rows, feature, scope_context = manage_planning.resolve_feature_lookup(feature_slug)
+    if not feature:
+        raise RuntimeError(f"Canonical planning feature not found: {feature_slug}")
+
+    success, message = manage_planning.update_feature_status(
+        rows,
+        feature,
+        "implemented",
+        force=True,
+        scope_context=scope_context,
+    )
+    if not success:
+        raise RuntimeError(message)
+
     metadata_path = feature_dir / ".planning-meta.json"
     payload: dict[str, object] = {}
     if metadata_path.exists():
         payload = json.loads(metadata_path.read_text(encoding="utf-8"))
 
-    payload.pop("feature_completed_at", None)
+    payload["feature_completed_at"] = reconciled_at
     payload.pop("planning_archive_targets", None)
     payload.pop("archived_slice_paths", None)
     payload.pop("history_targets", None)
@@ -280,8 +292,9 @@ def update_feature_reconciliation_metadata(feature_dir: Path, reconciled_at: str
 
 def main() -> int:
     args = parse_args()
-    manage_feature_changes = load_manage_feature_changes_module()
-    manage_execution = load_manage_execution_module()
+    manage_feature_changes = load_module(EVOLVE_SCRIPT, "manage_feature_changes")
+    manage_execution = load_module(EXECUTION_SCRIPT, "manage_execution")
+    manage_planning = load_module(PLANNING_SCRIPT, "manage_planning")
 
     try:
         feature_dir_str, feature_slug = manage_feature_changes.resolve_feature_dir(args.feature)
@@ -344,7 +357,12 @@ def main() -> int:
             raise RuntimeError(close_message)
 
         removed_slice_paths = delete_completed_slices(manage_execution, planned_ids)
-        update_feature_reconciliation_metadata(feature_dir=feature_dir, reconciled_at=reconciled_at)
+        update_feature_reconciliation_metadata(
+            feature_dir=feature_dir,
+            feature_slug=feature_slug,
+            reconciled_at=reconciled_at,
+            manage_planning=manage_planning,
+        )
 
         closed_rows = manage_feature_changes.load_registry(feature_dir_str)
         closed_change = manage_feature_changes.find_change(closed_rows, str(metadata["change_id"]))

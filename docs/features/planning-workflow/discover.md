@@ -7,7 +7,7 @@ The repository offers a planning-layer workflow, but its value is distributed ac
 ## Goals
 
 - Keep feature-level intent, scope, and architecture in repository artifacts.
-- Route work through explicit planning readiness states before execution bootstrap.
+- Route work through explicit planning readiness states before execution bootstrap and preserve a canonical terminal state once execution-backed delivery is complete.
 - Preserve clear ownership boundaries between planning artifacts and execution artifacts.
 - Produce planning outputs that are concrete enough for later review and slice bootstrap.
 
@@ -43,7 +43,7 @@ The repository offers a planning-layer workflow, but its value is distributed ac
 
 ## Success Criteria
 
-- A maintainer can initialize a feature folder and move it through discovery, design, and breakdown with durable state.
+- A maintainer can initialize a feature folder and move it through discovery, design, breakdown, and a durable post-execution implemented state.
 - Planning artifacts are detailed enough that `review-planning` can assess them without side-channel context.
 - Breakdown outputs produce execution-ready slices and demonstrable increments without inventing execution-slice state.
 
