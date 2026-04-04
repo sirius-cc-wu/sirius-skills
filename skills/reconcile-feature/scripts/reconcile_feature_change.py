@@ -38,12 +38,12 @@ def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(
         description=(
             "Reconcile an approved feature change packet back into the canonical "
-            "feature docs, remove completed execution slices, and remove the "
-            "completed change packet."
+            "feature docs, or repair canonical feature completion when no change "
+            "packet exists."
         )
     )
     parser.add_argument("feature", help="Feature slug, folder name, or path")
-    parser.add_argument("change", help="Change ID, folder name, or path")
+    parser.add_argument("change", nargs="?", help="Change ID, folder name, or path")
     parser.add_argument(
         "--canonical-file",
         action="append",
@@ -67,6 +67,14 @@ def parse_args() -> argparse.Namespace:
         "--force",
         action="store_true",
         help="Allow deliberate repair when the change is not in the normal reviewed state.",
+    )
+    parser.add_argument(
+        "--canonical-only",
+        action="store_true",
+        help=(
+            "Repair a canonical feature that has no change packet by removing closed "
+            "planned slices and marking the feature implemented."
+        ),
     )
     return parser.parse_args()
 
@@ -172,6 +180,27 @@ def planned_slice_ids(change_dir: Path, metadata: dict[str, object]) -> list[str
         return dedupe_preserve_order(
             [item.strip() for item in affected if isinstance(item, str) and item.strip()]
         )
+
+    return []
+
+
+def canonical_planned_slice_ids(feature_dir: Path) -> list[str]:
+    planning_path = feature_dir / "slice-planning.md"
+    if planning_path.exists():
+        extracted = extract_slice_ids_from_planning_text(
+            planning_path.read_text(encoding="utf-8")
+        )
+        if extracted:
+            return extracted
+
+    metadata_path = feature_dir / ".planning-meta.json"
+    if metadata_path.exists():
+        metadata = json.loads(metadata_path.read_text(encoding="utf-8"))
+        ready_slice_ids = metadata.get("ready_slice_ids")
+        if isinstance(ready_slice_ids, list):
+            return dedupe_preserve_order(
+                [item.strip() for item in ready_slice_ids if isinstance(item, str) and item.strip()]
+            )
 
     return []
 
@@ -282,12 +311,73 @@ def update_feature_reconciliation_metadata(
     if metadata_path.exists():
         payload = json.loads(metadata_path.read_text(encoding="utf-8"))
 
+    payload["ready_slice_ids"] = []
     payload["feature_completed_at"] = reconciled_at
     payload.pop("planning_archive_targets", None)
     payload.pop("archived_slice_paths", None)
     payload.pop("history_targets", None)
     payload["last_reconciled_at"] = reconciled_at
     metadata_path.write_text(json.dumps(payload, indent=2) + "\n", encoding="utf-8")
+
+
+def load_change_rows_if_present(manage_feature_changes, feature_dir: Path):
+    _, _, registry_json_path = manage_feature_changes.change_registry_paths(str(feature_dir))
+    if not Path(registry_json_path).exists():
+        return None
+    return manage_feature_changes.load_registry(str(feature_dir))
+
+
+def require_change_selector(change: str | None, canonical_only: bool) -> str:
+    if change:
+        return change
+    if canonical_only:
+        return ""
+    raise RuntimeError(
+        "Reconciliation requires a change packet selector unless you use --canonical-only "
+        "for canonical feature completion repair."
+    )
+
+
+def find_change_or_raise(manage_feature_changes, feature_dir: Path, selector: str, feature_slug: str):
+    rows = load_change_rows_if_present(manage_feature_changes, feature_dir)
+    if rows is None:
+        raise RuntimeError(
+            f"No feature change packet exists for '{feature_slug}'. "
+            "If this canonical feature only needs final cleanup, rerun with --canonical-only."
+        )
+
+    change = manage_feature_changes.find_change(rows, selector)
+    if change:
+        return rows, change
+
+    if not rows:
+        raise RuntimeError(
+            f"No feature change packet exists for '{feature_slug}'. "
+            "If this canonical feature only needs final cleanup, rerun with --canonical-only."
+        )
+
+    raise RuntimeError(f"Feature change not found: {selector}")
+
+
+def reconcile_canonical_feature_only(
+    *,
+    feature_dir: Path,
+    feature_slug: str,
+    manage_execution,
+    manage_planning,
+    force: bool,
+) -> list[str]:
+    planned_ids = canonical_planned_slice_ids(feature_dir)
+    require_feature_complete(manage_execution, planned_ids, force=force)
+    removed_slice_paths = delete_completed_slices(manage_execution, planned_ids)
+    reconciled_at = now_timestamp()
+    update_feature_reconciliation_metadata(
+        feature_dir=feature_dir,
+        feature_slug=feature_slug,
+        reconciled_at=reconciled_at,
+        manage_planning=manage_planning,
+    )
+    return removed_slice_paths
 
 
 def main() -> int:
@@ -299,10 +389,36 @@ def main() -> int:
     try:
         feature_dir_str, feature_slug = manage_feature_changes.resolve_feature_dir(args.feature)
         feature_dir = Path(feature_dir_str)
-        rows = manage_feature_changes.load_registry(feature_dir_str)
-        change = manage_feature_changes.find_change(rows, args.change)
-        if not change:
-            raise RuntimeError(f"Feature change not found: {args.change}")
+        if args.canonical_only:
+            if args.canonical_file:
+                raise RuntimeError(
+                    "--canonical-file can only be used when reconciling a feature change packet."
+                )
+            if args.change:
+                raise RuntimeError(
+                    "--canonical-only does not accept a change selector. "
+                    "Pass only the canonical feature and the flag."
+                )
+            removed_slice_paths = reconcile_canonical_feature_only(
+                feature_dir=feature_dir,
+                feature_slug=feature_slug,
+                manage_execution=manage_execution,
+                manage_planning=manage_planning,
+                force=args.force,
+            )
+            print(
+                "Reconciled canonical feature without a change packet: "
+                f"{relative_to_cwd(feature_dir)}"
+            )
+            for path in removed_slice_paths:
+                print(f"- removed execution slice: {path}")
+            print("- feature status: implemented")
+            return 0
+
+        change_selector = require_change_selector(args.change, args.canonical_only)
+        rows, change = find_change_or_raise(
+            manage_feature_changes, feature_dir, change_selector, feature_slug
+        )
 
         change_dir = Path(manage_feature_changes.change_dir_for_row(change))
         metadata = manage_feature_changes.read_metadata(str(change_dir))

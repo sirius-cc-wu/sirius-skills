@@ -268,6 +268,7 @@ def test_reconcile_rewrites_canonical_docs_and_removes_temporary_artifacts(
     assert change_registry["changes"] == []
     assert not (feature_dir / "changes" / "history.md").exists()
     assert planning_meta["status"] == "implemented"
+    assert planning_meta["ready_slice_ids"] == []
     assert planning_meta["last_reconciled_at"]
     assert planning_meta["feature_completed_at"]
     assert planning_registry["features"][0]["status"] == "implemented"
@@ -325,3 +326,72 @@ def test_reconcile_requires_reviewed_state(tmp_path, monkeypatch, capsys):
 
     captured = capsys.readouterr()
     assert "must be in 'reviewed' status" in captured.err
+
+
+def test_reconcile_canonical_only_repairs_feature_without_change_packet(
+    tmp_path, monkeypatch
+):
+    monkeypatch.chdir(tmp_path)
+    reconcile_module = load_module(RECONCILE_SCRIPT, "reconcile_feature_change")
+    feature_dir = setup_feature(tmp_path)
+    write_file(
+        feature_dir / "slice-planning.md",
+        "# Slice Planning\n\n"
+        "## 4. Execution Slice Backlog\n\n"
+        "| Slice ID | Story ID | Title | Summary | Target Area | Lane | Validation | Planned Action | Depends On | Slice Ready |\n"
+        "| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |\n"
+        "| CHK-101 | CHK-01 | Replace legacy flow | Implement the new checkout path. | `checkout/` | primary | `pytest -q` | create slice |  | yes |\n",
+    )
+    manage_execution = ensure_execution_registry(tmp_path, monkeypatch)
+    add_slice_with_status(manage_execution, monkeypatch, "CHK-101", "Checkout Flow", "closed")
+
+    assert (
+        run_cli(
+            reconcile_module,
+            "reconcile_feature_change.py",
+            monkeypatch,
+            "checkout",
+            "--canonical-only",
+        )
+        == 0
+    )
+
+    planning_meta = json.loads((feature_dir / ".planning-meta.json").read_text(encoding="utf-8"))
+    planning_registry = json.loads(
+        (tmp_path / "docs" / "features" / "registry.json").read_text(encoding="utf-8")
+    )
+    planning_readme = (tmp_path / "docs" / "features" / "README.md").read_text(encoding="utf-8")
+    registry = json.loads((tmp_path / "slices" / "registry.json").read_text(encoding="utf-8"))
+
+    assert planning_meta["status"] == "implemented"
+    assert planning_meta["ready_slice_ids"] == []
+    assert planning_meta["last_reconciled_at"]
+    assert planning_meta["feature_completed_at"]
+    assert planning_registry["features"][0]["status"] == "implemented"
+    assert "| checkout | implemented |" in planning_readme
+    assert registry["slices"] == []
+    assert not (tmp_path / "slices" / "CHK-101-checkout-flow").exists()
+    assert not (feature_dir / "changes").exists()
+
+
+def test_reconcile_guides_to_canonical_only_when_no_change_packet_exists(
+    tmp_path, monkeypatch, capsys
+):
+    monkeypatch.chdir(tmp_path)
+    reconcile_module = load_module(RECONCILE_SCRIPT, "reconcile_feature_change")
+    setup_feature(tmp_path)
+
+    assert (
+        run_cli(
+            reconcile_module,
+            "reconcile_feature_change.py",
+            monkeypatch,
+            "checkout",
+            "replace-legacy-flow",
+        )
+        == 2
+    )
+
+    captured = capsys.readouterr()
+    assert "No feature change packet exists for 'checkout'" in captured.err
+    assert "--canonical-only" in captured.err
