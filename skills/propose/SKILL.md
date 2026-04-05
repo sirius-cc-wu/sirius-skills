@@ -46,7 +46,7 @@ Only continue beyond proposal work if the user explicitly asks to:
 
 - `<proposal_dir>/README.md`
 - `<proposal_dir>/registry.json`
-- `<proposal_dir>/<proposal-slug>/discover.md`
+- `<proposal_dir>/<proposal-slug>/proposal.md`
 - `<proposal_dir>/<proposal-slug>/.proposal-meta.json`
 
 ## When To Use
@@ -60,7 +60,7 @@ Only continue beyond proposal work if the user explicitly asks to:
 
 1. Initialize the proposal registry with `manage_proposals.py init` if it does not exist yet.
 2. Create a proposal with `manage_proposals.py add <proposal-slug>`.
-3. Capture the problem framing in `discover.md` and optional candidate stories in `user-stories.md`.
+3. Capture the problem framing in `proposal.md` and optional candidate stories in `user-stories.md`.
 4. Optionally review the proposal and record the decision with `set-status` only if the user asked for review or a lifecycle update.
 5. If the user explicitly asks to accept the proposal, update proposal status to `accepted`.
 6. If the user explicitly asks to promote the accepted proposal or start planning, stop proposal work and hand off to `guide-planning`, which owns the proposal-to-feature transition.

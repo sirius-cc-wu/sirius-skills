@@ -139,7 +139,7 @@ Its job is to:
 
 Expected outputs:
 
-- `discover.md`
+- `proposal.md`
 - optional `user-stories.md`
 - `.proposal-meta.json`
 
@@ -443,7 +443,7 @@ Keep discovery, design, and breakdown artifacts in a feature-local planning fold
 
 ```text
 <proposal_dir>/<proposal-slug>/
-  discover.md
+  proposal.md
   user-stories.md          # optional
 ```
 

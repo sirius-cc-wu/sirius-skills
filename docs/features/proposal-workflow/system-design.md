@@ -53,8 +53,12 @@ such as `discovery_ready` or `planning_reviewed`.
 ### 4. Promotion is the boundary into canonical planning
 
 Promotion creates or resolves a canonical feature folder using the existing
-planning helpers and then copies applicable proposal artifacts such as
-`discover.md` and `user-stories.md` when they are not already present.
+planning helpers and may copy companion artifacts such as `user-stories.md`
+when they are not already present.
+
+Promotion does not transform `proposal.md` into canonical `discover.md`.
+After promotion, `guide-planning` should route to `discover`, which uses the
+accepted proposal as source context to generate the canonical discovery artifact.
 
 Promotion must fail safely when a canonical feature already exists unless the
 user is deliberately repairing state.
@@ -64,7 +68,7 @@ user is deliberately repairing state.
 - `skills/propose/SKILL.md`
   - defines when to use `propose`
 - `skills/propose/scripts/manage_proposals.py`
-  - manages registry, metadata, validation, and promotion
+  - manages proposal registry, metadata, and validation
 - `docs/proposals/README.md`
   - human-readable proposal registry
 - `docs/proposals/registry.json`
@@ -72,13 +76,13 @@ user is deliberately repairing state.
 - `docs/proposals/<proposal-slug>/.proposal-meta.json`
   - proposal lifecycle metadata
 - `skills/guide-planning/SKILL.md`
-  - routes speculative work to `propose`
+  - promotes accepted proposals into canonical planning and routes to `discover`
 - `skills/bootstrap/scripts/bootstrap.py`
   - writes default `proposal_dir`
 
 ## Validation Rules
 
-- `discover.md` is required once a proposal reaches `reviewed` or beyond.
+- `proposal.md` is required once a proposal reaches `reviewed` or beyond.
 - `review_note` is required for `reviewed`, `accepted`, `rejected`, and `promoted` states.
 - `promoted_feature` and `promoted_at` are required once a proposal reaches `promoted`.
 - Promotion requires the proposal to be `accepted` unless the user explicitly forces repair.

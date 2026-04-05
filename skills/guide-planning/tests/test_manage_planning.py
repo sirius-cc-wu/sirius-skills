@@ -533,7 +533,7 @@ def test_find_active_feature_skips_terminal_ready_and_implemented_rows():
     assert feature["feature"] == "active-feature"
 
 
-def test_promote_proposal_creates_feature_and_copies_docs(tmp_path, monkeypatch):
+def test_promote_proposal_creates_feature_without_generating_discover_doc(tmp_path, monkeypatch):
     planning_module = load_manage_planning_module()
     proposal_module = load_manage_proposals_module()
     monkeypatch.chdir(tmp_path)
@@ -542,7 +542,10 @@ def test_promote_proposal_creates_feature_and_copies_docs(tmp_path, monkeypatch)
     assert run_cli(proposal_module, monkeypatch, "add", "workflow-capability-upgrades") == 0
 
     proposal_dir = tmp_path / "docs" / "proposals" / "workflow-capability-upgrades"
-    write_file(proposal_dir / "discover.md", "# Discover\n")
+    write_file(
+        proposal_dir / "proposal.md",
+        "# Proposal: Workflow Capability Upgrades\n\nProposal body.\n",
+    )
     write_file(proposal_dir / "user-stories.md", "# Stories\n")
 
     assert (
@@ -589,7 +592,7 @@ def test_promote_proposal_creates_feature_and_copies_docs(tmp_path, monkeypatch)
     proposal_meta = json.loads((proposal_dir / ".proposal-meta.json").read_text(encoding="utf-8"))
 
     assert feature_meta["feature_slug"] == "workflow-capability-upgrades"
-    assert (feature_dir / "discover.md").read_text(encoding="utf-8") == "# Discover\n"
+    assert not (feature_dir / "discover.md").exists()
     assert (feature_dir / "user-stories.md").read_text(encoding="utf-8") == "# Stories\n"
     assert proposal_meta["status"] == "promoted"
     assert proposal_meta["promoted_feature"] == "workflow-capability-upgrades"
@@ -628,7 +631,7 @@ def test_promote_proposal_defaults_to_proposal_scope_without_target_scope(
     assert run_cli(proposal_module, monkeypatch, "add", "workflow-capability-upgrades") == 0
 
     proposal_dir = child_scope / "docs" / "proposals" / "workflow-capability-upgrades"
-    write_file(proposal_dir / "discover.md", "# Discover\n")
+    write_file(proposal_dir / "proposal.md", "# Proposal\n")
     write_file(proposal_dir / "user-stories.md", "# Stories\n")
 
     assert (
@@ -686,7 +689,7 @@ def test_promote_proposal_supports_explicit_target_scope(tmp_path, monkeypatch):
     assert run_cli(proposal_module, monkeypatch, "add", "workflow-capability-upgrades") == 0
 
     proposal_dir = child_scope / "docs" / "proposals" / "workflow-capability-upgrades"
-    write_file(proposal_dir / "discover.md", "# Discover\n")
+    write_file(proposal_dir / "proposal.md", "# Proposal\n")
     write_file(proposal_dir / "user-stories.md", "# Stories\n")
 
     assert (
@@ -744,7 +747,7 @@ def test_promote_proposal_rejects_target_scope_outside_repo(tmp_path, monkeypatc
     assert run_cli(proposal_module, monkeypatch, "add", "workflow-capability-upgrades") == 0
 
     proposal_dir = child_scope / "docs" / "proposals" / "workflow-capability-upgrades"
-    write_file(proposal_dir / "discover.md", "# Discover\n")
+    write_file(proposal_dir / "proposal.md", "# Proposal\n")
     write_file(proposal_dir / "user-stories.md", "# Stories\n")
 
     assert (
@@ -791,3 +794,55 @@ def test_promote_proposal_rejects_target_scope_outside_repo(tmp_path, monkeypatc
     assert exit_code == 2
     assert "outside repository root" in captured.err
     assert not (tmp_path / "docs" / "features" / "workflow-capability-upgrades").exists()
+
+
+def test_promote_proposal_accepts_legacy_discover_md(tmp_path, monkeypatch):
+    planning_module = load_manage_planning_module()
+    proposal_module = load_manage_proposals_module()
+    monkeypatch.chdir(tmp_path)
+
+    assert run_cli(planning_module, monkeypatch, "init") == 0
+    assert run_cli(proposal_module, monkeypatch, "add", "workflow-capability-upgrades") == 0
+
+    proposal_dir = tmp_path / "docs" / "proposals" / "workflow-capability-upgrades"
+    (proposal_dir / "proposal.md").unlink()
+    write_file(proposal_dir / "discover.md", "# Discover\n")
+
+    assert (
+        run_cli(
+            proposal_module,
+            monkeypatch,
+            "set-status",
+            "workflow-capability-upgrades",
+            "reviewed",
+            "--review-note",
+            "Legacy proposal scoped and ready for decision.",
+        )
+        == 0
+    )
+    assert (
+        run_cli(
+            proposal_module,
+            monkeypatch,
+            "set-status",
+            "workflow-capability-upgrades",
+            "accepted",
+            "--review-note",
+            "Accepted for canonical planning.",
+        )
+        == 0
+    )
+
+    assert (
+        run_cli(
+            planning_module,
+            monkeypatch,
+            "promote-proposal",
+            "workflow-capability-upgrades",
+        )
+        == 0
+    )
+
+    feature_dir = tmp_path / "docs" / "features" / "workflow-capability-upgrades"
+    assert feature_dir.exists()
+    assert not (feature_dir / "discover.md").exists()

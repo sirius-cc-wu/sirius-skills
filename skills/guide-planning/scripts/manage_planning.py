@@ -751,12 +751,12 @@ def promote_proposal_to_feature(
         return False, f"Canonical feature planning folder already exists: {feature_dir}"
 
     copied_files: List[str] = []
-    for filename in [manage_proposals.DISCOVER_FILE, manage_proposals.USER_STORIES_FILE]:
-        source = os.path.join(proposal_dir, filename)
-        target = os.path.join(feature_dir, filename)
-        if os.path.exists(source) and not os.path.exists(target):
-            shutil.copyfile(source, target)
-            copied_files.append(filename)
+
+    user_stories_source = os.path.join(proposal_dir, manage_proposals.USER_STORIES_FILE)
+    user_stories_target = os.path.join(feature_dir, manage_proposals.USER_STORIES_FILE)
+    if os.path.exists(user_stories_source) and not os.path.exists(user_stories_target):
+        shutil.copyfile(user_stories_source, user_stories_target)
+        copied_files.append(manage_proposals.USER_STORIES_FILE)
 
     timestamp = now_timestamp()
     updated_metadata = dict(proposal_metadata)

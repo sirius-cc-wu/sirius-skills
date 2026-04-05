@@ -24,7 +24,8 @@ REGISTRY_HEADER = (
     "|---|---|---|---|\n"
 )
 METADATA_FILE = ".proposal-meta.json"
-DISCOVER_FILE = "discover.md"
+PROPOSAL_FILE = "proposal.md"
+LEGACY_DISCOVER_FILE = "discover.md"
 USER_STORIES_FILE = "user-stories.md"
 SLUG_PATTERN = re.compile(r"^[A-Za-z0-9][A-Za-z0-9._-]*$")
 STATUS_SEQUENCE = ["draft", "reviewed", "accepted", "rejected", "promoted"]
@@ -468,12 +469,19 @@ def find_active_proposal(rows: List[Dict[str, object]]) -> Optional[Dict[str, ob
     return max(candidates, key=lambda row: (row.get("updated_at") or "", row["proposal"]))
 
 
-def write_discover_stub(proposal_dir: str, proposal_slug: str, summary: Optional[str]) -> None:
-    path = os.path.join(proposal_dir, DISCOVER_FILE)
+def resolve_proposal_doc_filename(proposal_dir: str) -> Optional[str]:
+    for filename in (PROPOSAL_FILE, LEGACY_DISCOVER_FILE):
+        if os.path.exists(os.path.join(proposal_dir, filename)):
+            return filename
+    return None
+
+
+def write_proposal_stub(proposal_dir: str, proposal_slug: str, summary: Optional[str]) -> None:
+    path = os.path.join(proposal_dir, PROPOSAL_FILE)
     if os.path.exists(path):
         return
-    discover_text = (
-        f"# Discover: {proposal_slug.replace('-', ' ').title()}\n\n"
+    proposal_text = (
+        f"# Proposal: {proposal_slug.replace('-', ' ').title()}\n\n"
         "## Problem\n\n"
         f"{summary or 'Describe the problem or opportunity this proposal explores.'}\n\n"
         "## Why This Is Still A Proposal\n\n"
@@ -481,7 +489,7 @@ def write_discover_stub(proposal_dir: str, proposal_slug: str, summary: Optional
         "- Keep speculative notes here until the team decides to promote or reject it.\n"
     )
     with open(path, "w", encoding="utf-8") as f:
-        f.write(discover_text)
+        f.write(proposal_text)
 
 
 def validate_required_file(proposal_dir: str, filename: str) -> Tuple[bool, str]:
@@ -493,6 +501,13 @@ def validate_required_file(proposal_dir: str, filename: str) -> Tuple[bool, str]
     if not content:
         return False, f"Required file '{filename}' is empty."
     return True, f"Found '{filename}'."
+
+
+def validate_required_proposal_doc(proposal_dir: str) -> Tuple[bool, str]:
+    filename = resolve_proposal_doc_filename(proposal_dir)
+    if filename is None:
+        return False, f"Missing required file '{PROPOSAL_FILE}'."
+    return validate_required_file(proposal_dir, filename)
 
 
 def validate_proposal_state(
@@ -517,8 +532,8 @@ def validate_proposal_state(
         return False, issues, checks
 
     if status in {"reviewed", "accepted", "rejected", "promoted"}:
-        ok, detail = validate_required_file(proposal_dir, DISCOVER_FILE)
-        record_check("discover", ok, detail)
+        ok, detail = validate_required_proposal_doc(proposal_dir)
+        record_check("proposal_doc", ok, detail)
         review_note = metadata.get("review_note")
         ok = isinstance(review_note, str) and bool(review_note.strip())
         record_check(
@@ -570,7 +585,7 @@ def create_proposal(
         proposal_slug, summary=summary, target_feature=target_feature
     )
     write_metadata(proposal_dir, metadata)
-    write_discover_stub(proposal_dir, proposal_slug, summary)
+    write_proposal_stub(proposal_dir, proposal_slug, summary)
     config = load_config(required=False, scope_context=scope_context)
     row_path = normalize_path(
         os.path.join(

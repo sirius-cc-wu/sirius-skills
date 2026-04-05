@@ -26,7 +26,7 @@ We separate **Proposal**, **Planning**, and **Implementation**.
 ## 2. Proposal Artifacts
 Stored in `docs/proposals/<proposal-slug>/`
 
-- `discover.md`: Early framing for a candidate capability or change.
+- `proposal.md`: Early framing for a candidate capability or change.
 - `.proposal-meta.json`: Machine-readable proposal lifecycle tracking.
 
 ---

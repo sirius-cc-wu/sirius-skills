@@ -95,7 +95,7 @@ def test_add_creates_proposal_metadata_and_registry_entries(tmp_path, monkeypatc
     assert metadata["proposal_slug"] == "workflow-capability-upgrades"
     assert metadata["status"] == "draft"
     assert metadata["summary"] == "Improve planning capabilities."
-    assert (proposal_dir / "discover.md").exists()
+    assert (proposal_dir / "proposal.md").exists()
     assert registry["proposals"][0]["proposal"] == "workflow-capability-upgrades"
 
 
@@ -354,7 +354,7 @@ def test_accepted_proposal_remains_proposal_scoped(tmp_path, monkeypatch):
     assert run_cli(module, monkeypatch, "add", "workflow-capability-upgrades") == 0
 
     proposal_dir = tmp_path / "docs" / "proposals" / "workflow-capability-upgrades"
-    write_file(proposal_dir / "discover.md", "# Discover\n")
+    write_file(proposal_dir / "proposal.md", "# Proposal\n")
     write_file(proposal_dir / "user-stories.md", "# Stories\n")
 
     assert (
@@ -399,7 +399,7 @@ def test_validate_proposal_reports_success_for_accepted_proposal(tmp_path, monke
     assert run_cli(module, monkeypatch, "init") == 0
     assert run_cli(module, monkeypatch, "add", "workflow-capability-upgrades") == 0
     proposal_dir = tmp_path / "docs" / "proposals" / "workflow-capability-upgrades"
-    write_file(proposal_dir / "discover.md", "# Discover\n")
+    write_file(proposal_dir / "proposal.md", "# Proposal\n")
 
     assert (
         run_cli(
@@ -422,6 +422,37 @@ def test_validate_proposal_reports_success_for_accepted_proposal(tmp_path, monke
             "accepted",
             "--review-note",
             "Accepted for promotion.",
+        )
+        == 0
+    )
+
+    monkeypatch.setattr(
+        sys,
+        "argv",
+        ["manage_proposals.py", "validate-proposal", "workflow-capability-upgrades"],
+    )
+    assert module.main() == 0
+
+
+def test_validate_proposal_accepts_legacy_discover_md(tmp_path, monkeypatch):
+    module = load_module()
+    monkeypatch.chdir(tmp_path)
+
+    assert run_cli(module, monkeypatch, "init") == 0
+    assert run_cli(module, monkeypatch, "add", "workflow-capability-upgrades") == 0
+    proposal_dir = tmp_path / "docs" / "proposals" / "workflow-capability-upgrades"
+    (proposal_dir / "proposal.md").unlink()
+    write_file(proposal_dir / "discover.md", "# Discover\n")
+
+    assert (
+        run_cli(
+            module,
+            monkeypatch,
+            "set-status",
+            "workflow-capability-upgrades",
+            "reviewed",
+            "--review-note",
+            "Reviewed as a legacy proposal candidate.",
         )
         == 0
     )
