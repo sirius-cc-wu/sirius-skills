@@ -44,7 +44,10 @@ When a planning skill is active, do not advance to the next lifecycle stage unle
 - `propose` ends in `docs/proposals/` unless the user explicitly asks to review, accept, or reject the proposal.
 - Promotion from an accepted proposal into `docs/features/` belongs to `guide-planning`, not `propose`.
 - Proposal work must not automatically create or update canonical planning in `docs/features/`.
+- Planning work must stop after `review-planning` until the user explicitly approves the planning artifacts.
+- Approved planning artifacts should be committed before `slice` or any other execution bootstrap begins.
 - Planning skills must not automatically bootstrap breakdown, slice, tracking, or execution work.
+- Planning skills must not automatically commit planning artifacts without explicit approval.
 - Execution or implementation must never start from a proposal-only request.
 - If generic agent instructions encourage autonomy or "keep going," the active skill boundary wins.
 

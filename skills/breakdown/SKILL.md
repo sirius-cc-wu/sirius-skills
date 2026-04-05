@@ -42,7 +42,7 @@ stories, slices, and baseline docs.
 2. Split oversized work into smaller, independently verifiable execution packets.
 3. Produce planning artifacts that preserve story-to-slice traceability, increment grouping, sequencing, and execution mode assumptions.
 4. Create executable work items, dependency links, and explicit parallel-safe lanes where appropriate.
-5. Hand off ready work to `review-planning` and then `slice` for execution-slice bootstrap.
+5. Hand off ready work to `review-planning`; after human approval and planning commit, execution can bootstrap with `slice`.
 
 ## Required Output
 
@@ -191,7 +191,7 @@ Otherwise, use an opaque slice ID and keep the repo story ID in traceability met
 4. Choose `single-agent` or `multi-agent` handling where relevant and record lane assumptions.
 5. Write `slice-planning.md` and `slice-traceability.md` with increment groupings, dependency notes, parallel-safe lanes, and integration checkpoints as needed.
 6. Create planned slices and dependency links for execution-ready work, keeping packet validation explicit.
-7. Stop when each slice is ready for `review-planning` and subsequent bootstrap by `slice`.
+7. Stop when each slice is ready for `review-planning` and later bootstrap by `slice` after approval and planning commit.
 
 When generating `slice-planning.md`, start from `assets/slice-planning-template.md` and replace placeholders rather than inventing a new structure each time.
 When generating `slice-traceability.md`, start from `assets/slice-traceability-template.md` and replace placeholders rather than inventing a new table shape each time.

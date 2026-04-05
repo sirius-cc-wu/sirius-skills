@@ -27,8 +27,8 @@ The intended direction is:
 The managed repo-first skill set is grouped into:
 
 - repo utilities: `skills/bootstrap/`, `skills/commit/`, `skills/create-pr/`, `skills/simplify/`
-- planning layer: `skills/guide-scope/`, `skills/guide-planning/`, `skills/propose/`, `skills/evolve-feature/`, `skills/assess/`, `skills/reconcile-feature/`, `skills/discover/`, `skills/design/`, `skills/ui-flow/`, `skills/breakdown/`, `skills/review-planning/`, `skills/slice/`
-- execution layer: `skills/guide-execution/`, `skills/brief/`, `skills/blueprint/`, `skills/review-execution/`, `skills/close-slice/`
+- planning layer: `skills/guide-scope/`, `skills/guide-planning/`, `skills/propose/`, `skills/evolve-feature/`, `skills/assess/`, `skills/reconcile-feature/`, `skills/discover/`, `skills/design/`, `skills/ui-flow/`, `skills/breakdown/`, `skills/review-planning/`
+- execution layer: `skills/slice/`, `skills/guide-execution/`, `skills/brief/`, `skills/blueprint/`, `skills/review-execution/`, `skills/close-slice/`
 
 If a project has no extra configuration, these skills should still work with generic conventions.
 
@@ -49,18 +49,19 @@ For repositories that use repo-first planning, the recommended short-name planni
 - `skills/ui-flow/`
 - `skills/breakdown/`
 - `skills/review-planning/`
-- `skills/slice/`
 
 These skills sit **before** the execution-slice skills:
 
-- planning layer: `guide-scope`, `guide-planning`, `propose`, `evolve-feature`, `assess`, `reconcile-feature`, `discover`, `design`, `ui-flow`, `breakdown`, `review-planning`, `slice`
-- execution layer: `guide-execution`, `brief`, `blueprint`, `review-execution`, `close-slice`
+- planning layer: `guide-scope`, `guide-planning`, `propose`, `evolve-feature`, `assess`, `reconcile-feature`, `discover`, `design`, `ui-flow`, `breakdown`, `review-planning`
+- execution layer: `slice`, `guide-execution`, `brief`, `blueprint`, `review-execution`, `close-slice`
 
 
 Recommended boundary:
 
 - keep goals, design, stories, decomposition, and increment plans in repo documents
 - keep executable slices and dependency tracking in the repository planning artifacts
+- stop planning at `review-planning` until a human explicitly approves the planning artifacts
+- commit approved planning artifacts before bootstrapping execution with `slice`
 - bootstrap one execution slice per executable slice
 - use `guide-scope` as the optional scope-aware entrypoint when multi-scope routing or explicit scope choice matters
 - let `guide-planning` own feature-planning readiness and routing inside the planning layer
@@ -87,14 +88,15 @@ Preferred repo workflow:
 7. `design` turns that into architecture, interfaces, and risks.
 8. `ui-flow` adds optional UX or screen-flow artifacts.
 9. `breakdown` turns repo stories into directly executable work items and groups those slices into small demonstrable increments.
-10. `review-planning` reviews planning artifacts and slice definitions before execution slice bootstrap.
-11. `slice` validates execution-ready input, bootstraps a slice-scoped execution slice, and hands off to `guide-execution`.
-12. `guide-execution` routes slice-scoped execution through `brief` to capture slice intent and acceptance, then through `blueprint` to produce the final execution artifact. When `.skills/execution.json` enables `auto_start_implementation`, that handoff continues directly into implementation after the blueprint is marked ready.
-13. `review-execution` checks implementation and validation outcomes against the slice-scoped execution artifacts before closure.
-14. `close-slice` closes completed execution slices and records durable closure metadata.
-15. `reconcile-feature` folds an approved feature change packet back into canonical feature docs, verifies planned slices are complete, removes completed execution slices, removes the completed change packet, and leaves the canonical feature docs as the durable specification.
+10. `review-planning` reviews planning artifacts and slice definitions, then stops for explicit human approval.
+11. After approval, commit the planning artifacts so the reviewed plan is durable before execution begins.
+12. `slice` validates approved, committed execution-ready input, bootstraps a slice-scoped execution slice, and hands off to `guide-execution`.
+13. `guide-execution` routes slice-scoped execution through `brief` to capture slice intent and acceptance, then through `blueprint` to produce the final execution artifact. When `.skills/execution.json` enables `auto_start_implementation`, that handoff continues directly into implementation after the blueprint is marked ready.
+14. `review-execution` checks implementation and validation outcomes against the slice-scoped execution artifacts before closure.
+15. `close-slice` closes completed execution slices and records durable closure metadata.
+16. `reconcile-feature` folds an approved feature change packet back into canonical feature docs, verifies planned slices are complete, removes completed execution slices, removes the completed change packet, and leaves the canonical feature docs as the durable specification.
 
-In the repo-native flow, `guide-planning` owns feature-planning readiness and routing, `breakdown` owns repo-story decomposition, `review-planning` owns planning readiness review, `brief` owns the slice-scoped `brief.md`, `blueprint` owns the final slice-scoped execution plan and validation checklist, and `review-execution` owns the final implementation-versus-brief review before closure.
+In the repo-native flow, `guide-planning` owns feature-planning readiness and routing, `breakdown` owns repo-story decomposition, `review-planning` owns planning readiness review, `slice` owns execution bootstrap from approved committed planning artifacts, `brief` owns the slice-scoped `brief.md`, `blueprint` owns the final slice-scoped execution plan and validation checklist, and `review-execution` owns the final implementation-versus-brief review before closure.
 
 Execution follows the same pattern: `guide-execution` owns routing, readiness, and registry state, while `brief`, `blueprint`, `review-execution`, and `close-slice` own slice-scoped artifacts and closure metadata. With `auto_start_implementation`, `guide-execution` can promote a slice from `blueprint_ready` to `execution_ready` as the signal to begin coding immediately.
 

@@ -1,11 +1,11 @@
 ---
 name: review-planning
-description: Reviews discovery, design, and breakdown artifacts for readiness before execution slice bootstrap, including change-packet planning.
+description: Reviews discovery, design, and breakdown artifacts for readiness before human approval, planning commit, and execution slice bootstrap, including change-packet planning.
 ---
 
 # Review Planning
 
-Use this skill after `discover`, `design`, or `breakdown` when the planning artifacts need an explicit readiness review before bootstrapping slice-scoped execution slices.
+Use this skill after `discover`, `design`, or `breakdown` when the planning artifacts need an explicit readiness review before human approval, planning commit, and slice-scoped execution bootstrap.
 
 It applies to both:
 
@@ -17,7 +17,7 @@ It applies to both:
 1. Review planning artifacts for intent clarity, scope, architecture fit, sequencing, and validation readiness.
 2. Identify gaps, contradictions, unresolved risks, or oversized work that would make execution brittle.
 3. Feed findings back into the existing planning docs rather than leaving critical decisions in side-channel notes.
-4. Confirm whether the work is ready for `slice` or needs another planning pass first.
+4. Confirm whether the work is ready for human approval and later `slice` bootstrap or needs another planning pass first.
 
 ## Preferred Input
 
@@ -61,11 +61,12 @@ Resolve `<feature_path>` as either:
 3. Compare discovery intent, design direction, and breakdown outputs for contradictions or missing handoff details.
 4. Record findings directly in the planning docs already used by the team. For change packets, write those findings back into the change-local docs under the packet.
 5. Update the affected planning artifacts so the reviewed state is durable.
-6. Stop when the work is ready for `slice` or return it to `discover`, `design`, or `breakdown` as needed.
+6. Stop when the work is ready for human approval and planning commit, or return it to `discover`, `design`, or `breakdown` as needed.
 
 ## Guardrails
 
-- Do not create slice-scoped execution slices directly; hand off to `slice` when ready.
+- Do not create slice-scoped execution slices directly; stop at reviewed planning and hand off to `slice` only after explicit approval and planning commit.
+- Do not commit planning artifacts automatically from review output; the approval checkpoint comes first.
 - Do not invent new lifecycle states for review; use findings and explicit readiness notes instead.
 - Do not leave blocking review outcomes only in chat or transient notes.
 - When reviewing a change packet, do not move the review outcome into canonical `slice-planning.md` or `slice-traceability.md` unless the planning change intentionally belongs in the canonical feature docs.

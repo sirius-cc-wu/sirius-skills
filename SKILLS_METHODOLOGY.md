@@ -21,8 +21,8 @@ Use a **two-layer workflow**:
    - `ui-flow` (optional)
    - `breakdown`
    - `review-planning`
-   - `slice`
 2. **Execution layer**
+   - `slice`
    - `guide-execution`
    - `brief`
    - `blueprint`
@@ -31,7 +31,7 @@ Use a **two-layer workflow**:
 
 The planning layer keeps scope, design, decomposition, and increment planning in repo documents, and `guide-planning` owns readiness and routing across those artifacts.
 
-The execution layer works one implementation-ready slice at a time.
+The execution layer works one implementation-ready slice at a time, starting with `slice` bootstrap from approved committed planning artifacts.
 
 ## Recommended Workflow
 
@@ -65,7 +65,7 @@ Its job is to:
 
 - resolve or initialize the feature planning folder
 - verify the current planning artifacts and metadata
-- decide whether the next step is `propose`, `evolve-feature`, `assess`, `reconcile-feature`, `discover`, `design`, `ui-flow`, `breakdown`, `review-planning`, or `slice`
+- decide whether the next step is `propose`, `evolve-feature`, `assess`, `reconcile-feature`, `discover`, `design`, `ui-flow`, `breakdown`, `review-planning`, or an approval/commit stop before execution begins
 - keep planning handoff decisions durable through explicit readiness states
 
 Expected planning states:
@@ -81,7 +81,7 @@ Expected planning states:
 Recommended handoff:
 
 ```text
-guide-scope -> guide-planning -> propose/evolve-feature/assess/reconcile-feature/discover/design/ui-flow/breakdown/review-planning/slice
+guide-scope -> guide-planning -> propose/evolve-feature/assess/reconcile-feature/discover/design/ui-flow/breakdown/review-planning -> human approval -> commit -> slice -> guide-execution
 ```
 
 If the request is still speculative, cross-cutting, or not yet accepted as a canonical feature, route to `propose` first. That keeps early exploration under `docs/proposals/` instead of polluting the canonical `docs/features/` registry too early.
@@ -123,7 +123,7 @@ Its job is to:
 Recommended handoff:
 
 ```text
-review-planning -> slice -> guide-execution -> brief -> blueprint -> review-execution -> close-slice -> reconcile-feature
+review-planning -> human approval -> commit -> slice -> guide-execution -> brief -> blueprint -> review-execution -> close-slice -> reconcile-feature
 ```
 
 ### 0a. Capture speculative ideas with propose
@@ -207,7 +207,7 @@ Its job is to:
 
 - validate story scope and size
 - split oversized work
-- create execution-ready slices
+- create execution-ready planned slices
 - group slices into small demonstrable increments
 - map stories to planned slices
 
@@ -243,7 +243,7 @@ targets for the canonical feature's `slice-planning.md` or `slice-traceability.m
 
 Review checkpoint:
 
-- review the slices and increments for scope, sequencing, ownership, and demonstrability before bootstrapping planned slices
+- review the slices and increments for scope, sequencing, ownership, and demonstrability before asking for approval and bootstrapping execution
 - make sure the planned validation approach is clear enough that each slice can be checked independently during execution
 
 ### 4. Define executable slices
@@ -285,7 +285,7 @@ Its job is to:
 - review the planning artifacts and slice definitions together rather than in isolation
 - identify blocking scope, design, sequencing, or validation gaps before slice bootstrap
 - record durable findings in the planning docs already used by the team
-- confirm whether the work is ready for `slice` or needs another planning pass
+- confirm whether the work is ready for human approval and later `slice` bootstrap or needs another planning pass
 
 It can review either canonical feature planning or a selected feature change packet.
 For change packets, the review should center on the change-local `discover.md`,
@@ -300,17 +300,17 @@ amended work required by that change.
 Recommended handoff:
 
 ```text
-guide-planning -> propose/discover -> design -> breakdown -> review-planning -> slice
+guide-planning -> propose/discover -> design -> breakdown -> review-planning -> human approval -> commit -> slice
 ```
 
-### 6. Bootstrap one execution slice per planned slice
+### 6. Bootstrap one execution slice per approved planned slice
 
-Once a planned slice is implementation-ready, use `slice`.
+Once a planned slice is implementation-ready, has passed `review-planning`, and its approved planning artifacts are committed, use `slice`.
 
 Preferred handoff:
 
 ```text
-guide-planning -> breakdown -> review-planning -> slice -> guide-execution
+guide-planning -> breakdown -> review-planning -> human approval -> commit -> slice -> guide-execution
 ```
 
 `slice` should bootstrap a slice-scoped execution slice from the execution-ready work item, typically with:
@@ -324,6 +324,8 @@ If execution config has not been initialized yet and the default `slices/` locat
 ```bash
 python3 skills/slice/scripts/bootstrap_slice.py --slice-dir "team-slices" "<slice-id>" "<slice-name>"
 ```
+
+Do not jump directly from `review-planning` to `slice`; stop for explicit human approval and commit the planning artifacts first.
 
 ### 7. Execute with guide-execution
 

@@ -41,8 +41,7 @@ Stored in `docs/proposals/<proposal-slug>/`
 - `discover`: Defines the problem, outcomes, and constraints.
 - `design`: Architecture, interfaces, and PlantUML system diagrams.
 - `breakdown`: Splits stories into executable **Slices** and **Increments**.
-- `review-planning`: Final check before moving to code.
-- `slice`: The handoff. Bootstraps an execution-scoped folder from a planned item.
+- `review-planning`: Final planning check before human approval.
 - `reconcile-feature`: Feeds approved change-packet results back into canonical feature docs after execution.
 
 ---
@@ -63,6 +62,7 @@ Stored in `docs/features/<feature-slug>/`
 *Where the work gets done, one slice at a time.*
 
 **Key Skills:**
+- `slice`: Bootstraps an execution-scoped folder from an approved, committed planned item.
 - `guide-execution`: Manages the slice registry and state transitions.
 - `brief`: Captures slice-scoped acceptance criteria and requirements.
 - `blueprint`: Detailed design, implementation packets, and validation steps.
@@ -87,10 +87,12 @@ Stored in `slices/<slice-id>-<slug>/`
 3.  **Plan a Net-New Feature**: `guide-planning` -> `discover` -> `design` -> `breakdown`.
 4.  **Evolve an Existing Feature**: `guide-planning` -> `evolve-feature` -> `assess` -> `design` -> `breakdown`.
 5.  **Review**: `review-planning` confirms the plan or change packet is ready.
-6.  **Bootstrap**: `slice` creates the execution folder.
-7.  **Execute**: `brief` -> `blueprint` -> (Code) -> `review-execution`.
-8.  **Close**: `close-slice` marks the slice done and preserves the execution context until feature-level reconciliation is requested.
-9.  **Reconcile Feature Changes**: `reconcile-feature` folds approved change-packet results back into the canonical feature docs, then removes the temporary slices and completed change packet once all planned slices are closed.
+6.  **Approve**: A human explicitly approves the reviewed planning artifacts.
+7.  **Commit Planning**: Commit the approved planning artifacts before execution starts.
+8.  **Bootstrap**: `slice` creates the execution folder.
+9.  **Execute**: `brief` -> `blueprint` -> (Code) -> `review-execution`.
+10. **Close**: `close-slice` marks the slice done and preserves the execution context until feature-level reconciliation is requested.
+11. **Reconcile Feature Changes**: `reconcile-feature` folds approved change-packet results back into the canonical feature docs, then removes the temporary slices and completed change packet once all planned slices are closed.
 
 ---
 

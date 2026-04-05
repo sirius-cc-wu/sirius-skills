@@ -1,16 +1,16 @@
 ---
 name: slice
-description: Validates execution-ready work, bootstraps a slice-scoped execution slice, and hands off to guide-execution.
+description: Validates approved, committed execution-ready work, bootstraps a slice-scoped execution slice, and hands off to guide-execution.
 ---
 
 # Slice
 
-Use this skill when a work item is small enough to execute, has passed planning review, and needs an execution slice.
+Use this skill when a work item is small enough to execute, has passed planning review, has explicit human approval, and its planning artifacts have been committed.
 
 ## Responsibilities
 
 1. Validate that the selected work item is ready for execution.
-2. Ensure execution bootstrap prerequisites exist, including `.skills/execution.json` and the slice registry.
+2. Ensure execution bootstrap prerequisites exist, including `.skills/execution.json`, the slice registry, and a durable approved planning checkpoint.
 3. Bootstrap one execution slice for that work item.
 4. Confirm the slice exists and is aligned with the repository's execution layout.
 5. Hand off to `guide-execution` for `brief.md` and `blueprint.md`.
@@ -35,6 +35,7 @@ Before bootstrapping, confirm:
 2. Dependencies, sequencing notes, and expected verification are already clear in the planning artifacts.
 3. The work item does not still need major decomposition, architecture discovery, or planning review.
 4. The chosen slice ID, if provided, should be preserved exactly.
+5. The planning artifacts were explicitly approved and committed before bootstrap.
 
 ## Workflow
 
@@ -60,4 +61,5 @@ python3 skills/slice/scripts/bootstrap_slice.py --slice-dir "team-slices" "<slic
 
 - Do not invent extra slice states to mirror external execution lifecycles.
 - Do not skip `guide-execution`; this skill prepares and bootstraps the slice, but `guide-execution` still owns execution readiness and routing.
+- Do not bootstrap directly from uncommitted planning output.
 - If the input work item is still too large, send it back to `guide-planning` or `breakdown`.

@@ -12,7 +12,7 @@ Use this skill as the planning-layer entrypoint when you need to decide the next
 1. Resolve or initialize the active feature planning folder.
 2. Promote accepted proposals into canonical feature planning folders when the user explicitly asks for planning to begin.
 3. Verify required planning files, registry state, and feature metadata.
-4. Route feature-scoped work to `propose`, `evolve-feature`, `assess`, `reconcile-feature`, `discover`, `design`, `ui-flow`, `breakdown`, `review-planning`, or `slice`.
+4. Route feature-scoped work to `propose`, `evolve-feature`, `assess`, `reconcile-feature`, `discover`, `design`, `ui-flow`, `breakdown`, or `review-planning`, then stop for approval/commit before execution begins.
 5. Update planning readiness state when a phase is complete.
 6. Keep planning handoff decisions durable in the repository instead of transient chat state.
 
@@ -30,9 +30,10 @@ Use `guide-planning` when you need to decide the next planning step before slice
 - If the architecture, interfaces, or validation strategy are still unresolved, route to `design`.
 - If UI or interaction flow remains material, route to `ui-flow`.
 - If the work is still too large for execution or slices are not explicit, route to `breakdown`.
-- If planning artifacts need a readiness pass before slice bootstrap, route to `review-planning`.
-- If the feature already has execution-ready work items with explicit slice IDs, route to `slice`.
-- If a slice-scoped execution slice already exists, route to `guide-execution`.
+- If planning artifacts need a readiness pass before approval and execution bootstrap, route to `review-planning`.
+- If planning has been reviewed but not yet explicitly approved, stop for human approval instead of advancing into execution.
+- If planning has been approved and committed and the feature already has execution-ready work items with explicit slice IDs, hand off to the execution layer through `slice`.
+- If a slice-scoped execution slice already exists, hand off to `guide-execution`.
 
 ## Workflow Boundary
 
@@ -41,12 +42,14 @@ Use `guide-planning` when you need to decide the next planning step before slice
 - Own the transition from accepted proposal to canonical feature planning.
 - Keep feature-planning readiness in planning metadata.
 - Do not duplicate execution-slice lifecycle state here.
-- Route execution-layer work to `guide-execution` instead of absorbing it into planning.
+- Stop at reviewed planning until the user approves the planning artifacts.
+- Treat planning commits as the durable checkpoint between planning and execution.
+- Hand off execution-layer work to `slice` or `guide-execution` instead of absorbing it into planning.
 
 Typical handoff:
 
 ```text
-guide-planning -> propose/evolve-feature/assess/reconcile-feature/discover -> design -> ui-flow -> breakdown -> review-planning -> slice -> guide-execution
+guide-planning -> propose/evolve-feature/assess/reconcile-feature/discover -> design -> ui-flow -> breakdown -> review-planning -> human approval -> commit -> slice -> guide-execution
 ```
 
 ## Lifecycle States
@@ -60,6 +63,9 @@ guide-planning -> propose/evolve-feature/assess/reconcile-feature/discover -> de
 - `implemented`
 
 Use adjacent transitions by default and repair skipped states only deliberately.
+
+- `planning_reviewed` means the planning packet has passed readiness review and is waiting for explicit human approval.
+- `slice_ready` means the approved planning artifacts are committed and at least one execution-ready work item is selected for execution bootstrap.
 
 ## Preflight
 

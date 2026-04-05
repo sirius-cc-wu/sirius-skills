@@ -24,7 +24,7 @@ When `.skills/execution.json` sets `auto_start_implementation` to `true`, treat 
 Use `guide-execution` when a slice already exists or you need to decide the next step for execution-layer work.
 
 - If the work is still feature-scoped or story-scoped, send it back to `guide-planning`.
-- If there is one execution-ready work item but no slice-scoped execution slice yet, route to `slice`.
+- If there is one execution-ready work item but no slice-scoped execution slice yet, route to `slice` after confirming the reviewed planning artifacts were approved and committed.
 - If a slice exists or can be resolved, stay in `guide-execution` and route inside the execution layer.
 
 ## Workflow Boundary
@@ -32,7 +32,7 @@ Use `guide-execution` when a slice already exists or you need to decide the next
 Typical handoff:
 
 ```text
-guide-planning -> discover -> design -> ui-flow -> breakdown -> review-planning -> slice -> guide-execution
+guide-planning -> discover -> design -> ui-flow -> breakdown -> review-planning -> human approval -> commit -> slice -> guide-execution
 ```
 
 `guide-execution` owns slice/document readiness only:
