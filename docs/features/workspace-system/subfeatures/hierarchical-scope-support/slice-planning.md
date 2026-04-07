@@ -13,7 +13,7 @@ Use this file to decompose repo stories into execution-ready slices before boots
 - Execution system: repository-managed slices
 - Execution mode: `single-agent`
 - Notes:
-  - This feature changes shared path-resolution behavior used by planning, proposal, and execution helpers, so the first pass should preserve one serial critical path.
+  - This subfeatures shared path-resolution behavior used by planning, proposal, and execution helpers, so the first pass should preserve one serial critical path.
   - The MVP keeps repository-root fallback behavior, but nested scopes become explicit local workspaces via `.skills/`.
   - Scoped slices are part of the intended outcome: execution should follow the resolved scope rather than stay in one global repo-root slice pool.
 

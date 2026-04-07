@@ -27,7 +27,7 @@ The intended direction is:
 The managed repo-first skill set is grouped into:
 
 - repo utilities: `skills/bootstrap/`, `skills/commit/`, `skills/create-pr/`, `skills/simplify/`
-- planning layer: `skills/guide-scope/`, `skills/guide-planning/`, `skills/propose/`, `skills/evolve-feature/`, `skills/assess/`, `skills/reconcile-feature/`, `skills/discover/`, `skills/design/`, `skills/ui-flow/`, `skills/breakdown/`, `skills/review-planning/`
+- planning layer: `skills/guide-scope/`, `skills/guide-planning/`, `skills/propose/`, `skills/add-subfeature/`, `skills/assess/`, `skills/finalize-subfeature/`, `skills/discover/`, `skills/design/`, `skills/ui-flow/`, `skills/breakdown/`, `skills/review-planning/`
 - execution layer: `skills/slice/`, `skills/guide-execution/`, `skills/brief/`, `skills/blueprint/`, `skills/review-execution/`, `skills/close-slice/`
 
 If a project has no extra configuration, these skills should still work with generic conventions.
@@ -41,9 +41,9 @@ For repositories that use repo-first planning, the recommended short-name planni
 - `skills/guide-scope/`
 - `skills/guide-planning/`
 - `skills/propose/`
-- `skills/evolve-feature/`
+- `skills/add-subfeature/`
 - `skills/assess/`
-- `skills/reconcile-feature/`
+- `skills/finalize-subfeature/`
 - `skills/discover/`
 - `skills/design/`
 - `skills/ui-flow/`
@@ -52,7 +52,7 @@ For repositories that use repo-first planning, the recommended short-name planni
 
 These skills sit **before** the execution-slice skills:
 
-- planning layer: `guide-scope`, `guide-planning`, `propose`, `evolve-feature`, `assess`, `reconcile-feature`, `discover`, `design`, `ui-flow`, `breakdown`, `review-planning`
+- planning layer: `guide-scope`, `guide-planning`, `propose`, `add-subfeature`, `assess`, `finalize-subfeature`, `discover`, `design`, `ui-flow`, `breakdown`, `review-planning`
 - execution layer: `slice`, `guide-execution`, `brief`, `blueprint`, `review-execution`, `close-slice`
 
 
@@ -82,8 +82,8 @@ Preferred repo workflow:
 1. In multi-scope repositories, `guide-scope` can resolve the active scope, stop on ambiguity, and hand off to `guide-planning`, `guide-execution`, or `bootstrap` without changing their ownership rules. In single-scope repositories it remains optional.
 2. `guide-planning` resolves the feature planning folder, validates planning readiness, and routes to the right planning skill.
 3. If the request is still speculative and should not become a canonical feature yet, `propose` creates a proposal folder under `docs/proposals/<proposal-slug>/`.
-4. If the request changes an existing feature rather than starting a new one, `evolve-feature` creates a feature-local change packet under `docs/features/<feature>/changes/<change-id>/`.
-5. `assess` inspects the canonical feature and writes change-scoped `impact-analysis.md` before change-local design starts.
+4. If the request adds or reshapes a durable child capability under an existing feature, `add-subfeature` creates a subfeature folder under `docs/features/<feature>/subfeatures/<subfeature-id>/`.
+5. `assess` inspects the parent feature and writes subfeature-scoped `impact-analysis.md` before subfeature-local design starts.
 6. `discover` creates problem framing and initial story candidates.
 7. `design` turns that into architecture, interfaces, and risks.
 8. `ui-flow` adds optional UX or screen-flow artifacts.
@@ -94,7 +94,7 @@ Preferred repo workflow:
 13. `guide-execution` routes slice-scoped execution through `brief` to capture slice intent and acceptance, then through `blueprint` to produce the final execution artifact. When `.skills/execution.json` enables `auto_start_implementation`, that handoff continues directly into implementation after the blueprint is marked ready.
 14. `review-execution` checks implementation and validation outcomes against the slice-scoped execution artifacts before closure.
 15. `close-slice` closes completed execution slices and records durable closure metadata.
-16. `reconcile-feature` folds an approved feature change packet back into canonical feature docs, verifies planned slices are complete, removes completed execution slices, removes the completed change packet, and leaves the canonical feature docs as the durable specification.
+16. `finalize-subfeature` verifies a reviewed subfeature's planned slices are complete, removes completed execution slices, marks the durable subfeature implemented, and leaves the subfeature planning folder in place as part of the feature hierarchy.
 
 In the repo-native flow, `guide-planning` owns feature-planning readiness and routing, `breakdown` owns repo-story decomposition, `review-planning` owns planning readiness review, `slice` owns execution bootstrap from approved committed planning artifacts, `brief` owns the slice-scoped `brief.md`, `blueprint` owns the final slice-scoped execution plan and validation checklist, and `review-execution` owns the final implementation-versus-brief review before closure.
 
@@ -121,9 +121,23 @@ The machine-readable metadata can also store explicit cross-slice relations such
 
 Closed slices are retained non-destructively. `sirius-skills` does not merge or delete the original `brief.md`/`blueprint.md` artifacts when a slice closes; instead it records closure durably in the slice registry and metadata.
 
-Feature-level cleanup belongs to reviewed change completion, not to per-slice closure. `reconcile-feature` is the human-invoked feature-level step that can verify every planned slice is closed, rewrite canonical feature docs directly, remove the temporary execution slices created for that change, and remove the completed change packet.
+Feature-level cleanup belongs to reviewed subfeature completion, not to per-slice closure. `finalize-subfeature` is the human-invoked feature-level step that can verify every planned slice is closed, remove the completed execution slices created for that subfeature, and mark the durable subfeature implemented without deleting its planning folder.
 
 To keep relation metadata healthy over time, `skills/guide-execution/scripts/manage_execution.py` also provides `audit-relations`, which checks for missing targets and missing reciprocal links.
+
+## Example prompts
+
+Examples of repo-native prompts that fit the current workflow:
+
+- "Use `guide-planning` to decide the next step for `planning-workflow`."
+- "Create a proposal for a new review automation feature, but keep it out of canonical planning for now."
+- "Add a durable subfeature `replace-legacy-flow` under `checkout` and frame its discovery docs."
+- "Assess the impact of subfeature `replace-legacy-flow` under `checkout`."
+- "Design the subfeature at `docs/features/checkout/subfeatures/replace-legacy-flow/`."
+- "Break down `docs/features/checkout/subfeatures/replace-legacy-flow/` into execution-ready slices."
+- "Review planning for the `replace-legacy-flow` subfeature before slice bootstrap."
+- "Finalize subfeature `replace-legacy-flow` under `checkout` after its planned slices are closed."
+
 ## Optional project configuration
 
 Use `skills/bootstrap/` when you want an agent to bootstrap the repo's

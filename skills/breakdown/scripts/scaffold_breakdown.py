@@ -17,23 +17,25 @@ DEFAULT_BASE_DIR = Path("docs/features")
 PLANNING_CONFIG_FILE = Path(".skills") / "planning.json"
 PLANNING_DIR_FIELD = "planning_dir"
 FEATURE_SLUG_PATTERN = re.compile(r"^[A-Za-z0-9][A-Za-z0-9._-]*$")
-CHANGE_METADATA_FILE = ".feature-change-meta.json"
+SUBFEATURE_METADATA_FILE = ".subfeature-meta.json"
 IMPACT_FILE = "impact-analysis.md"
-EVOLVE_SCRIPT = SCRIPT_DIR.parents[1] / "evolve-feature" / "scripts" / "manage_feature_changes.py"
+SUBFEATURE_SCRIPT = (
+    SCRIPT_DIR.parents[1] / "add-subfeature" / "scripts" / "manage_subfeatures.py"
+)
 
 
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(
         description=(
             "Scaffold increment-ready breakdown planning files for a canonical "
-            "feature folder or a selected change packet path."
+            "feature folder or a selected subfeature path."
         )
     )
     parser.add_argument(
         "target",
         help=(
             "Feature slug by default, or an explicit planning folder path such as "
-            "docs/features/<feature>/changes/<change-id>"
+            "docs/features/<feature>/subfeatures/<subfeature-id>"
         ),
     )
     parser.add_argument(
@@ -124,8 +126,8 @@ def load_template(path: Path) -> str:
     return path.read_text(encoding="utf-8")
 
 
-def load_manage_feature_changes_module():
-    spec = importlib.util.spec_from_file_location("manage_feature_changes", EVOLVE_SCRIPT)
+def load_manage_subfeatures_module():
+    spec = importlib.util.spec_from_file_location("manage_subfeatures", SUBFEATURE_SCRIPT)
     module = importlib.util.module_from_spec(spec)
     assert spec.loader is not None
     spec.loader.exec_module(module)
@@ -138,17 +140,27 @@ def format_code_list(items: list[str], empty: str) -> str:
     return "\n".join(f"- `{item}`" for item in items)
 
 
-def resolve_change_context(target_dir: Path) -> dict[str, object] | None:
-    metadata_path = target_dir / CHANGE_METADATA_FILE
+def relative_to_cwd(path: Path) -> str:
+    try:
+        return str(path.resolve().relative_to(Path.cwd().resolve()))
+    except ValueError:
+        text = str(path)
+        if text.startswith("./"):
+            return text[2:]
+        return text
+
+
+def resolve_subfeature_context(target_dir: Path) -> dict[str, object] | None:
+    metadata_path = target_dir / SUBFEATURE_METADATA_FILE
     if not metadata_path.exists():
         return None
 
-    manage_feature_changes = load_manage_feature_changes_module()
-    metadata = manage_feature_changes.read_metadata(str(target_dir))
-    feature_slug = str(metadata["feature_slug"])
-    canonical_feature_path = manage_feature_changes.get_feature_root(feature_slug)
-    change_id = str(metadata["change_id"])
-    change_type = str(metadata["change_type"])
+    manage_subfeatures = load_manage_subfeatures_module()
+    metadata = manage_subfeatures.read_metadata(str(target_dir))
+    feature_slug = str(metadata["parent_feature_slug"])
+    canonical_feature_path = relative_to_cwd(target_dir.parent.parent)
+    subfeature_id = str(metadata["subfeature_id"])
+    subfeature_type = str(metadata["subfeature_type"])
     status = str(metadata["status"])
     affected_story_ids = [str(item) for item in metadata.get("affected_story_ids", [])]
     affected_slice_ids = [str(item) for item in metadata.get("affected_slice_ids", [])]
@@ -156,8 +168,8 @@ def resolve_change_context(target_dir: Path) -> dict[str, object] | None:
 
     return {
         "feature_slug": feature_slug,
-        "change_id": change_id,
-        "change_type": change_type,
+        "subfeature_id": subfeature_id,
+        "subfeature_type": subfeature_type,
         "status": status,
         "canonical_feature_path": canonical_feature_path,
         "has_impact_analysis": (target_dir / IMPACT_FILE).exists(),
@@ -167,32 +179,32 @@ def resolve_change_context(target_dir: Path) -> dict[str, object] | None:
     }
 
 
-def render_change_context_section(change_context: dict[str, object]) -> str:
+def render_subfeature_context_section(subfeature_context: dict[str, object]) -> str:
     story_lines = format_code_list(
-        list(change_context["affected_story_ids"]),
+        list(subfeature_context["affected_story_ids"]),
         "No affected story IDs were recorded yet. Refine `impact-analysis.md` before final review.",
     )
     slice_lines = format_code_list(
-        list(change_context["affected_slice_ids"]),
+        list(subfeature_context["affected_slice_ids"]),
         "No affected canonical slice IDs were recorded yet.",
     )
     artifact_lines = format_code_list(
-        list(change_context["affected_artifacts"]),
+        list(subfeature_context["affected_artifacts"]),
         "No affected baseline artifacts were recorded yet.",
     )
     impact_status = (
-        f"`{IMPACT_FILE}` is present and should drive the change-local slice plan."
-        if change_context["has_impact_analysis"]
+        f"`{IMPACT_FILE}` is present and should drive the subfeature-local slice plan."
+        if subfeature_context["has_impact_analysis"]
         else f"`{IMPACT_FILE}` is missing; add or regenerate it before planning review."
     )
 
     return (
-        "## 0. Change Context\n\n"
-        f"- Canonical feature: `{change_context['feature_slug']}`\n"
-        f"- Canonical feature path: `{change_context['canonical_feature_path']}`\n"
-        f"- Change ID: `{change_context['change_id']}`\n"
-        f"- Change type: `{change_context['change_type']}`\n"
-        f"- Current change status: `{change_context['status']}`\n"
+        "## 0. Subfeature Context\n\n"
+        f"- Parent feature: `{subfeature_context['feature_slug']}`\n"
+        f"- Parent feature path: `{subfeature_context['canonical_feature_path']}`\n"
+        f"- Subfeature ID: `{subfeature_context['subfeature_id']}`\n"
+        f"- Subfeature type: `{subfeature_context['subfeature_type']}`\n"
+        f"- Current subfeature status: `{subfeature_context['status']}`\n"
         f"- Impact input: {impact_status}\n\n"
         "### Affected Story IDs\n\n"
         f"{story_lines}\n\n"
@@ -203,58 +215,56 @@ def render_change_context_section(change_context: dict[str, object]) -> str:
     )
 
 
-def render_slice_planning(feature_slug: str, change_context: dict[str, object] | None = None) -> str:
+def render_slice_planning(
+    feature_slug: str, subfeature_context: dict[str, object] | None = None
+) -> str:
     template = load_template(SLICE_PLANNING_TEMPLATE)
     template = template.replace("- Feature:\n", f"- Feature: {feature_slug}\n", 1)
-    if not change_context:
+    if not subfeature_context:
         return template
 
-    planning_sources = (
-        "- Planning sources:\n"
-        "  - `discover.md`\n"
-        "  - `impact-analysis.md`\n"
-        "  - `system-design.md`\n"
-        "  - `ui-design.md` (if applicable)\n"
-        f"  - canonical `{change_context['canonical_feature_path']}/user-stories.md`\n"
+    template = template.replace(
+        "  - `discover.md`\n",
+        "  - `discover.md`\n  - `impact-analysis.md`\n",
+        1,
     )
     template = template.replace(
-        "- Planning sources:\n"
-        "  - `discover.md`\n"
-        "  - `system-design.md`\n"
-        "  - `ui-design.md` (if applicable)\n"
         "  - `user-stories.md`\n",
-        planning_sources,
+        f"  - parent `{subfeature_context['canonical_feature_path']}/user-stories.md`\n",
         1,
     )
     template = template.replace(
         "- Notes:\n",
         "- Notes:\n"
-        f"  - This is change-local breakdown for `{change_context['change_id']}` against canonical feature `{change_context['feature_slug']}`.\n"
-        "  - Plan only the new or amended slices required by this change packet.\n"
-        "  - Keep this packet's `slice-planning.md` and `slice-traceability.md` as the execution-planning source of truth for the change.\n"
-        "  - When a change supersedes existing canonical slices, record the affected baseline slice IDs in dependency or notes fields instead of reusing them as change-local slice IDs.\n",
+        f"  - This is subfeature-local breakdown for `{subfeature_context['subfeature_id']}` under parent feature `{subfeature_context['feature_slug']}`.\n"
+        "  - Plan only the new or amended slices required by this subfeature.\n"
+        "  - Keep this subfeature's `slice-planning.md` and `slice-traceability.md` as the execution-planning source of truth for the child capability.\n"
+        "  - When a subfeature supersedes existing parent slices, record the affected baseline slice IDs in dependency or notes fields instead of reusing them as subfeature-local slice IDs.\n",
         1,
     )
     return template.replace(
         "## 1. Planning Scope\n\n",
-        render_change_context_section(change_context) + "\n\n## 1. Planning Scope\n\n",
+        render_subfeature_context_section(subfeature_context)
+        + "\n\n## 1. Planning Scope\n\n",
         1,
     )
 
 
-def render_slice_traceability(change_context: dict[str, object] | None = None) -> str:
+def render_slice_traceability(
+    subfeature_context: dict[str, object] | None = None
+) -> str:
     template = load_template(SLICE_TRACEABILITY_TEMPLATE)
-    if not change_context:
+    if not subfeature_context:
         return template
 
     notes = (
-        "## Change Context\n\n"
-        f"- Canonical feature: `{change_context['feature_slug']}`\n"
-        f"- Change ID: `{change_context['change_id']}`\n"
-        f"- Change type: `{change_context['change_type']}`\n"
-        "- Use `Planned Slice IDs` for the new or amended slices defined by this change packet.\n"
-        "- Keep change-local traceability in this packet instead of reconciling it back into canonical feature breakdown docs.\n"
-        "- Record superseded or narrowed canonical slice IDs in `Notes`, not `Execution Slice IDs`.\n"
+        "## Subfeature Context\n\n"
+        f"- Parent feature: `{subfeature_context['feature_slug']}`\n"
+        f"- Subfeature ID: `{subfeature_context['subfeature_id']}`\n"
+        f"- Subfeature type: `{subfeature_context['subfeature_type']}`\n"
+        "- Use `Planned Slice IDs` for the new or amended slices defined by this subfeature.\n"
+        "- Keep subfeature-local traceability in this folder instead of folding it back into parent feature breakdown docs.\n"
+        "- Record superseded or narrowed parent slice IDs in `Notes`, not `Execution Slice IDs`.\n"
     )
     return template.replace("## Conventions\n\n", notes + "\n## Conventions\n\n", 1)
 
@@ -272,17 +282,17 @@ def ensure_writable(paths: list[Path], force: bool) -> None:
 def scaffold(target_dir: Path, label: str, force: bool) -> Path:
     slice_planning_path = target_dir / "slice-planning.md"
     slice_traceability_path = target_dir / "slice-traceability.md"
-    change_context = resolve_change_context(target_dir)
+    subfeature_context = resolve_subfeature_context(target_dir)
 
     ensure_writable([slice_planning_path, slice_traceability_path], force=force)
     target_dir.mkdir(parents=True, exist_ok=True)
 
     slice_planning_path.write_text(
-        render_slice_planning(label, change_context=change_context),
+        render_slice_planning(label, subfeature_context=subfeature_context),
         encoding="utf-8",
     )
     slice_traceability_path.write_text(
-        render_slice_traceability(change_context=change_context),
+        render_slice_traceability(subfeature_context=subfeature_context),
         encoding="utf-8",
     )
     return target_dir

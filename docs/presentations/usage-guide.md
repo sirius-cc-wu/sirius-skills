@@ -36,13 +36,13 @@ Stored in `docs/proposals/<proposal-slug>/`
 
 **Key Skills:**
 - `guide-planning`: The planning entry point once work is ready for canonical feature handling.
-- `evolve-feature`: Creates a change packet when an existing canonical feature needs to evolve.
-- `assess`: Records change-scoped impact analysis before change-local design continues.
+- `add-subfeature`: Creates a subfeature when an existing canonical feature needs to evolve.
+- `assess`: Records change-scoped impact analysis before subfeature-local design continues.
 - `discover`: Defines the problem, outcomes, and constraints.
 - `design`: Architecture, interfaces, and PlantUML system diagrams.
 - `breakdown`: Splits stories into executable **Slices** and **Increments**.
 - `review-planning`: Final planning check before human approval.
-- `reconcile-feature`: Feeds approved change-packet results back into canonical feature docs after execution.
+- `finalize-subfeature`: Feeds approved change-packet results back into canonical feature docs after execution.
 
 ---
 
@@ -53,8 +53,8 @@ Stored in `docs/features/<feature-slug>/`
 - `system-design.md`: Technical architecture.
 - `slice-planning.md`: Sequencing and increments.
 - `slice-traceability.md`: Mapping stories to slices.
-- `changes/<change-id>/`: A planning-scoped delta for evolving an existing feature.
-- `changes/<change-id>/impact-analysis.md`: Change-scoped impact record for feature evolution.
+- `subfeatures/<change-id>/`: A planning-scoped delta for evolving an existing feature.
+- `subfeatures/<change-id>/impact-analysis.md`: Change-scoped impact record for feature evolution.
 
 ---
 
@@ -85,14 +85,14 @@ Stored in `slices/<slice-id>-<slug>/`
 1.  **Propose**: `propose` captures speculative or not-yet-accepted work.
 2.  **Hand Off to Planning**: `guide-planning` promotes accepted proposal artifacts into canonical feature planning and then continues the planning workflow.
 3.  **Plan a Net-New Feature**: `guide-planning` -> `discover` -> `design` -> `breakdown`.
-4.  **Evolve an Existing Feature**: `guide-planning` -> `evolve-feature` -> `assess` -> `design` -> `breakdown`.
-5.  **Review**: `review-planning` confirms the plan or change packet is ready.
+4.  **Evolve an Existing Feature**: `guide-planning` -> `add-subfeature` -> `assess` -> `design` -> `breakdown`.
+5.  **Review**: `review-planning` confirms the plan or subfeature is ready.
 6.  **Approve**: A human explicitly approves the reviewed planning artifacts.
 7.  **Commit Planning**: Commit the approved planning artifacts before execution starts.
 8.  **Bootstrap**: `slice` creates the execution folder.
 9.  **Execute**: `brief` -> `blueprint` -> (Code) -> `review-execution`.
-10. **Close**: `close-slice` marks the slice done and preserves the execution context until feature-level reconciliation is requested.
-11. **Reconcile Feature Changes**: `reconcile-feature` folds approved change-packet results back into the canonical feature docs, then removes the temporary slices and completed change packet once all planned slices are closed.
+10. **Close**: `close-slice` marks the slice done and preserves the execution context until feature-level finalization is requested.
+11. **Finalize a Reviewed Subfeature**: `finalize-subfeature` verifies the reviewed subfeature's planned slices are closed, removes the completed execution slices, and marks the durable subfeature implemented without deleting its planning folder.
 
 ---
 

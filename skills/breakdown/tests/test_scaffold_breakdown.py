@@ -5,21 +5,22 @@ from pathlib import Path
 
 
 SCRIPT_PATH = Path(__file__).resolve().parents[1] / "scripts" / "scaffold_breakdown.py"
-CHANGE_SCRIPT_PATH = (
-    Path(__file__).resolve().parents[2] / "evolve-feature" / "scripts" / "manage_feature_changes.py"
+SUBFEATURE_SCRIPT_PATH = (
+    Path(__file__).resolve().parents[2]
+    / "add-subfeature"
+    / "scripts"
+    / "manage_subfeatures.py"
+)
+PLANNING_SCRIPT_PATH = (
+    Path(__file__).resolve().parents[2]
+    / "guide-planning"
+    / "scripts"
+    / "manage_planning.py"
 )
 
 
-def load_module():
-    spec = importlib.util.spec_from_file_location("scaffold_breakdown", SCRIPT_PATH)
-    module = importlib.util.module_from_spec(spec)
-    assert spec.loader is not None
-    spec.loader.exec_module(module)
-    return module
-
-
-def load_change_module():
-    spec = importlib.util.spec_from_file_location("manage_feature_changes", CHANGE_SCRIPT_PATH)
+def load_module(path: Path, name: str):
+    spec = importlib.util.spec_from_file_location(name, path)
     module = importlib.util.module_from_spec(spec)
     assert spec.loader is not None
     spec.loader.exec_module(module)
@@ -31,8 +32,8 @@ def run_cli(module, monkeypatch, *args):
     return module.main()
 
 
-def run_change_cli(module, monkeypatch, *args):
-    monkeypatch.setattr(sys, "argv", ["manage_feature_changes.py", *args])
+def run_subfeature_cli(module, monkeypatch, *args):
+    monkeypatch.setattr(sys, "argv", ["manage_subfeatures.py", *args])
     return module.main()
 
 
@@ -42,6 +43,7 @@ def write_file(path: Path, content: str = "# doc\n"):
 
 
 def setup_feature(tmp_path: Path) -> Path:
+    planning_module = load_module(PLANNING_SCRIPT_PATH, "manage_planning")
     feature_dir = tmp_path / "docs" / "features" / "checkout"
     feature_dir.mkdir(parents=True, exist_ok=True)
     (tmp_path / ".skills").mkdir(parents=True, exist_ok=True)
@@ -69,11 +71,12 @@ def setup_feature(tmp_path: Path) -> Path:
     write_file(feature_dir / "user-stories.md", "# Stories\n")
     write_file(feature_dir / "slice-planning.md", "# Slice Planning\n")
     write_file(feature_dir / "slice-traceability.md", "# Traceability\n")
+    planning_module.sync_registry()
     return feature_dir
 
 
 def test_scaffold_defaults_to_docs_features(tmp_path, monkeypatch):
-    module = load_module()
+    module = load_module(SCRIPT_PATH, "scaffold_breakdown")
     monkeypatch.chdir(tmp_path)
 
     assert run_cli(module, monkeypatch, "demo-feature") == 0
@@ -84,7 +87,7 @@ def test_scaffold_defaults_to_docs_features(tmp_path, monkeypatch):
 
 
 def test_scaffold_uses_planning_config_dir(tmp_path, monkeypatch):
-    module = load_module()
+    module = load_module(SCRIPT_PATH, "scaffold_breakdown")
     monkeypatch.chdir(tmp_path)
 
     config_dir = tmp_path / ".skills"
@@ -102,7 +105,7 @@ def test_scaffold_uses_planning_config_dir(tmp_path, monkeypatch):
 
 
 def test_scaffold_base_dir_flag_overrides_planning_config_dir(tmp_path, monkeypatch):
-    module = load_module()
+    module = load_module(SCRIPT_PATH, "scaffold_breakdown")
     monkeypatch.chdir(tmp_path)
 
     config_dir = tmp_path / ".skills"
@@ -122,7 +125,7 @@ def test_scaffold_base_dir_flag_overrides_planning_config_dir(tmp_path, monkeypa
 
 
 def test_scaffold_rejects_non_string_planning_config_dir(tmp_path, monkeypatch, capsys):
-    module = load_module()
+    module = load_module(SCRIPT_PATH, "scaffold_breakdown")
     monkeypatch.chdir(tmp_path)
 
     config_dir = tmp_path / ".skills"
@@ -139,7 +142,7 @@ def test_scaffold_rejects_non_string_planning_config_dir(tmp_path, monkeypatch, 
 
 
 def test_scaffold_ignores_conventions_planning_dir(tmp_path, monkeypatch):
-    module = load_module()
+    module = load_module(SCRIPT_PATH, "scaffold_breakdown")
     monkeypatch.chdir(tmp_path)
 
     config_dir = tmp_path / ".skills"
@@ -155,27 +158,27 @@ def test_scaffold_ignores_conventions_planning_dir(tmp_path, monkeypatch):
     assert not (tmp_path / "legacy" / "features" / "demo-feature").exists()
 
 
-def test_scaffold_accepts_explicit_change_packet_path(tmp_path, monkeypatch):
-    module = load_module()
+def test_scaffold_accepts_explicit_subfeature_path(tmp_path, monkeypatch):
+    module = load_module(SCRIPT_PATH, "scaffold_breakdown")
     monkeypatch.chdir(tmp_path)
 
-    target = "docs/features/demo-feature/changes/replace-legacy-flow"
+    target = "docs/features/demo-feature/subfeatures/replace-legacy-flow"
 
     assert run_cli(module, monkeypatch, target) == 0
 
-    target_dir = tmp_path / "docs" / "features" / "demo-feature" / "changes" / "replace-legacy-flow"
+    target_dir = tmp_path / "docs" / "features" / "demo-feature" / "subfeatures" / "replace-legacy-flow"
     assert (target_dir / "slice-planning.md").exists()
     assert (target_dir / "slice-traceability.md").exists()
 
 
-def test_scaffold_change_packet_seeds_change_context(tmp_path, monkeypatch):
-    module = load_module()
-    change_module = load_change_module()
+def test_scaffold_subfeature_seeds_subfeature_context(tmp_path, monkeypatch):
+    module = load_module(SCRIPT_PATH, "scaffold_breakdown")
+    subfeature_module = load_module(SUBFEATURE_SCRIPT_PATH, "manage_subfeatures")
     monkeypatch.chdir(tmp_path)
     feature_dir = setup_feature(tmp_path)
 
-    assert run_change_cli(
-        change_module,
+    assert run_subfeature_cli(
+        subfeature_module,
         monkeypatch,
         "add",
         "checkout",
@@ -186,8 +189,8 @@ def test_scaffold_change_packet_seeds_change_context(tmp_path, monkeypatch):
         "Replace the legacy checkout path",
     ) == 0
 
-    change_dir = feature_dir / "changes" / "replace-legacy-flow"
-    metadata_path = change_dir / ".feature-change-meta.json"
+    subfeature_dir = feature_dir / "subfeatures" / "replace-legacy-flow"
+    metadata_path = subfeature_dir / ".subfeature-meta.json"
     metadata = json.loads(metadata_path.read_text(encoding="utf-8"))
     metadata["status"] = "design_ready"
     metadata["affected_artifacts"] = [
@@ -197,44 +200,42 @@ def test_scaffold_change_packet_seeds_change_context(tmp_path, monkeypatch):
     metadata["affected_story_ids"] = ["CHK-01", "CHK-02"]
     metadata["affected_slice_ids"] = ["CHK-101", "CHK-102"]
     metadata_path.write_text(json.dumps(metadata, indent=2) + "\n", encoding="utf-8")
-    write_file(change_dir / "impact-analysis.md", "# Impact Analysis\n")
-    write_file(change_dir / "system-design.md", "# Design\n")
+    write_file(subfeature_dir / "impact-analysis.md", "# Impact Analysis\n")
+    write_file(subfeature_dir / "system-design.md", "# Design\n")
 
-    target = "docs/features/checkout/changes/replace-legacy-flow"
+    target = "docs/features/checkout/subfeatures/replace-legacy-flow"
     assert run_cli(module, monkeypatch, target) == 0
 
-    slice_planning = (change_dir / "slice-planning.md").read_text(encoding="utf-8")
-    slice_traceability = (change_dir / "slice-traceability.md").read_text(encoding="utf-8")
+    slice_planning = (subfeature_dir / "slice-planning.md").read_text(encoding="utf-8")
+    slice_traceability = (subfeature_dir / "slice-traceability.md").read_text(encoding="utf-8")
 
-    assert "## 0. Change Context" in slice_planning
-    assert "- Canonical feature: `checkout`" in slice_planning
-    assert "- Change ID: `replace-legacy-flow`" in slice_planning
-    assert "- Change type: `superseding`" in slice_planning
+    assert "## 0. Subfeature Context" in slice_planning
+    assert "- Parent feature: `checkout`" in slice_planning
+    assert "- Subfeature ID: `replace-legacy-flow`" in slice_planning
+    assert "- Subfeature type: `superseding`" in slice_planning
     assert "- `impact-analysis.md`" in slice_planning
     assert "- `CHK-01`" in slice_planning
     assert "- `CHK-101`" in slice_planning
     assert "- `docs/features/checkout/discover.md`" in slice_planning
-    assert "canonical `docs/features/checkout/user-stories.md`" in slice_planning
-    assert "Plan only the new or amended slices required by this change packet." in slice_planning
+    assert "parent `docs/features/checkout/user-stories.md`" in slice_planning
+    assert "Plan only the new or amended slices required by this subfeature." in slice_planning
     assert (
-        "Keep this packet's `slice-planning.md` and `slice-traceability.md` as the execution-planning source of truth for the change."
+        "Keep this subfeature's `slice-planning.md` and `slice-traceability.md` as the execution-planning source of truth for the child capability."
         in slice_planning
     )
-    assert "canonical `docs/features/checkout/slice-planning.md`" not in slice_planning
-    assert "canonical `docs/features/checkout/slice-traceability.md`" not in slice_planning
 
-    assert "## Change Context" in slice_traceability
-    assert "- Canonical feature: `checkout`" in slice_traceability
-    assert "- Change ID: `replace-legacy-flow`" in slice_traceability
+    assert "## Subfeature Context" in slice_traceability
+    assert "- Parent feature: `checkout`" in slice_traceability
+    assert "- Subfeature ID: `replace-legacy-flow`" in slice_traceability
     assert (
-        "Keep change-local traceability in this packet instead of reconciling it back into canonical feature breakdown docs."
+        "Keep subfeature-local traceability in this folder instead of folding it back into parent feature breakdown docs."
         in slice_traceability
     )
-    assert "Record superseded or narrowed canonical slice IDs in `Notes`" in slice_traceability
+    assert "Record superseded or narrowed parent slice IDs in `Notes`" in slice_traceability
 
 
 def test_scaffold_traceability_template_uses_distinct_planned_and_execution_columns(tmp_path, monkeypatch):
-    module = load_module()
+    module = load_module(SCRIPT_PATH, "scaffold_breakdown")
     monkeypatch.chdir(tmp_path)
 
     assert run_cli(module, monkeypatch, "demo-feature") == 0

@@ -100,7 +100,7 @@ skill-first, generic-first, and agent-neutral direction.
   plugin system.
 - `review-planning` already provides a planning-readiness checkpoint, so new
   verification behavior should complement it rather than duplicate it.
-- `reconcile-feature` now provides the feature-level precedent for retained
+- `finalize-subfeature` now provides the feature-level precedent for retained
   history publication and post-completion artifact cleanup.
 
 ## Assumptions

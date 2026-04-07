@@ -9,7 +9,7 @@ The repository provides a slice-scoped execution workflow, but that workflow spa
 - Bootstrap one slice per execution-ready work item.
 - Capture slice intent in `brief.md` and make execution sequencing explicit in `blueprint.md`.
 - Keep slice readiness separate from day-to-day implementation progress.
-- Preserve non-destructive closure and relation metadata for later feature-level archival and historical publishing.
+- Preserve non-destructive closure and relation metadata for later feature-level finalization and historical publishing.
 
 ## Non-Goals
 
@@ -40,13 +40,13 @@ The repository provides a slice-scoped execution workflow, but that workflow spa
 - `skills/brief/templates/brief-template.md` defines the slice brief structure.
 - `skills/blueprint/templates/plan-template.md` defines implementation packets and validation mapping.
 - `skills/close-slice/scripts/close_slice.py` closes slices and records durable closure metadata.
-- `skills/reconcile-feature/scripts/reconcile_feature_change.py` is the human-invoked feature-level point that rewrites canonical feature docs and removes temporary slices/change packets once a reviewed change packet's planned slices are done.
+- `skills/finalize-subfeature/scripts/finalize_subfeature.py` is the human-invoked feature-level point that verifies a reviewed subfeature's planned slices are done, removes completed execution slices, and marks the subfeature implemented.
 - `skills/commit/` and `skills/create-pr/` enforce conventions and checklist completion around execution work.
 
 ## Success Criteria
 
 - A maintainer can bootstrap, brief, blueprint, review, and close a execution slice with durable metadata.
-- Slice artifacts remain sufficient for later audit until a human requests final feature-level reconciliation cleanup.
+- Slice artifacts remain sufficient for later audit until a human requests final feature-level cleanup for the reviewed subfeature.
 - Execution workflow stays generic-first while allowing project-level conventions via config.
 
 ## Risks and Open Questions

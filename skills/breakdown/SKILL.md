@@ -23,17 +23,17 @@ docs/features/<feature-slug>/slice-traceability.md
 If `.skills/planning.json` defines `planning_dir`, the scaffold uses
 `<planning_dir>/<feature-slug>/` instead unless `--base-dir` is passed.
 
-For change-local breakdown work, you can also scaffold directly into an existing
-change packet path:
+For subfeature-local breakdown work, you can also scaffold directly into an existing
+subfeature path:
 
 ```bash
 python3 skills/breakdown/scripts/scaffold_breakdown.py \
-  docs/features/<feature-slug>/changes/<change-id>
+  docs/features/<feature-slug>/subfeatures/<subfeature-id>
 ```
 
-When the target path is a real change packet with `.feature-change-meta.json`,
-the scaffold seeds change context from the packet metadata and `impact-analysis.md`
-so the resulting breakdown artifacts stay anchored to the affected canonical
+When the target path is a real subfeature with `.subfeature-meta.json`,
+the scaffold seeds subfeature context from the metadata and `impact-analysis.md`
+so the resulting breakdown artifacts stay anchored to the affected parent
 stories, slices, and baseline docs.
 
 ## Responsibilities
@@ -52,7 +52,7 @@ stories, slices, and baseline docs.
 Resolve `<feature_path>` as either:
 
 - `<planning_dir>/<feature-slug>/` for canonical feature planning
-- `<planning_dir>/<feature-slug>/changes/<change-id>/` for a selected feature change packet
+- `<planning_dir>/<feature-slug>/subfeatures/<subfeature-id>/` for a selected subfeature
 
 - If `.skills/planning.json` defines `planning_dir`, use that as `<planning_dir>`.
 - Otherwise default to `docs/features`.
@@ -63,7 +63,7 @@ Preferred execution output when available:
 
 Use `assets/slice-planning-template.md` as the default starting point for `<feature_path>/slice-planning.md`.
 Use `assets/slice-traceability-template.md` as the default starting point for `<feature_path>/slice-traceability.md`.
-Use `scripts/scaffold_breakdown.py` when you want both files scaffolded together from a feature slug or an explicit change packet path.
+Use `scripts/scaffold_breakdown.py` when you want both files scaffolded together from a feature slug or an explicit subfeature path.
 
 ## Breakdown Rules
 
@@ -184,7 +184,7 @@ Otherwise, use an opaque slice ID and keep the repo story ID in traceability met
 ## Workflow
 
 1. Read `discover.md`, `system-design.md`, optional `ui-design.md`, and `user-stories.md`.
-   For change packets, also read `impact-analysis.md` and the canonical feature's
+   For subfeatures, also read `impact-analysis.md` and the canonical feature's
    `user-stories.md`, `slice-planning.md`, and `slice-traceability.md`.
 2. Validate that each story has scope, acceptance notes, an explicit size, and an explicit risk rating.
 3. Split oversized work into smaller execution packets and group them into increments with clear demo outcomes.
@@ -204,6 +204,6 @@ When generating `slice-traceability.md`, start from `assets/slice-traceability-t
 - Do not turn `slice-planning.md` into a slice-scoped execution checklist; that belongs to `guide-execution` and `blueprint` later.
 - Do not mark work as parallel-safe unless overlap and integration risk are genuinely low.
 - If a slice still needs major replanning, split it again before handoff.
-- For change packets, only plan the new or amended slices needed by the change;
+- For subfeatures, only plan the new or amended slices needed by the change;
   keep references to superseded canonical slices in notes or dependencies rather
-  than reusing them as change-local slice IDs.
+  than reusing them as subfeature-local slice IDs.

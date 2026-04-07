@@ -11,9 +11,9 @@ MANAGED_SKILLS := \
 	bootstrap \
 	design \
 	discover \
-	evolve-feature \
+	add-subfeature \
 	assess \
-	reconcile-feature \
+	finalize-subfeature \
 	guide-scope \
 	guide-planning \
 	propose \
@@ -32,9 +32,9 @@ install:
 	npx skills add "$(REPO_ROOT)/skills/guide-planning" $(COMMON_FLAGS)
 	npx skills add "$(REPO_ROOT)/skills/propose" $(COMMON_FLAGS)
 	npx skills add "$(REPO_ROOT)/skills/discover" $(COMMON_FLAGS)
-	npx skills add "$(REPO_ROOT)/skills/evolve-feature" $(COMMON_FLAGS)
+	npx skills add "$(REPO_ROOT)/skills/add-subfeature" $(COMMON_FLAGS)
 	npx skills add "$(REPO_ROOT)/skills/assess" $(COMMON_FLAGS)
-	npx skills add "$(REPO_ROOT)/skills/reconcile-feature" $(COMMON_FLAGS)
+	npx skills add "$(REPO_ROOT)/skills/finalize-subfeature" $(COMMON_FLAGS)
 	npx skills add "$(REPO_ROOT)/skills/guide-scope" $(COMMON_FLAGS)
 	npx skills add "$(REPO_ROOT)/skills/design" $(COMMON_FLAGS)
 	npx skills add "$(REPO_ROOT)/skills/ui-flow" $(COMMON_FLAGS)

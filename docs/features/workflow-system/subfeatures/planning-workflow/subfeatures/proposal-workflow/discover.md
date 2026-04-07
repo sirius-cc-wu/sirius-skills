@@ -29,7 +29,7 @@ That makes the capability harder to evolve intentionally over time.
 
 - Turn every individual proposal into a canonical feature.
 - Replace `discover`, `design`, or `breakdown` for accepted features.
-- Replace `evolve-feature` for changes to existing canonical features.
+- Replace `add-subfeature` for changes to existing canonical features.
 - Introduce a standalone CLI product.
 
 ## Primary Actors

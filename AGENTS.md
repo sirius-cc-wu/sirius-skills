@@ -66,13 +66,13 @@ Rules:
 
 - prefer a verb when one clear verb exists
 - prefer short names over long noun phrases
-- use verb-noun forms only when the noun is needed for clarity, such as `evolve-feature` or `close-slice`
+- use verb-noun forms only when the noun is needed for clarity, such as `add-subfeature` or `close-slice`
 - avoid noun-only skill names when the skill is performing an action
 
 Examples:
 
 - good: `propose`, `discover`, `design`, `assess`
-- acceptable when needed: `evolve-feature`, `guide-planning`, `review-planning`
+- acceptable when needed: `add-subfeature`, `guide-planning`, `review-planning`
 - avoid for skill names: `proposal`, `impact-analysis`
 
 Artifact and storage names may stay noun-based when they describe durable

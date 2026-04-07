@@ -2,25 +2,27 @@
 
 import argparse
 import importlib.util
+import json
 import os
 import re
 import sys
 from pathlib import Path
-from typing import Iterable, List, Optional
+from typing import Iterable, List
 
 
 SCRIPT_DIR = Path(__file__).resolve().parent
 REPO_ROOT = SCRIPT_DIR.parents[2]
-EVOLVE_SCRIPT = REPO_ROOT / "skills" / "evolve-feature" / "scripts" / "manage_feature_changes.py"
-FEATURE_META_FILE = ".planning-meta.json"
+SUBFEATURE_SCRIPT = (
+    REPO_ROOT / "skills" / "add-subfeature" / "scripts" / "manage_subfeatures.py"
+)
 IMPACT_FILE = "impact-analysis.md"
 SLUG_PATTERN = re.compile(r"^[A-Za-z][A-Za-z0-9._-]*$")
 BOLD_STORY_PATTERN = re.compile(r"\*\*([A-Za-z][A-Za-z0-9._-]+)(?:\s+\([^)]*\))?\*\*")
 TABLE_ROW_PATTERN = re.compile(r"^\|(.+)\|$")
 
 
-def load_manage_feature_changes_module():
-    spec = importlib.util.spec_from_file_location("manage_feature_changes", EVOLVE_SCRIPT)
+def load_manage_subfeatures_module():
+    spec = importlib.util.spec_from_file_location("manage_subfeatures", SUBFEATURE_SCRIPT)
     module = importlib.util.module_from_spec(spec)
     assert spec.loader is not None
     spec.loader.exec_module(module)
@@ -29,10 +31,10 @@ def load_manage_feature_changes_module():
 
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(
-        description="Generate impact-analysis.md for an existing feature change packet."
+        description="Generate impact-analysis.md for a durable subfeature."
     )
-    parser.add_argument("feature", help="Feature slug, folder name, or path")
-    parser.add_argument("change", help="Change ID, folder name, or path")
+    parser.add_argument("feature", help="Parent feature slug, folder name, or path")
+    parser.add_argument("subfeature", help="Subfeature ID, folder name, or path")
     parser.add_argument(
         "--affected-artifact",
         action="append",
@@ -120,7 +122,7 @@ def extract_first_column_ids(section_lines: List[str]) -> List[str]:
     return ids
 
 
-def collect_canonical_artifacts(feature_dir: Path) -> List[str]:
+def collect_parent_artifacts(feature_dir: Path) -> List[str]:
     artifact_names = [
         "discover.md",
         "system-design.md",
@@ -148,7 +150,7 @@ def collect_story_ids(feature_dir: Path) -> List[str]:
     return dedupe(story_ids)
 
 
-def collect_slice_ids(feature_dir: Path) -> List[str]:
+def collect_slice_ids(feature_dir: Path, manage_subfeatures) -> List[str]:
     slice_ids: List[str] = []
     slice_planning_text = read_text_if_exists(feature_dir / "slice-planning.md")
     slice_ids.extend(
@@ -157,10 +159,8 @@ def collect_slice_ids(feature_dir: Path) -> List[str]:
         )
     )
 
-    feature_meta_path = feature_dir / FEATURE_META_FILE
+    feature_meta_path = feature_dir / manage_subfeatures.FEATURE_META_FILE
     if feature_meta_path.exists():
-        import json
-
         payload = json.loads(feature_meta_path.read_text(encoding="utf-8"))
         ready_slice_ids = payload.get("ready_slice_ids", [])
         if isinstance(ready_slice_ids, list):
@@ -185,11 +185,11 @@ def format_bullets(items: List[str], empty_line: str) -> str:
 
 
 def write_impact_analysis(
-    change_dir: Path,
-    feature_slug: str,
-    change_id: str,
-    change_type: str,
-    summary: Optional[str],
+    subfeature_dir: Path,
+    parent_feature_slug: str,
+    subfeature_id: str,
+    subfeature_type: str,
+    summary: str | None,
     current_status: str,
     affected_artifacts: List[str],
     affected_story_ids: List[str],
@@ -197,47 +197,47 @@ def write_impact_analysis(
     increment_ids: List[str],
     force: bool,
 ) -> Path:
-    impact_path = change_dir / IMPACT_FILE
+    impact_path = subfeature_dir / IMPACT_FILE
     if impact_path.exists() and not force:
         raise RuntimeError(
             f"Impact analysis already exists at '{normalize_relpath(impact_path)}'. Use --force to overwrite it."
         )
 
     summary_line = summary or "Describe why this existing feature needs a scoped impact review."
-    content = f"""# Impact Analysis: {change_id.replace('-', ' ').title()}
+    content = f"""# Impact Analysis: {subfeature_id.replace('-', ' ').title()}
 
-## Target Change
+## Target Subfeature
 
-- Feature: `{feature_slug}`
-- Change ID: `{change_id}`
-- Change Type: `{change_type}`
-- Current Change Status: `{current_status}`
+- Parent Feature: `{parent_feature_slug}`
+- Subfeature ID: `{subfeature_id}`
+- Subfeature Type: `{subfeature_type}`
+- Current Subfeature Status: `{current_status}`
 
-## Change Summary
+## Subfeature Summary
 
 {summary_line}
 
-## Canonical Baseline Reviewed
+## Parent Baseline Reviewed
 
-{format_bullets(affected_artifacts, 'No canonical planning artifacts detected.')}
+{format_bullets(affected_artifacts, 'No parent planning artifacts detected.')}
 
 ## Candidate Affected Story IDs
 
-{format_bullets(affected_story_ids, 'No candidate story IDs detected from the canonical baseline.')}
+{format_bullets(affected_story_ids, 'No candidate story IDs detected from the parent baseline.')}
 
 ## Candidate Affected Increment IDs
 
-{format_bullets(increment_ids, 'No candidate increment IDs detected from the canonical baseline.')}
+{format_bullets(increment_ids, 'No candidate increment IDs detected from the parent baseline.')}
 
 ## Candidate Affected Slice IDs
 
-{format_bullets(affected_slice_ids, 'No candidate slice IDs detected from the canonical baseline.')}
+{format_bullets(affected_slice_ids, 'No candidate slice IDs detected from the parent baseline.')}
 
 ## Impact Notes
 
-- Confirm whether this change keeps existing stories intact or narrows, supersedes, or replaces them.
-- Confirm whether existing planned slices remain valid or need new change-local slices.
-- Use this analysis to drive change-local `system-design.md` and later `slice-planning.md`.
+- Confirm whether this subfeature keeps existing stories intact or narrows, supersedes, or replaces them.
+- Confirm whether existing planned slices remain valid or need new subfeature-local slices.
+- Use this analysis to drive subfeature-local `system-design.md` and later `slice-planning.md`.
 """
     impact_path.write_text(content, encoding="utf-8")
     return impact_path
@@ -245,45 +245,52 @@ def write_impact_analysis(
 
 def main() -> int:
     args = parse_args()
-    manage_feature_changes = load_manage_feature_changes_module()
+    manage_subfeatures = load_manage_subfeatures_module()
+    manage_planning = manage_subfeatures.load_manage_planning_module()
 
     try:
-        feature_dir_str, feature_slug = manage_feature_changes.resolve_feature_dir(args.feature)
+        feature_dir_str, parent_feature_slug, scope_context = (
+            manage_subfeatures.resolve_parent_feature(manage_planning, args.feature)
+        )
+        rows = manage_subfeatures.load_registry(feature_dir_str)
+        subfeature = manage_subfeatures.find_subfeature(rows, args.subfeature)
+        if not subfeature:
+            raise RuntimeError(f"Subfeature not found: {args.subfeature}")
+        subfeature_dir = Path(
+            manage_subfeatures.subfeature_dir_for_row(subfeature, scope_context)
+        )
+        metadata = manage_subfeatures.read_metadata(str(subfeature_dir))
         feature_dir = Path(feature_dir_str)
-        rows = manage_feature_changes.load_registry(feature_dir_str)
-        change = manage_feature_changes.find_change(rows, args.change)
-        if not change:
-            raise RuntimeError(f"Feature change not found: {args.change}")
-        change_dir = Path(manage_feature_changes.change_dir_for_row(change))
-        metadata = manage_feature_changes.read_metadata(str(change_dir))
 
         affected_artifacts = dedupe(
-            collect_canonical_artifacts(feature_dir) + args.affected_artifact
+            collect_parent_artifacts(feature_dir) + list(args.affected_artifact)
         )
-        affected_story_ids = dedupe(collect_story_ids(feature_dir) + args.story_id)
-        affected_slice_ids = dedupe(collect_slice_ids(feature_dir) + args.slice_id)
+        affected_story_ids = dedupe(collect_story_ids(feature_dir) + list(args.story_id))
+        affected_slice_ids = dedupe(
+            collect_slice_ids(feature_dir, manage_subfeatures) + list(args.slice_id)
+        )
         increment_ids = collect_increment_ids(feature_dir)
 
-        impact_path = write_impact_analysis(
-            change_dir,
-            feature_slug,
-            str(metadata["change_id"]),
-            str(metadata["change_type"]),
+        write_impact_analysis(
+            subfeature_dir,
+            parent_feature_slug,
+            str(metadata["subfeature_id"]),
+            str(metadata["subfeature_type"]),
             metadata.get("summary"),
             str(metadata["status"]),
             affected_artifacts,
             affected_story_ids,
             affected_slice_ids,
             increment_ids,
-            force=args.force,
+            args.force,
         )
 
-        current_status = str(metadata["status"])
-        target_status = "impact_ready" if current_status == "draft" else current_status
-        success, message = manage_feature_changes.update_change_status(
+        success, message = manage_subfeatures.update_subfeature_status(
+            manage_planning,
             feature_dir_str,
-            change,
-            target_status,
+            subfeature,
+            "impact_ready",
+            scope_context,
             force=args.force,
             affected_artifacts=affected_artifacts,
             affected_story_ids=affected_story_ids,
@@ -291,14 +298,15 @@ def main() -> int:
         )
         if not success:
             raise RuntimeError(message)
-    except (RuntimeError, ValueError) as exc:
+    except RuntimeError as exc:
         print(str(exc), file=sys.stderr)
         return 2
 
-    print(f"Generated impact analysis: {normalize_relpath(impact_path)}")
-    print(message)
+    print(
+        f"Generated impact analysis for subfeature '{metadata['subfeature_id']}' under feature '{parent_feature_slug}'."
+    )
     return 0
 
 
 if __name__ == "__main__":
-    raise SystemExit(main())
+    sys.exit(main())

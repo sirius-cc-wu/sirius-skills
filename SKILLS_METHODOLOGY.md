@@ -13,9 +13,9 @@ Use a **two-layer workflow**:
    - `guide-scope` (optional scope-aware entrypoint)
    - `guide-planning`
    - `propose`
-   - `evolve-feature`
+   - `add-subfeature`
    - `assess`
-   - `reconcile-feature`
+   - `finalize-subfeature`
    - `discover`
    - `design`
    - `ui-flow` (optional)
@@ -65,7 +65,7 @@ Its job is to:
 
 - resolve or initialize the feature planning folder
 - verify the current planning artifacts and metadata
-- decide whether the next step is `propose`, `evolve-feature`, `assess`, `reconcile-feature`, `discover`, `design`, `ui-flow`, `breakdown`, `review-planning`, or an approval/commit stop before execution begins
+- decide whether the next step is `propose`, `add-subfeature`, `assess`, `finalize-subfeature`, `discover`, `design`, `ui-flow`, `breakdown`, `review-planning`, or an approval/commit stop before execution begins
 - keep planning handoff decisions durable through explicit readiness states
 
 Expected planning states:
@@ -81,49 +81,48 @@ Expected planning states:
 Recommended handoff:
 
 ```text
-guide-scope -> guide-planning -> propose/evolve-feature/assess/reconcile-feature/discover/design/ui-flow/breakdown/review-planning -> human approval -> commit -> slice -> guide-execution
+guide-scope -> guide-planning -> propose/add-subfeature/assess/finalize-subfeature/discover/design/ui-flow/breakdown/review-planning -> human approval -> commit -> slice -> guide-execution
 ```
 
 If the request is still speculative, cross-cutting, or not yet accepted as a canonical feature, route to `propose` first. That keeps early exploration under `docs/proposals/` instead of polluting the canonical `docs/features/` registry too early.
 
-If the request is changing an existing canonical feature instead of starting net-new planning work, route to `evolve-feature` first. That skill creates a feature-local change packet and keeps the canonical feature folder as the durable source of truth.
+If the request is changing an existing canonical feature instead of starting net-new planning work, route to `add-subfeature` first. That skill creates a feature-local subfeature and keeps the canonical feature folder as the durable source of truth.
 
-After a change packet exists, use `assess` before change-local design when you need an explicit record of affected baseline artifacts, stories, increments, and slices.
+After a subfeature exists, use `assess` before subfeature-local design when you need an explicit record of affected baseline artifacts, stories, increments, and slices.
 
 ### 0b. Assess existing-feature impact
 
-Use `assess` after `evolve-feature` and before change-local design or breakdown.
+Use `assess` after `add-subfeature` and before subfeature-local design or breakdown.
 
 Its job is to:
 
 - inspect the canonical feature baseline
-- write `impact-analysis.md` inside the selected change packet
-- record affected artifacts, story IDs, and slice IDs in `.feature-change-meta.json`
+- write `impact-analysis.md` inside the selected subfeature
+- record affected artifacts, story IDs, and slice IDs in `.subfeature-meta.json`
 - make the changed scope explicit before design starts
 
 Recommended handoff:
 
 ```text
-guide-planning -> evolve-feature -> assess -> design -> breakdown
+guide-planning -> add-subfeature -> assess -> design -> breakdown
 ```
 
-### 0c. Reconcile approved feature changes
+### 0c. Finalize reviewed subfeatures
 
-Use `reconcile-feature` after a reviewed feature change packet has been executed
-and the approved delta needs to be folded back into the canonical feature docs.
+Use `finalize-subfeature` after a reviewed subfeature has been executed and all
+of its planned slices are closed.
 
 Its job is to:
 
-- rewrite canonical feature docs directly with the approved change content
-- copy any durable figures needed by the canonical docs
-- remove the temporary execution slices created for that reviewed change
-- remove the completed change packet after reconciliation is done
-- close the change packet through the existing feature-change lifecycle before cleanup
+- verify that the subfeature's planned slices are closed
+- remove the completed execution slices created for that reviewed subfeature
+- mark the durable subfeature implemented
+- keep the subfeature folder in place as part of the feature hierarchy
 
 Recommended handoff:
 
 ```text
-review-planning -> human approval -> commit -> slice -> guide-execution -> brief -> blueprint -> review-execution -> close-slice -> reconcile-feature
+review-planning -> human approval -> commit -> slice -> guide-execution -> brief -> blueprint -> review-execution -> close-slice -> finalize-subfeature
 ```
 
 ### 0a. Capture speculative ideas with propose
@@ -227,19 +226,20 @@ python3 skills/breakdown/scripts/scaffold_breakdown.py <feature-slug>
 The helper uses `.skills/planning.json` field `planning_dir` when present and
 otherwise defaults to `docs/features`.
 
-For an existing feature change, scaffold directly into the selected change
+For an existing subfeature, scaffold directly into the selected change
 packet path instead:
 
 ```bash
 python3 skills/breakdown/scripts/scaffold_breakdown.py \
-  docs/features/<feature-slug>/changes/<change-id>
+  docs/features/<feature-slug>/subfeatures/<change-id>
 ```
 
-When the target is a real change packet, the scaffold seeds change context from
-`.feature-change-meta.json` and `impact-analysis.md` so the breakdown artifacts
+When the target is a real subfeature, the scaffold seeds subfeature context from
+`.subfeature-meta.json` and `impact-analysis.md` so the breakdown artifacts
 stay tied to the affected canonical stories, slices, and baseline docs.
-Those breakdown artifacts remain change-local; they are not default reconciliation
-targets for the canonical feature's `slice-planning.md` or `slice-traceability.md`.
+Those breakdown artifacts remain subfeature-local; they are not default
+finalization targets for the canonical feature's `slice-planning.md` or
+`slice-traceability.md`.
 
 Review checkpoint:
 
@@ -268,8 +268,8 @@ Recommended slice usage:
 - record real execution blockers as dependencies in `slice-planning.md`
 - keep repo story IDs in `slice-traceability.md`
 - keep slice IDs as the primary execution identifiers
-- for change packets, keep superseded canonical slice IDs in notes or dependency
-  fields instead of reusing them as new change-local slice IDs
+- for subfeatures, keep superseded canonical slice IDs in notes or dependency
+  fields instead of reusing them as new subfeature-local slice IDs
 
 Review checkpoint:
 
@@ -287,14 +287,14 @@ Its job is to:
 - record durable findings in the planning docs already used by the team
 - confirm whether the work is ready for human approval and later `slice` bootstrap or needs another planning pass
 
-It can review either canonical feature planning or a selected feature change packet.
-For change packets, the review should center on the change-local `discover.md`,
+It can review either canonical feature planning or a selected feature subfeature.
+For subfeatures, the review should center on the subfeature-local `discover.md`,
 optional `impact-analysis.md`, `system-design.md`, `slice-planning.md`, and
 `slice-traceability.md`, while using the canonical feature docs only as baseline
 context for the delta.
 
-When the review target is a change packet, write findings back into the
-change-local docs and confirm the planned slices represent only the new or
+When the review target is a subfeature, write findings back into the
+subfeature-local docs and confirm the planned slices represent only the new or
 amended work required by that change.
 
 Recommended handoff:
@@ -348,7 +348,7 @@ Within that execution layer:
 - when `.skills/execution.json` sets `auto_start_implementation` to `true`, marking the blueprint ready should immediately advance the slice into `execution_ready` and continue into repository implementation work
 - `review-execution` owns the explicit implementation-versus-brief review outcome
 - `close-slice` owns slice closure metadata
-- `reconcile-feature` owns human-invoked feature-level cleanup after all planned slices are done
+- `finalize-subfeature` owns human-invoked feature-level cleanup after all planned slices are done
 
 Keep the boundary explicit:
 
@@ -421,7 +421,10 @@ Important closure rules:
 - closing a slice does not merge or delete the original `brief.md` or `blueprint.md`; older slices may also retain `slices.md`
 - closure metadata belongs in the slice system itself
 
-Feature-level cleanup happens later. Once all slices listed in a reviewed change packet are closed, a human can request `reconcile-feature` to rewrite canonical feature docs, remove those temporary slices, and remove the completed change packet.
+Feature-level cleanup happens later. Once all slices listed in a reviewed
+subfeature are closed, a human can request `finalize-subfeature` to remove the
+completed execution slices, mark the subfeature implemented, and keep the
+subfeature folder as durable planning history.
 
 ## Recommended Repository Layout
 

@@ -30,7 +30,7 @@ Optional companion output:
 Resolve `<feature_path>` as either:
 
 - `<planning_dir>/<feature-slug>/` for canonical feature planning
-- `<planning_dir>/<feature-slug>/changes/<change-id>/` for a selected feature change packet
+- `<planning_dir>/<feature-slug>/subfeatures/<subfeature-id>/` for a selected durable subfeature
 
 - If `.skills/planning.json` defines `planning_dir`, use that as `<planning_dir>`.
 - Otherwise default to `docs/features`.

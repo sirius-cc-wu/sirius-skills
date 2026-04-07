@@ -22,7 +22,7 @@ This preserves a clean planning boundary:
 - proposal folders hold exploratory or not-yet-accepted work
 - feature folders hold accepted canonical planning
 - promotion is explicit instead of implicit
-- existing-feature changes still route through `evolve-feature`
+- existing-subfeatures still route through `add-subfeature`
 
 ## Architectural Decisions
 
@@ -91,7 +91,7 @@ user is deliberately repairing state.
 
 - Use `propose` for speculative, exploratory, or umbrella-scoped work.
 - Use `discover` directly when work is already accepted as canonical feature planning.
-- Use `evolve-feature` when the request changes an existing canonical feature.
+- Use `add-subfeature` when the request changes an existing canonical feature.
 
 ## Future Extension Areas
 

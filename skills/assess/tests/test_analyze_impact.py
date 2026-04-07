@@ -5,8 +5,17 @@ from pathlib import Path
 
 
 IMPACT_SCRIPT = Path(__file__).resolve().parents[1] / "scripts" / "analyze_impact.py"
-CHANGE_SCRIPT = (
-    Path(__file__).resolve().parents[2] / "evolve-feature" / "scripts" / "manage_feature_changes.py"
+SUBFEATURE_SCRIPT = (
+    Path(__file__).resolve().parents[2]
+    / "add-subfeature"
+    / "scripts"
+    / "manage_subfeatures.py"
+)
+PLANNING_SCRIPT = (
+    Path(__file__).resolve().parents[2]
+    / "guide-planning"
+    / "scripts"
+    / "manage_planning.py"
 )
 
 
@@ -29,6 +38,7 @@ def write_file(path: Path, content: str = "# doc\n"):
 
 
 def setup_feature(tmp_path: Path):
+    planning_module = load_module(PLANNING_SCRIPT, "manage_planning")
     feature_dir = tmp_path / "docs" / "features" / "checkout"
     feature_dir.mkdir(parents=True, exist_ok=True)
     (tmp_path / ".skills").mkdir(parents=True, exist_ok=True)
@@ -64,27 +74,52 @@ def setup_feature(tmp_path: Path):
         feature_dir / "slice-traceability.md",
         "# Traceability\n\n| Story ID | Story Title | Planned Slice IDs | Notes |\n| --- | --- | --- | --- |\n| CHK-01 | Update checkout flow | CHK-101 | Note |\n| CHK-02 | Preserve guest checkout | CHK-102 | Note |\n",
     )
+    planning_module.sync_registry()
     return feature_dir
+
+
+def add_subfeature(tmp_path: Path, monkeypatch):
+    subfeature_module = load_module(SUBFEATURE_SCRIPT, "manage_subfeatures")
+    assert run_cli(
+        subfeature_module,
+        "manage_subfeatures.py",
+        monkeypatch,
+        "add",
+        "checkout",
+        "replace-legacy-flow",
+        "--type",
+        "superseding",
+        "--summary",
+        "Replace the legacy checkout path",
+    ) == 0
+    return subfeature_module
 
 
 def test_analyze_generates_impact_analysis_and_updates_metadata(tmp_path, monkeypatch):
     impact_module = load_module(IMPACT_SCRIPT, "analyze_impact")
-    change_module = load_module(CHANGE_SCRIPT, "manage_feature_changes")
     monkeypatch.chdir(tmp_path)
     feature_dir = setup_feature(tmp_path)
+    add_subfeature(tmp_path, monkeypatch)
 
-    assert run_cli(change_module, "manage_feature_changes.py", monkeypatch, "add", "checkout", "replace-legacy-flow", "--type", "superseding", "--summary", "Replace the legacy checkout path") == 0
-    assert run_cli(impact_module, "analyze_impact.py", monkeypatch, "checkout", "replace-legacy-flow") == 0
+    assert run_cli(
+        impact_module,
+        "analyze_impact.py",
+        monkeypatch,
+        "checkout",
+        "replace-legacy-flow",
+    ) == 0
 
-    change_dir = feature_dir / "changes" / "replace-legacy-flow"
-    impact_text = (change_dir / "impact-analysis.md").read_text(encoding="utf-8")
-    metadata = json.loads((change_dir / ".feature-change-meta.json").read_text(encoding="utf-8"))
+    subfeature_dir = feature_dir / "subfeatures" / "replace-legacy-flow"
+    impact_text = (subfeature_dir / "impact-analysis.md").read_text(encoding="utf-8")
+    metadata = json.loads((subfeature_dir / ".subfeature-meta.json").read_text(encoding="utf-8"))
+    planning_meta = json.loads((subfeature_dir / ".planning-meta.json").read_text(encoding="utf-8"))
 
     assert "docs/features/checkout/discover.md" in impact_text
     assert "`CHK-01`" in impact_text
     assert "`CHK-102`" in impact_text
     assert "`I1`" in impact_text
     assert metadata["status"] == "impact_ready"
+    assert planning_meta["status"] == "discovery_ready"
     assert metadata["affected_artifacts"] == [
         "docs/features/checkout/discover.md",
         "docs/features/checkout/system-design.md",
@@ -98,11 +133,10 @@ def test_analyze_generates_impact_analysis_and_updates_metadata(tmp_path, monkey
 
 def test_analyze_accepts_manual_additions(tmp_path, monkeypatch):
     impact_module = load_module(IMPACT_SCRIPT, "analyze_impact")
-    change_module = load_module(CHANGE_SCRIPT, "manage_feature_changes")
     monkeypatch.chdir(tmp_path)
     feature_dir = setup_feature(tmp_path)
+    add_subfeature(tmp_path, monkeypatch)
 
-    assert run_cli(change_module, "manage_feature_changes.py", monkeypatch, "add", "checkout", "replace-legacy-flow") == 0
     assert run_cli(
         impact_module,
         "analyze_impact.py",
@@ -117,8 +151,8 @@ def test_analyze_accepts_manual_additions(tmp_path, monkeypatch):
         "docs/features/checkout/custom.md",
     ) == 0
 
-    change_dir = feature_dir / "changes" / "replace-legacy-flow"
-    metadata = json.loads((change_dir / ".feature-change-meta.json").read_text(encoding="utf-8"))
+    subfeature_dir = feature_dir / "subfeatures" / "replace-legacy-flow"
+    metadata = json.loads((subfeature_dir / ".subfeature-meta.json").read_text(encoding="utf-8"))
 
     assert "CHK-299" in metadata["affected_story_ids"]
     assert "CHK-999" in metadata["affected_slice_ids"]
@@ -127,13 +161,24 @@ def test_analyze_accepts_manual_additions(tmp_path, monkeypatch):
 
 def test_analyze_refuses_to_overwrite_without_force(tmp_path, monkeypatch, capsys):
     impact_module = load_module(IMPACT_SCRIPT, "analyze_impact")
-    change_module = load_module(CHANGE_SCRIPT, "manage_feature_changes")
     monkeypatch.chdir(tmp_path)
     setup_feature(tmp_path)
+    add_subfeature(tmp_path, monkeypatch)
 
-    assert run_cli(change_module, "manage_feature_changes.py", monkeypatch, "add", "checkout", "replace-legacy-flow") == 0
-    assert run_cli(impact_module, "analyze_impact.py", monkeypatch, "checkout", "replace-legacy-flow") == 0
-    assert run_cli(impact_module, "analyze_impact.py", monkeypatch, "checkout", "replace-legacy-flow") == 2
+    assert run_cli(
+        impact_module,
+        "analyze_impact.py",
+        monkeypatch,
+        "checkout",
+        "replace-legacy-flow",
+    ) == 0
+    assert run_cli(
+        impact_module,
+        "analyze_impact.py",
+        monkeypatch,
+        "checkout",
+        "replace-legacy-flow",
+    ) == 2
 
     captured = capsys.readouterr()
     assert "already exists" in captured.err

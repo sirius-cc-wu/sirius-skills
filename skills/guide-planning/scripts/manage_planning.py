@@ -125,6 +125,17 @@ def normalize_feature_path(path: str) -> str:
     return normalized + "/"
 
 
+def relative_path_from_scope_root(path: str, scope_context: object) -> str:
+    resolved = Path(path).resolve()
+    try:
+        relative = resolved.relative_to(Path(scope_context.scope_root).resolve())
+    except ValueError as exc:
+        raise RuntimeError(
+            f"Feature path '{path}' must stay inside scope '{scope_context.scope_root}'."
+        ) from exc
+    return normalize_feature_path(str(relative))
+
+
 def normalize_review_note(value: object) -> Optional[str]:
     if value is None or value == "":
         return None
@@ -314,7 +325,7 @@ def write_registry(rows: List[Dict[str, object]], scope_context: Optional[object
     )
     ensure_registry(planning_dir)
 
-    sorted_rows = sorted(rows, key=lambda row: (row["feature"], row.get("updated_at") or ""))
+    sorted_rows = sorted(rows, key=lambda row: (str(row["path"]), row.get("updated_at") or ""))
     with open(index_file, "w", encoding="utf-8") as f:
         f.write(REGISTRY_HEADER)
         for row in sorted_rows:
@@ -335,8 +346,54 @@ def parse_registry(scope_context: Optional[object] = None) -> List[Dict[str, obj
     )
     ensure_registry(planning_dir)
     if os.path.exists(registry_json_file):
-        return load_registry_json(registry_json_file)
-    rows = parse_registry_markdown(index_file)
+        rows = load_registry_json(registry_json_file)
+    else:
+        rows = parse_registry_markdown(index_file)
+    return sync_registry(rows, scope_context=scope_context)
+
+
+def build_registry_row(
+    feature_dir: str, metadata: Dict[str, object], scope_context: object
+) -> Dict[str, object]:
+    return {
+        "feature": validate_feature_slug(str(metadata["feature_slug"])),
+        "status": normalize_status(str(metadata["status"])),
+        "updated_at": normalize_optional_timestamp(metadata.get("updated_at")),
+        "path": relative_path_from_scope_root(feature_dir, scope_context),
+    }
+
+
+def discover_feature_dirs(planning_dir: str) -> List[str]:
+    root = Path(planning_dir)
+    if not root.exists():
+        return []
+    return sorted(
+        str(metadata_path.parent)
+        for metadata_path in root.rglob(METADATA_FILE)
+        if metadata_path.is_file()
+    )
+
+
+def sync_registry(
+    seed_rows: Optional[List[Dict[str, object]]] = None, scope_context: Optional[object] = None
+) -> List[Dict[str, object]]:
+    if scope_context is None:
+        scope_context = SCOPE_RUNTIME.resolve_scope_context()
+    planning_dir, _, _ = get_registry_paths(required_config=False, scope_context=scope_context)
+    ensure_registry(planning_dir)
+
+    by_path: Dict[str, Dict[str, object]] = {}
+    for row in seed_rows or []:
+        by_path[str(row["path"])] = dict(row)
+
+    discovered_paths = set()
+    for feature_dir in discover_feature_dirs(planning_dir):
+        metadata = read_metadata(feature_dir)
+        row = build_registry_row(feature_dir, metadata, scope_context)
+        discovered_paths.add(str(row["path"]))
+        by_path[str(row["path"])] = row
+
+    rows = [row for path, row in by_path.items() if path in discovered_paths]
     write_registry(rows, scope_context=scope_context)
     return rows
 
@@ -597,33 +654,43 @@ def create_feature(
 ) -> Tuple[str, bool]:
     if scope_context is None:
         scope_context = SCOPE_RUNTIME.resolve_scope_context()
+    planning_dir, _, _ = get_registry_paths(
+        required_config=False, scope_context=scope_context
+    )
+    feature_dir = os.path.join(planning_dir, validate_feature_slug(feature_slug))
+    return create_feature_at_path(
+        feature_dir,
+        feature_slug,
+        requires_ui_flow=requires_ui_flow,
+        scope_context=scope_context,
+    )
+
+
+def create_feature_at_path(
+    feature_dir: str,
+    feature_slug: str,
+    requires_ui_flow: bool = False,
+    scope_context: Optional[object] = None,
+) -> Tuple[str, bool]:
+    if scope_context is None:
+        scope_context = SCOPE_RUNTIME.resolve_scope_context()
     rows = parse_registry(scope_context=scope_context)
+    normalized_feature_dir = os.path.normpath(feature_dir)
+    for row in rows:
+        if os.path.normpath(feature_dir_for_row(row, scope_context=scope_context)) == normalized_feature_dir:
+            return normalized_feature_dir, False
     existing = find_feature(rows, feature_slug, scope_context=scope_context)
     if existing:
         return feature_dir_for_row(existing, scope_context=scope_context), False
 
-    config = load_config(required=False, scope_context=scope_context)
     planning_dir, _, _ = get_registry_paths(
         required_config=False, scope_context=scope_context
     )
     ensure_registry(planning_dir)
-    feature_dir = os.path.join(planning_dir, feature_slug)
     metadata = build_metadata(feature_slug, requires_ui_flow=requires_ui_flow)
-    write_metadata(feature_dir, metadata)
-    row_path = normalize_feature_path(
-        os.path.join(normalize_planning_dir(config["planning_dir"]), feature_slug)
-    )
-
-    rows.append(
-        {
-            "feature": feature_slug,
-            "status": metadata["status"],
-            "updated_at": metadata["updated_at"],
-            "path": row_path,
-        }
-    )
-    write_registry(rows, scope_context=scope_context)
-    return feature_dir, True
+    write_metadata(normalized_feature_dir, metadata)
+    sync_registry(rows, scope_context=scope_context)
+    return normalized_feature_dir, True
 
 
 def can_transition(current: str, target: str) -> bool:

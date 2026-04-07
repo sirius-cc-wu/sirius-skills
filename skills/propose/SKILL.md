@@ -93,7 +93,7 @@ python3 skills/propose/scripts/manage_proposals.py validate-proposal "workflow-c
 
 ## Guardrails
 
-- Do not use this skill for an existing canonical feature change; use `evolve-feature` for that.
+- Do not use this skill for an existing canonical subfeature; use `add-subfeature` for that.
 - Do not treat proposal folders as execution slices.
 - Do not keep unaccepted ideas in `docs/features/`.
 - Do not interpret "use the propose skill" as permission to plan or implement.
