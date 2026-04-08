@@ -1,0 +1,11 @@
+{
+  "subfeatures": [
+    {
+      "subfeature_id": "change-to-subfeature-migration",
+      "status": "reviewed",
+      "subfeature_type": "additive",
+      "updated_at": "2026-04-08T08:27:49",
+      "path": "docs/features/planning-workflow/subfeatures/change-to-subfeature-migration/"
+    }
+  ]
+}

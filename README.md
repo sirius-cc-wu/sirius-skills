@@ -27,7 +27,7 @@ The intended direction is:
 The managed repo-first skill set is grouped into:
 
 - repo utilities: `skills/bootstrap/`, `skills/commit/`, `skills/create-pr/`, `skills/simplify/`
-- planning layer: `skills/guide-scope/`, `skills/guide-planning/`, `skills/propose/`, `skills/add-subfeature/`, `skills/assess/`, `skills/finalize-subfeature/`, `skills/discover/`, `skills/design/`, `skills/ui-flow/`, `skills/breakdown/`, `skills/review-planning/`
+- planning layer: `skills/guide-scope/`, `skills/guide-planning/`, `skills/propose/`, `skills/add-subfeature/`, `skills/migrate-subfeatures/`, `skills/assess/`, `skills/finalize-subfeature/`, `skills/discover/`, `skills/design/`, `skills/ui-flow/`, `skills/breakdown/`, `skills/review-planning/`
 - execution layer: `skills/slice/`, `skills/guide-execution/`, `skills/brief/`, `skills/blueprint/`, `skills/review-execution/`, `skills/close-slice/`
 
 If a project has no extra configuration, these skills should still work with generic conventions.
@@ -42,6 +42,7 @@ For repositories that use repo-first planning, the recommended short-name planni
 - `skills/guide-planning/`
 - `skills/propose/`
 - `skills/add-subfeature/`
+- `skills/migrate-subfeatures/`
 - `skills/assess/`
 - `skills/finalize-subfeature/`
 - `skills/discover/`
@@ -52,7 +53,7 @@ For repositories that use repo-first planning, the recommended short-name planni
 
 These skills sit **before** the execution-slice skills:
 
-- planning layer: `guide-scope`, `guide-planning`, `propose`, `add-subfeature`, `assess`, `finalize-subfeature`, `discover`, `design`, `ui-flow`, `breakdown`, `review-planning`
+- planning layer: `guide-scope`, `guide-planning`, `propose`, `add-subfeature`, `migrate-subfeatures`, `assess`, `finalize-subfeature`, `discover`, `design`, `ui-flow`, `breakdown`, `review-planning`
 - execution layer: `slice`, `guide-execution`, `brief`, `blueprint`, `review-execution`, `close-slice`
 
 
@@ -96,6 +97,11 @@ Preferred repo workflow:
 15. `close-slice` closes completed execution slices and records durable closure metadata.
 16. `finalize-subfeature` verifies a reviewed subfeature's planned slices are complete, removes completed execution slices, marks the durable subfeature implemented, and leaves the subfeature planning folder in place as part of the feature hierarchy.
 
+For repositories that still contain legacy `changes/` packets from the old
+workflow, `migrate-subfeatures` can scan and convert those legacy planning
+folders into the current durable `subfeatures/` layout before normal planning
+work continues.
+
 In the repo-native flow, `guide-planning` owns feature-planning readiness and routing, `breakdown` owns repo-story decomposition, `review-planning` owns planning readiness review, `slice` owns execution bootstrap from approved committed planning artifacts, `brief` owns the slice-scoped `brief.md`, `blueprint` owns the final slice-scoped execution plan and validation checklist, and `review-execution` owns the final implementation-versus-brief review before closure.
 
 Execution follows the same pattern: `guide-execution` owns routing, readiness, and registry state, while `brief`, `blueprint`, `review-execution`, and `close-slice` own slice-scoped artifacts and closure metadata. With `auto_start_implementation`, `guide-execution` can promote a slice from `blueprint_ready` to `execution_ready` as the signal to begin coding immediately.
@@ -137,6 +143,8 @@ Examples of repo-native prompts that fit the current workflow:
 - "Break down `docs/features/checkout/subfeatures/replace-legacy-flow/` into execution-ready slices."
 - "Review planning for the `replace-legacy-flow` subfeature before slice bootstrap."
 - "Finalize subfeature `replace-legacy-flow` under `checkout` after its planned slices are closed."
+- "Scan the repo for legacy `changes/` packets that still need migration."
+- "Dry-run migration of old `changes/` packets under `checkout` into durable subfeatures."
 
 ## Optional project configuration
 

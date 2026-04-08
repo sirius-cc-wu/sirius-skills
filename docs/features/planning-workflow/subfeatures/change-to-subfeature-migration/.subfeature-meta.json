@@ -1,0 +1,31 @@
+{
+  "subfeature_id": "change-to-subfeature-migration",
+  "parent_feature_slug": "planning-workflow",
+  "status": "reviewed",
+  "created_at": "2026-04-08T08:13:23",
+  "updated_at": "2026-04-08T08:27:49",
+  "subfeature_type": "additive",
+  "summary": "Migrate legacy feature changes into durable subfeatures.",
+  "affected_artifacts": [
+    "docs/features/planning-workflow/discover.md",
+    "docs/features/planning-workflow/system-design.md",
+    "docs/features/planning-workflow/slice-planning.md",
+    "skills/add-subfeature/scripts/manage_subfeatures.py",
+    "skills/guide-planning/scripts/manage_planning.py"
+  ],
+  "affected_story_ids": [
+    "CTSM-01",
+    "CTSM-02",
+    "CTSM-03",
+    "CTSM-04"
+  ],
+  "affected_slice_ids": [
+    "CTSM-01-scan-legacy-layout",
+    "CTSM-02-dry-run-reporting",
+    "CTSM-03-metadata-conversion",
+    "CTSM-03-path-migration",
+    "CTSM-04-skill-docs-and-validation"
+  ],
+  "review_note": "Planning artifacts reviewed: migration scope, legacy-to-subfeature mapping, dry-run behavior, and conflict rules are coherent for implementation.",
+  "finalized_at": null
+}
