@@ -4,37 +4,37 @@
       "feature": "execution-workflow",
       "status": "planning_reviewed",
       "updated_at": "2026-03-24T03:39:26",
-      "path": "docs/features/workflow-system/subfeatures/execution-workflow/"
-    },
-    {
-      "feature": "planning-workflow",
-      "status": "planning_reviewed",
-      "updated_at": "2026-03-24T03:39:26",
-      "path": "docs/features/workflow-system/subfeatures/planning-workflow/"
-    },
-    {
-      "feature": "proposal-workflow",
-      "status": "planning_reviewed",
-      "updated_at": "2026-03-29T00:32:50",
-      "path": "docs/features/workflow-system/subfeatures/planning-workflow/subfeatures/proposal-workflow/"
-    },
-    {
-      "feature": "subfeature-workflow",
-      "status": "planning_reviewed",
-      "updated_at": "2026-03-28T23:26:17",
-      "path": "docs/features/workflow-system/subfeatures/planning-workflow/subfeatures/subfeature-workflow/"
+      "path": "docs/features/execution-workflow/"
     },
     {
       "feature": "hierarchical-scope-support",
       "status": "slice_ready",
       "updated_at": "2026-04-04T02:56:28",
-      "path": "docs/features/workspace-system/subfeatures/hierarchical-scope-support/"
+      "path": "docs/features/hierarchical-scope-support/"
     },
     {
       "feature": "installation-and-configuration",
       "status": "planning_reviewed",
       "updated_at": "2026-03-24T03:39:26",
-      "path": "docs/features/workspace-system/subfeatures/installation-and-configuration/"
+      "path": "docs/features/installation-and-configuration/"
+    },
+    {
+      "feature": "planning-workflow",
+      "status": "planning_reviewed",
+      "updated_at": "2026-03-24T03:39:26",
+      "path": "docs/features/planning-workflow/"
+    },
+    {
+      "feature": "proposal-workflow",
+      "status": "planning_reviewed",
+      "updated_at": "2026-03-29T00:32:50",
+      "path": "docs/features/planning-workflow/subfeatures/proposal-workflow/"
+    },
+    {
+      "feature": "subfeature-workflow",
+      "status": "planning_reviewed",
+      "updated_at": "2026-03-28T23:26:17",
+      "path": "docs/features/planning-workflow/subfeatures/subfeature-workflow/"
     }
   ]
 }
