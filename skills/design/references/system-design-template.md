@@ -30,6 +30,12 @@ Always include:
 
 Default to a forward-looking design for work that will later feed `breakdown`.
 
+The design may start from any of these sources:
+
+- a prior `discover.md`
+- a direct user prompt or backlog item without discovery artifacts
+- existing implementation that needs a reviewable current-state design
+
 If the task is to capture existing implemented behavior instead:
 
 - state that clearly in the title or opening summary

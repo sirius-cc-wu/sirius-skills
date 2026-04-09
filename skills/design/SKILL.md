@@ -5,7 +5,7 @@ description: Produces feature-level system-design.md artifacts before breakdown 
 
 # Design
 
-Use this skill after `discover` when the work needs architecture, integration, interface, operational, or validation decisions captured durably before `breakdown`.
+Use this skill when a feature needs architecture, integration, interface, operational, or validation decisions captured durably before `breakdown`, whether the input comes from `discover.md`, direct prompting, or current implementation review.
 
 Read these references when relevant:
 
@@ -31,6 +31,14 @@ Optional companion output:
 - updates to `<feature_path>/user-stories.md`
 - `<feature_path>/figures/*.puml` and `<feature_path>/figures/*.svg` when configured for linked SVG output
 
+## Preferred Inputs
+
+- `<feature_path>/discover.md` when present
+- `impact-analysis.md` when present
+- direct user prompt or backlog context when `discover.md` does not exist
+- relevant existing docs, ADRs, or feature notes
+- relevant code paths when documenting current implemented behavior
+
 ## Feature Path Resolution
 
 Resolve `<feature_path>` as either:
@@ -48,6 +56,10 @@ Resolve `<feature_path>` as either:
 - Focus on decisions that unblock later decomposition and execution.
 - Document interfaces, dependencies, and operational constraints clearly.
 - Call out risks that should affect slice ordering or stop-and-ask gates.
+- Support these entry modes explicitly:
+  - discover-led design from existing planning docs
+  - prompt-led design when engineers want to start from requirements or chat context
+  - current-state design when engineers want to reverse engineer implementation into a reviewable design document
 - Prefer explicit section headings over loosely structured prose so reviewers can scan decisions quickly.
 - Default to forward-looking design. If the feature is already implemented and the task is to capture current behavior, label it clearly as current-state or implemented design instead of presenting it as pre-implementation intent.
 - When implementation and intended design differ, record the delta explicitly so later planning and review do not treat drift as intent.
@@ -61,7 +73,9 @@ Resolve `<feature_path>` as either:
 
 ## Workflow
 
-1. Read `discover.md`, `impact-analysis.md` when present, and any existing feature planning docs.
+1. Gather the best available inputs:
+   - read `discover.md`, `impact-analysis.md`, and existing feature planning docs when present
+   - otherwise derive the design from the user prompt, backlog context, and repository context
 2. Inspect the relevant codebase or adjacent systems as needed, especially existing interfaces, ownership boundaries, and operational constraints.
 3. Read `.skills/planning.json` when present to determine whether diagrams stay embedded or are emitted under `<feature_path>/figures/`.
 4. Choose the framing mode:
@@ -79,3 +93,4 @@ Resolve `<feature_path>` as either:
 - If the work is purely UX-focused, use `ui-flow` instead or alongside this skill.
 - Do not let feature-level UML drift into slice-scoped class-by-class implementation design; that belongs in `plan`.
 - Do not leave critical behavior such as retry semantics, cache invalidation, ownership scope, or protocol error mapping as undocumented "implementation details" when they shape correctness or operator expectations.
+- Do not fail just because `discover.md` is absent; use the best available prompt, backlog, documentation, and code context instead.
