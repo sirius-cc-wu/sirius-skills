@@ -1,11 +1,16 @@
 ---
 name: design
-description: Produces feature-level system design artifacts covering architecture, interfaces, constraints, validation strategy, and PlantUML diagrams.
+description: Produces feature-level system-design.md artifacts before breakdown when a feature needs architecture, interface, constraint, failure-handling, or validation decisions captured durably.
 ---
 
 # Design
 
-Use this skill after `discover` when the work needs architecture, integration, or validation decisions before slice breakdown.
+Use this skill after `discover` when the work needs architecture, integration, interface, operational, or validation decisions captured durably before `breakdown`.
+
+Read these references when relevant:
+
+- `references/system-design-template.md` for the required `system-design.md` structure and quality bar
+- `references/behavioral-systems.md` when the feature includes shared state, routing, connection/session reuse, concurrency, retries, recovery, or protocol error mapping
 
 ## Responsibilities
 
@@ -14,6 +19,7 @@ Use this skill after `discover` when the work needs architecture, integration, o
 3. Make major tradeoffs, risks, and assumptions explicit.
 4. Define the validation strategy needed before implementation starts.
 5. Produce feature-scoped PlantUML diagrams that clarify the system design.
+6. Make failure handling, recovery behavior, and concurrency invariants explicit when they materially affect correctness.
 
 ## Required Output
 
@@ -42,21 +48,29 @@ Resolve `<feature_path>` as either:
 - Focus on decisions that unblock later decomposition and execution.
 - Document interfaces, dependencies, and operational constraints clearly.
 - Call out risks that should affect slice ordering or stop-and-ask gates.
+- Prefer explicit section headings over loosely structured prose so reviewers can scan decisions quickly.
+- Default to forward-looking design. If the feature is already implemented and the task is to capture current behavior, label it clearly as current-state or implemented design instead of presenting it as pre-implementation intent.
+- When implementation and intended design differ, record the delta explicitly so later planning and review do not treat drift as intent.
 - Use PlantUML as the UML language whenever you include diagrams.
 - If `design_diagram_mode` is `embedded`, include system-design diagrams directly in `system-design.md` with fenced `plantuml` blocks.
 - If `design_diagram_mode` is `linked_svg`, write the PlantUML source files under `<feature_path>/figures/`, generate matching SVGs into the same directory, and link those SVGs from `system-design.md` with relative Markdown image links such as `![Component diagram](figures/component-diagram.svg)`.
 - In `linked_svg` mode, do not also embed the same diagram as a fenced `plantuml` block in `system-design.md`.
 - Use stable, descriptive figure names such as `component-diagram.puml`, `component-diagram.svg`, `sequence-diagram.puml`, and `sequence-diagram.svg`.
 - Prefer feature-level diagrams such as component, package, sequence, state, or deployment diagrams over low-level implementation detail.
+- When the feature contains shared mutable state, cache entries, connection/session lifecycles, or cross-boundary protocol translation, include the relevant invariants, state transitions, and error-mapping policy instead of leaving them implicit.
 
 ## Workflow
 
 1. Read `discover.md`, `impact-analysis.md` when present, and any existing feature planning docs.
-2. Inspect the relevant codebase or adjacent systems as needed.
+2. Inspect the relevant codebase or adjacent systems as needed, especially existing interfaces, ownership boundaries, and operational constraints.
 3. Read `.skills/planning.json` when present to determine whether diagrams stay embedded or are emitted under `<feature_path>/figures/`.
-4. Write `system-design.md` with architecture, interfaces, constraints, validation notes, and PlantUML system-design diagrams or linked SVG figures, depending on configuration.
-5. Refine story boundaries when the design changes implementation shape.
-6. Stop when the work is concrete enough for `breakdown`.
+4. Choose the framing mode:
+   - planned design for work that is not yet implemented
+   - current-state design for documenting existing implemented behavior
+5. Write `system-design.md` using the structure in `references/system-design-template.md`, adding the behavioral guidance from `references/behavioral-systems.md` when applicable.
+6. Add PlantUML system-design diagrams or linked SVG figures, depending on configuration.
+7. Refine story boundaries when the design changes implementation shape.
+8. Stop when the work is concrete enough for `breakdown`.
 
 ## Guardrails
 
@@ -64,3 +78,4 @@ Resolve `<feature_path>` as either:
 - Do not create execution-ready slices for vague or unresolved designs.
 - If the work is purely UX-focused, use `ui-flow` instead or alongside this skill.
 - Do not let feature-level UML drift into slice-scoped class-by-class implementation design; that belongs in `plan`.
+- Do not leave critical behavior such as retry semantics, cache invalidation, ownership scope, or protocol error mapping as undocumented "implementation details" when they shape correctness or operator expectations.
