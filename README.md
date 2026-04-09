@@ -33,6 +33,7 @@ The managed repo-first skill set is grouped into:
 If a project has no extra configuration, these skills should still work with generic conventions.
 
 For the operational guide to using the skills together, see `SKILLS_METHODOLOGY.md`.
+For developer-facing examples of how to prompt the skills, see `PROMPT_GUIDE.md`.
 
 ## Planning layer
 
@@ -145,6 +146,8 @@ Examples of repo-native prompts that fit the current workflow:
 - "Finalize subfeature `replace-legacy-flow` under `checkout` after its planned slices are closed."
 - "Scan the repo for legacy `changes/` packets that still need migration."
 - "Dry-run migration of old `changes/` packets under `checkout` into durable subfeatures."
+
+For a broader developer prompt cookbook, including prompt-first design and reverse-engineered current-state design, see `PROMPT_GUIDE.md`.
 
 ## Optional project configuration
 

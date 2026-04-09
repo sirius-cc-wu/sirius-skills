@@ -1,0 +1,256 @@
+# Prompt Guide
+
+This guide helps developers prompt the `sirius-skills` workflow effectively.
+
+Use it together with:
+
+- `README.md` for repository layout and managed skill list
+- `SKILLS_METHODOLOGY.md` for the full planning and execution workflow
+
+## Core idea
+
+Good prompts do three things clearly:
+
+1. name the workflow stage or skill
+2. identify the feature, subfeature, slice, or path
+3. say what outcome you want the agent to produce
+
+When in doubt, prefer **routing prompts** first:
+
+- use `guide-scope` when the repository may have multiple scopes
+- use `guide-planning` when you know the work is planning-layer work
+- use `guide-execution` when you know the work is execution-layer work
+
+## Start with the simplest useful prompt
+
+If you are not sure which planning skill should run next:
+
+```text
+Use `guide-planning` to decide the next step for `checkout-redesign`.
+```
+
+If you are not sure whether the next step is planning, execution, or bootstrap:
+
+```text
+Use `guide-scope` to resolve the active scope and route this request.
+```
+
+If you already know the exact skill and target:
+
+```text
+Use `design` for `docs/features/checkout-redesign/`.
+```
+
+## Prompt patterns that work well
+
+### 1. New feature planning
+
+Use this when the work should become canonical planning under `docs/features/`.
+
+```text
+Use `discover` for `checkout-redesign` and frame the problem, goals, constraints, and initial stories.
+```
+
+```text
+Use `design` for `checkout-redesign` and produce `system-design.md` with architecture, interfaces, risks, and validation.
+```
+
+```text
+Use `breakdown` for `docs/features/checkout-redesign/` and create execution-ready slices.
+```
+
+### 2. Prompt-first design without `discover.md`
+
+Use this when engineers want to start directly from requirements or chat context.
+
+```text
+Use `design` for `checkout-redesign`. There is no `discover.md` yet. Use this prompt as the source of truth and write the feature design from it.
+```
+
+Add the most important context in the prompt:
+
+- the problem to solve
+- the constraints
+- the affected systems
+- the expected output or review goal
+
+### 3. Reverse-engineered current-state design
+
+Use this when implementation already exists and you want a reviewable design document.
+
+```text
+Use `design` for `docs/features/checkout-redesign/` and document the current implemented design from the code for review.
+```
+
+Useful additions:
+
+- name the implementation area to inspect
+- say whether the goal is review, onboarding, or drift detection
+- ask for implementation-vs-intended-design deltas when needed
+
+Example:
+
+```text
+Use `design` for `docs/features/checkout-redesign/` and reverse engineer the current implementation under `src/checkout/` into a reviewable `system-design.md`. Call out design drift explicitly.
+```
+
+### 4. Existing feature evolution
+
+Use this when a canonical feature already exists and you need a durable child change.
+
+```text
+Use `add-subfeature` to create `replace-legacy-flow` under `checkout`.
+```
+
+```text
+Use `assess` for subfeature `replace-legacy-flow` under `checkout`.
+```
+
+```text
+Use `design` for `docs/features/checkout/subfeatures/replace-legacy-flow/`.
+```
+
+### 5. Speculative work that should not be canonical yet
+
+Use this when the idea is exploratory or still needs acceptance.
+
+```text
+Use `propose` to create a proposal for automated review handoff, but keep it out of canonical planning for now.
+```
+
+### 6. Planning review and approval boundary
+
+Use this when discovery, design, and breakdown are complete enough for review.
+
+```text
+Use `review-planning` for `docs/features/checkout-redesign/`.
+```
+
+Remember the workflow boundary:
+
+- `review-planning` stops at readiness review
+- a human approves
+- approved planning is committed
+- only then should execution bootstrap begin
+
+### 7. Execution-layer prompts
+
+Use these only after planning is approved and committed.
+
+```text
+Use `slice` to bootstrap the next execution slice for `checkout-redesign`.
+```
+
+```text
+Use `guide-execution` to decide the next step for slice `CHK-12-form-state-refactor`.
+```
+
+```text
+Use `brief` for slice `CHK-12-form-state-refactor`.
+```
+
+```text
+Use `blueprint` for slice `CHK-12-form-state-refactor`.
+```
+
+```text
+Use `review-execution` for slice `CHK-12-form-state-refactor`.
+```
+
+```text
+Use `close-slice` for slice `CHK-12-form-state-refactor`.
+```
+
+## What to include in a strong prompt
+
+Include whichever of these matter:
+
+- the exact skill name, if you know it
+- the feature slug, subfeature ID, or slice ID
+- the repository path when the target is ambiguous
+- whether the work is new planning, current-state documentation, or review
+- important constraints such as compatibility, validation needs, or non-goals
+- whether the agent should stop at planning output or continue into the next workflow handoff
+
+Good:
+
+```text
+Use `design` for `docs/features/routing-cache/` and produce a reviewable `system-design.md` for the current implementation under `src/routing/`. Make failure and reconnect behavior explicit.
+```
+
+Weak:
+
+```text
+Help me with routing.
+```
+
+## When to prefer a guide skill
+
+Use a guide skill when you know the layer but not the exact next operation.
+
+### Prefer `guide-scope`
+
+When:
+
+- the repo may contain multiple scopes
+- you are unsure whether the task belongs to planning, execution, or bootstrap
+
+### Prefer `guide-planning`
+
+When:
+
+- the work is feature planning
+- you want the agent to pick among `propose`, `discover`, `design`, `breakdown`, or review-oriented planning skills
+
+### Prefer `guide-execution`
+
+When:
+
+- a slice already exists
+- you want the agent to choose among `brief`, `blueprint`, `review-execution`, and closure work
+
+## Common prompt mistakes
+
+- asking for implementation when planning is not reviewed yet
+- naming no feature, path, or slice when several are plausible
+- asking for `breakdown` before discovery or design is concrete
+- asking for `slice` bootstrap before planning approval and commit
+- writing a vague prompt that omits the desired artifact or stop point
+
+## Practical recipes
+
+### “I have an accepted feature idea”
+
+```text
+Use `guide-planning` for `checkout-redesign` and route to the right next planning skill.
+```
+
+### “I want design first, no discover doc”
+
+```text
+Use `design` for `checkout-redesign`. There is no `discover.md`; use this prompt as the planning input and create `system-design.md`.
+```
+
+### “I already implemented it; document it for review”
+
+```text
+Use `design` for `docs/features/checkout-redesign/` and reverse engineer the implementation into a current-state `system-design.md` for review.
+```
+
+### “I need a change under an existing feature”
+
+```text
+Use `guide-planning` for feature `checkout` and route this request as subfeature work if needed.
+```
+
+### “Planning is reviewed and committed; start execution”
+
+```text
+Use `slice` to bootstrap the next approved slice for `checkout-redesign`.
+```
+
+## Short rule of thumb
+
+If you know the exact artifact you want, prompt the specific skill.
+
+If you know only the workflow layer, prompt the corresponding guide skill.
