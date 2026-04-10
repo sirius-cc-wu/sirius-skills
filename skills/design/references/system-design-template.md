@@ -62,3 +62,11 @@ Choose diagrams that clarify real design risk:
 - deployment diagrams for topology or network placement
 
 Do not add diagrams that merely restate section prose without improving precision.
+
+When `.skills/planning.json` uses `design_diagram_mode: "linked_svg"`, keep the
+generated figures visually stable across themes:
+
+- set `skinparam backgroundColor white` in each PlantUML source
+- ensure each generated or hand-authored SVG starts with an explicit white
+  canvas rect such as `<rect fill="#FFFFFF" height="100%" width="100%" x="0"
+  y="0"/>`

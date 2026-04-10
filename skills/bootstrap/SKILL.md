@@ -115,7 +115,7 @@ Successful runs should leave the repository with:
 - `.skills/execution.json`
 - `.skills/conventions.json`
 
-When `.skills/planning.json` includes `design_diagram_mode: "linked_svg"`, planning/design skills should place diagram source and generated SVGs under `<feature_path>/figures/` and link the SVGs from `system-design.md`.
+When `.skills/planning.json` includes `design_diagram_mode: "linked_svg"`, planning/design skills should place diagram source and generated SVGs under `<feature_path>/figures/`, link the SVGs from `system-design.md`, and keep the figures on an explicit white background using `skinparam backgroundColor white` plus a white SVG canvas rect.
 
 In `default` mode, `.skills/conventions.json` may remain an empty object so the repo keeps its generic behavior explicit without inventing project-specific workflow rules.
 

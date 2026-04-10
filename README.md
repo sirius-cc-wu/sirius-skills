@@ -114,7 +114,7 @@ When UML diagrams are useful, use **PlantUML**:
 - `design` should produce feature-scoped system-design diagrams in `system-design.md`
 - `blueprint` should produce slice-scoped detailed-design diagrams in `blueprint.md`
 
-By default, `design` embeds PlantUML directly in `system-design.md`. If `.skills/planning.json` sets `"design_diagram_mode": "linked_svg"`, `design` should instead write `.puml` and `.svg` files under `<feature_path>/figures/` and link the SVGs from `system-design.md`.
+By default, `design` embeds PlantUML directly in `system-design.md`. If `.skills/planning.json` sets `"design_diagram_mode": "linked_svg"`, `design` should instead write `.puml` and `.svg` files under `<feature_path>/figures/` and link the SVGs from `system-design.md`. In that mode, keep diagrams on an explicit white background by setting `skinparam backgroundColor white` in PlantUML and ensuring the rendered SVG includes a white canvas rect.
 
 ## Execution slice source of truth
 
@@ -202,7 +202,7 @@ Current Phase 1 usage:
 - planning-layer skills resolve `.skills/planning.json` from the nearest scope, then fall back to the repository root when inside a Git worktree; `planning_dir` still defaults to `docs/features/<feature-slug>/`
 - `skills/propose/scripts/manage_proposals.py` reads the active scope's `.skills/planning.json` field `proposal_dir` when present and otherwise defaults to `docs/proposals/<proposal-slug>/`
 - `skills/guide-planning/scripts/manage_planning.py` reads the active scope's `.skills/planning.json` for `planning_dir` and maintains planning readiness metadata under `<feature_path>/.planning-meta.json`
-- `skills/design/SKILL.md` reads `.skills/planning.json` field `design_diagram_mode`; `embedded` keeps fenced PlantUML in `system-design.md`, while `linked_svg` writes `.puml` and `.svg` files under `<feature_path>/figures/` and links the SVGs from `system-design.md`
+- `skills/design/SKILL.md` reads `.skills/planning.json` field `design_diagram_mode`; `embedded` keeps fenced PlantUML in `system-design.md`, while `linked_svg` writes `.puml` and `.svg` files under `<feature_path>/figures/`, links the SVGs from `system-design.md`, and keeps those SVGs on an explicit white canvas
 - `skills/breakdown/scripts/scaffold_breakdown.py` uses `.skills/planning.json` field `planning_dir` during scaffolding when the file is present
 - `skills/slice/scripts/bootstrap_slice.py` resolves the nearest execution scope, reuses inherited scoped execution config when present, and only initializes `.skills/execution.json` locally when no execution config exists in the scope chain
 - `skills/guide-execution/scripts/manage_execution.py` resolves `.skills/execution.json`, `.skills/conventions.json`, and `slice_dir` from the active execution scope so nested scopes keep local slice registries and folders

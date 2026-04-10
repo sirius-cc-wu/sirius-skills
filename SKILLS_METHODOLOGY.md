@@ -187,7 +187,7 @@ Expected output:
 Diagram layout is configurable through `.skills/planning.json`:
 
 - `design_diagram_mode: "embedded"` keeps fenced `plantuml` blocks in `system-design.md`
-- `design_diagram_mode: "linked_svg"` writes `.puml` and `.svg` files under `<feature_path>/figures/` and links the SVGs from `system-design.md`
+- `design_diagram_mode: "linked_svg"` writes `.puml` and `.svg` files under `<feature_path>/figures/` and links the SVGs from `system-design.md`; keep those diagrams on an explicit white background with `skinparam backgroundColor white` and a white SVG canvas rect
 
 If the work has meaningful UI or interaction design, also use `ui-flow` to create:
 

@@ -66,6 +66,7 @@ Resolve `<feature_path>` as either:
 - Use PlantUML as the UML language whenever you include diagrams.
 - If `design_diagram_mode` is `embedded`, include system-design diagrams directly in `system-design.md` with fenced `plantuml` blocks.
 - If `design_diagram_mode` is `linked_svg`, write the PlantUML source files under `<feature_path>/figures/`, generate matching SVGs into the same directory, and link those SVGs from `system-design.md` with relative Markdown image links such as `![Component diagram](figures/component-diagram.svg)`.
+- In `linked_svg` mode, keep figure backgrounds explicitly white: set `skinparam backgroundColor white` in PlantUML, and ensure each emitted SVG includes an explicit white canvas rect such as `<rect fill="#FFFFFF" height="100%" width="100%" x="0" y="0"/>` so rendered diagrams do not inherit transparent or dark backgrounds.
 - In `linked_svg` mode, do not also embed the same diagram as a fenced `plantuml` block in `system-design.md`.
 - Use stable, descriptive figure names such as `component-diagram.puml`, `component-diagram.svg`, `sequence-diagram.puml`, and `sequence-diagram.svg`.
 - Prefer feature-level diagrams such as component, package, sequence, state, or deployment diagrams over low-level implementation detail.
