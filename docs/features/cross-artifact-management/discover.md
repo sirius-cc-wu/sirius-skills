@@ -62,6 +62,20 @@ keep it healthy over time.
   partial runs.
 - Archive or retire superseded artifacts without losing traceability.
 
+## Implemented v1 Capability Stack
+
+- `audit-artifacts` provides read-only artifact health checks and shared
+  inventory discovery.
+- `trace-artifacts` provides read-only lineage tracing across proposals,
+  features, subfeatures, planned slices, and execution slices.
+- `report-artifacts` provides read-only operational summaries grouped by type,
+  status, and parent feature.
+- `repair-artifacts` provides conservative dry-run/apply regeneration of active
+  registries and READMEs from durable directories plus valid metadata.
+- `archive-artifacts` provides read-only archive candidate discovery across
+  relevant artifact layers plus explicit closed-slice archival in v1 through the
+  execution owner helper.
+
 ## Confirmed Signals in Repo
 
 - `skills/propose/scripts/manage_proposals.py` already owns proposal registry

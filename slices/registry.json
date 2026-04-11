@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "generated_at": "2026-04-11T23:53:30",
+  "generated_at": "2026-04-11T23:58:00",
   "slices": [
     {
       "id": "HSS-01-root-fallback",
@@ -119,6 +119,16 @@
       "path": "slices/CAM-04-registry-drift-repair-repair-artifacts/",
       "updated_at": "2026-04-11T23:53:30",
       "closed_at": "2026-04-11T23:53:30",
+      "archived_at": null,
+      "relations": []
+    },
+    {
+      "id": "CAM-05-safe-slice-archival",
+      "feature": "archive-artifacts",
+      "status": "closed",
+      "path": "slices/CAM-05-safe-slice-archival-archive-artifacts/",
+      "updated_at": "2026-04-11T23:58:00",
+      "closed_at": "2026-04-11T23:58:00",
       "archived_at": null,
       "relations": []
     }

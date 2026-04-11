@@ -7,6 +7,7 @@ MANAGED_SKILLS := \
 	trace-artifacts \
 	report-artifacts \
 	repair-artifacts \
+	archive-artifacts \
 	brief \
 	breakdown \
 	create-pr \
@@ -35,6 +36,7 @@ install:
 	npx skills add "$(REPO_ROOT)/skills/trace-artifacts" $(COMMON_FLAGS)
 	npx skills add "$(REPO_ROOT)/skills/report-artifacts" $(COMMON_FLAGS)
 	npx skills add "$(REPO_ROOT)/skills/repair-artifacts" $(COMMON_FLAGS)
+	npx skills add "$(REPO_ROOT)/skills/archive-artifacts" $(COMMON_FLAGS)
 	npx skills add "$(REPO_ROOT)/skills/guide-execution" $(COMMON_FLAGS)
 	npx skills add "$(REPO_ROOT)/skills/brief" $(COMMON_FLAGS)
 	npx skills add "$(REPO_ROOT)/skills/blueprint" $(COMMON_FLAGS)

@@ -14,3 +14,4 @@
 | CAM-02-trace-artifact-lineage | trace-artifacts | closed | 2026-04-11T23:40:32 | 2026-04-11T23:40:32 | slices/CAM-02-trace-artifact-lineage-trace-artifacts/ |
 | CAM-03-artifact-state-report | report-artifacts | closed | 2026-04-11T23:48:13 | 2026-04-11T23:48:13 | slices/CAM-03-artifact-state-report-report-artifacts/ |
 | CAM-04-registry-drift-repair | repair-artifacts | closed | 2026-04-11T23:53:30 | 2026-04-11T23:53:30 | slices/CAM-04-registry-drift-repair-repair-artifacts/ |
+| CAM-05-safe-slice-archival | archive-artifacts | closed | 2026-04-11T23:58:00 | 2026-04-11T23:58:00 | slices/CAM-05-safe-slice-archival-archive-artifacts/ |
