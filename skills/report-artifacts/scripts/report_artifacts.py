@@ -1,0 +1,97 @@
+#!/usr/bin/env python3
+
+import argparse
+import json
+import sys
+from pathlib import Path
+from typing import Dict, List
+
+
+SCRIPT_DIR = Path(__file__).resolve().parent
+if str(SCRIPT_DIR) not in sys.path:
+    sys.path.insert(0, str(SCRIPT_DIR))
+
+from report_data import (  # noqa: E402
+    VALID_ARTIFACT_TYPES,
+    VALID_GROUP_BY,
+    build_report_result,
+)
+
+
+def positive_int(value: str) -> int:
+    parsed = int(value)
+    if parsed <= 0:
+        raise argparse.ArgumentTypeError("stale days must be greater than zero")
+    return parsed
+
+
+def parse_args() -> argparse.Namespace:
+    parser = argparse.ArgumentParser(
+        description=(
+            "Report operational workflow state across proposals, features, "
+            "subfeatures, and slices."
+        )
+    )
+    parser.add_argument(
+        "--artifact-type",
+        action="append",
+        choices=VALID_ARTIFACT_TYPES,
+        default=[],
+        help="Limit reporting to one or more artifact types. Repeatable.",
+    )
+    parser.add_argument(
+        "--group-by",
+        choices=VALID_GROUP_BY,
+        default="overview",
+        help="Choose how to group the report output.",
+    )
+    parser.add_argument(
+        "--stale-days",
+        type=positive_int,
+        default=30,
+        help="Mark artifacts stale when updated at or before this day threshold.",
+    )
+    parser.add_argument(
+        "--json",
+        action="store_true",
+        help="Emit machine-readable report output.",
+    )
+    return parser.parse_args()
+
+
+def run_report(artifact_types: List[str], group_by: str, stale_days: int) -> Dict[str, object]:
+    return build_report_result(artifact_types=artifact_types, group_by=group_by, stale_days=stale_days)
+
+
+def render_text(result: Dict[str, object]) -> str:
+    lines = [
+        f"Artifact report ({result['group_by']}, stale threshold: {result['stale_days']} days)",
+        f"Total artifacts: {result['summary']['total']}",
+        f"Stale artifacts: {result['summary']['stale']}",
+        "Groups:",
+    ]
+    for group in result["groups"]:
+        lines.append(f"- {group['key']}: {group['count']} total, {group['stale']} stale")
+    lines.append("Records:")
+    for record in result["records"]:
+        stale_marker = " stale" if record["is_stale"] else ""
+        parent_suffix = f", parent={record['parent_feature']}" if record["parent_feature"] else ""
+        lines.append(
+            f"- {record['artifact_type']}:{record['artifact_id']} "
+            f"[{record['status']}{stale_marker}] ({record['path']}{parent_suffix})"
+        )
+    return "\n".join(lines)
+
+
+def main() -> int:
+    args = parse_args()
+    result = run_report(args.artifact_type, args.group_by, args.stale_days)
+    if args.json:
+        print(json.dumps(result, indent=2))
+    else:
+        print(render_text(result))
+    return 0
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())

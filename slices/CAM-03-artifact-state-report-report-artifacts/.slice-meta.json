@@ -1,0 +1,10 @@
+{
+  "created_at": "2026-04-11T23:44:44",
+  "updated_at": "2026-04-11T23:48:13",
+  "status": "closed",
+  "slice_id": "CAM-03-artifact-state-report",
+  "feature": "report-artifacts",
+  "path": "slices/CAM-03-artifact-state-report-report-artifacts/",
+  "relations": [],
+  "closed_at": "2026-04-11T23:48:13"
+}

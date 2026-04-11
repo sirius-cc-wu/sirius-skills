@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "generated_at": "2026-04-11T23:40:32",
+  "generated_at": "2026-04-11T23:48:13",
   "slices": [
     {
       "id": "HSS-01-root-fallback",
@@ -99,6 +99,16 @@
       "path": "slices/CAM-02-trace-artifact-lineage-trace-artifacts/",
       "updated_at": "2026-04-11T23:40:32",
       "closed_at": "2026-04-11T23:40:32",
+      "archived_at": null,
+      "relations": []
+    },
+    {
+      "id": "CAM-03-artifact-state-report",
+      "feature": "report-artifacts",
+      "status": "closed",
+      "path": "slices/CAM-03-artifact-state-report-report-artifacts/",
+      "updated_at": "2026-04-11T23:48:13",
+      "closed_at": "2026-04-11T23:48:13",
       "archived_at": null,
       "relations": []
     }

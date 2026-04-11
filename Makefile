@@ -5,6 +5,7 @@ COMMON_FLAGS := --global --yes --agent github-copilot --agent codex --agent anti
 MANAGED_SKILLS := \
 	audit-artifacts \
 	trace-artifacts \
+	report-artifacts \
 	brief \
 	breakdown \
 	create-pr \
@@ -31,6 +32,7 @@ MANAGED_SKILLS := \
 install:
 	npx skills add "$(REPO_ROOT)/skills/audit-artifacts" $(COMMON_FLAGS)
 	npx skills add "$(REPO_ROOT)/skills/trace-artifacts" $(COMMON_FLAGS)
+	npx skills add "$(REPO_ROOT)/skills/report-artifacts" $(COMMON_FLAGS)
 	npx skills add "$(REPO_ROOT)/skills/guide-execution" $(COMMON_FLAGS)
 	npx skills add "$(REPO_ROOT)/skills/brief" $(COMMON_FLAGS)
 	npx skills add "$(REPO_ROOT)/skills/blueprint" $(COMMON_FLAGS)
