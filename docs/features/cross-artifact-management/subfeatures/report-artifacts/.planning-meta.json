@@ -1,9 +1,9 @@
 {
   "feature_slug": "report-artifacts",
-  "status": "discovery_pending",
+  "status": "planning_reviewed",
   "created_at": "2026-04-11T15:00:22",
-  "updated_at": "2026-04-11T15:00:22",
+  "updated_at": "2026-04-11T23:43:56",
   "requires_ui_flow": false,
-  "review_note": null,
+  "review_note": "Planning reviewed: the report packet stays read-only, reuses shared inventory and owner metadata, and fits one operational-summary slice.",
   "ready_slice_ids": []
 }
