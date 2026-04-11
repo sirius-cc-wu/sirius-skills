@@ -99,15 +99,15 @@ installation/docs wiring.
   - `skills/audit-artifacts/tests/test_audit_artifacts.py`
 - Dependencies: existing proposal/planning/execution owner scripts
 - Steps:
-  - [ ] S001 Load proposal, planning, subfeature, and execution owner modules and
+  - [x] S001 Load proposal, planning, subfeature, and execution owner modules and
         resolve the active artifact roots from existing config/runtime helpers.
-  - [ ] S002 Enumerate registry rows and on-disk artifact directories for
+  - [x] S002 Enumerate registry rows and on-disk artifact directories for
         proposals, features, subfeatures, and slices with one normalized
         inventory shape.
-  - [ ] S003 Record registry-vs-disk mismatch signals and link targets needed by
+  - [x] S003 Record registry-vs-disk mismatch signals and link targets needed by
         the later audit pass.
 - Validation:
-  - [ ] V001 `pytest -q skills/audit-artifacts/tests/test_audit_artifacts.py -k inventory`
+  - [x] V001 `pytest -q skills/audit-artifacts/tests/test_audit_artifacts.py -k inventory`
 - Definition of Done: the slice has a reusable inventory helper that can power
   audit findings without adding a second persistent state model.
 - Rollback / Mitigation: keep the helper read-only and local to the new skill so
@@ -123,19 +123,19 @@ installation/docs wiring.
   - `skills/audit-artifacts/tests/test_audit_artifacts.py`
 - Dependencies: P01
 - Steps:
-  - [ ] S004 Normalize delegated validation results and metadata read failures
+  - [x] S004 Normalize delegated validation results and metadata read failures
         into one finding model with artifact type, category, code, severity, and
         message.
-  - [ ] S005 Add cross-artifact checks for missing proposal target/promoted
+  - [x] S005 Add cross-artifact checks for missing proposal target/promoted
         features, missing subfeature parents, planning/subfeature registry drift,
         and delegated slice relation issues via `audit_relations(...)`.
-  - [ ] S006 Render grouped human-readable summaries plus `--json` output from
+  - [x] S006 Render grouped human-readable summaries plus `--json` output from
         the same finding set, and use explicit exit codes for clean vs findings
         vs runtime failure.
 - Validation:
-  - [ ] V002 `pytest -q skills/audit-artifacts/tests/test_audit_artifacts.py -k drift`
-  - [ ] V003 `pytest -q skills/audit-artifacts/tests/test_audit_artifacts.py -k relation`
-  - [ ] V004 `pytest -q skills/audit-artifacts/tests/test_audit_artifacts.py -k output`
+  - [x] V002 `pytest -q skills/audit-artifacts/tests/test_audit_artifacts.py -k drift`
+  - [x] V003 `pytest -q skills/audit-artifacts/tests/test_audit_artifacts.py -k relation`
+  - [x] V004 `pytest -q skills/audit-artifacts/tests/test_audit_artifacts.py -k output`
 - Definition of Done: maintainers can run one command and get coherent audit
   findings across all supported artifact layers.
 - Rollback / Mitigation: keep the audit output derived entirely from in-memory
@@ -151,12 +151,12 @@ installation/docs wiring.
   - `Makefile`
 - Dependencies: P02
 - Steps:
-  - [ ] S007 Author `skills/audit-artifacts/SKILL.md` with audit usage, output
+  - [x] S007 Author `skills/audit-artifacts/SKILL.md` with audit usage, output
         modes, and guardrails that keep it read-only.
-  - [ ] S008 Add `audit-artifacts` to the managed skill set and top-level skill
+  - [x] S008 Add `audit-artifacts` to the managed skill set and top-level skill
         listing so installation and repo guidance stay aligned.
 - Validation:
-  - [ ] V005 `pytest -q`
+  - [x] V005 `pytest -q`
 - Definition of Done: the new capability is installed, documented, and validated
   as part of the repo-managed skill set.
 - Rollback / Mitigation: keep docs and install changes localized to the new

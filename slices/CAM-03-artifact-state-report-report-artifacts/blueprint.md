@@ -88,14 +88,14 @@ skill and CLI with text and JSON output.
   - `skills/report-artifacts/tests/test_report_artifacts.py`
 - Dependencies: `skills/audit-artifacts/scripts/artifact_inventory.py`
 - Steps:
-  - [ ] S001 Load the shared inventory and metadata-backed status/timestamp
+  - [x] S001 Load the shared inventory and metadata-backed status/timestamp
         fields for proposals, features, subfeatures, and slices.
-  - [ ] S002 Compute parent feature context and explicit stale classification for
+  - [x] S002 Compute parent feature context and explicit stale classification for
         each report record.
-  - [ ] S003 Build grouped report aggregates for overview, status, and parent
+  - [x] S003 Build grouped report aggregates for overview, status, and parent
         views.
 - Validation:
-  - [ ] V001 `pytest -q skills/report-artifacts/tests/test_report_artifacts.py -k overview`
+  - [x] V001 `pytest -q skills/report-artifacts/tests/test_report_artifacts.py -k overview`
 - Definition of Done: one normalized report-record layer powers all grouped
 - report views.
 - Rollback / Mitigation: keep record normalization local to the new skill so the
@@ -110,13 +110,13 @@ skill and CLI with text and JSON output.
   - `skills/report-artifacts/tests/test_report_artifacts.py`
 - Dependencies: P01
 - Steps:
-  - [ ] S004 Add CLI options for grouping, artifact-type filtering, stale-days,
+  - [x] S004 Add CLI options for grouping, artifact-type filtering, stale-days,
         and JSON output.
-  - [ ] S005 Render text and JSON output from the same report result.
-  - [ ] S006 Keep the command read-only and fail clearly on invalid arguments.
+  - [x] S005 Render text and JSON output from the same report result.
+  - [x] S006 Keep the command read-only and fail clearly on invalid arguments.
 - Validation:
-  - [ ] V002 `pytest -q skills/report-artifacts/tests/test_report_artifacts.py -k status`
-  - [ ] V003 `pytest -q skills/report-artifacts/tests/test_report_artifacts.py -k parent`
+  - [x] V002 `pytest -q skills/report-artifacts/tests/test_report_artifacts.py -k status`
+  - [x] V003 `pytest -q skills/report-artifacts/tests/test_report_artifacts.py -k parent`
 - Definition of Done: maintainers can generate operational workflow summaries
   from one read-only command.
 - Rollback / Mitigation: keep grouping logic and rendering derived from the same
@@ -131,12 +131,12 @@ skill and CLI with text and JSON output.
   - `README.md`
 - Dependencies: P02
 - Steps:
-  - [ ] S007 Author `skills/report-artifacts/SKILL.md` with overview and grouped
+  - [x] S007 Author `skills/report-artifacts/SKILL.md` with overview and grouped
         reporting usage plus read-only guardrails.
-  - [ ] S008 Add `report-artifacts` to the managed skill set and top-level repo
+  - [x] S008 Add `report-artifacts` to the managed skill set and top-level repo
         guidance.
 - Validation:
-  - [ ] V004 `pytest -q`
+  - [x] V004 `pytest -q`
 - Definition of Done: the report capability is installed, documented, and
   validated in the managed skill set.
 - Rollback / Mitigation: keep install/docs changes localized to the new skill.

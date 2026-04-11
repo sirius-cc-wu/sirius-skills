@@ -88,14 +88,14 @@ CLI with text and JSON output.
   - `skills/repair-artifacts/tests/test_repair_artifacts.py`
 - Dependencies: `skills/audit-artifacts/scripts/artifact_inventory.py`
 - Steps:
-  - [ ] S001 Discover proposal, feature, subfeature, and slice directories from
+  - [x] S001 Discover proposal, feature, subfeature, and slice directories from
         the shared inventory.
-  - [ ] S002 Rebuild normalized active registry rows from valid metadata using
+  - [x] S002 Rebuild normalized active registry rows from valid metadata using
         owner-script row shapes.
-  - [ ] S003 Record skipped malformed metadata and planned write actions per
+  - [x] S003 Record skipped malformed metadata and planned write actions per
         artifact layer.
 - Validation:
-  - [ ] V001 `pytest -q skills/repair-artifacts/tests/test_repair_artifacts.py -k dry_run`
+  - [x] V001 `pytest -q skills/repair-artifacts/tests/test_repair_artifacts.py -k dry_run`
 - Definition of Done: one repair-plan model can preview all supported registry
   rebuilds from durable inputs.
 - Rollback / Mitigation: keep the model read-only until apply mode is explicitly
@@ -109,13 +109,13 @@ CLI with text and JSON output.
   - `skills/repair-artifacts/tests/test_repair_artifacts.py`
 - Dependencies: P01
 - Steps:
-  - [ ] S004 Render human-readable and JSON repair plans from one result shape.
-  - [ ] S005 On `--apply`, write rebuilt registries/readmes through the owner
+  - [x] S004 Render human-readable and JSON repair plans from one result shape.
+  - [x] S005 On `--apply`, write rebuilt registries/readmes through the owner
         scripts' registry writers.
-  - [ ] S006 Keep apply mode limited to the selected active registry surfaces.
+  - [x] S006 Keep apply mode limited to the selected active registry surfaces.
 - Validation:
-  - [ ] V002 `pytest -q skills/repair-artifacts/tests/test_repair_artifacts.py -k apply`
-  - [ ] V003 `pytest -q skills/repair-artifacts/tests/test_repair_artifacts.py -k slice`
+  - [x] V002 `pytest -q skills/repair-artifacts/tests/test_repair_artifacts.py -k apply`
+  - [x] V003 `pytest -q skills/repair-artifacts/tests/test_repair_artifacts.py -k slice`
 - Definition of Done: maintainers can preview and explicitly apply supported
   registry repairs from one command.
 - Rollback / Mitigation: keep writes localized to the selected registry layers.
@@ -129,12 +129,12 @@ CLI with text and JSON output.
   - `README.md`
 - Dependencies: P02
 - Steps:
-  - [ ] S007 Author `skills/repair-artifacts/SKILL.md` with dry-run/apply usage
+  - [x] S007 Author `skills/repair-artifacts/SKILL.md` with dry-run/apply usage
         and conservative guardrails.
-  - [ ] S008 Add `repair-artifacts` to the managed skill set and top-level repo
+  - [x] S008 Add `repair-artifacts` to the managed skill set and top-level repo
         guidance.
 - Validation:
-  - [ ] V004 `pytest -q`
+  - [x] V004 `pytest -q`
 - Definition of Done: the repair capability is installed, documented, and
   validated in the managed skill set.
 - Rollback / Mitigation: keep docs and install changes localized to the new

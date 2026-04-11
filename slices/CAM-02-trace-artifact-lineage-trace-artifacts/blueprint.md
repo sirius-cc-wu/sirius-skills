@@ -94,14 +94,14 @@ summary output.
   - `skills/trace-artifacts/tests/test_trace_artifacts.py`
 - Dependencies: `skills/audit-artifacts/scripts/artifact_inventory.py`
 - Steps:
-  - [ ] S001 Reuse the shared inventory helper to load proposals, features,
+  - [x] S001 Reuse the shared inventory helper to load proposals, features,
         subfeatures, and slices from their durable roots.
-  - [ ] S002 Parse `slice-traceability.md` tables by header names and normalize
+  - [x] S002 Parse `slice-traceability.md` tables by header names and normalize
         planned/execution slice mappings into a reusable row shape.
-  - [ ] S003 Collect metadata-backed lineage edges for proposals, subfeatures,
+  - [x] S003 Collect metadata-backed lineage edges for proposals, subfeatures,
         planned slices, execution slices, and slice relations.
 - Validation:
-  - [ ] V001 `pytest -q skills/trace-artifacts/tests/test_trace_artifacts.py -k lineage`
+  - [x] V001 `pytest -q skills/trace-artifacts/tests/test_trace_artifacts.py -k lineage`
 - Definition of Done: the slice has one reusable lineage-input layer built from
   inventory plus traceability parsing.
 - Rollback / Mitigation: keep the parser tolerant of table variants and local to
@@ -115,14 +115,14 @@ summary output.
   - `skills/trace-artifacts/tests/test_trace_artifacts.py`
 - Dependencies: P01
 - Steps:
-  - [ ] S004 Build a typed lineage graph and targeted query path for proposal,
+  - [x] S004 Build a typed lineage graph and targeted query path for proposal,
         feature, subfeature, planned-slice, and execution-slice targets.
-  - [ ] S005 Add summary output for the discovered lineage graph and clear
+  - [x] S005 Add summary output for the discovered lineage graph and clear
         failures for missing requested targets.
-  - [ ] S006 Render text and JSON output from the same lineage result structure.
+  - [x] S006 Render text and JSON output from the same lineage result structure.
 - Validation:
-  - [ ] V002 `pytest -q skills/trace-artifacts/tests/test_trace_artifacts.py -k targeted`
-  - [ ] V003 `pytest -q skills/trace-artifacts/tests/test_trace_artifacts.py -k output`
+  - [x] V002 `pytest -q skills/trace-artifacts/tests/test_trace_artifacts.py -k targeted`
+  - [x] V003 `pytest -q skills/trace-artifacts/tests/test_trace_artifacts.py -k output`
 - Definition of Done: maintainers can trace one artifact or summarize the repo's
   lineage graph from one read-only command.
 - Rollback / Mitigation: keep summary and targeted output derived from the same
@@ -137,12 +137,12 @@ summary output.
   - `README.md`
 - Dependencies: P02
 - Steps:
-  - [ ] S007 Author `skills/trace-artifacts/SKILL.md` with targeted and summary
+  - [x] S007 Author `skills/trace-artifacts/SKILL.md` with targeted and summary
         usage plus read-only guardrails.
-  - [ ] S008 Add `trace-artifacts` to the managed skill set and top-level repo
+  - [x] S008 Add `trace-artifacts` to the managed skill set and top-level repo
         guidance.
 - Validation:
-  - [ ] V004 `pytest -q`
+  - [x] V004 `pytest -q`
 - Definition of Done: the trace capability is installed, documented, and covered
   by the repo suite.
 - Rollback / Mitigation: keep docs and install wiring localized to the new skill.

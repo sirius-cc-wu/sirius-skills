@@ -84,14 +84,14 @@ an `archive-artifacts` skill and CLI with text and JSON output.
   - `skills/archive-artifacts/tests/test_archive_artifacts.py`
 - Dependencies: shared inventory and owner metadata readers
 - Steps:
-  - [ ] S001 Discover proposal, subfeature, and slice artifacts from the shared
+  - [x] S001 Discover proposal, subfeature, and slice artifacts from the shared
         inventory.
-  - [ ] S002 Classify archive candidates from durable statuses and closed-slice
+  - [x] S002 Classify archive candidates from durable statuses and closed-slice
         state.
-  - [ ] S003 Validate apply requests so only one closed slice target is allowed
+  - [x] S003 Validate apply requests so only one closed slice target is allowed
         in v1.
 - Validation:
-  - [ ] V001 `pytest -q skills/archive-artifacts/tests/test_archive_artifacts.py -k candidates`
+  - [x] V001 `pytest -q skills/archive-artifacts/tests/test_archive_artifacts.py -k candidates`
 - Definition of Done: one archive-result model powers candidate reporting and
   apply eligibility checks.
 - Rollback / Mitigation: keep candidate discovery read-only and local to the new
@@ -106,13 +106,13 @@ an `archive-artifacts` skill and CLI with text and JSON output.
   - `skills/archive-artifacts/tests/test_archive_artifacts.py`
 - Dependencies: P01
 - Steps:
-  - [ ] S004 Render human-readable and JSON output from one archive result.
-  - [ ] S005 On a supported slice apply request, archive the target through
+  - [x] S004 Render human-readable and JSON output from one archive result.
+  - [x] S005 On a supported slice apply request, archive the target through
         `manage_execution.archive_slice(...)`.
-  - [ ] S006 Reject unsupported apply requests clearly.
+  - [x] S006 Reject unsupported apply requests clearly.
 - Validation:
-  - [ ] V002 `pytest -q skills/archive-artifacts/tests/test_archive_artifacts.py -k unsupported`
-  - [ ] V003 `pytest -q skills/archive-artifacts/tests/test_archive_artifacts.py -k apply`
+  - [x] V002 `pytest -q skills/archive-artifacts/tests/test_archive_artifacts.py -k unsupported`
+  - [x] V003 `pytest -q skills/archive-artifacts/tests/test_archive_artifacts.py -k apply`
 - Definition of Done: maintainers can inspect archive candidates and archive one
   closed slice explicitly from the new command.
 - Rollback / Mitigation: keep apply handling narrow and delegated to the owner
@@ -127,12 +127,12 @@ an `archive-artifacts` skill and CLI with text and JSON output.
   - `README.md`
 - Dependencies: P02
 - Steps:
-  - [ ] S007 Author `skills/archive-artifacts/SKILL.md` with candidate-report
+  - [x] S007 Author `skills/archive-artifacts/SKILL.md` with candidate-report
         and slice-archive usage plus conservative guardrails.
-  - [ ] S008 Add `archive-artifacts` to the managed skill set and top-level repo
+  - [x] S008 Add `archive-artifacts` to the managed skill set and top-level repo
         guidance.
 - Validation:
-  - [ ] V004 `pytest -q`
+  - [x] V004 `pytest -q`
 - Definition of Done: the archive capability is installed, documented, and
   validated in the managed skill set.
 - Rollback / Mitigation: keep docs and install changes localized to the new
