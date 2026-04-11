@@ -2,9 +2,9 @@
   "subfeatures": [
     {
       "subfeature_id": "archive-artifacts",
-      "status": "draft",
+      "status": "reviewed",
       "subfeature_type": "additive",
-      "updated_at": "2026-04-11T15:00:23",
+      "updated_at": "2026-04-11T23:54:47",
       "path": "docs/features/cross-artifact-management/subfeatures/archive-artifacts/"
     },
     {

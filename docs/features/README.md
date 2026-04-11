@@ -3,7 +3,7 @@
 | Feature | Status | Updated | Path |
 |---|---|---|---|
 | cross-artifact-management | discovery_pending | 2026-04-11T15:00:22 | docs/features/cross-artifact-management/ |
-| archive-artifacts | discovery_pending | 2026-04-11T15:00:23 | docs/features/cross-artifact-management/subfeatures/archive-artifacts/ |
+| archive-artifacts | planning_reviewed | 2026-04-11T23:54:47 | docs/features/cross-artifact-management/subfeatures/archive-artifacts/ |
 | audit-artifacts | planning_reviewed | 2026-04-11T23:16:34 | docs/features/cross-artifact-management/subfeatures/audit-artifacts/ |
 | repair-artifacts | planning_reviewed | 2026-04-11T23:49:55 | docs/features/cross-artifact-management/subfeatures/repair-artifacts/ |
 | report-artifacts | planning_reviewed | 2026-04-11T23:43:56 | docs/features/cross-artifact-management/subfeatures/report-artifacts/ |

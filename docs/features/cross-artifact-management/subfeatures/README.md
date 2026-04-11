@@ -2,7 +2,7 @@
 
 | Subfeature | Status | Type | Updated | Path |
 |---|---|---|---|---|
-| archive-artifacts | draft | additive | 2026-04-11T15:00:23 | docs/features/cross-artifact-management/subfeatures/archive-artifacts/ |
+| archive-artifacts | reviewed | additive | 2026-04-11T23:54:47 | docs/features/cross-artifact-management/subfeatures/archive-artifacts/ |
 | audit-artifacts | reviewed | additive | 2026-04-11T23:16:34 | docs/features/cross-artifact-management/subfeatures/audit-artifacts/ |
 | repair-artifacts | reviewed | additive | 2026-04-11T23:49:55 | docs/features/cross-artifact-management/subfeatures/repair-artifacts/ |
 | report-artifacts | reviewed | additive | 2026-04-11T23:43:56 | docs/features/cross-artifact-management/subfeatures/report-artifacts/ |
