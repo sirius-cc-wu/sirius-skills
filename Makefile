@@ -3,6 +3,7 @@
 REPO_ROOT := $(CURDIR)
 COMMON_FLAGS := --global --yes --agent github-copilot --agent codex --agent antigravity --agent gemini-cli
 MANAGED_SKILLS := \
+	audit-artifacts \
 	brief \
 	breakdown \
 	create-pr \
@@ -27,6 +28,7 @@ MANAGED_SKILLS := \
 	ui-flow
 
 install:
+	npx skills add "$(REPO_ROOT)/skills/audit-artifacts" $(COMMON_FLAGS)
 	npx skills add "$(REPO_ROOT)/skills/guide-execution" $(COMMON_FLAGS)
 	npx skills add "$(REPO_ROOT)/skills/brief" $(COMMON_FLAGS)
 	npx skills add "$(REPO_ROOT)/skills/blueprint" $(COMMON_FLAGS)

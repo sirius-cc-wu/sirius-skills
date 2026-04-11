@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "generated_at": "2026-04-04T04:45:19",
+  "generated_at": "2026-04-11T23:30:02",
   "slices": [
     {
       "id": "HSS-01-root-fallback",
@@ -79,6 +79,16 @@
       "path": "slices/HSS-05-guide-scope-add-one-scope-aware-entry-skill/",
       "updated_at": "2026-04-04T04:45:19",
       "closed_at": "2026-04-04T04:45:19",
+      "archived_at": null,
+      "relations": []
+    },
+    {
+      "id": "CAM-01-cross-artifact-audit",
+      "feature": "audit-artifacts",
+      "status": "closed",
+      "path": "slices/CAM-01-cross-artifact-audit-audit-artifacts/",
+      "updated_at": "2026-04-11T23:30:02",
+      "closed_at": "2026-04-11T23:30:02",
       "archived_at": null,
       "relations": []
     }

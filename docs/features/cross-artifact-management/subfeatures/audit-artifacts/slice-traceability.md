@@ -14,7 +14,7 @@
 
 | Story ID | Story Size | Story Summary | Increments | Planned Slice IDs | Slice Areas | Blocked By | Execution Slice IDs | Notes |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| CAM-01 | L | Audit artifact health across proposals, features, subfeatures, and slices | I1 | CAM-01-cross-artifact-audit | Inventory helper, delegated validators, cross-artifact checks, skill/docs/tests |  |  | One cohesive slice that establishes the shared finding model for later subfeatures |
+| CAM-01 | L | Audit artifact health across proposals, features, subfeatures, and slices | I1 | CAM-01-cross-artifact-audit | Inventory helper, delegated validators, cross-artifact checks, skill/docs/tests |  | CAM-01-cross-artifact-audit | One cohesive slice that establishes the shared finding model for later subfeatures |
 
 ## Notes
 
