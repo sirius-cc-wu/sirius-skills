@@ -32,8 +32,8 @@
     },
     {
       "feature": "trace-artifacts",
-      "status": "discovery_pending",
-      "updated_at": "2026-04-11T15:00:22",
+      "status": "planning_reviewed",
+      "updated_at": "2026-04-11T23:33:38",
       "path": "docs/features/cross-artifact-management/subfeatures/trace-artifacts/"
     },
     {
