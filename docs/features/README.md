@@ -4,7 +4,7 @@
 |---|---|---|---|
 | cross-artifact-management | discovery_pending | 2026-04-11T15:00:22 | docs/features/cross-artifact-management/ |
 | archive-artifacts | discovery_pending | 2026-04-11T15:00:23 | docs/features/cross-artifact-management/subfeatures/archive-artifacts/ |
-| audit-artifacts | discovery_pending | 2026-04-11T15:00:22 | docs/features/cross-artifact-management/subfeatures/audit-artifacts/ |
+| audit-artifacts | planning_reviewed | 2026-04-11T23:16:34 | docs/features/cross-artifact-management/subfeatures/audit-artifacts/ |
 | repair-artifacts | discovery_pending | 2026-04-11T15:00:23 | docs/features/cross-artifact-management/subfeatures/repair-artifacts/ |
 | report-artifacts | discovery_pending | 2026-04-11T15:00:22 | docs/features/cross-artifact-management/subfeatures/report-artifacts/ |
 | trace-artifacts | discovery_pending | 2026-04-11T15:00:22 | docs/features/cross-artifact-management/subfeatures/trace-artifacts/ |

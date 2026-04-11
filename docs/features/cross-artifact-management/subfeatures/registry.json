@@ -9,9 +9,9 @@
     },
     {
       "subfeature_id": "audit-artifacts",
-      "status": "draft",
+      "status": "reviewed",
       "subfeature_type": "additive",
-      "updated_at": "2026-04-11T15:00:22",
+      "updated_at": "2026-04-11T23:16:34",
       "path": "docs/features/cross-artifact-management/subfeatures/audit-artifacts/"
     },
     {
