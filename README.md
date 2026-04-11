@@ -27,7 +27,7 @@ The intended direction is:
 The managed repo-first skill set is grouped into:
 
 - repo utilities: `skills/bootstrap/`, `skills/commit/`, `skills/create-pr/`, `skills/simplify/`
-- artifact maintenance: `skills/audit-artifacts/`, `skills/trace-artifacts/`, `skills/report-artifacts/`
+- artifact maintenance: `skills/audit-artifacts/`, `skills/trace-artifacts/`, `skills/report-artifacts/`, `skills/repair-artifacts/`
 - planning layer: `skills/guide-scope/`, `skills/guide-planning/`, `skills/propose/`, `skills/add-subfeature/`, `skills/migrate-subfeatures/`, `skills/assess/`, `skills/finalize-subfeature/`, `skills/discover/`, `skills/design/`, `skills/ui-flow/`, `skills/breakdown/`, `skills/review-planning/`
 - execution layer: `skills/slice/`, `skills/guide-execution/`, `skills/brief/`, `skills/blueprint/`, `skills/review-execution/`, `skills/close-slice/`
 
@@ -140,6 +140,7 @@ Examples of repo-native prompts that fit the current workflow:
 - "Audit workflow artifacts across proposals, features, subfeatures, and slices."
 - "Trace workflow lineage across proposals, features, subfeatures, planned slices, and execution slices."
 - "Report workflow state across proposals, features, subfeatures, and slices."
+- "Preview and repair workflow registry drift across proposals, features, subfeatures, and slices."
 - "Use `guide-planning` to decide the next step for `planning-workflow`."
 - "Create a proposal for a new review automation feature, but keep it out of canonical planning for now."
 - "Add a durable subfeature `replace-legacy-flow` under `checkout` and frame its discovery docs."

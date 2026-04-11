@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "generated_at": "2026-04-11T23:48:13",
+  "generated_at": "2026-04-11T23:53:30",
   "slices": [
     {
       "id": "HSS-01-root-fallback",
@@ -109,6 +109,16 @@
       "path": "slices/CAM-03-artifact-state-report-report-artifacts/",
       "updated_at": "2026-04-11T23:48:13",
       "closed_at": "2026-04-11T23:48:13",
+      "archived_at": null,
+      "relations": []
+    },
+    {
+      "id": "CAM-04-registry-drift-repair",
+      "feature": "repair-artifacts",
+      "status": "closed",
+      "path": "slices/CAM-04-registry-drift-repair-repair-artifacts/",
+      "updated_at": "2026-04-11T23:53:30",
+      "closed_at": "2026-04-11T23:53:30",
       "archived_at": null,
       "relations": []
     }

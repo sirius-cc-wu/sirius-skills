@@ -1,0 +1,10 @@
+{
+  "created_at": "2026-04-11T23:50:21",
+  "updated_at": "2026-04-11T23:53:30",
+  "status": "closed",
+  "slice_id": "CAM-04-registry-drift-repair",
+  "feature": "repair-artifacts",
+  "path": "slices/CAM-04-registry-drift-repair-repair-artifacts/",
+  "relations": [],
+  "closed_at": "2026-04-11T23:53:30"
+}
