@@ -20,8 +20,8 @@
     },
     {
       "feature": "repair-artifacts",
-      "status": "discovery_pending",
-      "updated_at": "2026-04-11T15:00:23",
+      "status": "planning_reviewed",
+      "updated_at": "2026-04-11T23:49:55",
       "path": "docs/features/cross-artifact-management/subfeatures/repair-artifacts/"
     },
     {

@@ -1,14 +1,26 @@
 {
   "subfeature_id": "repair-artifacts",
   "parent_feature_slug": "cross-artifact-management",
-  "status": "draft",
+  "status": "reviewed",
   "created_at": "2026-04-11T15:00:23",
-  "updated_at": "2026-04-11T15:00:23",
+  "updated_at": "2026-04-11T23:49:55",
   "subfeature_type": "additive",
   "summary": "Repair registry and metadata drift after manual edits, merges, or partial runs.",
-  "affected_artifacts": [],
-  "affected_story_ids": [],
-  "affected_slice_ids": [],
-  "review_note": null,
+  "affected_artifacts": [
+    "docs/features/cross-artifact-management/discover.md",
+    "docs/features/cross-artifact-management/user-stories.md",
+    "skills/audit-artifacts/scripts/artifact_inventory.py",
+    "skills/propose/scripts/manage_proposals.py",
+    "skills/guide-planning/scripts/manage_planning.py",
+    "skills/add-subfeature/scripts/manage_subfeatures.py",
+    "skills/guide-execution/scripts/manage_execution.py"
+  ],
+  "affected_story_ids": [
+    "CAM-04"
+  ],
+  "affected_slice_ids": [
+    "CAM-04-registry-drift-repair"
+  ],
+  "review_note": "Planning reviewed: the repair packet stays conservative, limits writes to derived registries, and keeps dry-run review ahead of apply mode.",
   "finalized_at": null
 }
