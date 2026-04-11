@@ -1,0 +1,14 @@
+{
+  "subfeature_id": "report-artifacts",
+  "parent_feature_slug": "cross-artifact-management",
+  "status": "draft",
+  "created_at": "2026-04-11T15:00:23",
+  "updated_at": "2026-04-11T15:00:23",
+  "subfeature_type": "additive",
+  "summary": "Report artifact state, queues, and stale workflow packets.",
+  "affected_artifacts": [],
+  "affected_story_ids": [],
+  "affected_slice_ids": [],
+  "review_note": null,
+  "finalized_at": null
+}

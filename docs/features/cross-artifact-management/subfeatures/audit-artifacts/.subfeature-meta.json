@@ -1,0 +1,14 @@
+{
+  "subfeature_id": "audit-artifacts",
+  "parent_feature_slug": "cross-artifact-management",
+  "status": "draft",
+  "created_at": "2026-04-11T15:00:22",
+  "updated_at": "2026-04-11T15:00:22",
+  "subfeature_type": "additive",
+  "summary": "Audit proposals, features, subfeatures, and slices for drift and missing links.",
+  "affected_artifacts": [],
+  "affected_story_ids": [],
+  "affected_slice_ids": [],
+  "review_note": null,
+  "finalized_at": null
+}

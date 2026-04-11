@@ -1,0 +1,9 @@
+{
+  "feature_slug": "archive-artifacts",
+  "status": "discovery_pending",
+  "created_at": "2026-04-11T15:00:23",
+  "updated_at": "2026-04-11T15:00:23",
+  "requires_ui_flow": false,
+  "review_note": null,
+  "ready_slice_ids": []
+}

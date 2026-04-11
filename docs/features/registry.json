@@ -1,6 +1,42 @@
 {
   "features": [
     {
+      "feature": "cross-artifact-management",
+      "status": "discovery_pending",
+      "updated_at": "2026-04-11T15:00:22",
+      "path": "docs/features/cross-artifact-management/"
+    },
+    {
+      "feature": "archive-artifacts",
+      "status": "discovery_pending",
+      "updated_at": "2026-04-11T15:00:23",
+      "path": "docs/features/cross-artifact-management/subfeatures/archive-artifacts/"
+    },
+    {
+      "feature": "audit-artifacts",
+      "status": "discovery_pending",
+      "updated_at": "2026-04-11T15:00:22",
+      "path": "docs/features/cross-artifact-management/subfeatures/audit-artifacts/"
+    },
+    {
+      "feature": "repair-artifacts",
+      "status": "discovery_pending",
+      "updated_at": "2026-04-11T15:00:23",
+      "path": "docs/features/cross-artifact-management/subfeatures/repair-artifacts/"
+    },
+    {
+      "feature": "report-artifacts",
+      "status": "discovery_pending",
+      "updated_at": "2026-04-11T15:00:22",
+      "path": "docs/features/cross-artifact-management/subfeatures/report-artifacts/"
+    },
+    {
+      "feature": "trace-artifacts",
+      "status": "discovery_pending",
+      "updated_at": "2026-04-11T15:00:22",
+      "path": "docs/features/cross-artifact-management/subfeatures/trace-artifacts/"
+    },
+    {
       "feature": "execution-workflow",
       "status": "planning_reviewed",
       "updated_at": "2026-03-24T03:39:26",

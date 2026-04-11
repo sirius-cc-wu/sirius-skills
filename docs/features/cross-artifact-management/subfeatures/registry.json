@@ -1,0 +1,39 @@
+{
+  "subfeatures": [
+    {
+      "subfeature_id": "archive-artifacts",
+      "status": "draft",
+      "subfeature_type": "additive",
+      "updated_at": "2026-04-11T15:00:23",
+      "path": "docs/features/cross-artifact-management/subfeatures/archive-artifacts/"
+    },
+    {
+      "subfeature_id": "audit-artifacts",
+      "status": "draft",
+      "subfeature_type": "additive",
+      "updated_at": "2026-04-11T15:00:22",
+      "path": "docs/features/cross-artifact-management/subfeatures/audit-artifacts/"
+    },
+    {
+      "subfeature_id": "repair-artifacts",
+      "status": "draft",
+      "subfeature_type": "additive",
+      "updated_at": "2026-04-11T15:00:23",
+      "path": "docs/features/cross-artifact-management/subfeatures/repair-artifacts/"
+    },
+    {
+      "subfeature_id": "report-artifacts",
+      "status": "draft",
+      "subfeature_type": "additive",
+      "updated_at": "2026-04-11T15:00:23",
+      "path": "docs/features/cross-artifact-management/subfeatures/report-artifacts/"
+    },
+    {
+      "subfeature_id": "trace-artifacts",
+      "status": "draft",
+      "subfeature_type": "additive",
+      "updated_at": "2026-04-11T15:00:22",
+      "path": "docs/features/cross-artifact-management/subfeatures/trace-artifacts/"
+    }
+  ]
+}

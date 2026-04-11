@@ -1,0 +1,14 @@
+{
+  "subfeature_id": "repair-artifacts",
+  "parent_feature_slug": "cross-artifact-management",
+  "status": "draft",
+  "created_at": "2026-04-11T15:00:23",
+  "updated_at": "2026-04-11T15:00:23",
+  "subfeature_type": "additive",
+  "summary": "Repair registry and metadata drift after manual edits, merges, or partial runs.",
+  "affected_artifacts": [],
+  "affected_story_ids": [],
+  "affected_slice_ids": [],
+  "review_note": null,
+  "finalized_at": null
+}
