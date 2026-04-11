@@ -14,7 +14,7 @@
 
 | Story ID | Story Size | Story Summary | Increments | Planned Slice IDs | Slice Areas | Blocked By | Execution Slice IDs | Notes |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| CAM-02 | L | Trace lineage across proposals, features, subfeatures, planned slices, and execution slices | I1 | CAM-02-trace-artifact-lineage | Shared inventory reuse, traceability parser, lineage graph, skill/docs/tests |  |  | One cohesive slice that builds the reusable lineage model for later reporting |
+| CAM-02 | L | Trace lineage across proposals, features, subfeatures, planned slices, and execution slices | I1 | CAM-02-trace-artifact-lineage | Shared inventory reuse, traceability parser, lineage graph, skill/docs/tests |  | CAM-02-trace-artifact-lineage | One cohesive slice that builds the reusable lineage model for later reporting |
 
 ## Notes
 
