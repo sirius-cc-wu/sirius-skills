@@ -16,6 +16,7 @@ GUIDE_PLANNING_SCRIPT = SKILLS_DIR / "guide-planning" / "scripts" / "manage_plan
 GUIDE_EXECUTION_SCRIPT = (
     SKILLS_DIR / "guide-execution" / "scripts" / "manage_execution.py"
 )
+SUBFEATURES_SCRIPT = SKILLS_DIR / "add-subfeature" / "scripts" / "manage_subfeatures.py"
 TRACE_DATA_SCRIPT = SKILLS_DIR / "trace-artifacts" / "scripts" / "trace_data.py"
 
 
@@ -247,14 +248,89 @@ def resolve_target(planning_module, selector: str, explicit_scope: Optional[str]
     return feature, feature_dir, metadata, scope_context, target_type
 
 
+def parse_dependency_selector(dependency: str) -> Optional[Tuple[str, str]]:
+    parts = dependency.rsplit(" ", 1)
+    if len(parts) != 2:
+        return None
+    selector, status = (part.strip() for part in parts)
+    if not selector or not status:
+        return None
+    return selector, status
+
+
+def dependency_is_satisfied(
+    dependency: str,
+    completed_planned_slices: set,
+    planning_module,
+    planning_rows: List[Dict[str, object]],
+    scope_context: object,
+    target_type: str,
+    target_dir: Path,
+    sibling_subfeature_rows: Optional[List[Dict[str, object]]] = None,
+    subfeature_module=None,
+) -> bool:
+    if dependency in completed_planned_slices:
+        return True
+
+    parsed_dependency = parse_dependency_selector(dependency)
+    if parsed_dependency is None:
+        return False
+    selector, required_status = parsed_dependency
+
+    if (
+        target_type == "subfeature"
+        and sibling_subfeature_rows is not None
+        and subfeature_module is not None
+    ):
+        try:
+            required_subfeature_status = subfeature_module.normalize_status(required_status)
+        except ValueError:
+            required_subfeature_status = None
+        if required_subfeature_status is not None:
+            sibling_subfeature = subfeature_module.find_subfeature(
+                sibling_subfeature_rows, selector
+            )
+            if sibling_subfeature is not None:
+                sibling_metadata = subfeature_module.read_metadata(
+                    subfeature_module.subfeature_dir_for_row(
+                        sibling_subfeature, scope_context
+                    )
+                )
+                actual_status = str(sibling_metadata["status"])
+                return subfeature_module.STATUS_SEQUENCE.index(
+                    actual_status
+                ) >= subfeature_module.STATUS_SEQUENCE.index(required_subfeature_status)
+
+    try:
+        required_planning_status = planning_module.normalize_status(required_status)
+    except ValueError:
+        return False
+
+    dependency_target = planning_module.find_feature(
+        planning_rows, selector, scope_context=scope_context
+    )
+    if dependency_target is None:
+        return False
+
+    dependency_metadata = planning_module.read_metadata(
+        planning_module.feature_dir_for_row(dependency_target, scope_context=scope_context)
+    )
+    actual_planning_status = str(dependency_metadata["status"])
+    return planning_module.STATUS_SEQUENCE.index(
+        actual_planning_status
+    ) >= planning_module.STATUS_SEQUENCE.index(required_planning_status)
+
+
 def resolve_backlog(selector: str, explicit_scope: Optional[str] = None) -> BacklogResolution:
     planning_module = load_module(GUIDE_PLANNING_SCRIPT, "manage_planning")
     execution_module = load_module(GUIDE_EXECUTION_SCRIPT, "manage_execution")
+    subfeature_module = load_module(SUBFEATURES_SCRIPT, "manage_subfeatures")
     trace_data = load_module(TRACE_DATA_SCRIPT, "trace_data")
 
     feature, target_dir, metadata, scope_context, target_type = resolve_target(
         planning_module, selector, explicit_scope
     )
+    target_dir_path = Path(target_dir)
 
     slice_planning_path = Path(target_dir) / "slice-planning.md"
     traceability_path = Path(target_dir) / "slice-traceability.md"
@@ -272,6 +348,12 @@ def resolve_backlog(selector: str, explicit_scope: Optional[str] = None) -> Back
     )
     execution_rows = execution_module.parse_registry(scope_context=scope_context)
     execution_status_by_id = {str(row["id"]): str(row["status"]) for row in execution_rows}
+    planning_rows = planning_module.parse_registry(scope_context=scope_context)
+    sibling_subfeature_rows: Optional[List[Dict[str, object]]] = None
+    if target_type == "subfeature":
+        sibling_subfeature_rows = subfeature_module.load_registry(
+            str(target_dir_path.parent.parent)
+        )
 
     execution_ids_by_planned_slice: Dict[str, List[str]] = {}
     for record in traceability_records:
@@ -335,7 +417,20 @@ def resolve_backlog(selector: str, explicit_scope: Optional[str] = None) -> Back
         if any(slice_id in active_execution_slices for slice_id in entry.execution_slice_ids):
             entry.state = "active"
             continue
-        if all(dep in completed_planned_slices for dep in entry.depends_on):
+        if all(
+            dependency_is_satisfied(
+                dep,
+                completed_planned_slices,
+                planning_module,
+                planning_rows,
+                scope_context,
+                target_type,
+                target_dir_path,
+                sibling_subfeature_rows=sibling_subfeature_rows,
+                subfeature_module=subfeature_module,
+            )
+            for dep in entry.depends_on
+        ):
             entry.state = "ready"
             ready_next.append(entry.planned_slice_id)
         else:

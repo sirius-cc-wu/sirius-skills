@@ -241,6 +241,104 @@ def test_resolve_subfeature_scope_uses_closed_execution_slice_lineage(
     assert states["EW-MSE-02-sequential-slice-orchestration"] == "ready"
 
 
+def test_resolve_subfeature_scope_allows_finalized_sibling_subfeature_dependency(
+    tmp_path, monkeypatch, capsys
+):
+    env = setup_repo(tmp_path, monkeypatch)
+    subfeatures = env["subfeatures"]
+    feature_path = env["feature_path"]
+    subfeature_path = env["subfeature_path"]
+    module = env["module"]
+
+    scope_context = env["planning"].SCOPE_RUNTIME.resolve_scope_context()
+    sibling_dir, created = subfeatures.create_subfeature(
+        env["planning"],
+        str(feature_path),
+        "execution-workflow",
+        "environment-injection",
+        "additive",
+        "Provide an already-finalized sibling prerequisite.",
+        scope_context,
+    )
+    assert created
+
+    write_file(Path(sibling_dir) / "discover.md", "# Discover\n")
+    write_file(Path(sibling_dir) / "impact-analysis.md", "# Impact\n")
+    write_file(Path(sibling_dir) / "system-design.md", "# Design\n")
+    write_file(Path(sibling_dir) / "slice-planning.md", "# Slice Planning\n")
+    write_file(Path(sibling_dir) / "slice-traceability.md", "# Slice Traceability\n")
+
+    sibling_rows = subfeatures.load_registry(str(feature_path))
+    sibling = subfeatures.find_subfeature(sibling_rows, "environment-injection")
+    assert sibling is not None
+    success, message = subfeatures.update_subfeature_status(
+        env["planning"],
+        str(feature_path),
+        sibling,
+        "finalized",
+        scope_context,
+        force=True,
+        review_note="done",
+        affected_artifacts=[
+            "docs/features/execution-workflow/discover.md",
+            "docs/features/execution-workflow/system-design.md",
+            "docs/features/execution-workflow/user-stories.md",
+        ],
+        affected_story_ids=["EW-00"],
+        affected_slice_ids=["EW-ENV-01"],
+    )
+    assert success, message
+
+    write_file(
+        subfeature_path / "slice-planning.md",
+        """# Slice Planning
+
+| Slice ID | Story ID | Title | Summary | Target Area | Lane | Validation | Planned Action | Depends On | Slice Ready |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| EW-MSE-01-scope-and-backlog-resolution | EW-01 | Resolve scope | Summary | area | primary | test | create slice | environment-injection finalized | yes |
+| EW-MSE-02-sequential-slice-orchestration | EW-01 | Orchestrate slices | Summary | area | primary | test | create slice | EW-MSE-01-scope-and-backlog-resolution | yes |
+""",
+    )
+    write_file(
+        subfeature_path / "slice-traceability.md",
+        """# Slice Traceability
+
+| Story ID | Story Size | Story Summary | Increments | Planned Slice IDs | Slice Areas | Blocked By | Execution Slice IDs | Notes |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| EW-01 | M | Summary | I1 | EW-MSE-01-scope-and-backlog-resolution | area | environment-injection finalized |  | Notes |
+| EW-01 | M | Summary | I2 | EW-MSE-02-sequential-slice-orchestration | area | EW-MSE-01-scope-and-backlog-resolution |  | Notes |
+""",
+    )
+
+    rows = subfeatures.load_registry(str(feature_path))
+    target_subfeature = subfeatures.find_subfeature(rows, "multi-slice-execution")
+    assert target_subfeature is not None
+    success, message = subfeatures.update_subfeature_status(
+        env["planning"],
+        str(feature_path),
+        target_subfeature,
+        "reviewed",
+        scope_context,
+        force=True,
+        review_note="ready",
+        affected_artifacts=[
+            "docs/features/execution-workflow/discover.md",
+            "docs/features/execution-workflow/system-design.md",
+            "docs/features/execution-workflow/user-stories.md",
+        ],
+        affected_story_ids=["EW-01"],
+    )
+    assert success, message
+
+    assert run_cli(module, monkeypatch, "multi-slice-execution", "--json") == 0
+    payload = json.loads(capsys.readouterr().out)
+
+    assert payload["ready_next"] == ["EW-MSE-01-scope-and-backlog-resolution"]
+    states = {entry["planned_slice_id"]: entry["state"] for entry in payload["entries"]}
+    assert states["EW-MSE-01-scope-and-backlog-resolution"] == "ready"
+    assert states["EW-MSE-02-sequential-slice-orchestration"] == "blocked"
+
+
 def test_resolve_backlog_rejects_unreviewed_targets(tmp_path, monkeypatch, capsys):
     env = setup_repo(tmp_path, monkeypatch)
     module = env["module"]
