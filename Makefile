@@ -19,7 +19,6 @@ MANAGED_SKILLS := \
 	add-subfeature \
 	migrate-subfeatures \
 	assess \
-	finalize-subfeature \
 	guide-scope \
 	guide-planning \
 	propose \
@@ -46,7 +45,6 @@ install:
 	npx skills add "$(REPO_ROOT)/skills/add-subfeature" $(COMMON_FLAGS)
 	npx skills add "$(REPO_ROOT)/skills/migrate-subfeatures" $(COMMON_FLAGS)
 	npx skills add "$(REPO_ROOT)/skills/assess" $(COMMON_FLAGS)
-	npx skills add "$(REPO_ROOT)/skills/finalize-subfeature" $(COMMON_FLAGS)
 	npx skills add "$(REPO_ROOT)/skills/guide-scope" $(COMMON_FLAGS)
 	npx skills add "$(REPO_ROOT)/skills/design" $(COMMON_FLAGS)
 	npx skills add "$(REPO_ROOT)/skills/ui-flow" $(COMMON_FLAGS)
