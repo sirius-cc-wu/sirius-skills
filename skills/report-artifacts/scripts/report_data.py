@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 
 from datetime import datetime, timedelta
+import json
 import sys
 from dataclasses import dataclass
 from pathlib import Path
@@ -64,8 +65,18 @@ def is_stale(updated_at: Optional[str], stale_days: int, now: Optional[datetime]
 def _safe_read_metadata(reader, path: Path) -> Optional[Dict[str, object]]:
     try:
         return reader(str(path))
-    except RuntimeError:
+    except (RuntimeError, ValueError):
         return None
+
+
+def _load_raw_metadata(path: Path) -> Optional[Dict[str, object]]:
+    try:
+        payload = json.loads(path.read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError):
+        return None
+    if not isinstance(payload, dict):
+        return None
+    return payload
 
 
 def load_report_records(
@@ -116,6 +127,8 @@ def load_report_records(
         for subfeature_dirs in inventory.subfeature_dirs_by_feature.values():
             for subfeature_dir in subfeature_dirs:
                 metadata = _safe_read_metadata(inventory.context.subfeatures.read_metadata, subfeature_dir)
+                if metadata is None:
+                    metadata = _load_raw_metadata(subfeature_dir / ".subfeature-meta.json")
                 if metadata is None:
                     continue
                 parent_feature = metadata.get("parent_feature_slug")

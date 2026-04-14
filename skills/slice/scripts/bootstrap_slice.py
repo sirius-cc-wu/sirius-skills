@@ -12,11 +12,27 @@ EXECUTION_SCRIPT_PATH = (
     / "scripts"
     / "manage_execution.py"
 )
+PLANNING_SCRIPT_PATH = (
+    Path(__file__).resolve().parents[2]
+    / "guide-planning"
+    / "scripts"
+    / "manage_planning.py"
+)
 
 
 def load_execution_module():
     spec = importlib.util.spec_from_file_location(
         "manage_execution", EXECUTION_SCRIPT_PATH
+    )
+    module = importlib.util.module_from_spec(spec)
+    assert spec.loader is not None
+    spec.loader.exec_module(module)
+    return module
+
+
+def load_planning_module():
+    spec = importlib.util.spec_from_file_location(
+        "manage_planning", PLANNING_SCRIPT_PATH
     )
     module = importlib.util.module_from_spec(spec)
     assert spec.loader is not None
@@ -74,6 +90,50 @@ def resolve_slice_id(module, requested_id: Optional[str], name: str) -> str:
     )
 
 
+def sync_planning_handoff(feature_name: str, slice_id: str) -> Optional[Dict[str, object]]:
+    planning = load_planning_module()
+    scope_context = planning.SCOPE_RUNTIME.resolve_scope_context()
+    merged_config = planning.SCOPE_RUNTIME.load_merged_config(scope_context, "planning")
+    if not merged_config:
+        return None
+
+    rows = planning.parse_registry(scope_context=scope_context)
+    feature = planning.find_feature(rows, feature_name, scope_context=scope_context)
+    if feature is None:
+        return None
+
+    feature_dir = planning.feature_dir_for_row(feature, scope_context=scope_context)
+    metadata = planning.read_metadata(feature_dir)
+    current_status = str(metadata["status"])
+    if current_status not in {"planning_reviewed", "slice_ready"}:
+        raise RuntimeError(
+            f"Planning feature '{feature['feature']}' must be in 'planning_reviewed' "
+            f"or 'slice_ready' before slice bootstrap. Current status: '{current_status}'."
+        )
+
+    ready_slice_ids = list(metadata.get("ready_slice_ids") or [])
+    if slice_id not in ready_slice_ids:
+        ready_slice_ids.append(slice_id)
+
+    ok, message = planning.update_feature_status(
+        rows,
+        feature,
+        "slice_ready",
+        slice_ids=ready_slice_ids,
+        scope_context=scope_context,
+    )
+    if not ok:
+        raise RuntimeError(
+            f"Failed to sync planning handoff for '{feature['feature']}': {message}"
+        )
+
+    return {
+        "feature": feature["feature"],
+        "status": "slice_ready",
+        "ready_slice_ids": ready_slice_ids,
+    }
+
+
 def bootstrap_slice(module, raw_args: List[str], requested_slice_dir: Optional[str]) -> Dict[str, object]:
     requested_id, name = parse_bootstrap_args(module, raw_args)
     initialized_slice_dir = ensure_execution_registry(module, requested_slice_dir)
@@ -92,6 +152,7 @@ def bootstrap_slice(module, raw_args: List[str], requested_slice_dir: Optional[s
         )
 
     config = module.load_config(required=True)
+    planning_sync = sync_planning_handoff(name, str(row["id"]))
     return {
         "slice_id": row["id"],
         "feature": row["feature"],
@@ -101,6 +162,7 @@ def bootstrap_slice(module, raw_args: List[str], requested_slice_dir: Optional[s
         "initialized_config": initialized_slice_dir is not None,
         "initialized_slice_dir": initialized_slice_dir,
         "slice_dir": config["slice_dir"],
+        "planning_sync": planning_sync,
         "checks": checks,
     }
 
@@ -155,6 +217,12 @@ def main() -> int:
     else:
         print(f"Slice already exists: {result['folder']}")
     print(f"Validated slice: {result['slice_id']}")
+    planning_sync = result.get("planning_sync")
+    if isinstance(planning_sync, dict):
+        print(
+            f"Synced planning feature '{planning_sync['feature']}' to "
+            f"'{planning_sync['status']}'."
+        )
     return 0
 
 

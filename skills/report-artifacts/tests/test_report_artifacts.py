@@ -142,6 +142,33 @@ def test_run_report_groups_by_status(tmp_path, monkeypatch):
     assert {"accepted", "planning_reviewed", "reviewed", "closed"}.issubset(groups)
 
 
+def test_run_report_preserves_raw_subfeature_status_when_reader_rejects_it(tmp_path, monkeypatch):
+    env = setup_repo(tmp_path, monkeypatch)
+    subfeature_meta_path = (
+        tmp_path
+        / "docs"
+        / "features"
+        / "checkout"
+        / "subfeatures"
+        / "replace-legacy-flow"
+        / ".subfeature-meta.json"
+    )
+    payload = json.loads(subfeature_meta_path.read_text(encoding="utf-8"))
+    payload["status"] = "planning_reviewed"
+    subfeature_meta_path.write_text(json.dumps(payload) + "\n", encoding="utf-8")
+
+    report = env["report"].build_report_result(
+        artifact_types=["subfeature"],
+        group_by="status",
+        stale_days=30,
+        now=datetime(2026, 2, 15),
+    )
+
+    groups = groups_by_key(report)
+    assert groups["planning_reviewed"]["count"] == 1
+    assert report["records"][0]["status"] == "planning_reviewed"
+
+
 def test_cli_json_groups_by_parent_for_selected_artifact_type(tmp_path, monkeypatch, capsys):
     env = setup_repo(tmp_path, monkeypatch)
 
