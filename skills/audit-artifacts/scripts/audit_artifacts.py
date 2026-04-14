@@ -195,7 +195,7 @@ def _compare_paths(
 def _safe_read_metadata(reader, artifact_type: str, artifact_id: str, path: Path) -> Tuple[Optional[Dict[str, object]], Optional[Finding]]:
     try:
         return reader(str(path)), None
-    except RuntimeError as exc:
+    except (RuntimeError, ValueError) as exc:
         return None, Finding(
             artifact_type=artifact_type,
             artifact_id=artifact_id,

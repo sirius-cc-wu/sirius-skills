@@ -123,6 +123,27 @@ def test_run_audit_reports_metadata_read_error_without_stopping(tmp_path, monkey
     assert any(finding["artifact_type"] == "proposal" for finding in result["findings"])
 
 
+def test_run_audit_reports_invalid_subfeature_status_as_metadata_read_error(
+    tmp_path, monkeypatch
+):
+    # Arrange: Create a repo whose subfeature metadata uses a planning-layer status.
+    env = setup_repo(tmp_path, monkeypatch)
+    subfeature_meta_path = env["subfeature_dir"] / ".subfeature-meta.json"
+    metadata = json.loads(subfeature_meta_path.read_text(encoding="utf-8"))
+    metadata["status"] = "planning_reviewed"
+    subfeature_meta_path.write_text(json.dumps(metadata) + "\n", encoding="utf-8")
+
+    # Act: Run the audit against the affected artifact layer.
+    result = env["audit"].run_audit(["subfeature"])
+
+    # Assert: The audit reports the metadata failure instead of crashing.
+    assert result["ok"] is False
+    assert "metadata_read_error" in finding_codes(result)
+    assert any(
+        finding["artifact_type"] == "subfeature" for finding in result["findings"]
+    )
+
+
 def test_run_audit_reports_missing_promoted_feature_and_subfeature_registry_drift(
     tmp_path, monkeypatch
 ):
