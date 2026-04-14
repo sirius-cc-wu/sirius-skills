@@ -56,15 +56,19 @@ class BootstrapResult:
     backlog: BacklogResolution
     bootstrapped_slice_id: Optional[str]
     bootstrapped_slice_path: Optional[str]
+    slice_status: Optional[str]
     next_owner: Optional[str]
     completed: bool
+    action: str
 
     def to_dict(self) -> Dict[str, object]:
         payload = self.backlog.to_dict()
         payload["bootstrapped_slice_id"] = self.bootstrapped_slice_id
         payload["bootstrapped_slice_path"] = self.bootstrapped_slice_path
+        payload["slice_status"] = self.slice_status
         payload["next_owner"] = self.next_owner
         payload["completed"] = self.completed
+        payload["action"] = self.action
         return payload
 
 
@@ -360,8 +364,10 @@ def bootstrap_next_slice(
             backlog=backlog,
             bootstrapped_slice_id=None,
             bootstrapped_slice_path=None,
+            slice_status=None,
             next_owner=None,
             completed=completed,
+            action="complete" if completed else "blocked",
         )
 
     planning_module = load_module(GUIDE_PLANNING_SCRIPT, "manage_planning")
@@ -401,8 +407,68 @@ def bootstrap_next_slice(
         backlog=refreshed_backlog,
         bootstrapped_slice_id=next_planned_slice_id,
         bootstrapped_slice_path=str(slice_row["path"]),
+        slice_status=str(slice_row["status"]),
         next_owner="guide-execution",
         completed=False,
+        action="bootstrap_next_slice",
+    )
+
+
+def resume_execution(
+    selector: str, explicit_scope: Optional[str] = None
+) -> BootstrapResult:
+    backlog = resolve_backlog(selector, explicit_scope=explicit_scope)
+    if len(backlog.active_execution_slices) > 1:
+        raise RuntimeError(
+            "Cannot resume while multiple mapped execution slices are active: "
+            + ", ".join(backlog.active_execution_slices)
+        )
+
+    planning_module = load_module(GUIDE_PLANNING_SCRIPT, "manage_planning")
+    execution_module = load_module(GUIDE_EXECUTION_SCRIPT, "manage_execution")
+    _, _, _, scope_context, _ = resolve_target(
+        planning_module, selector, explicit_scope
+    )
+
+    if backlog.active_execution_slices:
+        active_slice_id = backlog.active_execution_slices[0]
+        execution_rows = execution_module.parse_registry(scope_context=scope_context)
+        slice_row = execution_module.resolve_slice(execution_rows, active_slice_id)
+        if slice_row is None:
+            raise RuntimeError(
+                f"Mapped active execution slice could not be resolved: {active_slice_id}"
+            )
+        return BootstrapResult(
+            backlog=backlog,
+            bootstrapped_slice_id=active_slice_id,
+            bootstrapped_slice_path=str(slice_row["path"]),
+            slice_status=str(slice_row["status"]),
+            next_owner="guide-execution",
+            completed=False,
+            action="resume_active_slice",
+        )
+
+    if backlog.ready_next:
+        return bootstrap_next_slice(selector, explicit_scope=explicit_scope)
+
+    completed = all(entry.state == "completed" for entry in backlog.entries)
+    if completed:
+        return BootstrapResult(
+            backlog=backlog,
+            bootstrapped_slice_id=None,
+            bootstrapped_slice_path=None,
+            slice_status=None,
+            next_owner=None,
+            completed=True,
+            action="complete",
+        )
+
+    blocked = [
+        entry.planned_slice_id for entry in backlog.entries if entry.state == "blocked"
+    ]
+    raise RuntimeError(
+        "No ready planned slice remains while unfinished slices are blocked: "
+        + ", ".join(blocked)
     )
 
 
@@ -422,6 +488,11 @@ def build_parser() -> argparse.ArgumentParser:
         "--bootstrap-next",
         action="store_true",
         help="Bootstrap the next ready execution slice and record its traceability mapping.",
+    )
+    parser.add_argument(
+        "--resume",
+        action="store_true",
+        help="Resume an active mapped slice or bootstrap the next ready slice.",
     )
     parser.add_argument("--json", action="store_true", help="Emit machine-readable output.")
     return parser
@@ -447,12 +518,23 @@ def render_text(result: BacklogResolution) -> str:
 
 def render_bootstrap_text(result: BootstrapResult) -> str:
     lines = [render_text(result.backlog)]
-    if result.bootstrapped_slice_id:
+    if result.action == "resume_active_slice" and result.bootstrapped_slice_id:
+        lines.extend(
+            [
+                "",
+                f"Resume slice: {result.bootstrapped_slice_id}",
+                f"Slice path: {result.bootstrapped_slice_path}",
+                f"Slice status: {result.slice_status}",
+                f"Next owner: {result.next_owner}",
+            ]
+        )
+    elif result.action == "bootstrap_next_slice" and result.bootstrapped_slice_id:
         lines.extend(
             [
                 "",
                 f"Bootstrapped slice: {result.bootstrapped_slice_id}",
                 f"Slice path: {result.bootstrapped_slice_path}",
+                f"Slice status: {result.slice_status}",
                 f"Next owner: {result.next_owner}",
             ]
         )
@@ -466,8 +548,13 @@ def render_bootstrap_text(result: BootstrapResult) -> str:
 def main() -> int:
     parser = build_parser()
     args = parser.parse_args()
+    if args.bootstrap_next and args.resume:
+        print("Choose either --bootstrap-next or --resume, not both.", file=sys.stderr)
+        return 2
     try:
-        if args.bootstrap_next:
+        if args.resume:
+            result = resume_execution(args.target, explicit_scope=args.scope)
+        elif args.bootstrap_next:
             result = bootstrap_next_slice(args.target, explicit_scope=args.scope)
         else:
             result = resolve_backlog(args.target, explicit_scope=args.scope)

@@ -25,8 +25,14 @@ The second slice adds conservative sequential orchestration:
 6. Record the bootstrapped execution slice ID back into `slice-traceability.md`.
 7. Hand the active slice back to the existing execution owners.
 
-Later slices will extend this into stop/resume semantics and per-slice commit
-checkpoints.
+The third slice adds stop/resume semantics:
+
+8. Resume an already-active mapped slice instead of creating a second one.
+9. Recompute progress from closed slices, active slices, and dependencies without
+   a batch-only progress file.
+10. Stop explicitly when unfinished planned slices remain but none are ready.
+
+Later slices will extend this into per-slice commit checkpoints.
 
 ## Preferred Input
 
@@ -39,6 +45,7 @@ checkpoints.
 python3 skills/execute-all-slices/scripts/execute_all_slices.py <target>
 python3 skills/execute-all-slices/scripts/execute_all_slices.py <target> --json
 python3 skills/execute-all-slices/scripts/execute_all_slices.py <target> --bootstrap-next
+python3 skills/execute-all-slices/scripts/execute_all_slices.py <target> --resume
 python3 skills/execute-all-slices/scripts/execute_all_slices.py <target> --scope apps/payments
 ```
 
@@ -51,5 +58,7 @@ python3 skills/execute-all-slices/scripts/execute_all_slices.py <target> --scope
   completion state.
 - Refuse batch bootstrap when `slice-traceability.md` groups multiple planned
   slices into one row; the mapping is ambiguous and should be split first.
+- Stop when unfinished planned slices remain but no mapped slice is active and no
+  dependency-ready slice exists.
 - Keep one-slice execution ownership in the existing `slice`,
   `guide-execution`, `review-execution`, `close-slice`, and `commit` skills.
