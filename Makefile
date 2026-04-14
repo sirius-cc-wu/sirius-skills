@@ -27,6 +27,7 @@ MANAGED_SKILLS := \
 	review-planning \
 	simplify \
 	guide-execution \
+	execute-all-slices \
 	slice \
 	ui-flow
 
@@ -51,6 +52,7 @@ install:
 	npx skills add "$(REPO_ROOT)/skills/breakdown" $(COMMON_FLAGS)
 	npx skills add "$(REPO_ROOT)/skills/review-planning" $(COMMON_FLAGS)
 	npx skills add "$(REPO_ROOT)/skills/slice" $(COMMON_FLAGS)
+	npx skills add "$(REPO_ROOT)/skills/execute-all-slices" $(COMMON_FLAGS)
 	npx skills add "$(REPO_ROOT)/skills/close-slice" $(COMMON_FLAGS)
 	npx skills add "$(REPO_ROOT)/skills/review-execution" $(COMMON_FLAGS)
 	npx skills add "$(REPO_ROOT)/skills/commit" $(COMMON_FLAGS)

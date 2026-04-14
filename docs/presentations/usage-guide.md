@@ -9,7 +9,7 @@ We separate **Proposal**, **Planning**, **Execution**, and **Maintenance**.
 
 1.  **Proposal Layer**: Early exploratory or speculative work that is not yet canonical.
 2.  **Planning Layer**: High-level "What" and "How" for accepted feature work.
-3.  **Execution Layer**: Low-level "Code" for one implementation slice at a time.
+3.  **Execution Layer**: Low-level "Code" for one implementation slice at a time, with an optional backlog orchestrator for batch progress.
 4.  **Maintenance Layer**: Reporting, audit, repair, and archival after planning or execution work is complete.
 
 **Goal**: Keep repository history durable, traceable, and generic-first.
@@ -64,6 +64,7 @@ Stored in `docs/features/<feature-slug>/`
 **Key Skills:**
 - `slice`: Bootstraps an execution-scoped folder from an approved, committed planned item and syncs the relevant planning handoff state.
 - `guide-execution`: Manages the slice registry and state transitions.
+- `execute-all-slices`: Resolves one reviewed and committed feature or subfeature backlog, then resumes or bootstraps one mapped slice at a time.
 - `brief`: Captures slice-scoped acceptance criteria and requirements.
 - `blueprint`: Detailed design, implementation packets, and validation steps.
 - `review-execution`: Validates implementation against the brief/blueprint.
@@ -100,10 +101,11 @@ Stored in `slices/<slice-id>-<slug>/`
 5.  **Review**: `review-planning` confirms the plan or subfeature is ready.
 6.  **Approve**: A human explicitly approves the reviewed planning artifacts.
 7.  **Commit Planning**: Commit the approved planning artifacts before execution starts.
-8.  **Bootstrap**: `slice` creates the execution folder and syncs the matching feature or subfeature planning state to `slice_ready`.
-9.  **Execute**: `brief` -> `blueprint` -> (Code) -> `review-execution`.
-10. **Close**: `close-slice` marks the slice done and preserves the execution context.
-11. **Maintain Durable History**: `archive-artifacts` can later summarize closed slices into `system-design.md` and move them into the archive area.
+8.  **Bootstrap**: `slice` creates the next execution folder and syncs the matching feature or subfeature planning state to `slice_ready`.
+9.  **Optional Batch Orchestration**: `execute-all-slices` can keep working a reviewed and committed backlog one mapped slice at a time, but it stops at blockers and per-slice commit checkpoints.
+10. **Execute**: `brief` -> `blueprint` -> (Code) -> `review-execution`.
+11. **Close**: `close-slice` marks the slice done and preserves the execution context.
+12. **Maintain Durable History**: `archive-artifacts` can later summarize closed slices into `system-design.md` and move them into the archive area.
 
 ---
 

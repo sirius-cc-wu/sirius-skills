@@ -20,6 +20,7 @@ When in doubt, prefer **routing prompts** first:
 - use `guide-scope` when the repository may have multiple scopes
 - use `guide-planning` when you know the work is planning-layer work
 - use `guide-execution` when you know the work is execution-layer work
+- use `execute-all-slices` when reviewed planning is already committed and you want to work the remaining backlog one planned slice at a time
 - use `archive-artifacts` when you want to summarize and archive closed slices without losing durable history
 
 ## Start with the simplest useful prompt
@@ -146,6 +147,25 @@ Use `slice` to bootstrap the next execution slice for `checkout-redesign`.
 reviewed feature or subfeature, it should also sync the planning metadata to
 `slice_ready` and record the bootstrapped slice ID.
 
+Use `execute-all-slices` when a reviewed and committed feature or subfeature has
+multiple planned slices and the goal is to keep progressing through them without
+manually reselecting the next slice after each closure or commit.
+
+```text
+Use `execute-all-slices` for `docs/features/checkout/subfeatures/replace-legacy-flow/` and work the remaining planned slices one at a time.
+```
+
+```text
+Use `execute-all-slices` for `replace-legacy-flow` under `checkout` and resume from the current durable slice state.
+```
+
+Keep the boundary explicit:
+
+- `execute-all-slices` resolves backlog state from planning and execution artifacts
+- it resumes an active mapped slice or bootstraps the next ready one
+- it stops when the backlog is blocked or when a completed slice still needs its own commit checkpoint
+- it hands the next step back to `guide-execution` or `commit` instead of replacing those owners
+
 ```text
 Use `guide-execution` to decide the next step for slice `CHK-12-form-state-refactor`.
 ```
@@ -245,6 +265,7 @@ When:
 - naming no feature, path, or slice when several are plausible
 - asking for `breakdown` before discovery or design is concrete
 - asking for `slice` bootstrap before planning approval and commit
+- asking for `execute-all-slices` before the reviewed planning artifacts are committed
 - assuming closed slices are deleted automatically
 - writing a vague prompt that omits the desired artifact or stop point
 
@@ -278,6 +299,12 @@ Use `guide-planning` for feature `checkout` and route this request as subfeature
 
 ```text
 Use `slice` to bootstrap the next approved slice for `checkout-redesign`.
+```
+
+### “Planning is reviewed and committed; work the full backlog one slice at a time”
+
+```text
+Use `execute-all-slices` for `checkout-redesign` and continue through the planned slices until a blocker or per-slice commit checkpoint stops the run.
 ```
 
 ### “Move closed slices out of the active area but keep their design history”
