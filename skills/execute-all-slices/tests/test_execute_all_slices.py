@@ -225,3 +225,120 @@ def test_resolve_backlog_rejects_unreviewed_targets(tmp_path, monkeypatch, capsy
 
     assert run_cli(module, monkeypatch, "multi-slice-execution") == 2
     assert "must be in 'planning_reviewed' or 'slice_ready'" in capsys.readouterr().err
+
+
+def test_bootstrap_next_creates_first_ready_slice_and_updates_traceability(
+    tmp_path, monkeypatch, capsys
+):
+    env = setup_repo(tmp_path, monkeypatch)
+    planning = env["planning"]
+    feature_path = env["feature_path"]
+    module = env["module"]
+    execution = env["execution"]
+
+    write_file(
+        feature_path / "slice-planning.md",
+        """# Slice Planning
+
+| Slice ID | Story ID | Title | Summary | Target Area | Lane | Validation | Planned Action | Depends On | Slice Ready |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| EW-MSE-01 | EW-01 | Resolve backlog | Summary | area | primary | test | create slice |  | yes |
+| EW-MSE-02 | EW-01 | Orchestrate backlog | Summary | area | primary | test | create slice | EW-MSE-01 | yes |
+""",
+    )
+    write_file(
+        feature_path / "slice-traceability.md",
+        """# Slice Traceability
+
+| Story ID | Story Size | Story Summary | Increments | Planned Slice IDs | Slice Areas | Blocked By | Execution Slice IDs | Notes |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| EW-01 | M | Summary | I1 | EW-MSE-01 | area |  |  | Notes |
+| EW-01 | M | Summary | I2 | EW-MSE-02 | area | EW-MSE-01 |  | Notes |
+""",
+    )
+
+    rows = planning.parse_registry()
+    feature = planning.find_feature(rows, "execution-workflow")
+    assert feature is not None
+    ok, message = planning.update_feature_status(
+        rows,
+        feature,
+        "planning_reviewed",
+        force=True,
+        review_note="ready",
+    )
+    assert ok, message
+
+    assert run_cli(module, monkeypatch, "execution-workflow", "--bootstrap-next", "--json") == 0
+    payload = json.loads(capsys.readouterr().out)
+    registry_rows = execution.parse_registry()
+    slice_row = execution.resolve_slice(registry_rows, "EW-MSE-01")
+
+    assert payload["bootstrapped_slice_id"] == "EW-MSE-01"
+    assert payload["next_owner"] == "guide-execution"
+    assert slice_row is not None
+    assert slice_row["status"] == "draft"
+    traceability = (feature_path / "slice-traceability.md").read_text(encoding="utf-8")
+    assert "| EW-01 | M | Summary | I1 | EW-MSE-01 | area |  | EW-MSE-01 | Notes |" in traceability
+
+
+def test_bootstrap_next_refuses_when_mapped_execution_slice_is_active(
+    tmp_path, monkeypatch, capsys
+):
+    env = setup_repo(tmp_path, monkeypatch)
+    subfeatures = env["subfeatures"]
+    feature_path = env["feature_path"]
+    subfeature_path = env["subfeature_path"]
+    module = env["module"]
+    execution = env["execution"]
+
+    write_file(
+        subfeature_path / "slice-planning.md",
+        """# Slice Planning
+
+| Slice ID | Story ID | Title | Summary | Target Area | Lane | Validation | Planned Action | Depends On | Slice Ready |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| EW-MSE-01-scope-and-backlog-resolution | EW-01 | Resolve scope | Summary | area | primary | test | create slice |  | yes |
+| EW-MSE-02-sequential-slice-orchestration | EW-01 | Orchestrate slices | Summary | area | primary | test | create slice | EW-MSE-01-scope-and-backlog-resolution | yes |
+""",
+    )
+    write_file(
+        subfeature_path / "slice-traceability.md",
+        """# Slice Traceability
+
+| Story ID | Story Size | Story Summary | Increments | Planned Slice IDs | Slice Areas | Blocked By | Execution Slice IDs | Notes |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| EW-01 | M | Summary | I1 | EW-MSE-01-scope-and-backlog-resolution | area |  | EW-MSE-01-scope-and-backlog-resolution | Notes |
+| EW-01 | M | Summary | I2 | EW-MSE-02-sequential-slice-orchestration | area | EW-MSE-01-scope-and-backlog-resolution |  | Notes |
+""",
+    )
+
+    rows = subfeatures.load_registry(str(feature_path))
+    subfeature = subfeatures.find_subfeature(rows, "multi-slice-execution")
+    assert subfeature is not None
+    success, message = subfeatures.update_subfeature_status(
+        env["planning"],
+        str(feature_path),
+        subfeature,
+        "reviewed",
+        env["planning"].SCOPE_RUNTIME.resolve_scope_context(),
+        force=True,
+        review_note="ready",
+        affected_artifacts=[
+            "docs/features/execution-workflow/discover.md",
+            "docs/features/execution-workflow/system-design.md",
+            "docs/features/execution-workflow/user-stories.md",
+        ],
+        affected_story_ids=["EW-01"],
+    )
+    assert success, message
+
+    _, created = execution.create_slice(
+        "EW-MSE-01-scope-and-backlog-resolution", "Resolve scope"
+    )
+    assert created
+
+    assert (
+        run_cli(module, monkeypatch, "multi-slice-execution", "--bootstrap-next") == 2
+    )
+    assert "another mapped execution slice is still active" in capsys.readouterr().err

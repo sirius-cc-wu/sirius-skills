@@ -51,6 +51,23 @@ class BacklogResolution:
         }
 
 
+@dataclass
+class BootstrapResult:
+    backlog: BacklogResolution
+    bootstrapped_slice_id: Optional[str]
+    bootstrapped_slice_path: Optional[str]
+    next_owner: Optional[str]
+    completed: bool
+
+    def to_dict(self) -> Dict[str, object]:
+        payload = self.backlog.to_dict()
+        payload["bootstrapped_slice_id"] = self.bootstrapped_slice_id
+        payload["bootstrapped_slice_path"] = self.bootstrapped_slice_path
+        payload["next_owner"] = self.next_owner
+        payload["completed"] = self.completed
+        return payload
+
+
 def load_module(script_path: Path, name: str):
     spec = importlib.util.spec_from_file_location(name, script_path)
     if spec is None or spec.loader is None:
@@ -137,6 +154,72 @@ def parse_planned_slices(slice_planning_path: Path) -> List[Dict[str, object]]:
     return results
 
 
+def parse_traceability_table(
+    traceability_path: Path,
+) -> Tuple[List[str], int, Dict[str, int], List[List[str]]]:
+    lines = traceability_path.read_text(encoding="utf-8").splitlines()
+    header_map, start_index = _find_markdown_table(
+        lines,
+        [
+            "Story ID",
+            "Planned Slice IDs",
+            "Execution Slice IDs",
+        ],
+    )
+    rows: List[List[str]] = []
+    index = start_index
+    while index < len(lines):
+        row_line = lines[index].strip()
+        if not row_line.startswith("|"):
+            break
+        rows.append(_split_table_row(row_line))
+        index += 1
+    return lines, start_index, header_map, rows
+
+
+def record_execution_slice_id(
+    traceability_path: Path, planned_slice_id: str, execution_slice_id: str
+) -> None:
+    lines, start_index, header_map, rows = parse_traceability_table(traceability_path)
+    planned_slice_column = header_map["planned slice ids"]
+    execution_slice_column = header_map["execution slice ids"]
+    row_index: Optional[int] = None
+
+    for index, row in enumerate(rows):
+        if planned_slice_column >= len(row):
+            continue
+        planned_slice_ids = _split_cell_values(row[planned_slice_column])
+        if planned_slice_id not in planned_slice_ids:
+            continue
+        if len(planned_slice_ids) != 1:
+            raise RuntimeError(
+                "Batch execution requires one planned slice per traceability row. "
+                f"Split the row that contains '{planned_slice_id}' before bootstrapping."
+            )
+        row_index = index
+        execution_slice_ids = (
+            _split_cell_values(row[execution_slice_column])
+            if execution_slice_column < len(row)
+            else []
+        )
+        if execution_slice_id not in execution_slice_ids:
+            execution_slice_ids.append(execution_slice_id)
+        while len(row) <= execution_slice_column:
+            row.append("")
+        row[execution_slice_column] = ", ".join(execution_slice_ids)
+        break
+
+    if row_index is None:
+        raise RuntimeError(
+            f"Could not find a traceability row for planned slice '{planned_slice_id}'."
+        )
+
+    for offset, row in enumerate(rows):
+        line_index = start_index + offset
+        lines[line_index] = "| " + " | ".join(row) + " |"
+    traceability_path.write_text("\n".join(lines) + "\n", encoding="utf-8")
+
+
 def resolve_target(planning_module, selector: str, explicit_scope: Optional[str]):
     rows, feature, scope_context = planning_module.resolve_feature_lookup(
         selector, explicit_scope=explicit_scope
@@ -183,9 +266,21 @@ def resolve_backlog(selector: str, explicit_scope: Optional[str] = None) -> Back
 
     execution_ids_by_planned_slice: Dict[str, List[str]] = {}
     for record in traceability_records:
-        for planned_slice_id in record.planned_slice_ids:
-            bucket = execution_ids_by_planned_slice.setdefault(planned_slice_id, [])
+        if not record.execution_slice_ids:
+            continue
+        if len(record.planned_slice_ids) == 1:
+            bucket = execution_ids_by_planned_slice.setdefault(
+                record.planned_slice_ids[0], []
+            )
             for execution_slice_id in record.execution_slice_ids:
+                if execution_slice_id not in bucket:
+                    bucket.append(execution_slice_id)
+            continue
+        if len(record.planned_slice_ids) == len(record.execution_slice_ids):
+            for planned_slice_id, execution_slice_id in zip(
+                record.planned_slice_ids, record.execution_slice_ids
+            ):
+                bucket = execution_ids_by_planned_slice.setdefault(planned_slice_id, [])
                 if execution_slice_id not in bucket:
                     bucket.append(execution_slice_id)
 
@@ -248,6 +343,69 @@ def resolve_backlog(selector: str, explicit_scope: Optional[str] = None) -> Back
     )
 
 
+def bootstrap_next_slice(
+    selector: str, explicit_scope: Optional[str] = None
+) -> BootstrapResult:
+    backlog = resolve_backlog(selector, explicit_scope=explicit_scope)
+    if backlog.active_execution_slices:
+        raise RuntimeError(
+            "Cannot bootstrap the next planned slice while another mapped execution "
+            "slice is still active: "
+            + ", ".join(backlog.active_execution_slices)
+        )
+
+    if not backlog.ready_next:
+        completed = all(entry.state == "completed" for entry in backlog.entries)
+        return BootstrapResult(
+            backlog=backlog,
+            bootstrapped_slice_id=None,
+            bootstrapped_slice_path=None,
+            next_owner=None,
+            completed=completed,
+        )
+
+    planning_module = load_module(GUIDE_PLANNING_SCRIPT, "manage_planning")
+    execution_module = load_module(GUIDE_EXECUTION_SCRIPT, "manage_execution")
+    _, target_dir, _, scope_context, _ = resolve_target(
+        planning_module, selector, explicit_scope
+    )
+
+    next_planned_slice_id = backlog.ready_next[0]
+    entry = next(
+        item for item in backlog.entries if item.planned_slice_id == next_planned_slice_id
+    )
+    _, created = execution_module.create_slice(
+        next_planned_slice_id,
+        entry.title,
+        scope_context=scope_context,
+    )
+    execution_rows = execution_module.parse_registry(scope_context=scope_context)
+    slice_row = execution_module.resolve_slice(execution_rows, next_planned_slice_id)
+    if slice_row is None:
+        raise RuntimeError(
+            f"Bootstrapped slice could not be resolved: {next_planned_slice_id}"
+        )
+    if not created and str(slice_row["status"]) != "closed":
+        raise RuntimeError(
+            f"Execution slice '{next_planned_slice_id}' already exists with status "
+            f"'{slice_row['status']}'."
+        )
+
+    record_execution_slice_id(
+        Path(target_dir) / "slice-traceability.md",
+        next_planned_slice_id,
+        next_planned_slice_id,
+    )
+    refreshed_backlog = resolve_backlog(selector, explicit_scope=explicit_scope)
+    return BootstrapResult(
+        backlog=refreshed_backlog,
+        bootstrapped_slice_id=next_planned_slice_id,
+        bootstrapped_slice_path=str(slice_row["path"]),
+        next_owner="guide-execution",
+        completed=False,
+    )
+
+
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
         description=(
@@ -259,6 +417,11 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument(
         "--scope",
         help="Optional planning scope path when the target is outside the active scope.",
+    )
+    parser.add_argument(
+        "--bootstrap-next",
+        action="store_true",
+        help="Bootstrap the next ready execution slice and record its traceability mapping.",
     )
     parser.add_argument("--json", action="store_true", help="Emit machine-readable output.")
     return parser
@@ -282,19 +445,44 @@ def render_text(result: BacklogResolution) -> str:
     return "\n".join(lines)
 
 
+def render_bootstrap_text(result: BootstrapResult) -> str:
+    lines = [render_text(result.backlog)]
+    if result.bootstrapped_slice_id:
+        lines.extend(
+            [
+                "",
+                f"Bootstrapped slice: {result.bootstrapped_slice_id}",
+                f"Slice path: {result.bootstrapped_slice_path}",
+                f"Next owner: {result.next_owner}",
+            ]
+        )
+    elif result.completed:
+        lines.extend(["", "All planned slices are already completed."])
+    else:
+        lines.extend(["", "No ready slice was bootstrapped."])
+    return "\n".join(lines)
+
+
 def main() -> int:
     parser = build_parser()
     args = parser.parse_args()
     try:
-        result = resolve_backlog(args.target, explicit_scope=args.scope)
+        if args.bootstrap_next:
+            result = bootstrap_next_slice(args.target, explicit_scope=args.scope)
+        else:
+            result = resolve_backlog(args.target, explicit_scope=args.scope)
     except (RuntimeError, ValueError) as exc:
         print(str(exc), file=sys.stderr)
         return 2
 
     if args.json:
-        print(json.dumps(result.to_dict(), indent=2))
+        payload = result.to_dict() if hasattr(result, "to_dict") else result
+        print(json.dumps(payload, indent=2))
     else:
-        print(render_text(result))
+        if isinstance(result, BootstrapResult):
+            print(render_bootstrap_text(result))
+        else:
+            print(render_text(result))
     return 0
 
 

@@ -18,8 +18,15 @@ resolution:
 3. Compare planned slices with execution-slice lineage and closure state.
 4. Report which planned slices are completed, active, ready next, or blocked.
 
-Later slices will extend this skill into sequential execution, stop/resume
-semantics, and per-slice commit checkpoints.
+The second slice adds conservative sequential orchestration:
+
+5. Bootstrap exactly one next-ready execution slice when no mapped slice is
+   already active.
+6. Record the bootstrapped execution slice ID back into `slice-traceability.md`.
+7. Hand the active slice back to the existing execution owners.
+
+Later slices will extend this into stop/resume semantics and per-slice commit
+checkpoints.
 
 ## Preferred Input
 
@@ -31,6 +38,7 @@ semantics, and per-slice commit checkpoints.
 ```bash
 python3 skills/execute-all-slices/scripts/execute_all_slices.py <target>
 python3 skills/execute-all-slices/scripts/execute_all_slices.py <target> --json
+python3 skills/execute-all-slices/scripts/execute_all_slices.py <target> --bootstrap-next
 python3 skills/execute-all-slices/scripts/execute_all_slices.py <target> --scope apps/payments
 ```
 
@@ -38,8 +46,10 @@ python3 skills/execute-all-slices/scripts/execute_all_slices.py <target> --scope
 
 - Resolve exactly one planning scope; do not guess across ambiguous scopes.
 - Do not create or mutate execution slices during the first slice of this
-  capability.
+  capability beyond explicit `--bootstrap-next` orchestration.
 - Treat planning and execution registries as the source of truth for backlog and
   completion state.
+- Refuse batch bootstrap when `slice-traceability.md` groups multiple planned
+  slices into one row; the mapping is ambiguous and should be split first.
 - Keep one-slice execution ownership in the existing `slice`,
   `guide-execution`, `review-execution`, `close-slice`, and `commit` skills.
