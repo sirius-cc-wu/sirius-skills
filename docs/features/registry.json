@@ -43,6 +43,12 @@
       "path": "docs/features/execution-workflow/"
     },
     {
+      "feature": "multi-slice-execution",
+      "status": "planning_reviewed",
+      "updated_at": "2026-04-14T15:54:09",
+      "path": "docs/features/execution-workflow/subfeatures/multi-slice-execution/"
+    },
+    {
       "feature": "hierarchical-scope-support",
       "status": "slice_ready",
       "updated_at": "2026-04-04T02:56:28",

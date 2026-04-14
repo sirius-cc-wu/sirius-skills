@@ -1,0 +1,11 @@
+{
+  "subfeatures": [
+    {
+      "subfeature_id": "multi-slice-execution",
+      "status": "reviewed",
+      "subfeature_type": "additive",
+      "updated_at": "2026-04-14T15:54:09",
+      "path": "docs/features/execution-workflow/subfeatures/multi-slice-execution/"
+    }
+  ]
+}

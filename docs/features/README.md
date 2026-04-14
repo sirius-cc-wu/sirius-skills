@@ -9,6 +9,7 @@
 | report-artifacts | planning_reviewed | 2026-04-11T23:43:56 | docs/features/cross-artifact-management/subfeatures/report-artifacts/ |
 | trace-artifacts | planning_reviewed | 2026-04-11T23:33:38 | docs/features/cross-artifact-management/subfeatures/trace-artifacts/ |
 | execution-workflow | planning_reviewed | 2026-03-24T03:39:26 | docs/features/execution-workflow/ |
+| multi-slice-execution | planning_reviewed | 2026-04-14T15:54:09 | docs/features/execution-workflow/subfeatures/multi-slice-execution/ |
 | hierarchical-scope-support | slice_ready | 2026-04-04T02:56:28 | docs/features/hierarchical-scope-support/ |
 | installation-and-configuration | planning_reviewed | 2026-03-24T03:39:26 | docs/features/installation-and-configuration/ |
 | planning-workflow | planning_reviewed | 2026-03-24T03:39:26 | docs/features/planning-workflow/ |
