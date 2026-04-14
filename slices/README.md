@@ -15,3 +15,7 @@
 | CAM-03-artifact-state-report | report-artifacts | closed | 2026-04-11T23:48:13 | 2026-04-11T23:48:13 | slices/CAM-03-artifact-state-report-report-artifacts/ |
 | CAM-04-registry-drift-repair | repair-artifacts | closed | 2026-04-11T23:53:30 | 2026-04-11T23:53:30 | slices/CAM-04-registry-drift-repair-repair-artifacts/ |
 | CAM-05-safe-slice-archival | archive-artifacts | closed | 2026-04-11T23:58:00 | 2026-04-11T23:58:00 | slices/CAM-05-safe-slice-archival-archive-artifacts/ |
+| EW-MSE-01-scope-and-backlog-resolution | Resolve planning scope and remaining planned slices | closed | 2026-04-14T16:33:27 | 2026-04-14T16:33:27 | slices/EW-MSE-01-scope-and-backlog-resolution-resolve-planning-scope-and-remaining-planned-slices/ |
+| EW-MSE-02-sequential-slice-orchestration | Orchestrate sequential slice execution | closed | 2026-04-14T16:33:28 | 2026-04-14T16:33:28 | slices/EW-MSE-02-sequential-slice-orchestration-orchestrate-sequential-slice-execution/ |
+| EW-MSE-03-stop-and-resume-semantics | Stop on blockers and resume from durable state | closed | 2026-04-14T16:33:28 | 2026-04-14T16:33:28 | slices/EW-MSE-03-stop-and-resume-semantics-stop-on-blockers-and-resume-from-durable-state/ |
+| EW-MSE-04-per-slice-commit-checkpoints | Enforce one commit per completed slice | closed | 2026-04-14T16:33:28 | 2026-04-14T16:33:28 | slices/EW-MSE-04-per-slice-commit-checkpoints-enforce-one-commit-per-completed-slice/ |

@@ -238,10 +238,10 @@ def resolve_target(planning_module, selector: str, explicit_scope: Optional[str]
     feature_dir = planning_module.feature_dir_for_row(feature, scope_context=scope_context)
     metadata = planning_module.read_metadata(feature_dir)
     status = str(metadata["status"])
-    if status not in {"planning_reviewed", "slice_ready"}:
+    if status not in {"planning_reviewed", "slice_ready", "implemented"}:
         raise RuntimeError(
-            f"Planning target '{feature['feature']}' must be in 'planning_reviewed' "
-            f"or 'slice_ready'. Current status: '{status}'."
+            f"Planning target '{feature['feature']}' must be in 'planning_reviewed', "
+            f"'slice_ready', or 'implemented'. Current status: '{status}'."
         )
     target_type = "subfeature" if "/subfeatures/" in str(feature["path"]) else "feature"
     return feature, feature_dir, metadata, scope_context, target_type

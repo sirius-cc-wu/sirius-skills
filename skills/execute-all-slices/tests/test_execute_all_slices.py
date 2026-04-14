@@ -246,7 +246,10 @@ def test_resolve_backlog_rejects_unreviewed_targets(tmp_path, monkeypatch, capsy
     module = env["module"]
 
     assert run_cli(module, monkeypatch, "multi-slice-execution") == 2
-    assert "must be in 'planning_reviewed' or 'slice_ready'" in capsys.readouterr().err
+    assert (
+        "must be in 'planning_reviewed', 'slice_ready', or 'implemented'"
+        in capsys.readouterr().err
+    )
 
 
 def test_bootstrap_next_creates_first_ready_slice_and_updates_traceability(
@@ -618,3 +621,59 @@ def test_resume_requires_commit_checkpoint_before_next_slice(tmp_path, monkeypat
     assert payload["checkpoint_slice_id"] == "EW-MSE-01-scope-and-backlog-resolution"
     assert payload["next_owner"] == "commit"
     assert any("scratch.txt" in entry for entry in payload["dirty_worktree_paths"])
+
+
+def test_resolve_backlog_allows_implemented_target(tmp_path, monkeypatch, capsys):
+    env = setup_repo(tmp_path, monkeypatch)
+    planning = env["planning"]
+    feature_path = env["feature_path"]
+    module = env["module"]
+    execution = env["execution"]
+
+    write_file(
+        feature_path / "slice-planning.md",
+        """# Slice Planning
+
+| Slice ID | Story ID | Title | Summary | Target Area | Lane | Validation | Planned Action | Depends On | Slice Ready |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| EW-MSE-01 | EW-01 | Resolve backlog | Summary | area | primary | test | create slice |  | yes |
+""",
+    )
+    write_file(
+        feature_path / "slice-traceability.md",
+        """# Slice Traceability
+
+| Story ID | Story Size | Story Summary | Increments | Planned Slice IDs | Slice Areas | Blocked By | Execution Slice IDs | Notes |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| EW-01 | M | Summary | I1 | EW-MSE-01 | area |  | EW-MSE-01 | Notes |
+""",
+    )
+
+    rows = planning.parse_registry()
+    feature = planning.find_feature(rows, "execution-workflow")
+    assert feature is not None
+    ok, message = planning.update_feature_status(
+        rows,
+        feature,
+        "implemented",
+        force=True,
+        review_note="done",
+    )
+    assert ok, message
+
+    _, created = execution.create_slice("EW-MSE-01", "Resolve backlog")
+    assert created
+    execution_rows = execution.parse_registry()
+    slice_row = execution.resolve_slice(execution_rows, "EW-MSE-01")
+    assert slice_row is not None
+    success, message = execution.update_slice_status(
+        execution_rows, slice_row, "closed", force=True
+    )
+    assert success, message
+
+    assert run_cli(module, monkeypatch, "execution-workflow", "--json") == 0
+    payload = json.loads(capsys.readouterr().out)
+
+    assert payload["planning_status"] == "implemented"
+    assert payload["ready_next"] == []
+    assert payload["entries"][0]["state"] == "completed"

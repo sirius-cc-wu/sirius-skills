@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "generated_at": "2026-04-11T23:58:00",
+  "generated_at": "2026-04-14T16:33:28",
   "slices": [
     {
       "id": "HSS-01-root-fallback",
@@ -129,6 +129,46 @@
       "path": "slices/CAM-05-safe-slice-archival-archive-artifacts/",
       "updated_at": "2026-04-11T23:58:00",
       "closed_at": "2026-04-11T23:58:00",
+      "archived_at": null,
+      "relations": []
+    },
+    {
+      "id": "EW-MSE-01-scope-and-backlog-resolution",
+      "feature": "Resolve planning scope and remaining planned slices",
+      "status": "closed",
+      "path": "slices/EW-MSE-01-scope-and-backlog-resolution-resolve-planning-scope-and-remaining-planned-slices/",
+      "updated_at": "2026-04-14T16:33:27",
+      "closed_at": "2026-04-14T16:33:27",
+      "archived_at": null,
+      "relations": []
+    },
+    {
+      "id": "EW-MSE-02-sequential-slice-orchestration",
+      "feature": "Orchestrate sequential slice execution",
+      "status": "closed",
+      "path": "slices/EW-MSE-02-sequential-slice-orchestration-orchestrate-sequential-slice-execution/",
+      "updated_at": "2026-04-14T16:33:28",
+      "closed_at": "2026-04-14T16:33:28",
+      "archived_at": null,
+      "relations": []
+    },
+    {
+      "id": "EW-MSE-03-stop-and-resume-semantics",
+      "feature": "Stop on blockers and resume from durable state",
+      "status": "closed",
+      "path": "slices/EW-MSE-03-stop-and-resume-semantics-stop-on-blockers-and-resume-from-durable-state/",
+      "updated_at": "2026-04-14T16:33:28",
+      "closed_at": "2026-04-14T16:33:28",
+      "archived_at": null,
+      "relations": []
+    },
+    {
+      "id": "EW-MSE-04-per-slice-commit-checkpoints",
+      "feature": "Enforce one commit per completed slice",
+      "status": "closed",
+      "path": "slices/EW-MSE-04-per-slice-commit-checkpoints-enforce-one-commit-per-completed-slice/",
+      "updated_at": "2026-04-14T16:33:28",
+      "closed_at": "2026-04-14T16:33:28",
       "archived_at": null,
       "relations": []
     }

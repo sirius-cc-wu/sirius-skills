@@ -1,0 +1,10 @@
+{
+  "created_at": "2026-04-14T16:33:28",
+  "updated_at": "2026-04-14T16:33:28",
+  "status": "closed",
+  "slice_id": "EW-MSE-03-stop-and-resume-semantics",
+  "feature": "Stop on blockers and resume from durable state",
+  "path": "slices/EW-MSE-03-stop-and-resume-semantics-stop-on-blockers-and-resume-from-durable-state/",
+  "relations": [],
+  "closed_at": "2026-04-14T16:33:28"
+}
