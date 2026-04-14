@@ -24,8 +24,8 @@ ERROR_EXIT_CODE = 2
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(
         description=(
-            "Report archive candidates and archive one closed slice explicitly "
-            "through the execution owner helper."
+            "Report archive candidates and archive closed slices explicitly, "
+            "including feature or subfeature scoped archival with design summaries."
         )
     )
     parser.add_argument(

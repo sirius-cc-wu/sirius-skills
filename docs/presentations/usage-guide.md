@@ -3,13 +3,14 @@ A Guide for Teams
 
 ---
 
-## The Core Concept: Three-Layer Workflow
+## The Core Concept: Four Workflow Surfaces
 
-We separate **Proposal**, **Planning**, and **Implementation**.
+We separate **Proposal**, **Planning**, **Execution**, and **Maintenance**.
 
 1.  **Proposal Layer**: Early exploratory or speculative work that is not yet canonical.
 2.  **Planning Layer**: High-level "What" and "How" for accepted feature work.
 3.  **Execution Layer**: Low-level "Code" for one implementation slice at a time.
+4.  **Maintenance Layer**: Reporting, audit, repair, and archival after planning or execution work is complete.
 
 **Goal**: Keep repository history durable, traceable, and generic-first.
 
@@ -61,7 +62,7 @@ Stored in `docs/features/<feature-slug>/`
 *Where the work gets done, one slice at a time.*
 
 **Key Skills:**
-- `slice`: Bootstraps an execution-scoped folder from an approved, committed planned item.
+- `slice`: Bootstraps an execution-scoped folder from an approved, committed planned item and syncs the relevant planning handoff state.
 - `guide-execution`: Manages the slice registry and state transitions.
 - `brief`: Captures slice-scoped acceptance criteria and requirements.
 - `blueprint`: Detailed design, implementation packets, and validation steps.
@@ -70,7 +71,18 @@ Stored in `docs/features/<feature-slug>/`
 
 ---
 
-## 6. Execution Artifacts
+## 6. The Maintenance Layer
+*Where durable history is reported, repaired, and archived.*
+
+**Key Skills:**
+- `report-artifacts`: Summarizes proposals, features, subfeatures, and slices.
+- `audit-artifacts`: Finds drift, missing files, and broken links.
+- `repair-artifacts`: Repairs registries from valid durable state.
+- `archive-artifacts`: Archives closed slices directly, or summarizes and archives all closed planned slices for one feature or subfeature.
+
+---
+
+## 7. Execution Artifacts
 Stored in `slices/<slice-id>-<slug>/`
 
 - `brief.md`: The "Source of Truth" for this specific slice.
@@ -79,7 +91,7 @@ Stored in `slices/<slice-id>-<slug>/`
 
 ---
 
-## 7. The Handoff Lifecycle
+## 8. The Handoff Lifecycle
 
 1.  **Propose**: `propose` captures speculative or not-yet-accepted work.
 2.  **Hand Off to Planning**: `guide-planning` promotes accepted proposal artifacts into canonical feature planning and then continues the planning workflow.
@@ -88,9 +100,10 @@ Stored in `slices/<slice-id>-<slug>/`
 5.  **Review**: `review-planning` confirms the plan or subfeature is ready.
 6.  **Approve**: A human explicitly approves the reviewed planning artifacts.
 7.  **Commit Planning**: Commit the approved planning artifacts before execution starts.
-8.  **Bootstrap**: `slice` creates the execution folder.
+8.  **Bootstrap**: `slice` creates the execution folder and syncs the matching feature or subfeature planning state to `slice_ready`.
 9.  **Execute**: `brief` -> `blueprint` -> (Code) -> `review-execution`.
-10. **Close**: `close-slice` marks the slice done and preserves the execution context. Closed slices and durable subfeature planning folders stay in place unless a separate maintenance workflow archives them later.
+10. **Close**: `close-slice` marks the slice done and preserves the execution context.
+11. **Maintain Durable History**: `archive-artifacts` can later summarize closed slices into `system-design.md` and move them into the archive area.
 
 ---
 
@@ -100,6 +113,7 @@ Stored in `slices/<slice-id>-<slug>/`
 - **Durability**: Even after a feature is done, the "Why" (Design) and "How" (Blueprint) remain in the repo.
 - **Resumability**: Any agent or human can pick up a slice by reading its `brief.md`.
 - **Consistency**: Standardized gates ensure quality doesn't drift.
+- **Retention Without Clutter**: Closed slices can leave the active slice area without losing their design context.
 
 ---
 
@@ -108,4 +122,5 @@ Stored in `slices/<slice-id>-<slug>/`
 Check the methodology for more details:
 `SKILLS_METHODOLOGY.md`
 
-Use `guide-planning` to start your next feature!
+Use `guide-scope` when you want the workflow to pick the right surface, or
+`guide-planning` when you already know the work belongs in planning.

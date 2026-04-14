@@ -20,6 +20,7 @@ When in doubt, prefer **routing prompts** first:
 - use `guide-scope` when the repository may have multiple scopes
 - use `guide-planning` when you know the work is planning-layer work
 - use `guide-execution` when you know the work is execution-layer work
+- use `archive-artifacts` when you want to summarize and archive closed slices without losing durable history
 
 ## Start with the simplest useful prompt
 
@@ -141,6 +142,10 @@ Use these only after planning is approved and committed.
 Use `slice` to bootstrap the next execution slice for `checkout-redesign`.
 ```
 
+`slice` is the planning-to-execution bridge. When it bootstraps a slice for a
+reviewed feature or subfeature, it should also sync the planning metadata to
+`slice_ready` and record the bootstrapped slice ID.
+
 ```text
 Use `guide-execution` to decide the next step for slice `CHK-12-form-state-refactor`.
 ```
@@ -160,6 +165,31 @@ Use `review-execution` for slice `CHK-12-form-state-refactor`.
 ```text
 Use `close-slice` for slice `CHK-12-form-state-refactor`.
 ```
+
+`close-slice` is non-destructive. It closes the slice and preserves its working
+context. Use `archive-artifacts` later if you want to move closed slices out of
+the active execution area.
+
+### 8. Archive and summarize closed slices
+
+Use this when closed slices should leave the active slice area, but their work
+items and design should still be visible in planning docs.
+
+```text
+Use `archive-artifacts` with `--artifact-type feature --artifact-id checkout --apply` to summarize and archive all closed planned slices for `checkout`.
+```
+
+```text
+Use `archive-artifacts` with `--artifact-type subfeature --artifact-id replace-legacy-flow --apply` to summarize and archive all closed planned slices for that subfeature.
+```
+
+In scope apply mode, the skill:
+
+- reads planned slice IDs from `slice-planning.md`
+- finds closed, not-yet-archived slices
+- summarizes `brief.md` and `blueprint.md` into the target `system-design.md`
+- carries over blueprint figures by rewriting them to the archived slice path
+- archives the slice folders through the execution archive helper
 
 ## What to include in a strong prompt
 
@@ -215,6 +245,7 @@ When:
 - naming no feature, path, or slice when several are plausible
 - asking for `breakdown` before discovery or design is concrete
 - asking for `slice` bootstrap before planning approval and commit
+- assuming closed slices are deleted automatically
 - writing a vague prompt that omits the desired artifact or stop point
 
 ## Practical recipes
@@ -247,6 +278,12 @@ Use `guide-planning` for feature `checkout` and route this request as subfeature
 
 ```text
 Use `slice` to bootstrap the next approved slice for `checkout-redesign`.
+```
+
+### “Move closed slices out of the active area but keep their design history”
+
+```text
+Use `archive-artifacts` with `--artifact-type feature --artifact-id checkout --apply` and summarize the archived slices into the feature `system-design.md`.
 ```
 
 ## Short rule of thumb

@@ -1,6 +1,6 @@
 ---
 name: archive-artifacts
-description: Reports archive candidates and safely archives one closed execution slice at a time.
+description: Reports archive candidates and safely archives closed slices, including feature/subfeature scoped summarize-and-archive flows.
 ---
 
 # Archive Artifacts
@@ -10,18 +10,23 @@ durable history without broad cleanup side effects.
 
 ## Responsibilities
 
-1. Discover archive candidates across proposals, finalized subfeatures, and
+1. Discover archive candidates across proposals, features, subfeatures, and
    closed slices.
 2. Keep candidate reporting read-only by default.
 3. Archive one closed execution slice explicitly through the execution owner
    helper.
-4. Reject unsupported non-slice apply requests clearly.
+4. Summarize closed slices for one feature or subfeature into `system-design.md`
+   before archiving them.
 
 ## Preferred Input
 
 - no arguments for archive candidate discovery
 - optional artifact-type filtering
-- `--artifact-type slice --artifact-id <id> --apply` for slice archival
+- `--artifact-type slice --artifact-id <id> --apply` for one closed-slice archival
+- `--artifact-type feature --artifact-id <feature-slug> --apply` to summarize
+  and archive all closed planned slices for one feature
+- `--artifact-type subfeature --artifact-id <subfeature-id-or-path> --apply` to
+  summarize and archive all closed planned slices for one subfeature
 
 ## Tooling
 
@@ -36,6 +41,18 @@ python3 skills/archive-artifacts/scripts/archive_artifacts.py --artifact-type pr
 python3 skills/archive-artifacts/scripts/archive_artifacts.py \
   --artifact-type slice \
   --artifact-id CAM-03-artifact-state-report \
+  --apply
+
+# Summarize and archive closed slices for one feature
+python3 skills/archive-artifacts/scripts/archive_artifacts.py \
+  --artifact-type feature \
+  --artifact-id execution-workflow \
+  --apply
+
+# Summarize and archive closed slices for one subfeature
+python3 skills/archive-artifacts/scripts/archive_artifacts.py \
+  --artifact-type subfeature \
+  --artifact-id audit-artifacts \
   --apply
 
 # Emit machine-readable output
@@ -55,7 +72,9 @@ Exit behavior:
 ## Guardrails
 
 - Keep candidate discovery read-only.
-- Limit v1 apply mode to one closed execution slice at a time.
 - Delegate slice archival to the execution owner helper instead of moving slice
   folders directly here.
-- Treat proposal and subfeature archival as candidate-only in v1.
+- For feature and subfeature apply mode, summarize slice history into
+  `system-design.md` before archiving the targeted closed slices.
+- Keep archival explicit and scoped; do not bulk archive across unrelated
+  features by default.
