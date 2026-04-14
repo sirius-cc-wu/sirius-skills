@@ -79,8 +79,8 @@ metadata by hand, which is risky and inconsistent across repositories.
   explicit repair path.
 - Keep the migration auditable and deterministic.
 - Prefer a repo-managed helper or skill over ad hoc shell instructions.
-- Keep the migrated output compatible with `guide-planning`, `assess`,
-  `breakdown`, and `finalize-subfeature`.
+- Keep the migrated output compatible with `guide-planning`, `assess`, and
+  `breakdown`.
 
 ## Success Criteria
 

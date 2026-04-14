@@ -15,7 +15,6 @@ Use a **two-layer workflow**:
    - `propose`
    - `add-subfeature`
    - `assess`
-   - `finalize-subfeature`
    - `discover`
    - `design`
    - `ui-flow` (optional)
@@ -65,7 +64,7 @@ Its job is to:
 
 - resolve or initialize the feature planning folder
 - verify the current planning artifacts and metadata
-- decide whether the next step is `propose`, `add-subfeature`, `assess`, `finalize-subfeature`, `discover`, `design`, `ui-flow`, `breakdown`, `review-planning`, or an approval/commit stop before execution begins
+- decide whether the next step is `propose`, `add-subfeature`, `assess`, `discover`, `design`, `ui-flow`, `breakdown`, `review-planning`, or an approval/commit stop before execution begins
 - keep planning handoff decisions durable through explicit readiness states
 
 Expected planning states:
@@ -81,7 +80,7 @@ Expected planning states:
 Recommended handoff:
 
 ```text
-guide-scope -> guide-planning -> propose/add-subfeature/assess/finalize-subfeature/discover/design/ui-flow/breakdown/review-planning -> human approval -> commit -> slice -> guide-execution
+guide-scope -> guide-planning -> propose/add-subfeature/assess/discover/design/ui-flow/breakdown/review-planning -> human approval -> commit -> slice -> guide-execution
 ```
 
 If the request is still speculative, cross-cutting, or not yet accepted as a canonical feature, route to `propose` first. That keeps early exploration under `docs/proposals/` instead of polluting the canonical `docs/features/` registry too early.
@@ -105,24 +104,6 @@ Recommended handoff:
 
 ```text
 guide-planning -> add-subfeature -> assess -> design -> breakdown
-```
-
-### 0c. Finalize reviewed subfeatures
-
-Use `finalize-subfeature` after a reviewed subfeature has been executed and all
-of its planned slices are closed.
-
-Its job is to:
-
-- verify that the subfeature's planned slices are closed
-- remove the completed execution slices created for that reviewed subfeature
-- mark the durable subfeature implemented
-- keep the subfeature folder in place as part of the feature hierarchy
-
-Recommended handoff:
-
-```text
-review-planning -> human approval -> commit -> slice -> guide-execution -> brief -> blueprint -> review-execution -> close-slice -> finalize-subfeature
 ```
 
 ### 0a. Capture speculative ideas with propose
@@ -348,8 +329,6 @@ Within that execution layer:
 - when `.skills/execution.json` sets `auto_start_implementation` to `true`, marking the blueprint ready should immediately advance the slice into `execution_ready` and continue into repository implementation work
 - `review-execution` owns the explicit implementation-versus-brief review outcome
 - `close-slice` owns slice closure metadata
-- `finalize-subfeature` owns human-invoked feature-level cleanup after all planned slices are done
-
 Keep the boundary explicit:
 
 - `breakdown` owns repo-story decomposition and execution-ready slices
@@ -421,10 +400,10 @@ Important closure rules:
 - closing a slice does not merge or delete the original `brief.md` or `blueprint.md`; older slices may also retain `slices.md`
 - closure metadata belongs in the slice system itself
 
-Feature-level cleanup happens later. Once all slices listed in a reviewed
-subfeature are closed, a human can request `finalize-subfeature` to remove the
-completed execution slices, mark the subfeature implemented, and keep the
-subfeature folder as durable planning history.
+There is no dedicated subfeature-finalization skill. Once all slices listed in a
+reviewed subfeature are closed, keep the durable subfeature folder and the
+closed slices in place by default. If later cleanup or archival is needed, use
+explicit maintenance tooling rather than bundling deletion into slice closure.
 
 ## Recommended Repository Layout
 

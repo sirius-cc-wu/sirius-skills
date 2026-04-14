@@ -42,23 +42,24 @@
 | FEW-03-change-metadata | FEW-03 | Enforce subfeature state model | Add `.subfeature-meta.json` shape, state transitions, and artifact-gated validation for durable subfeatures. | `skills/add-subfeature/scripts/manage_subfeatures.py` | primary | `pytest -q skills/add-subfeature/tests/test_manage_subfeatures.py` | create slice | FEW-01-initiate-change | yes |
 | FEW-03-change-artifacts | FEW-03 | Support subfeature-local planning artifacts | Extend path resolution so `design` and `breakdown` can operate on a selected subfeature cleanly. | `skills/design/`, `skills/breakdown/`, path-resolution helpers | primary | Validate one subfeature reaches `design_ready` / `breakdown_ready` using tooling or fixture tests | create slice | FEW-02-impact-analysis, FEW-03-change-metadata | yes |
 | FEW-04-change-breakdown | FEW-04 | Break subfeatures into execution-ready slices | Generate subfeature-local `slice-planning.md` and `slice-traceability.md` that produce execution-ready slices from reviewed child planning. | `skills/breakdown/SKILL.md`, templates, subfeature examples | primary | Review generated planning docs and add fixture coverage for subfeature-local breakdown | create slice | FEW-03-change-artifacts | yes |
-| FEW-04-finalization-workflow | FEW-04 | Finalize reviewed subfeatures explicitly | Add a `finalize-subfeature` workflow that verifies slice closure, removes completed execution slices, and advances the durable child planning folder to implemented. | `skills/finalize-subfeature/SKILL.md`, `skills/finalize-subfeature/scripts/finalize_subfeature.py` | primary | `pytest -q skills/finalize-subfeature/tests/test_finalize_subfeature.py` | create slice | FEW-04-change-breakdown | yes |
-| FEW-05-history-closure | FEW-05 | Keep implemented subfeatures as durable history | Preserve the subfeature folder after finalization while cleaning up completed execution slices. | `skills/finalize-subfeature/`, subfeature metadata, execution registry cleanup | primary | Validate cleanup behavior in fixture tests | create slice | FEW-04-finalization-workflow | yes |
+| FEW-04-finalization-workflow | FEW-04 | Represent implemented subfeatures without a dedicated finalization skill | Keep reviewed subfeatures non-destructive after execution by relying on closed slice state plus planning metadata instead of a separate cleanup skill. | `skills/add-subfeature/scripts/manage_subfeatures.py`, `skills/close-slice/`, methodology docs | primary | Validate subfeature metadata and closure behavior in fixture tests | create slice | FEW-04-change-breakdown | yes |
+| FEW-05-history-closure | FEW-05 | Keep implemented subfeatures as durable history | Preserve the subfeature folder and closed execution slices as durable history unless explicit archive maintenance is requested later. | `skills/add-subfeature/`, `skills/close-slice/`, archive docs | primary | Review docs and fixture behavior for retained history | create slice | FEW-04-finalization-workflow | yes |
 | FEW-05-routing-docs | FEW-05 | Document routing for evolving features | Update methodology and skill docs so users know when to start a subfeature versus a net-new feature. | `README.md`, `SKILLS_METHODOLOGY.md`, `skills/guide-planning/SKILL.md` | primary | Review docs for route consistency and examples | create slice | FEW-05-history-closure | yes |
 
 ## 5. Dependency Notes
 
 - Critical path: subfeature registry -> subfeature bootstrap -> impact analysis
-  -> artifact support -> breakdown -> finalization -> routing/docs.
-- Explicit blockers: finalization depends on reviewed subfeature-local planning
-  outputs and closed execution slices.
+  -> artifact support -> breakdown -> retained-history semantics -> routing/docs.
+- Explicit blockers: retained-history semantics depend on reviewed
+  subfeature-local planning outputs and closed execution slices.
 - Parallel-safe slices: none recommended in the first iteration because nested
   path resolution, state transitions, and cleanup semantics are tightly coupled.
 - Increment ordering: I1 -> I2 -> I3 -> I4.
 - Lane owners and handoffs: `guide-planning` routes into `add-subfeature`;
   `assess`, `design`, and `breakdown` operate on the selected subfeature;
   `review-planning` confirms readiness before slice bootstrap;
-  `finalize-subfeature` closes the feature-level cleanup loop.
+  retained-history semantics close the feature-level execution loop without a
+  dedicated finalization skill.
 
 ## 6. Bootstrap Order
 

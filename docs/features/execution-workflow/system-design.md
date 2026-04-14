@@ -2,7 +2,7 @@
 
 ## Overview
 
-The execution workflow is a centralized slice system. `guide-execution` manages slice registry state and readiness transitions, while `brief`, `plan`, `review-execution`, and `close-slice` own the slice-scoped artifacts and review outcomes. Feature-level cleanup happens later during human-requested subfeature finalization once planned slices are complete.
+The execution workflow is a centralized slice system. `guide-execution` manages slice registry state and readiness transitions, while `brief`, `plan`, `review-execution`, and `close-slice` own the slice-scoped artifacts and review outcomes. Closed slices remain available for audit unless a separate maintenance workflow archives them later.
 
 ## Key Components
 
@@ -11,7 +11,6 @@ The execution workflow is a centralized slice system. `guide-execution` manages 
 - **Intent artifact**: `brief.md`
 - **Execution artifact**: `blueprint.md`
 - **Requirements checklist**: `checklists/requirements.md`
-- **Feature cleanup tooling**: `finalize_subfeature.py` for reviewed-subfeature cleanup after slice closure
 
 ## Interfaces and Responsibilities
 
@@ -26,7 +25,7 @@ The execution workflow is a centralized slice system. `guide-execution` manages 
 ## Constraints and Tradeoffs
 
 - Slice-scoped slices improve auditability but require stronger discipline to keep one work item per slice.
-- Closure is non-destructive, which preserves execution context until a later finalization step removes the completed slice artifacts for a reviewed subfeature.
+- Closure is non-destructive, which preserves execution context for later audit and optional maintenance workflows.
 - Day-to-day execution context stays intentionally lightweight, reducing workflow overhead but requiring careful handoff discipline.
 
 ## Validation Strategy
@@ -46,7 +45,6 @@ package "Execution Layer" {
   [blueprint]
   [review-execution]
   [close-slice]
-  [finalize-subfeature]
 }
 
 database "<slice_dir>/registry.json" as Registry
@@ -62,7 +60,6 @@ file "requirements.md" as Requirements
 [guide-execution] --> [blueprint]
 [guide-execution] --> [review-execution]
 [guide-execution] --> [close-slice]
-[close-slice] --> [finalize-subfeature]
 [brief] --> Brief
 [brief] --> Requirements
 [blueprint] --> PlanDoc
@@ -70,7 +67,5 @@ file "requirements.md" as Requirements
 [review-execution] --> PlanDoc
 [close-slice] --> Meta
 [close-slice] --> Registry
-[finalize-subfeature] --> Registry
-[finalize-subfeature] --> Meta
 @enduml
 ```

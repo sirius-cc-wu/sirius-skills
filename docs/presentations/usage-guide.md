@@ -42,7 +42,6 @@ Stored in `docs/proposals/<proposal-slug>/`
 - `design`: Architecture, interfaces, and PlantUML system diagrams.
 - `breakdown`: Splits stories into executable **Slices** and **Increments**.
 - `review-planning`: Final planning check before human approval.
-- `finalize-subfeature`: Feeds approved change-packet results back into canonical feature docs after execution.
 
 ---
 
@@ -91,8 +90,7 @@ Stored in `slices/<slice-id>-<slug>/`
 7.  **Commit Planning**: Commit the approved planning artifacts before execution starts.
 8.  **Bootstrap**: `slice` creates the execution folder.
 9.  **Execute**: `brief` -> `blueprint` -> (Code) -> `review-execution`.
-10. **Close**: `close-slice` marks the slice done and preserves the execution context until feature-level finalization is requested.
-11. **Finalize a Reviewed Subfeature**: `finalize-subfeature` verifies the reviewed subfeature's planned slices are closed, removes the completed execution slices, and marks the durable subfeature implemented without deleting its planning folder.
+10. **Close**: `close-slice` marks the slice done and preserves the execution context. Closed slices and durable subfeature planning folders stay in place unless a separate maintenance workflow archives them later.
 
 ---
 

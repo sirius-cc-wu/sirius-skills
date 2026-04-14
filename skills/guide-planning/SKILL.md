@@ -12,7 +12,7 @@ Use this skill as the planning-layer entrypoint when you need to decide the next
 1. Resolve or initialize the active feature planning folder.
 2. Promote accepted proposals into canonical feature planning folders when the user explicitly asks for planning to begin.
 3. Verify required planning files, registry state, and feature metadata.
-4. Route feature-scoped work to `propose`, `add-subfeature`, `assess`, `finalize-subfeature`, `discover`, `design`, `ui-flow`, `breakdown`, or `review-planning`, then stop for approval/commit before execution begins.
+4. Route feature-scoped work to `propose`, `add-subfeature`, `assess`, `discover`, `design`, `ui-flow`, `breakdown`, or `review-planning`, then stop for approval/commit before execution begins.
 5. Update planning readiness state when a phase is complete.
 6. Keep planning handoff decisions durable in the repository instead of transient chat state.
 
@@ -25,7 +25,6 @@ Use `guide-planning` when you need to decide the next planning step before slice
 - If the user wants an accepted proposal promoted into canonical planning, perform that promotion here and then route to `discover`.
 - If the request adds or reshapes a durable child capability under an existing feature, route to `add-subfeature`.
 - If an active subfeature exists and the parent-feature impact is not yet explicit, route to `assess`.
-- If a reviewed subfeature now needs final cleanup of its completed execution slices, route to `finalize-subfeature` only when the user explicitly asks for that final handoff.
 - If the problem, outcomes, or constraints are still being framed, route to `discover`.
 - If the architecture, interfaces, or validation strategy are still unresolved, route to `design`.
 - If UI or interaction flow remains material, route to `ui-flow`.
@@ -49,7 +48,7 @@ Use `guide-planning` when you need to decide the next planning step before slice
 Typical handoff:
 
 ```text
-guide-planning -> propose/add-subfeature/assess/finalize-subfeature/discover -> design -> ui-flow -> breakdown -> review-planning -> human approval -> commit -> slice -> guide-execution
+guide-planning -> propose/add-subfeature/assess/discover -> design -> ui-flow -> breakdown -> review-planning -> human approval -> commit -> slice -> guide-execution
 ```
 
 ## Lifecycle States

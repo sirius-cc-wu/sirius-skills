@@ -28,7 +28,7 @@ The managed repo-first skill set is grouped into:
 
 - repo utilities: `skills/bootstrap/`, `skills/commit/`, `skills/create-pr/`, `skills/simplify/`
 - artifact maintenance: `skills/audit-artifacts/`, `skills/trace-artifacts/`, `skills/report-artifacts/`, `skills/repair-artifacts/`, `skills/archive-artifacts/`
-- planning layer: `skills/guide-scope/`, `skills/guide-planning/`, `skills/propose/`, `skills/add-subfeature/`, `skills/migrate-subfeatures/`, `skills/assess/`, `skills/finalize-subfeature/`, `skills/discover/`, `skills/design/`, `skills/ui-flow/`, `skills/breakdown/`, `skills/review-planning/`
+- planning layer: `skills/guide-scope/`, `skills/guide-planning/`, `skills/propose/`, `skills/add-subfeature/`, `skills/migrate-subfeatures/`, `skills/assess/`, `skills/discover/`, `skills/design/`, `skills/ui-flow/`, `skills/breakdown/`, `skills/review-planning/`
 - execution layer: `skills/slice/`, `skills/guide-execution/`, `skills/brief/`, `skills/blueprint/`, `skills/review-execution/`, `skills/close-slice/`
 
 If a project has no extra configuration, these skills should still work with generic conventions.
@@ -46,7 +46,6 @@ For repositories that use repo-first planning, the recommended short-name planni
 - `skills/add-subfeature/`
 - `skills/migrate-subfeatures/`
 - `skills/assess/`
-- `skills/finalize-subfeature/`
 - `skills/discover/`
 - `skills/design/`
 - `skills/ui-flow/`
@@ -55,7 +54,7 @@ For repositories that use repo-first planning, the recommended short-name planni
 
 These skills sit **before** the execution-slice skills:
 
-- planning layer: `guide-scope`, `guide-planning`, `propose`, `add-subfeature`, `migrate-subfeatures`, `assess`, `finalize-subfeature`, `discover`, `design`, `ui-flow`, `breakdown`, `review-planning`
+- planning layer: `guide-scope`, `guide-planning`, `propose`, `add-subfeature`, `migrate-subfeatures`, `assess`, `discover`, `design`, `ui-flow`, `breakdown`, `review-planning`
 - execution layer: `slice`, `guide-execution`, `brief`, `blueprint`, `review-execution`, `close-slice`
 
 
@@ -97,7 +96,7 @@ Preferred repo workflow:
 13. `guide-execution` routes slice-scoped execution through `brief` to capture slice intent and acceptance, then through `blueprint` to produce the final execution artifact. When `.skills/execution.json` enables `auto_start_implementation`, that handoff continues directly into implementation after the blueprint is marked ready.
 14. `review-execution` checks implementation and validation outcomes against the slice-scoped execution artifacts before closure.
 15. `close-slice` closes completed execution slices and records durable closure metadata.
-16. `finalize-subfeature` verifies a reviewed subfeature's planned slices are complete, removes completed execution slices, marks the durable subfeature implemented, and leaves the subfeature planning folder in place as part of the feature hierarchy.
+16. After closure, keep the subfeature planning folder and closed slice artifacts in place. If a repository wants later cleanup or archival, handle that through maintenance tooling such as `archive-artifacts`, not a dedicated subfeature-finalization skill.
 
 For repositories that still contain legacy `changes/` packets from the old
 workflow, `migrate-subfeatures` can scan and convert those legacy planning
@@ -129,7 +128,7 @@ The machine-readable metadata can also store explicit cross-slice relations such
 
 Closed slices are retained non-destructively. `sirius-skills` does not merge or delete the original `brief.md`/`blueprint.md` artifacts when a slice closes; instead it records closure durably in the slice registry and metadata.
 
-Feature-level cleanup belongs to reviewed subfeature completion, not to per-slice closure. `finalize-subfeature` is the human-invoked feature-level step that can verify every planned slice is closed, remove the completed execution slices created for that subfeature, and mark the durable subfeature implemented without deleting its planning folder.
+Per-slice closure is non-destructive. `sirius-skills` keeps closed slices and durable subfeature planning folders in place by default; any later cleanup or archival should happen through explicit maintenance tooling instead of an automatic feature-finalization step.
 
 To keep relation metadata healthy over time, `skills/guide-execution/scripts/manage_execution.py` also provides `audit-relations`, which checks for missing targets and missing reciprocal links.
 

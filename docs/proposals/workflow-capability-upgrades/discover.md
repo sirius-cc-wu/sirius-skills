@@ -100,8 +100,9 @@ skill-first, generic-first, and agent-neutral direction.
   plugin system.
 - `review-planning` already provides a planning-readiness checkpoint, so new
   verification behavior should complement it rather than duplicate it.
-- `finalize-subfeature` now provides the feature-level precedent for retained
-  history publication and post-completion artifact cleanup.
+- Closed slices and durable subfeature planning folders are retained by default,
+  so later cleanup should be modeled as explicit maintenance rather than a
+  dedicated subfeature-finalization step.
 
 ## Assumptions
 

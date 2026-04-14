@@ -25,8 +25,8 @@ important context.
 ## Non-Goals
 
 - Automatically purge planning packets or slices as part of normal closure.
-- Override the narrow finalization ownership already documented for
-  `finalize-subfeature`.
+- Treat archival as an explicit maintenance workflow rather than something that
+  happens automatically during slice closure.
 - Treat archival as a substitute for audit or repair.
 
 ## Baseline Artifacts To Assess

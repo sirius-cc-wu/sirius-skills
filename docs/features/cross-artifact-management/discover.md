@@ -86,8 +86,9 @@ keep it healthy over time.
   child packets and subfeature metadata.
 - `skills/guide-execution/scripts/manage_execution.py` already owns slice
   registry state and relation metadata, including `audit-relations`.
-- `skills/finalize-subfeature/scripts/finalize_subfeature.py` already performs a
-  narrow final cleanup step for reviewed subfeatures.
+- Closed slices and durable subfeature planning folders are retained by default,
+  so cross-artifact maintenance should stay explicit rather than piggybacking on
+  execution closure.
 
 ## Constraints
 

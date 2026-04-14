@@ -86,7 +86,8 @@ become first-class planning artifacts.
 - `assess` writes subfeature-local `impact-analysis.md` from parent feature
   context.
 - `design` and `breakdown` can target a selected subfeature path.
-- `finalize-subfeature` performs the feature-level cleanup step after execution.
+- Subfeature execution remains non-destructive after closure; any later cleanup
+  or archival should be handled by explicit maintenance tooling.
 
 ## Success Criteria
 

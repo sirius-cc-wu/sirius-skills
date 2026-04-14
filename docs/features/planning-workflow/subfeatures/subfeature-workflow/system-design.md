@@ -73,17 +73,14 @@ Implemented lifecycle in code:
 
 Planning metadata mirrors that lifecycle through the existing planning statuses.
 
-### 5. Finalization is explicit and non-destructive
+### 5. Completion is explicit and non-destructive
 
-`finalize-subfeature` is the human-requested feature-level cleanup step. It:
+Reviewed subfeatures stay durable after execution:
 
-1. verifies the reviewed subfeature's planned slices are closed
-2. removes the completed execution slices created for that subfeature
-3. marks the subfeature implemented/finalized
-4. keeps the durable subfeature folder in place
-
-The workflow does not depend on deleting the child folder or rewriting the
-parent feature folder automatically.
+1. planned slices close individually through `close-slice`
+2. the subfeature folder stays in place as durable planning history
+3. closed execution slices stay available unless explicit archive maintenance is requested later
+4. parent feature folders are not rewritten automatically as part of execution closure
 
 ## Key Components
 
@@ -138,11 +135,6 @@ parent feature folder automatically.
 - **`review-planning`**
   - validates the child planning artifacts before slice bootstrap
 
-- **`finalize-subfeature`**
-  - checks reviewed-subfeature completion
-  - removes completed execution slices
-  - marks the durable subfeature implemented
-
 ## Data Model
 
 ### `subfeatures/registry.json`
@@ -176,7 +168,6 @@ Recommended fields:
 
 - `pytest -q skills/add-subfeature/tests/test_manage_subfeatures.py`
 - `pytest -q skills/assess/tests/test_analyze_impact.py`
-- `pytest -q skills/finalize-subfeature/tests/test_finalize_subfeature.py`
 - `pytest -q skills/breakdown/tests/test_scaffold_breakdown.py`
 - `pytest -q skills/guide-planning/tests/test_manage_planning.py`
 
@@ -203,7 +194,5 @@ folder "Parent Feature" {
 [add-subfeature] --> ChildMeta
 [assess] --> Impact
 [breakdown] --> Breakdown
-[finalize-subfeature] --> Registry
-[finalize-subfeature] --> ChildMeta
 @enduml
 ```
