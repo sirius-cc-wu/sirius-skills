@@ -32,7 +32,12 @@ The third slice adds stop/resume semantics:
    a batch-only progress file.
 10. Stop explicitly when unfinished planned slices remain but none are ready.
 
-Later slices will extend this into per-slice commit checkpoints.
+The fourth slice adds per-slice commit checkpoints:
+
+11. Refuse to bootstrap the next slice while the repository still has uncommitted
+    changes after a completed mapped slice.
+12. Hand that checkpoint back to the existing `commit` owner instead of silently
+    absorbing more work into the next slice.
 
 ## Preferred Input
 
@@ -60,5 +65,7 @@ python3 skills/execute-all-slices/scripts/execute_all_slices.py <target> --scope
   slices into one row; the mapping is ambiguous and should be split first.
 - Stop when unfinished planned slices remain but no mapped slice is active and no
   dependency-ready slice exists.
+- Require a clean worktree before continuing past a completed mapped slice so one
+  commit still represents one completed execution slice.
 - Keep one-slice execution ownership in the existing `slice`,
   `guide-execution`, `review-execution`, `close-slice`, and `commit` skills.

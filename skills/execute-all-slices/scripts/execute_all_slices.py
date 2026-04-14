@@ -3,6 +3,7 @@
 import argparse
 import importlib.util
 import json
+import subprocess
 import sys
 from dataclasses import asdict, dataclass
 from pathlib import Path
@@ -57,6 +58,8 @@ class BootstrapResult:
     bootstrapped_slice_id: Optional[str]
     bootstrapped_slice_path: Optional[str]
     slice_status: Optional[str]
+    checkpoint_slice_id: Optional[str]
+    dirty_worktree_paths: List[str]
     next_owner: Optional[str]
     completed: bool
     action: str
@@ -66,6 +69,8 @@ class BootstrapResult:
         payload["bootstrapped_slice_id"] = self.bootstrapped_slice_id
         payload["bootstrapped_slice_path"] = self.bootstrapped_slice_path
         payload["slice_status"] = self.slice_status
+        payload["checkpoint_slice_id"] = self.checkpoint_slice_id
+        payload["dirty_worktree_paths"] = list(self.dirty_worktree_paths)
         payload["next_owner"] = self.next_owner
         payload["completed"] = self.completed
         payload["action"] = self.action
@@ -365,6 +370,8 @@ def bootstrap_next_slice(
             bootstrapped_slice_id=None,
             bootstrapped_slice_path=None,
             slice_status=None,
+            checkpoint_slice_id=None,
+            dirty_worktree_paths=[],
             next_owner=None,
             completed=completed,
             action="complete" if completed else "blocked",
@@ -375,6 +382,9 @@ def bootstrap_next_slice(
     _, target_dir, _, scope_context, _ = resolve_target(
         planning_module, selector, explicit_scope
     )
+    checkpoint_required = require_commit_checkpoint(backlog, str(scope_context.repo_root))
+    if checkpoint_required is not None:
+        return checkpoint_required
 
     next_planned_slice_id = backlog.ready_next[0]
     entry = next(
@@ -408,6 +418,8 @@ def bootstrap_next_slice(
         bootstrapped_slice_id=next_planned_slice_id,
         bootstrapped_slice_path=str(slice_row["path"]),
         slice_status=str(slice_row["status"]),
+        checkpoint_slice_id=None,
+        dirty_worktree_paths=[],
         next_owner="guide-execution",
         completed=False,
         action="bootstrap_next_slice",
@@ -443,10 +455,16 @@ def resume_execution(
             bootstrapped_slice_id=active_slice_id,
             bootstrapped_slice_path=str(slice_row["path"]),
             slice_status=str(slice_row["status"]),
+            checkpoint_slice_id=None,
+            dirty_worktree_paths=[],
             next_owner="guide-execution",
             completed=False,
             action="resume_active_slice",
         )
+
+    checkpoint_required = require_commit_checkpoint(backlog, str(scope_context.repo_root))
+    if checkpoint_required is not None:
+        return checkpoint_required
 
     if backlog.ready_next:
         return bootstrap_next_slice(selector, explicit_scope=explicit_scope)
@@ -458,6 +476,8 @@ def resume_execution(
             bootstrapped_slice_id=None,
             bootstrapped_slice_path=None,
             slice_status=None,
+            checkpoint_slice_id=None,
+            dirty_worktree_paths=[],
             next_owner=None,
             completed=True,
             action="complete",
@@ -469,6 +489,40 @@ def resume_execution(
     raise RuntimeError(
         "No ready planned slice remains while unfinished slices are blocked: "
         + ", ".join(blocked)
+    )
+
+
+def read_dirty_worktree_paths(repo_root: str) -> List[str]:
+    result = subprocess.run(
+        ["git", "-C", repo_root, "status", "--short"],
+        check=False,
+        capture_output=True,
+        text=True,
+    )
+    if result.returncode != 0:
+        raise RuntimeError("Unable to inspect git worktree state for commit checkpoint.")
+    return [line.rstrip() for line in result.stdout.splitlines() if line.strip()]
+
+
+def require_commit_checkpoint(
+    backlog: BacklogResolution, repo_root: str
+) -> Optional[BootstrapResult]:
+    completed_entries = [entry for entry in backlog.entries if entry.state == "completed"]
+    if not completed_entries:
+        return None
+    dirty_worktree_paths = read_dirty_worktree_paths(repo_root)
+    if not dirty_worktree_paths:
+        return None
+    return BootstrapResult(
+        backlog=backlog,
+        bootstrapped_slice_id=None,
+        bootstrapped_slice_path=None,
+        slice_status=None,
+        checkpoint_slice_id=completed_entries[-1].planned_slice_id,
+        dirty_worktree_paths=dirty_worktree_paths,
+        next_owner="commit",
+        completed=False,
+        action="commit_checkpoint_required",
     )
 
 
@@ -536,6 +590,16 @@ def render_bootstrap_text(result: BootstrapResult) -> str:
                 f"Slice path: {result.bootstrapped_slice_path}",
                 f"Slice status: {result.slice_status}",
                 f"Next owner: {result.next_owner}",
+            ]
+        )
+    elif result.action == "commit_checkpoint_required":
+        lines.extend(
+            [
+                "",
+                f"Commit checkpoint required for: {result.checkpoint_slice_id}",
+                f"Next owner: {result.next_owner}",
+                "Dirty worktree paths:",
+                *[f"- {path}" for path in result.dirty_worktree_paths],
             ]
         )
     elif result.completed:

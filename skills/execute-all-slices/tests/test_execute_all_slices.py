@@ -1,5 +1,6 @@
 import importlib.util
 import json
+import subprocess
 import sys
 from pathlib import Path
 
@@ -41,8 +42,28 @@ def write_file(path: Path, content: str):
     path.write_text(content, encoding="utf-8")
 
 
+def init_git_repo(root: Path):
+    subprocess.run(["git", "init", "--quiet"], cwd=root, check=True)
+    subprocess.run(
+        ["git", "config", "user.name", "Copilot Test"],
+        cwd=root,
+        check=True,
+    )
+    subprocess.run(
+        ["git", "config", "user.email", "copilot@example.test"],
+        cwd=root,
+        check=True,
+    )
+
+
+def git_commit_all(root: Path, message: str):
+    subprocess.run(["git", "add", "."], cwd=root, check=True)
+    subprocess.run(["git", "commit", "--quiet", "-m", message], cwd=root, check=True)
+
+
 def setup_repo(tmp_path: Path, monkeypatch):
     monkeypatch.chdir(tmp_path)
+    init_git_repo(tmp_path)
     planning = load_module(PLANNING_SCRIPT, "manage_planning")
     subfeatures = load_module(SUBFEATURE_SCRIPT, "manage_subfeatures")
     execution = load_module(EXECUTION_SCRIPT, "manage_execution")
@@ -85,6 +106,7 @@ def setup_repo(tmp_path: Path, monkeypatch):
     write_file(subfeature_path / "discover.md", "# Discover\n")
     write_file(subfeature_path / "impact-analysis.md", "# Impact\n")
     write_file(subfeature_path / "system-design.md", "# Design\n")
+    git_commit_all(tmp_path, "fixture: initialize repo")
 
     return {
         "planning": planning,
@@ -471,6 +493,7 @@ def test_resume_bootstraps_next_ready_slice_after_completed_predecessor(
         execution_rows, slice_row, "closed", force=True
     )
     assert success, message
+    git_commit_all(tmp_path, "fixture: close first slice")
 
     assert run_cli(module, monkeypatch, "multi-slice-execution", "--resume", "--json") == 0
     payload = json.loads(capsys.readouterr().out)
@@ -521,3 +544,77 @@ def test_resume_rejects_blocked_unfinished_backlog_without_ready_slice(
 
     assert run_cli(module, monkeypatch, "execution-workflow", "--resume") == 2
     assert "No ready planned slice remains while unfinished slices are blocked" in capsys.readouterr().err
+
+
+def test_resume_requires_commit_checkpoint_before_next_slice(tmp_path, monkeypatch, capsys):
+    env = setup_repo(tmp_path, monkeypatch)
+    subfeatures = env["subfeatures"]
+    feature_path = env["feature_path"]
+    subfeature_path = env["subfeature_path"]
+    module = env["module"]
+    execution = env["execution"]
+
+    write_file(
+        subfeature_path / "slice-planning.md",
+        """# Slice Planning
+
+| Slice ID | Story ID | Title | Summary | Target Area | Lane | Validation | Planned Action | Depends On | Slice Ready |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| EW-MSE-01-scope-and-backlog-resolution | EW-01 | Resolve scope | Summary | area | primary | test | create slice |  | yes |
+| EW-MSE-02-sequential-slice-orchestration | EW-01 | Orchestrate slices | Summary | area | primary | test | create slice | EW-MSE-01-scope-and-backlog-resolution | yes |
+""",
+    )
+    write_file(
+        subfeature_path / "slice-traceability.md",
+        """# Slice Traceability
+
+| Story ID | Story Size | Story Summary | Increments | Planned Slice IDs | Slice Areas | Blocked By | Execution Slice IDs | Notes |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| EW-01 | M | Summary | I1 | EW-MSE-01-scope-and-backlog-resolution | area |  | EW-MSE-01-scope-and-backlog-resolution | Notes |
+| EW-01 | M | Summary | I2 | EW-MSE-02-sequential-slice-orchestration | area | EW-MSE-01-scope-and-backlog-resolution |  | Notes |
+""",
+    )
+
+    rows = subfeatures.load_registry(str(feature_path))
+    subfeature = subfeatures.find_subfeature(rows, "multi-slice-execution")
+    assert subfeature is not None
+    success, message = subfeatures.update_subfeature_status(
+        env["planning"],
+        str(feature_path),
+        subfeature,
+        "reviewed",
+        env["planning"].SCOPE_RUNTIME.resolve_scope_context(),
+        force=True,
+        review_note="ready",
+        affected_artifacts=[
+            "docs/features/execution-workflow/discover.md",
+            "docs/features/execution-workflow/system-design.md",
+            "docs/features/execution-workflow/user-stories.md",
+        ],
+        affected_story_ids=["EW-01"],
+    )
+    assert success, message
+
+    _, created = execution.create_slice(
+        "EW-MSE-01-scope-and-backlog-resolution", "Resolve scope"
+    )
+    assert created
+    execution_rows = execution.parse_registry()
+    slice_row = execution.resolve_slice(
+        execution_rows, "EW-MSE-01-scope-and-backlog-resolution"
+    )
+    assert slice_row is not None
+    success, message = execution.update_slice_status(
+        execution_rows, slice_row, "closed", force=True
+    )
+    assert success, message
+    git_commit_all(tmp_path, "fixture: close first slice")
+    write_file(tmp_path / "scratch.txt", "dirty\n")
+
+    assert run_cli(module, monkeypatch, "multi-slice-execution", "--resume", "--json") == 0
+    payload = json.loads(capsys.readouterr().out)
+
+    assert payload["action"] == "commit_checkpoint_required"
+    assert payload["checkpoint_slice_id"] == "EW-MSE-01-scope-and-backlog-resolution"
+    assert payload["next_owner"] == "commit"
+    assert any("scratch.txt" in entry for entry in payload["dirty_worktree_paths"])
