@@ -36,7 +36,31 @@ def write_scope_config(root: Path, filename: str, payload: dict):
     (skills_dir / filename).write_text(json.dumps(payload) + "\n", encoding="utf-8")
 
 
-def setup_repo(tmp_path: Path, monkeypatch):
+def advance_feature_to_planning_reviewed(planning, monkeypatch, feature_slug: str):
+    assert run_cli(planning, monkeypatch, "set-status", feature_slug, "discovery_ready") == 0
+    assert run_cli(planning, monkeypatch, "set-status", feature_slug, "design_ready") == 0
+    assert run_cli(planning, monkeypatch, "set-status", feature_slug, "breakdown_ready") == 0
+    assert (
+        run_cli(
+            planning,
+            monkeypatch,
+            "set-status",
+            feature_slug,
+            "planning_reviewed",
+            "--review-note",
+            "Reviewed for execution handoff readiness.",
+        )
+        == 0
+    )
+
+
+def setup_repo(
+    tmp_path: Path,
+    monkeypatch,
+    *,
+    include_slice: bool = False,
+    sync_planning_handoff: bool = False,
+):
     monkeypatch.chdir(tmp_path)
     propose = load_module(PROPOSE_SCRIPT, "manage_proposals")
     planning = load_module(PLANNING_SCRIPT, "manage_planning")
@@ -62,6 +86,10 @@ def setup_repo(tmp_path: Path, monkeypatch):
     feature_dir, _ = planning.create_feature("checkout")
     feature_path = Path(feature_dir)
     (feature_path / "discover.md").write_text("# Discover\n", encoding="utf-8")
+    (feature_path / "system-design.md").write_text("# System Design\n", encoding="utf-8")
+    (feature_path / "slice-planning.md").write_text("# Slice Planning\n", encoding="utf-8")
+    (feature_path / "slice-traceability.md").write_text("# Slice Traceability\n", encoding="utf-8")
+    advance_feature_to_planning_reviewed(planning, monkeypatch, "checkout")
     planning.sync_registry()
 
     proposal_dir, _ = propose.create_proposal(
@@ -83,7 +111,23 @@ def setup_repo(tmp_path: Path, monkeypatch):
         scope_context,
     )
 
-    execution.create_slice("CHK-101", "Checkout Slice")
+    slice_dir = None
+    if include_slice:
+        execution.create_slice("CHK-101", "checkout")
+        slice_dir = tmp_path / "slices" / "CHK-101-checkout"
+        if sync_planning_handoff:
+            assert (
+                run_cli(
+                    planning,
+                    monkeypatch,
+                    "set-status",
+                    "checkout",
+                    "slice_ready",
+                    "--slice-id",
+                    "CHK-101",
+                )
+                == 0
+            )
 
     return {
         "audit": audit,
@@ -95,7 +139,7 @@ def setup_repo(tmp_path: Path, monkeypatch):
         "proposal_dir": Path(proposal_dir),
         "proposal_row": proposal_row,
         "subfeature_dir": Path(subfeature_dir),
-        "slice_dir": tmp_path / "slices" / "CHK-101-checkout-slice",
+        "slice_dir": slice_dir,
     }
 
 
@@ -173,8 +217,23 @@ def test_run_audit_reports_missing_promoted_feature_and_subfeature_registry_drif
     assert "subfeature_registry_path_missing" in finding_codes(result)
 
 
+def test_run_audit_reports_feature_status_drift_when_execution_exists(tmp_path, monkeypatch):
+    env = setup_repo(tmp_path, monkeypatch, include_slice=True)
+
+    result = env["audit"].run_audit(["feature"])
+
+    assert result["ok"] is False
+    assert "planning_status_precedes_execution" in finding_codes(result)
+    assert any(
+        finding["artifact_type"] == "feature"
+        and finding["artifact_id"] == "checkout"
+        for finding in result["findings"]
+    )
+
+
 def test_cli_json_reports_slice_relation_issues(tmp_path, monkeypatch, capsys):
-    env = setup_repo(tmp_path, monkeypatch)
+    env = setup_repo(tmp_path, monkeypatch, include_slice=True, sync_planning_handoff=True)
+    capsys.readouterr()
 
     metadata = json.loads((env["slice_dir"] / ".slice-meta.json").read_text(encoding="utf-8"))
     metadata["relations"] = [

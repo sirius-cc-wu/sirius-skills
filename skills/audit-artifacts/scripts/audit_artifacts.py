@@ -395,6 +395,21 @@ def _audit_cross_links(
     canonical_feature_slugs = {
         str(metadata["feature_slug"]) for metadata in feature_metadata.values() if "feature_slug" in metadata
     }
+    canonical_feature_paths = {
+        str(metadata["feature_slug"]): relpath
+        for relpath, metadata in feature_metadata.items()
+        if "feature_slug" in metadata
+    }
+    feature_statuses = {
+        str(metadata["feature_slug"]): str(metadata.get("status") or "")
+        for metadata in feature_metadata.values()
+        if "feature_slug" in metadata
+    }
+    slice_rows_by_feature: Dict[str, List[Dict[str, object]]] = {}
+    for row in inventory.slice_rows:
+        feature_slug = str(row.get("feature") or "").strip()
+        if feature_slug:
+            slice_rows_by_feature.setdefault(feature_slug, []).append(dict(row))
 
     for proposal_id, metadata in proposal_metadata.items():
         proposal_path = normalize_dir_relpath(inventory.context.proposal_root / proposal_id)
@@ -456,6 +471,28 @@ def _audit_cross_links(
                         "error",
                         "Subfeature metadata parent_feature_slug does not match the parent folder path.",
                     )
+
+    for feature_slug, rows in slice_rows_by_feature.items():
+        if feature_slug not in canonical_feature_slugs:
+            continue
+        feature_status = feature_statuses.get(feature_slug, "")
+        if feature_status in {"slice_ready", "implemented"}:
+            continue
+        slice_ids = ", ".join(sorted(str(row["id"]) for row in rows))
+        add_finding(
+            findings,
+            selected,
+            "feature",
+            feature_slug,
+            canonical_feature_paths[feature_slug],
+            "cross_layer_drift",
+            "planning_status_precedes_execution",
+            "warning",
+            (
+                f"Feature planning status '{feature_status}' predates execution handoff, "
+                f"but execution slices already exist: {slice_ids}."
+            ),
+        )
 
 
 def _audit_relations(inventory: Inventory, findings: List[Finding], selected: Set[str]) -> None:

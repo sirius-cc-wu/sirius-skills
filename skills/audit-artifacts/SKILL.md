@@ -13,7 +13,8 @@ across proposals, canonical features, durable subfeatures, and execution slices.
 1. Inventory the current proposal, planning, subfeature, and slice artifacts.
 2. Reuse existing owner-script validators where available.
 3. Surface registry drift, missing required files, invalid metadata, broken
-   cross-artifact links, and slice relation problems.
+   cross-artifact links, planning-to-execution handoff drift, and slice
+   relation problems.
 4. Emit findings without mutating repository artifacts.
 
 ## Preferred Input
@@ -54,6 +55,7 @@ The first version audits:
 - proposal registry and proposal metadata
 - top-level planning registry plus canonical feature folders
 - feature-local subfeature registries plus subfeature folders
+- planning-to-execution handoff consistency for canonical features
 - execution slice registry, slice metadata, and slice relation health
 
 ## Guardrails
