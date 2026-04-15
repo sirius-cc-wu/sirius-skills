@@ -9,11 +9,15 @@ from typing import Dict, List, Optional, Sequence, Set, Tuple
 SCRIPT_DIR = Path(__file__).resolve().parent
 SKILLS_DIR = SCRIPT_DIR.parents[1]
 AUDIT_SCRIPT_DIR = SKILLS_DIR / "audit-artifacts" / "scripts"
+TRACE_SCRIPT_DIR = SKILLS_DIR / "trace-artifacts" / "scripts"
 
 if str(AUDIT_SCRIPT_DIR) not in sys.path:
     sys.path.insert(0, str(AUDIT_SCRIPT_DIR))
+if str(TRACE_SCRIPT_DIR) not in sys.path:
+    sys.path.insert(0, str(TRACE_SCRIPT_DIR))
 
 from artifact_inventory import load_inventory, normalize_dir_relpath  # noqa: E402
+from trace_data import parse_traceability_records  # noqa: E402
 
 
 VALID_ARTIFACT_TYPES = ("proposal", "feature", "subfeature", "slice")
@@ -56,6 +60,26 @@ class SkippedArtifact:
             "artifact_id": self.artifact_id,
             "path": self.path,
             "message": self.message,
+        }
+
+
+@dataclass
+class RepairSuggestion:
+    artifact_type: str
+    artifact_id: str
+    path: str
+    code: str
+    message: str
+    apply_supported: bool = False
+
+    def to_dict(self) -> Dict[str, object]:
+        return {
+            "artifact_type": self.artifact_type,
+            "artifact_id": self.artifact_id,
+            "path": self.path,
+            "code": self.code,
+            "message": self.message,
+            "apply_supported": self.apply_supported,
         }
 
 
@@ -187,6 +211,200 @@ def _rebuild_slice_rows(inventory, skipped: List[SkippedArtifact]) -> List[Dict[
     return sorted(rows, key=lambda row: str(row["path"]))
 
 
+def _dedupe_skipped(skipped: Sequence[SkippedArtifact]) -> List[SkippedArtifact]:
+    seen = set()
+    result: List[SkippedArtifact] = []
+    for item in skipped:
+        key = (item.artifact_type, item.artifact_id, item.path, item.message)
+        if key in seen:
+            continue
+        seen.add(key)
+        result.append(item)
+    return result
+
+
+def _dedupe_suggestions(
+    suggestions: Sequence[RepairSuggestion],
+) -> List[RepairSuggestion]:
+    seen = set()
+    result: List[RepairSuggestion] = []
+    for item in suggestions:
+        key = (item.artifact_type, item.artifact_id, item.path, item.code, item.message)
+        if key in seen:
+            continue
+        seen.add(key)
+        result.append(item)
+    return result
+
+
+def _canonical_feature_slugs(
+    inventory, skipped: List[SkippedArtifact]
+) -> Tuple[Set[str], Dict[str, Dict[str, object]], Dict[str, str]]:
+    slugs: Set[str] = set()
+    metadata_by_slug: Dict[str, Dict[str, object]] = {}
+    path_by_slug: Dict[str, str] = {}
+    for feature_dir in inventory.feature_dirs:
+        metadata, skipped_artifact = _safe_read_metadata(
+            inventory.context.planning.read_metadata, "feature", feature_dir.name, feature_dir
+        )
+        if skipped_artifact is not None:
+            skipped.append(skipped_artifact)
+            continue
+        feature_slug = str(metadata.get("feature_slug") or feature_dir.name)
+        slugs.add(feature_slug)
+        metadata_by_slug[feature_slug] = metadata
+        path_by_slug[feature_slug] = normalize_dir_relpath(feature_dir)
+    return slugs, metadata_by_slug, path_by_slug
+
+
+def _proposal_link_suggestions(
+    inventory,
+    selected: Set[str],
+    skipped: List[SkippedArtifact],
+    canonical_feature_slugs: Sequence[str],
+) -> List[RepairSuggestion]:
+    if "proposal" not in selected:
+        return []
+    suggestions: List[RepairSuggestion] = []
+    candidate_suffix = (
+        f" Candidate canonical features: {', '.join(canonical_feature_slugs)}."
+        if canonical_feature_slugs
+        else " No canonical features are currently available."
+    )
+    for proposal_dir in inventory.proposal_dirs:
+        metadata, skipped_artifact = _safe_read_metadata(
+            inventory.context.propose.read_metadata, "proposal", proposal_dir.name, proposal_dir
+        )
+        if skipped_artifact is not None:
+            skipped.append(skipped_artifact)
+            continue
+        proposal_path = normalize_dir_relpath(proposal_dir)
+        for field_name, code in (
+            ("target_feature", "repair_target_feature_link"),
+            ("promoted_feature", "repair_promoted_feature_link"),
+        ):
+            value = metadata.get(field_name)
+            if not isinstance(value, str) or not value.strip():
+                continue
+            if value in canonical_feature_slugs:
+                continue
+            suggestions.append(
+                RepairSuggestion(
+                    artifact_type="proposal",
+                    artifact_id=proposal_dir.name,
+                    path=proposal_path,
+                    code=code,
+                    message=(
+                        f"Preview only: update .proposal-meta.json field '{field_name}' "
+                        f"from '{value}' to a valid canonical feature slug."
+                        f"{candidate_suffix}"
+                    ),
+                )
+            )
+    return suggestions
+
+
+def _planning_status_suggestions(
+    inventory,
+    selected: Set[str],
+    feature_metadata_by_slug: Dict[str, Dict[str, object]],
+    feature_paths_by_slug: Dict[str, str],
+) -> List[RepairSuggestion]:
+    if "feature" not in selected:
+        return []
+    suggestions: List[RepairSuggestion] = []
+    slice_rows_by_feature: Dict[str, List[Dict[str, object]]] = {}
+    for row in inventory.slice_rows:
+        feature_slug = str(row.get("feature") or "").strip()
+        if feature_slug:
+            slice_rows_by_feature.setdefault(feature_slug, []).append(dict(row))
+
+    for feature_slug, rows in slice_rows_by_feature.items():
+        metadata = feature_metadata_by_slug.get(feature_slug)
+        if metadata is None:
+            continue
+        current_status = str(metadata.get("status") or "")
+        if current_status in {"slice_ready", "implemented"}:
+            continue
+        suggested_status = (
+            "implemented"
+            if rows and all(str(row.get("status")) == "closed" for row in rows)
+            else "slice_ready"
+        )
+        slice_ids = ", ".join(sorted(str(row["id"]) for row in rows))
+        suggestions.append(
+            RepairSuggestion(
+                artifact_type="feature",
+                artifact_id=feature_slug,
+                path=feature_paths_by_slug[feature_slug],
+                code="repair_planning_status_handoff",
+                message=(
+                    "Preview only: update .planning-meta.json status "
+                    f"from '{current_status}' to '{suggested_status}' to match "
+                    f"existing execution slices: {slice_ids}."
+                ),
+            )
+        )
+    return suggestions
+
+
+def _traceability_suggestions(
+    inventory,
+    selected: Set[str],
+) -> List[RepairSuggestion]:
+    suggestions: List[RepairSuggestion] = []
+    slice_ids_by_feature: Dict[str, Set[str]] = {}
+    for row in inventory.slice_rows:
+        feature_slug = str(row.get("feature") or "").strip()
+        slice_id = str(row.get("id") or "").strip()
+        if feature_slug and slice_id:
+            slice_ids_by_feature.setdefault(feature_slug, set()).add(slice_id)
+
+    owner_specs: List[Tuple[str, str, Path, str]] = []
+    if "feature" in selected:
+        for feature_dir in inventory.feature_dirs:
+            owner_specs.append(
+                ("feature", feature_dir.name, feature_dir / "slice-traceability.md", normalize_dir_relpath(feature_dir))
+            )
+    if "subfeature" in selected:
+        for feature_dir in inventory.feature_dirs:
+            for subfeature_dir in inventory.subfeature_dirs_by_feature.get(feature_dir.name, []):
+                owner_specs.append(
+                    (
+                        "subfeature",
+                        subfeature_dir.name,
+                        subfeature_dir / "slice-traceability.md",
+                        normalize_dir_relpath(subfeature_dir),
+                    )
+                )
+
+    for owner_type, owner_id, traceability_path, owner_path in owner_specs:
+        records = parse_traceability_records(traceability_path, owner_type, owner_id, owner_path)
+        actual_slice_ids = slice_ids_by_feature.get(owner_id, set())
+        if not actual_slice_ids:
+            continue
+        for record in records:
+            if record.execution_slice_ids:
+                continue
+            matching_ids = [slice_id for slice_id in record.planned_slice_ids if slice_id in actual_slice_ids]
+            if not matching_ids:
+                continue
+            suggestions.append(
+                RepairSuggestion(
+                    artifact_type=owner_type,
+                    artifact_id=owner_id,
+                    path=owner_path,
+                    code="repair_traceability_execution_ids",
+                    message=(
+                        "Preview only: backfill 'Execution Slice IDs' in "
+                        f"slice-traceability.md for story '{record.story_id}' with "
+                        f"{', '.join(matching_ids)}."
+                    ),
+                )
+            )
+    return suggestions
+
+
 def build_repair_result(
     artifact_types: Optional[Sequence[str]] = None, apply: bool = False
 ) -> Dict[str, object]:
@@ -277,8 +495,23 @@ def build_repair_result(
                 rebuilt_count=len(rebuilt),
                 changed=changed,
                 applied=apply and changed,
+                )
             )
+
+    canonical_feature_slugs, feature_metadata_by_slug, feature_paths_by_slug = _canonical_feature_slugs(
+        inventory, skipped
+    )
+    suggestions = _proposal_link_suggestions(
+        inventory, selected, skipped, sorted(canonical_feature_slugs)
+    )
+    suggestions.extend(
+        _planning_status_suggestions(
+            inventory, selected, feature_metadata_by_slug, feature_paths_by_slug
         )
+    )
+    suggestions.extend(_traceability_suggestions(inventory, selected))
+    deduped_skipped = _dedupe_skipped(skipped)
+    deduped_suggestions = _dedupe_suggestions(suggestions)
 
     return {
         "ok": True,
@@ -286,8 +519,10 @@ def build_repair_result(
         "summary": {
             "planned_actions": sum(1 for action in actions if action.changed),
             "applied_actions": sum(1 for action in actions if action.applied),
-            "skipped_artifacts": len(skipped),
+            "skipped_artifacts": len(deduped_skipped),
+            "suggested_repairs": len(deduped_suggestions),
         },
         "actions": [action.to_dict() for action in actions],
-        "skipped": [artifact.to_dict() for artifact in skipped],
+        "suggestions": [suggestion.to_dict() for suggestion in deduped_suggestions],
+        "skipped": [artifact.to_dict() for artifact in deduped_skipped],
     }

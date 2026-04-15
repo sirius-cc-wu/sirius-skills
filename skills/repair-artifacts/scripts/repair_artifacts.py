@@ -48,6 +48,7 @@ def render_text(result: Dict[str, object]) -> str:
         f"Changed layers: {result['summary']['planned_actions']}",
         f"Applied layers: {result['summary']['applied_actions']}",
         f"Skipped artifacts: {result['summary']['skipped_artifacts']}",
+        f"Suggested repairs: {result['summary']['suggested_repairs']}",
         "Actions:",
     ]
     for action in result["actions"]:
@@ -62,6 +63,13 @@ def render_text(result: Dict[str, object]) -> str:
         lines.append("Skipped:")
         for skipped in result["skipped"]:
             lines.append(f"- {skipped['artifact_type']}:{skipped['artifact_id']} ({skipped['message']})")
+    if result["suggestions"]:
+        lines.append("Suggestions:")
+        for suggestion in result["suggestions"]:
+            lines.append(
+                f"- {suggestion['artifact_type']}:{suggestion['artifact_id']} "
+                f"[{suggestion['code']}] {suggestion['message']}"
+            )
     return "\n".join(lines)
 
 

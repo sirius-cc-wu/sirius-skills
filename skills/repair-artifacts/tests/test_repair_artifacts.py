@@ -36,7 +36,23 @@ def write_scope_config(root: Path, filename: str, payload: dict):
     (skills_dir / filename).write_text(json.dumps(payload) + "\n", encoding="utf-8")
 
 
-def setup_repo(tmp_path: Path, monkeypatch):
+def write_traceability(feature_dir: Path, planned_slice_id: str, execution_slice_ids: str = ""):
+    (feature_dir / "slice-traceability.md").write_text(
+        "\n".join(
+            [
+                "# Slice Traceability",
+                "",
+                "| Story ID | Story Size | Story Summary | Increments | Planned Slice IDs | Slice Areas | Blocked By | Execution Slice IDs | Notes |",
+                "| --- | --- | --- | --- | --- | --- | --- | --- | --- |",
+                f"| CHK-01 | M | Summary | I1 | {planned_slice_id} | area |  | {execution_slice_ids} | Notes |",
+                "",
+            ]
+        ),
+        encoding="utf-8",
+    )
+
+
+def setup_repo(tmp_path: Path, monkeypatch, *, clear_registries: bool = True):
     monkeypatch.chdir(tmp_path)
     propose = load_module(PROPOSE_SCRIPT, "manage_proposals")
     planning = load_module(PLANNING_SCRIPT, "manage_planning")
@@ -75,12 +91,13 @@ def setup_repo(tmp_path: Path, monkeypatch):
         "Replace legacy flow",
         scope_context,
     )
-    execution.create_slice("CHK-101", "Checkout Slice")
+    execution.create_slice("CHK-101", "checkout")
 
-    propose.write_registry([])
-    planning.write_registry([])
-    subfeatures.write_registry(feature_dir, [])
-    execution.write_registry([])
+    if clear_registries:
+        propose.write_registry([])
+        planning.write_registry([])
+        subfeatures.write_registry(feature_dir, [])
+        execution.write_registry([])
 
     return {
         "repair": repair,
@@ -101,6 +118,7 @@ def test_build_repair_result_reports_dry_run_actions(tmp_path, monkeypatch):
     assert payload["summary"]["planned_actions"] == 4
     assert payload["summary"]["applied_actions"] == 0
     assert payload["summary"]["skipped_artifacts"] == 0
+    assert payload["summary"]["suggested_repairs"] == 0
 
 
 def test_build_repair_result_applies_registry_repairs(tmp_path, monkeypatch):
@@ -117,6 +135,7 @@ def test_build_repair_result_applies_registry_repairs(tmp_path, monkeypatch):
     assert proposal_rows[0]["proposal"] == "checkout-audit"
     assert len(slice_rows) == 1
     assert slice_rows[0]["id"] == "CHK-101"
+    assert payload["summary"]["suggested_repairs"] == 0
 
 
 def test_build_repair_result_skips_malformed_metadata(tmp_path, monkeypatch):
@@ -128,6 +147,54 @@ def test_build_repair_result_skips_malformed_metadata(tmp_path, monkeypatch):
 
     assert payload["summary"]["skipped_artifacts"] == 1
     assert payload["skipped"][0]["artifact_type"] == "proposal"
+
+
+def test_build_repair_result_reports_preview_only_semantic_suggestions(tmp_path, monkeypatch):
+    env = setup_repo(tmp_path, monkeypatch, clear_registries=False)
+    feature_dir = env["feature_dir"]
+
+    proposal_meta_path = env["proposal_dir"] / ".proposal-meta.json"
+    proposal_meta = json.loads(proposal_meta_path.read_text(encoding="utf-8"))
+    proposal_meta["target_feature"] = "missing-feature"
+    proposal_meta_path.write_text(json.dumps(proposal_meta) + "\n", encoding="utf-8")
+
+    planning_meta_path = feature_dir / ".planning-meta.json"
+    planning_meta = json.loads(planning_meta_path.read_text(encoding="utf-8"))
+    planning_meta["status"] = "planning_reviewed"
+    planning_meta_path.write_text(json.dumps(planning_meta) + "\n", encoding="utf-8")
+    env["planning"].sync_registry()
+
+    write_traceability(feature_dir, "CHK-101")
+
+    payload = env["repair"].build_repair_result()
+    suggestion_codes = {item["code"] for item in payload["suggestions"]}
+
+    assert payload["summary"]["suggested_repairs"] == 3
+    assert suggestion_codes == {
+        "repair_target_feature_link",
+        "repair_planning_status_handoff",
+        "repair_traceability_execution_ids",
+    }
+    assert all(item["apply_supported"] is False for item in payload["suggestions"])
+
+
+def test_build_repair_result_keeps_apply_mode_limited_to_derived_artifacts(tmp_path, monkeypatch):
+    env = setup_repo(tmp_path, monkeypatch, clear_registries=False)
+    feature_dir = env["feature_dir"]
+
+    planning_meta_path = feature_dir / ".planning-meta.json"
+    planning_meta = json.loads(planning_meta_path.read_text(encoding="utf-8"))
+    planning_meta["status"] = "planning_reviewed"
+    planning_meta_path.write_text(json.dumps(planning_meta) + "\n", encoding="utf-8")
+    env["planning"].sync_registry()
+
+    write_traceability(feature_dir, "CHK-101")
+
+    payload = env["repair"].build_repair_result(apply=True)
+    refreshed_meta = json.loads(planning_meta_path.read_text(encoding="utf-8"))
+
+    assert payload["summary"]["suggested_repairs"] == 2
+    assert refreshed_meta["status"] == "planning_reviewed"
 
 
 def test_cli_json_reports_selected_artifact_layer(tmp_path, monkeypatch, capsys):

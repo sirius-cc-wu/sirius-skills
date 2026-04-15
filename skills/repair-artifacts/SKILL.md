@@ -12,7 +12,7 @@ audit finds registry or readme drift.
 
 1. Reuse the shared inventory to discover active artifact directories.
 2. Rebuild normalized registry rows from valid metadata.
-3. Preview repair actions by default.
+3. Preview repair actions and manual follow-up suggestions by default.
 4. Apply registry/readme regeneration only when the maintainer explicitly asks.
 
 ## Preferred Input
@@ -41,8 +41,8 @@ python3 skills/repair-artifacts/scripts/repair_artifacts.py --json
 
 ## Output
 
-- default: human-readable dry-run or apply summary
-- `--json`: structured actions and skipped artifacts
+- default: human-readable dry-run or apply summary, plus preview-only repair suggestions
+- `--json`: structured actions, suggestions, and skipped artifacts
 
 Exit behavior:
 
@@ -52,5 +52,6 @@ Exit behavior:
 
 - Default to dry-run; do not write unless `--apply` is present.
 - Keep apply mode limited to derived registry/readme artifacts.
+- Preview metadata or traceability follow-up without guessing or silently rewriting those files.
 - Leave malformed metadata as manual follow-up instead of guessing corrections.
 - Reuse owner registry writers instead of copying registry formatting logic.
