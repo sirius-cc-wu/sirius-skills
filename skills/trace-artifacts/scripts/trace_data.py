@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
 
-import re
 import sys
 from dataclasses import dataclass
 from pathlib import Path
@@ -18,7 +17,9 @@ if str(AUDIT_SCRIPT_DIR) not in sys.path:
 
 from artifact_inventory import (  # noqa: E402
     Inventory,
+    TraceabilityRecord,
     iter_subfeature_dirs,
+    iter_traceability_records,
     load_inventory,
     normalize_dir_relpath,
 )
@@ -35,15 +36,6 @@ TYPE_ALIASES = {
     "execution_slice": "slice",
     "slice": "slice",
 }
-TRACEABILITY_HEADERS = {
-    "story id",
-    "increments",
-    "planned slice ids",
-    "execution slice ids",
-    "notes",
-}
-
-
 @dataclass
 class TraceNode:
     artifact_type: str
@@ -85,18 +77,6 @@ class TraceEdge:
 
 
 @dataclass
-class TraceabilityRecord:
-    owner_type: str
-    owner_id: str
-    owner_path: str
-    story_id: str
-    increments: str
-    planned_slice_ids: List[str]
-    execution_slice_ids: List[str]
-    notes: str
-
-
-@dataclass
 class TraceGraph:
     inventory: Inventory
     nodes: Dict[Tuple[str, str], TraceNode]
@@ -116,101 +96,6 @@ def normalize_artifact_type(value: str) -> str:
 
 def node_key(artifact_type: str, artifact_id: str) -> Tuple[str, str]:
     return artifact_type, artifact_id
-
-
-def _normalize_table_header(value: str) -> str:
-    return re.sub(r"\s+", " ", value.replace("-", " ").strip().lower())
-
-
-def _split_table_row(line: str) -> List[str]:
-    stripped = line.strip().strip("|")
-    return [cell.strip() for cell in stripped.split("|")]
-
-
-def _split_cell_values(value: str) -> List[str]:
-    raw = value.replace("<br/>", "\n").replace("<br />", "\n").replace("<br>", "\n")
-    items = [part.strip() for part in re.split(r"[\n,;]+", raw)]
-    return [item for item in items if item]
-
-
-def parse_traceability_records(
-    path: Path, owner_type: str, owner_id: str, owner_path: str
-) -> List[TraceabilityRecord]:
-    if not path.exists():
-        return []
-
-    lines = path.read_text(encoding="utf-8").splitlines()
-    records: List[TraceabilityRecord] = []
-    index = 0
-    while index < len(lines) - 1:
-        header_line = lines[index].strip()
-        divider_line = lines[index + 1].strip()
-        if "|" not in header_line or "|" not in divider_line:
-            index += 1
-            continue
-        headers = _split_table_row(header_line)
-        normalized_headers = [_normalize_table_header(header) for header in headers]
-        if not TRACEABILITY_HEADERS.issubset(set(normalized_headers)):
-            index += 1
-            continue
-        divider_cells = _split_table_row(divider_line)
-        if not divider_cells or not all(cell.startswith("---") for cell in divider_cells):
-            index += 1
-            continue
-
-        header_map = {name: position for position, name in enumerate(normalized_headers)}
-        index += 2
-        while index < len(lines):
-            row_line = lines[index].strip()
-            if not row_line.startswith("|"):
-                break
-            cells = _split_table_row(row_line)
-            if len(cells) < len(headers):
-                cells.extend([""] * (len(headers) - len(cells)))
-            records.append(
-                TraceabilityRecord(
-                    owner_type=owner_type,
-                    owner_id=owner_id,
-                    owner_path=owner_path,
-                    story_id=cells[header_map["story id"]],
-                    increments=cells[header_map["increments"]],
-                    planned_slice_ids=_split_cell_values(
-                        cells[header_map["planned slice ids"]]
-                    ),
-                    execution_slice_ids=_split_cell_values(
-                        cells[header_map["execution slice ids"]]
-                    ),
-                    notes=cells[header_map["notes"]],
-                )
-            )
-            index += 1
-        continue
-    return records
-
-
-def iter_traceability_records(inventory: Inventory) -> List[TraceabilityRecord]:
-    records: List[TraceabilityRecord] = []
-    for feature_dir in inventory.feature_dirs:
-        feature_path = normalize_dir_relpath(feature_dir)
-        records.extend(
-            parse_traceability_records(
-                feature_dir / "slice-traceability.md",
-                "feature",
-                feature_dir.name,
-                feature_path,
-            )
-        )
-    for subfeature_dir in iter_subfeature_dirs(inventory):
-        subfeature_path = normalize_dir_relpath(subfeature_dir)
-        records.extend(
-            parse_traceability_records(
-                subfeature_dir / "slice-traceability.md",
-                "subfeature",
-                subfeature_dir.name,
-                subfeature_path,
-            )
-        )
-    return records
 
 
 def _safe_read_metadata(reader, path: Path) -> Optional[Dict[str, object]]:

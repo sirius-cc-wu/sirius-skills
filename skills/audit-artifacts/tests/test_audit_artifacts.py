@@ -147,6 +147,39 @@ def finding_codes(result: dict) -> set[str]:
     return {finding["code"] for finding in result["findings"]}
 
 
+def write_subfeature_traceability(
+    subfeature_dir: Path, *, planned_slice_ids: list[str], execution_slice_ids: list[str]
+):
+    planned = ", ".join(planned_slice_ids)
+    execution = ", ".join(execution_slice_ids)
+    (subfeature_dir / "slice-traceability.md").write_text(
+        "\n".join(
+            [
+                "# Slice Traceability",
+                "",
+                "| Story ID | Increments | Planned Slice IDs | Execution Slice IDs | Notes |",
+                "| --- | --- | --- | --- | --- |",
+                f"| CHK-01 | I1 | {planned} | {execution} | Test row |",
+                "",
+            ]
+        ),
+        encoding="utf-8",
+    )
+
+
+def create_closed_slice(execution, tmp_path: Path, slice_id: str, feature_name: str) -> Path:
+    folder, created = execution.create_slice(slice_id, feature_name)
+    assert created is True
+
+    rows = execution.parse_registry()
+    slice_row = execution.resolve_slice(rows, slice_id)
+    assert slice_row is not None
+
+    success, _ = execution.update_slice_status(rows, slice_row, "closed", force=True)
+    assert success is True
+    return tmp_path / "slices" / folder
+
+
 def test_run_audit_reports_clean_inventory(tmp_path, monkeypatch):
     env = setup_repo(tmp_path, monkeypatch)
 
@@ -229,6 +262,44 @@ def test_run_audit_reports_feature_status_drift_when_execution_exists(tmp_path, 
         and finding["artifact_id"] == "checkout"
         for finding in result["findings"]
     )
+
+
+def test_run_audit_reports_subfeature_closed_execution_drift(tmp_path, monkeypatch):
+    env = setup_repo(tmp_path, monkeypatch)
+
+    create_closed_slice(env["execution"], tmp_path, "CHK-201", "Replace Legacy Flow")
+    write_subfeature_traceability(
+        env["subfeature_dir"],
+        planned_slice_ids=["CHK-201"],
+        execution_slice_ids=["CHK-201"],
+    )
+
+    result = env["audit"].run_audit(["subfeature"])
+
+    assert result["ok"] is False
+    assert "subfeature_affected_slice_ids_out_of_sync" in finding_codes(result)
+    assert "subfeature_status_precedes_closed_execution" in finding_codes(result)
+    assert any(
+        finding["artifact_type"] == "subfeature"
+        and finding["artifact_id"] == "replace-legacy-flow"
+        for finding in result["findings"]
+    )
+
+
+def test_run_audit_reports_missing_traceability_execution_slice_for_subfeature(
+    tmp_path, monkeypatch
+):
+    env = setup_repo(tmp_path, monkeypatch)
+    write_subfeature_traceability(
+        env["subfeature_dir"],
+        planned_slice_ids=["CHK-999"],
+        execution_slice_ids=["CHK-999"],
+    )
+
+    result = env["audit"].run_audit(["subfeature"])
+
+    assert result["ok"] is False
+    assert "missing_traceability_execution_slice" in finding_codes(result)
 
 
 def test_cli_json_reports_slice_relation_issues(tmp_path, monkeypatch, capsys):

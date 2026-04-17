@@ -1,6 +1,6 @@
 ---
 name: audit-artifacts
-description: Audits proposals, features, subfeatures, and slices for drift, missing files, and broken links.
+description: Audits proposals, features, subfeatures, and slices for drift, missing files, broken links, and planning-versus-execution mismatches.
 ---
 
 # Audit Artifacts
@@ -13,8 +13,8 @@ across proposals, canonical features, durable subfeatures, and execution slices.
 1. Inventory the current proposal, planning, subfeature, and slice artifacts.
 2. Reuse existing owner-script validators where available.
 3. Surface registry drift, missing required files, invalid metadata, broken
-   cross-artifact links, planning-to-execution handoff drift, and slice
-   relation problems.
+   cross-artifact links, planning-to-execution handoff drift, subfeature
+   traceability drift, and slice relation problems.
 4. Emit findings without mutating repository artifacts.
 
 ## Preferred Input
@@ -42,6 +42,13 @@ python3 skills/audit-artifacts/scripts/audit_artifacts.py --json
 - default: grouped human-readable findings
 - `--json`: structured findings with summary counts
 
+Interpret warnings as audit evidence, not automatic state promotion:
+
+- closed execution slices under a subfeature can mean its planning metadata is
+  stale
+- that does not mean the parent feature is fully implemented unless the rest of
+  the feature artifacts agree
+
 Exit behavior:
 
 - `0` when no findings are present
@@ -56,6 +63,9 @@ The first version audits:
 - top-level planning registry plus canonical feature folders
 - feature-local subfeature registries plus subfeature folders
 - planning-to-execution handoff consistency for canonical features
+- subfeature `slice-traceability.md` execution links versus actual slice state
+- stale subfeature status or `affected_slice_ids` when all traced execution
+  slices are already closed
 - execution slice registry, slice metadata, and slice relation health
 
 ## Guardrails

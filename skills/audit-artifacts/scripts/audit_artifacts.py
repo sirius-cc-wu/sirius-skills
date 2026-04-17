@@ -15,7 +15,9 @@ if str(SCRIPT_DIR) not in sys.path:
 from artifact_inventory import (  # noqa: E402
     Inventory,
     RegistryStatus,
+    TraceabilityRecord,
     iter_subfeature_dirs,
+    iter_traceability_records,
     load_inventory,
     normalize_dir_relpath,
     normalize_registry_path,
@@ -384,6 +386,25 @@ def _audit_slices(
             )
 
 
+def _subfeature_artifact_id(relpath: str, metadata: Dict[str, object]) -> str:
+    subfeature_id = metadata.get("subfeature_id")
+    if isinstance(subfeature_id, str) and subfeature_id.strip():
+        return subfeature_id.strip()
+    return Path(relpath.rstrip("/")).name
+
+
+def _normalize_string_list(value: object) -> List[str]:
+    if not isinstance(value, list):
+        return []
+    result = []
+    for item in value:
+        if isinstance(item, str):
+            normalized = item.strip()
+            if normalized:
+                result.append(normalized)
+    return sorted(set(result))
+
+
 def _audit_cross_links(
     inventory: Inventory,
     findings: List[Finding],
@@ -405,7 +426,11 @@ def _audit_cross_links(
         for metadata in feature_metadata.values()
         if "feature_slug" in metadata
     }
+    traceability_by_owner: Dict[Tuple[str, str], List[TraceabilityRecord]] = {}
+    for record in iter_traceability_records(inventory):
+        traceability_by_owner.setdefault((record.owner_type, record.owner_path), []).append(record)
     slice_rows_by_feature: Dict[str, List[Dict[str, object]]] = {}
+    slice_rows_by_id = {str(row["id"]): dict(row) for row in inventory.slice_rows}
     for row in inventory.slice_rows:
         feature_slug = str(row.get("feature") or "").strip()
         if feature_slug:
@@ -441,13 +466,15 @@ def _audit_cross_links(
             )
 
     for relpath, metadata in subfeature_metadata.items():
+        subfeature_id = _subfeature_artifact_id(relpath, metadata)
+        subfeature_status = str(metadata.get("status") or "")
         parent_feature_slug = str(metadata.get("parent_feature_slug") or "")
         if parent_feature_slug not in canonical_feature_slugs:
             add_finding(
                 findings,
                 selected,
                 "subfeature",
-                str(metadata.get("subfeature_id") or Path(relpath.rstrip("/")).name),
+                subfeature_id,
                 relpath,
                 "broken_link",
                 "missing_parent_feature",
@@ -464,13 +491,92 @@ def _audit_cross_links(
                         findings,
                         selected,
                         "subfeature",
-                        str(metadata.get("subfeature_id") or Path(relpath.rstrip("/")).name),
+                        subfeature_id,
                         relpath,
                         "broken_link",
                         "parent_path_mismatch",
                         "error",
                         "Subfeature metadata parent_feature_slug does not match the parent folder path.",
                     )
+
+        traceability_records = traceability_by_owner.get(("subfeature", relpath), [])
+        execution_slice_ids = sorted(
+            {
+                slice_id
+                for record in traceability_records
+                for slice_id in record.execution_slice_ids
+                if slice_id in slice_rows_by_id
+            }
+        )
+        missing_execution_slice_ids = sorted(
+            {
+                slice_id
+                for record in traceability_records
+                for slice_id in record.execution_slice_ids
+                if slice_id not in slice_rows_by_id
+            }
+        )
+        if missing_execution_slice_ids:
+            add_finding(
+                findings,
+                selected,
+                "subfeature",
+                subfeature_id,
+                relpath,
+                "broken_link",
+                "missing_traceability_execution_slice",
+                "error",
+                (
+                    "Subfeature traceability lists execution slices that do not exist in the "
+                    f"slice registry: {', '.join(missing_execution_slice_ids)}."
+                ),
+            )
+
+        if not execution_slice_ids:
+            continue
+
+        closed_execution_slice_ids = sorted(
+            slice_id
+            for slice_id in execution_slice_ids
+            if str(slice_rows_by_id[slice_id].get("status") or "") == "closed"
+        )
+        if len(closed_execution_slice_ids) != len(execution_slice_ids):
+            continue
+
+        affected_slice_ids = _normalize_string_list(metadata.get("affected_slice_ids"))
+        if affected_slice_ids != execution_slice_ids:
+            recorded = ", ".join(affected_slice_ids) if affected_slice_ids else "(none)"
+            traced = ", ".join(execution_slice_ids)
+            add_finding(
+                findings,
+                selected,
+                "subfeature",
+                subfeature_id,
+                relpath,
+                "cross_layer_drift",
+                "subfeature_affected_slice_ids_out_of_sync",
+                "warning",
+                (
+                    "Subfeature metadata affected_slice_ids "
+                    f"({recorded}) does not match the closed execution slices recorded in "
+                    f"traceability ({traced})."
+                ),
+            )
+        if subfeature_status != "finalized":
+            add_finding(
+                findings,
+                selected,
+                "subfeature",
+                subfeature_id,
+                relpath,
+                "cross_layer_drift",
+                "subfeature_status_precedes_closed_execution",
+                "warning",
+                (
+                    f"Subfeature status '{subfeature_status}' predates closed execution slices: "
+                    f"{', '.join(execution_slice_ids)}."
+                ),
+            )
 
     for feature_slug, rows in slice_rows_by_feature.items():
         if feature_slug not in canonical_feature_slugs:
