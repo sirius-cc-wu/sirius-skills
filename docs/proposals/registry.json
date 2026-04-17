@@ -7,10 +7,22 @@
       "path": "docs/proposals/hierarchical-scope-support/"
     },
     {
+      "proposal": "skill-state-engine-rewrite",
+      "status": "draft",
+      "updated_at": "2026-04-17T19:21:32",
+      "path": "docs/proposals/skill-state-engine-rewrite/"
+    },
+    {
       "proposal": "workflow-capability-upgrades",
       "status": "draft",
       "updated_at": "2026-03-28T22:29:44",
       "path": "docs/proposals/workflow-capability-upgrades/"
+    },
+    {
+      "proposal": "workflow-state-consistency",
+      "status": "draft",
+      "updated_at": "2026-04-17T19:21:32",
+      "path": "docs/proposals/workflow-state-consistency/"
     }
   ]
 }
