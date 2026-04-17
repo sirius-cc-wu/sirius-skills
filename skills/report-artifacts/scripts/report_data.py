@@ -11,11 +11,15 @@ from typing import Dict, Iterable, List, Optional, Sequence, Set
 SCRIPT_DIR = Path(__file__).resolve().parent
 SKILLS_DIR = SCRIPT_DIR.parents[1]
 AUDIT_SCRIPT_DIR = SKILLS_DIR / "audit-artifacts" / "scripts"
+MEASURE_SCRIPT_DIR = SKILLS_DIR / "measure-artifacts" / "scripts"
 
 if str(AUDIT_SCRIPT_DIR) not in sys.path:
     sys.path.insert(0, str(AUDIT_SCRIPT_DIR))
+if str(MEASURE_SCRIPT_DIR) not in sys.path:
+    sys.path.insert(0, str(MEASURE_SCRIPT_DIR))
 
 from artifact_inventory import load_inventory, normalize_dir_relpath  # noqa: E402
+from metrics_store import read_metrics  # noqa: E402
 
 
 VALID_ARTIFACT_TYPES = ("proposal", "feature", "subfeature", "slice")
@@ -31,6 +35,7 @@ class ReportRecord:
     updated_at: Optional[str]
     parent_feature: Optional[str]
     is_stale: bool
+    implementation_metrics: Optional[Dict[str, object]] = None
 
     def to_dict(self) -> Dict[str, object]:
         return {
@@ -41,6 +46,7 @@ class ReportRecord:
             "updated_at": self.updated_at,
             "parent_feature": self.parent_feature,
             "is_stale": self.is_stale,
+            "implementation_metrics": self.implementation_metrics,
         }
 
 
@@ -77,6 +83,13 @@ def _load_raw_metadata(path: Path) -> Optional[Dict[str, object]]:
     if not isinstance(payload, dict):
         return None
     return payload
+
+
+def _load_metrics_sidecar(path: Path) -> Optional[Dict[str, object]]:
+    try:
+        return read_metrics(path)
+    except RuntimeError:
+        return None
 
 
 def load_report_records(
@@ -120,6 +133,7 @@ def load_report_records(
                     updated_at=metadata.get("updated_at") if isinstance(metadata.get("updated_at"), str) else None,
                     parent_feature=feature_dir.name,
                     is_stale=is_stale(metadata.get("updated_at"), stale_days, now),
+                    implementation_metrics=_load_metrics_sidecar(feature_dir),
                 )
             )
 
@@ -145,6 +159,7 @@ def load_report_records(
                         if isinstance(parent_feature, str) and parent_feature.strip()
                         else None,
                         is_stale=is_stale(metadata.get("updated_at"), stale_days, now),
+                        implementation_metrics=_load_metrics_sidecar(subfeature_dir),
                     )
                 )
 

@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "generated_at": "2026-04-18T01:55:58",
+  "generated_at": "2026-04-18T02:04:05",
   "slices": [
     {
       "id": "HSS-01-root-fallback",
@@ -189,6 +189,16 @@
       "path": "slices/CAM-06-metrics-foundation-build-metrics-record-and-sidecar-engine/",
       "updated_at": "2026-04-18T01:55:58",
       "closed_at": "2026-04-18T01:55:58",
+      "archived_at": null,
+      "relations": []
+    },
+    {
+      "id": "CAM-06-metrics-consumers",
+      "feature": "Wire measure-artifacts skill and reporting consumers",
+      "status": "closed",
+      "path": "slices/CAM-06-metrics-consumers-wire-measure-artifacts-skill-and-reporting-consumers/",
+      "updated_at": "2026-04-18T02:04:05",
+      "closed_at": "2026-04-18T02:04:05",
       "archived_at": null,
       "relations": []
     }

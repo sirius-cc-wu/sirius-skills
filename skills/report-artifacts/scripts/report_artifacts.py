@@ -64,6 +64,26 @@ def run_report(artifact_types: List[str], group_by: str, stale_days: int) -> Dic
 
 
 def render_text(result: Dict[str, object]) -> str:
+    def metrics_suffix(record: Dict[str, object]) -> str:
+        metrics = record.get("implementation_metrics")
+        if not isinstance(metrics, dict):
+            return ""
+        story_size = metrics.get("story_size", {})
+        slices = metrics.get("slices", {})
+        size_points = (
+            story_size.get("sum_points") if isinstance(story_size, dict) else None
+        )
+        planned_count = (
+            slices.get("planned_count") if isinstance(slices, dict) else None
+        )
+        execution_mode = metrics.get("execution_mode", "unknown")
+        return (
+            " "
+            f"[metrics mode={execution_mode}, "
+            f"size={size_points if size_points is not None else 'unavailable'}, "
+            f"planned_slices={planned_count if planned_count is not None else 'unavailable'}]"
+        )
+
     lines = [
         f"Artifact report ({result['group_by']}, stale threshold: {result['stale_days']} days)",
         f"Total artifacts: {result['summary']['total']}",
@@ -79,6 +99,7 @@ def render_text(result: Dict[str, object]) -> str:
         lines.append(
             f"- {record['artifact_type']}:{record['artifact_id']} "
             f"[{record['status']}{stale_marker}] ({record['path']}{parent_suffix})"
+            f"{metrics_suffix(record)}"
         )
     return "\n".join(lines)
 

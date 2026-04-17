@@ -27,7 +27,7 @@ The intended direction is:
 The managed repo-first skill set is grouped into:
 
 - repo utilities: `skills/bootstrap/`, `skills/commit/`, `skills/create-pr/`, `skills/simplify/`
-- artifact maintenance: `skills/audit-artifacts/`, `skills/trace-artifacts/`, `skills/report-artifacts/`, `skills/repair-artifacts/`, `skills/archive-artifacts/`
+- artifact maintenance: `skills/audit-artifacts/`, `skills/measure-artifacts/`, `skills/trace-artifacts/`, `skills/report-artifacts/`, `skills/repair-artifacts/`, `skills/archive-artifacts/`
 - planning layer: `skills/guide-scope/`, `skills/guide-planning/`, `skills/propose/`, `skills/add-subfeature/`, `skills/migrate-subfeatures/`, `skills/assess/`, `skills/discover/`, `skills/design/`, `skills/ui-flow/`, `skills/breakdown/`, `skills/review-planning/`
 - execution layer: `skills/slice/`, `skills/guide-execution/`, `skills/execute-all-slices/`, `skills/brief/`, `skills/blueprint/`, `skills/review-execution/`, `skills/close-slice/`
 
@@ -153,6 +153,7 @@ To keep relation metadata healthy over time, `skills/guide-execution/scripts/man
 Examples of repo-native prompts that fit the current workflow:
 
 - "Audit workflow artifacts across proposals, features, subfeatures, and slices."
+- "Measure durable implementation metrics for a completed feature or subfeature."
 - "Trace workflow lineage across proposals, features, subfeatures, planned slices, and execution slices."
 - "Report workflow state across proposals, features, subfeatures, and slices."
 - "Preview and repair workflow registry drift across proposals, features, subfeatures, and slices."

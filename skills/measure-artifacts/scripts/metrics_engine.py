@@ -256,20 +256,17 @@ def _compute_commit_churn(repo_root: str, commit_shas: Optional[List[str]]) -> D
     }
 
 
-def build_metrics_record(
-    selector: str,
+def build_metrics_for_target(
+    target: MeasurementTarget,
     *,
-    explicit_scope: Optional[str] = None,
     computed_at: str,
     commit_shas: Optional[List[str]] = None,
-    write: bool = False,
 ) -> Dict[str, object]:
-    target = resolve_measurement_target(selector, explicit_scope=explicit_scope)
     records = _parse_target_traceability(target)
     planned_slice_ids = _planned_slice_ids(records)
     linked_execution_slice_ids = _linked_execution_slices(target, records)
 
-    record = {
+    return {
         "artifact_type": target.artifact_type,
         "artifact_id": target.artifact_id,
         "computed_at": computed_at,
@@ -292,6 +289,19 @@ def build_metrics_record(
         },
     }
 
+
+def build_metrics_record(
+    selector: str,
+    *,
+    explicit_scope: Optional[str] = None,
+    computed_at: str,
+    commit_shas: Optional[List[str]] = None,
+    write: bool = False,
+) -> Dict[str, object]:
+    target = resolve_measurement_target(selector, explicit_scope=explicit_scope)
+    record = build_metrics_for_target(
+        target, computed_at=computed_at, commit_shas=commit_shas
+    )
     if write:
         write_metrics(target.artifact_path, record)
     return record

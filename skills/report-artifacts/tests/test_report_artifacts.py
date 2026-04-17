@@ -200,3 +200,59 @@ def test_cli_rejects_non_positive_stale_days(tmp_path, monkeypatch):
         assert exc.code == 2
     else:
         raise AssertionError("Expected argparse to reject stale-days=0")
+
+
+def test_run_report_includes_persisted_metrics_when_sidecar_exists(tmp_path, monkeypatch, capsys):
+    env = setup_repo(tmp_path, monkeypatch)
+    subfeature_dir = (
+        tmp_path
+        / "docs"
+        / "features"
+        / "checkout"
+        / "subfeatures"
+        / "replace-legacy-flow"
+    )
+    sidecar_payload = {
+        "artifact_type": "subfeature",
+        "artifact_id": "replace-legacy-flow",
+        "computed_at": "2026-02-15T00:00:00",
+        "status": "implemented",
+        "execution_mode": "guided",
+        "story_size": {
+            "weights": {"S": 1, "M": 3, "L": 5},
+            "sum_points": 5,
+            "unsupported_sizes": [],
+        },
+        "slices": {"planned_count": 2, "linked_slice_ids": ["CHK-101", "CHK-102"]},
+        "implementation_churn": {
+            "added_lines": None,
+            "deleted_lines": None,
+            "total_changed_lines": None,
+            "source_commit_shas": [],
+            "confidence": "unavailable",
+        },
+        "workflow_outcomes": {
+            "follow_up_fix_count": None,
+            "review_findings_count": None,
+            "planning_drift": None,
+        },
+    }
+    (subfeature_dir / "implementation-metrics.json").write_text(
+        json.dumps(sidecar_payload) + "\n", encoding="utf-8"
+    )
+
+    payload = env["report"].build_report_result(
+        artifact_types=["subfeature"],
+        group_by="parent",
+        stale_days=30,
+        now=datetime(2026, 2, 15),
+    )
+
+    assert payload["records"][0]["implementation_metrics"]["execution_mode"] == "guided"
+    assert payload["records"][0]["implementation_metrics"]["story_size"]["sum_points"] == 5
+
+    assert run_cli(
+        env["report"], monkeypatch, "--artifact-type", "subfeature", "--group-by", "parent"
+    ) == 0
+    output = capsys.readouterr().out
+    assert "metrics mode=guided" in output

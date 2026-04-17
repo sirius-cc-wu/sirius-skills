@@ -5,6 +5,7 @@ from pathlib import Path
 
 
 ENGINE_SCRIPT = Path(__file__).resolve().parents[1] / "scripts" / "metrics_engine.py"
+CLI_SCRIPT = Path(__file__).resolve().parents[1] / "scripts" / "measure_artifacts.py"
 STORE_SCRIPT = Path(__file__).resolve().parents[1] / "scripts" / "metrics_store.py"
 PLANNING_SCRIPT = (
     Path(__file__).resolve().parents[2] / "guide-planning" / "scripts" / "manage_planning.py"
@@ -30,6 +31,11 @@ def write_scope_config(root: Path, filename: str, payload: dict):
     skills_dir = root / ".skills"
     skills_dir.mkdir(parents=True, exist_ok=True)
     (skills_dir / filename).write_text(json.dumps(payload) + "\n", encoding="utf-8")
+
+
+def run_cli(module, monkeypatch, *args):
+    monkeypatch.setattr(sys, "argv", ["measure_artifacts.py", *args])
+    return module.main()
 
 
 def write_traceability(
@@ -73,6 +79,7 @@ def setup_repo(tmp_path: Path, monkeypatch):
     subfeatures = load_module(SUBFEATURE_SCRIPT, "measure_test_manage_subfeatures")
     execution = load_module(EXECUTION_SCRIPT, "measure_test_manage_execution")
     engine = load_module(ENGINE_SCRIPT, "measure_test_metrics_engine")
+    cli = load_module(CLI_SCRIPT, "measure_test_measure_artifacts")
     store = load_module(STORE_SCRIPT, "measure_test_metrics_store")
 
     write_scope_config(
@@ -95,6 +102,7 @@ def setup_repo(tmp_path: Path, monkeypatch):
         "subfeatures": subfeatures,
         "execution": execution,
         "engine": engine,
+        "cli": cli,
         "store": store,
     }
 
@@ -257,3 +265,28 @@ def test_sidecar_write_is_deterministic(tmp_path, monkeypatch):
 
     assert first == second
     assert env["store"].read_metrics(feature_path) == record
+
+
+def test_cli_json_can_persist_metrics_sidecar(tmp_path, monkeypatch, capsys):
+    env = setup_repo(tmp_path, monkeypatch)
+    create_feature_target(env, "checkout", story_size="S", execution_slice_ids=[])
+
+    assert run_cli(env["cli"], monkeypatch, "checkout", "--json", "--write") == 0
+
+    payload = json.loads(capsys.readouterr().out)
+    assert payload["artifact_id"] == "checkout"
+    assert payload["persisted"] is True
+    sidecar_path = Path(payload["sidecar_path"])
+    assert sidecar_path.exists()
+
+
+def test_cli_text_reports_unavailable_churn(tmp_path, monkeypatch, capsys):
+    env = setup_repo(tmp_path, monkeypatch)
+    create_feature_target(env, "checkout", story_size="M", execution_slice_ids=[])
+
+    assert run_cli(env["cli"], monkeypatch, "checkout") == 0
+
+    output = capsys.readouterr().out
+    assert "Measurement target: feature checkout" in output
+    assert "Execution mode: direct" in output
+    assert "total changed lines: unavailable" in output

@@ -4,6 +4,7 @@ REPO_ROOT := $(CURDIR)
 COMMON_FLAGS := --global --yes --agent github-copilot --agent codex --agent antigravity --agent gemini-cli
 MANAGED_SKILLS := \
 	audit-artifacts \
+	measure-artifacts \
 	trace-artifacts \
 	report-artifacts \
 	repair-artifacts \
@@ -33,6 +34,7 @@ MANAGED_SKILLS := \
 
 install: sync-shared-references
 	npx skills add "$(REPO_ROOT)/skills/audit-artifacts" $(COMMON_FLAGS)
+	npx skills add "$(REPO_ROOT)/skills/measure-artifacts" $(COMMON_FLAGS)
 	npx skills add "$(REPO_ROOT)/skills/trace-artifacts" $(COMMON_FLAGS)
 	npx skills add "$(REPO_ROOT)/skills/report-artifacts" $(COMMON_FLAGS)
 	npx skills add "$(REPO_ROOT)/skills/repair-artifacts" $(COMMON_FLAGS)
