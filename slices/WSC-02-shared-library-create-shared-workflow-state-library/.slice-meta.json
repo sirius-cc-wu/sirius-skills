@@ -1,0 +1,9 @@
+{
+  "created_at": "2026-04-17T21:12:48",
+  "updated_at": "2026-04-17T21:12:48",
+  "status": "draft",
+  "slice_id": "WSC-02-shared-library",
+  "feature": "Create shared workflow-state library",
+  "path": "slices/WSC-02-shared-library-create-shared-workflow-state-library/",
+  "relations": []
+}

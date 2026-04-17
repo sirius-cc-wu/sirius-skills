@@ -19,3 +19,4 @@
 | EW-MSE-02-sequential-slice-orchestration | Orchestrate sequential slice execution | closed | 2026-04-14T16:33:28 | 2026-04-14T16:33:28 | slices/EW-MSE-02-sequential-slice-orchestration-orchestrate-sequential-slice-execution/ |
 | EW-MSE-03-stop-and-resume-semantics | Stop on blockers and resume from durable state | closed | 2026-04-14T16:33:28 | 2026-04-14T16:33:28 | slices/EW-MSE-03-stop-and-resume-semantics-stop-on-blockers-and-resume-from-durable-state/ |
 | EW-MSE-04-per-slice-commit-checkpoints | Enforce one commit per completed slice | closed | 2026-04-14T16:33:28 | 2026-04-14T16:33:28 | slices/EW-MSE-04-per-slice-commit-checkpoints-enforce-one-commit-per-completed-slice/ |
+| WSC-02-shared-library | Create shared workflow-state library | draft | 2026-04-17T21:12:48 | - | slices/WSC-02-shared-library-create-shared-workflow-state-library/ |

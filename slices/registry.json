@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "generated_at": "2026-04-14T16:33:28",
+  "generated_at": "2026-04-17T21:12:48",
   "slices": [
     {
       "id": "HSS-01-root-fallback",
@@ -169,6 +169,16 @@
       "path": "slices/EW-MSE-04-per-slice-commit-checkpoints-enforce-one-commit-per-completed-slice/",
       "updated_at": "2026-04-14T16:33:28",
       "closed_at": "2026-04-14T16:33:28",
+      "archived_at": null,
+      "relations": []
+    },
+    {
+      "id": "WSC-02-shared-library",
+      "feature": "Create shared workflow-state library",
+      "status": "draft",
+      "path": "slices/WSC-02-shared-library-create-shared-workflow-state-library/",
+      "updated_at": "2026-04-17T21:12:48",
+      "closed_at": null,
       "archived_at": null,
       "relations": []
     }

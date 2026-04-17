@@ -17,7 +17,9 @@ GUIDE_EXECUTION_SCRIPT = (
     SKILLS_DIR / "guide-execution" / "scripts" / "manage_execution.py"
 )
 SUBFEATURES_SCRIPT = SKILLS_DIR / "add-subfeature" / "scripts" / "manage_subfeatures.py"
-TRACE_DATA_SCRIPT = SKILLS_DIR / "trace-artifacts" / "scripts" / "trace_data.py"
+ARTIFACT_INVENTORY_SCRIPT = (
+    SKILLS_DIR / "audit-artifacts" / "scripts" / "artifact_inventory.py"
+)
 
 
 @dataclass
@@ -325,7 +327,7 @@ def resolve_backlog(selector: str, explicit_scope: Optional[str] = None) -> Back
     planning_module = load_module(GUIDE_PLANNING_SCRIPT, "manage_planning")
     execution_module = load_module(GUIDE_EXECUTION_SCRIPT, "manage_execution")
     subfeature_module = load_module(SUBFEATURES_SCRIPT, "manage_subfeatures")
-    trace_data = load_module(TRACE_DATA_SCRIPT, "trace_data")
+    artifact_inventory = load_module(ARTIFACT_INVENTORY_SCRIPT, "artifact_inventory")
 
     feature, target_dir, metadata, scope_context, target_type = resolve_target(
         planning_module, selector, explicit_scope
@@ -340,7 +342,7 @@ def resolve_backlog(selector: str, explicit_scope: Optional[str] = None) -> Back
         raise RuntimeError(f"Missing traceability file: {traceability_path}")
 
     planned_slices = parse_planned_slices(slice_planning_path)
-    traceability_records = trace_data.parse_traceability_records(
+    traceability_records = artifact_inventory.parse_traceability_records(
         traceability_path,
         target_type,
         str(feature["feature"]),
