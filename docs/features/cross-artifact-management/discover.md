@@ -58,6 +58,9 @@ keep it healthy over time.
 - Trace lineage across proposal, feature, subfeature, and slice artifacts.
 - Report queues, status summaries, stale packets, and recent activity in a
   reusable form.
+- Record durable implementation metrics and workflow evidence for completed
+  features and subfeatures so teams can compare execution modes and process
+  outcomes over time.
 - Repair README/registry/metadata drift caused by merges, manual edits, or
   partial runs.
 - Archive or retire superseded artifacts without losing traceability.

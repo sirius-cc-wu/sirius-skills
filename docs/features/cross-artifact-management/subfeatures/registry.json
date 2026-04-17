@@ -15,6 +15,13 @@
       "path": "docs/features/cross-artifact-management/subfeatures/audit-artifacts/"
     },
     {
+      "subfeature_id": "measure-artifacts",
+      "status": "reviewed",
+      "subfeature_type": "additive",
+      "updated_at": "2026-04-18T01:37:17",
+      "path": "docs/features/cross-artifact-management/subfeatures/measure-artifacts/"
+    },
+    {
       "subfeature_id": "repair-artifacts",
       "status": "reviewed",
       "subfeature_type": "additive",
