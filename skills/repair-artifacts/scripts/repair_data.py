@@ -16,8 +16,11 @@ if str(AUDIT_SCRIPT_DIR) not in sys.path:
 if str(TRACE_SCRIPT_DIR) not in sys.path:
     sys.path.insert(0, str(TRACE_SCRIPT_DIR))
 
-from artifact_inventory import load_inventory, normalize_dir_relpath  # noqa: E402
-from trace_data import parse_traceability_records  # noqa: E402
+from artifact_inventory import (  # noqa: E402
+    load_inventory,
+    normalize_dir_relpath,
+    parse_traceability_records,
+)
 
 
 VALID_ARTIFACT_TYPES = ("proposal", "feature", "subfeature", "slice")
