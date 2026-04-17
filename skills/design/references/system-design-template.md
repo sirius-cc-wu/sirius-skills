@@ -9,11 +9,13 @@ Prefer these sections unless a section is genuinely irrelevant to the feature:
 3. `## Goals and non-goals`
 4. `## Architecture`
 5. `## Interfaces and dependencies`
-6. `## Data flow, state, and lifecycle`
-7. `## Failure handling and operational constraints`
-8. `## Risks, assumptions, and open questions`
-9. `## Validation strategy`
-10. `## Summary`
+6. `## Configuration surfaces and ownership`
+7. `## Data flow, state, and lifecycle`
+8. `## Failure handling and operational constraints`
+9. `## Alternatives considered`
+10. `## Risks, assumptions, and open questions`
+11. `## Validation strategy`
+12. `## Summary`
 
 ## Required content
 
@@ -23,6 +25,7 @@ Always include:
 - the major architectural decision
 - the boundaries between components or modules
 - the interfaces, inputs, outputs, or contracts that matter
+- which configuration and state surfaces own each externally supplied value
 - constraints that affect execution, rollout, or safety
 - how the design will be validated
 
@@ -49,8 +52,9 @@ A strong `system-design.md` should let a reviewer answer these questions quickly
 1. What is being built or documented?
 2. Why is this approach chosen over the obvious alternatives?
 3. Which interfaces or dependencies constrain the work?
-4. What state, lifecycle, or operational rules must remain true?
-5. How will later planning and implementation verify the design?
+4. Why is each configuration surface necessary, and where does raw external input stop and typed internal state begin?
+5. What state, lifecycle, or operational rules must remain true?
+6. How will later planning and implementation verify the design?
 
 ## Diagram guidance
 

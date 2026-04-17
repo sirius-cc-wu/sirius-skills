@@ -9,13 +9,18 @@ Use this skill after `add-subfeature` when an existing canonical feature has a
 selected durable subfeature and you need explicit impact assessment before
 subfeature-local design begins.
 
+Read these references when relevant:
+
+- `references/config-surface-governance.md` when the subfeature touches configuration, startup, compatibility boundaries, environment injection, or test harness inputs
+
 ## Responsibilities
 
 1. Resolve the target parent feature and selected subfeature.
 2. Inspect parent planning artifacts under `docs/features/<feature-slug>/`.
 3. Identify affected baseline artifacts, story IDs, planned slice IDs, and increment IDs.
-4. Write `impact-analysis.md` inside the selected subfeature folder.
-5. Synchronize the discovered impact lists back into `.subfeature-meta.json`.
+4. Capture inherited constraints, especially existing ownership of configuration and state surfaces that the subfeature should reuse.
+5. Write `impact-analysis.md` inside the selected subfeature folder.
+6. Synchronize the discovered impact lists back into `.subfeature-meta.json`.
 
 ## Preferred Input
 
@@ -32,9 +37,10 @@ subfeature-local design begins.
 
 1. Resolve the active subfeature created by `add-subfeature`.
 2. Inspect parent feature docs such as `discover.md`, `system-design.md`, `user-stories.md`, `slice-planning.md`, and `slice-traceability.md`.
-3. Write `impact-analysis.md` with baseline files reviewed, candidate affected stories, increments, slices, and impact notes.
-4. Persist the discovered artifact, story, and slice lists into the subfeature metadata.
-5. Advance the subfeature to `impact_ready` when the artifact is complete.
+3. When the subfeature touches configuration or startup behavior, identify existing typed carriers, compatibility boundaries, and parent-owned control surfaces before design starts.
+4. Write `impact-analysis.md` with baseline files reviewed, candidate affected stories, increments, slices, inherited constraints, and impact notes.
+5. Persist the discovered artifact, story, and slice lists into the subfeature metadata.
+6. Advance the subfeature to `impact_ready` when the artifact is complete.
 
 ## Tooling
 
@@ -56,3 +62,4 @@ python3 skills/assess/scripts/analyze_impact.py \
 - Do not treat impact analysis as execution-slice planning.
 - Do not overwrite an existing `impact-analysis.md` unless the user is deliberately regenerating it.
 - Keep the analysis tied to the selected subfeature, not the parent feature root.
+- Do not let subfeature-local planning silently add a second control plane when the parent feature already owns the value through typed state or configuration.

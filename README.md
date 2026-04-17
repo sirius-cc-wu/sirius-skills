@@ -36,6 +36,18 @@ If a project has no extra configuration, these skills should still work with gen
 For the operational guide to using the skills together, see `SKILLS_METHODOLOGY.md`.
 For developer-facing examples of how to prompt the skills, see `PROMPT_GUIDE.md`.
 
+## Shared skill references
+
+Some guidance is kept as a canonical shared reference under `docs/shared/` and
+then copied into the individual skill folders that need to package it.
+
+Current shared-reference workflow:
+
+- keep the canonical source in `docs/shared/`
+- run `make sync-shared-references` after editing a canonical shared reference
+- have each consuming skill point only at its local `references/` copy so the
+  packaged skill remains self-contained
+
 ## Planning layer
 
 For repositories that use repo-first planning, the recommended short-name planning skills are:
