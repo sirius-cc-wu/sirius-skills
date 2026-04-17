@@ -20,8 +20,8 @@
     },
     {
       "proposal": "workflow-state-consistency",
-      "status": "draft",
-      "updated_at": "2026-04-17T19:21:32",
+      "status": "promoted",
+      "updated_at": "2026-04-17T19:35:53",
       "path": "docs/proposals/workflow-state-consistency/"
     }
   ]

@@ -16,3 +16,4 @@
 | change-to-subfeature-migration | planning_reviewed | 2026-04-08T08:27:49 | docs/features/planning-workflow/subfeatures/change-to-subfeature-migration/ |
 | proposal-workflow | planning_reviewed | 2026-03-29T00:32:50 | docs/features/planning-workflow/subfeatures/proposal-workflow/ |
 | subfeature-workflow | planning_reviewed | 2026-03-28T23:26:17 | docs/features/planning-workflow/subfeatures/subfeature-workflow/ |
+| workflow-state-consistency | planning_reviewed | 2026-04-17T20:45:42 | docs/features/workflow-state-consistency/ |
