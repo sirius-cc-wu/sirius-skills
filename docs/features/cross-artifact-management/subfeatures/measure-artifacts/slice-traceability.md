@@ -19,6 +19,8 @@ ownership outside repository planning artifacts.
 
 - Keep repo story IDs exactly as they appear in `user-stories.md`.
 - Use one primary row per repo story.
+- Add additional rows when one story fans out into multiple planned slices and
+  execution bootstrap needs one planned slice per row.
 - List increment IDs as a comma-separated list when a story spans multiple
   increments.
 - List multiple slice IDs as a comma-separated list.
@@ -29,7 +31,8 @@ ownership outside repository planning artifacts.
 
 | Story ID | Story Size | Story Summary | Increments | Planned Slice IDs | Slice Areas | Blocked By | Execution Slice IDs | Notes |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| CAM-06 | L | Record durable implementation metrics and workflow evidence for completed features and subfeatures | I1, I2 | CAM-06-metrics-foundation, CAM-06-metrics-consumers | Metrics schema and sidecar storage, artifact-derived evidence engine, skill CLI, reporting integration | CAM-06-metrics-foundation -> CAM-06-metrics-consumers |  | Split because evidence derivation/storage and consumer integration have different validation paths and different failure surfaces |
+| CAM-06 | L | Record durable implementation metrics and workflow evidence for completed features and subfeatures | I1 | CAM-06-metrics-foundation | Metrics schema and sidecar storage, artifact-derived evidence engine |  | CAM-06-metrics-foundation | Foundation slice for the reusable evidence model and deterministic sidecar persistence |
+| CAM-06 | L | Record durable implementation metrics and workflow evidence for completed features and subfeatures | I2 | CAM-06-metrics-consumers | Skill CLI, reporting integration | CAM-06-metrics-foundation |  | Consumer slice depends on the foundation interfaces and keeps archive-facing display out of the initial rollout |
 
 ## Notes
 
@@ -42,3 +45,6 @@ ownership outside repository planning artifacts.
   execution state.
 - If a story fans out into multiple executable slices, keep the fan-out here
   instead of inventing story-state outside the planning artifacts.
+- When batch bootstrap tooling is expected to record execution slice IDs back
+  into this file, use one planned slice per row so the mapping stays
+  deterministic.

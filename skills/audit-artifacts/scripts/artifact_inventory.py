@@ -81,6 +81,7 @@ class TraceabilityRecord:
     owner_id: str
     owner_path: str
     story_id: str
+    story_size: Optional[str]
     increments: str
     planned_slice_ids: List[str]
     execution_slice_ids: List[str]
@@ -227,6 +228,12 @@ def parse_traceability_records(
                     owner_id=owner_id,
                     owner_path=owner_path,
                     story_id=cells[header_map["story id"]],
+                    story_size=(
+                        cells[header_map["story size"]].strip()
+                        if "story size" in header_map
+                        else None
+                    )
+                    or None,
                     increments=cells[header_map["increments"]],
                     planned_slice_ids=_split_cell_values(
                         cells[header_map["planned slice ids"]]
