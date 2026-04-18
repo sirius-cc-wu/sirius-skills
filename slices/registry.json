@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "generated_at": "2026-04-18T02:04:05",
+  "generated_at": "2026-04-19T00:24:08",
   "slices": [
     {
       "id": "HSS-01-root-fallback",
@@ -199,6 +199,16 @@
       "path": "slices/CAM-06-metrics-consumers-wire-measure-artifacts-skill-and-reporting-consumers/",
       "updated_at": "2026-04-18T02:04:05",
       "closed_at": "2026-04-18T02:04:05",
+      "archived_at": null,
+      "relations": []
+    },
+    {
+      "id": "WSC-02-maintenance-adoption",
+      "feature": "Adopt shared reconciliation across maintenance skills",
+      "status": "closed",
+      "path": "slices/WSC-02-maintenance-adoption-adopt-shared-reconciliation-across-maintenance-skills/",
+      "updated_at": "2026-04-19T00:24:08",
+      "closed_at": "2026-04-19T00:24:08",
       "archived_at": null,
       "relations": []
     }

@@ -7,16 +7,17 @@ from typing import Dict, List, Optional, Sequence, Set, Tuple
 
 
 SCRIPT_DIR = Path(__file__).resolve().parent
-SKILLS_DIR = SCRIPT_DIR.parents[1]
-AUDIT_SCRIPT_DIR = SKILLS_DIR / "audit-artifacts" / "scripts"
-TRACE_SCRIPT_DIR = SKILLS_DIR / "trace-artifacts" / "scripts"
+SKILL_ROOT = SCRIPT_DIR.parents[1]
+REPO_ROOT = SCRIPT_DIR.parents[2]
+REPO_LIB_DIR = REPO_ROOT / "lib"
+SKILL_LIB_DIR = SKILL_ROOT / "lib"
 
-if str(AUDIT_SCRIPT_DIR) not in sys.path:
-    sys.path.insert(0, str(AUDIT_SCRIPT_DIR))
-if str(TRACE_SCRIPT_DIR) not in sys.path:
-    sys.path.insert(0, str(TRACE_SCRIPT_DIR))
+if REPO_LIB_DIR.is_dir() and str(REPO_LIB_DIR) not in sys.path:
+    sys.path.insert(0, str(REPO_LIB_DIR))
+if SKILL_LIB_DIR.is_dir() and str(SKILL_LIB_DIR) not in sys.path:
+    sys.path.append(str(SKILL_LIB_DIR))
 
-from artifact_inventory import (  # noqa: E402
+from workflow_state.inventory import (  # noqa: E402
     load_inventory,
     normalize_dir_relpath,
     parse_traceability_records,

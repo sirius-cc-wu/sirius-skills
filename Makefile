@@ -1,4 +1,4 @@
-.PHONY: install uninstall sync-shared-references
+.PHONY: install uninstall sync-shared-references sync-shared-runtime
 
 REPO_ROOT := $(CURDIR)
 COMMON_FLAGS := --global --yes --agent github-copilot --agent codex --agent antigravity --agent gemini-cli
@@ -32,7 +32,7 @@ MANAGED_SKILLS := \
 	slice \
 	ui-flow
 
-install: sync-shared-references
+install: sync-shared-runtime sync-shared-references
 	npx skills add "$(REPO_ROOT)/skills/audit-artifacts" $(COMMON_FLAGS)
 	npx skills add "$(REPO_ROOT)/skills/measure-artifacts" $(COMMON_FLAGS)
 	npx skills add "$(REPO_ROOT)/skills/trace-artifacts" $(COMMON_FLAGS)
@@ -64,6 +64,9 @@ install: sync-shared-references
 
 sync-shared-references:
 	python3 scripts/sync_shared_skill_references.py
+
+sync-shared-runtime:
+	python3 scripts/sync_shared_skill_runtime.py
 
 uninstall:
 	@installed="$$(npx skills ls -g --json | python3 -c 'import json, sys; managed = set("$(MANAGED_SKILLS)".split()); installed = [item["name"] for item in json.load(sys.stdin) if item.get("name") in managed]; print("\n".join(installed))')"; \

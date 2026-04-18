@@ -1,5 +1,6 @@
 import importlib.util
 import json
+import shutil
 import sys
 from datetime import datetime
 from pathlib import Path
@@ -24,6 +25,16 @@ def load_module(path: Path, name: str):
     assert spec.loader is not None
     spec.loader.exec_module(module)
     return module
+
+
+def copy_skill_for_isolated_import(tmp_path: Path, skill_name: str) -> Path:
+    source_root = Path(__file__).resolve().parents[1]
+    isolated_root = tmp_path / skill_name
+    shutil.copytree(source_root / "scripts", isolated_root / "scripts")
+    skill_lib = source_root / "lib"
+    if skill_lib.exists():
+        shutil.copytree(skill_lib, isolated_root / "lib")
+    return isolated_root
 
 
 def run_cli(module, monkeypatch, *args):
@@ -256,3 +267,14 @@ def test_run_report_includes_persisted_metrics_when_sidecar_exists(tmp_path, mon
     ) == 0
     output = capsys.readouterr().out
     assert "metrics mode=guided" in output
+
+
+def test_report_module_loads_from_self_contained_skill_copy(tmp_path):
+    isolated_root = copy_skill_for_isolated_import(tmp_path, "report-artifacts")
+
+    module = load_module(
+        isolated_root / "scripts" / "report_data.py",
+        "isolated_report_data",
+    )
+
+    assert hasattr(module, "build_report_result")

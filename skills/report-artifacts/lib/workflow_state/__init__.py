@@ -1,21 +1,4 @@
-#!/usr/bin/env python3
-
-import sys
-from pathlib import Path
-
-
-SCRIPT_DIR = Path(__file__).resolve().parent
-SKILL_ROOT = SCRIPT_DIR.parents[1]
-REPO_ROOT = SCRIPT_DIR.parents[2]
-REPO_LIB_DIR = REPO_ROOT / "lib"
-SKILL_LIB_DIR = SKILL_ROOT / "lib"
-
-if REPO_LIB_DIR.is_dir() and str(REPO_LIB_DIR) not in sys.path:
-    sys.path.insert(0, str(REPO_LIB_DIR))
-if SKILL_LIB_DIR.is_dir() and str(SKILL_LIB_DIR) not in sys.path:
-    sys.path.append(str(SKILL_LIB_DIR))
-
-from workflow_state.inventory import (  # noqa: E402,F401
+from workflow_state.inventory import (
     iter_subfeature_dirs,
     iter_traceability_records,
     load_inventory,
@@ -25,12 +8,13 @@ from workflow_state.inventory import (  # noqa: E402,F401
     planning_row_artifact_type,
     resolve_context,
 )
-from workflow_state.models import (  # noqa: E402,F401
+from workflow_state.models import (
     Inventory,
     InventoryContext,
     RegistryStatus,
     TraceabilityRecord,
 )
+
 __all__ = [
     "Inventory",
     "InventoryContext",

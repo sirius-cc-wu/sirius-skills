@@ -1,5 +1,6 @@
 import importlib.util
 import json
+import shutil
 import sys
 from pathlib import Path
 
@@ -23,6 +24,16 @@ def load_module(path: Path, name: str):
     assert spec.loader is not None
     spec.loader.exec_module(module)
     return module
+
+
+def copy_skill_for_isolated_import(tmp_path: Path, skill_name: str) -> Path:
+    source_root = Path(__file__).resolve().parents[1]
+    isolated_root = tmp_path / skill_name
+    shutil.copytree(source_root / "scripts", isolated_root / "scripts")
+    skill_lib = source_root / "lib"
+    if skill_lib.exists():
+        shutil.copytree(skill_lib, isolated_root / "lib")
+    return isolated_root
 
 
 def run_cli(module, monkeypatch, *args):
@@ -323,3 +334,14 @@ def test_cli_json_reports_slice_relation_issues(tmp_path, monkeypatch, capsys):
 
     assert payload["ok"] is False
     assert "missing_target_slice" in finding_codes(payload)
+
+
+def test_audit_module_loads_from_self_contained_skill_copy(tmp_path):
+    isolated_root = copy_skill_for_isolated_import(tmp_path, "audit-artifacts")
+
+    module = load_module(
+        isolated_root / "scripts" / "audit_artifacts.py",
+        "isolated_audit_artifacts",
+    )
+
+    assert hasattr(module, "run_audit")

@@ -22,3 +22,4 @@
 | WSC-02-shared-library | Create shared workflow-state library | closed | 2026-04-17T21:29:37 | 2026-04-17T21:29:37 | slices/WSC-02-shared-library-create-shared-workflow-state-library/ |
 | CAM-06-metrics-foundation | Build metrics record and sidecar engine | closed | 2026-04-18T01:55:58 | 2026-04-18T01:55:58 | slices/CAM-06-metrics-foundation-build-metrics-record-and-sidecar-engine/ |
 | CAM-06-metrics-consumers | Wire measure-artifacts skill and reporting consumers | closed | 2026-04-18T02:04:05 | 2026-04-18T02:04:05 | slices/CAM-06-metrics-consumers-wire-measure-artifacts-skill-and-reporting-consumers/ |
+| WSC-02-maintenance-adoption | Adopt shared reconciliation across maintenance skills | closed | 2026-04-19T00:24:08 | 2026-04-19T00:24:08 | slices/WSC-02-maintenance-adoption-adopt-shared-reconciliation-across-maintenance-skills/ |

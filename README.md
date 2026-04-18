@@ -44,6 +44,7 @@ then copied into the individual skill folders that need to package it.
 Current shared-reference workflow:
 
 - keep the canonical source in `docs/shared/`
+- `make install` refreshes shared runtime and reference copies before packaging managed skills
 - run `make sync-shared-references` after editing a canonical shared reference
 - have each consuming skill point only at its local `references/` copy so the
   packaged skill remains self-contained
