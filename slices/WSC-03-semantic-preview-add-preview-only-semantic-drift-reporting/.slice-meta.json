@@ -1,0 +1,10 @@
+{
+  "created_at": "2026-04-19T00:27:21",
+  "updated_at": "2026-04-19T00:40:49",
+  "status": "closed",
+  "slice_id": "WSC-03-semantic-preview",
+  "feature": "Add preview-only semantic drift reporting",
+  "path": "slices/WSC-03-semantic-preview-add-preview-only-semantic-drift-reporting/",
+  "relations": [],
+  "closed_at": "2026-04-19T00:40:49"
+}

@@ -58,3 +58,23 @@ class TraceabilityRecord:
     planned_slice_ids: List[str]
     execution_slice_ids: List[str]
     notes: str
+
+
+@dataclass
+class SemanticPreviewRecord:
+    artifact_type: str
+    artifact_id: str
+    path: str
+    code: str
+    message: str
+    apply_supported: bool = False
+
+    def to_dict(self) -> Dict[str, object]:
+        return {
+            "artifact_type": self.artifact_type,
+            "artifact_id": self.artifact_id,
+            "path": self.path,
+            "code": self.code,
+            "message": self.message,
+            "apply_supported": self.apply_supported,
+        }

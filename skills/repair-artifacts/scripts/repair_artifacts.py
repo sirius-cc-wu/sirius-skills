@@ -48,8 +48,8 @@ def render_text(result: Dict[str, object]) -> str:
         f"Changed layers: {result['summary']['planned_actions']}",
         f"Applied layers: {result['summary']['applied_actions']}",
         f"Skipped artifacts: {result['summary']['skipped_artifacts']}",
-        f"Suggested repairs: {result['summary']['suggested_repairs']}",
-        "Actions:",
+        f"Semantic preview findings: {result['summary']['semantic_preview_count']}",
+        "Derived actions:",
     ]
     for action in result["actions"]:
         changed_marker = "changed" if action["changed"] else "no-change"
@@ -63,9 +63,10 @@ def render_text(result: Dict[str, object]) -> str:
         lines.append("Skipped:")
         for skipped in result["skipped"]:
             lines.append(f"- {skipped['artifact_type']}:{skipped['artifact_id']} ({skipped['message']})")
-    if result["suggestions"]:
-        lines.append("Suggestions:")
-        for suggestion in result["suggestions"]:
+    semantic_preview = result.get("semantic_preview", result.get("suggestions", []))
+    if semantic_preview:
+        lines.append("Semantic preview:")
+        for suggestion in semantic_preview:
             lines.append(
                 f"- {suggestion['artifact_type']}:{suggestion['artifact_id']} "
                 f"[{suggestion['code']}] {suggestion['message']}"

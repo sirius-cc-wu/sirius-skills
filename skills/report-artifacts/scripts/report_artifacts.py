@@ -88,6 +88,7 @@ def render_text(result: Dict[str, object]) -> str:
         f"Artifact report ({result['group_by']}, stale threshold: {result['stale_days']} days)",
         f"Total artifacts: {result['summary']['total']}",
         f"Stale artifacts: {result['summary']['stale']}",
+        f"Semantic preview findings: {result['summary']['semantic_preview_count']}",
         "Groups:",
     ]
     for group in result["groups"]:
@@ -101,6 +102,13 @@ def render_text(result: Dict[str, object]) -> str:
             f"[{record['status']}{stale_marker}] ({record['path']}{parent_suffix})"
             f"{metrics_suffix(record)}"
         )
+    if result["semantic_preview"]:
+        lines.append("Semantic preview:")
+        for preview in result["semantic_preview"]:
+            lines.append(
+                f"- {preview['artifact_type']}:{preview['artifact_id']} "
+                f"[{preview['code']}] {preview['message']}"
+            )
     return "\n".join(lines)
 
 

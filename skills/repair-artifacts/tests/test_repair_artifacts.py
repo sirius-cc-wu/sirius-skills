@@ -178,15 +178,17 @@ def test_build_repair_result_reports_preview_only_semantic_suggestions(tmp_path,
     write_traceability(feature_dir, "CHK-101")
 
     payload = env["repair"].build_repair_result()
-    suggestion_codes = {item["code"] for item in payload["suggestions"]}
+    suggestion_codes = {item["code"] for item in payload["semantic_preview"]}
 
+    assert payload["summary"]["semantic_preview_count"] == 3
     assert payload["summary"]["suggested_repairs"] == 3
     assert suggestion_codes == {
         "repair_target_feature_link",
         "repair_planning_status_handoff",
         "repair_traceability_execution_ids",
     }
-    assert all(item["apply_supported"] is False for item in payload["suggestions"])
+    assert all(item["apply_supported"] is False for item in payload["semantic_preview"])
+    assert "Semantic preview:" in env["repair"].render_text(payload)
 
 
 def test_build_repair_result_keeps_apply_mode_limited_to_derived_artifacts(tmp_path, monkeypatch):
@@ -204,6 +206,7 @@ def test_build_repair_result_keeps_apply_mode_limited_to_derived_artifacts(tmp_p
     payload = env["repair"].build_repair_result(apply=True)
     refreshed_meta = json.loads(planning_meta_path.read_text(encoding="utf-8"))
 
+    assert payload["summary"]["semantic_preview_count"] == 2
     assert payload["summary"]["suggested_repairs"] == 2
     assert refreshed_meta["status"] == "planning_reviewed"
 

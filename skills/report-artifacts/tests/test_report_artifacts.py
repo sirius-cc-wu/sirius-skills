@@ -104,7 +104,7 @@ def setup_repo(tmp_path: Path, monkeypatch):
     subfeature_metadata["updated_at"] = "2026-02-14T00:00:00"
     subfeatures.write_metadata(subfeature_dir, subfeature_metadata)
 
-    execution.create_slice("CHK-101", "Checkout Slice")
+    execution.create_slice("CHK-101", "checkout")
     _, _, slice_registry = execution.get_registry_paths(required_config=False)
     slice_rows = execution.load_registry_json(slice_registry)
     slice_row = next(row for row in slice_rows if row["id"] == "CHK-101")
@@ -267,6 +267,25 @@ def test_run_report_includes_persisted_metrics_when_sidecar_exists(tmp_path, mon
     ) == 0
     output = capsys.readouterr().out
     assert "metrics mode=guided" in output
+
+
+def test_run_report_surfaces_semantic_preview_separately(tmp_path, monkeypatch, capsys):
+    env = setup_repo(tmp_path, monkeypatch)
+
+    payload = env["report"].build_report_result(
+        artifact_types=["feature"],
+        group_by="overview",
+        stale_days=30,
+        now=datetime(2026, 2, 15),
+    )
+
+    assert payload["summary"]["semantic_preview_count"] == 1
+    assert payload["semantic_preview"][0]["code"] == "repair_planning_status_handoff"
+
+    assert run_cli(env["report"], monkeypatch, "--artifact-type", "feature") == 0
+    output = capsys.readouterr().out
+    assert "Semantic preview:" in output
+    assert "repair_planning_status_handoff" in output
 
 
 def test_report_module_loads_from_self_contained_skill_copy(tmp_path):

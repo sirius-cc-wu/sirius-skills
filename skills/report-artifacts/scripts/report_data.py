@@ -21,6 +21,7 @@ if REPO_LIB_DIR.is_dir() and str(REPO_LIB_DIR) not in sys.path:
 if SKILL_LIB_DIR.is_dir() and str(SKILL_LIB_DIR) not in sys.path:
     sys.path.append(str(SKILL_LIB_DIR))
 
+from workflow_state import build_semantic_preview  # noqa: E402
 from workflow_state.inventory import load_inventory, normalize_dir_relpath  # noqa: E402
 from metrics_store import read_metrics  # noqa: E402
 
@@ -99,8 +100,9 @@ def load_report_records(
     artifact_types: Optional[Sequence[str]] = None,
     stale_days: int = 30,
     now: Optional[datetime] = None,
+    inventory=None,
 ) -> List[ReportRecord]:
-    inventory = load_inventory()
+    inventory = inventory or load_inventory()
     selected = selected_types(artifact_types or [])
     records: List[ReportRecord] = []
 
@@ -228,12 +230,23 @@ def build_report_result(
 ) -> Dict[str, object]:
     if group_by not in VALID_GROUP_BY:
         raise ValueError(f"Unsupported group-by mode: {group_by}")
-    records = load_report_records(artifact_types=artifact_types, stale_days=stale_days, now=now)
+    inventory = load_inventory()
+    records = load_report_records(
+        artifact_types=artifact_types,
+        stale_days=stale_days,
+        now=now,
+        inventory=inventory,
+    )
+    semantic_preview = build_semantic_preview(inventory, artifact_types or [])
     return {
         "ok": True,
         "group_by": group_by,
         "stale_days": stale_days,
-        "summary": summarize(records),
+        "summary": {
+            **summarize(records),
+            "semantic_preview_count": len(semantic_preview),
+        },
         "groups": build_groups(records, group_by),
         "records": [record.to_dict() for record in records],
+        "semantic_preview": [record.to_dict() for record in semantic_preview],
     }

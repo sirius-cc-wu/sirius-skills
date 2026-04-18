@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "generated_at": "2026-04-19T00:24:08",
+  "generated_at": "2026-04-19T00:40:49",
   "slices": [
     {
       "id": "HSS-01-root-fallback",
@@ -209,6 +209,16 @@
       "path": "slices/WSC-02-maintenance-adoption-adopt-shared-reconciliation-across-maintenance-skills/",
       "updated_at": "2026-04-19T00:24:08",
       "closed_at": "2026-04-19T00:24:08",
+      "archived_at": null,
+      "relations": []
+    },
+    {
+      "id": "WSC-03-semantic-preview",
+      "feature": "Add preview-only semantic drift reporting",
+      "status": "closed",
+      "path": "slices/WSC-03-semantic-preview-add-preview-only-semantic-drift-reporting/",
+      "updated_at": "2026-04-19T00:40:49",
+      "closed_at": "2026-04-19T00:40:49",
       "archived_at": null,
       "relations": []
     }
