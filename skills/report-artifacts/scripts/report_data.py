@@ -21,7 +21,7 @@ if REPO_LIB_DIR.is_dir() and str(REPO_LIB_DIR) not in sys.path:
 if SKILL_LIB_DIR.is_dir() and str(SKILL_LIB_DIR) not in sys.path:
     sys.path.append(str(SKILL_LIB_DIR))
 
-from workflow_state import build_semantic_preview  # noqa: E402
+from workflow_state import build_semantic_preview, inspect_installed_skill_parity  # noqa: E402
 from workflow_state.inventory import load_inventory, normalize_dir_relpath  # noqa: E402
 from metrics_store import read_metrics  # noqa: E402
 
@@ -227,6 +227,7 @@ def build_report_result(
     group_by: str = "overview",
     stale_days: int = 30,
     now: Optional[datetime] = None,
+    installed_skills: Optional[Sequence[Dict[str, object]]] = None,
 ) -> Dict[str, object]:
     if group_by not in VALID_GROUP_BY:
         raise ValueError(f"Unsupported group-by mode: {group_by}")
@@ -238,15 +239,18 @@ def build_report_result(
         inventory=inventory,
     )
     semantic_preview = build_semantic_preview(inventory, artifact_types or [])
+    installed_parity = inspect_installed_skill_parity(installed_skills=installed_skills)
     return {
         "ok": True,
         "group_by": group_by,
         "stale_days": stale_days,
         "summary": {
             **summarize(records),
+            "installed_parity_count": len(installed_parity),
             "semantic_preview_count": len(semantic_preview),
         },
         "groups": build_groups(records, group_by),
         "records": [record.to_dict() for record in records],
+        "installed_parity": [record.to_dict() for record in installed_parity],
         "semantic_preview": [record.to_dict() for record in semantic_preview],
     }

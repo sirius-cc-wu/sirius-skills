@@ -37,6 +37,13 @@ def copy_skill_for_isolated_import(tmp_path: Path, skill_name: str) -> Path:
     return isolated_root
 
 
+def copy_installed_skill(tmp_path: Path, skill_name: str) -> Path:
+    source_root = Path(__file__).resolve().parents[2] / skill_name
+    installed_root = tmp_path / "installed-skills" / skill_name
+    shutil.copytree(source_root, installed_root)
+    return installed_root
+
+
 def run_cli(module, monkeypatch, *args):
     monkeypatch.setattr(sys, "argv", ["report_artifacts.py", *args])
     return module.main()
@@ -55,6 +62,12 @@ def setup_repo(tmp_path: Path, monkeypatch):
     subfeatures = load_module(SUBFEATURE_SCRIPT, "manage_subfeatures")
     execution = load_module(EXECUTION_SCRIPT, "manage_execution")
     report = load_module(SCRIPT_PATH, "report_artifacts")
+    report_parity = report.build_report_result.__globals__["inspect_installed_skill_parity"]
+    monkeypatch.setitem(
+        report.build_report_result.__globals__,
+        "inspect_installed_skill_parity",
+        lambda installed_skills=None: [],
+    )
 
     write_scope_config(
         tmp_path,
@@ -117,7 +130,7 @@ def setup_repo(tmp_path: Path, monkeypatch):
     metadata["closed_at"] = "2026-02-13T00:00:00"
     execution.write_slice_metadata(execution.slice_path_for_row(slice_row), metadata)
 
-    return {"report": report}
+    return {"report": report, "report_parity": report_parity}
 
 
 def groups_by_key(payload: dict) -> dict:
@@ -286,6 +299,57 @@ def test_run_report_surfaces_semantic_preview_separately(tmp_path, monkeypatch, 
     output = capsys.readouterr().out
     assert "Semantic preview:" in output
     assert "repair_planning_status_handoff" in output
+
+
+def test_run_report_keeps_clean_installed_parity_quiet(tmp_path, monkeypatch):
+    env = setup_repo(tmp_path, monkeypatch)
+    installed_root = copy_installed_skill(tmp_path, "report-artifacts")
+    monkeypatch.setitem(
+        env["report"].build_report_result.__globals__,
+        "inspect_installed_skill_parity",
+        env["report_parity"],
+    )
+
+    payload = env["report"].build_report_result(
+        group_by="overview",
+        stale_days=30,
+        now=datetime(2026, 2, 15),
+        installed_skills=[{"name": "report-artifacts", "path": str(installed_root)}],
+    )
+
+    assert payload["summary"]["installed_parity_count"] == 0
+    assert payload["installed_parity"] == []
+
+
+def test_run_report_surfaces_installed_parity_separately(tmp_path, monkeypatch, capsys):
+    env = setup_repo(tmp_path, monkeypatch)
+    installed_root = copy_installed_skill(tmp_path, "report-artifacts")
+    monkeypatch.setitem(
+        env["report"].build_report_result.__globals__,
+        "inspect_installed_skill_parity",
+        env["report_parity"],
+    )
+    installed_script = installed_root / "scripts" / "report_data.py"
+    installed_script.write_text(
+        installed_script.read_text(encoding="utf-8") + "\n# stale installed copy\n",
+        encoding="utf-8",
+    )
+
+    payload = env["report"].build_report_result(
+        artifact_types=["feature"],
+        group_by="overview",
+        stale_days=30,
+        now=datetime(2026, 2, 15),
+        installed_skills=[{"name": "report-artifacts", "path": str(installed_root)}],
+    )
+
+    assert payload["summary"]["installed_parity_count"] == 1
+    assert payload["installed_parity"][0]["code"] == "content_mismatch"
+    assert payload["installed_parity"][0]["relative_path"] == "scripts/report_data.py"
+
+    text = env["report"].render_text(payload)
+    assert "Installed parity:" in text
+    assert "scripts/report_data.py" in text
 
 
 def test_report_module_loads_from_self_contained_skill_copy(tmp_path):

@@ -88,6 +88,7 @@ def render_text(result: Dict[str, object]) -> str:
         f"Artifact report ({result['group_by']}, stale threshold: {result['stale_days']} days)",
         f"Total artifacts: {result['summary']['total']}",
         f"Stale artifacts: {result['summary']['stale']}",
+        f"Installed parity findings: {result['summary']['installed_parity_count']}",
         f"Semantic preview findings: {result['summary']['semantic_preview_count']}",
         "Groups:",
     ]
@@ -102,6 +103,13 @@ def render_text(result: Dict[str, object]) -> str:
             f"[{record['status']}{stale_marker}] ({record['path']}{parent_suffix})"
             f"{metrics_suffix(record)}"
         )
+    if result["installed_parity"]:
+        lines.append("Installed parity:")
+        for parity in result["installed_parity"]:
+            lines.append(
+                f"- {parity['skill_name']} [{parity['code']}] "
+                f"{parity['message']} ({parity['relative_path']})"
+            )
     if result["semantic_preview"]:
         lines.append("Semantic preview:")
         for preview in result["semantic_preview"]:

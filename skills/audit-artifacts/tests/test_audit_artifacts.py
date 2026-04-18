@@ -36,6 +36,13 @@ def copy_skill_for_isolated_import(tmp_path: Path, skill_name: str) -> Path:
     return isolated_root
 
 
+def copy_installed_skill(tmp_path: Path, skill_name: str) -> Path:
+    source_root = Path(__file__).resolve().parents[2] / skill_name
+    installed_root = tmp_path / "installed-skills" / skill_name
+    shutil.copytree(source_root, installed_root)
+    return installed_root
+
+
 def run_cli(module, monkeypatch, *args):
     monkeypatch.setattr(sys, "argv", ["audit_artifacts.py", *args])
     return module.main()
@@ -78,6 +85,8 @@ def setup_repo(
     subfeatures = load_module(SUBFEATURE_SCRIPT, "manage_subfeatures")
     execution = load_module(EXECUTION_SCRIPT, "manage_execution")
     audit = load_module(SCRIPT_PATH, "audit_artifacts")
+    audit_parity = audit.inspect_installed_skill_parity
+    monkeypatch.setattr(audit, "inspect_installed_skill_parity", lambda installed_skills=None: [])
 
     write_scope_config(
         tmp_path,
@@ -146,6 +155,7 @@ def setup_repo(
         "planning": planning,
         "subfeatures": subfeatures,
         "execution": execution,
+        "audit_parity": audit_parity,
         "feature_dir": feature_path,
         "proposal_dir": Path(proposal_dir),
         "proposal_row": proposal_row,
@@ -198,6 +208,41 @@ def test_run_audit_reports_clean_inventory(tmp_path, monkeypatch):
 
     assert result["ok"] is True
     assert result["findings"] == []
+
+
+def test_run_audit_keeps_clean_installed_parity_quiet(tmp_path, monkeypatch):
+    env = setup_repo(tmp_path, monkeypatch)
+    installed_root = copy_installed_skill(tmp_path, "audit-artifacts")
+    monkeypatch.setattr(env["audit"], "inspect_installed_skill_parity", env["audit_parity"])
+
+    result = env["audit"].run_audit(
+        installed_skills=[{"name": "audit-artifacts", "path": str(installed_root)}]
+    )
+
+    assert result["ok"] is True
+    assert result["findings"] == []
+
+
+def test_run_audit_reports_stale_installed_skill_parity(tmp_path, monkeypatch):
+    env = setup_repo(tmp_path, monkeypatch)
+    installed_root = copy_installed_skill(tmp_path, "audit-artifacts")
+    monkeypatch.setattr(env["audit"], "inspect_installed_skill_parity", env["audit_parity"])
+    installed_script = installed_root / "scripts" / "audit_artifacts.py"
+    installed_script.write_text(
+        installed_script.read_text(encoding="utf-8") + "\n# stale installed copy\n",
+        encoding="utf-8",
+    )
+
+    result = env["audit"].run_audit(
+        installed_skills=[{"name": "audit-artifacts", "path": str(installed_root)}]
+    )
+
+    assert result["ok"] is False
+    assert "content_mismatch" in finding_codes(result)
+    finding = next(finding for finding in result["findings"] if finding["category"] == "installed_parity")
+    assert finding["artifact_type"] == "skill"
+    assert finding["artifact_id"] == "audit-artifacts"
+    assert finding["path"] == "scripts/audit_artifacts.py"
 
 
 def test_run_audit_reports_metadata_read_error_without_stopping(tmp_path, monkeypatch):

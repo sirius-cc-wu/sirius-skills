@@ -21,6 +21,7 @@ if REPO_LIB_DIR.is_dir() and str(REPO_LIB_DIR) not in sys.path:
 if SKILL_LIB_DIR.is_dir() and str(SKILL_LIB_DIR) not in sys.path:
     sys.path.append(str(SKILL_LIB_DIR))
 
+from workflow_state import inspect_installed_skill_parity  # noqa: E402
 from workflow_state.inventory import (  # noqa: E402
     iter_subfeature_dirs,
     iter_traceability_records,
@@ -678,7 +679,27 @@ def summarize(findings: Sequence[Finding]) -> Dict[str, object]:
     }
 
 
-def run_audit(artifact_types: Optional[Iterable[str]] = None) -> Dict[str, object]:
+def _audit_installed_parity(
+    findings: List[Finding], installed_skills: Optional[Sequence[Dict[str, object]]] = None
+) -> None:
+    for record in inspect_installed_skill_parity(installed_skills=installed_skills):
+        findings.append(
+            Finding(
+                artifact_type="skill",
+                artifact_id=record.skill_name,
+                path=record.relative_path,
+                category="installed_parity",
+                code=record.code,
+                severity="warning",
+                message=record.message,
+            )
+        )
+
+
+def run_audit(
+    artifact_types: Optional[Iterable[str]] = None,
+    installed_skills: Optional[Sequence[Dict[str, object]]] = None,
+) -> Dict[str, object]:
     selected = set(artifact_types) if artifact_types is not None else set(VALID_ARTIFACT_TYPES)
     inventory = load_inventory()
     findings: List[Finding] = []
@@ -785,6 +806,7 @@ def run_audit(artifact_types: Optional[Iterable[str]] = None) -> Dict[str, objec
         subfeature_metadata,
     )
     _audit_relations(inventory, findings, selected)
+    _audit_installed_parity(findings, installed_skills)
 
     deduped = dedupe_findings(findings)
     return {

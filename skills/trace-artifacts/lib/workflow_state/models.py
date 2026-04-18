@@ -92,3 +92,23 @@ class TransitionCheckResult:
             "findings": [item.to_dict() for item in self.findings],
             "override_flag": self.override_flag,
         }
+
+
+@dataclass
+class InstalledParityRecord:
+    skill_name: str
+    relative_path: str
+    code: str
+    message: str
+    repo_path: str
+    installed_path: str
+
+    def to_dict(self) -> Dict[str, str]:
+        return {
+            "skill_name": self.skill_name,
+            "relative_path": self.relative_path,
+            "code": self.code,
+            "message": self.message,
+            "repo_path": self.repo_path,
+            "installed_path": self.installed_path,
+        }
