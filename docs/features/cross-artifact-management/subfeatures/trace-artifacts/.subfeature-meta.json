@@ -1,9 +1,9 @@
 {
   "subfeature_id": "trace-artifacts",
   "parent_feature_slug": "cross-artifact-management",
-  "status": "reviewed",
+  "status": "finalized",
   "created_at": "2026-04-11T15:00:22",
-  "updated_at": "2026-04-11T23:33:38",
+  "updated_at": "2026-04-18T13:36:18",
   "subfeature_type": "additive",
   "summary": "Trace lineage and relationships across planning and execution artifacts.",
   "affected_artifacts": [
@@ -22,5 +22,5 @@
     "CAM-02-trace-artifact-lineage"
   ],
   "review_note": "Planning reviewed: the trace packet is scoped to one read-only lineage slice, reuses the shared inventory helper, and keeps lineage edges limited to durable repo signals.",
-  "finalized_at": null
+  "finalized_at": "2026-04-18T13:36:18"
 }

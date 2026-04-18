@@ -175,10 +175,10 @@
     {
       "id": "WSC-02-shared-library",
       "feature": "Create shared workflow-state library",
-      "status": "draft",
+      "status": "closed",
       "path": "slices/WSC-02-shared-library-create-shared-workflow-state-library/",
-      "updated_at": "2026-04-17T21:12:48",
-      "closed_at": null,
+      "updated_at": "2026-04-17T21:29:37",
+      "closed_at": "2026-04-17T21:29:37",
       "archived_at": null,
       "relations": []
     },

@@ -1,0 +1,30 @@
+{
+  "subfeature_id": "proposal-workflow",
+  "parent_feature_slug": "planning-workflow",
+  "status": "reviewed",
+  "created_at": "2026-03-29T00:32:50",
+  "updated_at": "2026-03-29T00:32:50",
+  "subfeature_type": "additive",
+  "summary": "Track proposal staging, lifecycle, and promotion as a durable child planning workflow.",
+  "affected_artifacts": [
+    "docs/features/planning-workflow/discover.md",
+    "docs/features/planning-workflow/system-design.md",
+    "docs/features/planning-workflow/user-stories.md"
+  ],
+  "affected_story_ids": [
+    "PFW-01",
+    "PFW-02",
+    "PFW-03",
+    "PFW-04",
+    "PFW-05"
+  ],
+  "affected_slice_ids": [
+    "PFW-01-proposal-registry",
+    "PFW-02-guide-routing",
+    "PFW-03-proposal-lifecycle",
+    "PFW-04-proposal-promotion",
+    "PFW-05-config-support"
+  ],
+  "review_note": "Proposal workflow is now a canonical feature distinct from proposal instances and is ready for future slices if expanded.",
+  "finalized_at": null
+}

@@ -1,9 +1,9 @@
 {
   "subfeature_id": "measure-artifacts",
   "parent_feature_slug": "cross-artifact-management",
-  "status": "reviewed",
+  "status": "finalized",
   "created_at": "2026-04-18T01:15:28",
-  "updated_at": "2026-04-18T01:37:17",
+  "updated_at": "2026-04-18T13:36:19",
   "subfeature_type": "additive",
   "summary": "Record implementation metrics and workflow evidence across completed features and subfeatures.",
   "affected_artifacts": [
@@ -19,7 +19,10 @@
   "affected_story_ids": [
     "CAM-06"
   ],
-  "affected_slice_ids": [],
+  "affected_slice_ids": [
+    "CAM-06-metrics-foundation",
+    "CAM-06-metrics-consumers"
+  ],
   "review_note": "Planning reviewed: the measurement packet keeps metrics in a dedicated sidecar, splits evidence foundation from reporting consumption, and defers archive-facing display until a later follow-up.",
-  "finalized_at": null
+  "finalized_at": "2026-04-18T13:36:19"
 }

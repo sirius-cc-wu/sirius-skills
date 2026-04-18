@@ -5,7 +5,7 @@
 - Parent Feature: `execution-workflow`
 - Subfeature ID: `multi-slice-execution`
 - Subfeature Type: `additive`
-- Current Subfeature Status: `reviewed`
+- Current Subfeature Status: `finalized`
 
 ## Subfeature Summary
 
@@ -37,11 +37,10 @@ committing each completed slice separately.
 
 ## Candidate Affected Slice IDs
 
-- `EW-01-bootstrap`
-- `EW-03-plan`
-- `EW-03-gates`
-- `EW-04-review`
-- `EW-04-close`
+- `EW-MSE-01-scope-and-backlog-resolution`
+- `EW-MSE-02-sequential-slice-orchestration`
+- `EW-MSE-03-stop-and-resume-semantics`
+- `EW-MSE-04-per-slice-commit-checkpoints`
 
 ## Impact Notes
 

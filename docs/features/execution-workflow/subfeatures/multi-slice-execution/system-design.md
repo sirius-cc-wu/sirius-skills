@@ -3,18 +3,20 @@
 ## Design summary
 
 `multi-slice-execution` adds a batch-style execution capability above the
-existing one-slice execution workflow. The new capability accepts a reviewed and
-committed feature or subfeature planning scope, resolves its planned slices and
-dependencies, then drives the existing execution skills one slice at a time.
+existing one-slice execution workflow. The new capability accepts a reviewed or
+implemented feature or subfeature planning scope, resolves its planned slices
+and dependencies, then bootstraps or resumes one mapped execution slice at a
+time while handing work back to the existing execution owners.
 
 The design is intentionally conservative:
 
 - keep `slice`, `guide-execution`, `review-execution`, `close-slice`, and
   `commit` as the owners of their current stages
 - add one orchestrator that resolves the target scope, chooses the next ready
-  planned slice, and stops after any blocking failure
-- require a commit after each slice closes so one execution slice still maps to
-  one durable Git checkpoint
+  planned slice, and stops at active-slice, dependency, or clean-worktree
+  checkpoints
+- require a clean worktree before advancing past a completed slice so one
+  execution slice still maps to one durable Git checkpoint
 
 ## Goals and non-goals
 
@@ -48,8 +50,8 @@ targets instead of guessing.
 
 The planning-scope resolver should confirm:
 
-- the target packet is `planning_reviewed` or `slice_ready`
-- the planning artifacts were explicitly approved and committed
+- the target packet is `planning_reviewed`, `slice_ready`, or `implemented`
+- the target is explicitly approved in durable planning metadata
 - the packet has planned slices in `slice-planning.md` and
   `slice-traceability.md`
 
@@ -76,18 +78,25 @@ state.
 ### 3. Sequential execution orchestrator
 
 The new user-facing capability should be a dedicated skill, tentatively
-`execute-all-slices`, that loops over the ready-next planned slice set:
+`execute-all-slices`, that operates conservatively over the ready-next planned
+slice set:
 
-1. bootstrap the next planned slice through `slice`
-2. continue execution through `guide-execution`
-3. require review through `review-execution`
-4. close the slice through `close-slice`
-5. create a commit through `commit`
-6. re-evaluate the remaining planned slices
+1. bootstrap the next planned slice through the execution owner helper when no
+   mapped slice is already active
+2. record the execution-slice lineage back into `slice-traceability.md`
+3. hand the active slice back to `guide-execution` and the existing downstream
+   owners
+4. refuse to bootstrap a later slice while the current slice is still active or
+   the worktree is dirty after a completed slice
+5. re-evaluate the remaining planned slices on the next invocation
+
+The first version does not directly run `review-execution`, `close-slice`, or
+`commit`. It enforces the checkpoints around those owners and resumes once
+durable repository state shows that the prior slice has progressed.
 
 The orchestrator should never hold more than one active slice at a time. It
 should refuse to move on while the current slice is still open or the worktree
-is not clean after the per-slice commit.
+is not clean after the per-slice checkpoint.
 
 ### 4. Per-slice commit checkpoint
 
@@ -100,9 +109,10 @@ The commit boundary should occur after slice closure so each commit can include:
 This keeps each commit aligned with one fully completed execution slice and
 prevents later commits from retroactively absorbing prior closure metadata.
 
-The orchestrator should treat commit failure as a hard stop. It should not
-continue to the next slice until the current slice has a durable commit
-checkpoint.
+The implemented first version uses a clean-worktree check as the conservative
+checkpoint before continuing. When a completed slice still leaves uncommitted
+changes, the orchestrator should hand control back to `commit` and stop. It
+does not inspect Git history directly to prove that a new commit was created.
 
 ### 5. Stop and resume semantics
 
@@ -110,8 +120,9 @@ The orchestrator should stop on:
 
 - no approved planning scope
 - no ready-next slice when unfinished planned slices remain
-- any execution, review, closure, or commit failure
-- any request for clarification from an owning skill
+- an already-active mapped execution slice that still needs owner-driven work
+- unresolved dependency blocks between planned slices
+- a dirty worktree after a completed mapped slice
 
 Resume should not need a new progress file. A later run can recompute progress
 from:
@@ -125,7 +136,8 @@ from:
 - **New skill**: `skills/execute-all-slices/`
   - resolves feature/subfeature planning scope
   - computes remaining planned slices
-  - drives the sequential execution loop
+  - bootstraps the next ready slice or resumes the active mapped slice
+  - hands execution back to existing owners between invocations
 
 - **Existing execution owners**
   - `skills/slice/`
@@ -148,16 +160,19 @@ copying readiness logic into a second state machine.
 2. Read planned slices and dependencies from durable planning artifacts.
 3. Determine the next ready planned slice from planning plus execution closure
    state.
-4. Execute that slice through existing execution owners.
-5. Commit the closed slice.
-6. Repeat until all planned slices for the target scope are complete.
+4. Bootstrap or resume one mapped slice and hand off to existing execution
+   owners.
+5. Re-evaluate the backlog after durable closure state and a clean worktree
+   checkpoint exist.
+6. Repeat across later invocations until all planned slices for the target scope
+   are complete.
 
 The first version should avoid adding any new persistent lifecycle state.
 Completion is inferred from existing planning and execution records.
 
 ## Failure handling and operational constraints
 
-- Do not skip a failed slice and continue to later slices.
+- Do not skip an active or blocked slice and continue to later slices.
 - Do not create more than one active slice for the same target scope.
 - Do not treat unstaged or unrelated changes as part of the current slice
   checkpoint.
@@ -179,7 +194,8 @@ Completion is inferred from existing planning and execution records.
 - Add unit tests for:
   - feature vs subfeature scope resolution
   - ready-next slice selection from planned dependencies and closed slices
-  - stop-on-failure behavior for execution, closure, or commit steps
+  - stop behavior for active slices, blocked backlogs, and dirty-worktree
+    checkpoints
   - resume behavior after some planned slices are already closed
 - Validate targeted workflow behavior with:
   - `pytest -q skills/execute-all-slices/tests/test_execute_all_slices.py`

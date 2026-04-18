@@ -1,0 +1,34 @@
+{
+  "subfeature_id": "subfeature-workflow",
+  "parent_feature_slug": "planning-workflow",
+  "status": "reviewed",
+  "created_at": "2026-03-28T22:41:56",
+  "updated_at": "2026-03-28T23:26:17",
+  "subfeature_type": "additive",
+  "summary": "Add a durable child-planning workflow for evolving existing features through subfeatures.",
+  "affected_artifacts": [
+    "docs/features/planning-workflow/discover.md",
+    "docs/features/planning-workflow/system-design.md",
+    "docs/features/planning-workflow/user-stories.md"
+  ],
+  "affected_story_ids": [
+    "FEW-01",
+    "FEW-02",
+    "FEW-03",
+    "FEW-04",
+    "FEW-05"
+  ],
+  "affected_slice_ids": [
+    "FEW-201",
+    "FEW-202",
+    "FEW-203",
+    "FEW-204",
+    "FEW-205",
+    "FEW-206",
+    "FEW-207",
+    "FEW-208",
+    "FEW-209"
+  ],
+  "review_note": "Planning artifacts reviewed: discovery intent, design boundaries, MVP decisions, and breakdown sequencing are coherent; start execution bootstrap with FEW-01-registry and FEW-01-initiate-change.",
+  "finalized_at": null
+}

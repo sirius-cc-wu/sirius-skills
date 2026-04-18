@@ -6,6 +6,20 @@
       "subfeature_type": "additive",
       "updated_at": "2026-04-08T08:27:49",
       "path": "docs/features/planning-workflow/subfeatures/change-to-subfeature-migration/"
+    },
+    {
+      "subfeature_id": "proposal-workflow",
+      "status": "reviewed",
+      "subfeature_type": "additive",
+      "updated_at": "2026-03-29T00:32:50",
+      "path": "docs/features/planning-workflow/subfeatures/proposal-workflow/"
+    },
+    {
+      "subfeature_id": "subfeature-workflow",
+      "status": "reviewed",
+      "subfeature_type": "additive",
+      "updated_at": "2026-03-28T23:26:17",
+      "path": "docs/features/planning-workflow/subfeatures/subfeature-workflow/"
     }
   ]
 }

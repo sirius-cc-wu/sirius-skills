@@ -1,9 +1,9 @@
 {
   "subfeature_id": "archive-artifacts",
   "parent_feature_slug": "cross-artifact-management",
-  "status": "reviewed",
+  "status": "finalized",
   "created_at": "2026-04-11T15:00:23",
-  "updated_at": "2026-04-11T23:54:47",
+  "updated_at": "2026-04-18T13:36:19",
   "subfeature_type": "additive",
   "summary": "Archive superseded or completed artifacts while preserving traceability.",
   "affected_artifacts": [
@@ -21,5 +21,5 @@
     "CAM-05-safe-slice-archival"
   ],
   "review_note": "Planning reviewed: the archive packet keeps candidate discovery read-only and limits apply mode to explicit closed-slice archival through the execution owner helper.",
-  "finalized_at": null
+  "finalized_at": "2026-04-18T13:36:19"
 }
