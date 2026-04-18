@@ -156,6 +156,45 @@ def test_bootstrap_preserves_unrelated_existing_planning_keys(tmp_path, monkeypa
     assert planning["design_diagram_mode"] == "embedded"
 
 
+def test_bootstrap_with_wiki_scaffolds_docs_wiki(tmp_path, monkeypatch):
+    module = load_module()
+    monkeypatch.chdir(tmp_path)
+
+    assert run_cli(module, monkeypatch, "--mode", "default", "--wiki") == 0
+
+    assert (tmp_path / "docs" / "wiki" / "features").is_dir()
+    assert (tmp_path / "docs" / "wiki" / "concepts").is_dir()
+
+    index_text = (tmp_path / "docs" / "wiki" / "index.md").read_text(
+        encoding="utf-8"
+    )
+    log_text = (tmp_path / "docs" / "wiki" / "log.md").read_text(encoding="utf-8")
+
+    assert "## Features" in index_text
+    assert "docs/features/" in index_text
+    assert "docs/proposals/" in index_text
+    assert "slices/" in index_text
+    assert "## Concepts" in index_text
+    assert "## [YYYY-MM-DD] operation | subject" in log_text
+
+
+def test_bootstrap_with_wiki_preserves_existing_index_and_log(tmp_path, monkeypatch):
+    module = load_module()
+    monkeypatch.chdir(tmp_path)
+
+    wiki_dir = tmp_path / "docs" / "wiki"
+    wiki_dir.mkdir(parents=True)
+    (wiki_dir / "index.md").write_text("custom index\n", encoding="utf-8")
+    (wiki_dir / "log.md").write_text("custom log\n", encoding="utf-8")
+
+    assert run_cli(module, monkeypatch, "--mode", "default", "--wiki") == 0
+
+    assert (wiki_dir / "features").is_dir()
+    assert (wiki_dir / "concepts").is_dir()
+    assert (wiki_dir / "index.md").read_text(encoding="utf-8") == "custom index\n"
+    assert (wiki_dir / "log.md").read_text(encoding="utf-8") == "custom log\n"
+
+
 def test_bootstrap_child_scope_inherits_parent_configs_before_applying_overrides(
     tmp_path, monkeypatch
 ):
@@ -235,6 +274,57 @@ def test_bootstrap_child_scope_inherits_parent_configs_before_applying_overrides
         "commit_format": "{scope}: {summary}",
         "custom_conv": "keep-conv",
     }
+
+
+def test_bootstrap_with_wiki_uses_inherited_scope_paths_in_index(
+    tmp_path, monkeypatch
+):
+    module = load_module()
+    monkeypatch.chdir(tmp_path)
+    (tmp_path / ".git").mkdir()
+
+    write_scope_config(
+        tmp_path,
+        "planning.json",
+        {
+            "planning_dir": "planning/features",
+            "proposal_dir": "planning/proposals",
+            "design_diagram_mode": "linked_svg",
+        },
+    )
+    write_scope_config(
+        tmp_path,
+        "execution.json",
+        {
+            "slice_dir": "team-slices",
+            "preferred_workflow": "BDD",
+            "auto_start_implementation": False,
+        },
+    )
+
+    child_scope = tmp_path / "apps" / "payments"
+    child_scope.mkdir(parents=True)
+
+    assert (
+        run_cli(
+            module,
+            monkeypatch,
+            "--mode",
+            "default",
+            "--repo-root",
+            str(child_scope),
+            "--wiki",
+        )
+        == 0
+    )
+
+    index_text = (child_scope / "docs" / "wiki" / "index.md").read_text(
+        encoding="utf-8"
+    )
+
+    assert "planning/features/" in index_text
+    assert "planning/proposals/" in index_text
+    assert "team-slices/" in index_text
 
 
 def test_invalid_existing_json_returns_error(tmp_path, monkeypatch, capsys):

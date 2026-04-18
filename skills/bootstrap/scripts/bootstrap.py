@@ -16,6 +16,7 @@ DEFAULT_DESIGN_DIAGRAM_MODE = "embedded"
 DEFAULT_SLICE_DIR = "slices"
 DEFAULT_WORKFLOW = "TDD"
 DEFAULT_AUTO_START_IMPLEMENTATION = True
+DEFAULT_WIKI_DIR = "docs/wiki"
 VALID_DESIGN_DIAGRAM_MODES = ("embedded", "linked_svg")
 
 DEFAULT_JIRA_CONVENTIONS = {
@@ -110,6 +111,15 @@ def parse_args() -> argparse.Namespace:
         default=None,
         help="Issue URL template for jira mode.",
     )
+    parser.add_argument(
+        "--wiki",
+        action=argparse.BooleanOptionalAction,
+        default=False,
+        help=(
+            "Create a lightweight docs/wiki scaffold with features, concepts, "
+            "index.md, and log.md."
+        ),
+    )
     return parser.parse_args()
 
 
@@ -129,6 +139,12 @@ def load_json_file(path: Path) -> dict[str, Any]:
 def write_json_file(path: Path, data: dict[str, Any]) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_text(json.dumps(data, indent=2) + "\n", encoding="utf-8")
+
+
+def write_text_file_if_missing(path: Path, content: str) -> None:
+    path.parent.mkdir(parents=True, exist_ok=True)
+    if not path.exists():
+        path.write_text(content, encoding="utf-8")
 
 
 def inherited_or_default(
@@ -227,6 +243,50 @@ def build_conventions_config(
     return updated
 
 
+def scaffold_wiki(
+    repo_root: Path, planning_dir: str, proposal_dir: str, slice_dir: str
+) -> None:
+    wiki_dir = repo_root / DEFAULT_WIKI_DIR
+    (wiki_dir / "features").mkdir(parents=True, exist_ok=True)
+    (wiki_dir / "concepts").mkdir(parents=True, exist_ok=True)
+
+    index_content = f"""# Wiki Index
+
+This wiki is the repository's synthesized knowledge layer. Read it before
+re-deriving answers from raw planning artifacts or upstream references.
+
+It is intentionally separate from `{planning_dir}/`, `{proposal_dir}/`, and
+`{slice_dir}/`, which remain the canonical planning and execution sources of
+truth.
+
+## Features
+
+| Page | Summary | Main sources |
+|---|---|---|
+
+## Concepts
+
+| Page | Summary | Main sources |
+|---|---|---|
+
+## Notes
+
+- Add feature pages as understanding changes or implementation completes.
+- Add concept pages only when multiple feature pages need the same
+  cross-cutting synthesis.
+"""
+    log_content = """# Wiki Log
+
+Append-only record of wiki maintenance.
+
+Use entries like `## [YYYY-MM-DD] operation | subject` so the log stays
+grep-friendly.
+"""
+
+    write_text_file_if_missing(wiki_dir / "index.md", index_content)
+    write_text_file_if_missing(wiki_dir / "log.md", log_content)
+
+
 def main() -> int:
     args = parse_args()
     repo_root = Path(args.repo_root).expanduser().resolve()
@@ -266,10 +326,22 @@ def main() -> int:
     write_json_file(execution_path, execution_config)
     write_json_file(conventions_path, conventions_config)
 
-    print(
+    if args.wiki:
+        scaffold_wiki(
+            repo_root,
+            planning_config["planning_dir"],
+            planning_config["proposal_dir"],
+            execution_config["slice_dir"],
+        )
+
+    message = (
         "Configured .skills/planning.json, .skills/execution.json, and "
         f".skills/conventions.json using '{args.mode}' mode."
     )
+    if args.wiki:
+        message += f" Created {DEFAULT_WIKI_DIR}/ scaffold."
+
+    print(message)
     return 0
 
 
