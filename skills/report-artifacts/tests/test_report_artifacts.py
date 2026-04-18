@@ -1,12 +1,14 @@
 import importlib.util
 import json
 import shutil
+import subprocess
 import sys
 from datetime import datetime
 from pathlib import Path
 
 
 SCRIPT_PATH = Path(__file__).resolve().parents[1] / "scripts" / "report_artifacts.py"
+VALIDATION_HOOK_SCRIPT = Path(__file__).resolve().parents[3] / "scripts" / "validate_workflow_state.py"
 PROPOSE_SCRIPT = Path(__file__).resolve().parents[2] / "propose" / "scripts" / "manage_proposals.py"
 PLANNING_SCRIPT = (
     Path(__file__).resolve().parents[2] / "guide-planning" / "scripts" / "manage_planning.py"
@@ -299,6 +301,35 @@ def test_run_report_surfaces_semantic_preview_separately(tmp_path, monkeypatch, 
     output = capsys.readouterr().out
     assert "Semantic preview:" in output
     assert "repair_planning_status_handoff" in output
+
+
+def test_workflow_state_validation_hook_runs_from_repo_root_and_returns_exit_code(monkeypatch):
+    module = load_module(VALIDATION_HOOK_SCRIPT, "validate_workflow_state_main")
+    calls = {}
+
+    def fake_run(command, cwd, check):
+        calls["command"] = command
+        calls["cwd"] = cwd
+        calls["check"] = check
+        return subprocess.CompletedProcess(command, 7)
+
+    monkeypatch.setattr(module.subprocess, "run", fake_run)
+
+    assert module.main(["--", "-k", "parity"]) == 7
+    assert calls["command"] == [
+        sys.executable,
+        "-m",
+        "pytest",
+        "-q",
+        "skills/audit-artifacts/tests/test_audit_artifacts.py",
+        "skills/report-artifacts/tests/test_report_artifacts.py",
+        "skills/guide-planning/tests/test_manage_planning.py",
+        "skills/close-slice/tests/test_close_slice.py",
+        "-k",
+        "parity",
+    ]
+    assert calls["cwd"] == module.REPO_ROOT
+    assert calls["check"] is False
 
 
 def test_run_report_keeps_clean_installed_parity_quiet(tmp_path, monkeypatch):

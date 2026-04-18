@@ -16,6 +16,13 @@ To remove the same managed skill set later:
 make uninstall
 ```
 
+To rerun the curated workflow consistency validation bundle used by CI and
+workflow-state maintenance work:
+
+```bash
+make validate-workflow-state
+```
+
 The intended direction is:
 
 - keep core workflow skills reusable across personal and company projects
@@ -45,6 +52,8 @@ Current shared-reference workflow:
 
 - keep the canonical source in `docs/shared/`
 - `make install` refreshes shared runtime and reference copies before packaging managed skills
+- `make validate-workflow-state` reruns the curated workflow consistency pytest
+  bundle for parity and transition guardrail regressions
 - run `make sync-shared-references` after editing a canonical shared reference
 - have each consuming skill point only at its local `references/` copy so the
   packaged skill remains self-contained

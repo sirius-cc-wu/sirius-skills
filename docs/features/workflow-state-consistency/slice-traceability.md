@@ -20,7 +20,7 @@ Use this file to map repo story IDs to execution slices without moving story own
 | WSC-02 | M | Share one reconciliation model across maintenance workflows | I1 | WSC-02-maintenance-adoption | Audit, Trace, Repair, Report, Install packaging | WSC-02-shared-library | WSC-02-maintenance-adoption | Second execution packet adopts the shared library across maintenance skills and wires managed install/package sync for self-contained skill copies. |
 | WSC-03 | M | Preview semantic workflow drift separately from derived repair | I2 | WSC-03-semantic-preview | Repair preview, Report summaries | WSC-02-maintenance-adoption | WSC-03-semantic-preview | Keeps semantic drift preview read-only and distinct from owner-mediated repair paths. |
 | WSC-04 | S | Detect installed maintenance-skill drift against the repo source | I3 | WSC-04-installed-parity | Parity inspection, Install checks | WSC-02-shared-library | WSC-04-installed-parity | Depends only on the shared parity primitives, but is scheduled after I2 so the parity contract reflects stabilized invariants. |
-| WSC-05 | M | Fail repeatable validation when durable workflow artifacts disagree | I3 | WSC-05-validation-hooks | Read-only validation entrypoint, CI hooks | WSC-01-transition-guardrails, WSC-04-installed-parity |  | Turns the stabilized guardrails and parity surfaces into automation-friendly validation. |
+| WSC-05 | M | Fail repeatable validation when durable workflow artifacts disagree | I3 | WSC-05-validation-hooks | Read-only validation entrypoint, CI hooks | WSC-01-transition-guardrails, WSC-04-installed-parity | WSC-05-validation-hooks | Turns the stabilized guardrails and parity surfaces into automation-friendly validation. |
 
 ## Notes
 

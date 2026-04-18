@@ -16,6 +16,7 @@ SUBFEATURE_SCRIPT = (
 EXECUTION_SCRIPT = (
     Path(__file__).resolve().parents[2] / "guide-execution" / "scripts" / "manage_execution.py"
 )
+VALIDATION_HOOK_SCRIPT = Path(__file__).resolve().parents[3] / "scripts" / "validate_workflow_state.py"
 
 
 def load_module(path: Path, name: str):
@@ -208,6 +209,33 @@ def test_run_audit_reports_clean_inventory(tmp_path, monkeypatch):
 
     assert result["ok"] is True
     assert result["findings"] == []
+
+
+def test_workflow_state_validation_hook_targets_reviewed_suite():
+    module = load_module(VALIDATION_HOOK_SCRIPT, "validate_workflow_state")
+
+    assert module.build_pytest_command() == [
+        sys.executable,
+        "-m",
+        "pytest",
+        "-q",
+        "skills/audit-artifacts/tests/test_audit_artifacts.py",
+        "skills/report-artifacts/tests/test_report_artifacts.py",
+        "skills/guide-planning/tests/test_manage_planning.py",
+        "skills/close-slice/tests/test_close_slice.py",
+    ]
+    assert module.build_pytest_command(["--", "-k", "installed_parity"]) == [
+        sys.executable,
+        "-m",
+        "pytest",
+        "-q",
+        "skills/audit-artifacts/tests/test_audit_artifacts.py",
+        "skills/report-artifacts/tests/test_report_artifacts.py",
+        "skills/guide-planning/tests/test_manage_planning.py",
+        "skills/close-slice/tests/test_close_slice.py",
+        "-k",
+        "installed_parity",
+    ]
 
 
 def test_run_audit_keeps_clean_installed_parity_quiet(tmp_path, monkeypatch):

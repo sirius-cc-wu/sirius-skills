@@ -26,3 +26,4 @@
 | WSC-03-semantic-preview | Add preview-only semantic drift reporting | closed | 2026-04-19T00:40:49 | 2026-04-19T00:40:49 | slices/WSC-03-semantic-preview-add-preview-only-semantic-drift-reporting/ |
 | WSC-01-transition-guardrails | Add high-confidence transition consistency checks | closed | 2026-04-19T00:58:24 | 2026-04-19T00:58:24 | slices/WSC-01-transition-guardrails-add-high-confidence-transition-consistency-checks/ |
 | WSC-04-installed-parity | Surface installed-vs-repo skill parity drift | closed | 2026-04-19T01:16:00 | 2026-04-19T01:16:00 | slices/WSC-04-installed-parity-surface-installed-vs-repo-skill-parity-drift/ |
+| WSC-05-validation-hooks | Add repeatable workflow consistency validation hooks | closed | 2026-04-19T01:24:17 | 2026-04-19T01:24:17 | slices/WSC-05-validation-hooks-add-repeatable-workflow-consistency-validation-hooks/ |
