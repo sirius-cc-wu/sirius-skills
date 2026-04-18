@@ -109,14 +109,14 @@ def normalize_relation_request(
 
 def ensure_slice_closed(
     module, rows: List[Dict[str, object]], slice: Dict[str, object], force: bool
-) -> Tuple[List[Dict[str, object]], Dict[str, object]]:
+) -> Tuple[List[Dict[str, object]], Dict[str, object], str]:
     status = module.normalize_status(str(slice["status"]))
     if status == "closed":
         refreshed_rows = module.parse_registry()
         refreshed_slice = module.resolve_slice(refreshed_rows, str(slice["id"]))
         if not refreshed_slice:
             raise RuntimeError(f"Slice disappeared after refresh: {slice['id']}")
-        return refreshed_rows, refreshed_slice
+        return refreshed_rows, refreshed_slice, f"Closed slice {slice['id']}"
 
     success, message = module.update_slice_status(rows, slice, "closed", force=force)
     if not success:
@@ -126,7 +126,7 @@ def ensure_slice_closed(
     refreshed_slice = module.resolve_slice(refreshed_rows, str(slice["id"]))
     if not refreshed_slice:
         raise RuntimeError(f"Slice disappeared after close: {slice['id']}")
-    return refreshed_rows, refreshed_slice
+    return refreshed_rows, refreshed_slice, message
 
 
 def read_text_if_exists(path: Path) -> str:
@@ -534,7 +534,7 @@ def main() -> int:
                 "--confirm-impact."
             )
 
-        _, slice = ensure_slice_closed(module, rows, slice, force=args.force)
+        _, slice, close_message = ensure_slice_closed(module, rows, slice, force=args.force)
         rows = module.parse_registry()
         slice = module.resolve_slice(rows, str(slice["id"]))
         if not slice:
@@ -568,10 +568,11 @@ def main() -> int:
             slice_path = Path(str(slice["path"]).rstrip("/"))
             metadata = module.load_slice_metadata(str(slice_path))
         result = build_result(slice, metadata)
+        result["message"] = close_message
         if args.json:
             print(json.dumps(result, indent=2))
         else:
-            print(f"Closed slice {slice['id']}")
+            print(close_message)
         return 0
     except (RuntimeError, OSError) as exc:
         print(str(exc), file=sys.stderr)

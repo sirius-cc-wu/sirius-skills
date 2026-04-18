@@ -26,6 +26,77 @@ def write_scope_config(scope_root: Path, filename: str, data: dict):
     (skills_dir / filename).write_text(json.dumps(data) + "\n", encoding="utf-8")
 
 
+def write_planning_config(scope_root: Path):
+    write_scope_config(
+        scope_root,
+        "planning.json",
+        {"planning_dir": "docs/features", "proposal_dir": "docs/proposals"},
+    )
+
+
+def write_transition_guardrail_feature(tmp_path: Path, slice_id: str):
+    feature_dir = tmp_path / "docs" / "features" / "checkout"
+    subfeature_dir = feature_dir / "subfeatures" / "replace-legacy-flow"
+    subfeature_dir.mkdir(parents=True, exist_ok=True)
+    (feature_dir / ".planning-meta.json").write_text(
+        json.dumps(
+            {
+                "feature_slug": "checkout",
+                "status": "planning_reviewed",
+                "created_at": "2026-01-01T00:00:00",
+                "updated_at": "2026-01-01T00:00:00",
+                "requires_ui_flow": False,
+                "review_note": "ready",
+                "ready_slice_ids": [slice_id],
+            }
+        )
+        + "\n",
+        encoding="utf-8",
+    )
+    (subfeature_dir / ".planning-meta.json").write_text(
+        json.dumps(
+            {
+                "feature_slug": "replace-legacy-flow",
+                "status": "planning_reviewed",
+                "created_at": "2026-01-01T00:00:00",
+                "updated_at": "2026-01-01T00:00:00",
+                "requires_ui_flow": False,
+                "review_note": "ready",
+                "ready_slice_ids": [],
+            }
+        )
+        + "\n",
+        encoding="utf-8",
+    )
+    (subfeature_dir / ".subfeature-meta.json").write_text(
+        json.dumps(
+            {
+                "parent_feature_slug": "checkout",
+                "subfeature_id": "replace-legacy-flow",
+                "status": "reviewed",
+                "created_at": "2026-01-01T00:00:00",
+                "updated_at": "2026-01-01T00:00:00",
+                "subfeature_type": "replacement",
+                "summary": "Replace legacy flow",
+                "affected_artifacts": [],
+                "affected_story_ids": [],
+                "affected_slice_ids": [slice_id],
+                "review_note": "ready",
+                "finalized_at": None,
+            }
+        )
+        + "\n",
+        encoding="utf-8",
+    )
+    (subfeature_dir / "slice-traceability.md").write_text(
+        "# Slice Traceability\n\n"
+        "| Story ID | Increments | Planned Slice IDs | Execution Slice IDs | Notes |\n"
+        "| --- | --- | --- | --- | --- |\n"
+        f"| CHK-01 | I2 | {slice_id} |  | demo |\n",
+        encoding="utf-8",
+    )
+
+
 def test_init_creates_human_and_machine_registry(tmp_path, monkeypatch):
     module = load_manage_specs_module()
     monkeypatch.chdir(tmp_path)
@@ -239,6 +310,37 @@ def test_closing_slice_records_closed_at_and_updates_registry(tmp_path, monkeypa
     assert registry["slices"][0]["status"] == "closed"
     assert registry["slices"][0]["closed_at"] == metadata["closed_at"]
     assert "| DEMO | Demo Feature | closed |" in readme
+
+
+def test_closing_slice_blocks_when_linked_subfeature_is_not_finalized(
+    tmp_path, monkeypatch, capsys
+):
+    module = load_manage_specs_module()
+    monkeypatch.chdir(tmp_path)
+    write_planning_config(tmp_path)
+
+    assert run_cli(module, monkeypatch, "init", "slices") == 0
+    assert run_cli(module, monkeypatch, "add", "DEMO", "Demo Feature") == 0
+
+    slice_dir = tmp_path / "slices" / "DEMO-demo-feature"
+    (slice_dir / "brief.md").write_text("# brief\n", encoding="utf-8")
+    (slice_dir / "checklists").mkdir()
+    (slice_dir / "checklists" / "requirements.md").write_text(
+        "- [x] requirements complete\n", encoding="utf-8"
+    )
+    assert run_cli(module, monkeypatch, "set-status", "DEMO", "brief_ready") == 0
+
+    (slice_dir / "blueprint.md").write_text("# plan\n", encoding="utf-8")
+    assert run_cli(module, monkeypatch, "set-status", "DEMO", "blueprint_ready") == 0
+    assert run_cli(module, monkeypatch, "set-status", "DEMO", "execution_ready") == 0
+
+    write_transition_guardrail_feature(tmp_path, "DEMO")
+
+    exit_code = run_cli(module, monkeypatch, "set-status", "DEMO", "closed")
+    captured = capsys.readouterr()
+
+    assert exit_code == 2
+    assert "transition_subfeature_finalize_required" in captured.err
 
 
 def test_archive_slice_moves_closed_slice_and_updates_registry(tmp_path, monkeypatch):

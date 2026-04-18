@@ -54,6 +54,24 @@ def write_planning_config(scope_root: Path, config: dict | None = None):
     )
 
 
+def write_execution_config(scope_root: Path, config: dict | None = None):
+    skills_dir = scope_root / ".skills"
+    skills_dir.mkdir(parents=True, exist_ok=True)
+    (skills_dir / "execution.json").write_text(
+        json.dumps(
+            config
+            if config is not None
+            else {
+                "slice_dir": "slices",
+                "preferred_workflow": "TDD",
+                "auto_start_implementation": True,
+            }
+        )
+        + "\n",
+        encoding="utf-8",
+    )
+
+
 def advance_feature_to_slice_ready(module, monkeypatch, feature_slug: str, slice_id: str):
     assert run_cli(module, monkeypatch, "set-status", feature_slug, "discovery_ready") == 0
     assert run_cli(module, monkeypatch, "set-status", feature_slug, "design_ready") == 0
@@ -160,6 +178,83 @@ def test_add_creates_feature_metadata_and_registry_entries(tmp_path, monkeypatch
     assert metadata["status"] == "discovery_pending"
     assert metadata["requires_ui_flow"] is False
     assert registry["features"][0]["feature"] == "habit-tracker"
+
+
+def test_slice_ready_warns_when_closed_execution_slices_leave_feature_out_of_sync(
+    tmp_path, monkeypatch, capsys
+):
+    module = load_manage_planning_module()
+    monkeypatch.chdir(tmp_path)
+
+    write_planning_config(tmp_path)
+    write_execution_config(tmp_path)
+
+    assert run_cli(module, monkeypatch, "add", "habit-tracker") == 0
+
+    feature_dir = tmp_path / "docs" / "features" / "habit-tracker"
+    write_file(feature_dir / "discover.md")
+    write_file(feature_dir / "system-design.md")
+    write_file(feature_dir / "slice-planning.md")
+    write_file(
+        feature_dir / "slice-traceability.md",
+        "# Slice Traceability\n\n"
+        "| Story ID | Increments | Planned Slice IDs | Execution Slice IDs | Notes |\n"
+        "| --- | --- | --- | --- | --- |\n"
+        "| HAB-01 | I1 | HAB-101 |  | demo |\n",
+    )
+
+    assert run_cli(module, monkeypatch, "set-status", "habit-tracker", "discovery_ready") == 0
+    assert run_cli(module, monkeypatch, "set-status", "habit-tracker", "design_ready") == 0
+    assert run_cli(module, monkeypatch, "set-status", "habit-tracker", "breakdown_ready") == 0
+    assert (
+        run_cli(
+            module,
+            monkeypatch,
+            "set-status",
+            "habit-tracker",
+            "planning_reviewed",
+            "--review-note",
+            "Reviewed for scope, sequencing, and validation readiness.",
+        )
+        == 0
+    )
+
+    slices_dir = tmp_path / "slices"
+    slices_dir.mkdir(parents=True, exist_ok=True)
+    (slices_dir / "registry.json").write_text(
+        json.dumps(
+            {
+                "slices": [
+                    {
+                        "id": "HAB-101",
+                        "feature": "habit-tracker",
+                        "status": "closed",
+                        "path": "slices/HAB-101-habit-tracker/",
+                        "updated_at": "2026-01-01T00:00:00",
+                        "closed_at": "2026-01-01T00:00:00",
+                    }
+                ]
+            }
+        )
+        + "\n",
+        encoding="utf-8",
+    )
+
+    assert (
+        run_cli(
+            module,
+            monkeypatch,
+            "set-status",
+            "habit-tracker",
+            "slice_ready",
+            "--slice-id",
+            "HAB-101",
+        )
+        == 0
+    )
+    captured = capsys.readouterr()
+
+    assert "repair_traceability_execution_ids" in captured.out
 
 
 def test_add_from_nested_directory_uses_root_scope_registry(tmp_path, monkeypatch):

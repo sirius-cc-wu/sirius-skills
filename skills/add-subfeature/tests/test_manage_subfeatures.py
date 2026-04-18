@@ -55,6 +55,22 @@ def setup_feature(tmp_path: Path):
     return feature_dir
 
 
+def write_execution_config(scope_root: Path):
+    skills_dir = scope_root / ".skills"
+    skills_dir.mkdir(parents=True, exist_ok=True)
+    (skills_dir / "execution.json").write_text(
+        json.dumps(
+            {
+                "slice_dir": "slices",
+                "preferred_workflow": "TDD",
+                "auto_start_implementation": True,
+            }
+        )
+        + "\n",
+        encoding="utf-8",
+    )
+
+
 def test_init_feature_creates_subfeature_registry_files(tmp_path, monkeypatch):
     module = load_module(SCRIPT_PATH, "manage_subfeatures")
     monkeypatch.chdir(tmp_path)
@@ -227,3 +243,102 @@ def test_reviewed_requires_review_note_and_validate_reports_success(tmp_path, mo
         ["manage_subfeatures.py", "validate", "checkout", "replace-legacy-flow"],
     )
     assert module.main() == 0
+
+
+def test_finalized_warns_when_linked_execution_slices_remain_open(
+    tmp_path, monkeypatch, capsys
+):
+    module = load_module(SCRIPT_PATH, "manage_subfeatures")
+    monkeypatch.chdir(tmp_path)
+    feature_dir = setup_feature(tmp_path)
+    write_execution_config(tmp_path)
+    (tmp_path / ".skills" / "planning.json").write_text(
+        json.dumps({"planning_dir": "docs/features", "proposal_dir": "docs/proposals"}) + "\n",
+        encoding="utf-8",
+    )
+
+    assert run_cli(module, "manage_subfeatures.py", monkeypatch, "add", "checkout", "replace-legacy-flow") == 0
+    subfeature_dir = feature_dir / "subfeatures" / "replace-legacy-flow"
+    write_file(subfeature_dir / "impact-analysis.md")
+    write_file(subfeature_dir / "system-design.md")
+    write_file(subfeature_dir / "slice-planning.md")
+    write_file(
+        subfeature_dir / "slice-traceability.md",
+        "# Slice Traceability\n\n"
+        "| Story ID | Increments | Planned Slice IDs | Execution Slice IDs | Notes |\n"
+        "| --- | --- | --- | --- | --- |\n"
+        "| CHK-01 | I1 | CHK-101 |  | demo |\n",
+    )
+
+    assert run_cli(
+        module,
+        "manage_subfeatures.py",
+        monkeypatch,
+        "set-status",
+        "checkout",
+        "replace-legacy-flow",
+        "impact_ready",
+    ) == 0
+    assert run_cli(
+        module,
+        "manage_subfeatures.py",
+        monkeypatch,
+        "set-status",
+        "checkout",
+        "replace-legacy-flow",
+        "design_ready",
+    ) == 0
+    assert run_cli(
+        module,
+        "manage_subfeatures.py",
+        monkeypatch,
+        "set-status",
+        "checkout",
+        "replace-legacy-flow",
+        "breakdown_ready",
+    ) == 0
+    assert run_cli(
+        module,
+        "manage_subfeatures.py",
+        monkeypatch,
+        "set-status",
+        "checkout",
+        "replace-legacy-flow",
+        "reviewed",
+        "--review-note",
+        "Reviewed and ready for durable subfeature execution.",
+    ) == 0
+
+    slices_dir = tmp_path / "slices"
+    slices_dir.mkdir(parents=True, exist_ok=True)
+    (slices_dir / "registry.json").write_text(
+        json.dumps(
+            {
+                "slices": [
+                    {
+                        "id": "CHK-101",
+                        "feature": "replace-legacy-flow",
+                        "status": "execution_ready",
+                        "path": "slices/CHK-101-replace-legacy-flow/",
+                        "updated_at": "2026-01-01T00:00:00",
+                        "closed_at": None,
+                    }
+                ]
+            }
+        )
+        + "\n",
+        encoding="utf-8",
+    )
+
+    assert run_cli(
+        module,
+        "manage_subfeatures.py",
+        monkeypatch,
+        "set-status",
+        "checkout",
+        "replace-legacy-flow",
+        "finalized",
+    ) == 0
+    captured = capsys.readouterr()
+
+    assert "transition_open_execution_slices" in captured.out

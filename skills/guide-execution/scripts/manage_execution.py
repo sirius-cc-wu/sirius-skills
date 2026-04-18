@@ -11,6 +11,25 @@ from datetime import datetime
 from pathlib import Path
 from typing import Dict, List, Optional, Tuple
 
+
+SCRIPT_DIR = Path(__file__).resolve().parent
+SKILL_LIB_DIR = SCRIPT_DIR.parent / "lib"
+REPO_LIB_DIR = next(
+    (
+        candidate / "lib"
+        for candidate in SCRIPT_DIR.parents
+        if (candidate / "lib" / "workflow_state").is_dir()
+    ),
+    None,
+)
+
+if REPO_LIB_DIR is not None and str(REPO_LIB_DIR) not in sys.path:
+    sys.path.insert(0, str(REPO_LIB_DIR))
+if SKILL_LIB_DIR.is_dir() and str(SKILL_LIB_DIR) not in sys.path:
+    sys.path.append(str(SKILL_LIB_DIR))
+
+from workflow_state import evaluate_slice_transition, format_transition_message  # noqa: E402
+
 DEFAULT_SLICES_DIR = "slices"
 DEFAULT_ARCHIVE_DIRNAME = ".archived"
 CONFIG_DIR = ".skills"
@@ -1270,6 +1289,17 @@ def update_slice_status(
             f"Cannot set {slice['id']} to status '{status}': {', '.join(issues)}",
         )
 
+    pre_transition_result = None
+    if status == "closed":
+        pre_transition_result = evaluate_slice_transition(str(slice["id"]), status)
+        if pre_transition_result.outcome == "block" and not force:
+            return (
+                False,
+                format_transition_message(
+                    f"Cannot set {slice['id']} to status '{status}'", pre_transition_result
+                ),
+            )
+
     final_status = status
     auto_started = False
     if status == "blueprint_ready" and not force:
@@ -1294,13 +1324,21 @@ def update_slice_status(
     slice["updated_at"] = normalize_optional_timestamp(updated_metadata.get("updated_at"))
     slice["closed_at"] = normalize_optional_timestamp(updated_metadata.get("closed_at"))
     write_registry(rows)
+    post_transition_result = None
+    if final_status == "closed":
+        post_transition_result = evaluate_slice_transition(str(slice["id"]), final_status)
     if auto_started:
         return (
             True,
             f"Updated {slice['id']} to status 'blueprint_ready' and "
             "auto-started implementation with status 'execution_ready'",
         )
-    return True, f"Updated {slice['id']} to status '{status}'"
+    message = f"Updated {slice['id']} to status '{status}'"
+    if final_status == "closed" and force and pre_transition_result is not None:
+        return True, format_transition_message(message, pre_transition_result)
+    if post_transition_result is not None:
+        return True, format_transition_message(message, post_transition_result)
+    return True, message
 
 
 def cmd_init(args: argparse.Namespace) -> int:

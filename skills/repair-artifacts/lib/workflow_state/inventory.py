@@ -14,7 +14,22 @@ from workflow_state.models import (
 )
 
 
-REPO_ROOT = Path(__file__).resolve().parents[2]
+def _resolve_repo_root() -> Path:
+    current = Path(__file__).resolve()
+    required_paths = (
+        Path("skills") / "guide-planning" / "scripts" / "manage_planning.py",
+        Path("skills") / "propose" / "scripts" / "manage_proposals.py",
+        Path("skills") / "guide-execution" / "scripts" / "manage_execution.py",
+    )
+    for candidate in current.parents:
+        if all((candidate / relpath).is_file() for relpath in required_paths):
+            return candidate
+    raise RuntimeError(
+        "Unable to resolve workflow-state repository root from shared runtime location."
+    )
+
+
+REPO_ROOT = _resolve_repo_root()
 PROPOSAL_SCRIPT = REPO_ROOT / "skills" / "propose" / "scripts" / "manage_proposals.py"
 PLANNING_SCRIPT = REPO_ROOT / "skills" / "guide-planning" / "scripts" / "manage_planning.py"
 SUBFEATURE_SCRIPT = REPO_ROOT / "skills" / "add-subfeature" / "scripts" / "manage_subfeatures.py"

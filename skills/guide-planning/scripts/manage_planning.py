@@ -11,6 +11,25 @@ from datetime import datetime
 from pathlib import Path
 from typing import Dict, List, Optional, Tuple
 
+
+SCRIPT_DIR = Path(__file__).resolve().parent
+SKILL_LIB_DIR = SCRIPT_DIR.parent / "lib"
+REPO_LIB_DIR = next(
+    (
+        candidate / "lib"
+        for candidate in SCRIPT_DIR.parents
+        if (candidate / "lib" / "workflow_state").is_dir()
+    ),
+    None,
+)
+
+if REPO_LIB_DIR is not None and str(REPO_LIB_DIR) not in sys.path:
+    sys.path.insert(0, str(REPO_LIB_DIR))
+if SKILL_LIB_DIR.is_dir() and str(SKILL_LIB_DIR) not in sys.path:
+    sys.path.append(str(SKILL_LIB_DIR))
+
+from workflow_state import evaluate_feature_transition, format_transition_message  # noqa: E402
+
 DEFAULT_PLANNING_DIR = "docs/features"
 DEFAULT_PROPOSAL_DIR = "docs/proposals"
 DEFAULT_DESIGN_DIAGRAM_MODE = "embedded"
@@ -738,7 +757,9 @@ def update_feature_status(
     feature["status"] = status
     feature["updated_at"] = updated_metadata["updated_at"]
     write_registry(rows, scope_context=scope_context)
-    return True, f"Updated {feature['feature']} to status '{status}'"
+    message = f"Updated {feature['feature']} to status '{status}'"
+    transition_result = evaluate_feature_transition(str(feature["feature"]), status)
+    return True, format_transition_message(message, transition_result)
 
 
 def validate_feature(

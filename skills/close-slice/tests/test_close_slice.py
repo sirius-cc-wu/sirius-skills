@@ -23,6 +23,78 @@ def run_cli(module, monkeypatch, *args):
     return module.main()
 
 
+def write_planning_config(scope_root: Path):
+    skills_dir = scope_root / ".skills"
+    skills_dir.mkdir(parents=True, exist_ok=True)
+    (skills_dir / "planning.json").write_text(
+        json.dumps({"planning_dir": "docs/features", "proposal_dir": "docs/proposals"}) + "\n",
+        encoding="utf-8",
+    )
+
+
+def write_transition_guardrail_feature(tmp_path: Path, slice_id: str):
+    feature_dir = tmp_path / "docs" / "features" / "checkout"
+    subfeature_dir = feature_dir / "subfeatures" / "replace-legacy-flow"
+    subfeature_dir.mkdir(parents=True, exist_ok=True)
+    (feature_dir / ".planning-meta.json").write_text(
+        json.dumps(
+            {
+                "feature_slug": "checkout",
+                "status": "planning_reviewed",
+                "created_at": "2026-01-01T00:00:00",
+                "updated_at": "2026-01-01T00:00:00",
+                "requires_ui_flow": False,
+                "review_note": "ready",
+                "ready_slice_ids": [slice_id],
+            }
+        )
+        + "\n",
+        encoding="utf-8",
+    )
+    (subfeature_dir / ".planning-meta.json").write_text(
+        json.dumps(
+            {
+                "feature_slug": "replace-legacy-flow",
+                "status": "planning_reviewed",
+                "created_at": "2026-01-01T00:00:00",
+                "updated_at": "2026-01-01T00:00:00",
+                "requires_ui_flow": False,
+                "review_note": "ready",
+                "ready_slice_ids": [],
+            }
+        )
+        + "\n",
+        encoding="utf-8",
+    )
+    (subfeature_dir / ".subfeature-meta.json").write_text(
+        json.dumps(
+            {
+                "parent_feature_slug": "checkout",
+                "subfeature_id": "replace-legacy-flow",
+                "status": "reviewed",
+                "created_at": "2026-01-01T00:00:00",
+                "updated_at": "2026-01-01T00:00:00",
+                "subfeature_type": "replacement",
+                "summary": "Replace legacy flow",
+                "affected_artifacts": [],
+                "affected_story_ids": [],
+                "affected_slice_ids": [slice_id],
+                "review_note": "ready",
+                "finalized_at": None,
+            }
+        )
+        + "\n",
+        encoding="utf-8",
+    )
+    (subfeature_dir / "slice-traceability.md").write_text(
+        "# Slice Traceability\n\n"
+        "| Story ID | Increments | Planned Slice IDs | Execution Slice IDs | Notes |\n"
+        "| --- | --- | --- | --- | --- |\n"
+        f"| CHK-01 | I2 | {slice_id} |  | demo |\n",
+        encoding="utf-8",
+    )
+
+
 def setup_execution_ready_slice(tmp_path, monkeypatch):
     manage_execution = load_module(MANAGE_EXECUTION_PATH, "manage_execution")
     monkeypatch.chdir(tmp_path)
@@ -128,3 +200,18 @@ def test_close_slice_records_relations_without_archiving_or_publishing(
     assert target_meta["relations"][0]["type"] == "superseded_by"
     assert "publications" not in source_meta
     assert "archived_at" not in source_meta
+
+
+def test_close_slice_blocks_when_linked_subfeature_is_not_finalized(
+    tmp_path, monkeypatch, capsys
+):
+    close_slice = load_module(CLOSE_SLICE_PATH, "close_slice")
+    _, _ = setup_execution_ready_slice(tmp_path, monkeypatch)
+    write_planning_config(tmp_path)
+    write_transition_guardrail_feature(tmp_path, "DEMO")
+
+    exit_code = run_cli(close_slice, monkeypatch, "--slice", "DEMO")
+    captured = capsys.readouterr()
+
+    assert exit_code == 2
+    assert "transition_subfeature_finalize_required" in captured.err

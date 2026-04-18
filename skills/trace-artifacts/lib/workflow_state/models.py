@@ -78,3 +78,17 @@ class SemanticPreviewRecord:
             "message": self.message,
             "apply_supported": self.apply_supported,
         }
+
+
+@dataclass
+class TransitionCheckResult:
+    outcome: str
+    findings: List[SemanticPreviewRecord]
+    override_flag: Optional[str] = None
+
+    def to_dict(self) -> Dict[str, object]:
+        return {
+            "outcome": self.outcome,
+            "findings": [item.to_dict() for item in self.findings],
+            "override_flag": self.override_flag,
+        }

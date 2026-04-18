@@ -24,3 +24,4 @@
 | CAM-06-metrics-consumers | Wire measure-artifacts skill and reporting consumers | closed | 2026-04-18T02:04:05 | 2026-04-18T02:04:05 | slices/CAM-06-metrics-consumers-wire-measure-artifacts-skill-and-reporting-consumers/ |
 | WSC-02-maintenance-adoption | Adopt shared reconciliation across maintenance skills | closed | 2026-04-19T00:24:08 | 2026-04-19T00:24:08 | slices/WSC-02-maintenance-adoption-adopt-shared-reconciliation-across-maintenance-skills/ |
 | WSC-03-semantic-preview | Add preview-only semantic drift reporting | closed | 2026-04-19T00:40:49 | 2026-04-19T00:40:49 | slices/WSC-03-semantic-preview-add-preview-only-semantic-drift-reporting/ |
+| WSC-01-transition-guardrails | Add high-confidence transition consistency checks | closed | 2026-04-19T00:58:24 | 2026-04-19T00:58:24 | slices/WSC-01-transition-guardrails-add-high-confidence-transition-consistency-checks/ |

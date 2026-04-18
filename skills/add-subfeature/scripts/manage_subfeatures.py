@@ -11,6 +11,25 @@ from pathlib import Path
 from typing import Dict, List, Optional, Tuple
 
 
+SCRIPT_DIR = Path(__file__).resolve().parent
+SKILL_LIB_DIR = SCRIPT_DIR.parent / "lib"
+REPO_LIB_DIR = next(
+    (
+        candidate / "lib"
+        for candidate in SCRIPT_DIR.parents
+        if (candidate / "lib" / "workflow_state").is_dir()
+    ),
+    None,
+)
+
+if REPO_LIB_DIR is not None and str(REPO_LIB_DIR) not in sys.path:
+    sys.path.insert(0, str(REPO_LIB_DIR))
+if SKILL_LIB_DIR.is_dir() and str(SKILL_LIB_DIR) not in sys.path:
+    sys.path.append(str(SKILL_LIB_DIR))
+
+from workflow_state import evaluate_subfeature_transition, format_transition_message  # noqa: E402
+
+
 DEFAULT_PLANNING_DIR = "docs/features"
 PLANNING_SCRIPT = (
     Path(__file__).resolve().parents[2]
@@ -612,7 +631,9 @@ def update_subfeature_status(
     selected["updated_at"] = timestamp
     write_registry(feature_dir, rows)
     manage_planning.sync_registry(scope_context=scope_context)
-    return True, f"Updated {selected['subfeature_id']} to status '{status}'"
+    message = f"Updated {selected['subfeature_id']} to status '{status}'"
+    transition_result = evaluate_subfeature_transition(str(selected["subfeature_id"]), status)
+    return True, format_transition_message(message, transition_result)
 
 
 def cmd_init_feature(args: argparse.Namespace) -> int:

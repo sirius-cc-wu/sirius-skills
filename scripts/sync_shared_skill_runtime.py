@@ -14,6 +14,9 @@ WORKFLOW_STATE_TARGETS = [
     REPO_ROOT / "skills" / "trace-artifacts" / "lib" / "workflow_state",
     REPO_ROOT / "skills" / "repair-artifacts" / "lib" / "workflow_state",
     REPO_ROOT / "skills" / "report-artifacts" / "lib" / "workflow_state",
+    REPO_ROOT / "skills" / "guide-planning" / "lib" / "workflow_state",
+    REPO_ROOT / "skills" / "add-subfeature" / "lib" / "workflow_state",
+    REPO_ROOT / "skills" / "guide-execution" / "lib" / "workflow_state",
 ]
 METRICS_STORE_SOURCE = (
     REPO_ROOT / "skills" / "measure-artifacts" / "scripts" / "metrics_store.py"
