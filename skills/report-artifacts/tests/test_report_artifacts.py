@@ -390,11 +390,7 @@ def test_run_report_surfaces_installed_parity_unavailable_without_crashing(tmp_p
         "inspect_installed_skill_parity",
         env["report_parity"],
     )
-
-    def fail_run(*args, **kwargs):
-        return subprocess.CompletedProcess(args[0], 1, "", "offline skills CLI")
-
-    monkeypatch.setattr(env["report_parity"].__globals__["subprocess"], "run", fail_run)
+    monkeypatch.setattr(env["report_parity"].__globals__["Path"], "home", lambda: tmp_path)
 
     payload = env["report"].build_report_result(
         artifact_types=["feature"],
@@ -405,7 +401,30 @@ def test_run_report_surfaces_installed_parity_unavailable_without_crashing(tmp_p
 
     assert payload["summary"]["installed_parity_count"] == 1
     assert payload["installed_parity"][0]["code"] == "installed_parity_unavailable"
-    assert "offline skills CLI" in payload["installed_parity"][0]["message"]
+    assert "no installed skills found under" in payload["installed_parity"][0]["message"]
+
+
+def test_run_report_discovers_local_skill_home_without_cli_dependency(tmp_path, monkeypatch):
+    env = setup_repo(tmp_path, monkeypatch)
+    monkeypatch.setitem(
+        env["report"].build_report_result.__globals__,
+        "inspect_installed_skill_parity",
+        env["report_parity"],
+    )
+    fake_home = tmp_path / "fake-home"
+    installed_root = fake_home / ".agents" / "skills" / "report-artifacts"
+    shutil.copytree(Path(__file__).resolve().parents[2] / "report-artifacts", installed_root)
+    monkeypatch.setattr(env["report_parity"].__globals__["Path"], "home", lambda: fake_home)
+
+    payload = env["report"].build_report_result(
+        artifact_types=["feature"],
+        group_by="overview",
+        stale_days=30,
+        now=datetime(2026, 2, 15),
+    )
+
+    assert payload["summary"]["installed_parity_count"] == 0
+    assert payload["installed_parity"] == []
 
 
 def test_report_module_loads_from_self_contained_skill_copy(tmp_path):

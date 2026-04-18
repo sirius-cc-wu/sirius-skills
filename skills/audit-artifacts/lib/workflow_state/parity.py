@@ -1,5 +1,4 @@
-import json
-import subprocess
+import os
 from pathlib import Path
 from typing import Dict, List, Mapping, Optional, Sequence
 
@@ -46,39 +45,63 @@ PARITY_TARGETS: Dict[str, Sequence[str]] = {
     ),
 }
 IGNORED_DIR_NAMES = {"__pycache__"}
+SKILL_HOME_ENV_VARS = ("CODEX_SKILLS_HOME",)
+
+
+def _local_skill_home_candidates() -> List[Path]:
+    candidates: List[Path] = []
+    seen: set[Path] = set()
+
+    def add_candidate(path: Path) -> None:
+        expanded = path.expanduser()
+        if expanded in seen:
+            return
+        seen.add(expanded)
+        candidates.append(expanded)
+
+    for env_var in SKILL_HOME_ENV_VARS:
+        raw_value = os.environ.get(env_var)
+        if raw_value:
+            add_candidate(Path(raw_value))
+
+    codex_home = os.environ.get("CODEX_HOME")
+    if codex_home:
+        add_candidate(Path(codex_home) / "skills")
+
+    home = Path.home()
+    add_candidate(home / ".agents" / "skills")
+    add_candidate(home / ".codex" / "skills")
+
+    return candidates
+
+
+def _discover_installed_skills_from_local_homes() -> List[Dict[str, str]]:
+    installed: List[Dict[str, str]] = []
+    seen_names = set()
+    for root in _local_skill_home_candidates():
+        if not root.is_dir():
+            continue
+        for child in sorted(root.iterdir()):
+            if not child.is_dir() or child.name.startswith("."):
+                continue
+            if not (child / "SKILL.md").is_file():
+                continue
+            if child.name in seen_names:
+                continue
+            seen_names.add(child.name)
+            installed.append({"name": child.name, "path": str(child)})
+    return installed
 
 
 def discover_installed_skills() -> List[Dict[str, str]]:
-    completed = subprocess.run(
-        ["npx", "skills", "ls", "-g", "--json"],
-        check=False,
-        capture_output=True,
-        text=True,
+    installed = _discover_installed_skills_from_local_homes()
+    if installed:
+        return installed
+    searched = ", ".join(str(path) for path in _local_skill_home_candidates())
+    raise RuntimeError(
+        "Failed to inspect installed skills from local skill homes: "
+        f"no installed skills found under {searched}."
     )
-    if completed.returncode != 0:
-        raise RuntimeError(
-            "Failed to inspect installed skills via `npx skills ls -g --json`: "
-            f"{completed.stderr.strip() or 'command exited non-zero'}"
-        )
-    try:
-        payload = json.loads(completed.stdout)
-    except json.JSONDecodeError as exc:
-        raise RuntimeError(
-            "Failed to parse installed skills from `npx skills ls -g --json`."
-        ) from exc
-    if not isinstance(payload, list):
-        raise RuntimeError("Expected `npx skills ls -g --json` to return a JSON array.")
-
-    installed: List[Dict[str, str]] = []
-    for item in payload:
-        if not isinstance(item, dict):
-            raise RuntimeError("Installed skill listing included a non-object entry.")
-        name = item.get("name")
-        path = item.get("path")
-        if not isinstance(name, str) or not isinstance(path, str):
-            raise RuntimeError("Installed skill listing entry is missing string `name` or `path`.")
-        installed.append({"name": name, "path": path})
-    return installed
 
 
 def inspect_installed_skill_parity(

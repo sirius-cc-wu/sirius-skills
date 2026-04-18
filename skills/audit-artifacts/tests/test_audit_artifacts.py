@@ -277,18 +277,14 @@ def test_run_audit_reports_stale_installed_skill_parity(tmp_path, monkeypatch):
 def test_run_audit_reports_installed_parity_unavailable_without_crashing(tmp_path, monkeypatch):
     env = setup_repo(tmp_path, monkeypatch)
     monkeypatch.setattr(env["audit"], "inspect_installed_skill_parity", env["audit_parity"])
-
-    def fail_run(*args, **kwargs):
-        return subprocess.CompletedProcess(args[0], 1, "", "offline skills CLI")
-
-    monkeypatch.setattr(env["audit_parity"].__globals__["subprocess"], "run", fail_run)
+    monkeypatch.setattr(env["audit_parity"].__globals__["Path"], "home", lambda: tmp_path)
 
     result = env["audit"].run_audit()
 
     assert result["ok"] is False
     finding = next(finding for finding in result["findings"] if finding["category"] == "installed_parity")
     assert finding["code"] == "installed_parity_unavailable"
-    assert "offline skills CLI" in finding["message"]
+    assert "no installed skills found under" in finding["message"]
 
 
 def test_run_audit_reports_metadata_read_error_without_stopping(tmp_path, monkeypatch):
