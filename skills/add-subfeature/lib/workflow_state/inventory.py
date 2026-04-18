@@ -14,26 +14,35 @@ from workflow_state.models import (
 )
 
 
-def _resolve_repo_root() -> Path:
+def _resolve_runtime_roots() -> Tuple[Path, Path]:
     current = Path(__file__).resolve()
-    required_paths = (
+    repo_layout_paths = (
         Path("skills") / "guide-planning" / "scripts" / "manage_planning.py",
         Path("skills") / "propose" / "scripts" / "manage_proposals.py",
         Path("skills") / "guide-execution" / "scripts" / "manage_execution.py",
+        Path("skills") / "add-subfeature" / "scripts" / "manage_subfeatures.py",
+    )
+    installed_layout_paths = (
+        Path("guide-planning") / "scripts" / "manage_planning.py",
+        Path("propose") / "scripts" / "manage_proposals.py",
+        Path("guide-execution") / "scripts" / "manage_execution.py",
+        Path("add-subfeature") / "scripts" / "manage_subfeatures.py",
     )
     for candidate in current.parents:
-        if all((candidate / relpath).is_file() for relpath in required_paths):
-            return candidate
+        if all((candidate / relpath).is_file() for relpath in repo_layout_paths):
+            return candidate, candidate / "skills"
+        if all((candidate / relpath).is_file() for relpath in installed_layout_paths):
+            return candidate, candidate
     raise RuntimeError(
         "Unable to resolve workflow-state repository root from shared runtime location."
     )
 
 
-REPO_ROOT = _resolve_repo_root()
-PROPOSAL_SCRIPT = REPO_ROOT / "skills" / "propose" / "scripts" / "manage_proposals.py"
-PLANNING_SCRIPT = REPO_ROOT / "skills" / "guide-planning" / "scripts" / "manage_planning.py"
-SUBFEATURE_SCRIPT = REPO_ROOT / "skills" / "add-subfeature" / "scripts" / "manage_subfeatures.py"
-EXECUTION_SCRIPT = REPO_ROOT / "skills" / "guide-execution" / "scripts" / "manage_execution.py"
+REPO_ROOT, SKILLS_ROOT = _resolve_runtime_roots()
+PROPOSAL_SCRIPT = SKILLS_ROOT / "propose" / "scripts" / "manage_proposals.py"
+PLANNING_SCRIPT = SKILLS_ROOT / "guide-planning" / "scripts" / "manage_planning.py"
+SUBFEATURE_SCRIPT = SKILLS_ROOT / "add-subfeature" / "scripts" / "manage_subfeatures.py"
+EXECUTION_SCRIPT = SKILLS_ROOT / "guide-execution" / "scripts" / "manage_execution.py"
 
 TRACEABILITY_HEADERS: Set[str] = {
     "story id",

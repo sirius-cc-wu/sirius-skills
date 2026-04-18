@@ -383,6 +383,31 @@ def test_run_report_surfaces_installed_parity_separately(tmp_path, monkeypatch, 
     assert "scripts/report_data.py" in text
 
 
+def test_run_report_surfaces_installed_parity_unavailable_without_crashing(tmp_path, monkeypatch):
+    env = setup_repo(tmp_path, monkeypatch)
+    monkeypatch.setitem(
+        env["report"].build_report_result.__globals__,
+        "inspect_installed_skill_parity",
+        env["report_parity"],
+    )
+
+    def fail_run(*args, **kwargs):
+        return subprocess.CompletedProcess(args[0], 1, "", "offline skills CLI")
+
+    monkeypatch.setattr(env["report_parity"].__globals__["subprocess"], "run", fail_run)
+
+    payload = env["report"].build_report_result(
+        artifact_types=["feature"],
+        group_by="overview",
+        stale_days=30,
+        now=datetime(2026, 2, 15),
+    )
+
+    assert payload["summary"]["installed_parity_count"] == 1
+    assert payload["installed_parity"][0]["code"] == "installed_parity_unavailable"
+    assert "offline skills CLI" in payload["installed_parity"][0]["message"]
+
+
 def test_report_module_loads_from_self_contained_skill_copy(tmp_path):
     isolated_root = copy_skill_for_isolated_import(tmp_path, "report-artifacts")
 
@@ -392,3 +417,24 @@ def test_report_module_loads_from_self_contained_skill_copy(tmp_path):
     )
 
     assert hasattr(module, "build_report_result")
+
+
+def test_report_cli_runs_from_installed_style_copy(tmp_path):
+    for dependency in (
+        "propose",
+        "guide-planning",
+        "add-subfeature",
+        "guide-execution",
+    ):
+        copy_installed_skill(tmp_path, dependency)
+    installed_root = copy_installed_skill(tmp_path, "report-artifacts")
+
+    completed = subprocess.run(
+        [sys.executable, str(installed_root / "scripts" / "report_artifacts.py"), "--help"],
+        check=False,
+        capture_output=True,
+        text=True,
+    )
+
+    assert completed.returncode == 0
+    assert "Report operational workflow state across proposals" in completed.stdout

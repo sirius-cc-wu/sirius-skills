@@ -9,17 +9,16 @@ from typing import Dict, Iterable, List, Optional, Sequence, Set, Tuple
 
 
 SCRIPT_DIR = Path(__file__).resolve().parent
-SKILL_ROOT = SCRIPT_DIR.parents[1]
-REPO_ROOT = SCRIPT_DIR.parents[2]
-REPO_LIB_DIR = REPO_ROOT / "lib"
-SKILL_LIB_DIR = SKILL_ROOT / "lib"
+IMPORT_PATH_CANDIDATES = (
+    SCRIPT_DIR,
+    SCRIPT_DIR.parent / "lib",
+    SCRIPT_DIR.parents[2] / "lib",
+    SCRIPT_DIR.parents[1] / "lib",
+)
 
-if str(SCRIPT_DIR) not in sys.path:
-    sys.path.insert(0, str(SCRIPT_DIR))
-if REPO_LIB_DIR.is_dir() and str(REPO_LIB_DIR) not in sys.path:
-    sys.path.insert(0, str(REPO_LIB_DIR))
-if SKILL_LIB_DIR.is_dir() and str(SKILL_LIB_DIR) not in sys.path:
-    sys.path.append(str(SKILL_LIB_DIR))
+for candidate in reversed(IMPORT_PATH_CANDIDATES):
+    if candidate.is_dir() and str(candidate) not in sys.path:
+        sys.path.insert(0, str(candidate))
 
 from workflow_state import inspect_installed_skill_parity  # noqa: E402
 from workflow_state.inventory import (  # noqa: E402

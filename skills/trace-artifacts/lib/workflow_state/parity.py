@@ -3,12 +3,25 @@ import subprocess
 from pathlib import Path
 from typing import Dict, List, Mapping, Optional, Sequence
 
-from workflow_state.inventory import REPO_ROOT as INVENTORY_REPO_ROOT
 from workflow_state.models import InstalledParityRecord
 
 
-REPO_ROOT = INVENTORY_REPO_ROOT
-SKILLS_ROOT = REPO_ROOT / "skills"
+def _resolve_source_repo_root() -> Optional[Path]:
+    current = Path(__file__).resolve()
+    required_paths = (
+        Path("skills") / "guide-planning" / "scripts" / "manage_planning.py",
+        Path("skills") / "propose" / "scripts" / "manage_proposals.py",
+        Path("skills") / "guide-execution" / "scripts" / "manage_execution.py",
+        Path("skills") / "add-subfeature" / "scripts" / "manage_subfeatures.py",
+    )
+    for candidate in current.parents:
+        if all((candidate / relpath).is_file() for relpath in required_paths):
+            return candidate
+    return None
+
+
+REPO_ROOT = _resolve_source_repo_root()
+SKILLS_ROOT = REPO_ROOT / "skills" if REPO_ROOT is not None else None
 PARITY_TARGETS: Dict[str, Sequence[str]] = {
     "audit-artifacts": (
         "scripts/audit_artifacts.py",
@@ -72,7 +85,36 @@ def inspect_installed_skill_parity(
     installed_skills: Optional[Sequence[Mapping[str, object]]] = None,
     skill_names: Optional[Sequence[str]] = None,
 ) -> List[InstalledParityRecord]:
-    listing = installed_skills if installed_skills is not None else discover_installed_skills()
+    if SKILLS_ROOT is None:
+        return [
+            InstalledParityRecord(
+                skill_name="installed-parity",
+                relative_path=".",
+                code="installed_parity_unavailable",
+                message=(
+                    "Installed skill parity is unavailable because no sirius-skills source "
+                    "repository root could be resolved from the packaged runtime."
+                ),
+                repo_path="",
+                installed_path="",
+            )
+        ]
+    if installed_skills is not None:
+        listing = installed_skills
+    else:
+        try:
+            listing = discover_installed_skills()
+        except RuntimeError as exc:
+            return [
+                InstalledParityRecord(
+                    skill_name="installed-parity",
+                    relative_path=".",
+                    code="installed_parity_unavailable",
+                    message=str(exc),
+                    repo_path=str(SKILLS_ROOT),
+                    installed_path="",
+                )
+            ]
     installed_by_name: Dict[str, Path] = {}
     for item in listing:
         name = item.get("name")
@@ -92,7 +134,17 @@ def inspect_installed_skill_parity(
             continue
         repo_root = SKILLS_ROOT / skill_name
         if not repo_root.is_dir():
-            raise RuntimeError(f"Repo skill root is missing for parity target `{skill_name}`.")
+            findings.append(
+                InstalledParityRecord(
+                    skill_name="installed-parity",
+                    relative_path=".",
+                    code="installed_parity_unavailable",
+                    message=f"Repo skill root is missing for parity target `{skill_name}`.",
+                    repo_path=str(repo_root),
+                    installed_path=str(installed_root),
+                )
+            )
+            continue
         if not installed_root.is_dir():
             findings.append(
                 InstalledParityRecord(

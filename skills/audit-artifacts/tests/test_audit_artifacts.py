@@ -1,6 +1,7 @@
 import importlib.util
 import json
 import shutil
+import subprocess
 import sys
 from pathlib import Path
 
@@ -273,6 +274,23 @@ def test_run_audit_reports_stale_installed_skill_parity(tmp_path, monkeypatch):
     assert finding["path"] == "scripts/audit_artifacts.py"
 
 
+def test_run_audit_reports_installed_parity_unavailable_without_crashing(tmp_path, monkeypatch):
+    env = setup_repo(tmp_path, monkeypatch)
+    monkeypatch.setattr(env["audit"], "inspect_installed_skill_parity", env["audit_parity"])
+
+    def fail_run(*args, **kwargs):
+        return subprocess.CompletedProcess(args[0], 1, "", "offline skills CLI")
+
+    monkeypatch.setattr(env["audit_parity"].__globals__["subprocess"], "run", fail_run)
+
+    result = env["audit"].run_audit()
+
+    assert result["ok"] is False
+    finding = next(finding for finding in result["findings"] if finding["category"] == "installed_parity")
+    assert finding["code"] == "installed_parity_unavailable"
+    assert "offline skills CLI" in finding["message"]
+
+
 def test_run_audit_reports_metadata_read_error_without_stopping(tmp_path, monkeypatch):
     env = setup_repo(tmp_path, monkeypatch)
     (env["proposal_dir"] / ".proposal-meta.json").write_text("{not-json}\n", encoding="utf-8")
@@ -418,3 +436,24 @@ def test_audit_module_loads_from_self_contained_skill_copy(tmp_path):
     )
 
     assert hasattr(module, "run_audit")
+
+
+def test_audit_cli_runs_from_installed_style_copy(tmp_path):
+    for dependency in (
+        "propose",
+        "guide-planning",
+        "add-subfeature",
+        "guide-execution",
+    ):
+        copy_installed_skill(tmp_path, dependency)
+    installed_root = copy_installed_skill(tmp_path, "audit-artifacts")
+
+    completed = subprocess.run(
+        [sys.executable, str(installed_root / "scripts" / "audit_artifacts.py"), "--help"],
+        check=False,
+        capture_output=True,
+        text=True,
+    )
+
+    assert completed.returncode == 0
+    assert "Audit proposals, features, subfeatures, and slices" in completed.stdout
