@@ -16,6 +16,8 @@ across proposals, canonical features, durable subfeatures, and execution slices.
    cross-artifact links, planning-to-execution handoff drift, subfeature
    traceability drift, and slice relation problems.
 4. Emit findings without mutating repository artifacts.
+5. Distinguish broken active slice state from intentionally pruned archived
+   slice history retained through planning-layer summaries.
 
 ## Preferred Input
 
@@ -77,3 +79,5 @@ The first version audits:
   malformed artifact.
 - Treat this skill as the inspection layer; repair, report, trace, and archive
   behaviors belong to their own capabilities.
+- Do not flag intentionally pruned archived slices as missing active directories
+  when retained summary history is still present.

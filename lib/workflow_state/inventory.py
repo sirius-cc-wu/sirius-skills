@@ -51,6 +51,14 @@ TRACEABILITY_HEADERS: Set[str] = {
     "execution slice ids",
     "notes",
 }
+ARCHIVE_SUMMARIES_START = "<!-- archived-slice-summaries:start -->"
+ARCHIVE_SUMMARIES_END = "<!-- archived-slice-summaries:end -->"
+SLICE_SUMMARY_BLOCK_PATTERN = re.compile(
+    r"<!-- archived-slice-summary:(?P<slice_id>[^:]+):start -->\n"
+    r"(?P<body>.*?)\n"
+    r"<!-- archived-slice-summary:(?P=slice_id):end -->",
+    re.DOTALL,
+)
 
 
 def load_module(script_path: Path, name: str):
@@ -134,6 +142,90 @@ def iter_subfeature_dirs(inventory: Inventory) -> List[Path]:
     for paths in inventory.subfeature_dirs_by_feature.values():
         result.extend(paths)
     return sorted(result)
+
+
+def archive_slice_root(inventory: Inventory) -> str:
+    return normalize_registry_path(
+        inventory.context.execution.default_archive_dir(str(inventory.context.slice_root))
+    )
+
+
+def is_archived_slice_row(inventory: Inventory, row: Dict[str, object]) -> bool:
+    archived_at = row.get("archived_at")
+    if isinstance(archived_at, str) and archived_at.strip():
+        return True
+    return normalize_registry_path(str(row.get("path", ""))).startswith(archive_slice_root(inventory))
+
+
+def iter_all_slice_dirs(inventory: Inventory) -> List[Path]:
+    archive_root = Path(archive_slice_root(inventory).rstrip("/"))
+    discovered = list(inventory.slice_dirs)
+    discovered.extend(_discover_child_dirs(archive_root))
+    dirs_by_relpath = {normalize_dir_relpath(path): path for path in discovered}
+    return [dirs_by_relpath[relpath] for relpath in sorted(dirs_by_relpath)]
+
+
+def iter_active_slice_rows(inventory: Inventory) -> List[Dict[str, object]]:
+    return [dict(row) for row in inventory.slice_rows if not is_archived_slice_row(inventory, row)]
+
+
+def load_archived_slice_summary_index(
+    inventory: Inventory,
+) -> Dict[str, List[Dict[str, str]]]:
+    index: Dict[str, List[Dict[str, str]]] = {}
+    owner_specs = [
+        ("feature", feature_dir.name, normalize_dir_relpath(feature_dir), feature_dir / "system-design.md")
+        for feature_dir in inventory.feature_dirs
+    ]
+    owner_specs.extend(
+        (
+            "subfeature",
+            subfeature_dir.name,
+            normalize_dir_relpath(subfeature_dir),
+            subfeature_dir / "system-design.md",
+        )
+        for subfeature_dir in iter_subfeature_dirs(inventory)
+    )
+    for owner_type, owner_id, owner_path, design_path in owner_specs:
+        if not design_path.exists():
+            continue
+        try:
+            design_text = design_path.read_text(encoding="utf-8")
+        except OSError:
+            continue
+        managed_match = re.search(
+            rf"(?s){re.escape(ARCHIVE_SUMMARIES_START)}\n(?P<body>.*?){re.escape(ARCHIVE_SUMMARIES_END)}",
+            design_text,
+        )
+        if managed_match is None:
+            continue
+        for match in SLICE_SUMMARY_BLOCK_PATTERN.finditer(managed_match.group("body")):
+            slice_id = match.group("slice_id").strip()
+            if not slice_id:
+                continue
+            index.setdefault(slice_id, []).append(
+                {
+                    "owner_type": owner_type,
+                    "owner_id": owner_id,
+                    "owner_path": owner_path,
+                    "design_path": normalize_dir_relpath(design_path),
+                }
+            )
+    return index
+
+
+def is_retained_pruned_slice_row(
+    inventory: Inventory,
+    row: Dict[str, object],
+    summary_index: Optional[Dict[str, List[Dict[str, str]]]] = None,
+) -> bool:
+    if not is_archived_slice_row(inventory, row):
+        return False
+    slice_dir = Path(inventory.context.execution.slice_path_for_row(row))
+    if slice_dir.is_dir():
+        return False
+    summaries = summary_index if summary_index is not None else load_archived_slice_summary_index(inventory)
+    return str(row.get("id", "")).strip() in summaries
 
 
 def _normalize_table_header(value: str) -> str:

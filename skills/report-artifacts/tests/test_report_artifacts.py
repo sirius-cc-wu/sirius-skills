@@ -132,11 +132,24 @@ def setup_repo(tmp_path: Path, monkeypatch):
     metadata["closed_at"] = "2026-02-13T00:00:00"
     execution.write_slice_metadata(execution.slice_path_for_row(slice_row), metadata)
 
-    return {"report": report, "report_parity": report_parity}
+    return {
+        "report": report,
+        "report_parity": report_parity,
+        "execution": execution,
+    }
 
 
 def groups_by_key(payload: dict) -> dict:
     return {group["key"]: group for group in payload["groups"]}
+
+
+def archive_closed_slice(execution, slice_id: str) -> dict:
+    rows = execution.parse_registry()
+    slice_row = execution.resolve_slice(rows, slice_id)
+    assert slice_row is not None
+    archived, _, updated_slice = execution.archive_slice(rows, slice_row)
+    assert archived is True
+    return updated_slice
 
 
 def test_run_report_overview_counts_by_type_and_staleness(tmp_path, monkeypatch):
@@ -166,6 +179,23 @@ def test_run_report_groups_by_status(tmp_path, monkeypatch):
 
     groups = groups_by_key(payload)
     assert {"accepted", "planning_reviewed", "reviewed", "closed"}.issubset(groups)
+
+
+def test_run_report_excludes_archived_slices_from_default_operational_view(
+    tmp_path, monkeypatch
+):
+    env = setup_repo(tmp_path, monkeypatch)
+    archive_closed_slice(env["execution"], "CHK-101")
+
+    payload = env["report"].build_report_result(
+        group_by="overview",
+        stale_days=30,
+        now=datetime(2026, 2, 15),
+    )
+
+    assert payload["summary"]["total"] == 3
+    assert all(record["artifact_type"] != "slice" for record in payload["records"])
+    assert "slice" not in groups_by_key(payload)
 
 
 def test_run_report_preserves_raw_subfeature_status_when_reader_rejects_it(tmp_path, monkeypatch):

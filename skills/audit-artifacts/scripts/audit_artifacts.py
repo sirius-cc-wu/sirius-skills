@@ -22,9 +22,12 @@ for candidate in reversed(IMPORT_PATH_CANDIDATES):
 
 from workflow_state import inspect_installed_skill_parity  # noqa: E402
 from workflow_state.inventory import (  # noqa: E402
+    is_retained_pruned_slice_row,
+    iter_all_slice_dirs,
     iter_subfeature_dirs,
     iter_traceability_records,
     load_inventory,
+    load_archived_slice_summary_index,
     normalize_dir_relpath,
     normalize_registry_path,
     planning_row_artifact_type,
@@ -363,10 +366,13 @@ def _audit_subfeatures(
 def _audit_slices(
     inventory: Inventory, findings: List[Finding], selected: Set[str]
 ) -> None:
+    summary_index = load_archived_slice_summary_index(inventory)
     slice_row_paths = {
         normalize_registry_path(str(row["path"])): dict(row) for row in inventory.slice_rows
     }
     for row in inventory.slice_rows:
+        if is_retained_pruned_slice_row(inventory, row, summary_index):
+            continue
         ok, issues, _ = inventory.context.execution.validate_slice(dict(row))
         if ok:
             continue
@@ -382,7 +388,7 @@ def _audit_slices(
                 "error",
                 issue,
             )
-    for slice_dir in inventory.slice_dirs:
+    for slice_dir in iter_all_slice_dirs(inventory):
         relpath = normalize_dir_relpath(slice_dir)
         if relpath in slice_row_paths:
             continue
@@ -720,10 +726,16 @@ def run_audit(
     slice_status = next(
         status for status in inventory.registry_statuses if status.artifact_type == "slice"
     )
+    retained_pruned_slice_paths = {
+        normalize_registry_path(str(row["path"]))
+        for row in inventory.slice_rows
+        if is_retained_pruned_slice_row(inventory, row)
+    }
+    all_slice_dirs = iter_all_slice_dirs(inventory)
 
     _registry_findings(findings, selected, proposal_status, inventory.proposal_dirs)
     _registry_findings(findings, selected, planning_status, inventory.feature_dirs + iter_subfeature_dirs(inventory))
-    _registry_findings(findings, selected, slice_status, inventory.slice_dirs)
+    _registry_findings(findings, selected, slice_status, all_slice_dirs)
 
     for status in inventory.registry_statuses:
         if status.artifact_type == "subfeature" and status.owner_id is not None:
@@ -773,8 +785,12 @@ def run_audit(
         findings,
         selected,
         "slice",
-        {normalize_registry_path(str(row["path"])) for row in inventory.slice_rows},
-        {normalize_dir_relpath(path) for path in inventory.slice_dirs},
+        {
+            normalize_registry_path(str(row["path"]))
+            for row in inventory.slice_rows
+            if normalize_registry_path(str(row["path"])) not in retained_pruned_slice_paths
+        },
+        {normalize_dir_relpath(path) for path in all_slice_dirs},
         "slice_registry_path_missing",
         "slice_registry_entry_missing",
     )

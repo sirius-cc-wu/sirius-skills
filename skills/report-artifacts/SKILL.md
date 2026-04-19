@@ -15,6 +15,8 @@ instead of manually inspecting multiple workflow registries.
    and slices.
 3. Group report output by artifact type, lifecycle status, or parent feature.
 4. Surface stale artifacts through an explicit threshold.
+5. Keep archived or intentionally pruned slice history out of the default active
+   operational slice report.
 
 ## Preferred Input
 
@@ -56,3 +58,5 @@ Exit behavior:
 - Preserve raw owner statuses and treat staleness as a separate derived signal.
 - Reuse existing inventory and metadata readers instead of introducing a second
   workflow state model.
+- Treat archived slice history as a separate retained layer, not as ordinary
+  active execution work.

@@ -21,7 +21,11 @@ for candidate in reversed(IMPORT_PATH_CANDIDATES):
         sys.path.insert(0, str(candidate))
 
 from workflow_state import build_semantic_preview, inspect_installed_skill_parity  # noqa: E402
-from workflow_state.inventory import load_inventory, normalize_dir_relpath  # noqa: E402
+from workflow_state.inventory import (  # noqa: E402
+    iter_active_slice_rows,
+    load_inventory,
+    normalize_dir_relpath,
+)
 from metrics_store import read_metrics  # noqa: E402
 
 
@@ -168,7 +172,7 @@ def load_report_records(
                 )
 
     if "slice" in selected:
-        for row in inventory.slice_rows:
+        for row in iter_active_slice_rows(inventory):
             metadata = inventory.context.execution.load_slice_metadata(
                 inventory.context.execution.slice_path_for_row(row)
             )

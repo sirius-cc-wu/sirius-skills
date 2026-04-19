@@ -203,6 +203,42 @@ def create_closed_slice(execution, tmp_path: Path, slice_id: str, feature_name: 
     return tmp_path / "slices" / folder
 
 
+def archive_closed_slice(execution, slice_id: str) -> dict:
+    rows = execution.parse_registry()
+    slice_row = execution.resolve_slice(rows, slice_id)
+    assert slice_row is not None
+    slice_dir = Path(execution.slice_path_for_row(slice_row))
+    (slice_dir / "brief.md").write_text("# Brief\n", encoding="utf-8")
+    (slice_dir / "blueprint.md").write_text("# Blueprint\n", encoding="utf-8")
+    (slice_dir / "checklists").mkdir(parents=True, exist_ok=True)
+    (slice_dir / "checklists" / "requirements.md").write_text(
+        "# Requirements\n", encoding="utf-8"
+    )
+
+    success, _ = execution.update_slice_status(rows, slice_row, "closed", force=True)
+    assert success is True
+
+    rows = execution.parse_registry()
+    slice_row = execution.resolve_slice(rows, slice_id)
+    assert slice_row is not None
+    archived, _, updated_slice = execution.archive_slice(rows, slice_row)
+    assert archived is True
+    return updated_slice
+
+
+def append_archived_slice_summary(design_path: Path, slice_id: str) -> None:
+    design_path.write_text(
+        design_path.read_text(encoding="utf-8").rstrip()
+        + "\n\n<!-- archived-slice-summaries:start -->\n"
+        + "## Archived Slice Summaries\n\n"
+        + f"<!-- archived-slice-summary:{slice_id}:start -->\n"
+        + f"### `{slice_id}`: Archived summary\n"
+        + f"<!-- archived-slice-summary:{slice_id}:end -->\n\n"
+        + "<!-- archived-slice-summaries:end -->\n",
+        encoding="utf-8",
+    )
+
+
 def test_run_audit_reports_clean_inventory(tmp_path, monkeypatch):
     env = setup_repo(tmp_path, monkeypatch)
 
@@ -376,6 +412,40 @@ def test_run_audit_reports_feature_status_drift_when_execution_exists(tmp_path, 
         and finding["artifact_id"] == "checkout"
         for finding in result["findings"]
     )
+
+
+def test_run_audit_accepts_archived_slice_directory_without_false_drift(tmp_path, monkeypatch):
+    env = setup_repo(tmp_path, monkeypatch, include_slice=True)
+    archive_closed_slice(env["execution"], "CHK-101")
+
+    result = env["audit"].run_audit(["slice"])
+
+    assert result["ok"] is True
+    assert result["findings"] == []
+
+
+def test_run_audit_accepts_intentionally_pruned_archived_slice_history(tmp_path, monkeypatch):
+    env = setup_repo(tmp_path, monkeypatch, include_slice=True)
+    archived_slice = archive_closed_slice(env["execution"], "CHK-101")
+    append_archived_slice_summary(env["feature_dir"] / "system-design.md", "CHK-101")
+    shutil.rmtree(tmp_path / archived_slice["path"].rstrip("/"))
+
+    result = env["audit"].run_audit(["slice"])
+
+    assert result["ok"] is True
+    assert result["findings"] == []
+
+
+def test_run_audit_keeps_missing_pruned_archive_without_summary_as_error(tmp_path, monkeypatch):
+    env = setup_repo(tmp_path, monkeypatch, include_slice=True)
+    archived_slice = archive_closed_slice(env["execution"], "CHK-101")
+    shutil.rmtree(tmp_path / archived_slice["path"].rstrip("/"))
+
+    result = env["audit"].run_audit(["slice"])
+
+    assert result["ok"] is False
+    assert "missing_slice_directory" in finding_codes(result)
+    assert "slice_registry_path_missing" in finding_codes(result)
 
 
 def test_run_audit_reports_subfeature_closed_execution_drift(tmp_path, monkeypatch):
