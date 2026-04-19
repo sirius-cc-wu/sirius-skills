@@ -7,5 +7,13 @@
   "review_note": "Reviewed discovery, design, and breakdown artifacts; scope model, sequencing, and validation plan are coherent and ready for slice bootstrap.",
   "ready_slice_ids": [
     "hss-root-fallback"
+  ],
+  "related_story_ids": [
+    "HSS-01",
+    "HSS-02",
+    "HSS-03",
+    "HSS-04",
+    "HSS-05",
+    "HSS-06"
   ]
 }

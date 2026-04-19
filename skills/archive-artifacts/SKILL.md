@@ -76,5 +76,7 @@ Exit behavior:
   folders directly here.
 - For feature and subfeature apply mode, summarize slice history into
   `system-design.md` before archiving the targeted closed slices.
+- Keep archived slice summaries self-contained inside `system-design.md`; do
+  not rely on source or archive path bullets to explain the result.
 - Keep archival explicit and scoped; do not bulk archive across unrelated
   features by default.

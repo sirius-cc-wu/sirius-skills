@@ -240,7 +240,9 @@ def test_build_archive_result_applies_feature_archive_and_updates_system_design(
     assert "Preserve the checkout slice as durable planning history." in design_text
     assert "Capture the execution design for the checkout archive flow" in design_text
     assert "```plantuml" in design_text
-    assert ".archived/CHK-101-checkout/figures/checkout-archive.svg" in design_text
+    assert "Archived from:" not in design_text
+    assert "Archived to:" not in design_text
+    assert "checkout-archive.svg" not in design_text
 
 
 def test_build_archive_result_applies_subfeature_archive_and_updates_system_design(

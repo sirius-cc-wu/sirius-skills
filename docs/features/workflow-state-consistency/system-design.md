@@ -26,6 +26,14 @@ for:
 - high-confidence invariant checks
 - installed-vs-repo parity inspection
 
+## Related stories
+
+- `WSC-01`: run narrow consistency checks after important state transitions
+- `WSC-02`: share one reconciliation model across audit, trace, and repair
+- `WSC-03`: keep semantic drift preview separate from derived registry repair
+- `WSC-04`: surface installed-vs-repo skill parity drift before repairs are trusted
+- `WSC-05`: provide repeatable validation hooks for workflow disagreement
+
 ## Goals and non-goals
 
 ### Goals

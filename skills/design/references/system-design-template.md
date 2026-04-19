@@ -6,22 +6,24 @@ Prefer these sections unless a section is genuinely irrelevant to the feature:
 
 1. `# System design: <feature name>`
 2. `## Design summary`
-3. `## Goals and non-goals`
-4. `## Architecture`
-5. `## Interfaces and dependencies`
-6. `## Configuration surfaces and ownership`
-7. `## Data flow, state, and lifecycle`
-8. `## Failure handling and operational constraints`
-9. `## Alternatives considered`
-10. `## Risks, assumptions, and open questions`
-11. `## Validation strategy`
-12. `## Summary`
+3. `## Related stories`
+4. `## Goals and non-goals`
+5. `## Architecture`
+6. `## Interfaces and dependencies`
+7. `## Configuration surfaces and ownership`
+8. `## Data flow, state, and lifecycle`
+9. `## Failure handling and operational constraints`
+10. `## Alternatives considered`
+11. `## Risks, assumptions, and open questions`
+12. `## Validation strategy`
+13. `## Summary`
 
 ## Required content
 
 Always include:
 
 - what problem the design solves
+- which feature stories the design directly serves
 - the major architectural decision
 - the boundaries between components or modules
 - the interfaces, inputs, outputs, or contracts that matter

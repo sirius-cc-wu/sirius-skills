@@ -4,6 +4,13 @@
 
 The execution workflow is a centralized slice system. `guide-execution` manages slice registry state and readiness transitions, while `brief`, `plan`, `review-execution`, and `close-slice` own the slice-scoped artifacts and review outcomes. Closed slices remain available for audit unless a separate maintenance workflow archives them later.
 
+## Related Stories
+
+- `EW-01`: bootstrap one slice per work item so execution stays slice-scoped and traceable
+- `EW-02`: capture a brief and requirements checklist so implementation starts from testable intent
+- `EW-03`: produce a concrete execution plan with gates and validation before coding
+- `EW-04`: review, relate, and close slices non-destructively so execution history stays durable
+
 ## Key Components
 
 - **Execution registry**: `<slice_dir>/README.md` and `registry.json`

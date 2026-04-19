@@ -5,5 +5,11 @@
   "updated_at": "2026-03-24T03:39:26",
   "requires_ui_flow": false,
   "review_note": "Reviewed: execution workflow slices are coherent and ready for slice bootstrap.",
-  "ready_task_ids": []
+  "ready_slice_ids": [],
+  "related_story_ids": [
+    "EW-01",
+    "EW-02",
+    "EW-03",
+    "EW-04"
+  ]
 }

@@ -4,6 +4,13 @@
 
 The planning workflow is a feature-scoped orchestration layer. `guide-planning` maintains the planning registry and readiness metadata, while authoring skills own individual artifacts. The planning layer hands off when a feature has been decomposed into execution-ready slices and can later record a canonical `implemented` state once execution-backed delivery is complete.
 
+## Related Stories
+
+- `PW-01`: initialize one durable feature planning folder per feature
+- `PW-02`: enforce explicit discovery and design readiness gates
+- `PW-03`: split stories into execution-ready slices and increments
+- `PW-04`: record planning review and slice handoff metadata durably
+
 ## Key Components
 
 - **Planning registry**: `docs/features/README.md` and `docs/features/registry.json`
@@ -18,6 +25,7 @@ The planning workflow is a feature-scoped orchestration layer. `guide-planning` 
 - `manage_planning.py init` initializes the planning registry and config.
 - `manage_planning.py add <feature-slug>` creates one feature folder and metadata entry.
 - `manage_planning.py set-status` advances lifecycle state only when artifact gates are satisfied.
+- `.planning-meta.json` records `related_story_ids` so feature-level story context remains durable even if execution slices are later archived or pruned.
 - `implemented` is a canonical feature state owned by planning metadata, not a slice execution state.
 - `breakdown/scripts/scaffold_breakdown.py` provides deterministic breakdown templates.
 

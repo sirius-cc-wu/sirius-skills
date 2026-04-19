@@ -1,5 +1,14 @@
 # Discover: Cross-Artifact Management
 
+## Related Stories
+
+- `CAM-01`: audit artifact health
+- `CAM-02`: trace artifact lineage
+- `CAM-03`: report artifact state
+- `CAM-04`: repair artifact drift
+- `CAM-05`: archive durable history safely
+- `CAM-06`: measure workflow evidence
+
 ## Problem
 
 This repository now creates and maintains durable workflow artifacts across

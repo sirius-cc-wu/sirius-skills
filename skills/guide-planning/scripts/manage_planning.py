@@ -177,6 +177,19 @@ def normalize_slice_ids(value: object) -> List[str]:
     return list(dict.fromkeys(normalized))
 
 
+def normalize_story_ids(value: object) -> List[str]:
+    if value is None or value == "":
+        return []
+    if not isinstance(value, list):
+        raise RuntimeError("Related story IDs must be stored as a list.")
+    normalized: List[str] = []
+    for item in value:
+        if not isinstance(item, str) or not item.strip():
+            raise RuntimeError("Related story IDs must contain non-empty strings.")
+        normalized.append(item.strip())
+    return list(dict.fromkeys(normalized))
+
+
 def load_raw_config(
     required: bool = False, scope_context: Optional[object] = None
 ) -> Dict[str, object]:
@@ -431,6 +444,7 @@ def build_metadata(feature_slug: str, requires_ui_flow: bool = False) -> Dict[st
         "requires_ui_flow": requires_ui_flow,
         "review_note": None,
         "ready_slice_ids": [],
+        "related_story_ids": [],
     }
 
 
@@ -453,7 +467,10 @@ def normalize_metadata(payload: object) -> Dict[str, object]:
         "updated_at": normalize_optional_timestamp(payload.get("updated_at")) or now_timestamp(),
         "requires_ui_flow": requires_ui_flow,
         "review_note": normalize_review_note(payload.get("review_note")),
-        "ready_slice_ids": normalize_slice_ids(payload.get("ready_slice_ids")),
+        "ready_slice_ids": normalize_slice_ids(
+            payload.get("ready_slice_ids", payload.get("ready_task_ids"))
+        ),
+        "related_story_ids": normalize_story_ids(payload.get("related_story_ids")),
     }
 
 

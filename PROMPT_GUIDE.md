@@ -208,7 +208,7 @@ In scope apply mode, the skill:
 - reads planned slice IDs from `slice-planning.md`
 - finds closed, not-yet-archived slices
 - summarizes `brief.md` and `blueprint.md` into the target `system-design.md`
-- carries over blueprint figures by rewriting them to the archived slice path
+- carries over embedded PlantUML figures directly into `system-design.md`
 - archives the slice folders through the execution archive helper
 
 ## What to include in a strong prompt

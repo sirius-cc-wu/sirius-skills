@@ -177,7 +177,39 @@ def test_add_creates_feature_metadata_and_registry_entries(tmp_path, monkeypatch
     assert metadata["feature_slug"] == "habit-tracker"
     assert metadata["status"] == "discovery_pending"
     assert metadata["requires_ui_flow"] is False
+    assert metadata["related_story_ids"] == []
     assert registry["features"][0]["feature"] == "habit-tracker"
+
+
+def test_read_metadata_accepts_legacy_ready_task_ids(tmp_path, monkeypatch):
+    module = load_manage_planning_module()
+    monkeypatch.chdir(tmp_path)
+
+    assert run_cli(module, monkeypatch, "init") == 0
+    assert run_cli(module, monkeypatch, "add", "habit-tracker") == 0
+
+    feature_dir = tmp_path / "docs" / "features" / "habit-tracker"
+    (feature_dir / ".planning-meta.json").write_text(
+        json.dumps(
+            {
+                "feature_slug": "habit-tracker",
+                "status": "planning_reviewed",
+                "created_at": "2026-01-01T00:00:00",
+                "updated_at": "2026-01-01T00:00:00",
+                "requires_ui_flow": False,
+                "review_note": None,
+                "ready_task_ids": ["HAB-101"],
+                "related_story_ids": ["HAB-01"],
+            }
+        )
+        + "\n",
+        encoding="utf-8",
+    )
+
+    metadata = module.read_metadata(str(feature_dir))
+
+    assert metadata["ready_slice_ids"] == ["HAB-101"]
+    assert metadata["related_story_ids"] == ["HAB-01"]
 
 
 def test_slice_ready_warns_when_closed_execution_slices_leave_feature_out_of_sync(

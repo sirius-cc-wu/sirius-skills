@@ -5,5 +5,12 @@
   "updated_at": "2026-04-19T11:36:15",
   "requires_ui_flow": false,
   "review_note": "Reviewed: planning artifacts are aligned, the initial rollout stays on high-confidence invariants, and install/package sync for the shared library is explicitly captured before slice bootstrap.",
-  "ready_slice_ids": []
+  "ready_slice_ids": [],
+  "related_story_ids": [
+    "WSC-01",
+    "WSC-02",
+    "WSC-03",
+    "WSC-04",
+    "WSC-05"
+  ]
 }

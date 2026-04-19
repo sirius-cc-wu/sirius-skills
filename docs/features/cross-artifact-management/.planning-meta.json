@@ -5,5 +5,13 @@
   "updated_at": "2026-04-11T15:00:22",
   "requires_ui_flow": false,
   "review_note": null,
-  "ready_slice_ids": []
+  "ready_slice_ids": [],
+  "related_story_ids": [
+    "CAM-01",
+    "CAM-02",
+    "CAM-03",
+    "CAM-04",
+    "CAM-05",
+    "CAM-06"
+  ]
 }

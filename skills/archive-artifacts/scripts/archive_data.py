@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
 
 import json
-import os
 import re
 import sys
 from dataclasses import dataclass
@@ -29,7 +28,6 @@ ARCHIVE_SUMMARIES_START = "<!-- archived-slice-summaries:start -->"
 ARCHIVE_SUMMARIES_END = "<!-- archived-slice-summaries:end -->"
 SLICE_SUMMARY_START_TEMPLATE = "<!-- archived-slice-summary:{slice_id}:start -->"
 SLICE_SUMMARY_END_TEMPLATE = "<!-- archived-slice-summary:{slice_id}:end -->"
-IMAGE_PATTERN = re.compile(r"!\[([^\]]*)\]\(([^)]+)\)")
 PLANTUML_BLOCK_PATTERN = re.compile(r"```plantuml[^\n]*\n.*?```", re.DOTALL)
 SLICE_BLOCK_PATTERN = re.compile(
     r"<!-- archived-slice-summary:(?P<slice_id>[^:]+):start -->\n"
@@ -74,7 +72,6 @@ class ScopeArchiveTarget:
 class PreparedSliceSummary:
     slice_id: str
     title: str
-    archived_from: str
     brief_items: List[str]
     design_summary: Optional[str]
     blueprint_text: str
@@ -394,38 +391,9 @@ def _extract_blueprint_summary(blueprint_text: str) -> Optional[str]:
     return None
 
 
-def _rewrite_image_reference(
-    design_path: Path,
-    archived_slice_dir: Path,
-    alt_text: str,
-    image_target: str,
-) -> str:
-    stripped_target = image_target.strip()
-    if stripped_target.startswith(("http://", "https://", "#", "/")):
-        return f"![{alt_text}]({stripped_target})"
-    rewritten_target = os.path.relpath(
-        str((archived_slice_dir / stripped_target).resolve()),
-        str(design_path.parent.resolve()),
-    ).replace(os.sep, "/")
-    return f"![{alt_text}]({rewritten_target})"
-
-
-def _extract_blueprint_figures(
-    blueprint_text: str,
-    design_path: Path,
-    archived_slice_dir: Path,
-) -> List[str]:
+def _extract_blueprint_figures(blueprint_text: str) -> List[str]:
     figures: List[str] = []
     figures.extend(match.group(0).strip() for match in PLANTUML_BLOCK_PATTERN.finditer(blueprint_text))
-    for match in IMAGE_PATTERN.finditer(blueprint_text):
-        figures.append(
-            _rewrite_image_reference(
-                design_path,
-                archived_slice_dir,
-                match.group(1),
-                match.group(2),
-            )
-        )
     return figures
 
 
@@ -438,7 +406,6 @@ def _prepare_slice_summary(inventory, row: Dict[str, object]) -> PreparedSliceSu
     return PreparedSliceSummary(
         slice_id=str(row["id"]),
         title=_extract_heading_title(brief_text, str(row["id"])),
-        archived_from=str(row["path"]),
         brief_items=_extract_brief_items(brief_text),
         design_summary=_extract_blueprint_summary(blueprint_text),
         blueprint_text=blueprint_text,
@@ -447,16 +414,10 @@ def _prepare_slice_summary(inventory, row: Dict[str, object]) -> PreparedSliceSu
 
 def _render_slice_summary_block(
     summary: PreparedSliceSummary,
-    design_path: Path,
-    archived_path: str,
 ) -> str:
-    archived_slice_dir = (Path.cwd() / archived_path.rstrip("/")).resolve()
     lines = [
         SLICE_SUMMARY_START_TEMPLATE.format(slice_id=summary.slice_id),
         f"### `{summary.slice_id}`: {summary.title}",
-        "",
-        f"- Archived from: `{summary.archived_from}`",
-        f"- Archived to: `{archived_path}`",
     ]
     if summary.brief_items:
         lines.append("")
@@ -468,7 +429,7 @@ def _render_slice_summary_block(
         lines.append("#### Detailed Design Summary")
         lines.append("")
         lines.append(summary.design_summary)
-    figures = _extract_blueprint_figures(summary.blueprint_text, design_path, archived_slice_dir)
+    figures = _extract_blueprint_figures(summary.blueprint_text)
     if figures:
         lines.append("")
         lines.append("#### Blueprint Figures")
@@ -527,7 +488,6 @@ def _apply_scope_archive(
     ]
 
     rows = inventory.context.execution.load_registry_json(inventory.context.slice_registry)
-    archived_paths: Dict[str, str] = {}
     archived_slice_ids: List[str] = []
     for row in sorted(target.closed_slice_rows, key=lambda item: str(item["id"])):
         current_row = inventory.context.execution.resolve_slice(rows, str(row["id"]))
@@ -537,15 +497,10 @@ def _apply_scope_archive(
         if not ok:
             raise ArchiveUsageError(message)
         archived_slice_ids.append(str(updated_slice["id"]))
-        archived_paths[str(updated_slice["id"])] = str(updated_slice["path"])
         rows = inventory.context.execution.load_registry_json(inventory.context.slice_registry)
 
     rendered_blocks = {
-        summary.slice_id: _render_slice_summary_block(
-            summary,
-            target.design_path,
-            archived_paths[summary.slice_id],
-        )
+        summary.slice_id: _render_slice_summary_block(summary)
         for summary in prepared_summaries
     }
     _write_summary_appendix(target.design_path, rendered_blocks)

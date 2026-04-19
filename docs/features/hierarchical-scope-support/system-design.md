@@ -15,6 +15,15 @@ The design keeps the current single-project behavior as the compatibility
 default while allowing nested subprojects to own local `.skills/`,
 `docs/features/`, `docs/proposals/`, and execution settings.
 
+## Related Stories
+
+- `HSS-01`: repository-root fallback keeps umbrella planning available
+- `HSS-02`: nested scopes own local planning and proposal artifacts
+- `HSS-03`: nearest-scope resolution keeps writes in the correct project area
+- `HSS-04`: ambiguous scope situations stop for explicit selection
+- `HSS-05`: `guide-scope` provides one reusable scope-aware entry layer
+- `HSS-06`: child scopes override parent `.skills` settings without breaking inherited defaults
+
 ## Architectural Decisions
 
 ### 1. Scope roots are explicit, with repository-root fallback

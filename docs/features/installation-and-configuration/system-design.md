@@ -9,6 +9,13 @@ configuration surfaces for planning layout, execution layout, and naming
 conventions. Project-local extensions live in `.skills/plugins/` and are only
 used when a specific skill explicitly opts in.
 
+## Related Stories
+
+- `IC-01`: maintain one managed install and uninstall path for the shared skills
+- `IC-02`: keep planning and execution layout config separate and explicit
+- `IC-03`: store naming and ID conventions in a dedicated config file
+- `IC-04`: document a plugin convention for project-local extensions
+
 ## Key Components
 
 - **Managed install entrypoint**: `Makefile`
