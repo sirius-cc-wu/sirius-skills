@@ -14,6 +14,9 @@ durable repo signals into a read-only reporting surface.
 - Reporting can group by artifact type, lifecycle status, or parent feature.
 - The first version can highlight stale artifacts through an explicit threshold
   instead of burying that logic in ad hoc scripts.
+- A later retention-aware revision can stop reporting pruned archived slices as
+  ordinary closed execution packets once their history has been retained in
+  planning docs.
 
 ## Affected existing artifacts
 
@@ -40,6 +43,8 @@ durable repo signals into a read-only reporting surface.
   in expected planning and execution cadence.
 - The first version should prefer reusable aggregates over one-off dashboards so
   later automation can consume the same output structure.
+- Historical slice retention and active operational reporting should stay
+  intentionally separate so cleanup does not look like workflow breakage.
 
 ## Story and slice framing
 

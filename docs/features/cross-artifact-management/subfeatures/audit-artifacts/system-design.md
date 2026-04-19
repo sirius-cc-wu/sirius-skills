@@ -56,6 +56,12 @@ That dual view lets the audit surface both:
 - registry entries pointing to missing paths
 - orphan artifact directories missing from registries
 
+The next revision should add one more distinction inside slice inventory:
+
+- **active execution slices** that are still expected to exist on disk
+- **retained historical slices** that have already been summarized into
+  planning-layer docs and may no longer have a backing directory
+
 Planning artifacts should be classified as:
 
 - **feature** when `.planning-meta.json` exists without `.subfeature-meta.json`
@@ -97,6 +103,15 @@ Findings should distinguish:
 - `registry_drift` findings from registry-vs-disk mismatches
 - `broken_link` findings from missing parent/target references
 - `relation` findings from slice relation audits
+
+Archived slice pruning should not be reported as `missing_slice_directory` when
+all of the following are true:
+
+- the slice is no longer part of the active execution inventory
+- the owning feature or subfeature retains the summarized history in
+  `system-design.md`
+- the remaining retained metadata marks the slice as intentionally summarized or
+  pruned rather than accidentally missing
 
 ### 4. Read-only audit command
 
@@ -162,6 +177,9 @@ registries, or update review state.
   depends on those findings.
 - The first version should avoid time-threshold-based "stale" heuristics because
   those belong in project-local conventions or future reporting overlays.
+- The audit must not force repositories to keep archived slice directories
+  forever once planning-layer summaries have become the retained source of
+  history.
 
 ## Risks, assumptions, and open questions
 
@@ -171,6 +189,9 @@ registries, or update review state.
   shape should stay generic and not be audit-specific.
 - If later repos want stricter stale-state rules, those should be added as
   configurable overlays rather than hardcoded age thresholds.
+- If prune semantics rely only on deleted directories and no retained tombstone
+  signal, the audit layer will not be able to tell intentional cleanup from
+  accidental loss.
 
 ## Validation strategy
 

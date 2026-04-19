@@ -14,6 +14,8 @@ new persistent report files.
 - Support concise overview reporting plus grouped report modes.
 - Surface stale packets through an explicit threshold parameter.
 - Keep the output reusable for humans and future automation.
+- Report active workflow state without requiring repositories to keep pruned
+  archived slice folders in the active execution inventory forever.
 
 ## 3. Proposed Shape
 
@@ -43,11 +45,22 @@ Each record should include:
 - `parent_feature`
 - `is_stale`
 
+The next revision should split slice reporting into two conceptual classes:
+
+- **active execution slices** that still belong in operational queues and status
+  summaries
+- **summarized historical slices** that may be retained only through planning
+  docs or lightweight tombstones after archival
+
 ### 3.3 Supported report modes
 
 - `overview`: counts by artifact type plus stale counts
 - `status`: counts grouped by lifecycle status
 - `parent`: counts grouped by parent feature
+
+Default operational reporting should include only active slices. Historical
+summaries, if reported at all, should be a distinct optional view instead of
+reusing the same record stream as live execution packets.
 
 Optional artifact-type filtering should apply before grouping so both text and
 JSON stay consistent.
@@ -73,3 +86,6 @@ python3 skills/report-artifacts/scripts/report_artifacts.py --stale-days 21 --js
   layer must group raw statuses rather than inventing a universal state machine.
 - Parent grouping must preserve slice feature ownership and subfeature parent
   ownership without conflating them.
+- If reporting continues to trust archived slice registry rows after the backing
+  directories are pruned, maintainers will see misleading closed-slice records
+  that no longer represent active workflow state.

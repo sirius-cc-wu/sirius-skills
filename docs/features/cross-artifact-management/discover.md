@@ -73,6 +73,8 @@ keep it healthy over time.
 - Repair README/registry/metadata drift caused by merges, manual edits, or
   partial runs.
 - Archive or retire superseded artifacts without losing traceability.
+- Allow summarized execution history to remain durable in planning docs even
+  after archived slice folders are intentionally pruned.
 
 ## Implemented v1 Capability Stack
 
@@ -113,6 +115,9 @@ keep it healthy over time.
   `.skills/conventions.json` or project-local extensions when needed.
 - Preserve non-destructive history by default; archival or cleanup operations
   should be explicit and reviewable.
+- Treat `system-design.md` slice summaries as the primary retained historical
+  narrative after archival; archived slice folders may become a secondary,
+  prunable storage layer rather than a permanently required runtime surface.
 
 ## Success Criteria
 

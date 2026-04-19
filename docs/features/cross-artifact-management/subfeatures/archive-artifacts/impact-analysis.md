@@ -13,6 +13,9 @@ history. `archive-artifacts` adds that next step conservatively.
 - The first version can safely archive closed execution slices through the
   existing execution owner helper.
 - Archive behavior stays explicit and reviewable; there is no implicit cleanup.
+- Summarized slice history in `system-design.md` becomes the primary retained
+  narrative, allowing archived slice folders to become optional later cleanup
+  targets.
 
 ## Affected existing artifacts
 
@@ -37,6 +40,8 @@ history. `archive-artifacts` adds that next step conservatively.
 - Execution slices already have an owner-supported archive path; reuse it.
 - Proposal and subfeature candidate reporting must not imply unsupported apply
   flows.
+- Any future prune step must coordinate with audit/report semantics so pruned
+  archived slices are not mistaken for broken active registry state.
 
 ## Story and slice framing
 

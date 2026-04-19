@@ -21,6 +21,9 @@ important context.
 - Preserve traceability from archived artifacts back to their original context.
 - Keep active registries readable while retaining durable history.
 - Respect the repo’s existing preference for explicit, human-invoked cleanup.
+- Make the feature/subfeature `system-design.md` summary the durable retained
+  history for closed slices once a maintainer decides the archived slice folders
+  no longer add value.
 
 ## Non-Goals
 
@@ -35,6 +38,7 @@ important context.
 - reviewed and finalized subfeatures
 - closed or superseded execution slices and their relation metadata
 - any registry entries or folder layout that would need archive-aware handling
+- archived slice summaries already copied into `system-design.md`
 
 ## Success Criteria
 
@@ -42,6 +46,9 @@ important context.
   lineage.
 - Archival remains explicit and reviewable rather than implicit side effects.
 - The capability fits cleanly with finalization and non-destructive closure.
+- A later prune step can remove archived slice folders without making the
+  feature-level history unreadable or turning audit/report output into false
+  breakage.
 
 ## Risks and Open Questions
 
@@ -49,3 +56,5 @@ important context.
   surfaces?
 - Should archival move folders, mark metadata, generate reports, or some
   combination of those?
+- What minimal retained signal should remain after an archived slice folder is
+  pruned: summary block only, registry tombstone, or explicit history sidecar?

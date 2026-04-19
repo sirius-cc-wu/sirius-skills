@@ -26,6 +26,8 @@ operational views.
 - Make it easy to surface workflow bottlenecks without mutating any source
   artifact.
 - Reuse data from registries and metadata rather than duplicating it.
+- Keep active operational reporting separate from summarized historical slices
+  that may no longer exist on disk.
 
 ## Non-Goals
 
@@ -39,14 +41,20 @@ operational views.
 - planning and slice metadata timestamps and statuses
 - relation metadata that can enrich reports with dependency or supersession
   context
+- planning-layer archived slice summaries that may outlive archived slice
+  directories
 
 ## Success Criteria
 
 - A maintainer can generate useful status summaries without manual folder reads.
 - Reports make stale or blocked workflow packets easy to spot.
 - The outputs are reusable for future human-facing docs or automation.
+- Pruned archived slices do not continue to appear as ordinary active slice
+  records in the default operational report.
 
 ## Risks and Open Questions
 
 - Which report shapes should be first-class vs left to project-local extensions?
 - How much historical detail should reports include by default?
+- Should summarized historical slices be counted separately from active slices
+  or omitted entirely from operational views?
