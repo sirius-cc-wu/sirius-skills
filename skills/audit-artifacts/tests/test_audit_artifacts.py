@@ -245,7 +245,8 @@ def test_run_audit_keeps_clean_installed_parity_quiet(tmp_path, monkeypatch):
     monkeypatch.setattr(env["audit"], "inspect_installed_skill_parity", env["audit_parity"])
 
     result = env["audit"].run_audit(
-        installed_skills=[{"name": "audit-artifacts", "path": str(installed_root)}]
+        installed_skills=[{"name": "audit-artifacts", "path": str(installed_root)}],
+        check_packaged_parity=True,
     )
 
     assert result["ok"] is True
@@ -263,7 +264,8 @@ def test_run_audit_reports_stale_installed_skill_parity(tmp_path, monkeypatch):
     )
 
     result = env["audit"].run_audit(
-        installed_skills=[{"name": "audit-artifacts", "path": str(installed_root)}]
+        installed_skills=[{"name": "audit-artifacts", "path": str(installed_root)}],
+        check_packaged_parity=True,
     )
 
     assert result["ok"] is False
@@ -279,12 +281,26 @@ def test_run_audit_reports_installed_parity_unavailable_without_crashing(tmp_pat
     monkeypatch.setattr(env["audit"], "inspect_installed_skill_parity", env["audit_parity"])
     monkeypatch.setattr(env["audit_parity"].__globals__["Path"], "home", lambda: tmp_path)
 
-    result = env["audit"].run_audit()
+    result = env["audit"].run_audit(check_packaged_parity=True)
 
     assert result["ok"] is False
     finding = next(finding for finding in result["findings"] if finding["category"] == "installed_parity")
     assert finding["code"] == "installed_parity_unavailable"
     assert "no installed skills found under" in finding["message"]
+
+
+def test_run_audit_skips_packaged_parity_by_default(tmp_path, monkeypatch):
+    env = setup_repo(tmp_path, monkeypatch)
+
+    def fail_if_called(*args, **kwargs):
+        raise AssertionError("installed parity should be opt-in")
+
+    monkeypatch.setattr(env["audit"], "inspect_installed_skill_parity", fail_if_called)
+
+    result = env["audit"].run_audit()
+
+    assert result["ok"] is True
+    assert result["findings"] == []
 
 
 def test_run_audit_reports_metadata_read_error_without_stopping(tmp_path, monkeypatch):

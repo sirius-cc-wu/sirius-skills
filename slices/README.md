@@ -32,3 +32,4 @@
 | SIM-02-packaged-targets | Split local and packaged install targets | closed | 2026-04-19T11:07:03 | 2026-04-19T11:07:03 | slices/SIM-02-packaged-targets-split-local-and-packaged-install-targets/ |
 | SIM-02-packaged-compat | Preserve packaged install compatibility during migration | closed | 2026-04-19T11:09:09 | 2026-04-19T11:09:09 | slices/SIM-02-packaged-compat-preserve-packaged-install-compatibility-during-migration/ |
 | SIM-03-runtime-scope | Scope shared-runtime sync to packaged installs | closed | 2026-04-19T11:10:55 | 2026-04-19T11:10:55 | slices/SIM-03-runtime-scope-scope-shared-runtime-sync-to-packaged-installs/ |
+| SIM-03-parity-scope | Re-scope installed parity to packaged validation | closed | 2026-04-19T11:13:49 | 2026-04-19T11:13:49 | slices/SIM-03-parity-scope-re-scope-installed-parity-to-packaged-validation/ |

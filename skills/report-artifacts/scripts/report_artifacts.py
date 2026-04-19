@@ -56,11 +56,26 @@ def parse_args() -> argparse.Namespace:
         action="store_true",
         help="Emit machine-readable report output.",
     )
+    parser.add_argument(
+        "--check-packaged-parity",
+        action="store_true",
+        help="Include installed packaged-skill parity findings in the report output.",
+    )
     return parser.parse_args()
 
 
-def run_report(artifact_types: List[str], group_by: str, stale_days: int) -> Dict[str, object]:
-    return build_report_result(artifact_types=artifact_types, group_by=group_by, stale_days=stale_days)
+def run_report(
+    artifact_types: List[str],
+    group_by: str,
+    stale_days: int,
+    check_packaged_parity: bool,
+) -> Dict[str, object]:
+    return build_report_result(
+        artifact_types=artifact_types,
+        group_by=group_by,
+        stale_days=stale_days,
+        check_packaged_parity=check_packaged_parity,
+    )
 
 
 def render_text(result: Dict[str, object]) -> str:
@@ -88,10 +103,14 @@ def render_text(result: Dict[str, object]) -> str:
         f"Artifact report ({result['group_by']}, stale threshold: {result['stale_days']} days)",
         f"Total artifacts: {result['summary']['total']}",
         f"Stale artifacts: {result['summary']['stale']}",
-        f"Installed parity findings: {result['summary']['installed_parity_count']}",
         f"Semantic preview findings: {result['summary']['semantic_preview_count']}",
         "Groups:",
     ]
+    if result.get("check_packaged_parity"):
+        lines.insert(
+            3,
+            f"Installed parity findings: {result['summary']['installed_parity_count']}",
+        )
     for group in result["groups"]:
         lines.append(f"- {group['key']}: {group['count']} total, {group['stale']} stale")
     lines.append("Records:")
@@ -103,7 +122,7 @@ def render_text(result: Dict[str, object]) -> str:
             f"[{record['status']}{stale_marker}] ({record['path']}{parent_suffix})"
             f"{metrics_suffix(record)}"
         )
-    if result["installed_parity"]:
+    if result.get("check_packaged_parity") and result["installed_parity"]:
         lines.append("Installed parity:")
         for parity in result["installed_parity"]:
             lines.append(
@@ -122,7 +141,12 @@ def render_text(result: Dict[str, object]) -> str:
 
 def main() -> int:
     args = parse_args()
-    result = run_report(args.artifact_type, args.group_by, args.stale_days)
+    result = run_report(
+        args.artifact_type,
+        args.group_by,
+        args.stale_days,
+        args.check_packaged_parity,
+    )
     if args.json:
         print(json.dumps(result, indent=2))
     else:

@@ -346,6 +346,7 @@ def test_run_report_keeps_clean_installed_parity_quiet(tmp_path, monkeypatch):
         stale_days=30,
         now=datetime(2026, 2, 15),
         installed_skills=[{"name": "report-artifacts", "path": str(installed_root)}],
+        check_packaged_parity=True,
     )
 
     assert payload["summary"]["installed_parity_count"] == 0
@@ -372,6 +373,7 @@ def test_run_report_surfaces_installed_parity_separately(tmp_path, monkeypatch, 
         stale_days=30,
         now=datetime(2026, 2, 15),
         installed_skills=[{"name": "report-artifacts", "path": str(installed_root)}],
+        check_packaged_parity=True,
     )
 
     assert payload["summary"]["installed_parity_count"] == 1
@@ -397,6 +399,7 @@ def test_run_report_surfaces_installed_parity_unavailable_without_crashing(tmp_p
         group_by="overview",
         stale_days=30,
         now=datetime(2026, 2, 15),
+        check_packaged_parity=True,
     )
 
     assert payload["summary"]["installed_parity_count"] == 1
@@ -421,10 +424,36 @@ def test_run_report_discovers_local_skill_home_without_cli_dependency(tmp_path, 
         group_by="overview",
         stale_days=30,
         now=datetime(2026, 2, 15),
+        check_packaged_parity=True,
     )
 
     assert payload["summary"]["installed_parity_count"] == 0
     assert payload["installed_parity"] == []
+
+
+def test_run_report_skips_packaged_parity_by_default(tmp_path, monkeypatch):
+    env = setup_repo(tmp_path, monkeypatch)
+
+    def fail_if_called(*args, **kwargs):
+        raise AssertionError("installed parity should be opt-in")
+
+    monkeypatch.setitem(
+        env["report"].build_report_result.__globals__,
+        "inspect_installed_skill_parity",
+        fail_if_called,
+    )
+
+    payload = env["report"].build_report_result(
+        artifact_types=["feature"],
+        group_by="overview",
+        stale_days=30,
+        now=datetime(2026, 2, 15),
+    )
+
+    assert payload["check_packaged_parity"] is False
+    assert payload["summary"]["installed_parity_count"] == 0
+    assert payload["installed_parity"] == []
+    assert "Installed parity findings" not in env["report"].render_text(payload)
 
 
 def test_report_module_loads_from_self_contained_skill_copy(tmp_path):

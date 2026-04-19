@@ -227,6 +227,7 @@ def build_report_result(
     stale_days: int = 30,
     now: Optional[datetime] = None,
     installed_skills: Optional[Sequence[Dict[str, object]]] = None,
+    check_packaged_parity: bool = False,
 ) -> Dict[str, object]:
     if group_by not in VALID_GROUP_BY:
         raise ValueError(f"Unsupported group-by mode: {group_by}")
@@ -238,11 +239,16 @@ def build_report_result(
         inventory=inventory,
     )
     semantic_preview = build_semantic_preview(inventory, artifact_types or [])
-    installed_parity = inspect_installed_skill_parity(installed_skills=installed_skills)
+    installed_parity = (
+        inspect_installed_skill_parity(installed_skills=installed_skills)
+        if check_packaged_parity
+        else []
+    )
     return {
         "ok": True,
         "group_by": group_by,
         "stale_days": stale_days,
+        "check_packaged_parity": check_packaged_parity,
         "summary": {
             **summarize(records),
             "installed_parity_count": len(installed_parity),

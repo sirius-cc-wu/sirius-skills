@@ -81,6 +81,11 @@ def parse_args() -> argparse.Namespace:
         action="store_true",
         help="Emit a machine-readable result instead of human-readable text.",
     )
+    parser.add_argument(
+        "--check-packaged-parity",
+        action="store_true",
+        help="Include installed packaged-skill parity findings in the audit result.",
+    )
     return parser.parse_args()
 
 
@@ -698,6 +703,7 @@ def _audit_installed_parity(
 def run_audit(
     artifact_types: Optional[Iterable[str]] = None,
     installed_skills: Optional[Sequence[Dict[str, object]]] = None,
+    check_packaged_parity: bool = False,
 ) -> Dict[str, object]:
     selected = set(artifact_types) if artifact_types is not None else set(VALID_ARTIFACT_TYPES)
     inventory = load_inventory()
@@ -805,7 +811,8 @@ def run_audit(
         subfeature_metadata,
     )
     _audit_relations(inventory, findings, selected)
-    _audit_installed_parity(findings, installed_skills)
+    if check_packaged_parity:
+        _audit_installed_parity(findings, installed_skills)
 
     deduped = dedupe_findings(findings)
     return {
@@ -838,7 +845,10 @@ def render_text(result: Dict[str, object]) -> str:
 
 def main() -> int:
     args = parse_args()
-    result = run_audit(args.artifact_type if args.artifact_type else None)
+    result = run_audit(
+        args.artifact_type if args.artifact_type else None,
+        check_packaged_parity=args.check_packaged_parity,
+    )
     if args.json:
         print(json.dumps(result, indent=2))
     else:
