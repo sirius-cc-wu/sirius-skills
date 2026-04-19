@@ -116,5 +116,6 @@ though the local developer only needed the checked-in skills.
   so the repo needs a deliberate compatibility phase.
 - Some maintained agents may still require packaged standalone skill folders,
   which means the packaged path cannot disappear immediately.
-- The repo must decide when parity leaves default audit/report output and
-  becomes an explicit packaged-release validation surface.
+- Packaged parity now belongs behind an explicit maintenance flag instead of the
+  default local audit/report path; operators still need clear migration notes so
+  they know when to opt in.

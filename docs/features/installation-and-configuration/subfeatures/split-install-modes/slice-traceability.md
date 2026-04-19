@@ -18,7 +18,7 @@
 | SIM-02 | L | Separate packaged install from local install | I2 | SIM-02-packaged-compat | Compatibility policy | SIM-02-packaged-targets | SIM-02-packaged-compat | Preserves the old packaged behavior while the new target split lands |
 | SIM-03 | L | Scope runtime sync and parity to packaging boundaries | I3 | SIM-03-runtime-scope | Runtime sync | SIM-02-packaged-compat | SIM-03-runtime-scope | Keeps copied-runtime sync behind the explicit packaged boundary |
 | SIM-03 | L | Scope runtime sync and parity to packaging boundaries | I3 | SIM-03-parity-scope | Maintenance reporting | SIM-03-runtime-scope | SIM-03-parity-scope | Narrows parity defaults only after packaged-runtime scoping is in place |
-| SIM-04 | M | Publish migration and operator guidance | I3 | SIM-04-migration-guidance | Docs, Migration notes | SIM-03-parity-scope |  | Guidance should reflect the final install target names and parity semantics |
+| SIM-04 | M | Publish migration and operator guidance | I3 | SIM-04-migration-guidance | Docs, Migration notes | SIM-03-parity-scope | SIM-04-migration-guidance | Guidance should reflect the final install target names and parity semantics |
 
 ## Notes
 

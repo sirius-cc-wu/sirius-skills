@@ -33,3 +33,4 @@
 | SIM-02-packaged-compat | Preserve packaged install compatibility during migration | closed | 2026-04-19T11:09:09 | 2026-04-19T11:09:09 | slices/SIM-02-packaged-compat-preserve-packaged-install-compatibility-during-migration/ |
 | SIM-03-runtime-scope | Scope shared-runtime sync to packaged installs | closed | 2026-04-19T11:10:55 | 2026-04-19T11:10:55 | slices/SIM-03-runtime-scope-scope-shared-runtime-sync-to-packaged-installs/ |
 | SIM-03-parity-scope | Re-scope installed parity to packaged validation | closed | 2026-04-19T11:13:49 | 2026-04-19T11:13:49 | slices/SIM-03-parity-scope-re-scope-installed-parity-to-packaged-validation/ |
+| SIM-04-migration-guidance | Publish the migration path and operator guidance | closed | 2026-04-19T11:15:37 | 2026-04-19T11:15:37 | slices/SIM-04-migration-guidance-publish-the-migration-path-and-operator-guidance/ |

@@ -38,6 +38,27 @@ make uninstall
 install flow through `npx skills`. `make install` and `make uninstall` still
 point at that packaged flow as migration-time compatibility aliases.
 
+## Migration Notes
+
+Current command map:
+
+- local source-linked use: `make install-local` / `make uninstall-local`
+- explicit packaged use: `make install-packaged` / `make uninstall-packaged`
+- legacy compatibility aliases: `make install` / `make uninstall`
+
+Current parity guidance:
+
+- default local `report-artifacts` and `audit-artifacts` runs do not inspect
+  installed packaged-skill parity
+- use `--check-packaged-parity` when you explicitly want packaged install
+  validation
+
+Current migration stance:
+
+- prefer `install-local` for day-to-day repo work
+- use `install-packaged` when validating or refreshing the packaged skill path
+- treat `install` / `uninstall` as compatibility aliases that still work today
+
 To rerun the curated workflow consistency validation bundle used by CI and
 workflow-state maintenance work:
 

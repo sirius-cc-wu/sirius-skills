@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "generated_at": "2026-04-19T11:13:49",
+  "generated_at": "2026-04-19T11:15:37",
   "slices": [
     {
       "id": "HSS-01-root-fallback",
@@ -309,6 +309,16 @@
       "path": "slices/SIM-03-parity-scope-re-scope-installed-parity-to-packaged-validation/",
       "updated_at": "2026-04-19T11:13:49",
       "closed_at": "2026-04-19T11:13:49",
+      "archived_at": null,
+      "relations": []
+    },
+    {
+      "id": "SIM-04-migration-guidance",
+      "feature": "Publish the migration path and operator guidance",
+      "status": "closed",
+      "path": "slices/SIM-04-migration-guidance-publish-the-migration-path-and-operator-guidance/",
+      "updated_at": "2026-04-19T11:15:37",
+      "closed_at": "2026-04-19T11:15:37",
       "archived_at": null,
       "relations": []
     }

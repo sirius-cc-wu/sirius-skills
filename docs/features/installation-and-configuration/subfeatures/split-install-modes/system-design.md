@@ -164,6 +164,17 @@ Makefile variables such as install roots for tests, not new durable repo config.
 4. Narrow parity/reporting defaults so local repo usage no longer depends on
    copied install assumptions.
 
+### Current migration guidance
+
+- Prefer `make install-local` / `make uninstall-local` for normal repo-local
+  development.
+- Use `make install-packaged` / `make uninstall-packaged` when validating the
+  packaged standalone workflow.
+- `make install` / `make uninstall` remain compatibility aliases to the
+  packaged path in the current rollout.
+- Use `--check-packaged-parity` on audit/report maintenance commands when you
+  want installed packaged-skill parity checked explicitly.
+
 ## Failure handling and operational constraints
 
 - Symlink creation must be idempotent and safe to rerun.
