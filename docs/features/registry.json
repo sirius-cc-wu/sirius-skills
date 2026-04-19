@@ -98,8 +98,8 @@
     },
     {
       "feature": "workflow-state-consistency",
-      "status": "planning_reviewed",
-      "updated_at": "2026-04-17T20:45:42",
+      "status": "implemented",
+      "updated_at": "2026-04-19T11:36:15",
       "path": "docs/features/workflow-state-consistency/"
     }
   ]
