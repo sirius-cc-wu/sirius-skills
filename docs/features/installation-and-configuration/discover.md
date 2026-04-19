@@ -6,7 +6,7 @@ The repository is designed as a reusable skill collection, but successful adopti
 
 ## Goals
 
-- Provide a managed installation and uninstallation path for the skill set.
+- Provide a clear local source-linked install path plus a managed packaged compatibility path for the skill set.
 - Keep project-specific behavior in config rather than hardcoded into core skills.
 - Separate planning layout, execution layout, and naming conventions into distinct config files.
 - Allow optional project-local extensions without requiring a full plugin loader.
@@ -33,14 +33,15 @@ The repository is designed as a reusable skill collection, but successful adopti
 
 ## Confirmed Signals in Repo
 
-- `Makefile` defines `make install` and `make uninstall` using `npx skills add/remove`.
+- `Makefile` now defines `make install-local` and `make uninstall-local` for source-linked local use.
+- `Makefile` still defines `make install` and `make uninstall` using `npx skills add/remove` for the current packaged compatibility flow.
 - `README.md` documents generic-first workflow and config surfaces.
 - `AGENTS.md` emphasizes configuration over hardcoding and preserving ownership boundaries.
 - `skills/commit/`, `skills/create-pr/`, `skills/guide-planning/`, and `skills/guide-execution/` all consume configuration in controlled ways.
 
 ## Success Criteria
 
-- A maintainer can install or remove the managed skill set through one documented entrypoint.
+- A maintainer can install or remove the managed skill set through one documented local entrypoint plus one documented packaged compatibility path.
 - A project can configure planning, execution, and conventions independently without modifying core skills.
 - Optional project-local extensions remain opt-in and explicitly documented.
 

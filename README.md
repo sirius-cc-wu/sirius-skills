@@ -4,17 +4,33 @@
 
 ## Installing skills
 
-Use the repository `Makefile` to register the managed skill set:
+For local development, prefer the source-linked install path:
+
+```bash
+make install-local
+```
+
+This creates per-skill symlinks into the local skill home. The default skill
+home is `~/.agents/skills`, and you can override it for another CLI or a test
+fixture with `SKILLS_HOME=/path/to/skills-home`.
+
+To remove the same local source-linked install later:
+
+```bash
+make uninstall-local
+```
+
+The original packaged compatibility path is still available in the current
+rollout:
 
 ```bash
 make install
-```
-
-To remove the same managed skill set later:
-
-```bash
 make uninstall
 ```
+
+`make install` and `make uninstall` still run the managed packaged install flow
+through `npx skills`. Later slices may rename that packaged path explicitly, but
+these are the current commands.
 
 To rerun the curated workflow consistency validation bundle used by CI and
 workflow-state maintenance work:

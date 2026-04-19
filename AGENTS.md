@@ -107,8 +107,12 @@ When editing skills:
 
 ### Installation
 
-Use `make install` to install or refresh skills and `make uninstall` to remove
-the managed skill set. Keep repo-level guidance agent-agnostic unless a
+Use `make install-local` and `make uninstall-local` for source-linked local
+development installs. `SKILLS_HOME` can override the target skill home when a
+CLI uses a different discovery path or when tests need a temporary directory.
+
+`make install` and `make uninstall` still represent the packaged compatibility
+path in the current rollout. Keep repo-level guidance agent-agnostic unless a
 specific integration requires otherwise.
 
 ## Agent Checklist

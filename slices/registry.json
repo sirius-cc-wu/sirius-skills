@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "generated_at": "2026-04-19T10:56:05",
+  "generated_at": "2026-04-19T10:58:51",
   "slices": [
     {
       "id": "HSS-01-root-fallback",
@@ -259,6 +259,16 @@
       "path": "slices/SIM-01-local-helper-add-source-linked-local-install-helper/",
       "updated_at": "2026-04-19T10:56:05",
       "closed_at": "2026-04-19T10:56:05",
+      "archived_at": null,
+      "relations": []
+    },
+    {
+      "id": "SIM-01-local-docs",
+      "feature": "Document the source-linked local install path",
+      "status": "closed",
+      "path": "slices/SIM-01-local-docs-document-the-source-linked-local-install-path/",
+      "updated_at": "2026-04-19T10:58:51",
+      "closed_at": "2026-04-19T10:58:51",
       "archived_at": null,
       "relations": []
     }
