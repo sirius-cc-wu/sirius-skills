@@ -13,6 +13,7 @@
 | multi-slice-execution | implemented | 2026-04-14T16:33:28 | docs/features/execution-workflow/subfeatures/multi-slice-execution/ |
 | hierarchical-scope-support | slice_ready | 2026-04-04T02:56:28 | docs/features/hierarchical-scope-support/ |
 | installation-and-configuration | planning_reviewed | 2026-03-24T03:39:26 | docs/features/installation-and-configuration/ |
+| split-install-modes | breakdown_ready | 2026-04-19T04:39:03+08:00 | docs/features/installation-and-configuration/subfeatures/split-install-modes/ |
 | planning-workflow | planning_reviewed | 2026-03-24T03:39:26 | docs/features/planning-workflow/ |
 | change-to-subfeature-migration | planning_reviewed | 2026-04-08T08:27:49 | docs/features/planning-workflow/subfeatures/change-to-subfeature-migration/ |
 | proposal-workflow | planning_reviewed | 2026-03-29T00:32:50 | docs/features/planning-workflow/subfeatures/proposal-workflow/ |

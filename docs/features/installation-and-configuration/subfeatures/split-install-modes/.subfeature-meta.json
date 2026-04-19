@@ -1,0 +1,35 @@
+{
+  "subfeature_id": "split-install-modes",
+  "parent_feature_slug": "installation-and-configuration",
+  "status": "breakdown_ready",
+  "created_at": "2026-04-19T04:25:37",
+  "updated_at": "2026-04-19T04:39:03+08:00",
+  "subfeature_type": "superseding",
+  "summary": "Split source-linked local installs from packaged standalone installs while keeping packaged distribution explicit.",
+  "affected_artifacts": [
+    "docs/features/installation-and-configuration/discover.md",
+    "docs/features/installation-and-configuration/system-design.md",
+    "docs/features/installation-and-configuration/user-stories.md",
+    "docs/features/installation-and-configuration/slice-planning.md",
+    "docs/features/installation-and-configuration/slice-traceability.md",
+    "Makefile",
+    "docs/features/workflow-state-consistency/system-design.md",
+    "slices/WSC-02-maintenance-adoption-adopt-shared-reconciliation-across-maintenance-skills/blueprint.md"
+  ],
+  "affected_story_ids": [
+    "IC-01",
+    "IC-02",
+    "IC-03",
+    "IC-04"
+  ],
+  "affected_slice_ids": [
+    "IC-01-install",
+    "IC-02-planning-config",
+    "IC-02-execution-config",
+    "IC-03-conventions-config",
+    "IC-04-plugin-convention",
+    "IC-04-doc-alignment"
+  ],
+  "review_note": null,
+  "finalized_at": null
+}

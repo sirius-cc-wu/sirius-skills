@@ -67,6 +67,12 @@
       "path": "docs/features/installation-and-configuration/"
     },
     {
+      "feature": "split-install-modes",
+      "status": "breakdown_ready",
+      "updated_at": "2026-04-19T04:39:03+08:00",
+      "path": "docs/features/installation-and-configuration/subfeatures/split-install-modes/"
+    },
+    {
       "feature": "planning-workflow",
       "status": "planning_reviewed",
       "updated_at": "2026-03-24T03:39:26",
