@@ -190,7 +190,8 @@ If one repo story splits into multiple executable work items:
 - keep the story as a repo concept in `user-stories.md`
 - create multiple planned slices
 - optionally create a non-executable parent item only when it helps grouped review
-- record the story-to-slice fan-out in `slice-traceability.md`
+- record the story-to-slice fan-out in `slice-traceability.md` with one planned
+  slice per row
 
 Only reuse the repo story ID as the planned slice ID when **all** of the following are true:
 
@@ -223,6 +224,8 @@ When generating `slice-traceability.md`, start from `assets/slice-traceability-t
 - Do not turn increments into execution states or spec-slice containers.
 - Do not turn `slice-planning.md` into a slice-scoped execution checklist; that belongs to `guide-execution` and `blueprint` later.
 - Do not mark work as parallel-safe unless overlap and integration risk are genuinely low.
+- Do not group multiple planned slice IDs into one `slice-traceability.md` row;
+  repeat the story row so each planned slice can be mapped back deterministically.
 - If a slice still needs major replanning, split it again before handoff.
 - Do not fall back to bare `slice-*` IDs unless a repository-specific convention
   explicitly requires them.

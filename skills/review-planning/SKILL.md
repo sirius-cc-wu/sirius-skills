@@ -55,6 +55,9 @@ Resolve `<feature_path>` as either:
 - Confirm that configuration and state ownership are coherent, especially when subfeatures inherit a parent feature that already defines typed control surfaces.
 - Make sure every execution-ready slice is small enough for one execution slice and has a concrete validation path.
 - Verify dependencies, sequencing, parallel-safe lanes, and integration checkpoints are explicit where they matter.
+- Confirm `slice-traceability.md` keeps one planned slice per row whenever a
+  story fans out, so later execution bootstrap can record execution slice IDs
+  deterministically.
 - Distinguish blocking findings from follow-up improvements so handoff decisions stay clear.
 - For subfeatures, review the subfeature-local planning docs against `impact-analysis.md` and the intended child capability rather than treating the parent feature breakdown as the execution backlog.
 - For subfeatures, confirm the planned slices represent only the new or amended work required by the subfeature and keep superseded parent slice IDs in notes or dependency references.

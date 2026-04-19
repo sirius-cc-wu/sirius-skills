@@ -125,6 +125,38 @@ def add_finding(
         )
 
 
+def add_grouped_traceability_finding(
+    findings: List[Finding],
+    selected: Set[str],
+    artifact_type: str,
+    artifact_id: str,
+    path: str,
+    traceability_records: Sequence[TraceabilityRecord],
+) -> None:
+    grouped_rows = [
+        f"{record.story_id}: {', '.join(record.planned_slice_ids)}"
+        for record in traceability_records
+        if len(record.planned_slice_ids) > 1
+    ]
+    if not grouped_rows:
+        return
+    add_finding(
+        findings,
+        selected,
+        artifact_type,
+        artifact_id,
+        path,
+        "planning_shape",
+        "grouped_planned_slice_ids",
+        "error",
+        (
+            "slice-traceability.md groups multiple planned slice IDs into one row "
+            f"({'; '.join(grouped_rows)}). Split those rows so each planned slice "
+            "has its own row before execute-all-slices bootstrap."
+        ),
+    )
+
+
 def _registry_findings(
     findings: List[Finding],
     selected: Set[str],
@@ -458,6 +490,19 @@ def _audit_cross_links(
         if feature_slug:
             slice_rows_by_feature.setdefault(feature_slug, []).append(dict(row))
 
+    for relpath, metadata in feature_metadata.items():
+        feature_slug = str(metadata.get("feature_slug") or "")
+        if not feature_slug:
+            continue
+        add_grouped_traceability_finding(
+            findings,
+            selected,
+            "feature",
+            feature_slug,
+            relpath,
+            traceability_by_owner.get(("feature", relpath), []),
+        )
+
     for proposal_id, metadata in proposal_metadata.items():
         proposal_path = normalize_dir_relpath(inventory.context.proposal_root / proposal_id)
         target_feature = metadata.get("target_feature")
@@ -522,6 +567,14 @@ def _audit_cross_links(
                     )
 
         traceability_records = traceability_by_owner.get(("subfeature", relpath), [])
+        add_grouped_traceability_finding(
+            findings,
+            selected,
+            "subfeature",
+            subfeature_id,
+            relpath,
+            traceability_records,
+        )
         execution_slice_ids = sorted(
             {
                 slice_id

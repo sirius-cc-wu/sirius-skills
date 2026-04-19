@@ -245,3 +245,5 @@ def test_scaffold_traceability_template_uses_distinct_planned_and_execution_colu
     ).read_text(encoding="utf-8")
     assert "Planned Slice IDs" in traceability
     assert "Execution Slice IDs" in traceability
+    assert "exactly one planned slice ID" in traceability
+    assert "Follow-on row for the same story" in traceability

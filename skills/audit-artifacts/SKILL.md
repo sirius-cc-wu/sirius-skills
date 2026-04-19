@@ -65,6 +65,8 @@ The first version audits:
 - top-level planning registry plus canonical feature folders
 - feature-local subfeature registries plus subfeature folders
 - planning-to-execution handoff consistency for canonical features
+- grouped `slice-traceability.md` rows that would block deterministic
+  planned-slice to execution-slice writeback
 - subfeature `slice-traceability.md` execution links versus actual slice state
 - stale subfeature status or `affected_slice_ids` when all traced execution
   slices are already closed

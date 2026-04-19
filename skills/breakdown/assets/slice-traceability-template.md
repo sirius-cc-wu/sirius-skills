@@ -8,9 +8,12 @@ Use this file to map repo story IDs to execution slices without moving story own
 - Use planned slice IDs that begin with a feature or subfeature prefix rather
   than bare `slice-*` placeholders unless a repository-specific convention says
   otherwise.
-- Use one primary row per repo story.
+- Use one primary row per repo story. When one story fans out into multiple
+  planned slices, add additional rows for that same story so each row keeps
+  exactly one planned slice ID.
 - List increment IDs as a comma-separated list when a story spans multiple increments.
-- List multiple slice IDs as a comma-separated list.
+- List multiple execution slice IDs as a comma-separated list only when a
+  single planned slice genuinely maps to more than one execution slice.
 - Record only real execution blockers in `Blocked By`.
 - Leave `Execution Slice IDs` blank until `slice` bootstraps execution slices.
 
@@ -18,8 +21,9 @@ Use this file to map repo story IDs to execution slices without moving story own
 
 | Story ID | Story Size | Story Summary | Increments | Planned Slice IDs | Slice Areas | Blocked By | Execution Slice IDs | Notes |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| AUTH-03 | L | Refresh token support | I1 | auth-api, auth-tests | API, Tests | auth-tests -> auth-api | auth-api, auth-tests | Split into API and tests |
-| <story-id> | <S/M/L/XL> | <short summary> | <I1[, I2...]> | <slice-id[, slice-id...]> | <area[, area...]> | <blocker relation or blank> | <slice-id[, slice-id...] or blank> | <notes> |
+| AUTH-03 | L | Refresh token support | I1 | auth-api | API |  | auth-api | Primary row for the split story |
+| AUTH-03 | L | Refresh token support | I1 | auth-tests | Tests | auth-api | auth-tests | Follow-on row for the same story |
+| <story-id> | <S/M/L/XL> | <short summary> | <I1[, I2...]> | <slice-id> | <area[, area...]> | <blocker relation or blank> | <slice-id[, slice-id...] or blank> | <notes> |
 
 ## Notes
 
@@ -27,4 +31,6 @@ Use this file to map repo story IDs to execution slices without moving story own
 - `Planned Slice IDs` records the planned identifiers before slice bootstrap.
 - `Execution Slice IDs` records the actual bootstrapped slice IDs after `slice` runs.
 - `Increments` records planning-level grouping only; do not treat it as an execution state.
-- If a story fans out into multiple executable slices, keep the fan-out here instead of inventing story-state outside the planning artifacts.
+- If a story fans out into multiple executable slices, keep the fan-out here by
+  repeating the story row once per planned slice instead of inventing
+  story-state outside the planning artifacts.

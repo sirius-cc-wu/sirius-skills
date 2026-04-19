@@ -190,6 +190,26 @@ def write_subfeature_traceability(
     )
 
 
+def write_traceability(
+    path: Path, *, planned_slice_ids: list[str], execution_slice_ids: list[str]
+):
+    planned = ", ".join(planned_slice_ids)
+    execution = ", ".join(execution_slice_ids)
+    path.write_text(
+        "\n".join(
+            [
+                "# Slice Traceability",
+                "",
+                "| Story ID | Increments | Planned Slice IDs | Execution Slice IDs | Notes |",
+                "| --- | --- | --- | --- | --- |",
+                f"| CHK-01 | I1 | {planned} | {execution} | Test row |",
+                "",
+            ]
+        ),
+        encoding="utf-8",
+    )
+
+
 def create_closed_slice(execution, tmp_path: Path, slice_id: str, feature_name: str) -> Path:
     folder, created = execution.create_slice(slice_id, feature_name)
     assert created is True
@@ -484,6 +504,31 @@ def test_run_audit_reports_missing_traceability_execution_slice_for_subfeature(
 
     assert result["ok"] is False
     assert "missing_traceability_execution_slice" in finding_codes(result)
+
+
+def test_run_audit_reports_grouped_planned_slice_rows_for_feature_and_subfeature(
+    tmp_path, monkeypatch
+):
+    env = setup_repo(tmp_path, monkeypatch)
+    write_traceability(
+        env["feature_dir"] / "slice-traceability.md",
+        planned_slice_ids=["CHK-101", "CHK-102"],
+        execution_slice_ids=[],
+    )
+    write_subfeature_traceability(
+        env["subfeature_dir"],
+        planned_slice_ids=["CHK-201", "CHK-202"],
+        execution_slice_ids=[],
+    )
+
+    result = env["audit"].run_audit(["feature", "subfeature"])
+
+    assert result["ok"] is False
+    grouped_findings = [
+        finding for finding in result["findings"] if finding["code"] == "grouped_planned_slice_ids"
+    ]
+    assert len(grouped_findings) == 2
+    assert {finding["artifact_type"] for finding in grouped_findings} == {"feature", "subfeature"}
 
 
 def test_cli_json_reports_slice_relation_issues(tmp_path, monkeypatch, capsys):
