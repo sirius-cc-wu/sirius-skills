@@ -32,6 +32,7 @@ MANAGED_SKILLS := \
 	execute-all-slices \
 	slice \
 	ui-flow
+MANAGED_SKILL_FLAGS := $(foreach skill,$(MANAGED_SKILLS),--skill $(skill))
 
 install-local:
 	python3 scripts/install_local_skills.py install --repo-root "$(REPO_ROOT)" --skills-home "$(SKILLS_HOME)" $(MANAGED_SKILLS)
@@ -40,34 +41,7 @@ install-local:
 install: install-packaged
 
 install-packaged: sync-shared-runtime sync-shared-references
-	npx skills add "$(REPO_ROOT)/skills/audit-artifacts" $(COMMON_FLAGS)
-	npx skills add "$(REPO_ROOT)/skills/measure-artifacts" $(COMMON_FLAGS)
-	npx skills add "$(REPO_ROOT)/skills/trace-artifacts" $(COMMON_FLAGS)
-	npx skills add "$(REPO_ROOT)/skills/report-artifacts" $(COMMON_FLAGS)
-	npx skills add "$(REPO_ROOT)/skills/repair-artifacts" $(COMMON_FLAGS)
-	npx skills add "$(REPO_ROOT)/skills/archive-artifacts" $(COMMON_FLAGS)
-	npx skills add "$(REPO_ROOT)/skills/guide-execution" $(COMMON_FLAGS)
-	npx skills add "$(REPO_ROOT)/skills/brief" $(COMMON_FLAGS)
-	npx skills add "$(REPO_ROOT)/skills/blueprint" $(COMMON_FLAGS)
-	npx skills add "$(REPO_ROOT)/skills/guide-planning" $(COMMON_FLAGS)
-	npx skills add "$(REPO_ROOT)/skills/propose" $(COMMON_FLAGS)
-	npx skills add "$(REPO_ROOT)/skills/discover" $(COMMON_FLAGS)
-	npx skills add "$(REPO_ROOT)/skills/add-subfeature" $(COMMON_FLAGS)
-	npx skills add "$(REPO_ROOT)/skills/migrate-subfeatures" $(COMMON_FLAGS)
-	npx skills add "$(REPO_ROOT)/skills/assess" $(COMMON_FLAGS)
-	npx skills add "$(REPO_ROOT)/skills/guide-scope" $(COMMON_FLAGS)
-	npx skills add "$(REPO_ROOT)/skills/design" $(COMMON_FLAGS)
-	npx skills add "$(REPO_ROOT)/skills/ui-flow" $(COMMON_FLAGS)
-	npx skills add "$(REPO_ROOT)/skills/breakdown" $(COMMON_FLAGS)
-	npx skills add "$(REPO_ROOT)/skills/review-planning" $(COMMON_FLAGS)
-	npx skills add "$(REPO_ROOT)/skills/slice" $(COMMON_FLAGS)
-	npx skills add "$(REPO_ROOT)/skills/execute-all-slices" $(COMMON_FLAGS)
-	npx skills add "$(REPO_ROOT)/skills/close-slice" $(COMMON_FLAGS)
-	npx skills add "$(REPO_ROOT)/skills/review-execution" $(COMMON_FLAGS)
-	npx skills add "$(REPO_ROOT)/skills/commit" $(COMMON_FLAGS)
-	npx skills add "$(REPO_ROOT)/skills/bootstrap" $(COMMON_FLAGS)
-	npx skills add "$(REPO_ROOT)/skills/create-pr" $(COMMON_FLAGS)
-	npx skills add "$(REPO_ROOT)/skills/simplify" $(COMMON_FLAGS)
+	npx skills add "$(REPO_ROOT)" $(COMMON_FLAGS) $(MANAGED_SKILL_FLAGS)
 
 uninstall-local:
 	python3 scripts/install_local_skills.py uninstall --repo-root "$(REPO_ROOT)" --skills-home "$(SKILLS_HOME)" $(MANAGED_SKILLS)

@@ -9,6 +9,7 @@ SYNC_RUNTIME = "python3 scripts/sync_shared_skill_runtime.py"
 SYNC_REFERENCES = "python3 scripts/sync_shared_skill_references.py"
 LOCAL_HELPER = "python3 scripts/install_local_skills.py install"
 PACKAGED_ADD = 'npx skills add "'
+PACKAGED_REPO_SOURCE = f'{PACKAGED_ADD}{REPO_ROOT}"'
 
 
 def render_make(target: str) -> str:
@@ -35,7 +36,10 @@ def test_install_packaged_keeps_packaged_sync() -> None:
 
     assert SYNC_RUNTIME in output
     assert SYNC_REFERENCES in output
-    assert PACKAGED_ADD in output
+    assert PACKAGED_REPO_SOURCE in output
+    assert output.count("npx skills add") == 1
+    assert "--skill audit-artifacts" in output
+    assert "--skill execute-all-slices" in output
 
 
 def test_install_alias_still_uses_packaged_flow() -> None:
@@ -43,4 +47,4 @@ def test_install_alias_still_uses_packaged_flow() -> None:
 
     assert SYNC_RUNTIME in output
     assert SYNC_REFERENCES in output
-    assert PACKAGED_ADD in output
+    assert PACKAGED_REPO_SOURCE in output
