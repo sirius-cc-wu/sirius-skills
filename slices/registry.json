@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "generated_at": "2026-04-19T10:58:51",
+  "generated_at": "2026-04-19T11:07:03",
   "slices": [
     {
       "id": "HSS-01-root-fallback",
@@ -269,6 +269,16 @@
       "path": "slices/SIM-01-local-docs-document-the-source-linked-local-install-path/",
       "updated_at": "2026-04-19T10:58:51",
       "closed_at": "2026-04-19T10:58:51",
+      "archived_at": null,
+      "relations": []
+    },
+    {
+      "id": "SIM-02-packaged-targets",
+      "feature": "Split local and packaged install targets",
+      "status": "closed",
+      "path": "slices/SIM-02-packaged-targets-split-local-and-packaged-install-targets/",
+      "updated_at": "2026-04-19T11:07:03",
+      "closed_at": "2026-04-19T11:07:03",
       "archived_at": null,
       "relations": []
     }

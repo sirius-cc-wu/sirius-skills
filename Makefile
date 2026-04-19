@@ -1,4 +1,4 @@
-.PHONY: install uninstall install-local uninstall-local sync-shared-references sync-shared-runtime validate-workflow-state
+.PHONY: install uninstall install-local uninstall-local install-packaged uninstall-packaged sync-shared-references sync-shared-runtime validate-workflow-state
 
 REPO_ROOT := $(CURDIR)
 SKILLS_HOME ?= $(HOME)/.agents/skills
@@ -36,7 +36,9 @@ MANAGED_SKILLS := \
 install-local:
 	python3 scripts/install_local_skills.py install --repo-root "$(REPO_ROOT)" --skills-home "$(SKILLS_HOME)" $(MANAGED_SKILLS)
 
-install: sync-shared-runtime sync-shared-references
+install: install-packaged
+
+install-packaged: sync-shared-runtime sync-shared-references
 	npx skills add "$(REPO_ROOT)/skills/audit-artifacts" $(COMMON_FLAGS)
 	npx skills add "$(REPO_ROOT)/skills/measure-artifacts" $(COMMON_FLAGS)
 	npx skills add "$(REPO_ROOT)/skills/trace-artifacts" $(COMMON_FLAGS)
@@ -78,7 +80,9 @@ sync-shared-runtime:
 validate-workflow-state:
 	python3 scripts/validate_workflow_state.py
 
-uninstall:
+uninstall: uninstall-packaged
+
+uninstall-packaged:
 	@installed="$$(npx skills ls -g --json | python3 -c 'import json, sys; managed = set("$(MANAGED_SKILLS)".split()); installed = [item["name"] for item in json.load(sys.stdin) if item.get("name") in managed]; print("\n".join(installed))')"; \
 	if [ -n "$$installed" ]; then \
 		printf '%s\n' "$$installed" | xargs npx skills remove $(COMMON_FLAGS); \

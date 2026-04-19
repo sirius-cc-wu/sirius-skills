@@ -29,3 +29,4 @@
 | WSC-05-validation-hooks | Add repeatable workflow consistency validation hooks | closed | 2026-04-19T01:24:17 | 2026-04-19T01:24:17 | slices/WSC-05-validation-hooks-add-repeatable-workflow-consistency-validation-hooks/ |
 | SIM-01-local-helper | Add source-linked local install helper | closed | 2026-04-19T10:56:05 | 2026-04-19T10:56:05 | slices/SIM-01-local-helper-add-source-linked-local-install-helper/ |
 | SIM-01-local-docs | Document the source-linked local install path | closed | 2026-04-19T10:58:51 | 2026-04-19T10:58:51 | slices/SIM-01-local-docs-document-the-source-linked-local-install-path/ |
+| SIM-02-packaged-targets | Split local and packaged install targets | closed | 2026-04-19T11:07:03 | 2026-04-19T11:07:03 | slices/SIM-02-packaged-targets-split-local-and-packaged-install-targets/ |
