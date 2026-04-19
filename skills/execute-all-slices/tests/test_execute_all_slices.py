@@ -844,6 +844,7 @@ def test_resume_requires_commit_checkpoint_before_next_slice(tmp_path, monkeypat
         execution_rows, slice_row, "closed", force=True
     )
     assert success, message
+    write_file(tmp_path / "scratch.txt", "tracked\n")
     git_commit_all(tmp_path, "fixture: close first slice")
     write_file(tmp_path / "scratch.txt", "dirty\n")
 

@@ -699,7 +699,7 @@ def resume_execution(
 
 def read_dirty_worktree_paths(repo_root: str) -> List[str]:
     result = subprocess.run(
-        ["git", "-C", repo_root, "status", "--short"],
+        ["git", "-C", repo_root, "status", "--short", "--untracked-files=no"],
         check=False,
         capture_output=True,
         text=True,

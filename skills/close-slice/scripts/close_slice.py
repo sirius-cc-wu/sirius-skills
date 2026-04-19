@@ -544,11 +544,17 @@ def _execution_ids_by_planned_slice(records: Sequence[object]) -> Dict[str, List
 
 
 def _related_owner_records(inventory, slice_id: str) -> Dict[Tuple[str, str, str], List[object]]:
-    grouped: Dict[Tuple[str, str, str], List[object]] = {}
+    owner_keys: set[Tuple[str, str, str]] = set()
     for record in iter_traceability_records(inventory):
         if slice_id not in record.planned_slice_ids and slice_id not in record.execution_slice_ids:
             continue
+        owner_keys.add((record.owner_type, record.owner_id, record.owner_path))
+
+    grouped: Dict[Tuple[str, str, str], List[object]] = {}
+    for record in iter_traceability_records(inventory):
         key = (record.owner_type, record.owner_id, record.owner_path)
+        if key not in owner_keys:
+            continue
         grouped.setdefault(key, []).append(record)
     return grouped
 

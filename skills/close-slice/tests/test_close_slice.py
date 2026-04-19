@@ -291,6 +291,53 @@ def test_close_slice_marks_feature_implemented_when_last_slice_closes(tmp_path, 
     assert planning.main() == 0
 
 
+def test_close_slice_keeps_feature_slice_ready_when_other_planned_slices_remain(
+    tmp_path, monkeypatch
+):
+    close_slice = load_module(CLOSE_SLICE_PATH, "close_slice")
+    planning = load_module(MANAGE_PLANNING_PATH, "manage_planning_close_slice_remaining")
+    _, _ = setup_execution_ready_slice(tmp_path, monkeypatch)
+    write_planning_config(tmp_path)
+    write_transition_guardrail_feature(
+        tmp_path,
+        "DEMO",
+        feature_status="slice_ready",
+        feature_ready_slice_ids=["DEMO", "NEXT"],
+        include_subfeature=False,
+    )
+    feature_dir = tmp_path / "docs" / "features" / "checkout"
+    (feature_dir / "slice-traceability.md").write_text(
+        "# Slice Traceability\n\n"
+        "| Story ID | Increments | Planned Slice IDs | Execution Slice IDs | Notes |\n"
+        "| --- | --- | --- | --- | --- |\n"
+        "| CHK-01 | I1 | DEMO | DEMO | closed slice |\n"
+        "| CHK-02 | I1 | NEXT | NEXT | remaining slice |\n",
+        encoding="utf-8",
+    )
+
+    assert run_cli(close_slice, monkeypatch, "--slice", "DEMO") == 0
+
+    planning.sync_registry(scope_context=planning.SCOPE_RUNTIME.resolve_scope_context())
+    feature_metadata = json.loads(
+        (feature_dir / ".planning-meta.json").read_text(encoding="utf-8")
+    )
+    registry = json.loads(
+        (tmp_path / "docs" / "features" / "registry.json").read_text(encoding="utf-8")
+    )
+
+    assert feature_metadata["status"] == "slice_ready"
+    assert feature_metadata["ready_slice_ids"] == ["DEMO", "NEXT"]
+    feature_row = next(row for row in registry["features"] if row["feature"] == "checkout")
+    assert feature_row["status"] == "slice_ready"
+
+    monkeypatch.setattr(
+        sys,
+        "argv",
+        ["manage_planning.py", "validate-feature", "checkout"],
+    )
+    assert planning.main() == 0
+
+
 def test_close_slice_finalizes_reviewed_subfeature_when_last_slice_closes(
     tmp_path, monkeypatch
 ):
