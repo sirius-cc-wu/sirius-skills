@@ -89,6 +89,7 @@ though the local developer only needed the checked-in skills.
 - **Install-mode split**
   - separate local development install from packaged standalone install
   - rename or re-alias Make targets so the default path is explicit
+  - keep the local target naming generic enough for multiple agent CLIs
 
 - **Packaged-boundary hardening**
   - keep shared-runtime sync only for packaged/export flows

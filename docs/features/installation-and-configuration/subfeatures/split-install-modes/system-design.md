@@ -77,7 +77,7 @@ repo to adopt a `superpowers`-style namespaced bundle.
 
 The repo should distinguish:
 
-- `install-local-codex` / `uninstall-local-codex`
+- `install-local` / `uninstall-local`
 - `install-packaged` / `uninstall-packaged`
 
 During migration, `install` can remain as a compatibility alias. After the
@@ -106,8 +106,9 @@ the runtime is source-linked by symlink.
 
 - **`Makefile`**
   - owns user-facing install targets and migration aliases
+  - can expose a `SKILLS_HOME` override for multi-CLI environments and tests
 - **new local install helper**
-  - creates and refreshes per-skill symlinks under `~/.agents/skills/`
+  - creates and refreshes per-skill symlinks under the selected skill home
   - removes managed symlinks on uninstall
 - **existing packaged install helper flow**
   - retains `npx skills add/remove` and shared-runtime sync
@@ -139,7 +140,7 @@ Makefile variables such as install roots for tests, not new durable repo config.
 
 ### Source-linked local install flow
 
-1. User runs `make install-local-codex`.
+1. User runs `make install-local`.
 2. Helper enumerates the managed skill set from the repo.
 3. Helper ensures the chosen skill home exists.
 4. Helper refreshes per-skill symlinks to repo `skills/<skill>/`.
@@ -166,7 +167,8 @@ Makefile variables such as install roots for tests, not new durable repo config.
 ## Failure handling and operational constraints
 
 - Symlink creation must be idempotent and safe to rerun.
-- Helpers must avoid deleting unrelated personal skills under `~/.agents/skills/`.
+- Helpers must avoid deleting unrelated personal skills under the selected
+  skill home.
 - The local helper should fail clearly when an expected skill directory is
   missing in the repo.
 - Windows compatibility may require junction handling or a documented fallback;
@@ -236,7 +238,7 @@ folder "Agent Skill Home" as AgentsSkills
 component "Agent CLI discovery" as AgentDiscovery
 component "packaged standalone install" as PackagedInstall
 
-Developer --> Makefile : install-local-codex
+Developer --> Makefile : install-local
 Makefile --> LocalHelper
 LocalHelper --> Skills : resolve managed skills
 LocalHelper --> AgentsSkills : create per-skill symlinks

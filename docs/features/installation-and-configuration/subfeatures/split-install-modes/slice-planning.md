@@ -2,7 +2,6 @@
 
 ## 1. Planning Scope
 
-- Feature: Codex native install
 - Feature: Split install modes
 - Planning sources:
   - `discover.md`
@@ -38,7 +37,7 @@
 
 | Slice ID | Story ID | Title | Summary | Target Area | Lane | Validation | Planned Action | Depends On | Slice Ready |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| SIM-01-local-helper | SIM-01 | Add source-linked local install helper | Create deterministic install/uninstall helpers that manage per-skill symlinks under the target skill home without touching unrelated skills. | `Makefile`, new install helper under `scripts/` | primary | Helper-focused tests plus a dry-run or fixture-based symlink refresh check | create slice |  | yes |
+| SIM-01-local-helper | SIM-01 | Add source-linked local install helper | Create deterministic `install-local` and `uninstall-local` helpers that manage per-skill symlinks under the target skill home without touching unrelated skills. | `Makefile`, new install helper under `scripts/` | primary | Helper-focused tests plus a dry-run or fixture-based symlink refresh check | create slice |  | yes |
 | SIM-01-local-docs | SIM-01 | Document the source-linked local install path | Update README and install guidance so local CLI usage clearly points at the source-linked workflow. | `README.md`, `AGENTS.md`, install docs | primary | Review docs against helper behavior and one local install example | create slice | SIM-01-local-helper | yes |
 | SIM-02-packaged-targets | SIM-02 | Split local and packaged install targets | Rename or alias Make targets so packaged install/uninstall becomes an explicit mode distinct from source-linked local install. | `Makefile` | primary | Review target behavior plus fixture or smoke coverage for target selection | create slice | SIM-01-local-helper | yes |
 | SIM-02-packaged-compat | SIM-02 | Preserve packaged install compatibility during migration | Keep the existing packaged path working while documenting the compatibility phase and future default flip. | `Makefile`, packaging docs, helper scripts | primary | Validate packaged install helpers still call the required sync steps and managed packaging flow | create slice | SIM-02-packaged-targets | yes |
@@ -77,3 +76,10 @@
 
 - This subfeature is planning-scoped. It defines the rollout for install-mode boundaries; execution slices still carry the implementation work.
 - The parent `installation-and-configuration` feature remains the baseline. This subfeature narrows and supersedes only the install-path assumptions, not the broader configuration-surface model.
+
+## Review Notes
+
+- Planning reviewed: the packet uses generic `install-local` versus
+  `install-packaged` naming, keeps `install` as a compatibility alias in the
+  first rollout, and scopes the local install root to a helper or Makefile
+  override instead of a new durable config surface.
