@@ -20,7 +20,7 @@ Prefer source-linked local installs over packaged per-skill local installs while
 - `docs/features/installation-and-configuration/slice-traceability.md`
 - `Makefile`
 - `docs/features/workflow-state-consistency/system-design.md`
-- `slices/WSC-02-maintenance-adoption-adopt-shared-reconciliation-across-maintenance-skills/blueprint.md`
+- `slices/wsc-maintenance-adoption-adopt-shared-reconciliation-across-maintenance-skills/blueprint.md`
 
 ## Candidate Affected Story IDs
 
@@ -34,18 +34,18 @@ Prefer source-linked local installs over packaged per-skill local installs while
 
 ## Candidate Affected Slice IDs
 
-- `IC-01-install`
-- `IC-04-plugin-convention`
-- `IC-04-doc-alignment`
+- `iac-install`
+- `iac-plugin-convention`
+- `iac-doc-alignment`
 
 ## Impact Notes
 
 - This subfeature supersedes the original assumption that one managed install
   path should serve both local development and packaged standalone skill
   distribution.
-- `IC-01-install` remains relevant, but its scope narrows to the packaged
+- `iac-install` remains relevant, but its scope narrows to the packaged
   install/export boundary once a local source-linked path exists.
-- `IC-04-plugin-convention` and `IC-04-doc-alignment` are affected because the
+- `iac-plugin-convention` and `iac-doc-alignment` are affected because the
   repo will now document a native-discovery local path alongside the existing
   managed packaging flow.
 - The workflow-state consistency feature is affected indirectly: its packaged

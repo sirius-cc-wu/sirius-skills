@@ -10,10 +10,10 @@
 
 | Story ID | Story Size | Story Summary | Increments | Slice IDs | Slice Slices | Blocked By | Slice IDs | Notes |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| EW-01 | M | Bootstrap execution registry and slices | I1 | EW-101 | Bootstrap |  |  | Covers config, registry, metadata, and slice creation |
-| EW-02 | L | Define slice brief and checklist readiness | I1 | EW-102, EW-103 | Brief, Checklist | EW-101 |  | Split between artifact authoring and readiness enforcement |
-| EW-03 | L | Plan execution with gates and validation | I2 | EW-104, EW-105 | Plan, Gates | EW-103 |  | Keeps plan content separate from status-gate behavior |
-| EW-04 | L | Review, relate, and close slices | I3 | EW-106, EW-107, EW-108 | Review, Relations, Close | EW-105 |  | Closure depends on prior review and relation integrity |
+| EW-01 | M | Bootstrap execution registry and slices | I1 | ew-bootstrap | Bootstrap |  |  | Covers config, registry, metadata, and slice creation |
+| EW-02 | L | Define slice brief and checklist readiness | I1 | ew-brief, ew-checklist | Brief, Checklist | ew-bootstrap |  | Split between artifact authoring and readiness enforcement |
+| EW-03 | L | Plan execution with gates and validation | I2 | ew-plan, ew-gates | Plan, Gates | ew-checklist |  | Keeps plan content separate from status-gate behavior |
+| EW-04 | L | Review, relate, and close slices | I3 | ew-review, ew-relations, ew-close | Review, Relations, Close | ew-gates |  | Closure depends on prior review and relation integrity |
 
 ## Notes
 

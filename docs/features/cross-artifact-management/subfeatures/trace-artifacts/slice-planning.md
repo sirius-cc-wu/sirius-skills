@@ -24,13 +24,13 @@
 
 | Increment | Goal / User-Visible Value | Included Story IDs | Planned Slice IDs | Demo / Verification Outcome | Notes |
 | --- | --- | --- | --- | --- | --- |
-| I1 | Trace one artifact's lineage or summarize the repo's lineage graph | CAM-02 | CAM-02-trace-artifact-lineage | A maintainer can trace proposal, feature, subfeature, planned-slice, or execution-slice lineage from one command. | Simplest usable path |
+| I1 | Trace one artifact's lineage or summarize the repo's lineage graph | CAM-02 | tat-trace-artifact-lineage | A maintainer can trace proposal, feature, subfeature, planned-slice, or execution-slice lineage from one command. | Simplest usable path |
 
 ## 4. Execution Slice Backlog
 
 | Slice ID | Story ID | Title | Summary | Target Area | Lane | Validation | Planned Action | Depends On | Slice Ready |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| CAM-02-trace-artifact-lineage | CAM-02 | Build the cross-artifact trace command | Add a lineage graph helper, parse planning traceability docs, expose targeted and summary trace output, and ship the `trace-artifacts` skill with tests and docs. | `skills/trace-artifacts/`, `skills/audit-artifacts/scripts/artifact_inventory.py`, planning traceability parsing | primary | `pytest -q skills/trace-artifacts/tests/test_trace_artifacts.py` and `pytest -q` | create slice |  | yes |
+| tat-trace-artifact-lineage | CAM-02 | Build the cross-artifact trace command | Add a lineage graph helper, parse planning traceability docs, expose targeted and summary trace output, and ship the `trace-artifacts` skill with tests and docs. | `skills/trace-artifacts/`, `skills/audit-artifacts/scripts/artifact_inventory.py`, planning traceability parsing | primary | `pytest -q skills/trace-artifacts/tests/test_trace_artifacts.py` and `pytest -q` | create slice |  | yes |
 
 ## 5. Dependency Notes
 
@@ -47,11 +47,11 @@
 
 ## 6. Bootstrap Order
 
-1. CAM-02-trace-artifact-lineage
+1. tat-trace-artifact-lineage
 
 ## 7. Review Notes
 
-- Review outcome: Ready for `slice` with `CAM-02-trace-artifact-lineage`.
+- Review outcome: Ready for `slice` with `tat-trace-artifact-lineage`.
 - Blocking findings: none. The design stays read-only, reuses the shared
   inventory helper, and limits lineage edges to durable repo signals.
 - Handoff note: keep planned slices as typed graph nodes and parse

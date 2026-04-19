@@ -4,7 +4,7 @@
 
 - Story: `CAM-04` — repair artifact drift
 - Increment: `I1`
-- Planned slice: `CAM-04-registry-drift-repair`
+- Planned slice: `rpr-registry-drift-repair`
 - Value: one conservative repair command that previews and optionally rebuilds
   active registry/readme artifacts from durable directories plus valid metadata.
 

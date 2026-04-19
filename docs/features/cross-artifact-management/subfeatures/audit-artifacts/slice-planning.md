@@ -24,13 +24,13 @@
 
 | Increment | Goal / User-Visible Value | Included Story IDs | Planned Slice IDs | Demo / Verification Outcome | Notes |
 | --- | --- | --- | --- | --- | --- |
-| I1 | Audit the repo's durable workflow packets in one command | CAM-01 | CAM-01-cross-artifact-audit | A maintainer can run one audit command and see missing files, registry drift, broken links, and slice relation issues in one report. | Simplest usable path |
+| I1 | Audit the repo's durable workflow packets in one command | CAM-01 | aat-cross-artifact-audit | A maintainer can run one audit command and see missing files, registry drift, broken links, and slice relation issues in one report. | Simplest usable path |
 
 ## 4. Execution Slice Backlog
 
 | Slice ID | Story ID | Title | Summary | Target Area | Lane | Validation | Planned Action | Depends On | Slice Ready |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| CAM-01-cross-artifact-audit | CAM-01 | Build the cross-artifact audit command | Add a reusable artifact inventory helper, delegate owner-script validation, audit registry/link drift, and ship the `audit-artifacts` skill with tests and docs. | `skills/audit-artifacts/`, shared artifact inventory helper, owner-script integration points | primary | `pytest -q skills/audit-artifacts/tests/test_audit_artifacts.py` and `pytest -q` | create slice |  | yes |
+| aat-cross-artifact-audit | CAM-01 | Build the cross-artifact audit command | Add a reusable artifact inventory helper, delegate owner-script validation, audit registry/link drift, and ship the `audit-artifacts` skill with tests and docs. | `skills/audit-artifacts/`, shared artifact inventory helper, owner-script integration points | primary | `pytest -q skills/audit-artifacts/tests/test_audit_artifacts.py` and `pytest -q` | create slice |  | yes |
 
 ## 5. Dependency Notes
 
@@ -47,11 +47,11 @@
 
 ## 6. Bootstrap Order
 
-1. CAM-01-cross-artifact-audit
+1. aat-cross-artifact-audit
 
 ## 7. Review Notes
 
-- Review outcome: Ready for `slice` with `CAM-01-cross-artifact-audit`.
+- Review outcome: Ready for `slice` with `aat-cross-artifact-audit`.
 - Blocking findings: none. The planning packet keeps artifact-specific
   validation in the existing owner scripts and limits new work to the shared
   inventory plus cross-artifact checks.

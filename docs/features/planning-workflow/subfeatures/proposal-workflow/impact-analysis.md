@@ -30,11 +30,11 @@ planning workflow without treating proposal instances as canonical features.
 
 ## Candidate Affected Slice IDs
 
-- `PFW-01-proposal-registry`
-- `PFW-02-guide-routing`
-- `PFW-03-proposal-lifecycle`
-- `PFW-04-proposal-promotion`
-- `PFW-05-config-support`
+- `pfw-proposal-registry`
+- `pfw-guide-routing`
+- `pfw-proposal-lifecycle`
+- `pfw-proposal-promotion`
+- `pfw-config-support`
 
 ## Impact Notes
 

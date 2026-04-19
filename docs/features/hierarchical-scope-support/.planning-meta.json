@@ -6,6 +6,6 @@
   "requires_ui_flow": false,
   "review_note": "Reviewed discovery, design, and breakdown artifacts; scope model, sequencing, and validation plan are coherent and ready for slice bootstrap.",
   "ready_slice_ids": [
-    "HSS-01-root-fallback"
+    "hss-root-fallback"
   ]
 }

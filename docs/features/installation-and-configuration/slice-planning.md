@@ -29,20 +29,20 @@
 
 | Increment | Goal / User-Visible Value | Included Story IDs | Planned Slice IDs | Demo / Verification Outcome | Notes |
 | --- | --- | --- | --- | --- | --- |
-| I1 | Managed repo setup works out of the box | IC-01, IC-02 | IC-01-install, IC-02-planning-config, IC-02-execution-config | A project can install the shared skills and resolve planning/execution layout from config. | Simplest repository adoption path |
-| I2 | Project conventions stay generic-first | IC-03 | IC-03-conventions-config | Commit, PR, and execution naming behavior can be configured without hardcoding project-specific workflow logic. | Depends on I1 |
-| I3 | Project-local extension boundaries are explicit | IC-04 | IC-04-plugin-convention, IC-04-doc-alignment | A maintainer understands where optional extension scripts/configs live and that core skills read them explicitly. | Depends on I2 |
+| I1 | Managed repo setup works out of the box | IC-01, IC-02 | iac-install, iac-planning-config, iac-execution-config | A project can install the shared skills and resolve planning/execution layout from config. | Simplest repository adoption path |
+| I2 | Project conventions stay generic-first | IC-03 | iac-conventions-config | Commit, PR, and execution naming behavior can be configured without hardcoding project-specific workflow logic. | Depends on I1 |
+| I3 | Project-local extension boundaries are explicit | IC-04 | iac-plugin-convention, iac-doc-alignment | A maintainer understands where optional extension scripts/configs live and that core skills read them explicitly. | Depends on I2 |
 
 ## 4. Execution Slice Backlog
 
 | Slice ID | Story ID | Title | Summary | Target Area | Lane | Validation | Planned Action | Depends On | Slice Ready |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| IC-01-install | IC-01 | Manage installed skill set | Keep `make install` / `make uninstall` aligned with the managed skills list. | `Makefile` | primary | Review install/uninstall targets and managed skill list | create slice |  | yes |
-| IC-02-planning-config | IC-02 | Resolve planning layout from config | Keep `planning.json` semantics explicit and stable. | `skills/guide-planning/scripts/manage_planning.py`, docs | primary | `pytest -q skills/guide-planning/tests/test_manage_planning.py` | create slice | IC-01-install | yes |
-| IC-02-execution-config | IC-02 | Resolve execution layout from config | Keep `execution.json` semantics explicit and stable. | `skills/guide-execution/scripts/manage_execution.py`, docs | primary | `pytest -q skills/guide-execution/tests/test_manage_execution.py` | create slice | IC-02-planning-config | yes |
-| IC-03-conventions-config | IC-03 | Apply repo naming and ID conventions | Keep `conventions.json` as the cross-cutting conventions surface. | `skills/guide-execution/scripts/manage_execution.py`, `skills/commit/SKILL.md`, `skills/create-pr/SKILL.md` | primary | Review config consumers and tests | create slice | IC-02-execution-config | yes |
-| IC-04-plugin-convention | IC-04 | Document project-local plugin behavior | Keep `.skills/plugins/` explicit and opt-in rather than auto-loaded. | `README.md`, `AGENTS.md`, consumer skills | primary | Review docs for explicit plugin loading language | create slice | IC-03-conventions-config | yes |
-| IC-04-doc-alignment | IC-04 | Keep docs aligned with config behavior | Update docs and examples whenever config semantics shift. | `README.md`, `AGENTS.md`, skill docs | primary | Cross-check docs with code readers | create slice | IC-04-plugin-convention | yes |
+| iac-install | IC-01 | Manage installed skill set | Keep `make install` / `make uninstall` aligned with the managed skills list. | `Makefile` | primary | Review install/uninstall targets and managed skill list | create slice |  | yes |
+| iac-planning-config | IC-02 | Resolve planning layout from config | Keep `planning.json` semantics explicit and stable. | `skills/guide-planning/scripts/manage_planning.py`, docs | primary | `pytest -q skills/guide-planning/tests/test_manage_planning.py` | create slice | iac-install | yes |
+| iac-execution-config | IC-02 | Resolve execution layout from config | Keep `execution.json` semantics explicit and stable. | `skills/guide-execution/scripts/manage_execution.py`, docs | primary | `pytest -q skills/guide-execution/tests/test_manage_execution.py` | create slice | iac-planning-config | yes |
+| iac-conventions-config | IC-03 | Apply repo naming and ID conventions | Keep `conventions.json` as the cross-cutting conventions surface. | `skills/guide-execution/scripts/manage_execution.py`, `skills/commit/SKILL.md`, `skills/create-pr/SKILL.md` | primary | Review config consumers and tests | create slice | iac-execution-config | yes |
+| iac-plugin-convention | IC-04 | Document project-local plugin behavior | Keep `.skills/plugins/` explicit and opt-in rather than auto-loaded. | `README.md`, `AGENTS.md`, consumer skills | primary | Review docs for explicit plugin loading language | create slice | iac-conventions-config | yes |
+| iac-doc-alignment | IC-04 | Keep docs aligned with config behavior | Update docs and examples whenever config semantics shift. | `README.md`, `AGENTS.md`, skill docs | primary | Cross-check docs with code readers | create slice | iac-plugin-convention | yes |
 
 ## 5. Dependency Notes
 
@@ -55,10 +55,10 @@
 
 ## 6. Bootstrap Order
 
-1. IC-01-install
-2. IC-02-planning-config, IC-02-execution-config
-3. IC-03-conventions-config
-4. IC-04-plugin-convention, IC-04-doc-alignment
+1. iac-install
+2. iac-planning-config, iac-execution-config
+3. iac-conventions-config
+4. iac-plugin-convention, iac-doc-alignment
 
 ## 7. Open Questions / Stop-and-Ask Items
 
@@ -68,5 +68,5 @@
 
 - Review outcome: Ready for `slice` after selecting the first configuration or installation slice to execute.
 - Blocking findings: none. The install path, config-surface split, and plugin-boundary guidance are coherent across the planning artifacts.
-- Handoff note: begin with `IC-01-install` and keep later config/documentation slices aligned with the documented ownership boundaries.
+- Handoff note: begin with `iac-install` and keep later config/documentation slices aligned with the documented ownership boundaries.
 - Follow-up improvements: if plugin conventions expand, add a more explicit repository example showing how a consumer skill opts into project-local extensions.

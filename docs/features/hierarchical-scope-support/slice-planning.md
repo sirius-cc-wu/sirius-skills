@@ -49,10 +49,10 @@ Use increments to group related slices into small, demonstrable outcomes. Increm
 
 | Increment | Goal / User-Visible Value | Included Story IDs | Planned Slice IDs | Demo / Verification Outcome | Notes |
 | --- | --- | --- | --- | --- | --- |
-| I1 | Scope-aware planning works from root and nested directories | HSS-01, HSS-02, HSS-03 | HSS-01-root-fallback, HSS-02-local-registries, HSS-03-nearest-scope | A maintainer can run planning/proposal commands from a nested scope and get local registries while repo-root behavior still works unchanged. | Simplest end-to-end usable path |
-| I2 | Multi-scope targeting is safe and configurable | HSS-04, HSS-06 | HSS-04-scope-selection, HSS-04-promotion-targeting, HSS-06-config-inheritance | Ambiguous slug lookups stop for explicit scope choice, cross-scope promotion requires explicit targeting, and child scopes override parent config deterministically. | Depends on I1 |
-| I3 | Execution follows the resolved scope | HSS-06 | HSS-06-scoped-execution | A nested scope can bootstrap and manage slices using its resolved `execution.json`, `conventions.json`, and `slice_dir`. | Depends on I2 |
-| I4 | Users get one scope-aware workflow entrypoint | HSS-05 | HSS-05-guide-scope | `guide-scope` can resolve the active scope and hand off cleanly to planning, execution, or bootstrap flows. | Depends on I3 |
+| I1 | Scope-aware planning works from root and nested directories | HSS-01, HSS-02, HSS-03 | hss-root-fallback, hss-local-registries, hss-nearest-scope | A maintainer can run planning/proposal commands from a nested scope and get local registries while repo-root behavior still works unchanged. | Simplest end-to-end usable path |
+| I2 | Multi-scope targeting is safe and configurable | HSS-04, HSS-06 | hss-scope-selection, hss-promotion-targeting, hss-config-inheritance | Ambiguous slug lookups stop for explicit scope choice, cross-scope promotion requires explicit targeting, and child scopes override parent config deterministically. | Depends on I1 |
+| I3 | Execution follows the resolved scope | HSS-06 | hss-scoped-execution | A nested scope can bootstrap and manage slices using its resolved `execution.json`, `conventions.json`, and `slice_dir`. | Depends on I2 |
+| I4 | Users get one scope-aware workflow entrypoint | HSS-05 | hss-guide-scope | `guide-scope` can resolve the active scope and hand off cleanly to planning, execution, or bootstrap flows. | Depends on I3 |
 
 Rules:
 
@@ -65,14 +65,14 @@ Rules:
 
 | Slice ID | Story ID | Title | Summary | Target Area | Lane | Validation | Planned Action | Depends On | Slice Ready |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| HSS-01-root-fallback | HSS-01 | Add scope runtime with root fallback | Introduce shared scope resolution and preserve current repository-root behavior when no explicit nested scope exists. | shared scope helper, `skills/guide-planning/scripts/manage_planning.py`, `skills/propose/scripts/manage_proposals.py` | primary | `pytest -q skills/guide-planning/tests/test_manage_planning.py skills/propose/tests/test_manage_proposals.py` | create slice |  | yes |
-| HSS-02-local-registries | HSS-02 | Keep planning and proposal registries local to each scope | Resolve feature and proposal roots inside the selected scope instead of assuming one repository-root planning area. | `skills/guide-planning/scripts/manage_planning.py`, `skills/propose/scripts/manage_proposals.py` | primary | `pytest -q skills/guide-planning/tests/test_manage_planning.py skills/propose/tests/test_manage_proposals.py` | create slice | HSS-01-root-fallback | yes |
-| HSS-03-nearest-scope | HSS-03 | Default CLI operations to the nearest enclosing scope | Add nearest-scope resolution for planning and proposal commands when `--scope` is not provided. | shared scope helper, planning/proposal CLI entrypoints | primary | `pytest -q skills/guide-planning/tests/test_manage_planning.py skills/propose/tests/test_manage_proposals.py` | create slice | HSS-01-root-fallback, HSS-02-local-registries | yes |
-| HSS-04-scope-selection | HSS-04 | Require explicit scope selection for ambiguous lookups | Detect multi-scope ambiguity, surface candidate scopes, and fail safely for slug-only lookups. | shared scope helper, planning/proposal lookup helpers | primary | `pytest -q skills/guide-planning/tests/test_manage_planning.py skills/propose/tests/test_manage_proposals.py` | create slice | HSS-03-nearest-scope | yes |
-| HSS-04-promotion-targeting | HSS-04 | Support explicit cross-scope promotion targets | Keep same-scope promotion as default while requiring `--target-scope` when canonical planning should be created elsewhere. | `skills/guide-planning/scripts/manage_planning.py`, `skills/propose/scripts/manage_proposals.py` | primary | `pytest -q skills/guide-planning/tests/test_manage_planning.py skills/propose/tests/test_manage_proposals.py` | create slice | HSS-04-scope-selection | yes |
-| HSS-06-config-inheritance | HSS-06 | Merge parent and child `.skills` config by scope | Load planning, execution, and conventions config from the scope chain with child overrides and preserved unknown keys. | shared scope helper, `skills/bootstrap/`, `skills/guide-planning/`, `skills/propose/`, `skills/guide-execution/` | primary | `pytest -q skills/bootstrap/tests/test_bootstrap.py skills/guide-planning/tests/test_manage_planning.py skills/propose/tests/test_manage_proposals.py skills/guide-execution/tests/test_manage_execution.py` | create slice | HSS-03-nearest-scope | yes |
-| HSS-06-scoped-execution | HSS-06 | Keep slices and execution registries local to the resolved scope | Apply the resolved scope's `execution.json`, `conventions.json`, and `slice_dir` to execution helpers and slice bootstrap. | `skills/guide-execution/scripts/manage_execution.py`, `skills/slice/scripts/bootstrap_slice.py` | primary | `pytest -q skills/guide-execution/tests/test_manage_execution.py skills/slice/tests/test_bootstrap_slice.py` | create slice | HSS-06-config-inheritance | yes |
-| HSS-05-guide-scope | HSS-05 | Add one scope-aware entry skill | Create `guide-scope` and align repo docs and examples around scope discovery, explicit targeting, and workflow handoff. | `skills/guide-scope/`, `README.md`, `SKILLS_METHODOLOGY.md` | primary | review `skills/guide-scope/SKILL.md` handoff examples + `pytest -q skills/guide-planning/tests/test_manage_planning.py skills/guide-execution/tests/test_manage_execution.py` | create slice | HSS-04-promotion-targeting, HSS-06-scoped-execution | yes |
+| hss-root-fallback | HSS-01 | Add scope runtime with root fallback | Introduce shared scope resolution and preserve current repository-root behavior when no explicit nested scope exists. | shared scope helper, `skills/guide-planning/scripts/manage_planning.py`, `skills/propose/scripts/manage_proposals.py` | primary | `pytest -q skills/guide-planning/tests/test_manage_planning.py skills/propose/tests/test_manage_proposals.py` | create slice |  | yes |
+| hss-local-registries | HSS-02 | Keep planning and proposal registries local to each scope | Resolve feature and proposal roots inside the selected scope instead of assuming one repository-root planning area. | `skills/guide-planning/scripts/manage_planning.py`, `skills/propose/scripts/manage_proposals.py` | primary | `pytest -q skills/guide-planning/tests/test_manage_planning.py skills/propose/tests/test_manage_proposals.py` | create slice | hss-root-fallback | yes |
+| hss-nearest-scope | HSS-03 | Default CLI operations to the nearest enclosing scope | Add nearest-scope resolution for planning and proposal commands when `--scope` is not provided. | shared scope helper, planning/proposal CLI entrypoints | primary | `pytest -q skills/guide-planning/tests/test_manage_planning.py skills/propose/tests/test_manage_proposals.py` | create slice | hss-root-fallback, hss-local-registries | yes |
+| hss-scope-selection | HSS-04 | Require explicit scope selection for ambiguous lookups | Detect multi-scope ambiguity, surface candidate scopes, and fail safely for slug-only lookups. | shared scope helper, planning/proposal lookup helpers | primary | `pytest -q skills/guide-planning/tests/test_manage_planning.py skills/propose/tests/test_manage_proposals.py` | create slice | hss-nearest-scope | yes |
+| hss-promotion-targeting | HSS-04 | Support explicit cross-scope promotion targets | Keep same-scope promotion as default while requiring `--target-scope` when canonical planning should be created elsewhere. | `skills/guide-planning/scripts/manage_planning.py`, `skills/propose/scripts/manage_proposals.py` | primary | `pytest -q skills/guide-planning/tests/test_manage_planning.py skills/propose/tests/test_manage_proposals.py` | create slice | hss-scope-selection | yes |
+| hss-config-inheritance | HSS-06 | Merge parent and child `.skills` config by scope | Load planning, execution, and conventions config from the scope chain with child overrides and preserved unknown keys. | shared scope helper, `skills/bootstrap/`, `skills/guide-planning/`, `skills/propose/`, `skills/guide-execution/` | primary | `pytest -q skills/bootstrap/tests/test_bootstrap.py skills/guide-planning/tests/test_manage_planning.py skills/propose/tests/test_manage_proposals.py skills/guide-execution/tests/test_manage_execution.py` | create slice | hss-nearest-scope | yes |
+| hss-scoped-execution | HSS-06 | Keep slices and execution registries local to the resolved scope | Apply the resolved scope's `execution.json`, `conventions.json`, and `slice_dir` to execution helpers and slice bootstrap. | `skills/guide-execution/scripts/manage_execution.py`, `skills/slice/scripts/bootstrap_slice.py` | primary | `pytest -q skills/guide-execution/tests/test_manage_execution.py skills/slice/tests/test_bootstrap_slice.py` | create slice | hss-config-inheritance | yes |
+| hss-guide-scope | HSS-05 | Add one scope-aware entry skill | Create `guide-scope` and align repo docs and examples around scope discovery, explicit targeting, and workflow handoff. | `skills/guide-scope/`, `README.md`, `SKILLS_METHODOLOGY.md` | primary | review `skills/guide-scope/SKILL.md` handoff examples + `pytest -q skills/guide-planning/tests/test_manage_planning.py skills/guide-execution/tests/test_manage_execution.py` | create slice | hss-promotion-targeting, hss-scoped-execution | yes |
 
 ## 5. Dependency Notes
 
@@ -89,14 +89,14 @@ Rules:
 
 ## 6. Bootstrap Order
 
-1. HSS-01-root-fallback
-2. HSS-02-local-registries
-3. HSS-03-nearest-scope
-4. HSS-04-scope-selection
-5. HSS-04-promotion-targeting
-6. HSS-06-config-inheritance
-7. HSS-06-scoped-execution
-8. HSS-05-guide-scope
+1. hss-root-fallback
+2. hss-local-registries
+3. hss-nearest-scope
+4. hss-scope-selection
+5. hss-promotion-targeting
+6. hss-config-inheritance
+7. hss-scoped-execution
+8. hss-guide-scope
 
 ## 7. Open Questions / Stop-and-Ask Items
 
@@ -108,7 +108,7 @@ Rules:
 
 - Review outcome: Ready for `slice` after bootstrapping the first reviewed backlog item from the documented dependency chain.
 - Blocking findings: none. Discovery goals, scope decisions, design contracts, and backlog sequencing are aligned, and the serial-first execution strategy is appropriate for the shared scope runtime.
-- Handoff note: start with `HSS-01-root-fallback`, then preserve the dependency chain through `HSS-06-scoped-execution` before adding `HSS-05-guide-scope`.
+- Handoff note: start with `hss-root-fallback`, then preserve the dependency chain through `hss-scoped-execution` before adding `hss-guide-scope`.
 - Follow-up improvements: if later iterations need broader observability, add a follow-on slice for repository-wide scope discovery/reporting without changing the local-registry ownership model.
 
 ## Notes

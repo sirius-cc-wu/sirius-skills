@@ -26,19 +26,19 @@
 
 | Increment | Goal / User-Visible Value | Included Story IDs | Planned Slice IDs | Demo / Verification Outcome | Notes |
 | --- | --- | --- | --- | --- | --- |
-| I1 | Inspect legacy repos safely | CTSM-01, CTSM-02 | CTSM-01-scan-legacy-layout, CTSM-02-dry-run-reporting | A maintainer can list legacy change packets and preview migration without writes. | Simplest usable path |
-| I2 | Convert legacy change packets into durable subfeatures | CTSM-03 | CTSM-03-metadata-conversion, CTSM-03-path-migration | A feature with old `changes/` packets becomes valid `subfeatures/` output. | Depends on I1 |
-| I3 | Make the capability reusable | CTSM-04 | CTSM-04-skill-docs-and-validation | The migration skill is installed, documented, and covered by tests. | Depends on I2 |
+| I1 | Inspect legacy repos safely | CTSM-01, CTSM-02 | ctsm-scan-legacy-layout, ctsm-dry-run-reporting | A maintainer can list legacy change packets and preview migration without writes. | Simplest usable path |
+| I2 | Convert legacy change packets into durable subfeatures | CTSM-03 | ctsm-metadata-conversion, ctsm-path-migration | A feature with old `changes/` packets becomes valid `subfeatures/` output. | Depends on I1 |
+| I3 | Make the capability reusable | CTSM-04 | ctsm-skill-docs-and-validation | The migration skill is installed, documented, and covered by tests. | Depends on I2 |
 
 ## 4. Execution Slice Backlog
 
 | Slice ID | Story ID | Title | Summary | Target Area | Lane | Validation | Planned Action | Depends On | Slice Ready |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| CTSM-01-scan-legacy-layout | CTSM-01 | Detect legacy change packets | Scan one feature or the whole planning tree for `changes/` folders and report migration candidates and blockers. | `skills/migrate-subfeatures/scripts/migrate_subfeatures.py` | primary | Targeted pytest coverage for scan output | create slice |  | yes |
-| CTSM-02-dry-run-reporting | CTSM-02 | Preview migration without writes | Add `--dry-run` reporting so users can see planned target paths and conflicts safely. | `skills/migrate-subfeatures/scripts/migrate_subfeatures.py` | primary | Targeted pytest coverage for dry-run behavior | create slice | CTSM-01-scan-legacy-layout | yes |
-| CTSM-03-metadata-conversion | CTSM-03 | Convert legacy change metadata | Map `.feature-change-meta.json` and legacy statuses into `.subfeature-meta.json` and `.planning-meta.json`. | `skills/migrate-subfeatures/scripts/migrate_subfeatures.py`, migration tests | primary | Pytest coverage for status/type/metadata mapping | create slice | CTSM-02-dry-run-reporting | yes |
-| CTSM-03-path-migration | CTSM-03 | Move legacy change artifacts into subfeatures | Move planning artifacts from `changes/<id>/` into `subfeatures/<id>/`, rebuild registries, and remove emptied legacy folders. | `skills/migrate-subfeatures/scripts/migrate_subfeatures.py`, guide-planning integration | primary | Pytest coverage for full migration and conflict handling | create slice | CTSM-03-metadata-conversion | yes |
-| CTSM-04-skill-docs-and-validation | CTSM-04 | Ship the reusable migration skill | Add the skill definition, install wiring, README guidance, and repository validation for the migration capability. | `skills/migrate-subfeatures/`, `Makefile`, `README.md` | primary | `pytest -q` plus targeted migration tests | create slice | CTSM-03-path-migration | yes |
+| ctsm-scan-legacy-layout | CTSM-01 | Detect legacy change packets | Scan one feature or the whole planning tree for `changes/` folders and report migration candidates and blockers. | `skills/migrate-subfeatures/scripts/migrate_subfeatures.py` | primary | Targeted pytest coverage for scan output | create slice |  | yes |
+| ctsm-dry-run-reporting | CTSM-02 | Preview migration without writes | Add `--dry-run` reporting so users can see planned target paths and conflicts safely. | `skills/migrate-subfeatures/scripts/migrate_subfeatures.py` | primary | Targeted pytest coverage for dry-run behavior | create slice | ctsm-scan-legacy-layout | yes |
+| ctsm-metadata-conversion | CTSM-03 | Convert legacy change metadata | Map `.feature-change-meta.json` and legacy statuses into `.subfeature-meta.json` and `.planning-meta.json`. | `skills/migrate-subfeatures/scripts/migrate_subfeatures.py`, migration tests | primary | Pytest coverage for status/type/metadata mapping | create slice | ctsm-dry-run-reporting | yes |
+| ctsm-path-migration | CTSM-03 | Move legacy change artifacts into subfeatures | Move planning artifacts from `changes/<id>/` into `subfeatures/<id>/`, rebuild registries, and remove emptied legacy folders. | `skills/migrate-subfeatures/scripts/migrate_subfeatures.py`, guide-planning integration | primary | Pytest coverage for full migration and conflict handling | create slice | ctsm-metadata-conversion | yes |
+| ctsm-skill-docs-and-validation | CTSM-04 | Ship the reusable migration skill | Add the skill definition, install wiring, README guidance, and repository validation for the migration capability. | `skills/migrate-subfeatures/`, `Makefile`, `README.md` | primary | `pytest -q` plus targeted migration tests | create slice | ctsm-path-migration | yes |
 
 ## 5. Dependency Notes
 
@@ -51,8 +51,8 @@
 
 ## 6. Bootstrap Order
 
-1. CTSM-01-scan-legacy-layout
-2. CTSM-02-dry-run-reporting
-3. CTSM-03-metadata-conversion
-4. CTSM-03-path-migration
-5. CTSM-04-skill-docs-and-validation
+1. ctsm-scan-legacy-layout
+2. ctsm-dry-run-reporting
+3. ctsm-metadata-conversion
+4. ctsm-path-migration
+5. ctsm-skill-docs-and-validation

@@ -19,7 +19,7 @@
     "CAM-02"
   ],
   "affected_slice_ids": [
-    "CAM-02-trace-artifact-lineage"
+    "tat-trace-artifact-lineage"
   ],
   "review_note": "Planning reviewed: the trace packet is scoped to one read-only lineage slice, reuses the shared inventory helper, and keeps lineage edges limited to durable repo signals.",
   "finalized_at": "2026-04-18T13:36:18"

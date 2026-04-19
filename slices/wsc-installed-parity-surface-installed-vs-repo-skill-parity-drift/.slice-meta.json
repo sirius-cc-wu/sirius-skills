@@ -1,0 +1,10 @@
+{
+  "created_at": "2026-04-19T01:00:46",
+  "updated_at": "2026-04-19T01:16:00",
+  "status": "closed",
+  "slice_id": "wsc-installed-parity",
+  "feature": "Surface installed-vs-repo skill parity drift",
+  "path": "slices/wsc-installed-parity-surface-installed-vs-repo-skill-parity-drift/",
+  "relations": [],
+  "closed_at": "2026-04-19T01:16:00"
+}

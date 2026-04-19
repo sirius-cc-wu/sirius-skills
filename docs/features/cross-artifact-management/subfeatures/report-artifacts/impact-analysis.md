@@ -44,4 +44,4 @@ durable repo signals into a read-only reporting surface.
 ## Story and slice framing
 
 - Parent story: `CAM-03` — report artifact state
-- Planned slice: `CAM-03-artifact-state-report`
+- Planned slice: `rpt-artifact-state-report`

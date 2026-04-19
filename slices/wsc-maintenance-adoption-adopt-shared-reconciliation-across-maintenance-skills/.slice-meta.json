@@ -1,0 +1,10 @@
+{
+  "created_at": "2026-04-19T00:01:19",
+  "updated_at": "2026-04-19T00:24:08",
+  "status": "closed",
+  "slice_id": "wsc-maintenance-adoption",
+  "feature": "Adopt shared reconciliation across maintenance skills",
+  "path": "slices/wsc-maintenance-adoption-adopt-shared-reconciliation-across-maintenance-skills/",
+  "relations": [],
+  "closed_at": "2026-04-19T00:24:08"
+}

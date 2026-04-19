@@ -37,10 +37,10 @@ committing each completed slice separately.
 
 ## Candidate Affected Slice IDs
 
-- `EW-MSE-01-scope-and-backlog-resolution`
-- `EW-MSE-02-sequential-slice-orchestration`
-- `EW-MSE-03-stop-and-resume-semantics`
-- `EW-MSE-04-per-slice-commit-checkpoints`
+- `mse-scope-and-backlog-resolution`
+- `mse-sequential-slice-orchestration`
+- `mse-stop-and-resume-semantics`
+- `mse-per-slice-commit-checkpoints`
 
 ## Impact Notes
 

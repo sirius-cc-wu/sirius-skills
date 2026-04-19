@@ -14,7 +14,7 @@
     "docs/features/installation-and-configuration/slice-traceability.md",
     "Makefile",
     "docs/features/workflow-state-consistency/system-design.md",
-    "slices/WSC-02-maintenance-adoption-adopt-shared-reconciliation-across-maintenance-skills/blueprint.md"
+    "slices/wsc-maintenance-adoption-adopt-shared-reconciliation-across-maintenance-skills/blueprint.md"
   ],
   "affected_story_ids": [
     "IC-01",
@@ -23,12 +23,12 @@
     "IC-04"
   ],
   "affected_slice_ids": [
-    "IC-01-install",
-    "IC-02-planning-config",
-    "IC-02-execution-config",
-    "IC-03-conventions-config",
-    "IC-04-plugin-convention",
-    "IC-04-doc-alignment"
+    "iac-install",
+    "iac-planning-config",
+    "iac-execution-config",
+    "iac-conventions-config",
+    "iac-plugin-convention",
+    "iac-doc-alignment"
   ],
   "review_note": "Planning reviewed: generic install-local versus install-packaged naming is coherent, install stays a compatibility alias for the first rollout, and local skill-home selection remains a helper/Makefile override instead of a new durable config surface.",
   "finalized_at": "2026-04-19T11:16:05"

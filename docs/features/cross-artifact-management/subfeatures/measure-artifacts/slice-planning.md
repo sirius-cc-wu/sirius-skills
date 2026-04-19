@@ -84,8 +84,8 @@ Increment 1 should usually be the simplest end-to-end usable path.
 
 | Increment | Goal / User-Visible Value | Included Story IDs | Planned Slice IDs | Demo / Verification Outcome | Notes |
 | --- | --- | --- | --- | --- | --- |
-| I1 | First durable implementation-evidence packet | CAM-06 | CAM-06-metrics-foundation | A maintainer can compute and persist story-size, slice-count, execution-mode, and explicit churn availability in `implementation-metrics.json`. | Establishes the sidecar model and reusable measurement engine without changing other skills yet. |
-| I2 | Metrics become reusable workflow signals | CAM-06 | CAM-06-metrics-consumers | A maintainer can run `measure-artifacts` directly and see persisted metrics reused by reporting output when present. | Finishes the user-facing skill wiring and consumer integration. |
+| I1 | First durable implementation-evidence packet | CAM-06 | mea-metrics-foundation | A maintainer can compute and persist story-size, slice-count, execution-mode, and explicit churn availability in `implementation-metrics.json`. | Establishes the sidecar model and reusable measurement engine without changing other skills yet. |
+| I2 | Metrics become reusable workflow signals | CAM-06 | mea-metrics-consumers | A maintainer can run `measure-artifacts` directly and see persisted metrics reused by reporting output when present. | Finishes the user-facing skill wiring and consumer integration. |
 
 Rules:
 
@@ -100,12 +100,12 @@ Rules:
 
 | Slice ID | Story ID | Title | Summary | Target Area | Lane | Validation | Planned Action | Depends On | Slice Ready |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| CAM-06-metrics-foundation | CAM-06 | Build metrics record and sidecar engine | Add the reusable metrics schema, story-size and slice-count derivation, execution-mode classification, and deterministic `implementation-metrics.json` read/write behavior with explicit unavailable churn handling. | `skills/measure-artifacts`, shared metric helpers, planning/execution artifact readers | primary | `pytest -q skills/measure-artifacts/tests/test_measure_artifacts.py` | create slice |  | yes |
-| CAM-06-metrics-consumers | CAM-06 | Wire measure-artifacts skill and reporting consumers | Add the `measure-artifacts` skill wrapper/CLI, JSON/text output, persistence mode, and read-only consumption hooks for `report-artifacts` without changing lifecycle ownership; leave archive-facing display as a later follow-up once persisted metrics prove stable. | `skills/measure-artifacts`, `skills/report-artifacts`, docs/tests | primary | `pytest -q skills/measure-artifacts/tests/test_measure_artifacts.py && pytest -q skills/report-artifacts/tests/test_report_artifacts.py` | create slice | CAM-06-metrics-foundation | yes |
+| mea-metrics-foundation | CAM-06 | Build metrics record and sidecar engine | Add the reusable metrics schema, story-size and slice-count derivation, execution-mode classification, and deterministic `implementation-metrics.json` read/write behavior with explicit unavailable churn handling. | `skills/measure-artifacts`, shared metric helpers, planning/execution artifact readers | primary | `pytest -q skills/measure-artifacts/tests/test_measure_artifacts.py` | create slice |  | yes |
+| mea-metrics-consumers | CAM-06 | Wire measure-artifacts skill and reporting consumers | Add the `measure-artifacts` skill wrapper/CLI, JSON/text output, persistence mode, and read-only consumption hooks for `report-artifacts` without changing lifecycle ownership; leave archive-facing display as a later follow-up once persisted metrics prove stable. | `skills/measure-artifacts`, `skills/report-artifacts`, docs/tests | primary | `pytest -q skills/measure-artifacts/tests/test_measure_artifacts.py && pytest -q skills/report-artifacts/tests/test_report_artifacts.py` | create slice | mea-metrics-foundation | yes |
 
 ## 5. Dependency Notes
 
-- Critical path: `CAM-06-metrics-foundation -> CAM-06-metrics-consumers`
+- Critical path: `mea-metrics-foundation -> mea-metrics-consumers`
 - Explicit blockers: consumer integration depends on the sidecar schema and
   derivation engine being stable first
 - Parallel-safe slices: none; the second slice consumes the interfaces created by
@@ -121,13 +121,13 @@ Rules:
 
 ## 6. Bootstrap Order
 
-1. `CAM-06-metrics-foundation`
-2. `CAM-06-metrics-consumers`
+1. `mea-metrics-foundation`
+2. `mea-metrics-consumers`
 
 ## 7. Review Notes
 
 - Review outcome: Ready for human approval, planning commit, and later `slice`
-  bootstrap beginning with `CAM-06-metrics-foundation`.
+  bootstrap beginning with `mea-metrics-foundation`.
 - Blocking findings: none. Discovery intent, impact scope, sidecar ownership,
   evidence-source rules, and the two-slice breakdown are now aligned.
 - Review resolution: `I2` should integrate persisted metrics into

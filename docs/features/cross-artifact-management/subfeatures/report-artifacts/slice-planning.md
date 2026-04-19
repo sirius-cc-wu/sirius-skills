@@ -4,7 +4,7 @@
 
 - Story: `CAM-03` — report artifact state
 - Increment: `I1`
-- Planned slice: `CAM-03-artifact-state-report`
+- Planned slice: `rpt-artifact-state-report`
 - Value: one read-only reporting command that summarizes operational workflow
   state across proposals, features, subfeatures, and slices.
 

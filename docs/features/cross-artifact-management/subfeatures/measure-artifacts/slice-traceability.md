@@ -31,8 +31,8 @@ ownership outside repository planning artifacts.
 
 | Story ID | Story Size | Story Summary | Increments | Planned Slice IDs | Slice Areas | Blocked By | Execution Slice IDs | Notes |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| CAM-06 | L | Record durable implementation metrics and workflow evidence for completed features and subfeatures | I1 | CAM-06-metrics-foundation | Metrics schema and sidecar storage, artifact-derived evidence engine |  | CAM-06-metrics-foundation | Foundation slice for the reusable evidence model and deterministic sidecar persistence |
-| CAM-06 | L | Record durable implementation metrics and workflow evidence for completed features and subfeatures | I2 | CAM-06-metrics-consumers | Skill CLI, reporting integration | CAM-06-metrics-foundation | CAM-06-metrics-consumers | Consumer slice depends on the foundation interfaces and keeps archive-facing display out of the initial rollout |
+| CAM-06 | L | Record durable implementation metrics and workflow evidence for completed features and subfeatures | I1 | mea-metrics-foundation | Metrics schema and sidecar storage, artifact-derived evidence engine |  | mea-metrics-foundation | Foundation slice for the reusable evidence model and deterministic sidecar persistence |
+| CAM-06 | L | Record durable implementation metrics and workflow evidence for completed features and subfeatures | I2 | mea-metrics-consumers | Skill CLI, reporting integration | mea-metrics-foundation | mea-metrics-consumers | Consumer slice depends on the foundation interfaces and keeps archive-facing display out of the initial rollout |
 
 ## Notes
 

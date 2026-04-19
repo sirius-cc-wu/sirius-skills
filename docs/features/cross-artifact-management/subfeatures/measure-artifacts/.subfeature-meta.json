@@ -20,8 +20,8 @@
     "CAM-06"
   ],
   "affected_slice_ids": [
-    "CAM-06-metrics-foundation",
-    "CAM-06-metrics-consumers"
+    "mea-metrics-foundation",
+    "mea-metrics-consumers"
   ],
   "review_note": "Planning reviewed: the measurement packet keeps metrics in a dedicated sidecar, splits evidence foundation from reporting consumption, and defers archive-facing display until a later follow-up.",
   "finalized_at": "2026-04-18T13:36:19"

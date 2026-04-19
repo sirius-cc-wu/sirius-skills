@@ -91,7 +91,7 @@ Recommended CLI shape:
 ```bash
 python3 skills/trace-artifacts/scripts/trace_artifacts.py
 python3 skills/trace-artifacts/scripts/trace_artifacts.py --artifact-type proposal --artifact-id checkout-audit
-python3 skills/trace-artifacts/scripts/trace_artifacts.py --artifact-type planned-slice --artifact-id CAM-01-cross-artifact-audit --json
+python3 skills/trace-artifacts/scripts/trace_artifacts.py --artifact-type planned-slice --artifact-id aat-cross-artifact-audit --json
 ```
 
 ### 4. Ownership boundaries

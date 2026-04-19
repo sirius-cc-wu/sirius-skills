@@ -10,7 +10,7 @@
 
 | Story ID | Story Size | Story Summary | Increments | Planned Slice IDs | Slice Areas | Blocked By | Execution Slice IDs | Notes |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| CAM-04 | M | Repair registry and readme drift from durable artifact metadata | I1 | CAM-04-registry-drift-repair | Rebuilt rows, dry-run repair plans, apply mode, skill/docs/tests |  | CAM-04-registry-drift-repair | One conservative slice focused on active registry regeneration |
+| CAM-04 | M | Repair registry and readme drift from durable artifact metadata | I1 | rpr-registry-drift-repair | Rebuilt rows, dry-run repair plans, apply mode, skill/docs/tests |  | rpr-registry-drift-repair | One conservative slice focused on active registry regeneration |
 
 ## Notes
 

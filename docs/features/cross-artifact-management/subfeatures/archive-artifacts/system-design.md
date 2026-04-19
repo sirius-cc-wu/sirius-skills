@@ -46,7 +46,7 @@ One result shape should power:
 ```bash
 python3 skills/archive-artifacts/scripts/archive_artifacts.py
 python3 skills/archive-artifacts/scripts/archive_artifacts.py --artifact-type proposal
-python3 skills/archive-artifacts/scripts/archive_artifacts.py --artifact-type slice --artifact-id CAM-03-artifact-state-report --apply
+python3 skills/archive-artifacts/scripts/archive_artifacts.py --artifact-type slice --artifact-id rpt-artifact-state-report --apply
 python3 skills/archive-artifacts/scripts/archive_artifacts.py --json
 ```
 

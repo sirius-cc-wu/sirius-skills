@@ -29,21 +29,21 @@
 
 | Increment | Goal / User-Visible Value | Included Story IDs | Planned Slice IDs | Demo / Verification Outcome | Notes |
 | --- | --- | --- | --- | --- | --- |
-| I1 | Local users can install the repo skills without packaging them | SIM-01 | SIM-01-local-helper, SIM-01-local-docs | A contributor can run a source-linked local install helper and see repo skills discovered through symlinks in the target skill home. | Simplest end-to-end path |
-| I2 | Packaged install remains available but becomes explicit | SIM-02 | SIM-02-packaged-targets, SIM-02-packaged-compat | The repo exposes separate local and packaged install commands without silently dropping the old path. | Depends on I1 |
-| I3 | Packaging-only runtime sync and parity are clear | SIM-03, SIM-04 | SIM-03-runtime-scope, SIM-03-parity-scope, SIM-04-migration-guidance | Local maintenance flows stop assuming copied installs, while packaged/release validation still works. | Depends on I2 |
+| I1 | Local users can install the repo skills without packaging them | SIM-01 | sim-local-helper, sim-local-docs | A contributor can run a source-linked local install helper and see repo skills discovered through symlinks in the target skill home. | Simplest end-to-end path |
+| I2 | Packaged install remains available but becomes explicit | SIM-02 | sim-packaged-targets, sim-packaged-compat | The repo exposes separate local and packaged install commands without silently dropping the old path. | Depends on I1 |
+| I3 | Packaging-only runtime sync and parity are clear | SIM-03, SIM-04 | sim-runtime-scope, sim-parity-scope, sim-migration-guidance | Local maintenance flows stop assuming copied installs, while packaged/release validation still works. | Depends on I2 |
 
 ## 4. Execution Slice Backlog
 
 | Slice ID | Story ID | Title | Summary | Target Area | Lane | Validation | Planned Action | Depends On | Slice Ready |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| SIM-01-local-helper | SIM-01 | Add source-linked local install helper | Create deterministic `install-local` and `uninstall-local` helpers that manage per-skill symlinks under the target skill home without touching unrelated skills. | `Makefile`, new install helper under `scripts/` | primary | Helper-focused tests plus a dry-run or fixture-based symlink refresh check | create slice |  | yes |
-| SIM-01-local-docs | SIM-01 | Document the source-linked local install path | Update README and install guidance so local CLI usage clearly points at the source-linked workflow. | `README.md`, `AGENTS.md`, install docs | primary | Review docs against helper behavior and one local install example | create slice | SIM-01-local-helper | yes |
-| SIM-02-packaged-targets | SIM-02 | Split local and packaged install targets | Rename or alias Make targets so packaged install/uninstall becomes an explicit mode distinct from source-linked local install. | `Makefile` | primary | Review target behavior plus fixture or smoke coverage for target selection | create slice | SIM-01-local-helper | yes |
-| SIM-02-packaged-compat | SIM-02 | Preserve packaged install compatibility during migration | Keep the existing packaged path working while documenting the compatibility phase and future default flip. | `Makefile`, packaging docs, helper scripts | primary | Validate packaged install helpers still call the required sync steps and managed packaging flow | create slice | SIM-02-packaged-targets | yes |
-| SIM-03-runtime-scope | SIM-03 | Scope shared-runtime sync to packaged installs | Remove shared-runtime sync from the local install path and keep it only in packaged/export flows that still rely on copied runtime files. | `Makefile`, `scripts/sync_shared_skill_runtime.py`, maintenance-skill packaging assumptions | primary | Packaged regression tests for self-contained runtime imports plus local helper smoke checks | create slice | SIM-02-packaged-compat | yes |
-| SIM-03-parity-scope | SIM-03 | Re-scope installed parity to packaged validation | Narrow parity and related maintenance output so repo-local usage no longer treats copied installs as the default runtime contract. | `lib/workflow_state/`, maintenance skill entrypoints, tests | primary | `pytest -q skills/audit-artifacts/tests/test_audit_artifacts.py skills/report-artifacts/tests/test_report_artifacts.py` plus explicit packaged-parity fixture coverage | create slice | SIM-03-runtime-scope | yes |
-| SIM-04-migration-guidance | SIM-04 | Publish the migration path and operator guidance | Add durable guidance for moving from the current `make install` behavior to the split local-versus-packaged model. | `README.md`, feature docs, migration notes | primary | Cross-check docs against final Make targets and helper behavior | create slice | SIM-03-parity-scope | yes |
+| sim-local-helper | SIM-01 | Add source-linked local install helper | Create deterministic `install-local` and `uninstall-local` helpers that manage per-skill symlinks under the target skill home without touching unrelated skills. | `Makefile`, new install helper under `scripts/` | primary | Helper-focused tests plus a dry-run or fixture-based symlink refresh check | create slice |  | yes |
+| sim-local-docs | SIM-01 | Document the source-linked local install path | Update README and install guidance so local CLI usage clearly points at the source-linked workflow. | `README.md`, `AGENTS.md`, install docs | primary | Review docs against helper behavior and one local install example | create slice | sim-local-helper | yes |
+| sim-packaged-targets | SIM-02 | Split local and packaged install targets | Rename or alias Make targets so packaged install/uninstall becomes an explicit mode distinct from source-linked local install. | `Makefile` | primary | Review target behavior plus fixture or smoke coverage for target selection | create slice | sim-local-helper | yes |
+| sim-packaged-compat | SIM-02 | Preserve packaged install compatibility during migration | Keep the existing packaged path working while documenting the compatibility phase and future default flip. | `Makefile`, packaging docs, helper scripts | primary | Validate packaged install helpers still call the required sync steps and managed packaging flow | create slice | sim-packaged-targets | yes |
+| sim-runtime-scope | SIM-03 | Scope shared-runtime sync to packaged installs | Remove shared-runtime sync from the local install path and keep it only in packaged/export flows that still rely on copied runtime files. | `Makefile`, `scripts/sync_shared_skill_runtime.py`, maintenance-skill packaging assumptions | primary | Packaged regression tests for self-contained runtime imports plus local helper smoke checks | create slice | sim-packaged-compat | yes |
+| sim-parity-scope | SIM-03 | Re-scope installed parity to packaged validation | Narrow parity and related maintenance output so repo-local usage no longer treats copied installs as the default runtime contract. | `lib/workflow_state/`, maintenance skill entrypoints, tests | primary | `pytest -q skills/audit-artifacts/tests/test_audit_artifacts.py skills/report-artifacts/tests/test_report_artifacts.py` plus explicit packaged-parity fixture coverage | create slice | sim-runtime-scope | yes |
+| sim-migration-guidance | SIM-04 | Publish the migration path and operator guidance | Add durable guidance for moving from the current `make install` behavior to the split local-versus-packaged model. | `README.md`, feature docs, migration notes | primary | Cross-check docs against final Make targets and helper behavior | create slice | sim-parity-scope | yes |
 
 ## 5. Dependency Notes
 
@@ -59,13 +59,13 @@
 
 ## 6. Bootstrap Order
 
-1. SIM-01-local-helper
-2. SIM-01-local-docs
-3. SIM-02-packaged-targets
-4. SIM-02-packaged-compat
-5. SIM-03-runtime-scope
-6. SIM-03-parity-scope
-7. SIM-04-migration-guidance
+1. sim-local-helper
+2. sim-local-docs
+3. sim-packaged-targets
+4. sim-packaged-compat
+5. sim-runtime-scope
+6. sim-parity-scope
+7. sim-migration-guidance
 
 ## 7. Open Questions / Stop-and-Ask Items
 

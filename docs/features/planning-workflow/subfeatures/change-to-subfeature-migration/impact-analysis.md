@@ -69,7 +69,7 @@ The migration needs to regenerate:
 
 ### Planned Slice IDs
 
-- `CTSM-01-scan-legacy-layout`
+- `ctsm-scan-legacy-layout`
 - `CTSM-02-migrate-change-packets`
 - `CTSM-03-docs-and-install`
 

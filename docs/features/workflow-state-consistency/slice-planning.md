@@ -48,9 +48,9 @@ Use increments to group related slices into small, demonstrable outcomes. Increm
 
 | Increment | Goal / User-Visible Value | Included Story IDs | Planned Slice IDs | Demo / Verification Outcome | Notes |
 | --- | --- | --- | --- | --- | --- |
-| I1 | Maintenance skills share one canonical workflow-state interpretation | WSC-02 | WSC-02-shared-library, WSC-02-maintenance-adoption | Audit, trace, repair, and report agree on the same fixture-repo linkage findings in targeted tests. | Simplest end-to-end usable path and foundation for all later guardrails |
-| I2 | Maintainers can preview semantic drift and lifecycle owners surface it during transitions | WSC-01, WSC-03 | WSC-03-semantic-preview, WSC-01-transition-guardrails | Repair/report preview separates semantic drift from derived drift, and close/finalize flows warn or block on the same high-confidence findings. | Depends on I1 |
-| I3 | Repo owners can detect stale installed behavior and enforce consistency in automation | WSC-04, WSC-05 | WSC-04-installed-parity, WSC-05-validation-hooks | Installed-vs-repo mismatches become visible, and repeatable validation fails on fixture-backed workflow drift. | Depends on I2 |
+| I1 | Maintenance skills share one canonical workflow-state interpretation | WSC-02 | wsc-shared-library, wsc-maintenance-adoption | Audit, trace, repair, and report agree on the same fixture-repo linkage findings in targeted tests. | Simplest end-to-end usable path and foundation for all later guardrails |
+| I2 | Maintainers can preview semantic drift and lifecycle owners surface it during transitions | WSC-01, WSC-03 | wsc-semantic-preview, wsc-transition-guardrails | Repair/report preview separates semantic drift from derived drift, and close/finalize flows warn or block on the same high-confidence findings. | Depends on I1 |
+| I3 | Repo owners can detect stale installed behavior and enforce consistency in automation | WSC-04, WSC-05 | wsc-installed-parity, wsc-validation-hooks | Installed-vs-repo mismatches become visible, and repeatable validation fails on fixture-backed workflow drift. | Depends on I2 |
 
 Rules:
 
@@ -63,12 +63,12 @@ Rules:
 
 | Slice ID | Story ID | Title | Summary | Target Area | Lane | Validation | Planned Action | Depends On | Slice Ready |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| WSC-02-shared-library | WSC-02 | Create shared workflow-state library | Introduce the canonical repo-local workflow-state package for normalized models, artifact inventory, traceability parsing, reconciliation, transition helpers, and parity primitives without changing writer ownership. | `lib/workflow_state/`, `skills/audit-artifacts/`, `skills/trace-artifacts/` | primary | `pytest -q skills/audit-artifacts/tests/test_audit_artifacts.py skills/trace-artifacts/tests/test_trace_artifacts.py` | create slice |  | yes |
-| WSC-02-maintenance-adoption | WSC-02 | Adopt shared reconciliation across maintenance skills | Move audit, trace, repair, and report wrappers onto the shared workflow-state interfaces, and wire managed install/package sync so self-contained installed skills receive the shared library deterministically. | `skills/audit-artifacts/`, `skills/trace-artifacts/`, `skills/repair-artifacts/`, `skills/report-artifacts/`, `Makefile` | primary | `pytest -q skills/audit-artifacts/tests/test_audit_artifacts.py skills/trace-artifacts/tests/test_trace_artifacts.py skills/repair-artifacts/tests/test_repair_artifacts.py skills/report-artifacts/tests/test_report_artifacts.py` plus a managed install/package artifact check for the synced shared library | create slice | WSC-02-shared-library | yes |
-| WSC-03-semantic-preview | WSC-03 | Add preview-only semantic drift reporting | Extend maintenance output so semantic metadata drift is previewed separately from derived registry/readme rebuild work and can be reviewed safely before any owner-mediated write path. | `skills/repair-artifacts/`, `skills/report-artifacts/` | primary | `pytest -q skills/repair-artifacts/tests/test_repair_artifacts.py skills/report-artifacts/tests/test_report_artifacts.py` | create slice | WSC-02-maintenance-adoption | yes |
-| WSC-01-transition-guardrails | WSC-01 | Add high-confidence transition consistency checks | Wire shared transition checks into planning, subfeature, execution, and close/finalize owners so obvious stale-state mutations surface immediately and deterministically. | `skills/guide-planning/`, `skills/add-subfeature/`, `skills/guide-execution/`, `skills/close-slice/` | primary | `pytest -q skills/guide-planning/tests/test_manage_planning.py skills/add-subfeature/tests/test_manage_subfeatures.py skills/guide-execution/tests/test_manage_execution.py skills/close-slice/tests/test_close_slice.py` | create slice | WSC-03-semantic-preview | yes |
-| WSC-04-installed-parity | WSC-04 | Surface installed-vs-repo skill parity drift | Add one shared parity inspection path surfaced through existing maintenance commands and shared output fields so maintainers can tell when active installed maintenance-skill behavior no longer matches the checked-in repo source. | `lib/workflow_state/parity.py`, maintenance skill entrypoints, `Makefile` | primary | `pytest -q skills/audit-artifacts/tests/test_audit_artifacts.py skills/report-artifacts/tests/test_report_artifacts.py` and a parity output check against a stale-install fixture or staged package copy | create slice | WSC-02-shared-library | yes |
-| WSC-05-validation-hooks | WSC-05 | Add repeatable workflow consistency validation hooks | Turn the stabilized read-only reconciliation checks into a repeatable validation entrypoint suitable for CI and maintainer reruns against fixture-backed drift cases. | `Makefile`, `skills/audit-artifacts/`, `skills/report-artifacts/` | primary | `pytest -q skills/audit-artifacts/tests/test_audit_artifacts.py skills/report-artifacts/tests/test_report_artifacts.py skills/guide-planning/tests/test_manage_planning.py skills/close-slice/tests/test_close_slice.py` | create slice | WSC-01-transition-guardrails, WSC-04-installed-parity | yes |
+| wsc-shared-library | WSC-02 | Create shared workflow-state library | Introduce the canonical repo-local workflow-state package for normalized models, artifact inventory, traceability parsing, reconciliation, transition helpers, and parity primitives without changing writer ownership. | `lib/workflow_state/`, `skills/audit-artifacts/`, `skills/trace-artifacts/` | primary | `pytest -q skills/audit-artifacts/tests/test_audit_artifacts.py skills/trace-artifacts/tests/test_trace_artifacts.py` | create slice |  | yes |
+| wsc-maintenance-adoption | WSC-02 | Adopt shared reconciliation across maintenance skills | Move audit, trace, repair, and report wrappers onto the shared workflow-state interfaces, and wire managed install/package sync so self-contained installed skills receive the shared library deterministically. | `skills/audit-artifacts/`, `skills/trace-artifacts/`, `skills/repair-artifacts/`, `skills/report-artifacts/`, `Makefile` | primary | `pytest -q skills/audit-artifacts/tests/test_audit_artifacts.py skills/trace-artifacts/tests/test_trace_artifacts.py skills/repair-artifacts/tests/test_repair_artifacts.py skills/report-artifacts/tests/test_report_artifacts.py` plus a managed install/package artifact check for the synced shared library | create slice | wsc-shared-library | yes |
+| wsc-semantic-preview | WSC-03 | Add preview-only semantic drift reporting | Extend maintenance output so semantic metadata drift is previewed separately from derived registry/readme rebuild work and can be reviewed safely before any owner-mediated write path. | `skills/repair-artifacts/`, `skills/report-artifacts/` | primary | `pytest -q skills/repair-artifacts/tests/test_repair_artifacts.py skills/report-artifacts/tests/test_report_artifacts.py` | create slice | wsc-maintenance-adoption | yes |
+| wsc-transition-guardrails | WSC-01 | Add high-confidence transition consistency checks | Wire shared transition checks into planning, subfeature, execution, and close/finalize owners so obvious stale-state mutations surface immediately and deterministically. | `skills/guide-planning/`, `skills/add-subfeature/`, `skills/guide-execution/`, `skills/close-slice/` | primary | `pytest -q skills/guide-planning/tests/test_manage_planning.py skills/add-subfeature/tests/test_manage_subfeatures.py skills/guide-execution/tests/test_manage_execution.py skills/close-slice/tests/test_close_slice.py` | create slice | wsc-semantic-preview | yes |
+| wsc-installed-parity | WSC-04 | Surface installed-vs-repo skill parity drift | Add one shared parity inspection path surfaced through existing maintenance commands and shared output fields so maintainers can tell when active installed maintenance-skill behavior no longer matches the checked-in repo source. | `lib/workflow_state/parity.py`, maintenance skill entrypoints, `Makefile` | primary | `pytest -q skills/audit-artifacts/tests/test_audit_artifacts.py skills/report-artifacts/tests/test_report_artifacts.py` and a parity output check against a stale-install fixture or staged package copy | create slice | wsc-shared-library | yes |
+| wsc-validation-hooks | WSC-05 | Add repeatable workflow consistency validation hooks | Turn the stabilized read-only reconciliation checks into a repeatable validation entrypoint suitable for CI and maintainer reruns against fixture-backed drift cases. | `Makefile`, `skills/audit-artifacts/`, `skills/report-artifacts/` | primary | `pytest -q skills/audit-artifacts/tests/test_audit_artifacts.py skills/report-artifacts/tests/test_report_artifacts.py skills/guide-planning/tests/test_manage_planning.py skills/close-slice/tests/test_close_slice.py` | create slice | wsc-transition-guardrails, wsc-installed-parity | yes |
 
 ## 5. Dependency Notes
 
@@ -84,12 +84,12 @@ Rules:
 
 ## 6. Bootstrap Order
 
-1. WSC-02-shared-library
-2. WSC-02-maintenance-adoption
-3. WSC-03-semantic-preview
-4. WSC-01-transition-guardrails
-5. WSC-04-installed-parity
-6. WSC-05-validation-hooks
+1. wsc-shared-library
+2. wsc-maintenance-adoption
+3. wsc-semantic-preview
+4. wsc-transition-guardrails
+5. wsc-installed-parity
+6. wsc-validation-hooks
 
 ## 7. Open Questions / Stop-and-Ask Items
 
@@ -100,7 +100,7 @@ Rules:
 
 - Review outcome: Ready for `slice` after selecting the first reviewed backlog item from the documented dependency chain.
 - Blocking findings: none. Discovery goals, design boundaries, install-time packaging expectations, configuration ownership, and slice sequencing are aligned.
-- Handoff note: start with `WSC-02-shared-library`, then preserve the documented dependency chain through `WSC-05-validation-hooks`; `WSC-02-maintenance-adoption` must include managed install/package sync for self-contained skills.
+- Handoff note: start with `wsc-shared-library`, then preserve the documented dependency chain through `wsc-validation-hooks`; `wsc-maintenance-adoption` must include managed install/package sync for self-contained skills.
 - Follow-up improvements: if parity or CI wiring grows beyond this scope, promote it into a follow-on subfeature instead of widening the first increment.
 
 ## Notes

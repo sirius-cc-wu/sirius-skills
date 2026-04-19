@@ -36,10 +36,10 @@ python3 skills/trace-artifacts/scripts/trace_artifacts.py \
 # Trace one planned or execution slice
 python3 skills/trace-artifacts/scripts/trace_artifacts.py \
   --artifact-type planned-slice \
-  --artifact-id CAM-02-trace-artifact-lineage
+  --artifact-id tat-trace-artifact-lineage
 python3 skills/trace-artifacts/scripts/trace_artifacts.py \
   --artifact-type slice \
-  --artifact-id CAM-02-trace-artifact-lineage
+  --artifact-id tat-trace-artifact-lineage
 
 # Emit machine-readable lineage output
 python3 skills/trace-artifacts/scripts/trace_artifacts.py --json

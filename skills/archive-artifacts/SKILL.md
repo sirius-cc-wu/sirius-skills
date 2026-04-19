@@ -40,7 +40,7 @@ python3 skills/archive-artifacts/scripts/archive_artifacts.py --artifact-type pr
 # Archive one closed slice
 python3 skills/archive-artifacts/scripts/archive_artifacts.py \
   --artifact-type slice \
-  --artifact-id CAM-03-artifact-state-report \
+  --artifact-id rpt-artifact-state-report \
   --apply
 
 # Summarize and archive closed slices for one feature

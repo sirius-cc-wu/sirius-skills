@@ -30,15 +30,15 @@ subfeatures without replacing the parent feature packet.
 
 ## Candidate Affected Slice IDs
 
-- `FEW-201`
-- `FEW-202`
-- `FEW-203`
-- `FEW-204`
-- `FEW-205`
-- `FEW-206`
-- `FEW-207`
-- `FEW-208`
-- `FEW-209`
+- `sfw-registry`
+- `sfw-initiate-change`
+- `sfw-impact-analysis`
+- `sfw-change-metadata`
+- `sfw-change-artifacts`
+- `sfw-change-breakdown`
+- `sfw-finalization-workflow`
+- `sfw-history-closure`
+- `sfw-routing-docs`
 
 ## Impact Notes
 

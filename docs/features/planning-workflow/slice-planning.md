@@ -29,21 +29,21 @@
 
 | Increment | Goal / User-Visible Value | Included Story IDs | Planned Slice IDs | Demo / Verification Outcome | Notes |
 | --- | --- | --- | --- | --- | --- |
-| I1 | Durable feature planning bootstrap | PW-01, PW-02 | PW-01-registry, PW-02-gates | A maintainer can initialize a feature and advance to `discovery_ready` / `design_ready` with valid artifacts. | Simplest end-to-end planning flow |
-| I2 | Execution-ready decomposition | PW-03 | PW-03-templates, PW-03-breakdown-guidance | A feature can produce increments and slices in `slice-planning.md` and `slice-traceability.md`. | Depends on I1 |
-| I3 | Reviewed handoff to execution | PW-04 | PW-04-review-readiness, PW-04-slice-handoff | Planning review notes and ready slice IDs can be recorded before execution bootstrap. | Depends on I2 |
+| I1 | Durable feature planning bootstrap | PW-01, PW-02 | pw-registry, pw-gates | A maintainer can initialize a feature and advance to `discovery_ready` / `design_ready` with valid artifacts. | Simplest end-to-end planning flow |
+| I2 | Execution-ready decomposition | PW-03 | pw-templates, pw-breakdown-guidance | A feature can produce increments and slices in `slice-planning.md` and `slice-traceability.md`. | Depends on I1 |
+| I3 | Reviewed handoff to execution | PW-04 | pw-review-readiness, pw-slice-handoff | Planning review notes and ready slice IDs can be recorded before execution bootstrap. | Depends on I2 |
 
 ## 4. Execution Slice Backlog
 
 | Slice ID | Story ID | Title | Summary | Target Area | Lane | Validation | Planned Action | Depends On | Slice Ready |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| PW-01-registry | PW-01 | Initialize planning registry and metadata | Manage planning config, registry, and `.planning-meta.json` lifecycle. | `skills/guide-planning/scripts/manage_planning.py` | primary | `pytest -q skills/guide-planning/tests/test_manage_planning.py` | create slice |  | yes |
-| PW-02-gates | PW-02 | Enforce planning readiness gates | Validate required artifacts across discovery and design transitions. | `skills/guide-planning/scripts/manage_planning.py` | primary | `pytest -q skills/guide-planning/tests/test_manage_planning.py` | create slice | PW-01-registry | yes |
-| PW-02-routing | PW-02 | Document routing across planning skills | Keep guide-planning routing and lifecycle guidance aligned with docs. | `README.md`, `SKILLS_METHODOLOGY.md`, `skills/guide-planning/SKILL.md` | primary | Review docs for consistent routing and states | create slice | PW-02-gates | yes |
-| PW-03-templates | PW-03 | Maintain breakdown scaffolding | Keep breakdown templates and scaffold behavior aligned with planning needs. | `skills/breakdown/assets`, `skills/breakdown/scripts` | primary | `pytest -q skills/breakdown/tests/test_scaffold_breakdown.py` | create slice | PW-02-routing | yes |
-| PW-03-breakdown-guidance | PW-03 | Produce execution-ready slice guidance | Ensure decomposition guidance yields traceable, demonstrable increments. | `skills/breakdown/SKILL.md`, templates | primary | Review generated artifacts for coherent increments and slice IDs | create slice | PW-03-templates | yes |
-| PW-04-review-readiness | PW-04 | Record planning review readiness | Require review notes and validate reviewed state before handoff. | `skills/review-planning/`, `manage_planning.py` | primary | `pytest -q skills/guide-planning/tests/test_manage_planning.py` | create slice | PW-03-breakdown-guidance | yes |
-| PW-04-slice-handoff | PW-04 | Bootstrap execution from reviewed planning output | Pass ready slice IDs to `slice` without moving execution logic into planning, then allow canonical features to advance to `implemented` after execution-backed completion. | `skills/slice/SKILL.md`, planning docs | primary | Validate `slice_ready` with `--slice-id` using `manage_planning.py` | create slice | PW-04-review-readiness | yes |
+| pw-registry | PW-01 | Initialize planning registry and metadata | Manage planning config, registry, and `.planning-meta.json` lifecycle. | `skills/guide-planning/scripts/manage_planning.py` | primary | `pytest -q skills/guide-planning/tests/test_manage_planning.py` | create slice |  | yes |
+| pw-gates | PW-02 | Enforce planning readiness gates | Validate required artifacts across discovery and design transitions. | `skills/guide-planning/scripts/manage_planning.py` | primary | `pytest -q skills/guide-planning/tests/test_manage_planning.py` | create slice | pw-registry | yes |
+| pw-routing | PW-02 | Document routing across planning skills | Keep guide-planning routing and lifecycle guidance aligned with docs. | `README.md`, `SKILLS_METHODOLOGY.md`, `skills/guide-planning/SKILL.md` | primary | Review docs for consistent routing and states | create slice | pw-gates | yes |
+| pw-templates | PW-03 | Maintain breakdown scaffolding | Keep breakdown templates and scaffold behavior aligned with planning needs. | `skills/breakdown/assets`, `skills/breakdown/scripts` | primary | `pytest -q skills/breakdown/tests/test_scaffold_breakdown.py` | create slice | pw-routing | yes |
+| pw-breakdown-guidance | PW-03 | Produce execution-ready slice guidance | Ensure decomposition guidance yields traceable, demonstrable increments. | `skills/breakdown/SKILL.md`, templates | primary | Review generated artifacts for coherent increments and slice IDs | create slice | pw-templates | yes |
+| pw-review-readiness | PW-04 | Record planning review readiness | Require review notes and validate reviewed state before handoff. | `skills/review-planning/`, `manage_planning.py` | primary | `pytest -q skills/guide-planning/tests/test_manage_planning.py` | create slice | pw-breakdown-guidance | yes |
+| pw-slice-handoff | PW-04 | Bootstrap execution from reviewed planning output | Pass ready slice IDs to `slice` without moving execution logic into planning, then allow canonical features to advance to `implemented` after execution-backed completion. | `skills/slice/SKILL.md`, planning docs | primary | Validate `slice_ready` with `--slice-id` using `manage_planning.py` | create slice | pw-review-readiness | yes |
 
 ## 5. Dependency Notes
 
@@ -56,10 +56,10 @@
 
 ## 6. Bootstrap Order
 
-1. PW-01-registry
-2. PW-02-gates, PW-02-routing
-3. PW-03-templates, PW-03-breakdown-guidance
-4. PW-04-review-readiness, PW-04-slice-handoff
+1. pw-registry
+2. pw-gates, pw-routing
+3. pw-templates, pw-breakdown-guidance
+4. pw-review-readiness, pw-slice-handoff
 
 ## 7. Open Questions / Stop-and-Ask Items
 
@@ -69,5 +69,5 @@
 
 - Review outcome: Ready for `slice` after selecting concrete slices from this backlog.
 - Blocking findings: none. Discovery intent, design boundaries, and breakdown sequencing are consistent.
-- Handoff note: start with `PW-01-registry`, then preserve the documented dependency chain through `PW-04-slice-handoff`.
+- Handoff note: start with `pw-registry`, then preserve the documented dependency chain through `pw-slice-handoff`.
 - Follow-up improvements: if the repo later wants stronger review enforcement, consider structured evidence for artifact-quality checks in addition to file-presence validation.

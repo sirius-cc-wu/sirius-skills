@@ -61,5 +61,5 @@ reusable metrics that can later support:
 
 - Parent story: `CAM-06` — measure workflow evidence
 - Planned slices:
-  - `CAM-06-metrics-foundation`
-  - `CAM-06-metrics-consumers`
+  - `mea-metrics-foundation`
+  - `mea-metrics-consumers`

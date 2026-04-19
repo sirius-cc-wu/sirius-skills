@@ -41,4 +41,4 @@ edits, or partial automation. `repair-artifacts` provides that remediation path.
 ## Story and slice framing
 
 - Parent story: `CAM-04` — repair artifact drift
-- Planned slice: `CAM-04-registry-drift-repair`
+- Planned slice: `rpr-registry-drift-repair`

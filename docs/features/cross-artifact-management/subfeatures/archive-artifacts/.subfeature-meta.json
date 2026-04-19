@@ -18,7 +18,7 @@
     "CAM-05"
   ],
   "affected_slice_ids": [
-    "CAM-05-safe-slice-archival"
+    "arc-safe-slice-archival"
   ],
   "review_note": "Planning reviewed: the archive packet keeps candidate discovery read-only and limits apply mode to explicit closed-slice archival through the execution owner helper.",
   "finalized_at": "2026-04-18T13:36:19"

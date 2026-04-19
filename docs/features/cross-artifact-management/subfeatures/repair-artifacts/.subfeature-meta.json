@@ -19,7 +19,7 @@
     "CAM-04"
   ],
   "affected_slice_ids": [
-    "CAM-04-registry-drift-repair"
+    "rpr-registry-drift-repair"
   ],
   "review_note": "Planning reviewed: the repair packet stays conservative, limits writes to derived registries, and keeps dry-run review ahead of apply mode.",
   "finalized_at": "2026-04-18T13:36:19"

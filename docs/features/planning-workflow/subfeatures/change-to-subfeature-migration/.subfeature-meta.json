@@ -20,11 +20,11 @@
     "CTSM-04"
   ],
   "affected_slice_ids": [
-    "CTSM-01-scan-legacy-layout",
-    "CTSM-02-dry-run-reporting",
-    "CTSM-03-metadata-conversion",
-    "CTSM-03-path-migration",
-    "CTSM-04-skill-docs-and-validation"
+    "ctsm-scan-legacy-layout",
+    "ctsm-dry-run-reporting",
+    "ctsm-metadata-conversion",
+    "ctsm-path-migration",
+    "ctsm-skill-docs-and-validation"
   ],
   "review_note": "Planning artifacts reviewed: migration scope, legacy-to-subfeature mapping, dry-run behavior, and conflict rules are coherent for implementation.",
   "finalized_at": null

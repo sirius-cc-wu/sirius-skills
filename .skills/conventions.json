@@ -1,0 +1,7 @@
+{
+  "slice_id_style": "scope_prefix",
+  "slice_id_format": "{scope_prefix}-{capability_slug}",
+  "slice_id_scope_precedence": "subfeature_then_feature",
+  "slice_id_prefix_source": "slug_alias",
+  "slice_id_prefix_guidance": "Use a short lowercase alias derived from the feature or subfeature slug and avoid bare 'slice-*' IDs."
+}

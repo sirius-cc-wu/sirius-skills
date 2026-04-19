@@ -130,8 +130,8 @@ def test_resolve_feature_scope_returns_first_ready_planned_slice(tmp_path, monke
 
 | Slice ID | Story ID | Title | Summary | Target Area | Lane | Validation | Planned Action | Depends On | Slice Ready |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| EW-MSE-01 | EW-01 | Resolve backlog | Summary | area | primary | test | create slice |  | yes |
-| EW-MSE-02 | EW-03 | Resume backlog | Summary | area | primary | test | create slice | EW-MSE-01 | yes |
+| mse-scope-and-backlog-resolution | EW-01 | Resolve backlog | Summary | area | primary | test | create slice |  | yes |
+| mse-sequential-slice-orchestration | EW-03 | Resume backlog | Summary | area | primary | test | create slice | mse-scope-and-backlog-resolution | yes |
 """,
     )
     write_file(
@@ -140,7 +140,7 @@ def test_resolve_feature_scope_returns_first_ready_planned_slice(tmp_path, monke
 
 | Story ID | Story Size | Story Summary | Increments | Planned Slice IDs | Slice Areas | Blocked By | Execution Slice IDs | Notes |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| EW-01 | M | Summary | I1 | EW-MSE-01, EW-MSE-02 | area | EW-MSE-01 -> EW-MSE-02 |  | Notes |
+| EW-01 | M | Summary | I1 | mse-scope-and-backlog-resolution, mse-sequential-slice-orchestration | area | mse-scope-and-backlog-resolution -> mse-sequential-slice-orchestration |  | Notes |
 """,
     )
 
@@ -160,10 +160,10 @@ def test_resolve_feature_scope_returns_first_ready_planned_slice(tmp_path, monke
     payload = json.loads(capsys.readouterr().out)
 
     assert payload["target_type"] == "feature"
-    assert payload["ready_next"] == ["EW-MSE-01"]
+    assert payload["ready_next"] == ["mse-scope-and-backlog-resolution"]
     states = {entry["planned_slice_id"]: entry["state"] for entry in payload["entries"]}
-    assert states["EW-MSE-01"] == "ready"
-    assert states["EW-MSE-02"] == "blocked"
+    assert states["mse-scope-and-backlog-resolution"] == "ready"
+    assert states["mse-sequential-slice-orchestration"] == "blocked"
 
 
 def test_resolve_subfeature_scope_uses_closed_execution_slice_lineage(
@@ -182,8 +182,8 @@ def test_resolve_subfeature_scope_uses_closed_execution_slice_lineage(
 
 | Slice ID | Story ID | Title | Summary | Target Area | Lane | Validation | Planned Action | Depends On | Slice Ready |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| EW-MSE-01-scope-and-backlog-resolution | EW-01 | Resolve scope | Summary | area | primary | test | create slice |  | yes |
-| EW-MSE-02-sequential-slice-orchestration | EW-01 | Orchestrate slices | Summary | area | primary | test | create slice | EW-MSE-01-scope-and-backlog-resolution | yes |
+| mse-scope-and-backlog-resolution | EW-01 | Resolve scope | Summary | area | primary | test | create slice |  | yes |
+| mse-sequential-slice-orchestration | EW-01 | Orchestrate slices | Summary | area | primary | test | create slice | mse-scope-and-backlog-resolution | yes |
 """,
     )
     write_file(
@@ -192,8 +192,8 @@ def test_resolve_subfeature_scope_uses_closed_execution_slice_lineage(
 
 | Story ID | Story Size | Story Summary | Increments | Planned Slice IDs | Slice Areas | Blocked By | Execution Slice IDs | Notes |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| EW-01 | M | Summary | I1 | EW-MSE-01-scope-and-backlog-resolution | area |  | EW-MSE-01-scope-and-backlog-resolution | Notes |
-| EW-01 | M | Summary | I2 | EW-MSE-02-sequential-slice-orchestration | area | EW-MSE-01-scope-and-backlog-resolution |  | Notes |
+| EW-01 | M | Summary | I1 | mse-scope-and-backlog-resolution | area |  | mse-scope-and-backlog-resolution | Notes |
+| EW-01 | M | Summary | I2 | mse-sequential-slice-orchestration | area | mse-scope-and-backlog-resolution |  | Notes |
 """,
     )
 
@@ -218,12 +218,12 @@ def test_resolve_subfeature_scope_uses_closed_execution_slice_lineage(
     assert success, message
 
     _, created = execution.create_slice(
-        "EW-MSE-01-scope-and-backlog-resolution", "multi-slice-execution"
+        "mse-scope-and-backlog-resolution", "multi-slice-execution"
     )
     assert created
     execution_rows = execution.parse_registry()
     slice_row = execution.resolve_slice(
-        execution_rows, "EW-MSE-01-scope-and-backlog-resolution"
+        execution_rows, "mse-scope-and-backlog-resolution"
     )
     assert slice_row is not None
     success, message = execution.update_slice_status(
@@ -235,10 +235,10 @@ def test_resolve_subfeature_scope_uses_closed_execution_slice_lineage(
     payload = json.loads(capsys.readouterr().out)
 
     assert payload["target_type"] == "subfeature"
-    assert payload["ready_next"] == ["EW-MSE-02-sequential-slice-orchestration"]
+    assert payload["ready_next"] == ["mse-sequential-slice-orchestration"]
     states = {entry["planned_slice_id"]: entry["state"] for entry in payload["entries"]}
-    assert states["EW-MSE-01-scope-and-backlog-resolution"] == "completed"
-    assert states["EW-MSE-02-sequential-slice-orchestration"] == "ready"
+    assert states["mse-scope-and-backlog-resolution"] == "completed"
+    assert states["mse-sequential-slice-orchestration"] == "ready"
 
 
 def test_resolve_subfeature_scope_allows_finalized_sibling_subfeature_dependency(
@@ -295,8 +295,8 @@ def test_resolve_subfeature_scope_allows_finalized_sibling_subfeature_dependency
 
 | Slice ID | Story ID | Title | Summary | Target Area | Lane | Validation | Planned Action | Depends On | Slice Ready |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| EW-MSE-01-scope-and-backlog-resolution | EW-01 | Resolve scope | Summary | area | primary | test | create slice | environment-injection finalized | yes |
-| EW-MSE-02-sequential-slice-orchestration | EW-01 | Orchestrate slices | Summary | area | primary | test | create slice | EW-MSE-01-scope-and-backlog-resolution | yes |
+| mse-scope-and-backlog-resolution | EW-01 | Resolve scope | Summary | area | primary | test | create slice | environment-injection finalized | yes |
+| mse-sequential-slice-orchestration | EW-01 | Orchestrate slices | Summary | area | primary | test | create slice | mse-scope-and-backlog-resolution | yes |
 """,
     )
     write_file(
@@ -305,8 +305,8 @@ def test_resolve_subfeature_scope_allows_finalized_sibling_subfeature_dependency
 
 | Story ID | Story Size | Story Summary | Increments | Planned Slice IDs | Slice Areas | Blocked By | Execution Slice IDs | Notes |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| EW-01 | M | Summary | I1 | EW-MSE-01-scope-and-backlog-resolution | area | environment-injection finalized |  | Notes |
-| EW-01 | M | Summary | I2 | EW-MSE-02-sequential-slice-orchestration | area | EW-MSE-01-scope-and-backlog-resolution |  | Notes |
+| EW-01 | M | Summary | I1 | mse-scope-and-backlog-resolution | area | environment-injection finalized |  | Notes |
+| EW-01 | M | Summary | I2 | mse-sequential-slice-orchestration | area | mse-scope-and-backlog-resolution |  | Notes |
 """,
     )
 
@@ -333,10 +333,10 @@ def test_resolve_subfeature_scope_allows_finalized_sibling_subfeature_dependency
     assert run_cli(module, monkeypatch, "multi-slice-execution", "--json") == 0
     payload = json.loads(capsys.readouterr().out)
 
-    assert payload["ready_next"] == ["EW-MSE-01-scope-and-backlog-resolution"]
+    assert payload["ready_next"] == ["mse-scope-and-backlog-resolution"]
     states = {entry["planned_slice_id"]: entry["state"] for entry in payload["entries"]}
-    assert states["EW-MSE-01-scope-and-backlog-resolution"] == "ready"
-    assert states["EW-MSE-02-sequential-slice-orchestration"] == "blocked"
+    assert states["mse-scope-and-backlog-resolution"] == "ready"
+    assert states["mse-sequential-slice-orchestration"] == "blocked"
 
 
 def test_resolve_backlog_rejects_unreviewed_targets(tmp_path, monkeypatch, capsys):
@@ -365,8 +365,8 @@ def test_bootstrap_next_creates_first_ready_slice_and_updates_traceability(
 
 | Slice ID | Story ID | Title | Summary | Target Area | Lane | Validation | Planned Action | Depends On | Slice Ready |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| EW-MSE-01 | EW-01 | Resolve backlog | Summary | area | primary | test | create slice |  | yes |
-| EW-MSE-02 | EW-01 | Orchestrate backlog | Summary | area | primary | test | create slice | EW-MSE-01 | yes |
+| mse-scope-and-backlog-resolution | EW-01 | Resolve backlog | Summary | area | primary | test | create slice |  | yes |
+| mse-sequential-slice-orchestration | EW-01 | Orchestrate backlog | Summary | area | primary | test | create slice | mse-scope-and-backlog-resolution | yes |
 """,
     )
     write_file(
@@ -375,8 +375,8 @@ def test_bootstrap_next_creates_first_ready_slice_and_updates_traceability(
 
 | Story ID | Story Size | Story Summary | Increments | Planned Slice IDs | Slice Areas | Blocked By | Execution Slice IDs | Notes |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| EW-01 | M | Summary | I1 | EW-MSE-01 | area |  |  | Notes |
-| EW-01 | M | Summary | I2 | EW-MSE-02 | area | EW-MSE-01 |  | Notes |
+| EW-01 | M | Summary | I1 | mse-scope-and-backlog-resolution | area |  |  | Notes |
+| EW-01 | M | Summary | I2 | mse-sequential-slice-orchestration | area | mse-scope-and-backlog-resolution |  | Notes |
 """,
     )
 
@@ -395,14 +395,14 @@ def test_bootstrap_next_creates_first_ready_slice_and_updates_traceability(
     assert run_cli(module, monkeypatch, "execution-workflow", "--bootstrap-next", "--json") == 0
     payload = json.loads(capsys.readouterr().out)
     registry_rows = execution.parse_registry()
-    slice_row = execution.resolve_slice(registry_rows, "EW-MSE-01")
+    slice_row = execution.resolve_slice(registry_rows, "mse-scope-and-backlog-resolution")
 
-    assert payload["bootstrapped_slice_id"] == "EW-MSE-01"
+    assert payload["bootstrapped_slice_id"] == "mse-scope-and-backlog-resolution"
     assert payload["next_owner"] == "guide-execution"
     assert slice_row is not None
     assert slice_row["status"] == "draft"
     traceability = (feature_path / "slice-traceability.md").read_text(encoding="utf-8")
-    assert "| EW-01 | M | Summary | I1 | EW-MSE-01 | area |  | EW-MSE-01 | Notes |" in traceability
+    assert "| EW-01 | M | Summary | I1 | mse-scope-and-backlog-resolution | area |  | mse-scope-and-backlog-resolution | Notes |" in traceability
 
 
 def test_bootstrap_next_refuses_when_mapped_execution_slice_is_active(
@@ -421,8 +421,8 @@ def test_bootstrap_next_refuses_when_mapped_execution_slice_is_active(
 
 | Slice ID | Story ID | Title | Summary | Target Area | Lane | Validation | Planned Action | Depends On | Slice Ready |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| EW-MSE-01-scope-and-backlog-resolution | EW-01 | Resolve scope | Summary | area | primary | test | create slice |  | yes |
-| EW-MSE-02-sequential-slice-orchestration | EW-01 | Orchestrate slices | Summary | area | primary | test | create slice | EW-MSE-01-scope-and-backlog-resolution | yes |
+| mse-scope-and-backlog-resolution | EW-01 | Resolve scope | Summary | area | primary | test | create slice |  | yes |
+| mse-sequential-slice-orchestration | EW-01 | Orchestrate slices | Summary | area | primary | test | create slice | mse-scope-and-backlog-resolution | yes |
 """,
     )
     write_file(
@@ -431,8 +431,8 @@ def test_bootstrap_next_refuses_when_mapped_execution_slice_is_active(
 
 | Story ID | Story Size | Story Summary | Increments | Planned Slice IDs | Slice Areas | Blocked By | Execution Slice IDs | Notes |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| EW-01 | M | Summary | I1 | EW-MSE-01-scope-and-backlog-resolution | area |  | EW-MSE-01-scope-and-backlog-resolution | Notes |
-| EW-01 | M | Summary | I2 | EW-MSE-02-sequential-slice-orchestration | area | EW-MSE-01-scope-and-backlog-resolution |  | Notes |
+| EW-01 | M | Summary | I1 | mse-scope-and-backlog-resolution | area |  | mse-scope-and-backlog-resolution | Notes |
+| EW-01 | M | Summary | I2 | mse-sequential-slice-orchestration | area | mse-scope-and-backlog-resolution |  | Notes |
 """,
     )
 
@@ -457,7 +457,7 @@ def test_bootstrap_next_refuses_when_mapped_execution_slice_is_active(
     assert success, message
 
     _, created = execution.create_slice(
-        "EW-MSE-01-scope-and-backlog-resolution", "Resolve scope"
+        "mse-scope-and-backlog-resolution", "Resolve scope"
     )
     assert created
 
@@ -481,8 +481,8 @@ def test_resume_returns_active_mapped_slice_and_next_owner(tmp_path, monkeypatch
 
 | Slice ID | Story ID | Title | Summary | Target Area | Lane | Validation | Planned Action | Depends On | Slice Ready |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| EW-MSE-01-scope-and-backlog-resolution | EW-01 | Resolve scope | Summary | area | primary | test | create slice |  | yes |
-| EW-MSE-02-sequential-slice-orchestration | EW-01 | Orchestrate slices | Summary | area | primary | test | create slice | EW-MSE-01-scope-and-backlog-resolution | yes |
+| mse-scope-and-backlog-resolution | EW-01 | Resolve scope | Summary | area | primary | test | create slice |  | yes |
+| mse-sequential-slice-orchestration | EW-01 | Orchestrate slices | Summary | area | primary | test | create slice | mse-scope-and-backlog-resolution | yes |
 """,
     )
     write_file(
@@ -491,8 +491,8 @@ def test_resume_returns_active_mapped_slice_and_next_owner(tmp_path, monkeypatch
 
 | Story ID | Story Size | Story Summary | Increments | Planned Slice IDs | Slice Areas | Blocked By | Execution Slice IDs | Notes |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| EW-01 | M | Summary | I1 | EW-MSE-01-scope-and-backlog-resolution | area |  | EW-MSE-01-scope-and-backlog-resolution | Notes |
-| EW-01 | M | Summary | I2 | EW-MSE-02-sequential-slice-orchestration | area | EW-MSE-01-scope-and-backlog-resolution |  | Notes |
+| EW-01 | M | Summary | I1 | mse-scope-and-backlog-resolution | area |  | mse-scope-and-backlog-resolution | Notes |
+| EW-01 | M | Summary | I2 | mse-sequential-slice-orchestration | area | mse-scope-and-backlog-resolution |  | Notes |
 """,
     )
 
@@ -517,7 +517,7 @@ def test_resume_returns_active_mapped_slice_and_next_owner(tmp_path, monkeypatch
     assert success, message
 
     _, created = execution.create_slice(
-        "EW-MSE-01-scope-and-backlog-resolution", "Resolve scope"
+        "mse-scope-and-backlog-resolution", "Resolve scope"
     )
     assert created
 
@@ -525,7 +525,7 @@ def test_resume_returns_active_mapped_slice_and_next_owner(tmp_path, monkeypatch
     payload = json.loads(capsys.readouterr().out)
 
     assert payload["action"] == "resume_active_slice"
-    assert payload["bootstrapped_slice_id"] == "EW-MSE-01-scope-and-backlog-resolution"
+    assert payload["bootstrapped_slice_id"] == "mse-scope-and-backlog-resolution"
     assert payload["next_owner"] == "guide-execution"
     assert payload["slice_status"] == "draft"
 
@@ -546,8 +546,8 @@ def test_resume_bootstraps_next_ready_slice_after_completed_predecessor(
 
 | Slice ID | Story ID | Title | Summary | Target Area | Lane | Validation | Planned Action | Depends On | Slice Ready |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| EW-MSE-01-scope-and-backlog-resolution | EW-01 | Resolve scope | Summary | area | primary | test | create slice |  | yes |
-| EW-MSE-02-sequential-slice-orchestration | EW-01 | Orchestrate slices | Summary | area | primary | test | create slice | EW-MSE-01-scope-and-backlog-resolution | yes |
+| mse-scope-and-backlog-resolution | EW-01 | Resolve scope | Summary | area | primary | test | create slice |  | yes |
+| mse-sequential-slice-orchestration | EW-01 | Orchestrate slices | Summary | area | primary | test | create slice | mse-scope-and-backlog-resolution | yes |
 """,
     )
     write_file(
@@ -556,8 +556,8 @@ def test_resume_bootstraps_next_ready_slice_after_completed_predecessor(
 
 | Story ID | Story Size | Story Summary | Increments | Planned Slice IDs | Slice Areas | Blocked By | Execution Slice IDs | Notes |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| EW-01 | M | Summary | I1 | EW-MSE-01-scope-and-backlog-resolution | area |  | EW-MSE-01-scope-and-backlog-resolution | Notes |
-| EW-01 | M | Summary | I2 | EW-MSE-02-sequential-slice-orchestration | area | EW-MSE-01-scope-and-backlog-resolution |  | Notes |
+| EW-01 | M | Summary | I1 | mse-scope-and-backlog-resolution | area |  | mse-scope-and-backlog-resolution | Notes |
+| EW-01 | M | Summary | I2 | mse-sequential-slice-orchestration | area | mse-scope-and-backlog-resolution |  | Notes |
 """,
     )
 
@@ -582,12 +582,12 @@ def test_resume_bootstraps_next_ready_slice_after_completed_predecessor(
     assert success, message
 
     _, created = execution.create_slice(
-        "EW-MSE-01-scope-and-backlog-resolution", "Resolve scope"
+        "mse-scope-and-backlog-resolution", "Resolve scope"
     )
     assert created
     execution_rows = execution.parse_registry()
     slice_row = execution.resolve_slice(
-        execution_rows, "EW-MSE-01-scope-and-backlog-resolution"
+        execution_rows, "mse-scope-and-backlog-resolution"
     )
     assert slice_row is not None
     success, message = execution.update_slice_status(
@@ -600,7 +600,7 @@ def test_resume_bootstraps_next_ready_slice_after_completed_predecessor(
     payload = json.loads(capsys.readouterr().out)
 
     assert payload["action"] == "bootstrap_next_slice"
-    assert payload["bootstrapped_slice_id"] == "EW-MSE-02-sequential-slice-orchestration"
+    assert payload["bootstrapped_slice_id"] == "mse-sequential-slice-orchestration"
     assert payload["next_owner"] == "guide-execution"
 
 
@@ -618,7 +618,7 @@ def test_resume_rejects_blocked_unfinished_backlog_without_ready_slice(
 
 | Slice ID | Story ID | Title | Summary | Target Area | Lane | Validation | Planned Action | Depends On | Slice Ready |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| EW-MSE-02 | EW-01 | Orchestrate backlog | Summary | area | primary | test | create slice | EW-MSE-01 | yes |
+| mse-sequential-slice-orchestration | EW-01 | Orchestrate backlog | Summary | area | primary | test | create slice | mse-scope-and-backlog-resolution | yes |
 """,
     )
     write_file(
@@ -627,7 +627,7 @@ def test_resume_rejects_blocked_unfinished_backlog_without_ready_slice(
 
 | Story ID | Story Size | Story Summary | Increments | Planned Slice IDs | Slice Areas | Blocked By | Execution Slice IDs | Notes |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| EW-01 | M | Summary | I2 | EW-MSE-02 | area | EW-MSE-01 |  | Notes |
+| EW-01 | M | Summary | I2 | mse-sequential-slice-orchestration | area | mse-scope-and-backlog-resolution |  | Notes |
 """,
     )
 
@@ -661,8 +661,8 @@ def test_resume_requires_commit_checkpoint_before_next_slice(tmp_path, monkeypat
 
 | Slice ID | Story ID | Title | Summary | Target Area | Lane | Validation | Planned Action | Depends On | Slice Ready |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| EW-MSE-01-scope-and-backlog-resolution | EW-01 | Resolve scope | Summary | area | primary | test | create slice |  | yes |
-| EW-MSE-02-sequential-slice-orchestration | EW-01 | Orchestrate slices | Summary | area | primary | test | create slice | EW-MSE-01-scope-and-backlog-resolution | yes |
+| mse-scope-and-backlog-resolution | EW-01 | Resolve scope | Summary | area | primary | test | create slice |  | yes |
+| mse-sequential-slice-orchestration | EW-01 | Orchestrate slices | Summary | area | primary | test | create slice | mse-scope-and-backlog-resolution | yes |
 """,
     )
     write_file(
@@ -671,8 +671,8 @@ def test_resume_requires_commit_checkpoint_before_next_slice(tmp_path, monkeypat
 
 | Story ID | Story Size | Story Summary | Increments | Planned Slice IDs | Slice Areas | Blocked By | Execution Slice IDs | Notes |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| EW-01 | M | Summary | I1 | EW-MSE-01-scope-and-backlog-resolution | area |  | EW-MSE-01-scope-and-backlog-resolution | Notes |
-| EW-01 | M | Summary | I2 | EW-MSE-02-sequential-slice-orchestration | area | EW-MSE-01-scope-and-backlog-resolution |  | Notes |
+| EW-01 | M | Summary | I1 | mse-scope-and-backlog-resolution | area |  | mse-scope-and-backlog-resolution | Notes |
+| EW-01 | M | Summary | I2 | mse-sequential-slice-orchestration | area | mse-scope-and-backlog-resolution |  | Notes |
 """,
     )
 
@@ -697,12 +697,12 @@ def test_resume_requires_commit_checkpoint_before_next_slice(tmp_path, monkeypat
     assert success, message
 
     _, created = execution.create_slice(
-        "EW-MSE-01-scope-and-backlog-resolution", "Resolve scope"
+        "mse-scope-and-backlog-resolution", "Resolve scope"
     )
     assert created
     execution_rows = execution.parse_registry()
     slice_row = execution.resolve_slice(
-        execution_rows, "EW-MSE-01-scope-and-backlog-resolution"
+        execution_rows, "mse-scope-and-backlog-resolution"
     )
     assert slice_row is not None
     success, message = execution.update_slice_status(
@@ -716,7 +716,7 @@ def test_resume_requires_commit_checkpoint_before_next_slice(tmp_path, monkeypat
     payload = json.loads(capsys.readouterr().out)
 
     assert payload["action"] == "commit_checkpoint_required"
-    assert payload["checkpoint_slice_id"] == "EW-MSE-01-scope-and-backlog-resolution"
+    assert payload["checkpoint_slice_id"] == "mse-scope-and-backlog-resolution"
     assert payload["next_owner"] == "commit"
     assert any("scratch.txt" in entry for entry in payload["dirty_worktree_paths"])
 
@@ -734,7 +734,7 @@ def test_resolve_backlog_allows_implemented_target(tmp_path, monkeypatch, capsys
 
 | Slice ID | Story ID | Title | Summary | Target Area | Lane | Validation | Planned Action | Depends On | Slice Ready |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| EW-MSE-01 | EW-01 | Resolve backlog | Summary | area | primary | test | create slice |  | yes |
+| mse-scope-and-backlog-resolution | EW-01 | Resolve backlog | Summary | area | primary | test | create slice |  | yes |
 """,
     )
     write_file(
@@ -743,7 +743,7 @@ def test_resolve_backlog_allows_implemented_target(tmp_path, monkeypatch, capsys
 
 | Story ID | Story Size | Story Summary | Increments | Planned Slice IDs | Slice Areas | Blocked By | Execution Slice IDs | Notes |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| EW-01 | M | Summary | I1 | EW-MSE-01 | area |  | EW-MSE-01 | Notes |
+| EW-01 | M | Summary | I1 | mse-scope-and-backlog-resolution | area |  | mse-scope-and-backlog-resolution | Notes |
 """,
     )
 
@@ -759,10 +759,10 @@ def test_resolve_backlog_allows_implemented_target(tmp_path, monkeypatch, capsys
     )
     assert ok, message
 
-    _, created = execution.create_slice("EW-MSE-01", "Resolve backlog")
+    _, created = execution.create_slice("mse-scope-and-backlog-resolution", "Resolve backlog")
     assert created
     execution_rows = execution.parse_registry()
-    slice_row = execution.resolve_slice(execution_rows, "EW-MSE-01")
+    slice_row = execution.resolve_slice(execution_rows, "mse-scope-and-backlog-resolution")
     assert slice_row is not None
     success, message = execution.update_slice_status(
         execution_rows, slice_row, "closed", force=True

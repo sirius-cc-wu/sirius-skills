@@ -17,10 +17,10 @@
     "EW-04"
   ],
   "affected_slice_ids": [
-    "EW-MSE-01-scope-and-backlog-resolution",
-    "EW-MSE-02-sequential-slice-orchestration",
-    "EW-MSE-03-stop-and-resume-semantics",
-    "EW-MSE-04-per-slice-commit-checkpoints"
+    "mse-scope-and-backlog-resolution",
+    "mse-sequential-slice-orchestration",
+    "mse-stop-and-resume-semantics",
+    "mse-per-slice-commit-checkpoints"
   ],
   "review_note": "Implemented via separate slice-scoped commits for scope resolution, sequential orchestration, resume semantics, and per-slice commit checkpoints.",
   "finalized_at": "2026-04-14T16:33:28"

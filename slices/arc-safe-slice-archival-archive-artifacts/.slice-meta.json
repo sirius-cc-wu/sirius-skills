@@ -1,0 +1,10 @@
+{
+  "created_at": "2026-04-11T23:55:15",
+  "updated_at": "2026-04-11T23:58:00",
+  "status": "closed",
+  "slice_id": "arc-safe-slice-archival",
+  "feature": "archive-artifacts",
+  "path": "slices/arc-safe-slice-archival-archive-artifacts/",
+  "relations": [],
+  "closed_at": "2026-04-11T23:58:00"
+}

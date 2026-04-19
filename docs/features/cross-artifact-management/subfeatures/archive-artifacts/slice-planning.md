@@ -4,7 +4,7 @@
 
 - Story: `CAM-05` — archive durable history safely
 - Increment: `I1`
-- Planned slice: `CAM-05-safe-slice-archival`
+- Planned slice: `arc-safe-slice-archival`
 - Value: one explicit archive command that reports archive candidates across
   relevant artifact layers and safely archives one closed execution slice at a
   time through the execution owner helper.

@@ -41,4 +41,4 @@ history. `archive-artifacts` adds that next step conservatively.
 ## Story and slice framing
 
 - Parent story: `CAM-05` — archive durable history safely
-- Planned slice: `CAM-05-safe-slice-archival`
+- Planned slice: `arc-safe-slice-archival`

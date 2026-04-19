@@ -20,7 +20,7 @@
     "CAM-03"
   ],
   "affected_slice_ids": [
-    "CAM-03-artifact-state-report"
+    "rpt-artifact-state-report"
   ],
   "review_note": "Planning reviewed: the report packet stays read-only, reuses shared inventory and owner metadata, and fits one operational-summary slice.",
   "finalized_at": "2026-04-18T13:36:19"

@@ -19,7 +19,7 @@
     "CAM-01"
   ],
   "affected_slice_ids": [
-    "CAM-01-cross-artifact-audit"
+    "aat-cross-artifact-audit"
   ],
   "review_note": "Planning reviewed: the audit packet is scoped to one read-only slice, reuses existing owner validators, and keeps cross-artifact checks explicit and implementation-ready.",
   "finalized_at": "2026-04-18T13:36:18"

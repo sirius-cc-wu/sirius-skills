@@ -25,19 +25,19 @@
 
 | Increment | Goal / User-Visible Value | Included Story IDs | Planned Slice IDs | Demo / Verification Outcome | Notes |
 | --- | --- | --- | --- | --- | --- |
-| I1 | Stage speculative ideas outside the feature registry | PFW-01, PFW-03 | PFW-01-proposal-registry, PFW-03-proposal-lifecycle | A maintainer can create and validate proposal folders under `docs/proposals/`. | Simplest usable path |
-| I2 | Route planning into the proposal workflow | PFW-02, PFW-05 | PFW-02-guide-routing, PFW-05-config-support | `guide-planning` and project config support proposal staging cleanly. | Depends on I1 |
-| I3 | Promote accepted proposals into canonical planning | PFW-04 | PFW-04-proposal-promotion | An accepted proposal can be promoted into `docs/features/<feature>/` with safeguards. | Depends on I2 |
+| I1 | Stage speculative ideas outside the feature registry | PFW-01, PFW-03 | pfw-proposal-registry, pfw-proposal-lifecycle | A maintainer can create and validate proposal folders under `docs/proposals/`. | Simplest usable path |
+| I2 | Route planning into the proposal workflow | PFW-02, PFW-05 | pfw-guide-routing, pfw-config-support | `guide-planning` and project config support proposal staging cleanly. | Depends on I1 |
+| I3 | Promote accepted proposals into canonical planning | PFW-04 | pfw-proposal-promotion | An accepted proposal can be promoted into `docs/features/<feature>/` with safeguards. | Depends on I2 |
 
 ## 4. Execution Slice Backlog
 
 | Slice ID | Story ID | Title | Summary | Target Area | Lane | Validation | Planned Action | Depends On | Slice Ready |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| PFW-01-proposal-registry | PFW-01 | Create proposal registry and storage | Add `docs/proposals/` registry files and proposal-scoped folder creation. | `skills/propose/`, `docs/proposals/` | primary | `pytest -q skills/propose/tests/test_manage_proposals.py` | completed |  | yes |
-| PFW-03-proposal-lifecycle | PFW-03 | Enforce proposal lifecycle and validation | Track proposal states, review notes, and validation gates in `.proposal-meta.json`. | `skills/propose/scripts/manage_proposals.py` | primary | `pytest -q skills/propose/tests/test_manage_proposals.py` | completed | PFW-01-proposal-registry | yes |
-| PFW-02-guide-routing | PFW-02 | Route speculative work through propose | Update planning docs and skill routing so early ideas use `propose`. | `README.md`, `SKILLS_METHODOLOGY.md`, `skills/guide-planning/SKILL.md` | primary | doc review + related pytest coverage | completed | PFW-01-proposal-registry | yes |
-| PFW-05-config-support | PFW-05 | Support configurable proposal storage | Extend `.skills/planning.json` and bootstrap defaults with `proposal_dir`. | `.skills/planning.json`, `skills/bootstrap/` | primary | `pytest -q skills/bootstrap/tests/test_bootstrap.py` | completed | PFW-01-proposal-registry | yes |
-| PFW-04-proposal-promotion | PFW-04 | Promote accepted proposals into features | Add explicit promotion from proposal staging into canonical feature planning. | `skills/guide-planning/scripts/manage_planning.py` | primary | `pytest -q skills/propose/tests/test_manage_proposals.py skills/guide-planning/tests/test_manage_planning.py` | completed | PFW-02-guide-routing, PFW-03-proposal-lifecycle, PFW-05-config-support | yes |
+| pfw-proposal-registry | PFW-01 | Create proposal registry and storage | Add `docs/proposals/` registry files and proposal-scoped folder creation. | `skills/propose/`, `docs/proposals/` | primary | `pytest -q skills/propose/tests/test_manage_proposals.py` | completed |  | yes |
+| pfw-proposal-lifecycle | PFW-03 | Enforce proposal lifecycle and validation | Track proposal states, review notes, and validation gates in `.proposal-meta.json`. | `skills/propose/scripts/manage_proposals.py` | primary | `pytest -q skills/propose/tests/test_manage_proposals.py` | completed | pfw-proposal-registry | yes |
+| pfw-guide-routing | PFW-02 | Route speculative work through propose | Update planning docs and skill routing so early ideas use `propose`. | `README.md`, `SKILLS_METHODOLOGY.md`, `skills/guide-planning/SKILL.md` | primary | doc review + related pytest coverage | completed | pfw-proposal-registry | yes |
+| pfw-config-support | PFW-05 | Support configurable proposal storage | Extend `.skills/planning.json` and bootstrap defaults with `proposal_dir`. | `.skills/planning.json`, `skills/bootstrap/` | primary | `pytest -q skills/bootstrap/tests/test_bootstrap.py` | completed | pfw-proposal-registry | yes |
+| pfw-proposal-promotion | PFW-04 | Promote accepted proposals into features | Add explicit promotion from proposal staging into canonical feature planning. | `skills/guide-planning/scripts/manage_planning.py` | primary | `pytest -q skills/propose/tests/test_manage_proposals.py skills/guide-planning/tests/test_manage_planning.py` | completed | pfw-guide-routing, pfw-proposal-lifecycle, pfw-config-support | yes |
 
 ## 5. Dependency Notes
 

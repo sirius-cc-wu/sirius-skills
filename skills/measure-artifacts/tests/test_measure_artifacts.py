@@ -165,16 +165,16 @@ def create_finalized_subfeature_target(env):
                 "",
                 "| Story ID | Story Size | Story Summary | Increments | Planned Slice IDs | Slice Areas | Blocked By | Execution Slice IDs | Notes |",
                 "| --- | --- | --- | --- | --- | --- | --- | --- | --- |",
-                "| CAM-06 | L | Summary | I1 | CAM-06-metrics-foundation | Metrics |  | CAM-06-metrics-foundation | Foundation |",
-                "| CAM-06 | L | Summary | I2 | CAM-06-metrics-consumers | CLI | CAM-06-metrics-foundation | CAM-06-metrics-consumers | Consumers |",
+                "| CAM-06 | L | Summary | I1 | mea-metrics-foundation | Metrics |  | mea-metrics-foundation | Foundation |",
+                "| CAM-06 | L | Summary | I2 | mea-metrics-consumers | CLI | mea-metrics-foundation | mea-metrics-consumers | Consumers |",
                 "",
             ]
         ),
         encoding="utf-8",
     )
 
-    create_closed_slice(execution, "CAM-06-metrics-foundation", "Foundation")
-    create_closed_slice(execution, "CAM-06-metrics-consumers", "Consumers")
+    create_closed_slice(execution, "mea-metrics-foundation", "Foundation")
+    create_closed_slice(execution, "mea-metrics-consumers", "Consumers")
 
     subfeature_metadata = subfeatures.read_metadata(subfeature_dir)
     subfeature_metadata["status"] = "finalized"
@@ -231,8 +231,8 @@ def test_build_metrics_record_derives_guided_subfeature_metrics(tmp_path, monkey
     assert record["story_size"]["sum_points"] == 5
     assert record["slices"]["planned_count"] == 2
     assert record["slices"]["linked_slice_ids"] == [
-        "CAM-06-metrics-foundation",
-        "CAM-06-metrics-consumers",
+        "mea-metrics-foundation",
+        "mea-metrics-consumers",
     ]
     assert record["execution_mode"] == "guided"
 

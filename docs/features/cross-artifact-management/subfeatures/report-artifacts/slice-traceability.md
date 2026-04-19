@@ -10,7 +10,7 @@
 
 | Story ID | Story Size | Story Summary | Increments | Planned Slice IDs | Slice Areas | Blocked By | Execution Slice IDs | Notes |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| CAM-03 | M | Report active, reviewed, stale, and closed workflow artifacts | I1 | CAM-03-artifact-state-report | Shared reporting records, grouped summaries, stale classification, skill/docs/tests |  | CAM-03-artifact-state-report | One read-only slice that turns durable metadata into operational views |
+| CAM-03 | M | Report active, reviewed, stale, and closed workflow artifacts | I1 | rpt-artifact-state-report | Shared reporting records, grouped summaries, stale classification, skill/docs/tests |  | rpt-artifact-state-report | One read-only slice that turns durable metadata into operational views |
 
 ## Notes
 

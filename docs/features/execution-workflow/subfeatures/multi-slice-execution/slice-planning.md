@@ -28,26 +28,26 @@
 
 | Increment | Goal / User-Visible Value | Included Story IDs | Planned Slice IDs | Demo / Verification Outcome | Notes |
 | --- | --- | --- | --- | --- | --- |
-| I1 | A reviewed feature or subfeature can resolve its remaining planned slice backlog | EW-01 | EW-MSE-01-scope-and-backlog-resolution | The capability can target one planning scope, read its planned slices, and identify the next ready slice without executing work yet. | Establish the durable input model first |
-| I2 | The workflow can execute the backlog one slice at a time and stop safely on blockers | EW-01, EW-03 | EW-MSE-02-sequential-slice-orchestration, EW-MSE-03-stop-and-resume-semantics | The orchestrator can bootstrap one ready slice at a time, stop on execution failures, and resume from durable state. | Depends on I1 |
-| I3 | Each finished slice becomes its own durable Git checkpoint before the next slice starts | EW-04 | EW-MSE-04-per-slice-commit-checkpoints | A completed slice must close and commit before the next planned slice can begin. | Depends on I2 |
+| I1 | A reviewed feature or subfeature can resolve its remaining planned slice backlog | EW-01 | mse-scope-and-backlog-resolution | The capability can target one planning scope, read its planned slices, and identify the next ready slice without executing work yet. | Establish the durable input model first |
+| I2 | The workflow can execute the backlog one slice at a time and stop safely on blockers | EW-01, EW-03 | mse-sequential-slice-orchestration, mse-stop-and-resume-semantics | The orchestrator can bootstrap one ready slice at a time, stop on execution failures, and resume from durable state. | Depends on I1 |
+| I3 | Each finished slice becomes its own durable Git checkpoint before the next slice starts | EW-04 | mse-per-slice-commit-checkpoints | A completed slice must close and commit before the next planned slice can begin. | Depends on I2 |
 
 ## 4. Execution Slice Backlog
 
 | Slice ID | Story ID | Title | Summary | Target Area | Lane | Validation | Planned Action | Depends On | Slice Ready |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| EW-MSE-01-scope-and-backlog-resolution | EW-01 | Resolve planning scope and remaining planned slices | Add scope resolution for feature/subfeature execution targets plus durable backlog derivation from planning traceability and closed execution slices. | new `skills/execute-all-slices/`, shared planning-lineage helper(s), integration with existing planning/execution metadata | primary | `pytest -q skills/execute-all-slices/tests/test_execute_all_slices.py -k scope_or_backlog` | create slice |  | yes |
-| EW-MSE-02-sequential-slice-orchestration | EW-01 | Orchestrate sequential slice execution | Drive `slice`, `guide-execution`, `review-execution`, and `close-slice` one planned slice at a time while keeping only one active slice. | `skills/execute-all-slices/`, execution-owner integration points | primary | `pytest -q skills/execute-all-slices/tests/test_execute_all_slices.py -k orchestration` | create slice | EW-MSE-01-scope-and-backlog-resolution | yes |
-| EW-MSE-03-stop-and-resume-semantics | EW-03 | Stop on blockers and resume from durable state | Detect active-slice, failed-step, and dependency-blocked conditions, then resume from closed-slice and planned-slice lineage without extra progress state. | `skills/execute-all-slices/`, possible helper reuse from `guide-execution` and `trace-artifacts` | primary | `pytest -q skills/execute-all-slices/tests/test_execute_all_slices.py -k stop_or_resume` | create slice | EW-MSE-02-sequential-slice-orchestration | yes |
-| EW-MSE-04-per-slice-commit-checkpoints | EW-04 | Enforce one commit per completed slice | Integrate the existing `commit` skill boundary into the orchestration loop so a slice must close and commit before the next slice begins. | `skills/execute-all-slices/`, `skills/commit/`, closure/clean-worktree handoff points | primary | `pytest -q skills/execute-all-slices/tests/test_execute_all_slices.py -k commit_checkpoint` | create slice | EW-MSE-03-stop-and-resume-semantics | yes |
+| mse-scope-and-backlog-resolution | EW-01 | Resolve planning scope and remaining planned slices | Add scope resolution for feature/subfeature execution targets plus durable backlog derivation from planning traceability and closed execution slices. | new `skills/execute-all-slices/`, shared planning-lineage helper(s), integration with existing planning/execution metadata | primary | `pytest -q skills/execute-all-slices/tests/test_execute_all_slices.py -k scope_or_backlog` | create slice |  | yes |
+| mse-sequential-slice-orchestration | EW-01 | Orchestrate sequential slice execution | Drive `slice`, `guide-execution`, `review-execution`, and `close-slice` one planned slice at a time while keeping only one active slice. | `skills/execute-all-slices/`, execution-owner integration points | primary | `pytest -q skills/execute-all-slices/tests/test_execute_all_slices.py -k orchestration` | create slice | mse-scope-and-backlog-resolution | yes |
+| mse-stop-and-resume-semantics | EW-03 | Stop on blockers and resume from durable state | Detect active-slice, failed-step, and dependency-blocked conditions, then resume from closed-slice and planned-slice lineage without extra progress state. | `skills/execute-all-slices/`, possible helper reuse from `guide-execution` and `trace-artifacts` | primary | `pytest -q skills/execute-all-slices/tests/test_execute_all_slices.py -k stop_or_resume` | create slice | mse-sequential-slice-orchestration | yes |
+| mse-per-slice-commit-checkpoints | EW-04 | Enforce one commit per completed slice | Integrate the existing `commit` skill boundary into the orchestration loop so a slice must close and commit before the next slice begins. | `skills/execute-all-slices/`, `skills/commit/`, closure/clean-worktree handoff points | primary | `pytest -q skills/execute-all-slices/tests/test_execute_all_slices.py -k commit_checkpoint` | create slice | mse-stop-and-resume-semantics | yes |
 
 ## 5. Dependency Notes
 
 - Critical path: scope/backlog resolution -> sequential orchestration -> stop/resume semantics -> per-slice commit checkpoints.
 - Explicit blockers:
-  - `EW-MSE-02-sequential-slice-orchestration` should not start until planning-scope and ready-next-slice resolution are durable.
-  - `EW-MSE-03-stop-and-resume-semantics` depends on the orchestration loop so resume uses the same state model as normal execution.
-  - `EW-MSE-04-per-slice-commit-checkpoints` depends on closure-aware orchestration so commits are aligned with completed slices.
+  - `mse-sequential-slice-orchestration` should not start until planning-scope and ready-next-slice resolution are durable.
+  - `mse-stop-and-resume-semantics` depends on the orchestration loop so resume uses the same state model as normal execution.
+  - `mse-per-slice-commit-checkpoints` depends on closure-aware orchestration so commits are aligned with completed slices.
 - Parallel-safe slices: none recommended; the batch capability shares one orchestrator and one state model.
 - Increment ordering: I1 -> I2 -> I3.
 - Lane owners and handoffs: the new orchestrator owns backlog traversal only; existing skills remain owners for slice bootstrap, execution routing, review, closure, and commit.
@@ -58,10 +58,10 @@
 
 ## 6. Bootstrap Order
 
-1. EW-MSE-01-scope-and-backlog-resolution
-2. EW-MSE-02-sequential-slice-orchestration
-3. EW-MSE-03-stop-and-resume-semantics
-4. EW-MSE-04-per-slice-commit-checkpoints
+1. mse-scope-and-backlog-resolution
+2. mse-sequential-slice-orchestration
+3. mse-stop-and-resume-semantics
+4. mse-per-slice-commit-checkpoints
 
 ## 7. Review Notes
 

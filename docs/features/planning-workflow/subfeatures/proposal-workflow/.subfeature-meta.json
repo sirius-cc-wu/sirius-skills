@@ -19,11 +19,11 @@
     "PFW-05"
   ],
   "affected_slice_ids": [
-    "PFW-01-proposal-registry",
-    "PFW-02-guide-routing",
-    "PFW-03-proposal-lifecycle",
-    "PFW-04-proposal-promotion",
-    "PFW-05-config-support"
+    "pfw-proposal-registry",
+    "pfw-guide-routing",
+    "pfw-proposal-lifecycle",
+    "pfw-proposal-promotion",
+    "pfw-config-support"
   ],
   "review_note": "Proposal workflow is now a canonical feature distinct from proposal instances and is ready for future slices if expanded.",
   "finalized_at": null
