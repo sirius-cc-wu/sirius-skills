@@ -12,9 +12,12 @@
 
 | Story ID | Story Size | Story Summary | Increments | Planned Slice IDs | Slice Areas | Blocked By | Execution Slice IDs | Notes |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| SIM-01 | M | Add a source-linked local install path | I1 | SIM-01-local-helper, SIM-01-local-docs | Helper, Docs |  |  | Split between helper behavior and published local install guidance |
-| SIM-02 | L | Separate packaged install from local install | I2 | SIM-02-packaged-targets, SIM-02-packaged-compat | Make targets, Compatibility policy | SIM-01-local-helper |  | Install-mode split depends on a working local helper first |
-| SIM-03 | L | Scope runtime sync and parity to packaging boundaries | I3 | SIM-03-runtime-scope, SIM-03-parity-scope | Runtime sync, Maintenance reporting | SIM-02-packaged-compat |  | Keeps copied-runtime and parity assumptions behind the explicit packaged boundary |
+| SIM-01 | M | Add a source-linked local install path | I1 | SIM-01-local-helper | Helper |  |  | Establishes the deterministic local symlink helper before other install-mode work depends on it |
+| SIM-01 | M | Add a source-linked local install path | I1 | SIM-01-local-docs | Docs | SIM-01-local-helper |  | Documents the local workflow only after helper behavior is concrete |
+| SIM-02 | L | Separate packaged install from local install | I2 | SIM-02-packaged-targets | Make targets | SIM-01-local-helper |  | Splits the command surface once the local helper contract exists |
+| SIM-02 | L | Separate packaged install from local install | I2 | SIM-02-packaged-compat | Compatibility policy | SIM-02-packaged-targets |  | Preserves the old packaged behavior while the new target split lands |
+| SIM-03 | L | Scope runtime sync and parity to packaging boundaries | I3 | SIM-03-runtime-scope | Runtime sync | SIM-02-packaged-compat |  | Keeps copied-runtime sync behind the explicit packaged boundary |
+| SIM-03 | L | Scope runtime sync and parity to packaging boundaries | I3 | SIM-03-parity-scope | Maintenance reporting | SIM-03-runtime-scope |  | Narrows parity defaults only after packaged-runtime scoping is in place |
 | SIM-04 | M | Publish migration and operator guidance | I3 | SIM-04-migration-guidance | Docs, Migration notes | SIM-03-parity-scope |  | Guidance should reflect the final install target names and parity semantics |
 
 ## Notes
