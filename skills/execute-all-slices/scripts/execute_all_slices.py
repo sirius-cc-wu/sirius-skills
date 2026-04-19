@@ -27,6 +27,7 @@ class PlannedSliceBacklogEntry:
     planned_slice_id: str
     story_id: str
     title: str
+    increment_ids: List[str]
     depends_on: List[str]
     execution_slice_ids: List[str]
     closed_execution_slice_ids: List[str]
@@ -39,6 +40,9 @@ class BacklogResolution:
     target_id: str
     target_path: str
     planning_status: str
+    increment_order: List[str]
+    current_increment: Optional[str]
+    completed_increments: List[str]
     ready_next: List[str]
     active_execution_slices: List[str]
     entries: List[PlannedSliceBacklogEntry]
@@ -49,6 +53,9 @@ class BacklogResolution:
             "target_id": self.target_id,
             "target_path": self.target_path,
             "planning_status": self.planning_status,
+            "increment_order": list(self.increment_order),
+            "current_increment": self.current_increment,
+            "completed_increments": list(self.completed_increments),
             "ready_next": list(self.ready_next),
             "active_execution_slices": list(self.active_execution_slices),
             "entries": [asdict(entry) for entry in self.entries],
@@ -166,6 +173,46 @@ def parse_planned_slices(slice_planning_path: Path) -> List[Dict[str, object]]:
     return results
 
 
+def parse_increment_plan(
+    slice_planning_path: Path,
+) -> Tuple[List[str], Dict[str, List[str]]]:
+    lines = slice_planning_path.read_text(encoding="utf-8").splitlines()
+    try:
+        header_map, start_index = _find_markdown_table(
+            lines,
+            [
+                "Increment",
+                "Planned Slice IDs",
+            ],
+        )
+    except RuntimeError:
+        return [], {}
+
+    increment_order: List[str] = []
+    increment_ids_by_planned_slice: Dict[str, List[str]] = {}
+    index = start_index
+    while index < len(lines):
+        row_line = lines[index].strip()
+        if not row_line.startswith("|"):
+            break
+        cells = _split_table_row(row_line)
+        if len(cells) <= max(header_map.values()):
+            index += 1
+            continue
+        increment_id = cells[header_map["increment"]].strip()
+        if not increment_id:
+            index += 1
+            continue
+        if increment_id not in increment_order:
+            increment_order.append(increment_id)
+        for planned_slice_id in _split_cell_values(cells[header_map["planned slice ids"]]):
+            bucket = increment_ids_by_planned_slice.setdefault(planned_slice_id, [])
+            if increment_id not in bucket:
+                bucket.append(increment_id)
+        index += 1
+    return increment_order, increment_ids_by_planned_slice
+
+
 def parse_traceability_table(
     traceability_path: Path,
 ) -> Tuple[List[str], int, Dict[str, int], List[List[str]]]:
@@ -187,6 +234,23 @@ def parse_traceability_table(
         rows.append(_split_table_row(row_line))
         index += 1
     return lines, start_index, header_map, rows
+
+
+def collect_increment_metadata(
+    slice_planning_path: Path, traceability_records
+) -> Tuple[List[str], Dict[str, List[str]]]:
+    increment_order, increment_ids_by_planned_slice = parse_increment_plan(slice_planning_path)
+    for record in traceability_records:
+        increment_ids = _split_cell_values(record.increments)
+        for increment_id in increment_ids:
+            if increment_id not in increment_order:
+                increment_order.append(increment_id)
+        for planned_slice_id in record.planned_slice_ids:
+            bucket = increment_ids_by_planned_slice.setdefault(planned_slice_id, [])
+            for increment_id in increment_ids:
+                if increment_id not in bucket:
+                    bucket.append(increment_id)
+    return increment_order, increment_ids_by_planned_slice
 
 
 def record_execution_slice_id(
@@ -348,6 +412,9 @@ def resolve_backlog(selector: str, explicit_scope: Optional[str] = None) -> Back
         str(feature["feature"]),
         str(feature["path"]),
     )
+    increment_order, increment_ids_by_planned_slice = collect_increment_metadata(
+        slice_planning_path, traceability_records
+    )
     execution_rows = execution_module.parse_registry(scope_context=scope_context)
     execution_status_by_id = {str(row["id"]): str(row["status"]) for row in execution_rows}
     planning_rows = planning_module.parse_registry(scope_context=scope_context)
@@ -404,6 +471,7 @@ def resolve_backlog(selector: str, explicit_scope: Optional[str] = None) -> Back
                 planned_slice_id=planned_slice_id,
                 story_id=str(planned_slice["story_id"]),
                 title=str(planned_slice["title"]),
+                increment_ids=list(increment_ids_by_planned_slice.get(planned_slice_id, [])),
                 depends_on=list(planned_slice["depends_on"]),
                 execution_slice_ids=list(execution_slice_ids),
                 closed_execution_slice_ids=list(closed_execution_slice_ids),
@@ -411,7 +479,7 @@ def resolve_backlog(selector: str, explicit_scope: Optional[str] = None) -> Back
             )
         )
 
-    ready_next: List[str] = []
+    dependency_ready_next: List[str] = []
     for entry in entries:
         if entry.closed_execution_slice_ids:
             entry.state = "completed"
@@ -434,15 +502,55 @@ def resolve_backlog(selector: str, explicit_scope: Optional[str] = None) -> Back
             for dep in entry.depends_on
         ):
             entry.state = "ready"
-            ready_next.append(entry.planned_slice_id)
+            dependency_ready_next.append(entry.planned_slice_id)
         else:
             entry.state = "blocked"
+
+    active_increment_ids: List[str] = []
+    for entry in entries:
+        if entry.state != "active":
+            continue
+        for increment_id in entry.increment_ids:
+            if increment_id not in active_increment_ids:
+                active_increment_ids.append(increment_id)
+
+    current_increment: Optional[str] = None
+    if active_increment_ids:
+        current_increment = active_increment_ids[0]
+    else:
+        for increment_id in increment_order:
+            if any(
+                increment_id in entry.increment_ids and entry.state != "completed"
+                for entry in entries
+            ):
+                current_increment = increment_id
+                break
+
+    ready_next: List[str] = []
+    for entry in entries:
+        if entry.state != "ready":
+            continue
+        if current_increment is None or current_increment in entry.increment_ids:
+            ready_next.append(entry.planned_slice_id)
+            continue
+        entry.state = "deferred"
+
+    completed_increments: List[str] = []
+    for increment_id in increment_order:
+        increment_entries = [
+            entry for entry in entries if increment_id in entry.increment_ids
+        ]
+        if increment_entries and all(entry.state == "completed" for entry in increment_entries):
+            completed_increments.append(increment_id)
 
     return BacklogResolution(
         target_type=target_type,
         target_id=str(feature["feature"]),
         target_path=str(feature["path"]),
         planning_status=str(metadata["status"]),
+        increment_order=increment_order,
+        current_increment=current_increment,
+        completed_increments=completed_increments,
         ready_next=ready_next,
         active_execution_slices=active_execution_slices,
         entries=entries,
@@ -654,6 +762,9 @@ def render_text(result: BacklogResolution) -> str:
         f"Target: {result.target_type} {result.target_id}",
         f"Planning status: {result.planning_status}",
         f"Path: {result.target_path}",
+        f"Increment order: {', '.join(result.increment_order) if result.increment_order else '-'}",
+        f"Current increment: {result.current_increment or '-'}",
+        f"Completed increments: {', '.join(result.completed_increments) if result.completed_increments else '-'}",
         f"Ready next: {', '.join(result.ready_next) if result.ready_next else '-'}",
         f"Active execution slices: {', '.join(result.active_execution_slices) if result.active_execution_slices else '-'}",
         "",
@@ -663,7 +774,12 @@ def render_text(result: BacklogResolution) -> str:
         suffix = ""
         if entry.depends_on:
             suffix = f" (depends on: {', '.join(entry.depends_on)})"
-        lines.append(f"- {entry.planned_slice_id}: {entry.state}{suffix}")
+        increment_suffix = (
+            f" [increments: {', '.join(entry.increment_ids)}]"
+            if entry.increment_ids
+            else ""
+        )
+        lines.append(f"- {entry.planned_slice_id}{increment_suffix}: {entry.state}{suffix}")
     return "\n".join(lines)
 
 

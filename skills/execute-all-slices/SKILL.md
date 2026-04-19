@@ -1,6 +1,6 @@
 ---
 name: execute-all-slices
-description: Resolves one reviewed feature or subfeature backlog into remaining planned slices and, in later slices, will execute them sequentially with one commit per completed slice.
+description: Resolves one reviewed feature or subfeature backlog into remaining planned slices and, in later slices, executes them increment-aware and sequentially with one commit per completed slice.
 ---
 
 # Execute All Slices
@@ -14,22 +14,22 @@ The first slice of this capability establishes durable scope and backlog
 resolution:
 
 1. Resolve exactly one feature or subfeature planning packet.
-2. Read its planned slices and dependency order from planning artifacts.
+2. Read its planned slices, increment order, and dependency order from planning artifacts.
 3. Compare planned slices with execution-slice lineage and closure state.
-4. Report which planned slices are completed, active, ready next, or blocked.
+4. Report which planned slices are completed, active, ready next, blocked, or deferred by an earlier unfinished increment.
 
 The second slice adds conservative sequential orchestration:
 
-5. Bootstrap exactly one next-ready execution slice when no mapped slice is
-   already active.
+5. Bootstrap exactly one next-ready execution slice from the current unfinished
+   increment when no mapped slice is already active.
 6. Record the bootstrapped execution slice ID back into `slice-traceability.md`.
 7. Hand the active slice back to the existing execution owners.
 
 The third slice adds stop/resume semantics:
 
 8. Resume an already-active mapped slice instead of creating a second one.
-9. Recompute progress from closed slices, active slices, and dependencies without
-   a batch-only progress file.
+9. Recompute progress from closed slices, active slices, increments, and
+   dependencies without a batch-only progress file.
 10. Stop explicitly when unfinished planned slices remain but none are ready.
 
 The fourth slice adds per-slice commit checkpoints:
@@ -38,6 +38,8 @@ The fourth slice adds per-slice commit checkpoints:
     changes after a completed mapped slice.
 12. Hand that checkpoint back to the existing `commit` owner instead of silently
     absorbing more work into the next slice.
+13. Report when an increment is complete and execution is moving on to the next
+    increment.
 
 ## Preferred Input
 
@@ -61,6 +63,9 @@ python3 skills/execute-all-slices/scripts/execute_all_slices.py <target> --scope
   capability beyond explicit `--bootstrap-next` orchestration.
 - Treat planning and execution registries as the source of truth for backlog and
   completion state.
+- Respect increment ordering first and slice dependency order second; do not
+  bootstrap a later-increment slice while an earlier increment still has
+  unfinished planned slices.
 - Refuse batch bootstrap when `slice-traceability.md` groups multiple planned
   slices into one row; the mapping is ambiguous and should be split first.
 - Stop when unfinished planned slices remain but no mapped slice is active and no

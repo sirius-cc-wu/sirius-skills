@@ -160,7 +160,7 @@ Preferred repo workflow:
 11. After approval, commit the planning artifacts so the reviewed plan is durable before execution begins.
 12. `slice` validates approved, committed execution-ready input, bootstraps a slice-scoped execution slice, and hands off to `guide-execution`.
 13. `guide-execution` routes slice-scoped execution through `brief` to capture slice intent and acceptance, then through `blueprint` to produce the final execution artifact. When `.skills/execution.json` enables `auto_start_implementation`, that handoff continues directly into implementation after the blueprint is marked ready.
-14. `execute-all-slices` is the optional batch entrypoint when a reviewed and committed feature or subfeature backlog should be worked one planned slice at a time. It resumes or bootstraps one mapped slice, then stops at the next owning execution step or commit checkpoint.
+14. `execute-all-slices` is the optional batch entrypoint when a reviewed and committed feature or subfeature backlog should be worked one planned slice at a time. It respects increment order first, then slice dependencies within the current increment, resumes or bootstraps one mapped slice, and stops at the next owning execution step or commit checkpoint.
 15. `review-execution` checks implementation and validation outcomes against the slice-scoped execution artifacts before closure.
 16. `close-slice` closes completed execution slices and records durable closure metadata.
 17. After closure, keep the subfeature planning folder and closed slice artifacts in place. If a repository wants later cleanup or archival, handle that through maintenance tooling such as `archive-artifacts`, not a dedicated subfeature-finalization skill.

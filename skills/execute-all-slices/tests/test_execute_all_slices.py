@@ -166,6 +166,63 @@ def test_resolve_feature_scope_returns_first_ready_planned_slice(tmp_path, monke
     assert states["mse-sequential-slice-orchestration"] == "blocked"
 
 
+def test_resolve_backlog_defers_ready_slice_in_later_increment_until_earlier_increment_completes(
+    tmp_path, monkeypatch, capsys
+):
+    env = setup_repo(tmp_path, monkeypatch)
+    planning = env["planning"]
+    feature_path = env["feature_path"]
+    module = env["module"]
+
+    write_file(
+        feature_path / "slice-planning.md",
+        """# Slice Planning
+
+| Increment | Goal / User-Visible Value | Included Story IDs | Planned Slice IDs | Demo / Verification Outcome | Notes |
+| --- | --- | --- | --- | --- | --- |
+| I1 | First increment | EW-01 | mse-scope-and-backlog-resolution | test | Notes |
+| I2 | Second increment | EW-02 | mse-sequential-slice-orchestration | test | Notes |
+
+| Slice ID | Story ID | Title | Summary | Target Area | Lane | Validation | Planned Action | Depends On | Slice Ready |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| mse-scope-and-backlog-resolution | EW-01 | Resolve backlog | Summary | area | primary | test | create slice |  | yes |
+| mse-sequential-slice-orchestration | EW-02 | Orchestrate backlog | Summary | area | primary | test | create slice |  | yes |
+""",
+    )
+    write_file(
+        feature_path / "slice-traceability.md",
+        """# Slice Traceability
+
+| Story ID | Story Size | Story Summary | Increments | Planned Slice IDs | Slice Areas | Blocked By | Execution Slice IDs | Notes |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| EW-01 | M | Summary | I1 | mse-scope-and-backlog-resolution | area |  |  | Notes |
+| EW-02 | M | Summary | I2 | mse-sequential-slice-orchestration | area |  |  | Notes |
+""",
+    )
+
+    rows = planning.parse_registry()
+    feature = planning.find_feature(rows, "execution-workflow")
+    assert feature is not None
+    ok, message = planning.update_feature_status(
+        rows,
+        feature,
+        "planning_reviewed",
+        force=True,
+        review_note="ready",
+    )
+    assert ok, message
+
+    assert run_cli(module, monkeypatch, "execution-workflow", "--json") == 0
+    payload = json.loads(capsys.readouterr().out)
+
+    assert payload["increment_order"] == ["I1", "I2"]
+    assert payload["current_increment"] == "I1"
+    assert payload["ready_next"] == ["mse-scope-and-backlog-resolution"]
+    states = {entry["planned_slice_id"]: entry["state"] for entry in payload["entries"]}
+    assert states["mse-scope-and-backlog-resolution"] == "ready"
+    assert states["mse-sequential-slice-orchestration"] == "deferred"
+
+
 def test_resolve_subfeature_scope_uses_closed_execution_slice_lineage(
     tmp_path, monkeypatch, capsys
 ):
@@ -602,6 +659,84 @@ def test_resume_bootstraps_next_ready_slice_after_completed_predecessor(
     assert payload["action"] == "bootstrap_next_slice"
     assert payload["bootstrapped_slice_id"] == "mse-sequential-slice-orchestration"
     assert payload["next_owner"] == "guide-execution"
+
+
+def test_resolve_backlog_reports_completed_and_current_increments_in_text_output(
+    tmp_path, monkeypatch, capsys
+):
+    env = setup_repo(tmp_path, monkeypatch)
+    subfeatures = env["subfeatures"]
+    feature_path = env["feature_path"]
+    subfeature_path = env["subfeature_path"]
+    module = env["module"]
+    execution = env["execution"]
+
+    write_file(
+        subfeature_path / "slice-planning.md",
+        """# Slice Planning
+
+| Increment | Goal / User-Visible Value | Included Story IDs | Planned Slice IDs | Demo / Verification Outcome | Notes |
+| --- | --- | --- | --- | --- | --- |
+| I1 | First increment | EW-01 | mse-scope-and-backlog-resolution | test | Notes |
+| I2 | Second increment | EW-01 | mse-sequential-slice-orchestration | test | Notes |
+
+| Slice ID | Story ID | Title | Summary | Target Area | Lane | Validation | Planned Action | Depends On | Slice Ready |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| mse-scope-and-backlog-resolution | EW-01 | Resolve scope | Summary | area | primary | test | create slice |  | yes |
+| mse-sequential-slice-orchestration | EW-01 | Orchestrate slices | Summary | area | primary | test | create slice | mse-scope-and-backlog-resolution | yes |
+""",
+    )
+    write_file(
+        subfeature_path / "slice-traceability.md",
+        """# Slice Traceability
+
+| Story ID | Story Size | Story Summary | Increments | Planned Slice IDs | Slice Areas | Blocked By | Execution Slice IDs | Notes |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| EW-01 | M | Summary | I1 | mse-scope-and-backlog-resolution | area |  | mse-scope-and-backlog-resolution | Notes |
+| EW-01 | M | Summary | I2 | mse-sequential-slice-orchestration | area | mse-scope-and-backlog-resolution |  | Notes |
+""",
+    )
+
+    rows = subfeatures.load_registry(str(feature_path))
+    subfeature = subfeatures.find_subfeature(rows, "multi-slice-execution")
+    assert subfeature is not None
+    success, message = subfeatures.update_subfeature_status(
+        env["planning"],
+        str(feature_path),
+        subfeature,
+        "reviewed",
+        env["planning"].SCOPE_RUNTIME.resolve_scope_context(),
+        force=True,
+        review_note="ready",
+        affected_artifacts=[
+            "docs/features/execution-workflow/discover.md",
+            "docs/features/execution-workflow/system-design.md",
+            "docs/features/execution-workflow/user-stories.md",
+        ],
+        affected_story_ids=["EW-01"],
+    )
+    assert success, message
+
+    _, created = execution.create_slice(
+        "mse-scope-and-backlog-resolution", "Resolve scope"
+    )
+    assert created
+    execution_rows = execution.parse_registry()
+    slice_row = execution.resolve_slice(
+        execution_rows, "mse-scope-and-backlog-resolution"
+    )
+    assert slice_row is not None
+    success, message = execution.update_slice_status(
+        execution_rows, slice_row, "closed", force=True
+    )
+    assert success, message
+
+    assert run_cli(module, monkeypatch, "multi-slice-execution") == 0
+    output = capsys.readouterr().out
+
+    assert "Current increment: I2" in output
+    assert "Completed increments: I1" in output
+    assert "- mse-sequential-slice-orchestration [increments: I2]: ready" in output
 
 
 def test_resume_rejects_blocked_unfinished_backlog_without_ready_slice(
