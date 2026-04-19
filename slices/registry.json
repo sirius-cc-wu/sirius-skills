@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "generated_at": "2026-04-19T11:09:09",
+  "generated_at": "2026-04-19T11:10:55",
   "slices": [
     {
       "id": "HSS-01-root-fallback",
@@ -289,6 +289,16 @@
       "path": "slices/SIM-02-packaged-compat-preserve-packaged-install-compatibility-during-migration/",
       "updated_at": "2026-04-19T11:09:09",
       "closed_at": "2026-04-19T11:09:09",
+      "archived_at": null,
+      "relations": []
+    },
+    {
+      "id": "SIM-03-runtime-scope",
+      "feature": "Scope shared-runtime sync to packaged installs",
+      "status": "closed",
+      "path": "slices/SIM-03-runtime-scope-scope-shared-runtime-sync-to-packaged-installs/",
+      "updated_at": "2026-04-19T11:10:55",
+      "closed_at": "2026-04-19T11:10:55",
       "archived_at": null,
       "relations": []
     }
