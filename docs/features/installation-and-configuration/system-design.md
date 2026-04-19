@@ -23,8 +23,9 @@ used when a specific skill explicitly opts in.
 
 - `make install-local` symlinks the managed skill set into a selected skill home.
 - `make uninstall-local` removes only the managed local symlinks created for the managed skill names.
-- `make install` registers the managed packaged skill set.
-- `make uninstall` removes only the managed packaged skill names currently installed.
+- `make install-packaged` registers the managed packaged skill set.
+- `make uninstall-packaged` removes only the managed packaged skill names currently installed.
+- `make install` and `make uninstall` remain compatibility aliases to the packaged path in the current rollout.
 - `manage_planning.py` reads `planning.json` for `planning_dir`.
 - `manage_execution.py` reads `execution.json` for `slice_dir`, `preferred_workflow`, and `auto_start_implementation`.
 - `manage_execution.py`, `commit`, `create-pr`, and `close-slice` read `conventions.json` for naming and issue-link behavior.
@@ -41,7 +42,8 @@ used when a specific skill explicitly opts in.
 - Use repository tests that exercise config readers in planning, execution, breakdown, and close-slice flows.
 - Review `README.md` and `AGENTS.md` whenever config semantics change.
 - Verify `make install-local` / `make uninstall-local` match the managed skill list for source-linked installs.
-- Verify `make install` / `make uninstall` continue to match the managed packaged skill list.
+- Verify `make install-packaged` / `make uninstall-packaged` continue to match the managed packaged skill list.
+- Verify `make install` / `make uninstall` still behave as packaged compatibility aliases.
 
 ## PlantUML
 

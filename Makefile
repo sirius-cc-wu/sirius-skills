@@ -36,6 +36,7 @@ MANAGED_SKILLS := \
 install-local:
 	python3 scripts/install_local_skills.py install --repo-root "$(REPO_ROOT)" --skills-home "$(SKILLS_HOME)" $(MANAGED_SKILLS)
 
+# Compatibility alias during the migration to explicit local and packaged modes.
 install: install-packaged
 
 install-packaged: sync-shared-runtime sync-shared-references
@@ -80,6 +81,7 @@ sync-shared-runtime:
 validate-workflow-state:
 	python3 scripts/validate_workflow_state.py
 
+# Compatibility alias during the migration to explicit local and packaged modes.
 uninstall: uninstall-packaged
 
 uninstall-packaged:

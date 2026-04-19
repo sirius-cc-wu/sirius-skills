@@ -34,7 +34,8 @@ The repository is designed as a reusable skill collection, but successful adopti
 ## Confirmed Signals in Repo
 
 - `Makefile` now defines `make install-local` and `make uninstall-local` for source-linked local use.
-- `Makefile` still defines `make install` and `make uninstall` using `npx skills add/remove` for the current packaged compatibility flow.
+- `Makefile` now defines `make install-packaged` and `make uninstall-packaged` for the explicit packaged flow.
+- `Makefile` still keeps `make install` and `make uninstall` as packaged compatibility aliases during the migration.
 - `README.md` documents generic-first workflow and config surfaces.
 - `AGENTS.md` emphasizes configuration over hardcoding and preserving ownership boundaries.
 - `skills/commit/`, `skills/create-pr/`, `skills/guide-planning/`, and `skills/guide-execution/` all consume configuration in controlled ways.

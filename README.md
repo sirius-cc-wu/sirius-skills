@@ -20,17 +20,23 @@ To remove the same local source-linked install later:
 make uninstall-local
 ```
 
-The original packaged compatibility path is still available in the current
-rollout:
+The explicit packaged path is:
+
+```bash
+make install-packaged
+make uninstall-packaged
+```
+
+The original compatibility aliases are still available in the current rollout:
 
 ```bash
 make install
 make uninstall
 ```
 
-`make install` and `make uninstall` still run the managed packaged install flow
-through `npx skills`. Later slices may rename that packaged path explicitly, but
-these are the current commands.
+`make install-packaged` and `make uninstall-packaged` run the managed packaged
+install flow through `npx skills`. `make install` and `make uninstall` still
+point at that packaged flow as migration-time compatibility aliases.
 
 To rerun the curated workflow consistency validation bundle used by CI and
 workflow-state maintenance work:
@@ -67,7 +73,7 @@ then copied into the individual skill folders that need to package it.
 Current shared-reference workflow:
 
 - keep the canonical source in `docs/shared/`
-- `make install` refreshes shared runtime and reference copies before packaging managed skills
+- `make install-packaged` refreshes shared runtime and reference copies before packaging managed skills
 - `make validate-workflow-state` reruns the curated workflow consistency pytest
   bundle for parity and transition guardrail regressions
 - run `make sync-shared-references` after editing a canonical shared reference

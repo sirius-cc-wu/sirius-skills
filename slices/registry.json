@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "generated_at": "2026-04-19T11:07:03",
+  "generated_at": "2026-04-19T11:09:09",
   "slices": [
     {
       "id": "HSS-01-root-fallback",
@@ -279,6 +279,16 @@
       "path": "slices/SIM-02-packaged-targets-split-local-and-packaged-install-targets/",
       "updated_at": "2026-04-19T11:07:03",
       "closed_at": "2026-04-19T11:07:03",
+      "archived_at": null,
+      "relations": []
+    },
+    {
+      "id": "SIM-02-packaged-compat",
+      "feature": "Preserve packaged install compatibility during migration",
+      "status": "closed",
+      "path": "slices/SIM-02-packaged-compat-preserve-packaged-install-compatibility-during-migration/",
+      "updated_at": "2026-04-19T11:09:09",
+      "closed_at": "2026-04-19T11:09:09",
       "archived_at": null,
       "relations": []
     }

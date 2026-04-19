@@ -111,9 +111,12 @@ Use `make install-local` and `make uninstall-local` for source-linked local
 development installs. `SKILLS_HOME` can override the target skill home when a
 CLI uses a different discovery path or when tests need a temporary directory.
 
-`make install` and `make uninstall` still represent the packaged compatibility
-path in the current rollout. Keep repo-level guidance agent-agnostic unless a
-specific integration requires otherwise.
+Use `make install-packaged` and `make uninstall-packaged` for the explicit
+packaged workflow. `make install` and `make uninstall` remain compatibility
+aliases to that packaged path in the current rollout.
+
+Keep repo-level guidance agent-agnostic unless a specific integration requires
+otherwise.
 
 ## Agent Checklist
 
