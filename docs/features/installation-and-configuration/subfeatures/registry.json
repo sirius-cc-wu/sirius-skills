@@ -2,9 +2,9 @@
   "subfeatures": [
     {
       "subfeature_id": "split-install-modes",
-      "status": "reviewed",
+      "status": "finalized",
       "subfeature_type": "superseding",
-      "updated_at": "2026-04-19T10:48:31",
+      "updated_at": "2026-04-19T11:16:05",
       "path": "docs/features/installation-and-configuration/subfeatures/split-install-modes/"
     }
   ]

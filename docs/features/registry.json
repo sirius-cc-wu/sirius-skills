@@ -68,8 +68,8 @@
     },
     {
       "feature": "split-install-modes",
-      "status": "slice_ready",
-      "updated_at": "2026-04-19T10:55:35",
+      "status": "implemented",
+      "updated_at": "2026-04-19T11:16:05",
       "path": "docs/features/installation-and-configuration/subfeatures/split-install-modes/"
     },
     {
