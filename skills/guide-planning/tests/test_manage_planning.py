@@ -589,11 +589,7 @@ def test_implemented_is_terminal_and_does_not_require_ready_slice_ids(
     assert run_cli(module, monkeypatch, "set-status", "habit-tracker", "implemented") == 0
 
     metadata = json.loads((feature_dir / ".planning-meta.json").read_text(encoding="utf-8"))
-    metadata["ready_slice_ids"] = []
-    (feature_dir / ".planning-meta.json").write_text(
-        json.dumps(metadata, indent=2) + "\n",
-        encoding="utf-8",
-    )
+    assert metadata["ready_slice_ids"] == []
 
     monkeypatch.setattr(sys, "argv", ["manage_planning.py", "validate-feature", "habit-tracker"])
     exit_code = module.main()

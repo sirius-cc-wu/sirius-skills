@@ -746,6 +746,8 @@ def update_feature_status(
         updated_metadata["review_note"] = normalize_review_note(review_note)
     if slice_ids is not None:
         updated_metadata["ready_slice_ids"] = normalize_slice_ids(slice_ids)
+    elif status == "implemented":
+        updated_metadata["ready_slice_ids"] = []
     if requires_ui_flow is not None:
         updated_metadata["requires_ui_flow"] = requires_ui_flow
 

@@ -92,18 +92,19 @@ def _subfeature_blockers_for_slice_close(
             continue
         metadata = inventory.context.subfeatures.read_metadata(str(subfeature_dir))
         current_status = str(metadata.get("status") or "")
-        if current_status == "finalized":
+        if current_status in {"reviewed", "finalized"}:
             continue
         findings.append(
             SemanticPreviewRecord(
                 artifact_type="subfeature",
                 artifact_id=record.owner_id,
                 path=record.owner_path,
-                code="transition_subfeature_finalize_required",
+                code="transition_subfeature_review_required",
                 message=(
                     f"Transition block: closing slice '{slice_id}' would leave linked "
                     f"subfeature '{record.owner_id}' in status '{current_status}'. "
-                    "Finalize the subfeature first or rerun with --force."
+                    "Advance the subfeature to at least 'reviewed' before closing linked slices "
+                    "or rerun with --force."
                 ),
             )
         )

@@ -8,6 +8,9 @@ CLOSE_SLICE_PATH = Path(__file__).resolve().parents[1] / "scripts" / "close_slic
 MANAGE_EXECUTION_PATH = (
     Path(__file__).resolve().parents[2] / "guide-execution" / "scripts" / "manage_execution.py"
 )
+MANAGE_PLANNING_PATH = (
+    Path(__file__).resolve().parents[2] / "guide-planning" / "scripts" / "manage_planning.py"
+)
 
 
 def load_module(path: Path, name: str):
@@ -32,30 +35,60 @@ def write_planning_config(scope_root: Path):
     )
 
 
-def write_transition_guardrail_feature(tmp_path: Path, slice_id: str):
+def write_transition_guardrail_feature(
+    tmp_path: Path,
+    slice_id: str,
+    *,
+    feature_status: str = "planning_reviewed",
+    feature_ready_slice_ids: list[str] | None = None,
+    subfeature_status: str = "reviewed",
+    subfeature_planning_status: str = "planning_reviewed",
+    include_subfeature: bool = True,
+):
     feature_dir = tmp_path / "docs" / "features" / "checkout"
     subfeature_dir = feature_dir / "subfeatures" / "replace-legacy-flow"
-    subfeature_dir.mkdir(parents=True, exist_ok=True)
+    if include_subfeature:
+        subfeature_dir.mkdir(parents=True, exist_ok=True)
+    else:
+        feature_dir.mkdir(parents=True, exist_ok=True)
+    (feature_dir / "discover.md").write_text("# Discover\n", encoding="utf-8")
+    (feature_dir / "system-design.md").write_text("# Design\n", encoding="utf-8")
+    (feature_dir / "slice-planning.md").write_text("# Slice Planning\n", encoding="utf-8")
+    (feature_dir / "slice-traceability.md").write_text(
+        "# Slice Traceability\n\n"
+        "| Story ID | Increments | Planned Slice IDs | Execution Slice IDs | Notes |\n"
+        "| --- | --- | --- | --- | --- |\n"
+        f"| CHK-01 | I1 | {slice_id} | {slice_id} | demo |\n",
+        encoding="utf-8",
+    )
     (feature_dir / ".planning-meta.json").write_text(
         json.dumps(
             {
                 "feature_slug": "checkout",
-                "status": "planning_reviewed",
+                "status": feature_status,
                 "created_at": "2026-01-01T00:00:00",
                 "updated_at": "2026-01-01T00:00:00",
                 "requires_ui_flow": False,
                 "review_note": "ready",
-                "ready_slice_ids": [slice_id],
+                "ready_slice_ids": feature_ready_slice_ids
+                if feature_ready_slice_ids is not None
+                else [slice_id],
             }
         )
         + "\n",
         encoding="utf-8",
     )
+    if not include_subfeature:
+        return
+    (subfeature_dir / "discover.md").write_text("# Discover\n", encoding="utf-8")
+    (subfeature_dir / "impact-analysis.md").write_text("# Impact\n", encoding="utf-8")
+    (subfeature_dir / "system-design.md").write_text("# Design\n", encoding="utf-8")
+    (subfeature_dir / "slice-planning.md").write_text("# Slice Planning\n", encoding="utf-8")
     (subfeature_dir / ".planning-meta.json").write_text(
         json.dumps(
             {
                 "feature_slug": "replace-legacy-flow",
-                "status": "planning_reviewed",
+                "status": subfeature_planning_status,
                 "created_at": "2026-01-01T00:00:00",
                 "updated_at": "2026-01-01T00:00:00",
                 "requires_ui_flow": False,
@@ -71,7 +104,7 @@ def write_transition_guardrail_feature(tmp_path: Path, slice_id: str):
             {
                 "parent_feature_slug": "checkout",
                 "subfeature_id": "replace-legacy-flow",
-                "status": "reviewed",
+                "status": subfeature_status,
                 "created_at": "2026-01-01T00:00:00",
                 "updated_at": "2026-01-01T00:00:00",
                 "subfeature_type": "replacement",
@@ -90,7 +123,7 @@ def write_transition_guardrail_feature(tmp_path: Path, slice_id: str):
         "# Slice Traceability\n\n"
         "| Story ID | Increments | Planned Slice IDs | Execution Slice IDs | Notes |\n"
         "| --- | --- | --- | --- | --- |\n"
-        f"| CHK-01 | I2 | {slice_id} |  | demo |\n",
+        f"| CHK-01 | I2 | {slice_id} | {slice_id} | demo |\n",
         encoding="utf-8",
     )
 
@@ -208,10 +241,85 @@ def test_close_slice_blocks_when_linked_subfeature_is_not_finalized(
     close_slice = load_module(CLOSE_SLICE_PATH, "close_slice")
     _, _ = setup_execution_ready_slice(tmp_path, monkeypatch)
     write_planning_config(tmp_path)
-    write_transition_guardrail_feature(tmp_path, "DEMO")
+    write_transition_guardrail_feature(
+        tmp_path,
+        "DEMO",
+        subfeature_status="draft",
+        subfeature_planning_status="discovery_pending",
+    )
 
     exit_code = run_cli(close_slice, monkeypatch, "--slice", "DEMO")
     captured = capsys.readouterr()
 
     assert exit_code == 2
-    assert "transition_subfeature_finalize_required" in captured.err
+    assert "transition_subfeature_review_required" in captured.err
+
+
+def test_close_slice_marks_feature_implemented_when_last_slice_closes(tmp_path, monkeypatch):
+    close_slice = load_module(CLOSE_SLICE_PATH, "close_slice")
+    planning = load_module(MANAGE_PLANNING_PATH, "manage_planning_close_slice")
+    _, _ = setup_execution_ready_slice(tmp_path, monkeypatch)
+    write_planning_config(tmp_path)
+    write_transition_guardrail_feature(
+        tmp_path,
+        "DEMO",
+        feature_status="slice_ready",
+        include_subfeature=False,
+    )
+
+    assert run_cli(close_slice, monkeypatch, "--slice", "DEMO") == 0
+
+    feature_metadata = json.loads(
+        (tmp_path / "docs" / "features" / "checkout" / ".planning-meta.json").read_text(
+            encoding="utf-8"
+        )
+    )
+    registry = json.loads(
+        (tmp_path / "docs" / "features" / "registry.json").read_text(encoding="utf-8")
+    )
+
+    assert feature_metadata["status"] == "implemented"
+    assert feature_metadata["ready_slice_ids"] == []
+    feature_row = next(row for row in registry["features"] if row["feature"] == "checkout")
+    assert feature_row["status"] == "implemented"
+
+    monkeypatch.setattr(
+        sys,
+        "argv",
+        ["manage_planning.py", "validate-feature", "checkout"],
+    )
+    assert planning.main() == 0
+
+
+def test_close_slice_finalizes_reviewed_subfeature_when_last_slice_closes(
+    tmp_path, monkeypatch
+):
+    close_slice = load_module(CLOSE_SLICE_PATH, "close_slice")
+    _, _ = setup_execution_ready_slice(tmp_path, monkeypatch)
+    write_planning_config(tmp_path)
+    write_transition_guardrail_feature(
+        tmp_path,
+        "DEMO",
+        feature_status="planning_reviewed",
+        feature_ready_slice_ids=[],
+        subfeature_status="reviewed",
+        subfeature_planning_status="planning_reviewed",
+    )
+
+    assert run_cli(close_slice, monkeypatch, "--slice", "DEMO") == 0
+
+    subfeature_dir = (
+        tmp_path / "docs" / "features" / "checkout" / "subfeatures" / "replace-legacy-flow"
+    )
+    subfeature_metadata = json.loads(
+        (subfeature_dir / ".subfeature-meta.json").read_text(encoding="utf-8")
+    )
+    planning_metadata = json.loads(
+        (subfeature_dir / ".planning-meta.json").read_text(encoding="utf-8")
+    )
+
+    assert subfeature_metadata["status"] == "finalized"
+    assert subfeature_metadata["affected_slice_ids"] == ["DEMO"]
+    assert subfeature_metadata["finalized_at"]
+    assert planning_metadata["status"] == "implemented"
+    assert planning_metadata["ready_slice_ids"] == []
