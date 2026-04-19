@@ -67,7 +67,8 @@ Resolve `<feature_path>` as either:
 3. Compare discovery intent, design direction, and breakdown outputs for contradictions or missing handoff details, including duplicate configuration surfaces or parent/subfeature ownership drift.
 4. Record findings directly in the planning docs already used by the team. For subfeatures, write those findings back into the subfeature-local docs.
 5. Update the affected planning artifacts so the reviewed state is durable.
-6. Stop when the work is ready for human approval and planning commit, or return it to `discover`, `design`, or `breakdown` as needed.
+6. When the outcome is ready for approval, persist the readiness note in the planning docs and run `python3 skills/guide-planning/scripts/manage_planning.py sync-status <feature-selector> --through planning_reviewed --review-note "<readiness note>"`. If blockers remain, leave the metadata status unchanged.
+7. Stop when the work is ready for human approval and planning commit, or return it to `discover`, `design`, or `breakdown` as needed.
 
 ## Guardrails
 

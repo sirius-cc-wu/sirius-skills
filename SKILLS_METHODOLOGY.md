@@ -31,6 +31,8 @@ Use a **two-layer workflow**:
 
 The planning layer keeps scope, design, decomposition, and increment planning in repo documents, and `guide-planning` owns readiness and routing across those artifacts.
 
+After each planning phase writes or updates its repository artifacts, persist the matching metadata transition with `python3 skills/guide-planning/scripts/manage_planning.py sync-status <feature-selector> --through <expected-status>`. Use `sync-status` for normal adjacent advancement and drift repair; reserve `set-status` for explicit manual overrides and terminal execution states.
+
 The execution layer works one implementation-ready slice at a time, starting with `slice` bootstrap from approved committed planning artifacts. `execute-all-slices` can sit above that flow when a reviewed and committed feature or subfeature should be worked as one dependency-aware backlog; it should follow increment order first, then slice dependencies within the current increment, while still handing each concrete slice back to the existing single-slice owners.
 
 ## Recommended Workflow

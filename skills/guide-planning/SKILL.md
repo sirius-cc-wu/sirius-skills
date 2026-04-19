@@ -13,7 +13,7 @@ Use this skill as the planning-layer entrypoint when you need to decide the next
 2. Promote accepted proposals into canonical feature planning folders when the user explicitly asks for planning to begin.
 3. Verify required planning files, registry state, and feature metadata.
 4. Route feature-scoped work to `propose`, `add-subfeature`, `assess`, `discover`, `design`, `ui-flow`, `breakdown`, or `review-planning`, then stop for approval/commit before execution begins.
-5. Update planning readiness state when a phase is complete.
+5. Persist planning readiness state when a phase is complete.
 6. Keep planning handoff decisions durable in the repository instead of transient chat state.
 
 ## Entry Decision Guide
@@ -78,3 +78,6 @@ Use adjacent transitions by default and repair skipped states only deliberately.
 ## Tooling
 
 Always use `scripts/manage_planning.py` in this skill directory for initialization, proposal promotion, registry synchronization, state transitions, and validation.
+
+- Use `sync-status` after `discover`, `design`, `ui-flow`, `breakdown`, and successful `review-planning` passes so metadata advances through the normal adjacent planning states instead of drifting behind the authored artifacts.
+- Use `set-status` for explicit manual overrides, terminal execution states, or deliberate repair that should not be inferred from current artifacts alone.

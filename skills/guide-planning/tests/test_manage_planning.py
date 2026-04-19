@@ -582,6 +582,94 @@ def test_slice_ready_requires_review_note_and_slice_ids(tmp_path, monkeypatch, c
     assert metadata["ready_slice_ids"] == ["HAB-101"]
 
 
+def test_sync_status_honors_through_limit_for_phase_completion(
+    tmp_path, monkeypatch, capsys
+):
+    module = load_manage_planning_module()
+    monkeypatch.chdir(tmp_path)
+
+    assert run_cli(module, monkeypatch, "init") == 0
+    assert run_cli(module, monkeypatch, "add", "habit-tracker") == 0
+
+    feature_dir = tmp_path / "docs" / "features" / "habit-tracker"
+    write_file(feature_dir / "discover.md")
+    write_file(feature_dir / "system-design.md")
+
+    exit_code = run_cli(
+        module,
+        monkeypatch,
+        "sync-status",
+        "habit-tracker",
+        "--through",
+        "discovery_ready",
+    )
+    captured = capsys.readouterr()
+
+    assert exit_code == 0
+    assert "to 'discovery_ready'" in captured.out
+
+    metadata = json.loads((feature_dir / ".planning-meta.json").read_text(encoding="utf-8"))
+    assert metadata["status"] == "discovery_ready"
+
+
+def test_sync_status_advances_to_highest_valid_state_and_reports_next_blocker(
+    tmp_path, monkeypatch, capsys
+):
+    module = load_manage_planning_module()
+    monkeypatch.chdir(tmp_path)
+
+    assert run_cli(module, monkeypatch, "init") == 0
+    assert run_cli(module, monkeypatch, "add", "habit-tracker") == 0
+
+    feature_dir = tmp_path / "docs" / "features" / "habit-tracker"
+    write_file(feature_dir / "discover.md")
+    write_file(feature_dir / "system-design.md")
+
+    exit_code = run_cli(module, monkeypatch, "sync-status", "habit-tracker")
+    captured = capsys.readouterr()
+
+    assert exit_code == 0
+    assert "to 'design_ready'" in captured.out
+    assert "Next blocked status 'breakdown_ready'" in captured.out
+
+    metadata = json.loads((feature_dir / ".planning-meta.json").read_text(encoding="utf-8"))
+    assert metadata["status"] == "design_ready"
+
+
+def test_sync_status_uses_review_note_to_reach_planning_reviewed(
+    tmp_path, monkeypatch, capsys
+):
+    module = load_manage_planning_module()
+    monkeypatch.chdir(tmp_path)
+
+    assert run_cli(module, monkeypatch, "init") == 0
+    assert run_cli(module, monkeypatch, "add", "habit-tracker") == 0
+
+    feature_dir = tmp_path / "docs" / "features" / "habit-tracker"
+    write_file(feature_dir / "discover.md")
+    write_file(feature_dir / "system-design.md")
+    write_file(feature_dir / "slice-planning.md")
+    write_file(feature_dir / "slice-traceability.md")
+
+    exit_code = run_cli(
+        module,
+        monkeypatch,
+        "sync-status",
+        "habit-tracker",
+        "--review-note",
+        "Planning artifacts reviewed and ready for tracker bootstrap.",
+    )
+    captured = capsys.readouterr()
+
+    assert exit_code == 0
+    assert "to 'planning_reviewed'" in captured.out
+    assert "Next blocked status 'slice_ready'" in captured.out
+
+    metadata = json.loads((feature_dir / ".planning-meta.json").read_text(encoding="utf-8"))
+    assert metadata["status"] == "planning_reviewed"
+    assert metadata["review_note"] == "Planning artifacts reviewed and ready for tracker bootstrap."
+
+
 def test_validate_feature_reports_success_for_ready_feature(tmp_path, monkeypatch):
     module = load_manage_planning_module()
     monkeypatch.chdir(tmp_path)

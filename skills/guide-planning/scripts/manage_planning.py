@@ -54,6 +54,7 @@ STATUS_SEQUENCE = [
     "slice_ready",
     "implemented",
 ]
+SYNCABLE_MAX_STATUS = "slice_ready"
 VALID_STATUSES = set(STATUS_SEQUENCE)
 STATUS_ALIASES = {
     "discovery_pending": "discovery_pending",
@@ -735,6 +736,29 @@ def can_transition(current: str, target: str) -> bool:
     return STATUS_SEQUENCE.index(target) - STATUS_SEQUENCE.index(current) == 1
 
 
+def next_status(current: str) -> Optional[str]:
+    current_index = STATUS_SEQUENCE.index(current)
+    if current_index >= len(STATUS_SEQUENCE) - 1:
+        return None
+    return STATUS_SEQUENCE[current_index + 1]
+
+
+def apply_metadata_overrides(
+    metadata: Dict[str, object],
+    review_note: Optional[str] = None,
+    slice_ids: Optional[List[str]] = None,
+    requires_ui_flow: Optional[bool] = None,
+) -> Dict[str, object]:
+    updated_metadata = dict(metadata)
+    if review_note is not None:
+        updated_metadata["review_note"] = normalize_review_note(review_note)
+    if slice_ids is not None:
+        updated_metadata["ready_slice_ids"] = normalize_slice_ids(slice_ids)
+    if requires_ui_flow is not None:
+        updated_metadata["requires_ui_flow"] = requires_ui_flow
+    return updated_metadata
+
+
 def update_feature_status(
     rows: List[Dict[str, object]],
     feature: Dict[str, object],
@@ -779,6 +803,111 @@ def update_feature_status(
     message = f"Updated {feature['feature']} to status '{status}'"
     transition_result = evaluate_feature_transition(str(feature["feature"]), status)
     return True, format_transition_message(message, transition_result)
+
+
+def sync_feature_status(
+    rows: List[Dict[str, object]],
+    feature: Dict[str, object],
+    through: Optional[str] = None,
+    review_note: Optional[str] = None,
+    slice_ids: Optional[List[str]] = None,
+    requires_ui_flow: Optional[bool] = None,
+    scope_context: Optional[object] = None,
+) -> Tuple[bool, str]:
+    feature_dir = feature_dir_for_row(feature, scope_context=scope_context)
+    metadata = read_metadata(feature_dir)
+    current_status = str(metadata["status"])
+
+    if through is None:
+        target_status = SYNCABLE_MAX_STATUS
+    else:
+        target_status = through
+
+    if STATUS_SEQUENCE.index(target_status) > STATUS_SEQUENCE.index(SYNCABLE_MAX_STATUS):
+        return (
+            False,
+            f"sync-status supports transitions only through '{SYNCABLE_MAX_STATUS}', "
+            f"not '{target_status}'. Use set-status for terminal execution states.",
+        )
+    if STATUS_SEQUENCE.index(target_status) < STATUS_SEQUENCE.index(current_status):
+        return (
+            False,
+            f"Cannot sync planning feature '{feature['feature']}' backward from "
+            f"'{current_status}' to '{target_status}'.",
+        )
+
+    updated_metadata = apply_metadata_overrides(
+        metadata,
+        review_note=review_note,
+        slice_ids=slice_ids,
+        requires_ui_flow=requires_ui_flow,
+    )
+    current_ok, current_issues, _ = validate_feature_state(feature_dir, updated_metadata)
+    if not current_ok:
+        return (
+            False,
+            f"Cannot sync planning feature '{feature['feature']}' because current status "
+            f"'{current_status}' is inconsistent: {'; '.join(current_issues)}",
+        )
+
+    working_metadata = dict(updated_metadata)
+    advanced_statuses: List[str] = []
+    blocked_status: Optional[str] = None
+    blocked_issues: List[str] = []
+
+    while True:
+        current_working_status = str(working_metadata["status"])
+        candidate_status = next_status(current_working_status)
+        if candidate_status is None:
+            break
+        if STATUS_SEQUENCE.index(candidate_status) > STATUS_SEQUENCE.index(target_status):
+            break
+
+        candidate_metadata = dict(working_metadata)
+        candidate_metadata["status"] = candidate_status
+        ok, issues, _ = validate_feature_state(feature_dir, candidate_metadata)
+        if not ok:
+            blocked_status = candidate_status
+            blocked_issues = issues
+            break
+
+        working_metadata["status"] = candidate_status
+        advanced_statuses.append(candidate_status)
+
+    metadata_changed = working_metadata != metadata
+    final_status = str(working_metadata["status"])
+
+    if metadata_changed:
+        working_metadata["updated_at"] = now_timestamp()
+        write_metadata(feature_dir, working_metadata)
+        feature["status"] = final_status
+        feature["updated_at"] = working_metadata["updated_at"]
+        write_registry(rows, scope_context=scope_context)
+
+    if advanced_statuses:
+        message = (
+            f"Synced {feature['feature']} from '{current_status}' to '{final_status}' "
+            f"(advanced through: {', '.join(advanced_statuses)})."
+        )
+        transition_result = evaluate_feature_transition(str(feature["feature"]), final_status)
+        message = format_transition_message(message, transition_result)
+    elif metadata_changed:
+        message = (
+            f"Updated planning metadata for {feature['feature']} at status "
+            f"'{current_status}'."
+        )
+    else:
+        message = (
+            f"Planning feature '{feature['feature']}' is already aligned at status "
+            f"'{current_status}'."
+        )
+
+    if blocked_status is not None:
+        message += (
+            f" Next blocked status '{blocked_status}': {'; '.join(blocked_issues)}"
+        )
+
+    return True, message
 
 
 def validate_feature(
@@ -990,6 +1119,45 @@ def cmd_validate_feature(args: argparse.Namespace) -> int:
     return 0 if ok else 3
 
 
+def cmd_sync_status(args: argparse.Namespace) -> int:
+    try:
+        rows, feature, scope_context = resolve_feature_lookup(
+            args.feature, explicit_scope=args.scope
+        )
+        through = normalize_status(args.through) if args.through else None
+    except RuntimeError as exc:
+        print(str(exc), file=sys.stderr)
+        return 2
+    except ValueError as exc:
+        print(str(exc), file=sys.stderr)
+        return 2
+
+    if not feature:
+        print(f"Planning feature not found: {args.feature}", file=sys.stderr)
+        return 2
+
+    requires_ui_flow: Optional[bool]
+    if args.require_ui_flow:
+        requires_ui_flow = True
+    elif args.clear_ui_flow:
+        requires_ui_flow = False
+    else:
+        requires_ui_flow = None
+
+    success, message = sync_feature_status(
+        rows,
+        feature,
+        through=through,
+        review_note=args.review_note,
+        slice_ids=args.slice_id if args.slice_id else None,
+        requires_ui_flow=requires_ui_flow,
+        scope_context=scope_context,
+    )
+    stream = sys.stdout if success else sys.stderr
+    print(message, file=stream)
+    return 0 if success else 2
+
+
 def cmd_promote_proposal(args: argparse.Namespace) -> int:
     success, message = promote_proposal_to_feature(
         args.proposal,
@@ -1072,6 +1240,44 @@ def build_parser() -> argparse.ArgumentParser:
         help="Explicit scope path to use for feature lookup.",
     )
 
+    sync_p = subparsers.add_parser(
+        "sync-status",
+        help="Advance planning metadata as far as current artifacts safely allow",
+    )
+    sync_p.add_argument("feature", help="Feature slug, folder name, or path")
+    sync_p.add_argument(
+        "--through",
+        help=(
+            "Optional maximum status to reach. Defaults to the highest syncable "
+            "planning state."
+        ),
+    )
+    sync_p.add_argument(
+        "--review-note",
+        help="Review readiness note to persist before attempting planning_reviewed.",
+    )
+    sync_p.add_argument(
+        "--slice-id",
+        action="append",
+        default=[],
+        help="Ready slice ID to persist before attempting slice_ready. Repeatable.",
+    )
+    sync_ui_group = sync_p.add_mutually_exclusive_group()
+    sync_ui_group.add_argument(
+        "--require-ui-flow",
+        action="store_true",
+        help="Mark UI flow as required for this feature before syncing.",
+    )
+    sync_ui_group.add_argument(
+        "--clear-ui-flow",
+        action="store_true",
+        help="Clear the UI flow requirement for this feature before syncing.",
+    )
+    sync_p.add_argument(
+        "--scope",
+        help="Explicit scope path to use for feature lookup.",
+    )
+
     promote_p = subparsers.add_parser(
         "promote-proposal",
         help="Promote an accepted proposal into canonical feature planning",
@@ -1117,6 +1323,8 @@ def main() -> int:
             return cmd_get_active(args)
         if args.command == "validate-feature":
             return cmd_validate_feature(args)
+        if args.command == "sync-status":
+            return cmd_sync_status(args)
         if args.command == "promote-proposal":
             return cmd_promote_proposal(args)
     except (RuntimeError, ValueError) as exc:

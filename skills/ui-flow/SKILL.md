@@ -36,7 +36,8 @@ Resolve `<feature_path>` as `<planning_dir>/<feature-slug>/`.
 2. Capture flows, states, and notable UX constraints.
 3. Write `ui-design.md` with screen-level requirements and edge cases.
 4. Refine story boundaries or acceptance notes if the UI changes scope.
-5. Stop when the UI work is concrete enough for `breakdown`.
+5. Run `python3 skills/guide-planning/scripts/manage_planning.py sync-status <feature-selector> --through design_ready` when the feature requires UI flow so metadata catches up once the design packet is complete.
+6. Stop when the UI work is concrete enough for `breakdown`.
 
 ## Guardrails
 

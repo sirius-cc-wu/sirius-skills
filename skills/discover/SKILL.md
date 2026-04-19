@@ -44,7 +44,8 @@ Resolve `<feature_path>` from the repository planning layout:
 2. Inspect the repository, existing docs, and relevant context.
 3. Write `discover.md` with problem framing, actors, goals, constraints, and risks.
 4. If helpful, draft an initial `user-stories.md` with stable story identifiers.
-5. Stop when the work is concrete enough for `design`.
+5. Run `python3 skills/guide-planning/scripts/manage_planning.py sync-status <feature-selector> --through discovery_ready` so `.planning-meta.json` records that discovery is complete.
+6. Stop when the work is concrete enough for `design`.
 
 ## Guardrails
 

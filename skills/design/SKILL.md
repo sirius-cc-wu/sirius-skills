@@ -91,7 +91,8 @@ Resolve `<feature_path>` as either:
 5. Write `system-design.md` using the structure in `references/system-design-template.md`, adding the behavioral guidance from `references/behavioral-systems.md` and `references/config-surface-governance.md` when applicable.
 6. Add PlantUML system-design diagrams or linked SVG figures, depending on configuration.
 7. Refine story boundaries when the design changes implementation shape.
-8. Stop when the work is concrete enough for `breakdown`.
+8. Run `python3 skills/guide-planning/scripts/manage_planning.py sync-status <feature-selector> --through design_ready`. If UI flow is required and `ui-design.md` is still missing, treat the blocked transition as a signal to hand off to `ui-flow` before claiming design readiness.
+9. Stop when the work is concrete enough for `breakdown`.
 
 ## Guardrails
 
