@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "generated_at": "2026-04-19T01:24:17",
+  "generated_at": "2026-04-19T10:56:05",
   "slices": [
     {
       "id": "HSS-01-root-fallback",
@@ -249,6 +249,16 @@
       "path": "slices/WSC-05-validation-hooks-add-repeatable-workflow-consistency-validation-hooks/",
       "updated_at": "2026-04-19T01:24:17",
       "closed_at": "2026-04-19T01:24:17",
+      "archived_at": null,
+      "relations": []
+    },
+    {
+      "id": "SIM-01-local-helper",
+      "feature": "Add source-linked local install helper",
+      "status": "closed",
+      "path": "slices/SIM-01-local-helper-add-source-linked-local-install-helper/",
+      "updated_at": "2026-04-19T10:56:05",
+      "closed_at": "2026-04-19T10:56:05",
       "archived_at": null,
       "relations": []
     }

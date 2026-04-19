@@ -1,6 +1,7 @@
-.PHONY: install uninstall sync-shared-references sync-shared-runtime validate-workflow-state
+.PHONY: install uninstall install-local uninstall-local sync-shared-references sync-shared-runtime validate-workflow-state
 
 REPO_ROOT := $(CURDIR)
+SKILLS_HOME ?= $(HOME)/.agents/skills
 COMMON_FLAGS := --global --yes --agent github-copilot --agent codex --agent antigravity --agent gemini-cli
 MANAGED_SKILLS := \
 	audit-artifacts \
@@ -32,6 +33,9 @@ MANAGED_SKILLS := \
 	slice \
 	ui-flow
 
+install-local:
+	python3 scripts/install_local_skills.py install --repo-root "$(REPO_ROOT)" --skills-home "$(SKILLS_HOME)" $(MANAGED_SKILLS)
+
 install: sync-shared-runtime sync-shared-references
 	npx skills add "$(REPO_ROOT)/skills/audit-artifacts" $(COMMON_FLAGS)
 	npx skills add "$(REPO_ROOT)/skills/measure-artifacts" $(COMMON_FLAGS)
@@ -61,6 +65,9 @@ install: sync-shared-runtime sync-shared-references
 	npx skills add "$(REPO_ROOT)/skills/bootstrap" $(COMMON_FLAGS)
 	npx skills add "$(REPO_ROOT)/skills/create-pr" $(COMMON_FLAGS)
 	npx skills add "$(REPO_ROOT)/skills/simplify" $(COMMON_FLAGS)
+
+uninstall-local:
+	python3 scripts/install_local_skills.py uninstall --repo-root "$(REPO_ROOT)" --skills-home "$(SKILLS_HOME)" $(MANAGED_SKILLS)
 
 sync-shared-references:
 	python3 scripts/sync_shared_skill_references.py
