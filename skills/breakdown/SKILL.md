@@ -141,6 +141,25 @@ Use `slice-planning.md` as the execution backlog:
 
 Record slices and dependencies directly in `slice-planning.md` and use it as the primary execution backlog.
 
+## Default Slice ID Naming
+
+Unless the repository explicitly overrides slice naming in
+`.skills/conventions.json`, use this default convention:
+
+- planned slice IDs should use `<scope-prefix>-<capability-slug>`
+- use a short lowercase alias derived from the owning feature slug for
+  feature-scoped breakdown
+- use a short lowercase alias derived from the owning subfeature ID for
+  subfeature-scoped breakdown
+- when planning is subfeature-local, prefer the subfeature prefix rather than
+  the parent feature prefix
+- avoid meaningless generic prefixes such as bare `slice-*`
+
+Examples:
+
+- feature-scoped: `atf-read-file`, `tpm-runner`, `wmt-write-file`
+- subfeature-scoped: `shp-store`, `dmc-capture-policy`, `mrc-retrieval-startup`
+
 ## Story-to-Slice Mapping
 
 Treat repo story IDs as the planning-system identifiers and planned slice IDs as the execution identifiers.
@@ -204,6 +223,8 @@ When generating `slice-traceability.md`, start from `assets/slice-traceability-t
 - Do not turn `slice-planning.md` into a slice-scoped execution checklist; that belongs to `guide-execution` and `blueprint` later.
 - Do not mark work as parallel-safe unless overlap and integration risk are genuinely low.
 - If a slice still needs major replanning, split it again before handoff.
+- Do not fall back to bare `slice-*` IDs unless a repository-specific convention
+  explicitly requires them.
 - For subfeatures, only plan the new or amended slices needed by the change;
   keep references to superseded canonical slices in notes or dependencies rather
   than reusing them as subfeature-local slice IDs.

@@ -53,6 +53,9 @@ Stored in `docs/features/<feature-slug>/`
 - `system-design.md`: Technical architecture.
 - `slice-planning.md`: Sequencing and increments.
 - `slice-traceability.md`: Mapping stories to slices.
+
+Default planned slice IDs should use a scope-prefixed format such as
+`atf-read-file` or `shp-store` rather than bare `slice-*` placeholders.
 - `subfeatures/<change-id>/`: A planning-scoped delta for evolving an existing feature.
 - `subfeatures/<change-id>/impact-analysis.md`: Change-scoped impact record for feature evolution.
 

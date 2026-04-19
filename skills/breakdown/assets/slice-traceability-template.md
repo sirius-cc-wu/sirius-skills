@@ -5,6 +5,9 @@ Use this file to map repo story IDs to execution slices without moving story own
 ## Conventions
 
 - Keep repo story IDs exactly as they appear in `user-stories.md`.
+- Use planned slice IDs that begin with a feature or subfeature prefix rather
+  than bare `slice-*` placeholders unless a repository-specific convention says
+  otherwise.
 - Use one primary row per repo story.
 - List increment IDs as a comma-separated list when a story spans multiple increments.
 - List multiple slice IDs as a comma-separated list.
@@ -15,7 +18,7 @@ Use this file to map repo story IDs to execution slices without moving story own
 
 | Story ID | Story Size | Story Summary | Increments | Planned Slice IDs | Slice Areas | Blocked By | Execution Slice IDs | Notes |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| AUTH-03 | L | Refresh token support | I1 | slice-a1b2c3, slice-d4e5f6 | API, Tests | slice-d4e5f6 -> slice-a1b2c3 | slice-a1b2c3, slice-d4e5f6 | Split into API and tests |
+| AUTH-03 | L | Refresh token support | I1 | auth-api, auth-tests | API, Tests | auth-tests -> auth-api | auth-api, auth-tests | Split into API and tests |
 | <story-id> | <S/M/L/XL> | <short summary> | <I1[, I2...]> | <slice-id[, slice-id...]> | <area[, area...]> | <blocker relation or blank> | <slice-id[, slice-id...] or blank> | <notes> |
 
 ## Notes

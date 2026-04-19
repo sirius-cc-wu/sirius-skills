@@ -2,6 +2,16 @@
 
 Use this file to decompose repo stories into execution-ready slices before bootstrapping execution slices.
 
+## Slice ID Naming
+
+- Default naming: `<scope-prefix>-<capability-slug>`
+- Use a short lowercase alias derived from the owning feature slug for
+  feature-scoped breakdown.
+- Use a short lowercase alias derived from the owning subfeature ID for
+  subfeature-scoped breakdown.
+- Avoid meaningless generic prefixes such as bare `slice-*` unless a
+  repository-specific convention explicitly requires them.
+
 ## 1. Planning Scope
 
 - Feature:
@@ -42,8 +52,8 @@ Use increments to group related slices into small, demonstrable outcomes. Increm
 
 | Increment | Goal / User-Visible Value | Included Story IDs | Planned Slice IDs | Demo / Verification Outcome | Notes |
 | --- | --- | --- | --- | --- | --- |
-| I1 | First usable refresh flow | AUTH-03 | AUTH-03-api, AUTH-03-tests | User can refresh a token successfully in an end-to-end test run | Simplest end-to-end path |
-| I2 | Operational hardening for refresh flow | AUTH-03 | AUTH-03-rate-limit | Refresh path enforces retry or abuse limits | Optional follow-on increment |
+| I1 | First usable refresh flow | AUTH-03 | auth-api, auth-tests | User can refresh a token successfully in an end-to-end test run | Simplest end-to-end path |
+| I2 | Operational hardening for refresh flow | AUTH-03 | auth-rate-limit | Refresh path enforces retry or abuse limits | Optional follow-on increment |
 | <I1/I2/...> | <small demonstrable outcome> | <story-id[, ...]> | <slice-id[, ...]> | <demo, test command, or artifact check> | <ordering, scope, or risk note> |
 
 Rules:
@@ -57,8 +67,8 @@ Rules:
 
 | Slice ID | Story ID | Title | Summary | Target Area | Lane | Validation | Planned Action | Depends On | Slice Ready |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| AUTH-03-api | AUTH-03 | Implement refresh token endpoint | Add refresh endpoint and token rotation logic | `auth/api` | primary | `pytest tests/auth/test_refresh.py` | create slice |  | yes |
-| AUTH-03-tests | AUTH-03 | Add refresh token integration tests | Cover refresh flow end-to-end | `tests/auth` | primary | `pytest tests/auth/test_refresh.py` | create slice | AUTH-03-api | yes |
+| auth-api | AUTH-03 | Implement refresh token endpoint | Add refresh endpoint and token rotation logic | `auth/api` | primary | `pytest tests/auth/test_refresh.py` | create slice |  | yes |
+| auth-tests | AUTH-03 | Add refresh token integration tests | Cover refresh flow end-to-end | `tests/auth` | primary | `pytest tests/auth/test_refresh.py` | create slice | auth-api | yes |
 | <slice-id> | <story-id> | <slice title> | <short summary> | <module/path> | <lane name or primary> | <command or manual check> | <create slice | defer> | <slice-id[, ...] or blank> | <yes|no> |
 
 ## 5. Dependency Notes

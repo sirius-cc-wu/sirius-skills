@@ -27,6 +27,16 @@ DEFAULT_JIRA_CONVENTIONS = {
     "pr_title_format": "{ID}: {summary}",
     "issue_url_template": "https://jira.example.com/browse/{ID}",
 }
+DEFAULT_SLICE_NAMING_CONVENTIONS = {
+    "slice_id_style": "scope_prefix",
+    "slice_id_format": "{scope_prefix}-{capability_slug}",
+    "slice_id_scope_precedence": "subfeature_then_feature",
+    "slice_id_prefix_source": "slug_alias",
+    "slice_id_prefix_guidance": (
+        "Use a short lowercase alias derived from the feature or subfeature slug "
+        "and avoid bare 'slice-*' IDs."
+    ),
+}
 
 
 def load_scope_runtime_module():
@@ -235,6 +245,8 @@ def build_conventions_config(
     existing: dict[str, Any], mode: str, issue_url_template: str | None
 ) -> dict[str, Any]:
     updated = dict(existing)
+    for key, value in DEFAULT_SLICE_NAMING_CONVENTIONS.items():
+        updated.setdefault(key, value)
     if mode == "jira":
         updated.update(DEFAULT_JIRA_CONVENTIONS)
         updated["issue_url_template"] = (

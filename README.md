@@ -247,6 +247,13 @@ Example:
 
 Projects can add `.skills/conventions.json` in the repository root to describe their local conventions.
 
+Generic default slice naming now assumes scope-prefixed planned slice IDs:
+
+- default format: `{scope_prefix}-{capability_slug}`
+- feature-scoped planning uses a short lowercase alias derived from the feature slug
+- subfeature-scoped planning uses a short lowercase alias derived from the subfeature ID
+- avoid bare `slice-*` IDs unless the project explicitly overrides that convention
+
 Projects can add `.skills/execution.json` in the repository root to configure execution-slice layout for `guide-execution` and `slice` bootstrap.
 
 Example:

@@ -52,7 +52,13 @@ def test_default_mode_writes_generic_config_files(tmp_path, monkeypatch):
         "preferred_workflow": "TDD",
         "auto_start_implementation": True,
     }
-    assert conventions == {}
+    assert conventions == {
+        "slice_id_style": "scope_prefix",
+        "slice_id_format": "{scope_prefix}-{capability_slug}",
+        "slice_id_scope_precedence": "subfeature_then_feature",
+        "slice_id_prefix_source": "slug_alias",
+        "slice_id_prefix_guidance": "Use a short lowercase alias derived from the feature or subfeature slug and avoid bare 'slice-*' IDs.",
+    }
 
 
 def test_jira_mode_sets_jira_conventions_and_preserves_other_keys(
@@ -109,7 +115,14 @@ def test_default_mode_preserves_existing_conventions_file(tmp_path, monkeypatch)
     conventions = json.loads(
         (skills_dir / "conventions.json").read_text(encoding="utf-8")
     )
-    assert conventions == {"commit_format": "{scope}: {summary}"}
+    assert conventions == {
+        "commit_format": "{scope}: {summary}",
+        "slice_id_style": "scope_prefix",
+        "slice_id_format": "{scope_prefix}-{capability_slug}",
+        "slice_id_scope_precedence": "subfeature_then_feature",
+        "slice_id_prefix_source": "slug_alias",
+        "slice_id_prefix_guidance": "Use a short lowercase alias derived from the feature or subfeature slug and avoid bare 'slice-*' IDs.",
+    }
 
 
 def test_bootstrap_writes_custom_design_diagram_mode(tmp_path, monkeypatch):
@@ -273,6 +286,11 @@ def test_bootstrap_child_scope_inherits_parent_configs_before_applying_overrides
     assert conventions == {
         "commit_format": "{scope}: {summary}",
         "custom_conv": "keep-conv",
+        "slice_id_style": "scope_prefix",
+        "slice_id_format": "{scope_prefix}-{capability_slug}",
+        "slice_id_scope_precedence": "subfeature_then_feature",
+        "slice_id_prefix_source": "slug_alias",
+        "slice_id_prefix_guidance": "Use a short lowercase alias derived from the feature or subfeature slug and avoid bare 'slice-*' IDs.",
     }
 
 

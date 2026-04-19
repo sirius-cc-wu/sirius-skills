@@ -49,6 +49,15 @@ Use these defaults unless the user asked for different values:
 - `preferred_workflow`: `TDD`
 - `auto_start_implementation`: `true`
 
+In both `default` and `jira` mode, seed `.skills/conventions.json` with these
+generic slice-ID defaults unless the repo already overrides them:
+
+- `slice_id_style`: `scope_prefix`
+- `slice_id_format`: `{scope_prefix}-{capability_slug}`
+- `slice_id_scope_precedence`: `subfeature_then_feature`
+- `slice_id_prefix_source`: `slug_alias`
+- `slice_id_prefix_guidance`: `Use a short lowercase alias derived from the feature or subfeature slug and avoid bare 'slice-*' IDs.`
+
 For `jira` mode, use these preset conventions unless the user supplies project-specific values:
 
 - `issue_sliceer`: `jira`
@@ -150,8 +159,6 @@ bootstrap defaults.
 
 When `.skills/planning.json` includes `design_diagram_mode: "linked_svg"`, planning/design skills should place diagram source and generated SVGs under `<feature_path>/figures/`, link the SVGs from `system-design.md`, and keep the figures on an explicit white background using `skinparam backgroundColor white` plus a white SVG canvas rect.
 
-In `default` mode, `.skills/conventions.json` may remain an empty object so the repo keeps its generic behavior explicit without inventing project-specific workflow rules.
-
 ## Examples
 
 ### Example 1: Generic setup
@@ -162,7 +169,7 @@ Action:
 
 1. Use `default` mode.
 2. Apply the default planning and execution directories.
-3. Create `.skills/conventions.json` as `{}` when it does not already exist.
+3. Create `.skills/conventions.json` with the generic scope-prefixed slice-ID defaults when it does not already exist.
 
 ### Example 2: Default setup with wiki
 
