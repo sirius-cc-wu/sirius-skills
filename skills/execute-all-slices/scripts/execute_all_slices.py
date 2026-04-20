@@ -27,6 +27,7 @@ class PlannedSliceBacklogEntry:
     planned_slice_id: str
     story_id: str
     title: str
+    validation_hint: str
     increment_ids: List[str]
     depends_on: List[str]
     execution_slice_ids: List[str]
@@ -46,6 +47,7 @@ class BacklogResolution:
     ready_next: List[str]
     active_execution_slices: List[str]
     entries: List[PlannedSliceBacklogEntry]
+    active_slice_handoff: Optional[Dict[str, object]]
 
     def to_dict(self) -> Dict[str, object]:
         return {
@@ -59,6 +61,9 @@ class BacklogResolution:
             "ready_next": list(self.ready_next),
             "active_execution_slices": list(self.active_execution_slices),
             "entries": [asdict(entry) for entry in self.entries],
+            "active_slice_handoff": dict(self.active_slice_handoff)
+            if self.active_slice_handoff is not None
+            else None,
         }
 
 
@@ -166,6 +171,9 @@ def parse_planned_slices(slice_planning_path: Path) -> List[Dict[str, object]]:
                 "planned_slice_id": planned_slice_id,
                 "story_id": cells[header_map["story id"]].strip(),
                 "title": cells[header_map["title"]].strip(),
+                "validation_hint": cells[header_map["validation"]].strip()
+                if "validation" in header_map and len(cells) > header_map["validation"]
+                else "",
                 "depends_on": _split_cell_values(cells[header_map["depends on"]]),
             }
         )
@@ -471,6 +479,7 @@ def resolve_backlog(selector: str, explicit_scope: Optional[str] = None) -> Back
                 planned_slice_id=planned_slice_id,
                 story_id=str(planned_slice["story_id"]),
                 title=str(planned_slice["title"]),
+                validation_hint=str(planned_slice.get("validation_hint", "")),
                 increment_ids=list(increment_ids_by_planned_slice.get(planned_slice_id, [])),
                 depends_on=list(planned_slice["depends_on"]),
                 execution_slice_ids=list(execution_slice_ids),
@@ -543,6 +552,27 @@ def resolve_backlog(selector: str, explicit_scope: Optional[str] = None) -> Back
         if increment_entries and all(entry.state == "completed" for entry in increment_entries):
             completed_increments.append(increment_id)
 
+    active_slice_handoff: Optional[Dict[str, object]] = None
+    if len(active_execution_slices) == 1:
+        active_slice_id = active_execution_slices[0]
+        active_slice = execution_module.resolve_slice(execution_rows, active_slice_id)
+        if active_slice is not None:
+            active_entry = next(
+                (
+                    entry
+                    for entry in entries
+                    if active_slice_id == entry.planned_slice_id
+                    or active_slice_id in entry.execution_slice_ids
+                ),
+                None,
+            )
+            active_slice_handoff = build_active_slice_handoff(
+                active_slice,
+                active_entry,
+                execution_module=execution_module,
+                scope_context=scope_context,
+            )
+
     return BacklogResolution(
         target_type=target_type,
         target_id=str(feature["feature"]),
@@ -554,7 +584,92 @@ def resolve_backlog(selector: str, explicit_scope: Optional[str] = None) -> Back
         ready_next=ready_next,
         active_execution_slices=active_execution_slices,
         entries=entries,
+        active_slice_handoff=active_slice_handoff,
     )
+
+
+def inspect_slice_artifacts(slice_row: Dict[str, object], execution_module, scope_context) -> Dict[str, bool]:
+    slice_path = Path(execution_module.slice_path_for_row(slice_row, scope_context=scope_context))
+    return {
+        "brief_exists": (slice_path / "brief.md").is_file(),
+        "requirements_exists": (slice_path / "checklists" / "requirements.md").is_file(),
+        "blueprint_exists": (slice_path / "blueprint.md").is_file(),
+        "metadata_exists": (slice_path / ".slice-meta.json").is_file(),
+    }
+
+
+def build_active_slice_handoff(
+    slice_row: Dict[str, object],
+    backlog_entry: Optional[PlannedSliceBacklogEntry],
+    *,
+    execution_module,
+    scope_context,
+) -> Dict[str, object]:
+    status = str(slice_row["status"])
+    checks = inspect_slice_artifacts(slice_row, execution_module, scope_context)
+    config = execution_module.load_config(required=True, scope_context=scope_context)
+    validation_hint = backlog_entry.validation_hint if backlog_entry is not None else ""
+    missing_artifacts: List[str] = []
+    downstream_owners: List[str]
+
+    if not checks["brief_exists"]:
+        missing_artifacts.append("brief.md")
+    if not checks["requirements_exists"]:
+        missing_artifacts.append("checklists/requirements.md")
+    if status in {"blueprint_ready", "execution_ready", "closed"} and not checks["blueprint_exists"]:
+        missing_artifacts.append("blueprint.md")
+
+    if status == "draft":
+        next_owner = "brief"
+        next_action = "create_or_update_brief"
+        downstream_owners = [
+            "blueprint",
+            "implementation",
+            "review-execution",
+            "close-slice",
+            "commit",
+        ]
+    elif status == "brief_ready":
+        next_owner = "blueprint"
+        next_action = "create_or_update_blueprint"
+        downstream_owners = [
+            "implementation",
+            "review-execution",
+            "close-slice",
+            "commit",
+        ]
+    elif status == "blueprint_ready" and not bool(config["auto_start_implementation"]):
+        next_owner = "guide-execution"
+        next_action = "promote_blueprint_to_execution_ready"
+        downstream_owners = [
+            "implementation",
+            "review-execution",
+            "close-slice",
+            "commit",
+        ]
+    elif status in {"blueprint_ready", "execution_ready"}:
+        next_owner = "implementation"
+        next_action = "implement_validate_review_and_close"
+        downstream_owners = ["review-execution", "close-slice", "commit"]
+    elif status == "closed":
+        next_owner = "commit"
+        next_action = "commit_completed_slice"
+        downstream_owners = []
+    else:
+        next_owner = "guide-execution"
+        next_action = "resolve_active_slice"
+        downstream_owners = ["implementation", "review-execution", "close-slice", "commit"]
+
+    return {
+        "slice_id": str(slice_row["id"]),
+        "slice_path": str(slice_row["path"]),
+        "slice_status": status,
+        "next_owner": next_owner,
+        "next_action": next_action,
+        "validation_hint": validation_hint,
+        "missing_artifacts": missing_artifacts,
+        "downstream_owners": downstream_owners,
+    }
 
 
 def bootstrap_next_slice(
@@ -625,7 +740,11 @@ def bootstrap_next_slice(
         slice_status=str(slice_row["status"]),
         checkpoint_slice_id=None,
         dirty_worktree_paths=[],
-        next_owner="guide-execution",
+        next_owner=(
+            str(refreshed_backlog.active_slice_handoff["next_owner"])
+            if refreshed_backlog.active_slice_handoff is not None
+            else "guide-execution"
+        ),
         completed=False,
         action="bootstrap_next_slice",
     )
@@ -662,7 +781,11 @@ def resume_execution(
             slice_status=str(slice_row["status"]),
             checkpoint_slice_id=None,
             dirty_worktree_paths=[],
-            next_owner="guide-execution",
+            next_owner=(
+                str(backlog.active_slice_handoff["next_owner"])
+                if backlog.active_slice_handoff is not None
+                else "guide-execution"
+            ),
             completed=False,
             action="resume_active_slice",
         )
@@ -780,7 +903,34 @@ def render_text(result: BacklogResolution) -> str:
             else ""
         )
         lines.append(f"- {entry.planned_slice_id}{increment_suffix}: {entry.state}{suffix}")
+    if result.active_slice_handoff is not None:
+        lines.extend(render_active_slice_handoff_lines(result.active_slice_handoff))
     return "\n".join(lines)
+
+
+def render_active_slice_handoff_lines(handoff: Dict[str, object]) -> List[str]:
+    downstream_owners = handoff.get("downstream_owners", [])
+    missing_artifacts = handoff.get("missing_artifacts", [])
+    lines = [
+        "",
+        "Active slice handoff:",
+        f"- Slice: {handoff['slice_id']}",
+        f"- Slice path: {handoff['slice_path']}",
+        f"- Slice status: {handoff['slice_status']}",
+        f"- Next owner: {handoff['next_owner']}",
+        f"- Next action: {handoff['next_action']}",
+    ]
+    validation_hint = str(handoff.get("validation_hint") or "").strip()
+    if validation_hint:
+        lines.append(f"- Validation hint: {validation_hint}")
+    if missing_artifacts:
+        lines.append(f"- Missing artifacts: {', '.join(str(item) for item in missing_artifacts)}")
+    if downstream_owners:
+        lines.append(
+            "- Downstream owners after this step: "
+            + ", ".join(str(owner) for owner in downstream_owners)
+        )
+    return lines
 
 
 def render_bootstrap_text(result: BootstrapResult) -> str:

@@ -153,7 +153,7 @@ Preferred repo workflow:
 12. After approval, commit the planning artifacts so the reviewed plan is durable before execution begins.
 13. `slice` validates approved, committed execution-ready input, bootstraps a slice-scoped execution slice, and hands off to `guide-execution`.
 14. `guide-execution` routes slice-scoped execution through `brief` to capture slice intent and acceptance, then through `blueprint` to produce the final execution artifact. When `.skills/execution.json` enables `auto_start_implementation`, that handoff continues directly into implementation after the blueprint is marked ready.
-15. `execute-all-slices` is the optional batch entrypoint when a reviewed and committed feature or subfeature backlog should be worked one planned slice at a time. It respects increment order first, then slice dependencies within the current increment, resumes or bootstraps one mapped slice, and stops at the next owning execution step or commit checkpoint.
+15. `execute-all-slices` is the optional batch entrypoint when a reviewed and committed feature or subfeature backlog should be worked one planned slice at a time. It respects increment order first, then slice dependencies within the current increment, resumes or bootstraps one mapped slice, reports the next concrete execution owner for that slice, and stops at blockers or commit checkpoints.
 16. `review-execution` checks implementation and validation outcomes against the slice-scoped execution artifacts before closure.
 17. `close-slice` closes completed execution slices and records durable closure metadata.
 18. After closure, keep the subfeature planning folder and closed slice artifacts in place. If a repository wants later cleanup or archival, handle that through maintenance tooling such as `archive-artifacts`, not a dedicated subfeature-finalization skill.
@@ -167,7 +167,7 @@ In the repo-native flow, `guide-planning` owns feature-planning readiness and ro
 
 Execution follows the same pattern: `guide-execution` owns routing, readiness, and registry state, while `brief`, `blueprint`, `review-execution`, and `close-slice` own slice-scoped artifacts and closure metadata. With `auto_start_implementation`, `guide-execution` can promote a slice from `blueprint_ready` to `execution_ready` as the signal to begin coding immediately.
 
-`execute-all-slices` sits above that single-slice flow as an optional orchestrator. It resolves one reviewed and committed feature or subfeature backlog, resumes or bootstraps one mapped execution slice at a time, and hands the next step back to `guide-execution` or `commit`. It does not replace `slice`, `guide-execution`, `review-execution`, `close-slice`, or `commit`.
+`execute-all-slices` sits above that single-slice flow as an optional orchestrator. It resolves one reviewed and committed feature or subfeature backlog, resumes or bootstraps one mapped execution slice at a time, and hands that slice to the next concrete owner such as `brief`, `blueprint`, repository implementation, `guide-execution`, `review-execution`, `close-slice`, or `commit`. It does not replace those owners.
 
 By default, new execution slices are created under `slices/` unless `.skills/execution.json` overrides the location.
 

@@ -455,7 +455,10 @@ def test_bootstrap_next_creates_first_ready_slice_and_updates_traceability(
     slice_row = execution.resolve_slice(registry_rows, "mse-scope-and-backlog-resolution")
 
     assert payload["bootstrapped_slice_id"] == "mse-scope-and-backlog-resolution"
-    assert payload["next_owner"] == "guide-execution"
+    assert payload["next_owner"] == "brief"
+    assert payload["active_slice_handoff"]["next_owner"] == "brief"
+    assert payload["active_slice_handoff"]["next_action"] == "create_or_update_brief"
+    assert payload["active_slice_handoff"]["validation_hint"] == "test"
     assert slice_row is not None
     assert slice_row["status"] == "draft"
     traceability = (feature_path / "slice-traceability.md").read_text(encoding="utf-8")
@@ -583,7 +586,15 @@ def test_resume_returns_active_mapped_slice_and_next_owner(tmp_path, monkeypatch
 
     assert payload["action"] == "resume_active_slice"
     assert payload["bootstrapped_slice_id"] == "mse-scope-and-backlog-resolution"
-    assert payload["next_owner"] == "guide-execution"
+    assert payload["next_owner"] == "brief"
+    assert payload["active_slice_handoff"]["next_owner"] == "brief"
+    assert payload["active_slice_handoff"]["downstream_owners"] == [
+        "blueprint",
+        "implementation",
+        "review-execution",
+        "close-slice",
+        "commit",
+    ]
     assert payload["slice_status"] == "draft"
 
 
@@ -658,7 +669,151 @@ def test_resume_bootstraps_next_ready_slice_after_completed_predecessor(
 
     assert payload["action"] == "bootstrap_next_slice"
     assert payload["bootstrapped_slice_id"] == "mse-sequential-slice-orchestration"
-    assert payload["next_owner"] == "guide-execution"
+    assert payload["next_owner"] == "brief"
+
+
+def test_resume_routes_brief_ready_slice_to_blueprint(tmp_path, monkeypatch, capsys):
+    env = setup_repo(tmp_path, monkeypatch)
+    planning = env["planning"]
+    feature_path = env["feature_path"]
+    module = env["module"]
+    execution = env["execution"]
+
+    write_file(
+        feature_path / "slice-planning.md",
+        """# Slice Planning
+
+| Slice ID | Story ID | Title | Summary | Target Area | Lane | Validation | Planned Action | Depends On | Slice Ready |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| mse-scope-and-backlog-resolution | EW-01 | Resolve backlog | Summary | area | primary | pytest -q tests/test_demo.py | create slice |  | yes |
+""",
+    )
+    write_file(
+        feature_path / "slice-traceability.md",
+        """# Slice Traceability
+
+| Story ID | Story Size | Story Summary | Increments | Planned Slice IDs | Slice Areas | Blocked By | Execution Slice IDs | Notes |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| EW-01 | M | Summary | I1 | mse-scope-and-backlog-resolution | area |  | mse-scope-and-backlog-resolution | Notes |
+""",
+    )
+
+    rows = planning.parse_registry()
+    feature = planning.find_feature(rows, "execution-workflow")
+    assert feature is not None
+    ok, message = planning.update_feature_status(
+        rows,
+        feature,
+        "planning_reviewed",
+        force=True,
+        review_note="ready",
+    )
+    assert ok, message
+
+    _, created = execution.create_slice(
+        "mse-scope-and-backlog-resolution", "Resolve backlog"
+    )
+    assert created
+    slice_dir = tmp_path / "slices" / "mse-scope-and-backlog-resolution-resolve-backlog"
+    write_file(slice_dir / "brief.md", "# brief\n")
+    write_file(slice_dir / "checklists" / "requirements.md", "- [x] requirements complete\n")
+    execution_rows = execution.parse_registry()
+    slice_row = execution.resolve_slice(
+        execution_rows, "mse-scope-and-backlog-resolution"
+    )
+    assert slice_row is not None
+    success, message = execution.update_slice_status(
+        execution_rows, slice_row, "brief_ready"
+    )
+    assert success, message
+
+    assert run_cli(module, monkeypatch, "execution-workflow", "--resume", "--json") == 0
+    payload = json.loads(capsys.readouterr().out)
+
+    assert payload["next_owner"] == "blueprint"
+    assert payload["active_slice_handoff"]["next_owner"] == "blueprint"
+    assert payload["active_slice_handoff"]["next_action"] == "create_or_update_blueprint"
+    assert payload["active_slice_handoff"]["validation_hint"] == "pytest -q tests/test_demo.py"
+
+
+def test_resume_routes_execution_ready_slice_to_implementation(
+    tmp_path, monkeypatch, capsys
+):
+    env = setup_repo(tmp_path, monkeypatch)
+    planning = env["planning"]
+    feature_path = env["feature_path"]
+    module = env["module"]
+    execution = env["execution"]
+
+    write_file(
+        feature_path / "slice-planning.md",
+        """# Slice Planning
+
+| Slice ID | Story ID | Title | Summary | Target Area | Lane | Validation | Planned Action | Depends On | Slice Ready |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| mse-scope-and-backlog-resolution | EW-01 | Resolve backlog | Summary | area | primary | pytest -q tests/test_demo.py | create slice |  | yes |
+""",
+    )
+    write_file(
+        feature_path / "slice-traceability.md",
+        """# Slice Traceability
+
+| Story ID | Story Size | Story Summary | Increments | Planned Slice IDs | Slice Areas | Blocked By | Execution Slice IDs | Notes |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| EW-01 | M | Summary | I1 | mse-scope-and-backlog-resolution | area |  | mse-scope-and-backlog-resolution | Notes |
+""",
+    )
+
+    rows = planning.parse_registry()
+    feature = planning.find_feature(rows, "execution-workflow")
+    assert feature is not None
+    ok, message = planning.update_feature_status(
+        rows,
+        feature,
+        "planning_reviewed",
+        force=True,
+        review_note="ready",
+    )
+    assert ok, message
+
+    _, created = execution.create_slice(
+        "mse-scope-and-backlog-resolution", "Resolve backlog"
+    )
+    assert created
+    slice_dir = tmp_path / "slices" / "mse-scope-and-backlog-resolution-resolve-backlog"
+    write_file(slice_dir / "brief.md", "# brief\n")
+    write_file(slice_dir / "checklists" / "requirements.md", "- [x] requirements complete\n")
+    execution_rows = execution.parse_registry()
+    slice_row = execution.resolve_slice(
+        execution_rows, "mse-scope-and-backlog-resolution"
+    )
+    assert slice_row is not None
+    success, message = execution.update_slice_status(
+        execution_rows, slice_row, "brief_ready"
+    )
+    assert success, message
+    write_file(slice_dir / "blueprint.md", "# plan\n")
+    execution_rows = execution.parse_registry()
+    slice_row = execution.resolve_slice(
+        execution_rows, "mse-scope-and-backlog-resolution"
+    )
+    assert slice_row is not None
+    success, message = execution.update_slice_status(
+        execution_rows, slice_row, "blueprint_ready"
+    )
+    assert success, message
+
+    assert run_cli(module, monkeypatch, "execution-workflow", "--resume", "--json") == 0
+    payload = json.loads(capsys.readouterr().out)
+
+    assert payload["slice_status"] == "execution_ready"
+    assert payload["next_owner"] == "implementation"
+    assert payload["active_slice_handoff"]["next_owner"] == "implementation"
+    assert payload["active_slice_handoff"]["downstream_owners"] == [
+        "review-execution",
+        "close-slice",
+        "commit",
+    ]
 
 
 def test_resolve_backlog_reports_completed_and_current_increments_in_text_output(

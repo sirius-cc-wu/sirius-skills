@@ -171,8 +171,9 @@ Keep the boundary explicit:
 
 - `execute-all-slices` resolves backlog state from planning and execution artifacts
 - it resumes an active mapped slice or bootstraps the next ready one
+- it reports the next concrete owner for the active slice instead of forcing you to re-decide that handoff
 - it stops when the backlog is blocked or when a completed slice still needs its own commit checkpoint
-- it hands the next step back to `guide-execution` or `commit` instead of replacing those owners
+- it routes through the existing execution owners instead of replacing them
 
 ```text
 Use `guide-execution` to decide the next step for slice `CHK-12-form-state-refactor`.
