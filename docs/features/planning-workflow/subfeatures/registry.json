@@ -15,6 +15,13 @@
       "path": "docs/features/planning-workflow/subfeatures/proposal-workflow/"
     },
     {
+      "subfeature_id": "reference-research-synthesis",
+      "status": "reviewed",
+      "subfeature_type": "additive",
+      "updated_at": "2026-04-21T00:30:11",
+      "path": "docs/features/planning-workflow/subfeatures/reference-research-synthesis/"
+    },
+    {
       "subfeature_id": "subfeature-workflow",
       "status": "reviewed",
       "subfeature_type": "additive",

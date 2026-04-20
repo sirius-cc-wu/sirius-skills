@@ -1,14 +1,15 @@
 ---
 name: bootstrap
-description: Bootstraps `.skills/planning.json`, `.skills/execution.json`, and `.skills/conventions.json` for a repository, and can also scaffold a `docs/wiki/` knowledge layer. Use when a user asks to configure a project, initialize `sirius-skills` settings, apply generic defaults, add Jira-oriented conventions, or bootstrap the repo's wiki skeleton.
+description: Bootstraps `.skills/planning.json`, `.skills/execution.json`, and `.skills/conventions.json` for a repository, and can also scaffold a wiki knowledge layer next to the planning feature directory. Use when a user asks to configure a project, initialize `sirius-skills` settings, apply generic defaults, add Jira-oriented conventions, or bootstrap the repo's wiki skeleton.
 ---
 
 # Bootstrap
 
 This skill configures the repository-local `.skills/` files used by `sirius-skills`.
 
-When requested, it also scaffolds a lightweight `docs/wiki/` layer with
-`features/`, `concepts/`, `index.md`, and `log.md`.
+When requested, it also scaffolds a lightweight wiki layer with `features/`,
+`concepts/`, `index.md`, and `log.md`. The wiki root is derived from the parent
+directory of `planning_dir`, so it stays next to the feature planning tree.
 
 It supports three modes:
 
@@ -69,13 +70,21 @@ For `jira` mode, use these preset conventions unless the user supplies project-s
 
 If the user already gave a real Jira URL, use it instead of the placeholder.
 
-If the user also wants a wiki scaffold, use these defaults:
+If the user also wants a wiki scaffold, derive the wiki root from the parent
+directory of `planning_dir`.
 
-- wiki root: `docs/wiki`
-- feature synthesis pages: `docs/wiki/features`
-- cross-cutting concept pages: `docs/wiki/concepts`
-- wiki index: `docs/wiki/index.md`
-- append-only log: `docs/wiki/log.md`
+Examples:
+
+- `planning_dir = docs/features` -> wiki root `docs/wiki`
+- `planning_dir = planning/features` -> wiki root `planning/wiki`
+
+The scaffold layout under that derived root is:
+
+- wiki root: `<planning-parent>/wiki`
+- feature synthesis pages: `<planning-parent>/wiki/features`
+- cross-cutting concept pages: `<planning-parent>/wiki/concepts`
+- wiki index: `<planning-parent>/wiki/index.md`
+- append-only log: `<planning-parent>/wiki/log.md`
 
 Do not assume the wiki should be created unless the user asked for it.
 
@@ -121,8 +130,9 @@ After running the helper:
 
 - read back the written JSON files
 - confirm the mode-specific values are present
-- when `--wiki` was used, confirm `docs/wiki/index.md`, `docs/wiki/log.md`,
-  `docs/wiki/features/`, and `docs/wiki/concepts/` exist
+- when `--wiki` was used, confirm `<wiki-root>/index.md`,
+  `<wiki-root>/log.md`, `<wiki-root>/features/`, and
+  `<wiki-root>/concepts/` exist
 - summarize the result for the user
 
 If the helper reports invalid existing JSON, surface that error instead of overwriting the file blindly.
@@ -148,10 +158,10 @@ Successful runs should leave the repository with:
 
 When `--wiki` is used, successful runs should also leave the repository with:
 
-- `docs/wiki/index.md`
-- `docs/wiki/log.md`
-- `docs/wiki/features/`
-- `docs/wiki/concepts/`
+- `<wiki-root>/index.md`
+- `<wiki-root>/log.md`
+- `<wiki-root>/features/`
+- `<wiki-root>/concepts/`
 
 The generated wiki scaffold is intentionally generic. Repositories can refine
 their wiki rules and page placement in `AGENTS.md` later without changing the
@@ -179,8 +189,9 @@ Action:
 
 1. Use `default` mode.
 2. Run the helper with `--wiki`.
-3. Confirm the wiki scaffold uses `docs/wiki/features/` and
-   `docs/wiki/concepts/`.
+3. Confirm the wiki scaffold uses the directory derived from the parent of
+   `planning_dir` (for the default layout, `docs/wiki/features/` and
+   `docs/wiki/concepts/`).
 
 ### Example 3: Jira setup
 

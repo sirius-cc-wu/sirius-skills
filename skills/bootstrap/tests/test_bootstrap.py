@@ -208,6 +208,28 @@ def test_bootstrap_with_wiki_preserves_existing_index_and_log(tmp_path, monkeypa
     assert (wiki_dir / "log.md").read_text(encoding="utf-8") == "custom log\n"
 
 
+def test_bootstrap_with_wiki_uses_parent_of_custom_planning_dir(tmp_path, monkeypatch):
+    module = load_module()
+    monkeypatch.chdir(tmp_path)
+
+    assert (
+        run_cli(
+            module,
+            monkeypatch,
+            "--mode",
+            "default",
+            "--planning-dir",
+            "planning/features",
+            "--wiki",
+        )
+        == 0
+    )
+
+    wiki_dir = tmp_path / "planning" / "wiki"
+    assert (wiki_dir / "features").is_dir()
+    assert (wiki_dir / "concepts").is_dir()
+
+
 def test_bootstrap_child_scope_inherits_parent_configs_before_applying_overrides(
     tmp_path, monkeypatch
 ):
@@ -336,9 +358,11 @@ def test_bootstrap_with_wiki_uses_inherited_scope_paths_in_index(
         == 0
     )
 
-    index_text = (child_scope / "docs" / "wiki" / "index.md").read_text(
-        encoding="utf-8"
-    )
+    wiki_dir = child_scope / "planning" / "wiki"
+    assert (wiki_dir / "features").is_dir()
+    assert (wiki_dir / "concepts").is_dir()
+
+    index_text = (wiki_dir / "index.md").read_text(encoding="utf-8")
 
     assert "planning/features/" in index_text
     assert "planning/proposals/" in index_text

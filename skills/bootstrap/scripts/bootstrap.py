@@ -6,7 +6,7 @@ import argparse
 import importlib.util
 import json
 import sys
-from pathlib import Path
+from pathlib import Path, PurePosixPath
 from typing import Any
 
 
@@ -16,7 +16,7 @@ DEFAULT_DESIGN_DIAGRAM_MODE = "embedded"
 DEFAULT_SLICE_DIR = "slices"
 DEFAULT_WORKFLOW = "TDD"
 DEFAULT_AUTO_START_IMPLEMENTATION = True
-DEFAULT_WIKI_DIR = "docs/wiki"
+DEFAULT_WIKI_DIR_NAME = "wiki"
 VALID_DESIGN_DIAGRAM_MODES = ("embedded", "linked_svg")
 
 DEFAULT_JIRA_CONVENTIONS = {
@@ -126,8 +126,8 @@ def parse_args() -> argparse.Namespace:
         action=argparse.BooleanOptionalAction,
         default=False,
         help=(
-            "Create a lightweight docs/wiki scaffold with features, concepts, "
-            "index.md, and log.md."
+            "Create a lightweight wiki scaffold next to the planning feature "
+            "directory, with features, concepts, index.md, and log.md."
         ),
     )
     return parser.parse_args()
@@ -155,6 +155,14 @@ def write_text_file_if_missing(path: Path, content: str) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
     if not path.exists():
         path.write_text(content, encoding="utf-8")
+
+
+def derive_wiki_dir(planning_dir: str) -> str:
+    planning_path = PurePosixPath(planning_dir)
+    parent = planning_path.parent
+    if str(parent) in {"", "."}:
+        return DEFAULT_WIKI_DIR_NAME
+    return str(parent / DEFAULT_WIKI_DIR_NAME)
 
 
 def inherited_or_default(
@@ -258,7 +266,7 @@ def build_conventions_config(
 def scaffold_wiki(
     repo_root: Path, planning_dir: str, proposal_dir: str, slice_dir: str
 ) -> None:
-    wiki_dir = repo_root / DEFAULT_WIKI_DIR
+    wiki_dir = repo_root / Path(derive_wiki_dir(planning_dir))
     (wiki_dir / "features").mkdir(parents=True, exist_ok=True)
     (wiki_dir / "concepts").mkdir(parents=True, exist_ok=True)
 
@@ -339,6 +347,7 @@ def main() -> int:
     write_json_file(conventions_path, conventions_config)
 
     if args.wiki:
+        wiki_dir = derive_wiki_dir(planning_config["planning_dir"])
         scaffold_wiki(
             repo_root,
             planning_config["planning_dir"],
@@ -351,7 +360,7 @@ def main() -> int:
         f".skills/conventions.json using '{args.mode}' mode."
     )
     if args.wiki:
-        message += f" Created {DEFAULT_WIKI_DIR}/ scaffold."
+        message += f" Created {wiki_dir}/ scaffold."
 
     print(message)
     return 0

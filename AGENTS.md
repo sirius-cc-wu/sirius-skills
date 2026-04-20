@@ -30,6 +30,11 @@ Project-specific behavior should normally live in:
 If you add configurable behavior, document the config surface and preserve a
 useful generic default.
 
+When bootstrap scaffolds a wiki, keep the wiki root aligned with the planning
+layout: derive it from the parent directory of `planning_dir` (for example,
+`docs/features` -> `docs/wiki`, `planning/features` -> `planning/wiki`) instead
+of hardcoding `docs/wiki` for every repository.
+
 ### Preserve ownership boundaries
 
 Do not mix workflow responsibilities:

@@ -17,5 +17,6 @@
 | planning-workflow | planning_reviewed | 2026-03-24T03:39:26 | docs/features/planning-workflow/ |
 | change-to-subfeature-migration | planning_reviewed | 2026-04-08T08:27:49 | docs/features/planning-workflow/subfeatures/change-to-subfeature-migration/ |
 | proposal-workflow | planning_reviewed | 2026-03-29T00:32:50 | docs/features/planning-workflow/subfeatures/proposal-workflow/ |
+| reference-research-synthesis | planning_reviewed | 2026-04-21T00:30:11 | docs/features/planning-workflow/subfeatures/reference-research-synthesis/ |
 | subfeature-workflow | planning_reviewed | 2026-03-28T23:26:17 | docs/features/planning-workflow/subfeatures/subfeature-workflow/ |
 | workflow-state-consistency | implemented | 2026-04-19T11:36:15 | docs/features/workflow-state-consistency/ |

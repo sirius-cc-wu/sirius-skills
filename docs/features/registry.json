@@ -91,6 +91,12 @@
       "path": "docs/features/planning-workflow/subfeatures/proposal-workflow/"
     },
     {
+      "feature": "reference-research-synthesis",
+      "status": "planning_reviewed",
+      "updated_at": "2026-04-21T00:30:11",
+      "path": "docs/features/planning-workflow/subfeatures/reference-research-synthesis/"
+    },
+    {
       "feature": "subfeature-workflow",
       "status": "planning_reviewed",
       "updated_at": "2026-03-28T23:26:17",
