@@ -36,6 +36,7 @@ Optional companion output:
 ## Preferred Inputs
 
 - `<feature_path>/discover.md` when present
+- optional `<feature_path>/reference-research.md` when present
 - `impact-analysis.md` when present
 - direct user prompt or backlog context when `discover.md` does not exist
 - relevant existing docs, ADRs, or feature notes
@@ -66,6 +67,9 @@ Resolve `<feature_path>` as either:
 - Prefer explicit section headings over loosely structured prose so reviewers can scan decisions quickly.
 - Default to forward-looking design. If the feature is already implemented and the task is to capture current behavior, label it clearly as current-state or implemented design instead of presenting it as pre-implementation intent.
 - When implementation and intended design differ, record the delta explicitly so later planning and review do not treat drift as intent.
+- When `reference-research.md` exists and affects the chosen approach, preserve
+  its borrowing-path decision and tradeoffs in `system-design.md` instead of
+  silently re-deriving or replacing them.
 - Use PlantUML as the UML language whenever you include diagrams.
 - If `design_diagram_mode` is `embedded`, include system-design diagrams directly in `system-design.md` with fenced `plantuml` blocks.
 - If `design_diagram_mode` is `linked_svg`, write the PlantUML source files under `<feature_path>/figures/`, generate matching SVGs into the same directory, and link those SVGs from `system-design.md` with relative Markdown image links such as `![Component diagram](figures/component-diagram.svg)`.
@@ -81,7 +85,7 @@ Resolve `<feature_path>` as either:
 ## Workflow
 
 1. Gather the best available inputs:
-   - read `discover.md`, `impact-analysis.md`, and existing feature planning docs when present
+   - read `discover.md`, optional `reference-research.md`, `impact-analysis.md`, and existing feature planning docs when present
    - otherwise derive the design from the user prompt, backlog context, and repository context
 2. Inspect the relevant codebase or adjacent systems as needed, especially existing interfaces, ownership boundaries, operational constraints, and already-owned configuration/state surfaces.
 3. Read `.skills/planning.json` when present to determine whether diagrams stay embedded or are emitted under `<feature_path>/figures/`.
@@ -100,5 +104,7 @@ Resolve `<feature_path>` as either:
 - Do not create execution-ready slices for vague or unresolved designs.
 - If the work is purely UX-focused, use `ui-flow` instead or alongside this skill.
 - Do not let feature-level UML drift into slice-scoped class-by-class implementation design; that belongs in `plan`.
+- Do not treat missing research as a design failure when the feature never
+  needed upstream comparison in the first place.
 - Do not leave critical behavior such as retry semantics, cache invalidation, ownership scope, or protocol error mapping as undocumented "implementation details" when they shape correctness or operator expectations.
 - Do not fail just because `discover.md` is absent; use the best available prompt, backlog, documentation, and code context instead.

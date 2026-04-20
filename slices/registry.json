@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "generated_at": "2026-04-21T01:00:53",
+  "generated_at": "2026-04-21T01:05:08",
   "slices": [
     {
       "id": "hss-root-fallback",
@@ -339,6 +339,16 @@
       "path": "slices/rrs-relevance-routing-route-research-only-when-relevant/",
       "updated_at": "2026-04-21T01:00:53",
       "closed_at": "2026-04-21T01:00:53",
+      "archived_at": null,
+      "relations": []
+    },
+    {
+      "id": "rrs-research-consumers",
+      "feature": "Teach planning docs to cite research output",
+      "status": "closed",
+      "path": "slices/rrs-research-consumers-teach-planning-docs-to-cite-research-output/",
+      "updated_at": "2026-04-21T01:05:08",
+      "closed_at": "2026-04-21T01:05:08",
       "archived_at": null,
       "relations": []
     }

@@ -26,6 +26,7 @@ Read these references when relevant:
 ## Preferred Input
 
 - `<feature_path>/discover.md`
+- optional `<feature_path>/reference-research.md` when present
 - optional `<feature_path>/impact-analysis.md` when reviewing a subfeature
 - `<feature_path>/system-design.md`
 - optional `<feature_path>/ui-design.md`
@@ -53,6 +54,9 @@ Resolve `<feature_path>` as either:
 - Confirm the business intent, constraints, and success criteria are still coherent across the planning artifacts.
 - Check that the technical approach matches the stated architecture, repository boundaries, and non-functional constraints.
 - Confirm that configuration and state ownership are coherent, especially when subfeatures inherit a parent feature that already defines typed control surfaces.
+- When `reference-research.md` exists, confirm that the relevant borrowing-path
+  conclusions and tradeoffs remain coherent across discovery, design, and
+  breakdown artifacts instead of drifting into contradictory intent.
 - Make sure every execution-ready slice is small enough for one execution slice and has a concrete validation path.
 - Verify dependencies, sequencing, parallel-safe lanes, and integration checkpoints are explicit where they matter.
 - Confirm `slice-traceability.md` keeps one planned slice per row whenever a
@@ -66,7 +70,9 @@ Resolve `<feature_path>` as either:
 ## Workflow
 
 1. Resolve whether the review target is canonical feature planning or a selected subfeature.
-2. Read the current planning artifacts and any linked backlog context. For subfeatures, also read `impact-analysis.md` and the parent feature context needed to evaluate the child capability.
+2. Read the current planning artifacts, optional `reference-research.md`, and
+   any linked backlog context. For subfeatures, also read `impact-analysis.md`
+   and the parent feature context needed to evaluate the child capability.
 3. Compare discovery intent, design direction, and breakdown outputs for contradictions or missing handoff details, including duplicate configuration surfaces or parent/subfeature ownership drift.
 4. Record findings directly in the planning docs already used by the team. For subfeatures, write those findings back into the subfeature-local docs.
 5. Update the affected planning artifacts so the reviewed state is durable.
@@ -79,4 +85,7 @@ Resolve `<feature_path>` as either:
 - Do not commit planning artifacts automatically from review output; the approval checkpoint comes first.
 - Do not invent new lifecycle states for review; use findings and explicit readiness notes instead.
 - Do not leave blocking review outcomes only in chat or transient notes.
+- Do not invent a blocking finding solely because `reference-research.md` is
+  absent unless the planning packet actually depended on research that should
+  have been done already.
 - When reviewing a subfeature, do not move the review outcome into parent-feature `slice-planning.md` or `slice-traceability.md` unless that planning change intentionally belongs in the parent feature docs.

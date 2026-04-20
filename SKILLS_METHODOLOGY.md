@@ -146,6 +146,10 @@ Skip `research` when the work is repo-local and does not depend on external
 comparison, or when an existing `reference-research.md` already covers the same
 decision scope without a material change.
 
+When `reference-research.md` exists, later planning phases should reuse it as
+the durable source for borrowing-path decisions instead of re-deriving the same
+comparison from memory or transient chat context.
+
 ### 0a. Capture speculative ideas with propose
 
 Use `propose` when the request is still exploratory and should not become a real feature planning folder yet.
@@ -185,6 +189,10 @@ Expected outputs:
 - `discover.md`
 - optional early `user-stories.md`
 
+If `reference-research.md` exists, use it to inform discovery framing,
+constraints, and upstream-influenced goals. If it does not exist, discovery can
+still proceed normally when research was never required.
+
 Review checkpoint:
 
 - confirm the business intent, scope, constraints, and success criteria with the relevant stakeholders before moving into design
@@ -204,6 +212,10 @@ Use `design` to define:
 Expected output:
 
 - `system-design.md`
+
+If `reference-research.md` exists and affects the approach, carry the chosen
+borrowing path and tradeoffs into `system-design.md` instead of silently
+re-deriving them.
 
 Diagram layout is configurable through `.skills/planning.json`:
 
@@ -307,6 +319,10 @@ Its job is to:
 - identify blocking scope, design, sequencing, or validation gaps before slice bootstrap
 - record durable findings in the planning docs already used by the team
 - confirm whether the work is ready for human approval and later `slice` bootstrap or needs another planning pass
+
+When `reference-research.md` exists, review-planning should check that the
+relevant borrowing-path decisions still line up with `discover.md`,
+`system-design.md`, and `slice-planning.md`.
 
 It can review either canonical feature planning or a selected feature subfeature.
 For subfeatures, the review should center on the subfeature-local `discover.md`,

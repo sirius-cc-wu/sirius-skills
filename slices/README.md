@@ -36,3 +36,4 @@
 | sim-migration-guidance | Publish the migration path and operator guidance | closed | 2026-04-19T11:15:37 | 2026-04-19T11:15:37 | slices/sim-migration-guidance-publish-the-migration-path-and-operator-guidance/ |
 | rrs-research-skill | Create explicit research skill | closed | 2026-04-21T00:54:26 | 2026-04-21T00:54:26 | slices/rrs-research-skill-create-explicit-research-skill/ |
 | rrs-relevance-routing | Route research only when relevant | closed | 2026-04-21T01:00:53 | 2026-04-21T01:00:53 | slices/rrs-relevance-routing-route-research-only-when-relevant/ |
+| rrs-research-consumers | Teach planning docs to cite research output | closed | 2026-04-21T01:05:08 | 2026-04-21T01:05:08 | slices/rrs-research-consumers-teach-planning-docs-to-cite-research-output/ |

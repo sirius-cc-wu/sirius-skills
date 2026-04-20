@@ -37,11 +37,15 @@ Resolve `<feature_path>` from the repository planning layout:
 - Record success criteria and constraints explicitly.
 - Separate confirmed facts from assumptions and open questions.
 - Name candidate stories in a way that later decomposition can preserve traceability.
+- When `reference-research.md` exists for the current feature or subfeature,
+  treat it as durable context for upstream-informed goals, constraints, and
+  tradeoffs instead of re-deriving the same comparison in chat.
 
 ## Workflow
 
 1. Resolve `<feature_path>` from `.skills/planning.json` when `planning_dir` is present; otherwise use `docs/features/<feature-slug>/`, then identify or create the feature planning folder.
-2. Inspect the repository, existing docs, and relevant context.
+2. Inspect the repository, existing docs, optional `reference-research.md`, and
+   other relevant context.
 3. Write `discover.md` with problem framing, actors, goals, constraints, and risks.
 4. If helpful, draft an initial `user-stories.md` with stable story identifiers.
 5. Run `python3 skills/guide-planning/scripts/manage_planning.py sync-status <feature-selector> --through discovery_ready` so `.planning-meta.json` records that discovery is complete.
@@ -52,4 +56,6 @@ Resolve `<feature_path>` from the repository planning layout:
 - Do not create slice-scoped execution slices.
 - Do not promote proposals into canonical feature folders; use `guide-planning` for that transition first.
 - Do not move directly into implementation planning.
+- Do not treat a missing `reference-research.md` as a discovery blocker when the
+  current planning target does not need research.
 - If the request is already architecture-focused, hand off to `design`.
