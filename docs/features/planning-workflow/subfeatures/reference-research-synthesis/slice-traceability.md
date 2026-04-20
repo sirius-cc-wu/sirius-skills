@@ -35,7 +35,7 @@ ownership outside repository planning artifacts.
 
 | Story ID | Story Size | Story Summary | Increments | Planned Slice IDs | Slice Areas | Blocked By | Execution Slice IDs | Notes |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| RRS-01 | M | Add an explicit reference-research step | I1 | rrs-research-skill | research skill, local artifact |  |  | Seeds the `reference-research.md` contract for both feature and subfeature planning packets |
+| RRS-01 | M | Add an explicit reference-research step | I1 | rrs-research-skill | research skill, local artifact |  | rrs-research-skill | Seeds the `reference-research.md` contract for both feature and subfeature planning packets |
 | RRS-04 | S | Require research only when relevant | I1 | rrs-relevance-routing | guide-planning routing, methodology | rrs-research-skill |  | Keeps low-relevance work on direct `discover` or `design` paths |
 | RRS-03 | M | Record the chosen borrowing path durably | I2 | rrs-research-consumers | planning skill docs | rrs-relevance-routing |  | Makes downstream planning phases consume the local research artifact instead of re-deriving comparison |
 | RRS-02 | M | Write reusable conclusions into the wiki layer | I2 | rrs-wiki-synthesis | research skill, wiki layer | rrs-research-consumers |  | Uses the derived wiki root and updates `index.md` and `log.md` only when conclusions are reusable |

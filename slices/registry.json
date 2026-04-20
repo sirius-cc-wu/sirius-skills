@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "generated_at": "2026-04-19T11:15:37",
+  "generated_at": "2026-04-21T00:54:26",
   "slices": [
     {
       "id": "hss-root-fallback",
@@ -319,6 +319,16 @@
       "path": "slices/sim-migration-guidance-publish-the-migration-path-and-operator-guidance/",
       "updated_at": "2026-04-19T11:15:37",
       "closed_at": "2026-04-19T11:15:37",
+      "archived_at": null,
+      "relations": []
+    },
+    {
+      "id": "rrs-research-skill",
+      "feature": "Create explicit research skill",
+      "status": "closed",
+      "path": "slices/rrs-research-skill-create-explicit-research-skill/",
+      "updated_at": "2026-04-21T00:54:26",
+      "closed_at": "2026-04-21T00:54:26",
       "archived_at": null,
       "relations": []
     }

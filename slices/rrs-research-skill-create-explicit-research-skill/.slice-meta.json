@@ -1,0 +1,10 @@
+{
+  "created_at": "2026-04-21T00:41:39",
+  "updated_at": "2026-04-21T00:54:26",
+  "status": "closed",
+  "slice_id": "rrs-research-skill",
+  "feature": "Create explicit research skill",
+  "path": "slices/rrs-research-skill-create-explicit-research-skill/",
+  "relations": [],
+  "closed_at": "2026-04-21T00:54:26"
+}
