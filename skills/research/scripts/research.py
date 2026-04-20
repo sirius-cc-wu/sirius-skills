@@ -1,10 +1,9 @@
 #!/usr/bin/env python3
 
-from __future__ import annotations
-
 import argparse
 import importlib.util
 import sys
+from dataclasses import dataclass
 from datetime import datetime
 from pathlib import Path, PurePosixPath
 
@@ -13,6 +12,20 @@ SCRIPT_DIR = Path(__file__).resolve().parent
 SKILLS_DIR = SCRIPT_DIR.parents[1]
 GUIDE_PLANNING_SCRIPT = SKILLS_DIR / "guide-planning" / "scripts" / "manage_planning.py"
 OUTPUT_FILE = "reference-research.md"
+
+
+@dataclass(frozen=True)
+class ResearchDetails:
+    target_id: str
+    target_type: str
+    target_path: str
+    planning_status: str
+    question: str
+    sources: list[str]
+    chosen_reference: str
+    decision: str
+    alternatives: list[str]
+    research_artifact: str
 
 
 def load_module(script_path: Path, name: str):
@@ -132,42 +145,35 @@ def format_title(slug: str) -> str:
 
 def build_wiki_page_content(
     title: str,
-    target_id: str,
-    target_path: str,
-    research_artifact: str,
-    question: str,
-    sources: list[str],
-    chosen_reference: str,
-    decision: str,
-    alternatives: list[str],
+    details: ResearchDetails,
 ) -> str:
     return f"""# {title}
 
 ## Summary
 
-- Source planning target: `{target_path}`
-- Source research artifact: `{research_artifact}`
-- Preferred reference: `{chosen_reference}`
+- Source planning target: `{details.target_path}`
+- Source research artifact: `{details.research_artifact}`
+- Preferred reference: `{details.chosen_reference}`
 
 ## Reusable Conclusion
 
-{decision}
+{details.decision}
 
 ## Research Question
 
-{question}
+{details.question}
 
 ## Sources Reviewed
 
-{format_bullets(sources, "No reviewed sources were recorded.")}
+{format_bullets(details.sources, "No reviewed sources were recorded.")}
 
 ## Lower-Priority Alternatives
 
-{format_bullets(alternatives, "No lower-priority alternatives were recorded.")}
+{format_bullets(details.alternatives, "No lower-priority alternatives were recorded.")}
 
 ## Origin
 
-- Generated from `{research_artifact}` for `{target_id}`
+- Generated from `{details.research_artifact}` for `{details.target_id}`
 """
 
 
@@ -221,42 +227,25 @@ def write_wiki_outputs(
     wiki_page_path: Path,
     wiki_page_rel: str,
     title: str,
-    target_id: str,
-    target_path: str,
-    research_artifact: str,
-    question: str,
-    sources: list[str],
-    chosen_reference: str,
-    decision: str,
-    alternatives: list[str],
+    details: ResearchDetails,
 ) -> None:
     wiki_page_path.parent.mkdir(parents=True, exist_ok=True)
     wiki_page_path.write_text(
-        build_wiki_page_content(
-            title=title,
-            target_id=target_id,
-            target_path=target_path,
-            research_artifact=research_artifact,
-            question=question,
-            sources=sources,
-            chosen_reference=chosen_reference,
-            decision=decision,
-            alternatives=alternatives,
-        ),
+        build_wiki_page_content(title=title, details=details),
         encoding="utf-8",
     )
     upsert_wiki_index(
         wiki_root / "index.md",
         wiki_page_rel,
-        f"Reusable research for `{target_id}`: {decision}",
+        f"Reusable research for `{details.target_id}`: {details.decision}",
     )
     append_wiki_log(
         wiki_root / "log.md",
-        target_id,
+        details.target_id,
         wiki_page_rel,
-        research_artifact,
-        chosen_reference,
-        decision,
+        details.research_artifact,
+        details.chosen_reference,
+        details.decision,
     )
 
 
@@ -273,15 +262,7 @@ def resolve_target(planning_module, selector: str, explicit_scope: str | None):
 
 
 def build_content(
-    target_id: str,
-    target_type: str,
-    target_path: str,
-    planning_status: str,
-    question: str,
-    sources: list[str],
-    chosen_reference: str,
-    decision: str,
-    alternatives: list[str],
+    details: ResearchDetails,
     wiki_root: str,
     wiki_root_exists: bool,
     wiki_status: str,
@@ -295,31 +276,31 @@ def build_content(
     )
     wiki_note_line = f"- Note: {wiki_note}" if wiki_note else "- Note: none"
 
-    return f"""# Reference Research: {target_id}
+    return f"""# Reference Research: {details.target_id}
 
 ## Target
 
-- Target type: `{target_type}`
-- Target ID: `{target_id}`
-- Planning path: `{target_path}`
-- Planning status: `{planning_status}`
+- Target type: `{details.target_type}`
+- Target ID: `{details.target_id}`
+- Planning path: `{details.target_path}`
+- Planning status: `{details.planning_status}`
 
 ## Research Question
 
-{question}
+{details.question}
 
 ## Sources Reviewed
 
-{format_bullets(sources, "No reviewed sources were recorded.")}
+{format_bullets(details.sources, "No reviewed sources were recorded.")}
 
 ## Chosen Borrowing Path
 
-- Preferred reference: `{chosen_reference}`
-- Decision: {decision}
+- Preferred reference: `{details.chosen_reference}`
+- Decision: {details.decision}
 
 ## Lower-Priority Alternatives
 
-{format_bullets(alternatives, "No lower-priority alternatives were recorded.")}
+{format_bullets(details.alternatives, "No lower-priority alternatives were recorded.")}
 
 ## Wiki Follow-up
 
@@ -378,7 +359,7 @@ def main() -> int:
 
         output_path = target_dir / OUTPUT_FILE
         research_artifact_rel = normalize_relpath(output_path, repo_root)
-        content = build_content(
+        details = ResearchDetails(
             target_id=str(feature["feature"]),
             target_type=target_type,
             target_path=normalize_relpath(target_dir, repo_root),
@@ -388,6 +369,10 @@ def main() -> int:
             chosen_reference=args.chosen_reference,
             decision=args.decision,
             alternatives=list(args.alternative),
+            research_artifact=research_artifact_rel,
+        )
+        content = build_content(
+            details=details,
             wiki_root=normalize_relpath(wiki_root, repo_root),
             wiki_root_exists=wiki_root_exists,
             wiki_status=wiki_status,
@@ -401,14 +386,7 @@ def main() -> int:
                 wiki_page_path=wiki_page_path,
                 wiki_page_rel=wiki_page_rel,
                 title=format_title(wiki_page_path.stem),
-                target_id=str(feature["feature"]),
-                target_path=normalize_relpath(target_dir, repo_root),
-                research_artifact=research_artifact_rel,
-                question=args.question,
-                sources=list(args.source),
-                chosen_reference=args.chosen_reference,
-                decision=args.decision,
-                alternatives=list(args.alternative),
+                details=details,
             )
     except RuntimeError as exc:
         print(str(exc), file=sys.stderr)
