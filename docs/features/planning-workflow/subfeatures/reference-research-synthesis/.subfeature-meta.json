@@ -1,9 +1,9 @@
 {
   "subfeature_id": "reference-research-synthesis",
   "parent_feature_slug": "planning-workflow",
-  "status": "reviewed",
+  "status": "finalized",
   "created_at": "2026-04-21T00:04:50",
-  "updated_at": "2026-04-21T00:30:11",
+  "updated_at": "2026-04-21T01:10:07",
   "subfeature_type": "additive",
   "summary": "Add a planning-oriented capability for cross-reference research and durable wiki synthesis before or alongside feature discovery.",
   "affected_artifacts": [
@@ -20,14 +20,11 @@
     "PW-04"
   ],
   "affected_slice_ids": [
-    "pw-registry",
-    "pw-gates",
-    "pw-routing",
-    "pw-templates",
-    "pw-breakdown-guidance",
-    "pw-review-readiness",
-    "pw-slice-handoff"
+    "rrs-relevance-routing",
+    "rrs-research-consumers",
+    "rrs-research-skill",
+    "rrs-wiki-synthesis"
   ],
   "review_note": "Reviewed: explicit research skill, local artifact contract, and breakdown sequencing are aligned; ready for human approval and planning commit.",
-  "finalized_at": null
+  "finalized_at": "2026-04-21T01:10:07"
 }

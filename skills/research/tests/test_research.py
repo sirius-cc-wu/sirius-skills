@@ -147,7 +147,7 @@ def test_research_writes_subfeature_artifact_and_honors_written_wiki(tmp_path, m
             "--wiki-status",
             "written",
             "--wiki-page",
-            "planning/wiki/concepts/reference-research-patterns.md",
+            "concepts/reference-research-patterns.md",
         )
         == 0
     )
@@ -163,6 +163,82 @@ def test_research_writes_subfeature_artifact_and_honors_written_wiki(tmp_path, m
     assert "Derived wiki root: `planning/wiki`" in artifact
     assert "Status: `written`" in artifact
     assert "Page: `planning/wiki/concepts/reference-research-patterns.md`" in artifact
+
+    wiki_page = (wiki_root / "concepts" / "reference-research-patterns.md").read_text(
+        encoding="utf-8"
+    )
+    assert "# Reference Research Patterns" in wiki_page
+    assert "Write reference-research.md into the subfeature folder." in wiki_page
+    assert (
+        "`planning/features/planning-workflow/subfeatures/reference-research-synthesis/reference-research.md`"
+        in wiki_page
+    )
+
+    wiki_index = (wiki_root / "index.md").read_text(encoding="utf-8")
+    assert "[Reference Research Patterns](planning/wiki/concepts/reference-research-patterns.md)" in wiki_index
+
+    wiki_log = (wiki_root / "log.md").read_text(encoding="utf-8")
+    assert "# Wiki Log" in wiki_log
+    assert "research | reference-research-synthesis" in wiki_log
+    assert "planning/wiki/concepts/reference-research-patterns.md" in wiki_log
+
+
+def test_research_updates_wiki_page_and_appends_log(tmp_path, monkeypatch):
+    module = load_module(RESEARCH_SCRIPT, "research")
+    setup_feature(tmp_path, monkeypatch, planning_dir="planning/features")
+    wiki_root = tmp_path / "planning" / "wiki"
+    wiki_root.mkdir(parents=True)
+
+    assert (
+        run_cli(
+            module,
+            "research.py",
+            monkeypatch,
+            "planning-workflow",
+            "--question",
+            "Which reusable workflow pattern should be documented?",
+            "--source",
+            "references/OpenHarness/: explicit workflow owner",
+            "--chosen-reference",
+            "references/OpenHarness/",
+            "--decision",
+            "Capture the initial reusable workflow conclusion.",
+            "--wiki-status",
+            "written",
+            "--wiki-page",
+            "concepts/workflow-patterns.md",
+        )
+        == 0
+    )
+    assert (
+        run_cli(
+            module,
+            "research.py",
+            monkeypatch,
+            "planning-workflow",
+            "--question",
+            "Which reusable workflow pattern should be documented?",
+            "--source",
+            "references/OpenHarness/: explicit workflow owner",
+            "--chosen-reference",
+            "references/OpenHarness/",
+            "--decision",
+            "Capture the updated reusable workflow conclusion.",
+            "--wiki-status",
+            "written",
+            "--wiki-page",
+            "concepts/workflow-patterns.md",
+            "--force",
+        )
+        == 0
+    )
+
+    wiki_page = (wiki_root / "concepts" / "workflow-patterns.md").read_text(encoding="utf-8")
+    assert "Capture the updated reusable workflow conclusion." in wiki_page
+    assert "Capture the initial reusable workflow conclusion." not in wiki_page
+
+    wiki_log = (wiki_root / "log.md").read_text(encoding="utf-8")
+    assert wiki_log.count("## [") == 2
 
 
 def test_research_refuses_written_wiki_without_wiki_root(tmp_path, monkeypatch, capsys):

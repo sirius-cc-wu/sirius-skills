@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "generated_at": "2026-04-21T01:05:08",
+  "generated_at": "2026-04-21T01:10:07",
   "slices": [
     {
       "id": "hss-root-fallback",
@@ -349,6 +349,16 @@
       "path": "slices/rrs-research-consumers-teach-planning-docs-to-cite-research-output/",
       "updated_at": "2026-04-21T01:05:08",
       "closed_at": "2026-04-21T01:05:08",
+      "archived_at": null,
+      "relations": []
+    },
+    {
+      "id": "rrs-wiki-synthesis",
+      "feature": "Add reusable wiki synthesis flow",
+      "status": "closed",
+      "path": "slices/rrs-wiki-synthesis-add-reusable-wiki-synthesis-flow/",
+      "updated_at": "2026-04-21T01:10:07",
+      "closed_at": "2026-04-21T01:10:07",
       "archived_at": null,
       "relations": []
     }
