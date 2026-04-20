@@ -43,6 +43,10 @@ If you already know the exact skill and target:
 Use `design` for `docs/features/checkout-redesign/`.
 ```
 
+```text
+Use `research` for `docs/features/checkout/subfeatures/replace-legacy-flow/` and record the chosen borrowing path from checked-in references.
+```
+
 ## Prompt patterns that work well
 
 ### 1. New feature planning
@@ -106,6 +110,10 @@ Use `add-subfeature` to create `replace-legacy-flow` under `checkout`.
 
 ```text
 Use `assess` for subfeature `replace-legacy-flow` under `checkout`.
+```
+
+```text
+Use `research` for `docs/features/checkout/subfeatures/replace-legacy-flow/` when upstream reference comparison should be captured durably before discovery or design continues.
 ```
 
 ```text
@@ -250,7 +258,7 @@ When:
 When:
 
 - the work is feature planning
-- you want the agent to pick among `propose`, `discover`, `design`, `breakdown`, or review-oriented planning skills
+- you want the agent to pick among `propose`, `research`, `discover`, `design`, `breakdown`, or review-oriented planning skills
 
 ### Prefer `guide-execution`
 
@@ -281,6 +289,12 @@ Use `guide-planning` for `checkout-redesign` and route to the right next plannin
 
 ```text
 Use `design` for `checkout-redesign`. There is no `discover.md`; use this prompt as the planning input and create `system-design.md`.
+```
+
+### “This feature overlaps checked-in references; capture the borrowing path first”
+
+```text
+Use `research` for `docs/features/checkout-redesign/` and write `reference-research.md` from the relevant checked-in references before design continues.
 ```
 
 ### “I already implemented it; document it for review”
