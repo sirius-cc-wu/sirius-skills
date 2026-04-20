@@ -1,7 +1,6 @@
-.PHONY: install uninstall install-local uninstall-local install-packaged uninstall-packaged sync-shared-references sync-shared-runtime validate-workflow-state
+.PHONY: install uninstall install-packaged uninstall-packaged sync-shared-references sync-shared-runtime validate-workflow-state
 
 REPO_ROOT := $(CURDIR)
-SKILLS_HOME ?= $(HOME)/.agents/skills
 COMMON_FLAGS := --global --yes --agent github-copilot --agent codex --agent antigravity --agent gemini-cli
 MANAGED_SKILLS := \
 	audit-artifacts \
@@ -34,17 +33,10 @@ MANAGED_SKILLS := \
 	ui-flow
 MANAGED_SKILL_FLAGS := $(foreach skill,$(MANAGED_SKILLS),--skill $(skill))
 
-install-local:
-	python3 scripts/install_local_skills.py install --repo-root "$(REPO_ROOT)" --skills-home "$(SKILLS_HOME)" $(MANAGED_SKILLS)
-
-# Compatibility alias during the migration to explicit local and packaged modes.
-install: install-packaged
-
-install-packaged: sync-shared-runtime sync-shared-references
+install: sync-shared-runtime sync-shared-references
 	npx skills add "$(REPO_ROOT)" $(COMMON_FLAGS) $(MANAGED_SKILL_FLAGS)
 
-uninstall-local:
-	python3 scripts/install_local_skills.py uninstall --repo-root "$(REPO_ROOT)" --skills-home "$(SKILLS_HOME)" $(MANAGED_SKILLS)
+install-packaged: install
 
 sync-shared-references:
 	python3 scripts/sync_shared_skill_references.py
@@ -55,7 +47,6 @@ sync-shared-runtime:
 validate-workflow-state:
 	python3 scripts/validate_workflow_state.py
 
-# Compatibility alias during the migration to explicit local and packaged modes.
 uninstall: uninstall-packaged
 
 uninstall-packaged:

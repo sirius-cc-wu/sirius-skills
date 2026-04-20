@@ -112,13 +112,14 @@ When editing skills:
 
 ### Installation
 
-Use `make install-local` and `make uninstall-local` for source-linked local
-development installs. `SKILLS_HOME` can override the target skill home when a
-CLI uses a different discovery path or when tests need a temporary directory.
+Use `make install` and `make uninstall` for the supported packaged workflow.
+`make install-packaged` and `make uninstall-packaged` remain explicit aliases to
+the same packaged path.
 
-Use `make install-packaged` and `make uninstall-packaged` for the explicit
-packaged workflow. `make install` and `make uninstall` remain compatibility
-aliases to that packaged path in the current rollout.
+Packaged installs depend on the shared-runtime sync step. When a skill imports
+shared Python support such as `workflow_state`, update
+`scripts/sync_shared_skill_runtime.py` so `make install` packages that runtime
+with the consuming skill.
 
 Keep repo-level guidance agent-agnostic unless a specific integration requires
 otherwise.

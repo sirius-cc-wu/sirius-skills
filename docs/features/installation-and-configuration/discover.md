@@ -6,7 +6,7 @@ The repository is designed as a reusable skill collection, but successful adopti
 
 ## Goals
 
-- Provide a clear local source-linked install path plus a managed packaged compatibility path for the skill set.
+- Provide one clear managed packaged install path for the skill set.
 - Keep project-specific behavior in config rather than hardcoded into core skills.
 - Separate planning layout, execution layout, and naming conventions into distinct config files.
 - Allow optional project-local extensions without requiring a full plugin loader.
@@ -33,16 +33,16 @@ The repository is designed as a reusable skill collection, but successful adopti
 
 ## Confirmed Signals in Repo
 
-- `Makefile` now defines `make install-local` and `make uninstall-local` for source-linked local use.
 - `Makefile` now defines `make install-packaged` and `make uninstall-packaged` for the explicit packaged flow.
-- `Makefile` still keeps `make install` and `make uninstall` as packaged compatibility aliases during the migration.
+- `Makefile` uses `make install` and `make uninstall` as the default packaged entrypoints.
+- Packaged installs rely on the shared-runtime sync step so skills such as `close-slice` carry `workflow_state` when installed.
 - `README.md` documents generic-first workflow and config surfaces.
 - `AGENTS.md` emphasizes configuration over hardcoding and preserving ownership boundaries.
 - `skills/commit/`, `skills/create-pr/`, `skills/guide-planning/`, and `skills/guide-execution/` all consume configuration in controlled ways.
 
 ## Success Criteria
 
-- A maintainer can install or remove the managed skill set through one documented local entrypoint plus one documented packaged compatibility path.
+- A maintainer can install or remove the managed skill set through one documented packaged entrypoint.
 - A project can configure planning, execution, and conventions independently without modifying core skills.
 - Optional project-local extensions remain opt-in and explicitly documented.
 

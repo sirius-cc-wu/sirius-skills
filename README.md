@@ -4,47 +4,38 @@
 
 ## Installing skills
 
-For local development, prefer the source-linked install path:
+Install the managed skills with the packaged workflow:
 
 ```bash
-make install-local
+make install
 ```
 
-This creates per-skill symlinks into the local skill home. The default skill
-home is `~/.agents/skills`, and you can override it for another CLI or a test
-fixture with `SKILLS_HOME=/path/to/skills-home`.
+This uses `npx skills add` to register the managed skills after refreshing the
+shared runtime and shared references that packaged installs depend on.
 
-To remove the same local source-linked install later:
+To remove the managed packaged install later:
 
 ```bash
-make uninstall-local
+make uninstall
 ```
 
-The explicit packaged path is:
+The explicit packaged aliases are still available:
 
 ```bash
 make install-packaged
 make uninstall-packaged
 ```
 
-The original compatibility aliases are still available in the current rollout:
-
-```bash
-make install
-make uninstall
-```
-
-`make install-packaged` and `make uninstall-packaged` run the managed packaged
-install flow through `npx skills`. `make install` and `make uninstall` still
-point at that packaged flow as migration-time compatibility aliases.
+`make install`, `make install-packaged`, `make uninstall`, and
+`make uninstall-packaged` all use the managed packaged flow through
+`npx skills`.
 
 ## Migration Notes
 
 Current command map:
 
-- local source-linked use: `make install-local` / `make uninstall-local`
-- explicit packaged use: `make install-packaged` / `make uninstall-packaged`
-- legacy compatibility aliases: `make install` / `make uninstall`
+- default packaged use: `make install` / `make uninstall`
+- explicit packaged aliases: `make install-packaged` / `make uninstall-packaged`
 
 Current parity guidance:
 
@@ -53,11 +44,11 @@ Current parity guidance:
 - use `--check-packaged-parity` when you explicitly want packaged install
   validation
 
-Current migration stance:
+Current install stance:
 
-- prefer `install-local` for day-to-day repo work
-- use `install-packaged` when validating or refreshing the packaged skill path
-- treat `install` / `uninstall` as compatibility aliases that still work today
+- use `make install` for normal repo refreshes before reloading skills
+- use `make install-packaged` only when you want the explicit packaged alias
+- treat `make uninstall` / `make uninstall-packaged` as equivalent packaged removals
 
 To rerun the curated workflow consistency validation bundle used by CI and
 workflow-state maintenance work:
