@@ -12,7 +12,7 @@ Use this skill as the planning-layer entrypoint when you need to decide the next
 1. Resolve or initialize the active feature planning folder.
 2. Promote accepted proposals into canonical feature planning folders when the user explicitly asks for planning to begin.
 3. Verify required planning files, registry state, and feature metadata.
-4. Route feature-scoped work to `propose`, `add-subfeature`, `assess`, `discover`, `design`, `ui-flow`, `breakdown`, or `review-planning`, then stop for approval/commit before execution begins.
+4. Route feature-scoped work to `propose`, `add-subfeature`, `assess`, `research`, `discover`, `design`, `ui-flow`, `breakdown`, or `review-planning`, then stop for approval/commit before execution begins.
 5. Persist planning readiness state when a phase is complete.
 6. Keep planning handoff decisions durable in the repository instead of transient chat state.
 
@@ -25,6 +25,8 @@ Use `guide-planning` when you need to decide the next planning step before slice
 - If the user wants an accepted proposal promoted into canonical planning, perform that promotion here and then route to `discover`.
 - If the request adds or reshapes a durable child capability under an existing feature, route to `add-subfeature`.
 - If an active subfeature exists and the parent-feature impact is not yet explicit, route to `assess`.
+- If the user explicitly asks for reference-project research or wiki synthesis, if the target overlaps checked-in `references/` patterns and has no durable `reference-research.md` yet, or if discovery/design depends on choosing between multiple upstream patterns, route to `research`.
+- If the work is a small repo-local change whose shape does not depend on upstream comparison, skip `research` and continue directly into the normal planning path.
 - If the problem, outcomes, or constraints are still being framed, route to `discover`.
 - If the architecture, interfaces, or validation strategy are still unresolved, route to `design`.
 - If UI or interaction flow remains material, route to `ui-flow`.
@@ -40,6 +42,7 @@ Use `guide-planning` when you need to decide the next planning step before slice
 
 - Own the transition from accepted proposal to canonical feature planning.
 - Keep feature-planning readiness in planning metadata.
+- Keep `research` advisory within the existing planning lifecycle instead of introducing a new readiness state.
 - Do not duplicate execution-slice lifecycle state here.
 - Stop at reviewed planning until the user approves the planning artifacts.
 - Treat planning commits as the durable checkpoint between planning and execution.
@@ -48,7 +51,7 @@ Use `guide-planning` when you need to decide the next planning step before slice
 Typical handoff:
 
 ```text
-guide-planning -> propose/add-subfeature/assess/discover -> design -> ui-flow -> breakdown -> review-planning -> human approval -> commit -> slice -> guide-execution
+guide-planning -> propose/add-subfeature/assess/research/discover -> design -> ui-flow -> breakdown -> review-planning -> human approval -> commit -> slice -> guide-execution
 ```
 
 ## Lifecycle States
@@ -73,7 +76,7 @@ Use adjacent transitions by default and repair skipped states only deliberately.
 3. Ensure the planning registry exists.
 4. Resolve the active feature using tooling or a user-provided slug/path.
 5. Confirm the folder represents one coherent feature or capability.
-6. Check `discover.md`, `system-design.md`, optional `ui-design.md`, `slice-planning.md`, `slice-traceability.md`, and `.planning-meta.json` as appropriate for the current state.
+6. Check optional `reference-research.md`, `discover.md`, `system-design.md`, optional `ui-design.md`, `slice-planning.md`, `slice-traceability.md`, and `.planning-meta.json` as appropriate for the current state.
 
 ## Tooling
 

@@ -15,6 +15,7 @@ Use a **two-layer workflow**:
    - `propose`
    - `add-subfeature`
    - `assess`
+   - `research` (when upstream comparison materially affects planning shape)
    - `discover`
    - `design`
    - `ui-flow` (optional)
@@ -29,7 +30,9 @@ Use a **two-layer workflow**:
    - `review-execution`
    - `close-slice`
 
-The planning layer keeps scope, design, decomposition, and increment planning in repo documents, and `guide-planning` owns readiness and routing across those artifacts.
+The planning layer keeps scope, design, decomposition, increment planning, and
+optional durable reference comparison in repo documents, and `guide-planning`
+owns readiness and routing across those artifacts.
 
 After each planning phase writes or updates its repository artifacts, persist the matching metadata transition with `python3 skills/guide-planning/scripts/manage_planning.py sync-status <feature-selector> --through <expected-status>`. Use `sync-status` for normal adjacent advancement and drift repair; reserve `set-status` for explicit manual overrides and terminal execution states.
 
@@ -67,7 +70,7 @@ Its job is to:
 
 - resolve or initialize the feature planning folder
 - verify the current planning artifacts and metadata
-- decide whether the next step is `propose`, `add-subfeature`, `assess`, `discover`, `design`, `ui-flow`, `breakdown`, `review-planning`, or an approval/commit stop before execution begins
+- decide whether the next step is `propose`, `add-subfeature`, `assess`, `research`, `discover`, `design`, `ui-flow`, `breakdown`, `review-planning`, or an approval/commit stop before execution begins
 - keep planning handoff decisions durable through explicit readiness states
 
 Expected planning states:
@@ -83,7 +86,7 @@ Expected planning states:
 Recommended handoff:
 
 ```text
-guide-scope -> guide-planning -> propose/add-subfeature/assess/discover/design/ui-flow/breakdown/review-planning -> human approval -> commit -> slice/execute-all-slices -> guide-execution
+guide-scope -> guide-planning -> propose/add-subfeature/assess/research/discover/design/ui-flow/breakdown/review-planning -> human approval -> commit -> slice/execute-all-slices -> guide-execution
 ```
 
 If the request is still speculative, cross-cutting, or not yet accepted as a canonical feature, route to `propose` first. That keeps early exploration under `docs/proposals/` instead of polluting the canonical `docs/features/` registry too early.
@@ -91,6 +94,13 @@ If the request is still speculative, cross-cutting, or not yet accepted as a can
 If the request is changing an existing canonical feature instead of starting net-new planning work, route to `add-subfeature` first. That skill creates a feature-local subfeature and keeps the canonical feature folder as the durable source of truth.
 
 After a subfeature exists, use `assess` before subfeature-local design when you need an explicit record of affected baseline artifacts, stories, increments, and slices.
+
+Use `research` only when upstream comparison can materially change the planning
+shape: explicit user requests for reference-project research or wiki synthesis,
+missing durable research for a feature or subfeature that overlaps checked-in
+`references/` patterns, or discovery/design work that depends on choosing
+between multiple upstream patterns. Skip `research` for small repo-local edits
+whose shape does not depend on external comparison.
 
 ### 0b. Assess existing-feature impact
 
@@ -108,6 +118,33 @@ Recommended handoff:
 ```text
 guide-planning -> add-subfeature -> assess -> design -> breakdown
 ```
+
+### 0c. Capture reference-project comparison only when it matters
+
+Use `research` after `guide-planning` or `assess` when durable upstream
+comparison is needed before discovery or design should continue.
+
+Its job is to:
+
+- compare relevant checked-in references against the local planning target
+- write `reference-research.md` into the feature or subfeature packet
+- record the chosen borrowing path and lower-priority alternatives durably
+- note whether reusable wiki synthesis was written, skipped, or deferred
+
+Expected outputs:
+
+- `reference-research.md`
+
+Recommended handoff:
+
+```text
+guide-planning -> research -> discover/design
+guide-planning -> add-subfeature -> assess -> research -> design/breakdown
+```
+
+Skip `research` when the work is repo-local and does not depend on external
+comparison, or when an existing `reference-research.md` already covers the same
+decision scope without a material change.
 
 ### 0a. Capture speculative ideas with propose
 

@@ -1,0 +1,10 @@
+{
+  "created_at": "2026-04-21T00:56:28",
+  "updated_at": "2026-04-21T01:00:53",
+  "status": "closed",
+  "slice_id": "rrs-relevance-routing",
+  "feature": "Route research only when relevant",
+  "path": "slices/rrs-relevance-routing-route-research-only-when-relevant/",
+  "relations": [],
+  "closed_at": "2026-04-21T01:00:53"
+}

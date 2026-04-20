@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "generated_at": "2026-04-21T00:54:26",
+  "generated_at": "2026-04-21T01:00:53",
   "slices": [
     {
       "id": "hss-root-fallback",
@@ -329,6 +329,16 @@
       "path": "slices/rrs-research-skill-create-explicit-research-skill/",
       "updated_at": "2026-04-21T00:54:26",
       "closed_at": "2026-04-21T00:54:26",
+      "archived_at": null,
+      "relations": []
+    },
+    {
+      "id": "rrs-relevance-routing",
+      "feature": "Route research only when relevant",
+      "status": "closed",
+      "path": "slices/rrs-relevance-routing-route-research-only-when-relevant/",
+      "updated_at": "2026-04-21T01:00:53",
+      "closed_at": "2026-04-21T01:00:53",
       "archived_at": null,
       "relations": []
     }
