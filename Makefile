@@ -28,6 +28,7 @@ MANAGED_SKILLS := \
 	review-planning \
 	simplify \
 	guide-execution \
+	learn \
 	ship \
 	slice \
 	ui-flow

@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import json
 from dataclasses import asdict, dataclass, field
+from datetime import datetime, timezone
 from pathlib import Path
 from typing import Iterable, List, Optional
 
@@ -76,18 +77,28 @@ def query_learnings(
 
 
 def update_learning_state(path: Path, learning_id: str, new_state: str) -> LearningRecord:
-    records = read_learnings(path)
-    updated: Optional[LearningRecord] = None
-    for record in records:
-        if record.id == learning_id:
-            record.state = new_state
-            updated = record
-            break
-    if updated is None:
-        raise ValueError(f"Unknown learning id: {learning_id}")
     path.parent.mkdir(parents=True, exist_ok=True)
-    path.write_text(
-        "".join(json.dumps(record.to_dict(), sort_keys=True) + "\n" for record in records),
-        encoding="utf-8",
-    )
+    updated: Optional[LearningRecord] = None
+    with locked_file(path) as handle:
+        handle.seek(0)
+        payload = handle.read()
+        records = [
+            LearningRecord.from_dict(json.loads(line))
+            for line in payload.splitlines()
+            if line.strip()
+        ]
+        timestamp = datetime.now(timezone.utc).replace(microsecond=0).isoformat()
+        for record in records:
+            if record.id == learning_id:
+                record.state = new_state
+                record.updated_at = timestamp
+                updated = record
+                break
+        if updated is None:
+            raise ValueError(f"Unknown learning id: {learning_id}")
+        handle.seek(0)
+        handle.truncate()
+        handle.write(
+            "".join(json.dumps(record.to_dict(), sort_keys=True) + "\n" for record in records)
+        )
     return updated

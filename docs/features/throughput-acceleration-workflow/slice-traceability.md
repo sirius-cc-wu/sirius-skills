@@ -16,7 +16,7 @@
 | TAW-02 | XL | Finish one active slice end to end without replacing existing owners | I3 | taw-ship-backlog-integration | optional backlog delegation, execution config, one-active-slice enforcement | taw-ship-slice-loop |  | Reuses the validated finisher instead of expanding `ship` into a monolith |
 | TAW-03 | L | Resume interrupted accelerator runs from durable checkpoint context | I1 | taw-runtime-foundation | shared runtime stores, locking, packaged runtime sync |  | taw-runtime-foundation | Establishes supplemental runtime support without changing workflow truth ownership |
 | TAW-03 | L | Resume interrupted accelerator runs from durable checkpoint context | I2 | taw-ship-slice-loop | checkpoint reconciliation, stop-boundary resume semantics | taw-ship-handoff |  | Couples resume behavior to one-slice finishing so the state model stays consistent |
-| TAW-04 | M | Persist repo-scoped workflow learnings across sessions | I1 | taw-learn-skill | learnings store access, promotion/pruning flows, learn skill CLI | taw-runtime-foundation |  | Makes learnings durable and inspectable before accelerators begin consuming them widely |
+| TAW-04 | M | Persist repo-scoped workflow learnings across sessions | I1 | taw-learn-skill | learnings store access, promotion/pruning flows, learn skill CLI | taw-runtime-foundation | taw-learn-skill | Makes learnings durable and inspectable before accelerators begin consuming them widely |
 
 ## Notes
 

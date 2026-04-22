@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "generated_at": "2026-04-22T09:59:00",
+  "generated_at": "2026-04-22T10:08:56",
   "slices": [
     {
       "id": "hss-root-fallback",
@@ -369,6 +369,16 @@
       "path": "slices/taw-runtime-foundation-add-shared-accelerator-runtime-support/",
       "updated_at": "2026-04-22T09:59:00",
       "closed_at": "2026-04-22T09:59:00",
+      "archived_at": null,
+      "relations": []
+    },
+    {
+      "id": "taw-learn-skill",
+      "feature": "Add durable learnings skill",
+      "status": "closed",
+      "path": "slices/taw-learn-skill-add-durable-learnings-skill/",
+      "updated_at": "2026-04-22T10:08:56",
+      "closed_at": "2026-04-22T10:08:56",
       "archived_at": null,
       "relations": []
     }
