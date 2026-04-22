@@ -43,3 +43,4 @@
 | taw-ship-handoff | Extend ship with machine-readable handoff payloads | closed | 2026-04-22T10:14:11 | 2026-04-22T10:14:11 | slices/taw-ship-handoff-extend-ship-with-machine-readable-handoff-payloads/ |
 | taw-ship-slice-loop | Add one-slice finishing and resume orchestration | closed | 2026-04-22T10:19:28 | 2026-04-22T10:19:28 | slices/taw-ship-slice-loop-add-one-slice-finishing-and-resume-orchestration/ |
 | taw-ship-backlog-integration | Integrate backlog delegation from ship to ship-slice | closed | 2026-04-22T10:24:00 | 2026-04-22T10:24:00 | slices/taw-ship-backlog-integration-integrate-backlog-delegation-from-ship-to-ship-slice/ |
+| taw-autoplan | Add high-autonomy planning orchestration | closed | 2026-04-22T10:27:11 | 2026-04-22T10:27:11 | slices/taw-autoplan-add-high-autonomy-planning-orchestration/ |

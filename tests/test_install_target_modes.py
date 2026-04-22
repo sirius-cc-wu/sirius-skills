@@ -30,6 +30,7 @@ def test_install_target_keeps_packaged_sync() -> None:
     assert PACKAGED_REPO_SOURCE in output
     assert output.count("npx skills add") == 1
     assert "--skill audit-artifacts" in output
+    assert "--skill autoplan" in output
     assert "--skill learn" in output
     assert "--skill ship" in output
     assert "--skill ship-slice" in output
@@ -43,6 +44,7 @@ def test_install_packaged_alias_matches_install() -> None:
     assert PACKAGED_REPO_SOURCE in output
     assert output.count("npx skills add") == 1
     assert "--skill audit-artifacts" in output
+    assert "--skill autoplan" in output
     assert "--skill learn" in output
     assert "--skill ship" in output
     assert "--skill ship-slice" in output

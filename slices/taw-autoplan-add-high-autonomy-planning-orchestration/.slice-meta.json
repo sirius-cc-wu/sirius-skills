@@ -1,0 +1,10 @@
+{
+  "created_at": "2026-04-22T10:24:36",
+  "updated_at": "2026-04-22T10:27:11",
+  "status": "closed",
+  "slice_id": "taw-autoplan",
+  "feature": "Add high-autonomy planning orchestration",
+  "path": "slices/taw-autoplan-add-high-autonomy-planning-orchestration/",
+  "relations": [],
+  "closed_at": "2026-04-22T10:27:11"
+}

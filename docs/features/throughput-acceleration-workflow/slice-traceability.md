@@ -10,7 +10,7 @@
 
 | Story ID | Story Size | Story Summary | Increments | Planned Slice IDs | Slice Areas | Blocked By | Execution Slice IDs | Notes |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| TAW-01 | L | Add one planning entrypoint that can run the reviewed planning stack end to end | I3 | taw-autoplan | planning-layer orchestration, review boundary preservation | taw-runtime-foundation |  | Keeps planning acceleration separate from execution finishing semantics |
+| TAW-01 | L | Add one planning entrypoint that can run the reviewed planning stack end to end | I3 | taw-autoplan | planning-layer orchestration, review boundary preservation | taw-runtime-foundation | taw-autoplan | Keeps planning acceleration separate from execution finishing semantics |
 | TAW-02 | XL | Finish one active slice end to end without replacing existing owners | I2 | taw-ship-handoff | backlog handoff contract, `ship` JSON output | taw-runtime-foundation | taw-ship-handoff | Preserves `ship` as a standalone backlog resolver while making later delegation possible |
 | TAW-02 | XL | Finish one active slice end to end without replacing existing owners | I2 | taw-ship-slice-loop | one-slice finishing, checkpoint-aware resume, execution-owner orchestration | taw-ship-handoff | taw-ship-slice-loop | Adds the narrow finisher without absorbing backlog traversal |
 | TAW-02 | XL | Finish one active slice end to end without replacing existing owners | I3 | taw-ship-backlog-integration | optional backlog delegation, execution config, one-active-slice enforcement | taw-ship-slice-loop | taw-ship-backlog-integration | Reuses the validated finisher instead of expanding `ship` into a monolith |

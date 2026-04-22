@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "generated_at": "2026-04-22T10:24:00",
+  "generated_at": "2026-04-22T10:27:11",
   "slices": [
     {
       "id": "hss-root-fallback",
@@ -409,6 +409,16 @@
       "path": "slices/taw-ship-backlog-integration-integrate-backlog-delegation-from-ship-to-ship-slice/",
       "updated_at": "2026-04-22T10:24:00",
       "closed_at": "2026-04-22T10:24:00",
+      "archived_at": null,
+      "relations": []
+    },
+    {
+      "id": "taw-autoplan",
+      "feature": "Add high-autonomy planning orchestration",
+      "status": "closed",
+      "path": "slices/taw-autoplan-add-high-autonomy-planning-orchestration/",
+      "updated_at": "2026-04-22T10:27:11",
+      "closed_at": "2026-04-22T10:27:11",
       "archived_at": null,
       "relations": []
     }

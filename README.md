@@ -68,11 +68,11 @@ The intended direction is:
 The managed repo-first skill set is grouped into:
 
 - repo utilities: `skills/bootstrap/`, `skills/commit/`, `skills/create-pr/`, `skills/simplify/`
-- accelerator utilities: `skills/learn/`, `skills/ship-slice/`
+- accelerator utilities: `skills/autoplan/`, `skills/learn/`, `skills/ship-slice/`
 - artifact maintenance: `skills/audit-artifacts/`, `skills/measure-artifacts/`, `skills/trace-artifacts/`, `skills/report-artifacts/`, `skills/repair-artifacts/`, `skills/archive-artifacts/`
 - planning layer: `skills/guide-scope/`, `skills/guide-planning/`, `skills/propose/`, `skills/add-subfeature/`, `skills/migrate-subfeatures/`, `skills/assess/`, `skills/research/`, `skills/discover/`, `skills/design/`, `skills/ui-flow/`, `skills/breakdown/`, `skills/review-planning/`
 - execution layer: `skills/slice/`, `skills/guide-execution/`, `skills/ship/`, `skills/brief/`, `skills/blueprint/`, `skills/review-execution/`, `skills/close-slice/`
-- accelerator utilities: `skills/learn/`, `skills/ship-slice/`
+- accelerator utilities: `skills/autoplan/`, `skills/learn/`, `skills/ship-slice/`
 
 If a project has no extra configuration, these skills should still work with generic conventions.
 

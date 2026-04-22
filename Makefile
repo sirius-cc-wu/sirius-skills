@@ -3,6 +3,7 @@
 REPO_ROOT := $(CURDIR)
 COMMON_FLAGS := --global --yes --agent github-copilot --agent codex --agent antigravity --agent gemini-cli
 MANAGED_SKILLS := \
+	autoplan \
 	audit-artifacts \
 	measure-artifacts \
 	trace-artifacts \
