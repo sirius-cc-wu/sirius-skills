@@ -120,6 +120,9 @@ def test_autoplan_routes_discovery_pending_to_discover(tmp_path: Path, monkeypat
     payload = json.loads(result.stdout)
     assert payload["next_owner"] == "discover"
     assert Path(payload["checkpoint_path"]).is_file()
+    assert payload["readiness"]["can_proceed"] is True
+    assert payload["readiness"]["blocked_by"] == []
+    assert payload["readiness"]["approval_gate"]["required"] is False
 
 
 def test_autoplan_resume_uses_checkpoint(tmp_path: Path, monkeypatch) -> None:
@@ -149,6 +152,9 @@ def test_autoplan_stops_at_planning_reviewed_boundary(tmp_path: Path, monkeypatc
     payload = json.loads(result.stdout)
     assert payload["next_owner"] == "approval"
     assert payload["action"] == "approval_required"
+    assert payload["readiness"]["can_proceed"] is False
+    assert payload["readiness"]["blocked_by"] == ["approval_boundary"]
+    assert payload["readiness"]["approval_gate"]["required"] is True
 
 
 def test_autoplan_owner_chain_advances_to_review_boundary(tmp_path: Path, monkeypatch) -> None:
@@ -176,6 +182,9 @@ def test_autoplan_owner_chain_advances_to_review_boundary(tmp_path: Path, monkey
     assert payload["action"] == "approval_required"
     assert payload["execute_owner_chain"] is True
     assert payload["owner_chain"]["stop_reason"]["kind"] == "approval_boundary"
+    assert payload["readiness"]["can_proceed"] is False
+    assert payload["readiness"]["blocked_by"] == ["approval_boundary"]
+    assert payload["readiness"]["stop_reason"]["kind"] == "approval_boundary"
     assert [step["owner"] for step in payload["owner_chain"]["steps"]] == [
         "discover",
         "design",
@@ -204,6 +213,8 @@ def test_autoplan_owner_chain_respects_stop_owner_boundary(tmp_path: Path, monke
     assert payload["next_owner"] == "design"
     assert payload["action"] == "run_design"
     assert payload["owner_chain"]["stop_reason"]["kind"] == "owner_stop"
+    assert payload["readiness"]["can_proceed"] is False
+    assert payload["readiness"]["blocked_by"] == ["owner_stop"]
     assert [step["owner"] for step in payload["owner_chain"]["steps"]] == ["discover"]
 
 
@@ -225,6 +236,8 @@ def test_autoplan_owner_chain_reports_missing_required_input(tmp_path: Path, mon
     assert payload["next_owner"] == "discover"
     assert payload["action"] == "run_discover"
     assert payload["owner_chain"]["stop_reason"]["kind"] == "missing_required_input"
+    assert payload["readiness"]["can_proceed"] is False
+    assert payload["readiness"]["blocked_by"] == ["missing_required_input"]
     assert payload["owner_chain"]["steps"][0]["advanced"] is False
 
 
@@ -248,3 +261,5 @@ def test_autoplan_owner_chain_reports_approval_when_already_reviewed(
     assert payload["next_owner"] == "approval"
     assert payload["owner_chain"]["steps"] == []
     assert payload["owner_chain"]["stop_reason"]["kind"] == "approval_boundary"
+    assert payload["readiness"]["can_proceed"] is False
+    assert payload["readiness"]["blocked_by"] == ["approval_boundary"]

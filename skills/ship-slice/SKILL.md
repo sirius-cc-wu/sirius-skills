@@ -20,6 +20,9 @@ current state with checkpointed runtime context.
    execution event.
 6. Stop at review, close, commit, or verification boundaries rather than
    replacing existing owner skills.
+7. Emit a `readiness` summary in JSON output (`can_proceed`, `blocked_by`,
+   `stop_reason`, approval/commit gate state) so `ship` and dashboards can
+   read one-slice acceleration status without parsing owner-chain internals.
 
 ## Tooling
 

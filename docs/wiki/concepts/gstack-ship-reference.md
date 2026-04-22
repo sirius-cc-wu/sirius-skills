@@ -54,7 +54,8 @@ blueprint semantics.
 
 1. **Readiness dashboard pattern**
    Add a concise readiness matrix to `ship` text/JSON output so maintainers can
-   see gate status quickly before any mutation.
+   see gate status quickly before any mutation. Status: implemented as
+   normalized `readiness` JSON across `autoplan`, `ship`, and `ship-slice`.
 2. **Explicit idempotency contract**
    Document rerun behavior in `skills/ship/SKILL.md` using "always recheck vs
    mutate once" language.

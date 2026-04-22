@@ -161,6 +161,9 @@ def test_resolve_feature_scope_returns_first_ready_planned_slice(tmp_path, monke
 
     assert payload["target_type"] == "feature"
     assert payload["ready_next"] == ["mse-scope-and-backlog-resolution"]
+    assert payload["readiness"]["can_proceed"] is True
+    assert payload["readiness"]["next_owner"] == "brief"
+    assert payload["readiness"]["blocked_by"] == []
     states = {entry["planned_slice_id"]: entry["state"] for entry in payload["entries"]}
     assert states["mse-scope-and-backlog-resolution"] == "ready"
     assert states["mse-sequential-slice-orchestration"] == "blocked"
@@ -637,6 +640,8 @@ def test_resume_returns_active_mapped_slice_and_next_owner(tmp_path, monkeypatch
     assert payload["action"] == "resume_active_slice"
     assert payload["bootstrapped_slice_id"] == "mse-scope-and-backlog-resolution"
     assert payload["next_owner"] == "brief"
+    assert payload["readiness"]["can_proceed"] is True
+    assert payload["readiness"]["blocked_by"] == []
     assert payload["active_slice_handoff"]["next_owner"] == "brief"
     assert payload["active_slice_handoff"]["downstream_owners"] == [
         "blueprint",
@@ -870,6 +875,8 @@ def test_resume_routes_execution_ready_slice_to_implementation_with_handoff_payl
 
     assert payload["slice_status"] == "execution_ready"
     assert payload["next_owner"] == "implementation"
+    assert payload["readiness"]["can_proceed"] is True
+    assert payload["readiness"]["blocked_by"] == []
     assert payload["active_slice_handoff"]["next_owner"] == "implementation"
     assert payload["active_slice_handoff"]["downstream_owners"] == [
         "review-execution",
@@ -1074,6 +1081,9 @@ def test_resume_requires_commit_checkpoint_before_next_slice(tmp_path, monkeypat
     assert payload["action"] == "commit_checkpoint_required"
     assert payload["checkpoint_slice_id"] == "mse-scope-and-backlog-resolution"
     assert payload["next_owner"] == "commit"
+    assert payload["readiness"]["can_proceed"] is False
+    assert payload["readiness"]["blocked_by"] == ["commit_checkpoint"]
+    assert payload["readiness"]["commit_checkpoint"]["required"] is True
     assert any("scratch.txt" in entry for entry in payload["dirty_worktree_paths"])
 
 
@@ -1145,6 +1155,8 @@ def test_resume_delegation_routes_active_slice_through_ship_slice(
 
     assert payload["action"] == "delegated_to_ship_slice"
     assert payload["next_owner"] == "brief"
+    assert payload["readiness"]["can_proceed"] is True
+    assert payload["readiness"]["blocked_by"] == []
     assert payload["delegate_result"]["next_owner"] == "brief"
     assert payload["delegate_result"]["handoff_payload"]["execution_slice_id"] == (
         "mse-scope-and-backlog-resolution"
@@ -1215,6 +1227,9 @@ def test_resume_delegation_requires_explicit_approval(
     assert payload["next_owner"] == "approval"
     assert payload["approval_gate"]["required"] is True
     assert payload["approval_gate"]["decision"] == "waiting_approval"
+    assert payload["readiness"]["can_proceed"] is False
+    assert payload["readiness"]["blocked_by"] == ["approval_required"]
+    assert payload["readiness"]["approval_gate"]["state"] == "waiting_approval"
 
 
 def test_resume_delegation_invalidates_approval_when_planning_changes(
@@ -1288,6 +1303,9 @@ def test_resume_delegation_invalidates_approval_when_planning_changes(
     assert payload["next_owner"] == "approval"
     assert payload["approval_gate"]["decision"] == "invalidated"
     assert payload["approval_gate"]["reason"] == "planning_artifacts_changed"
+    assert payload["readiness"]["can_proceed"] is False
+    assert payload["readiness"]["blocked_by"] == ["approval_required"]
+    assert payload["readiness"]["approval_gate"]["state"] == "invalidated"
 
 
 def test_resolve_backlog_allows_implemented_target(tmp_path, monkeypatch, capsys):
@@ -1344,3 +1362,6 @@ def test_resolve_backlog_allows_implemented_target(tmp_path, monkeypatch, capsys
     assert payload["planning_status"] == "implemented"
     assert payload["ready_next"] == []
     assert payload["entries"][0]["state"] == "completed"
+    assert payload["readiness"]["can_proceed"] is False
+    assert payload["readiness"]["next_owner"] == "none"
+    assert payload["readiness"]["blocked_by"] == ["completed"]

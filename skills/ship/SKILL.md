@@ -52,6 +52,14 @@ The fifth slice adds explicit two-step approval gating for delegated autopilot:
 16. Require a valid approval record before delegating into `ship-slice` autopilot.
 17. Invalidate approval automatically when planning artifacts change after approval.
 
+The sixth slice adds a machine-readable readiness dashboard:
+
+18. Emit a consistent `readiness` object in JSON output for backlog, resume, and
+    delegated flows.
+19. Summarize blocked reasons (`approval_required`, `commit_checkpoint`,
+    `review_boundary`, etc.) without replacing planning/execution source-of-truth
+    artifacts.
+
 ## Preferred Input
 
 - a feature slug, subfeature slug, or planning packet path

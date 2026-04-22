@@ -47,6 +47,7 @@ OWNER_TRANSITIONS = {
 }
 
 VALID_OWNER_NAMES = {owner for owner, _ in STATUS_TO_OWNER.values()}
+AUTOMATABLE_OWNERS = {"discover", "design", "breakdown", "review-planning"}
 
 
 def load_module(script_path: Path, name: str):
@@ -293,6 +294,50 @@ def execute_owner_chain(
     }
 
 
+def _dedupe(values: list[str]) -> list[str]:
+    result: list[str] = []
+    for value in values:
+        if value and value not in result:
+            result.append(value)
+    return result
+
+
+def build_readiness_payload(
+    *,
+    next_owner: str,
+    owner_chain: Optional[dict[str, Any]],
+) -> dict[str, Any]:
+    blocked_by: list[str] = []
+    stop_reason = owner_chain.get("stop_reason") if isinstance(owner_chain, dict) else None
+    if isinstance(stop_reason, dict):
+        kind = str(stop_reason.get("kind") or "").strip()
+        if kind:
+            blocked_by.append(kind)
+
+    approval_required = next_owner == "approval"
+    if approval_required:
+        blocked_by.append("approval_boundary")
+    if next_owner == "guide-planning":
+        blocked_by.append("planning_resolution_required")
+
+    blocked_by = _dedupe(blocked_by)
+    can_proceed = not blocked_by and next_owner in AUTOMATABLE_OWNERS
+    return {
+        "can_proceed": can_proceed,
+        "next_owner": next_owner,
+        "blocked_by": blocked_by,
+        "stop_reason": stop_reason if isinstance(stop_reason, dict) else None,
+        "approval_gate": {
+            "required": approval_required,
+            "state": "waiting_approval" if approval_required else "not_required",
+        },
+        "commit_checkpoint": {
+            "required": False,
+            "state": "not_required",
+        },
+    }
+
+
 def write_runtime_records(
     checkpoint_path: Path,
     event_log_path: Path,
@@ -460,6 +505,10 @@ def main(argv: Sequence[str] | None = None) -> int:
         "event_log_path": str(event_log_path),
         "learnings": learnings,
         "checkpoint_stale_reason": checkpoint_stale_reason,
+        "readiness": build_readiness_payload(
+            next_owner=next_owner,
+            owner_chain=owner_chain,
+        ),
     }
     if args.json:
         print(json.dumps(payload, indent=2, sort_keys=True))

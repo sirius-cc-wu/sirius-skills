@@ -74,7 +74,8 @@ High-value improvements inferred from the comparison:
 
 1. Add a formal "ship readiness summary" surface in `ship` output that mirrors
    current gates (active slice, increment readiness, commit checkpoint, owner
-   handoff) in one quick dashboard.
+   handoff) in one quick dashboard. Status: implemented via `readiness` JSON in
+   `autoplan`, `ship`, and `ship-slice`.
 2. Document idempotency contracts in `skills/ship/SKILL.md` as explicit rerun
    guarantees (what is always recomputed vs what is mutation-only).
 3. Add an optional preflight branch-freshness check (config-driven, non-default)
@@ -97,7 +98,9 @@ Current status:
   `accelerators.ship_slice.execute_owner_chain` and `stop_on_owner`
 - delegated execution now enforces an explicit durable approval gate from
   `planning_reviewed` via `ship --approve` before autopilot handoff
-- readiness dashboards remain follow-up work
+- all three accelerator surfaces now emit a normalized `readiness` payload:
+  `can_proceed`, `next_owner`, `blocked_by`, `stop_reason`,
+  `approval_gate`, and `commit_checkpoint`
 
 Roadmap link:
 

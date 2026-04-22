@@ -138,6 +138,8 @@ def test_finish_or_resume_from_handoff_routes_draft_slice_and_writes_runtime_fil
     assert payload["action"] == "create_or_update_brief"
     assert Path(payload["checkpoint_path"]).is_file()
     assert Path(payload["event_log_path"]).is_file()
+    assert payload["readiness"]["can_proceed"] is True
+    assert payload["readiness"]["blocked_by"] == []
 
 
 def test_finish_or_resume_uses_checkpoint_on_resume(tmp_path: Path, monkeypatch) -> None:
@@ -182,6 +184,8 @@ def test_finish_or_resume_routes_closed_dirty_slice_to_commit(
     payload = json.loads(result.stdout)
     assert payload["next_owner"] == "commit"
     assert payload["action"] == "commit_completed_slice"
+    assert payload["readiness"]["can_proceed"] is False
+    assert payload["readiness"]["blocked_by"] == ["commit_checkpoint"]
 
 
 def test_ship_slice_owner_chain_advances_to_review_boundary(tmp_path: Path, monkeypatch) -> None:
@@ -212,6 +216,9 @@ def test_ship_slice_owner_chain_advances_to_review_boundary(tmp_path: Path, monk
     assert payload["next_owner"] == "review-execution"
     assert payload["action"] == "run_review_execution"
     assert payload["owner_chain"]["stop_reason"]["kind"] == "review_boundary"
+    assert payload["readiness"]["can_proceed"] is False
+    assert payload["readiness"]["blocked_by"] == ["review_boundary"]
+    assert payload["readiness"]["stop_reason"]["kind"] == "review_boundary"
     assert [step["owner"] for step in payload["owner_chain"]["steps"]] == [
         "implementation"
     ]
@@ -246,6 +253,8 @@ def test_ship_slice_owner_chain_respects_stop_owner_boundary(
     assert payload["slice_status"] == "blueprint_ready"
     assert payload["next_owner"] == "implementation"
     assert payload["owner_chain"]["stop_reason"]["kind"] == "owner_stop"
+    assert payload["readiness"]["can_proceed"] is False
+    assert payload["readiness"]["blocked_by"] == ["owner_stop"]
     assert payload["owner_chain"]["steps"] == []
 
 
@@ -280,6 +289,8 @@ def test_ship_slice_owner_chain_reports_missing_required_input(
     assert payload["slice_status"] == "brief_ready"
     assert payload["next_owner"] == "blueprint"
     assert payload["owner_chain"]["stop_reason"]["kind"] == "missing_required_input"
+    assert payload["readiness"]["can_proceed"] is False
+    assert payload["readiness"]["blocked_by"] == ["missing_required_input"]
 
 
 def test_ship_slice_owner_chain_reports_commit_checkpoint(
@@ -310,3 +321,5 @@ def test_ship_slice_owner_chain_reports_commit_checkpoint(
     assert payload["next_owner"] == "commit"
     assert payload["action"] == "commit_completed_slice"
     assert payload["owner_chain"]["stop_reason"]["kind"] == "commit_checkpoint"
+    assert payload["readiness"]["can_proceed"] is False
+    assert payload["readiness"]["blocked_by"] == ["commit_checkpoint"]

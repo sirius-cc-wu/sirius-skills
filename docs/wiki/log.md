@@ -55,3 +55,10 @@ grep-friendly.
 - Added `ship --approve [--approval-note]` to record explicit execution approval for `planning_reviewed` targets.
 - Enforced approval before delegated execution autopilot (`ship` -> `ship-slice`) and invalidated prior approvals automatically when planning artifacts change.
 - Added focused `ship` tests for approval-required delegation and post-approval invalidation behavior.
+
+## [2026-04-23] implementation-synthesis | accelerator readiness dashboard
+
+- Added a normalized `readiness` payload to `autoplan`, `ship`, and `ship-slice` JSON outputs with `can_proceed`, `next_owner`, `blocked_by`, `stop_reason`, `approval_gate`, and `commit_checkpoint`.
+- Kept gate ownership explicit: approval and commit remain hard boundaries, now surfaced in one machine-readable contract.
+- Added focused test assertions across autoplan/ship-slice/ship suites for approval boundaries, review boundaries, commit checkpoints, and happy-path readiness.
+- Updated skill docs and throughput/two-step/gstack wiki synthesis pages to mark readiness-dashboard work as implemented.

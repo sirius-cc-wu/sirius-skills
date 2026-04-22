@@ -40,6 +40,7 @@ APPROVAL_FINGERPRINT_FILES = (
     "user-stories.md",
     "reference-research.md",
 )
+AUTOMATABLE_OWNERS = {"brief", "blueprint", "implementation"}
 
 if REPO_LIB_DIR.is_dir() and str(REPO_LIB_DIR) not in sys.path:
     sys.path.insert(0, str(REPO_LIB_DIR))
@@ -93,6 +94,7 @@ class BacklogResolution:
             if self.active_slice_handoff is not None
             else None,
             "approval_gate": dict(self.approval_gate),
+            "readiness": build_backlog_readiness(self),
         }
 
 
@@ -128,7 +130,131 @@ class BootstrapResult:
             and "handoff_payload" in self.backlog.active_slice_handoff
             else None
         )
+        payload["readiness"] = build_bootstrap_readiness(self)
         return payload
+
+
+def _dedupe(values: List[str]) -> List[str]:
+    result: List[str] = []
+    for value in values:
+        if value and value not in result:
+            result.append(value)
+    return result
+
+
+def _derive_next_owner(backlog: BacklogResolution) -> Optional[str]:
+    if backlog.active_slice_handoff is not None:
+        raw_owner = backlog.active_slice_handoff.get("next_owner")
+        if isinstance(raw_owner, str) and raw_owner.strip():
+            return raw_owner
+    if backlog.ready_next:
+        return "brief"
+    if all(entry.state == "completed" for entry in backlog.entries):
+        return "none"
+    return "guide-execution"
+
+
+def _approval_gate_state(backlog: BacklogResolution) -> Dict[str, object]:
+    gate = backlog.approval_gate if isinstance(backlog.approval_gate, dict) else {}
+    required = bool(gate.get("required"))
+    return {
+        "required": required,
+        "state": str(gate.get("decision") or ("not_required" if not required else "unknown")),
+        "reason": gate.get("reason"),
+        "approval_path": gate.get("approval_path"),
+    }
+
+
+def _extract_delegate_readiness(
+    delegate_result: Optional[Dict[str, object]]
+) -> Optional[Dict[str, object]]:
+    if not isinstance(delegate_result, dict):
+        return None
+    readiness = delegate_result.get("readiness")
+    return readiness if isinstance(readiness, dict) else None
+
+
+def build_backlog_readiness(backlog: BacklogResolution) -> Dict[str, object]:
+    next_owner = _derive_next_owner(backlog)
+    blocked_by: List[str] = []
+    approval_gate = _approval_gate_state(backlog)
+
+    if next_owner == "approval":
+        blocked_by.append("approval_required")
+    elif next_owner == "commit":
+        blocked_by.append("commit_checkpoint")
+    elif next_owner == "none":
+        blocked_by.append("completed")
+    elif next_owner == "guide-execution":
+        if backlog.active_slice_handoff is None and not backlog.ready_next:
+            blocked_by.append("dependency_blocked")
+        else:
+            blocked_by.append("execution_resolution_required")
+
+    blocked_by = _dedupe(blocked_by)
+    return {
+        "can_proceed": not blocked_by and next_owner in AUTOMATABLE_OWNERS,
+        "next_owner": next_owner,
+        "blocked_by": blocked_by,
+        "stop_reason": None,
+        "approval_gate": approval_gate,
+        "commit_checkpoint": {
+            "required": next_owner == "commit",
+            "state": "waiting_commit" if next_owner == "commit" else "not_required",
+            "slice_id": None,
+        },
+    }
+
+
+def build_bootstrap_readiness(result: BootstrapResult) -> Dict[str, object]:
+    next_owner = result.next_owner or _derive_next_owner(result.backlog)
+    blocked_by: List[str] = []
+    approval_gate = _approval_gate_state(result.backlog)
+
+    delegate_readiness = _extract_delegate_readiness(result.delegate_result)
+    stop_reason = None
+    if delegate_readiness is not None:
+        delegate_blocked = delegate_readiness.get("blocked_by")
+        if isinstance(delegate_blocked, list):
+            for item in delegate_blocked:
+                if isinstance(item, str):
+                    blocked_by.append(item)
+        delegate_stop = delegate_readiness.get("stop_reason")
+        if isinstance(delegate_stop, dict):
+            stop_reason = dict(delegate_stop)
+
+    if result.action == "approval_required":
+        blocked_by.append("approval_required")
+    elif result.action == "commit_checkpoint_required":
+        blocked_by.append("commit_checkpoint")
+    elif result.action == "blocked":
+        blocked_by.append("dependency_blocked")
+    elif result.completed or result.action == "complete":
+        blocked_by.append("completed")
+
+    if next_owner == "approval":
+        blocked_by.append("approval_required")
+    elif next_owner == "commit":
+        blocked_by.append("commit_checkpoint")
+    elif next_owner == "none":
+        blocked_by.append("completed")
+
+    blocked_by = _dedupe(blocked_by)
+    commit_required = (
+        result.action == "commit_checkpoint_required" or next_owner == "commit"
+    )
+    return {
+        "can_proceed": not blocked_by and next_owner in AUTOMATABLE_OWNERS,
+        "next_owner": next_owner,
+        "blocked_by": blocked_by,
+        "stop_reason": stop_reason,
+        "approval_gate": approval_gate,
+        "commit_checkpoint": {
+            "required": commit_required,
+            "state": "waiting_commit" if commit_required else "not_required",
+            "slice_id": result.checkpoint_slice_id,
+        },
+    }
 
 
 def load_module(script_path: Path, name: str):

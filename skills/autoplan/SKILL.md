@@ -18,6 +18,9 @@ stack with checkpointed resume support.
 5. Stop explicitly at the `planning_reviewed` approval boundary.
 6. Write runtime checkpoint and event-log context for resume, including owner-chain
    stop context when owner-chain mode is enabled.
+7. Emit a `readiness` summary in JSON output (`can_proceed`, `blocked_by`,
+   `stop_reason`, approval/commit gate state) so upstream orchestrators can
+   detect whether autoplan can continue automatically.
 
 ## Tooling
 

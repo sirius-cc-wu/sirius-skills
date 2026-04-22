@@ -57,6 +57,7 @@ VALID_STOP_OWNERS = {
     "guide-execution",
     "none",
 }
+AUTOMATABLE_OWNERS = {"brief", "blueprint", "implementation"}
 
 
 @dataclass
@@ -451,6 +452,54 @@ def execute_owner_chain(
     )
 
 
+def _dedupe(values: list[str]) -> list[str]:
+    result: list[str] = []
+    for value in values:
+        if value and value not in result:
+            result.append(value)
+    return result
+
+
+def build_readiness_payload(
+    *,
+    route: SliceRoute,
+    owner_chain: Optional[dict[str, Any]],
+) -> dict[str, Any]:
+    blocked_by: list[str] = []
+    stop_reason = owner_chain.get("stop_reason") if isinstance(owner_chain, dict) else None
+    if isinstance(stop_reason, dict):
+        kind = str(stop_reason.get("kind") or "").strip()
+        if kind:
+            blocked_by.append(kind)
+
+    commit_required = route.next_owner == "commit"
+    if commit_required:
+        blocked_by.append("commit_checkpoint")
+    if route.next_owner == "review-execution":
+        blocked_by.append("review_boundary")
+    if route.next_owner == "guide-execution":
+        blocked_by.append("execution_resolution_required")
+    if route.next_owner == "none":
+        blocked_by.append("completed")
+
+    blocked_by = _dedupe(blocked_by)
+    can_proceed = not blocked_by and route.next_owner in AUTOMATABLE_OWNERS
+    return {
+        "can_proceed": can_proceed,
+        "next_owner": route.next_owner,
+        "blocked_by": blocked_by,
+        "stop_reason": stop_reason if isinstance(stop_reason, dict) else None,
+        "approval_gate": {
+            "required": False,
+            "state": "not_required",
+        },
+        "commit_checkpoint": {
+            "required": commit_required,
+            "state": "waiting_commit" if commit_required else "not_required",
+        },
+    }
+
+
 def write_runtime_records(
     *,
     checkpoint_path: Path,
@@ -620,6 +669,10 @@ def main(argv: Sequence[str] | None = None) -> int:
         "dirty_worktree_paths": dirty_paths,
         "learnings": learnings,
         "checkpoint_stale_reason": checkpoint_stale_reason,
+        "readiness": build_readiness_payload(
+            route=route,
+            owner_chain=owner_chain,
+        ),
     }
     if args.json:
         print(json.dumps(payload, indent=2, sort_keys=True))
