@@ -104,8 +104,8 @@
     },
     {
       "feature": "throughput-acceleration-workflow",
-      "status": "discovery_ready",
-      "updated_at": "2026-04-22T09:21:22",
+      "status": "planning_reviewed",
+      "updated_at": "2026-04-22T09:45:36",
       "path": "docs/features/throughput-acceleration-workflow/"
     },
     {
