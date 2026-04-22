@@ -33,7 +33,9 @@ The third slice adds stop/resume semantics:
 10. Report whether the active slice next belongs to `brief`, `blueprint`,
     repository implementation, `guide-execution`, `review-execution`,
     `close-slice`, or `commit`.
-11. Stop explicitly when unfinished planned slices remain but none are ready.
+11. Expose a stable machine-readable handoff payload for the active slice in
+    JSON output without changing backlog ownership semantics.
+12. Stop explicitly when unfinished planned slices remain but none are ready.
 
 The fourth slice adds per-slice commit checkpoints:
 
@@ -80,3 +82,5 @@ python3 skills/ship/scripts/ship.py <target> --scope apps/payments
   `commit` skills.
 - Route to the next concrete owner, but do not absorb artifact authoring or
   closure logic that belongs to those owner skills.
+- Keep any machine-readable handoff payload derived from existing planning and
+  execution artifacts instead of introducing a second source of truth.

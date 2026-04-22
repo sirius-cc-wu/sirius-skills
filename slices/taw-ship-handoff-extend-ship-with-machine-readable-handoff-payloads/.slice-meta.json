@@ -1,0 +1,10 @@
+{
+  "created_at": "2026-04-22T10:09:24",
+  "updated_at": "2026-04-22T10:14:11",
+  "status": "closed",
+  "slice_id": "taw-ship-handoff",
+  "feature": "Extend ship with machine-readable handoff payloads",
+  "path": "slices/taw-ship-handoff-extend-ship-with-machine-readable-handoff-payloads/",
+  "relations": [],
+  "closed_at": "2026-04-22T10:14:11"
+}

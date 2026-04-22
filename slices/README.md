@@ -40,3 +40,4 @@
 | rrs-wiki-synthesis | Add reusable wiki synthesis flow | closed | 2026-04-21T01:10:07 | 2026-04-21T01:10:07 | slices/rrs-wiki-synthesis-add-reusable-wiki-synthesis-flow/ |
 | taw-runtime-foundation | Add shared accelerator runtime support | closed | 2026-04-22T09:59:00 | 2026-04-22T09:59:00 | slices/taw-runtime-foundation-add-shared-accelerator-runtime-support/ |
 | taw-learn-skill | Add durable learnings skill | closed | 2026-04-22T10:08:56 | 2026-04-22T10:08:56 | slices/taw-learn-skill-add-durable-learnings-skill/ |
+| taw-ship-handoff | Extend ship with machine-readable handoff payloads | closed | 2026-04-22T10:14:11 | 2026-04-22T10:14:11 | slices/taw-ship-handoff-extend-ship-with-machine-readable-handoff-payloads/ |

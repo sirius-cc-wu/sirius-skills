@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "generated_at": "2026-04-22T10:08:56",
+  "generated_at": "2026-04-22T10:14:11",
   "slices": [
     {
       "id": "hss-root-fallback",
@@ -379,6 +379,16 @@
       "path": "slices/taw-learn-skill-add-durable-learnings-skill/",
       "updated_at": "2026-04-22T10:08:56",
       "closed_at": "2026-04-22T10:08:56",
+      "archived_at": null,
+      "relations": []
+    },
+    {
+      "id": "taw-ship-handoff",
+      "feature": "Extend ship with machine-readable handoff payloads",
+      "status": "closed",
+      "path": "slices/taw-ship-handoff-extend-ship-with-machine-readable-handoff-payloads/",
+      "updated_at": "2026-04-22T10:14:11",
+      "closed_at": "2026-04-22T10:14:11",
       "archived_at": null,
       "relations": []
     }

@@ -1,5 +1,7 @@
 #!/usr/bin/env python3
 
+from __future__ import annotations
+
 import argparse
 import importlib.util
 import json
@@ -11,7 +13,11 @@ from typing import Dict, List, Optional, Sequence, Tuple
 
 
 SCRIPT_DIR = Path(__file__).resolve().parent
+SKILL_DIR = SCRIPT_DIR.parent
 SKILLS_DIR = SCRIPT_DIR.parents[1]
+REPO_ROOT = SKILLS_DIR.parent
+REPO_LIB_DIR = REPO_ROOT / "lib"
+SKILL_LIB_DIR = SKILL_DIR / "lib"
 GUIDE_PLANNING_SCRIPT = SKILLS_DIR / "guide-planning" / "scripts" / "manage_planning.py"
 GUIDE_EXECUTION_SCRIPT = (
     SKILLS_DIR / "guide-execution" / "scripts" / "manage_execution.py"
@@ -20,6 +26,13 @@ SUBFEATURES_SCRIPT = SKILLS_DIR / "add-subfeature" / "scripts" / "manage_subfeat
 ARTIFACT_INVENTORY_SCRIPT = (
     SKILLS_DIR / "audit-artifacts" / "scripts" / "artifact_inventory.py"
 )
+
+if REPO_LIB_DIR.is_dir() and str(REPO_LIB_DIR) not in sys.path:
+    sys.path.insert(0, str(REPO_LIB_DIR))
+if SKILL_LIB_DIR.is_dir() and str(SKILL_LIB_DIR) not in sys.path:
+    sys.path.append(str(SKILL_LIB_DIR))
+
+from workflow_runtime.handoff import HandoffPayload  # noqa: E402
 
 
 @dataclass
@@ -89,6 +102,12 @@ class BootstrapResult:
         payload["next_owner"] = self.next_owner
         payload["completed"] = self.completed
         payload["action"] = self.action
+        payload["handoff_payload"] = (
+            dict(self.backlog.active_slice_handoff["handoff_payload"])
+            if self.backlog.active_slice_handoff is not None
+            and "handoff_payload" in self.backlog.active_slice_handoff
+            else None
+        )
         return payload
 
 
@@ -567,6 +586,8 @@ def resolve_backlog(selector: str, explicit_scope: Optional[str] = None) -> Back
                 None,
             )
             active_slice_handoff = build_active_slice_handoff(
+                target_type,
+                str(feature["feature"]),
                 active_slice,
                 active_entry,
                 execution_module=execution_module,
@@ -599,6 +620,8 @@ def inspect_slice_artifacts(slice_row: Dict[str, object], execution_module, scop
 
 
 def build_active_slice_handoff(
+    target_type: str,
+    target_id: str,
     slice_row: Dict[str, object],
     backlog_entry: Optional[PlannedSliceBacklogEntry],
     *,
@@ -660,6 +683,19 @@ def build_active_slice_handoff(
         next_action = "resolve_active_slice"
         downstream_owners = ["implementation", "review-execution", "close-slice", "commit"]
 
+    handoff_payload = HandoffPayload(
+        target_type=target_type,
+        target_id=target_id,
+        planned_slice_id=(
+            backlog_entry.planned_slice_id if backlog_entry is not None else str(slice_row["id"])
+        ),
+        execution_slice_id=str(slice_row["id"]),
+        execution_slice_path=str(slice_row["path"]),
+        slice_status=status,
+        next_owner=next_owner,
+        action="resume_active_slice",
+    ).to_dict()
+
     return {
         "slice_id": str(slice_row["id"]),
         "slice_path": str(slice_row["path"]),
@@ -669,6 +705,7 @@ def build_active_slice_handoff(
         "validation_hint": validation_hint,
         "missing_artifacts": missing_artifacts,
         "downstream_owners": downstream_owners,
+        "handoff_payload": handoff_payload,
     }
 
 

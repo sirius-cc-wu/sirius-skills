@@ -722,7 +722,9 @@ def test_resume_bootstraps_next_ready_slice_after_completed_predecessor(
     assert payload["next_owner"] == "brief"
 
 
-def test_resume_routes_brief_ready_slice_to_blueprint(tmp_path, monkeypatch, capsys):
+def test_resume_routes_brief_ready_slice_to_blueprint_and_emits_handoff_payload(
+    tmp_path, monkeypatch, capsys
+):
     env = setup_repo(tmp_path, monkeypatch)
     planning = env["planning"]
     feature_path = env["feature_path"]
@@ -784,9 +786,19 @@ def test_resume_routes_brief_ready_slice_to_blueprint(tmp_path, monkeypatch, cap
     assert payload["active_slice_handoff"]["next_owner"] == "blueprint"
     assert payload["active_slice_handoff"]["next_action"] == "create_or_update_blueprint"
     assert payload["active_slice_handoff"]["validation_hint"] == "pytest -q tests/test_demo.py"
+    assert payload["handoff_payload"] == {
+        "action": "resume_active_slice",
+        "execution_slice_id": "mse-scope-and-backlog-resolution",
+        "execution_slice_path": "slices/mse-scope-and-backlog-resolution-resolve-backlog/",
+        "next_owner": "blueprint",
+        "planned_slice_id": "mse-scope-and-backlog-resolution",
+        "slice_status": "brief_ready",
+        "target_id": "execution-workflow",
+        "target_type": "feature",
+    }
 
 
-def test_resume_routes_execution_ready_slice_to_implementation(
+def test_resume_routes_execution_ready_slice_to_implementation_with_handoff_payload(
     tmp_path, monkeypatch, capsys
 ):
     env = setup_repo(tmp_path, monkeypatch)
@@ -864,6 +876,9 @@ def test_resume_routes_execution_ready_slice_to_implementation(
         "close-slice",
         "commit",
     ]
+    assert payload["handoff_payload"]["next_owner"] == "implementation"
+    assert payload["handoff_payload"]["slice_status"] == "execution_ready"
+    assert payload["active_slice_handoff"]["handoff_payload"] == payload["handoff_payload"]
 
 
 def test_resolve_backlog_reports_completed_and_current_increments_in_text_output(
