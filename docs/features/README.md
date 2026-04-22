@@ -19,5 +19,5 @@
 | proposal-workflow | planning_reviewed | 2026-03-29T00:32:50 | docs/features/planning-workflow/subfeatures/proposal-workflow/ |
 | reference-research-synthesis | implemented | 2026-04-21T01:10:07 | docs/features/planning-workflow/subfeatures/reference-research-synthesis/ |
 | subfeature-workflow | planning_reviewed | 2026-03-28T23:26:17 | docs/features/planning-workflow/subfeatures/subfeature-workflow/ |
-| throughput-acceleration-workflow | planning_reviewed | 2026-04-22T09:45:36 | docs/features/throughput-acceleration-workflow/ |
+| throughput-acceleration-workflow | implemented | 2026-04-22T10:27:11 | docs/features/throughput-acceleration-workflow/ |
 | workflow-state-consistency | implemented | 2026-04-19T11:36:15 | docs/features/workflow-state-consistency/ |
