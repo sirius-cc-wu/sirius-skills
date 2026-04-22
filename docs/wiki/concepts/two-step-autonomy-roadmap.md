@@ -7,6 +7,28 @@ Reduce orchestration friction from many manual commands to two high-level steps:
 1. `autoplan` drives planning owners end-to-end.
 2. After approval, `ship`/`ship-slice` drives execution owners end-to-end.
 
+## Primary Operator Flow
+
+Use this as the default happy-path UX when accelerators are enabled:
+
+1. Run `autoplan` until planning reaches approval boundary:
+   `python3 skills/autoplan/scripts/autoplan.py <target> --execute-owner-chain --json`
+2. Review planning artifacts, then approve explicitly.
+3. Record approval:
+   `python3 skills/ship/scripts/ship.py <target> --approve --approval-note "<note>" --json`
+4. Start execution autopilot:
+   `python3 skills/ship/scripts/ship.py <target> --resume --json`
+5. Re-run `ship --resume` until `readiness.blocked_by` reports a boundary
+   requiring manual action (for example `commit_checkpoint`).
+
+Guide-path positioning:
+
+- `guide-scope`, `guide-planning`, and `guide-execution` remain available, but
+  should be treated as advanced/manual entrypoints for ambiguous scopes,
+  recovery, and fine-grained control.
+- The primary operator path should prefer `autoplan` and `ship` for normal
+  two-step execution.
+
 ## Current Gap
 
 Current accelerator skills now support owner-chain orchestration in both layers:

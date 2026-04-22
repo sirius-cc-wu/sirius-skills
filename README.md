@@ -160,6 +160,18 @@ Preferred repo workflow:
 17. `close-slice` closes completed execution slices and records durable closure metadata.
 18. After closure, keep the subfeature planning folder and closed slice artifacts in place. If a repository wants later cleanup or archival, handle that through maintenance tooling such as `archive-artifacts`, not a dedicated subfeature-finalization skill.
 
+Two-step accelerator fast path (when enabled):
+
+1. `python3 skills/autoplan/scripts/autoplan.py <target> --execute-owner-chain --json`
+2. review planning artifacts, then approve explicitly
+3. `python3 skills/ship/scripts/ship.py <target> --approve --approval-note "<note>" --json`
+4. `python3 skills/ship/scripts/ship.py <target> --resume --json`
+5. repeat `ship --resume` until a boundary in `readiness.blocked_by` requires manual intervention
+
+`guide-scope`, `guide-planning`, and `guide-execution` remain valid but are
+best treated as advanced/manual control paths for ambiguity resolution,
+recovery, or fine-grained intervention.
+
 For repositories that still contain legacy `changes/` packets from the old
 workflow, `migrate-subfeatures` can scan and convert those legacy planning
 folders into the current durable `subfeatures/` layout before normal planning

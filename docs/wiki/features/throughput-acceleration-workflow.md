@@ -89,6 +89,10 @@ Desired UX:
 
 1. one planning command (`autoplan`) drives discover/design/breakdown/review
 2. after approval, one execution command drives brief/blueprint/implementation/review-execution
+3. operator-facing command sequence:
+   `autoplan --execute-owner-chain` -> human review -> `ship --approve` -> `ship --resume`
+4. `guide-scope`/`guide-planning`/`guide-execution` stay available as
+   advanced/manual paths, not the default happy path
 
 Current status:
 

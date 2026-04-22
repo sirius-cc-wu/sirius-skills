@@ -26,7 +26,7 @@ truth.
 | `concepts/workflow-ownership-boundaries.md` | Cross-feature synthesis of planning, execution, and maintenance ownership boundaries. | planning/execution/consistency/throughput feature designs |
 | `concepts/gstack-ship-reference.md` | Reference comparison of `gstack /ship` vs `sirius-skills ship` and adoptable improvements. | `gstack/ship` + `skills/ship*` |
 | `concepts/agent-skills-reference.md` | Reference comparison of Addy Osmani's `agent-skills` and `sirius-skills` workflow model and UX implications. | `agent-skills` + `skills/autoplan*` + `skills/ship*` |
-| `concepts/two-step-autonomy-roadmap.md` | Proposed design to run `sirius-skills` in two high-level steps (`autoplan`, then post-approval execution autopilot). | `skills/autoplan*` + `skills/ship*` |
+| `concepts/two-step-autonomy-roadmap.md` | Two-step operating model, explicit command flow (`autoplan -> review -> ship --approve -> ship --resume`), and guide-path positioning. | `skills/autoplan*` + `skills/ship*` |
 
 ## Notes
 

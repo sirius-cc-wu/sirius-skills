@@ -62,3 +62,10 @@ grep-friendly.
 - Kept gate ownership explicit: approval and commit remain hard boundaries, now surfaced in one machine-readable contract.
 - Added focused test assertions across autoplan/ship-slice/ship suites for approval boundaries, review boundaries, commit checkpoints, and happy-path readiness.
 - Updated skill docs and throughput/two-step/gstack wiki synthesis pages to mark readiness-dashboard work as implemented.
+
+## [2026-04-23] docs-synthesis | two-step UX cleanup entrypoints
+
+- Updated `docs/wiki/concepts/two-step-autonomy-roadmap.md` with an explicit operator command flow:
+  `autoplan --execute-owner-chain` -> human review -> `ship --approve` -> `ship --resume`.
+- Clarified guide-path positioning: `guide-scope`, `guide-planning`, and `guide-execution` remain advanced/manual entrypoints rather than the default happy path.
+- Updated throughput synthesis, wiki index summary text, and `README.md` to reflect the same two-step entrypoint guidance consistently.
