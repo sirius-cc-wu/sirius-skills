@@ -27,7 +27,7 @@ callers, and add regression coverage for the packaged runtime path.
   - Managed skill installation (`make install`) currently syncs shared
     documentation references only; it does not copy shared Python runtime files
     into self-contained skill folders.
-  - The installed `execute-all-slices` copy already exposed the risk: when a
+  - The installed `ship` copy already exposed the risk: when a
     self-contained skill cannot reach repo-root `lib/workflow_state`, imports
     fail even though repo-local execution still works.
 - Target modules / files:
@@ -283,6 +283,6 @@ LocalCopy --> Report : installed runtime
   - brief-to-implementation gap: none
   - intent-to-brief gap: none
   - follow-up improvement outside the active slice:
-    - `archive-artifacts`, `measure-artifacts`, and `execute-all-slices` still
+    - `archive-artifacts`, `measure-artifacts`, and `ship` still
       rely on compatibility-path imports or separate packaging assumptions that
       remain outside this maintenance-consumer adoption slice

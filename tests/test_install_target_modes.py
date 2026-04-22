@@ -30,7 +30,7 @@ def test_install_target_keeps_packaged_sync() -> None:
     assert PACKAGED_REPO_SOURCE in output
     assert output.count("npx skills add") == 1
     assert "--skill audit-artifacts" in output
-    assert "--skill execute-all-slices" in output
+    assert "--skill ship" in output
 
 
 def test_install_packaged_alias_matches_install() -> None:
@@ -41,7 +41,7 @@ def test_install_packaged_alias_matches_install() -> None:
     assert PACKAGED_REPO_SOURCE in output
     assert output.count("npx skills add") == 1
     assert "--skill audit-artifacts" in output
-    assert "--skill execute-all-slices" in output
+    assert "--skill ship" in output
 
 
 def test_uninstall_alias_still_uses_packaged_flow() -> None:

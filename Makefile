@@ -28,7 +28,7 @@ MANAGED_SKILLS := \
 	review-planning \
 	simplify \
 	guide-execution \
-	execute-all-slices \
+	ship \
 	slice \
 	ui-flow
 MANAGED_SKILL_FLAGS := $(foreach skill,$(MANAGED_SKILLS),--skill $(skill))

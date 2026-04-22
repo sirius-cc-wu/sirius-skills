@@ -11,7 +11,7 @@
 - **Source Story / Increment / Slice**: `EW-04` / `I3` / `mse-per-slice-commit-checkpoints`
 - **Requested Outcome**: As a maintainer, I want every completed slice in a batch run to become its own Git checkpoint so the history remains aligned with slice boundaries.
 - **Why this matters**: Batch execution should preserve the same durable closure and commit discipline expected from one-slice-at-a-time work.
-- **Independent Test**: `pytest -q skills/execute-all-slices/tests/test_execute_all_slices.py -k commit_checkpoint`
+- **Independent Test**: `pytest -q skills/ship/tests/test_ship.py -k commit_checkpoint`
 
 ## 2. Acceptance Scenarios
 

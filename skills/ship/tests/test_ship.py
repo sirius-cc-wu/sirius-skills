@@ -5,7 +5,7 @@ import sys
 from pathlib import Path
 
 
-SCRIPT_PATH = Path(__file__).resolve().parents[1] / "scripts" / "execute_all_slices.py"
+SCRIPT_PATH = Path(__file__).resolve().parents[1] / "scripts" / "ship.py"
 PLANNING_SCRIPT = (
     Path(__file__).resolve().parents[2] / "guide-planning" / "scripts" / "manage_planning.py"
 )
@@ -27,7 +27,7 @@ def load_module(path: Path, name: str):
 
 
 def run_cli(module, monkeypatch, *args):
-    monkeypatch.setattr(sys, "argv", ["execute_all_slices.py", *args])
+    monkeypatch.setattr(sys, "argv", ["ship.py", *args])
     return module.main()
 
 
@@ -67,7 +67,7 @@ def setup_repo(tmp_path: Path, monkeypatch):
     planning = load_module(PLANNING_SCRIPT, "manage_planning")
     subfeatures = load_module(SUBFEATURE_SCRIPT, "manage_subfeatures")
     execution = load_module(EXECUTION_SCRIPT, "manage_execution")
-    execute_all_slices = load_module(SCRIPT_PATH, "execute_all_slices")
+    ship_module = load_module(SCRIPT_PATH, "ship")
 
     write_scope_config(
         tmp_path,
@@ -112,7 +112,7 @@ def setup_repo(tmp_path: Path, monkeypatch):
         "planning": planning,
         "subfeatures": subfeatures,
         "execution": execution,
-        "module": execute_all_slices,
+        "module": ship_module,
         "feature_path": feature_path,
         "subfeature_path": subfeature_path,
     }

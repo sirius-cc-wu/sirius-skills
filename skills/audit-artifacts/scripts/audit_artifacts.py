@@ -152,7 +152,7 @@ def add_grouped_traceability_finding(
         (
             "slice-traceability.md groups multiple planned slice IDs into one row "
             f"({'; '.join(grouped_rows)}). Split those rows so each planned slice "
-            "has its own row before execute-all-slices bootstrap."
+            "has its own row before ship bootstrap."
         ),
     )
 

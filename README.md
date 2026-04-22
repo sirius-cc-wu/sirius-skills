@@ -70,7 +70,7 @@ The managed repo-first skill set is grouped into:
 - repo utilities: `skills/bootstrap/`, `skills/commit/`, `skills/create-pr/`, `skills/simplify/`
 - artifact maintenance: `skills/audit-artifacts/`, `skills/measure-artifacts/`, `skills/trace-artifacts/`, `skills/report-artifacts/`, `skills/repair-artifacts/`, `skills/archive-artifacts/`
 - planning layer: `skills/guide-scope/`, `skills/guide-planning/`, `skills/propose/`, `skills/add-subfeature/`, `skills/migrate-subfeatures/`, `skills/assess/`, `skills/research/`, `skills/discover/`, `skills/design/`, `skills/ui-flow/`, `skills/breakdown/`, `skills/review-planning/`
-- execution layer: `skills/slice/`, `skills/guide-execution/`, `skills/execute-all-slices/`, `skills/brief/`, `skills/blueprint/`, `skills/review-execution/`, `skills/close-slice/`
+- execution layer: `skills/slice/`, `skills/guide-execution/`, `skills/ship/`, `skills/brief/`, `skills/blueprint/`, `skills/review-execution/`, `skills/close-slice/`
 
 If a project has no extra configuration, these skills should still work with generic conventions.
 
@@ -112,7 +112,7 @@ For repositories that use repo-first planning, the recommended short-name planni
 These skills sit **before** the execution-slice skills:
 
 - planning layer: `guide-scope`, `guide-planning`, `propose`, `add-subfeature`, `migrate-subfeatures`, `assess`, `research`, `discover`, `design`, `ui-flow`, `breakdown`, `review-planning`
-- execution layer: `slice`, `guide-execution`, `execute-all-slices`, `brief`, `blueprint`, `review-execution`, `close-slice`
+- execution layer: `slice`, `guide-execution`, `ship`, `brief`, `blueprint`, `review-execution`, `close-slice`
 
 
 Recommended boundary:
@@ -125,7 +125,7 @@ Recommended boundary:
 - use `guide-scope` as the optional scope-aware entrypoint when multi-scope routing or explicit scope choice matters
 - let `guide-planning` own feature-planning readiness and routing inside the planning layer
 - let `guide-execution` own slice readiness and state transitions within the execution layer
-- let `execute-all-slices` orchestrate one reviewed and committed feature or subfeature backlog without absorbing the owning execution steps
+- let `ship` orchestrate one reviewed and committed feature or subfeature backlog without absorbing the owning execution steps
 
 Feature-local planning defaults to `docs/features/<feature-slug>/` unless
 the active planning scope's `.skills/planning.json` defines a different
@@ -153,7 +153,7 @@ Preferred repo workflow:
 12. After approval, commit the planning artifacts so the reviewed plan is durable before execution begins.
 13. `slice` validates approved, committed execution-ready input, bootstraps a slice-scoped execution slice, and hands off to `guide-execution`.
 14. `guide-execution` routes slice-scoped execution through `brief` to capture slice intent and acceptance, then through `blueprint` to produce the final execution artifact. When `.skills/execution.json` enables `auto_start_implementation`, that handoff continues directly into implementation after the blueprint is marked ready.
-15. `execute-all-slices` is the optional batch entrypoint when a reviewed and committed feature or subfeature backlog should be worked one planned slice at a time. It respects increment order first, then slice dependencies within the current increment, resumes or bootstraps one mapped slice, reports the next concrete execution owner for that slice, and stops at blockers or commit checkpoints.
+15. `ship` is the optional batch entrypoint when a reviewed and committed feature or subfeature backlog should be worked one planned slice at a time. It respects increment order first, then slice dependencies within the current increment, resumes or bootstraps one mapped slice, reports the next concrete execution owner for that slice, and stops at blockers or commit checkpoints.
 16. `review-execution` checks implementation and validation outcomes against the slice-scoped execution artifacts before closure.
 17. `close-slice` closes completed execution slices and records durable closure metadata.
 18. After closure, keep the subfeature planning folder and closed slice artifacts in place. If a repository wants later cleanup or archival, handle that through maintenance tooling such as `archive-artifacts`, not a dedicated subfeature-finalization skill.
@@ -167,7 +167,7 @@ In the repo-native flow, `guide-planning` owns feature-planning readiness and ro
 
 Execution follows the same pattern: `guide-execution` owns routing, readiness, and registry state, while `brief`, `blueprint`, `review-execution`, and `close-slice` own slice-scoped artifacts and closure metadata. With `auto_start_implementation`, `guide-execution` can promote a slice from `blueprint_ready` to `execution_ready` as the signal to begin coding immediately.
 
-`execute-all-slices` sits above that single-slice flow as an optional orchestrator. It resolves one reviewed and committed feature or subfeature backlog, resumes or bootstraps one mapped execution slice at a time, and hands that slice to the next concrete owner such as `brief`, `blueprint`, repository implementation, `guide-execution`, `review-execution`, `close-slice`, or `commit`. It does not replace those owners.
+`ship` sits above that single-slice flow as an optional orchestrator. It resolves one reviewed and committed feature or subfeature backlog, resumes or bootstraps one mapped execution slice at a time, and hands that slice to the next concrete owner such as `brief`, `blueprint`, repository implementation, `guide-execution`, `review-execution`, `close-slice`, or `commit`. It does not replace those owners.
 
 By default, new execution slices are created under `slices/` unless `.skills/execution.json` overrides the location.
 
@@ -212,7 +212,7 @@ Examples of repo-native prompts that fit the current workflow:
 - "Design the subfeature at `docs/features/checkout/subfeatures/replace-legacy-flow/`."
 - "Break down `docs/features/checkout/subfeatures/replace-legacy-flow/` into execution-ready slices."
 - "Review planning for the `replace-legacy-flow` subfeature before slice bootstrap."
-- "Use `execute-all-slices` for `docs/features/checkout/subfeatures/replace-legacy-flow/` and continue until a blocker or per-slice commit checkpoint stops the run."
+- "Use `ship` for `docs/features/checkout/subfeatures/replace-legacy-flow/` and continue until a blocker or per-slice commit checkpoint stops the run."
 - "Finalize subfeature `replace-legacy-flow` under `checkout` after its planned slices are closed."
 - "Scan the repo for legacy `changes/` packets that still need migration."
 - "Dry-run migration of old `changes/` packets under `checkout` into durable subfeatures."

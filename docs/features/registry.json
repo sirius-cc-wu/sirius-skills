@@ -103,6 +103,12 @@
       "path": "docs/features/planning-workflow/subfeatures/subfeature-workflow/"
     },
     {
+      "feature": "throughput-acceleration-workflow",
+      "status": "discovery_ready",
+      "updated_at": "2026-04-22T09:21:22",
+      "path": "docs/features/throughput-acceleration-workflow/"
+    },
+    {
       "feature": "workflow-state-consistency",
       "status": "implemented",
       "updated_at": "2026-04-19T11:36:15",

@@ -11,7 +11,7 @@
 - **Source Story / Increment / Slice**: `EW-03` / `I2` / `mse-stop-and-resume-semantics`
 - **Requested Outcome**: As a maintainer, I want the batch executor to stop on active-slice or dependency blockers and resume later from closed-slice state instead of maintaining a second progress ledger.
 - **Why this matters**: Multi-slice execution is only trustworthy if interruptions do not create hidden progress or skip blocked work.
-- **Independent Test**: `pytest -q skills/execute-all-slices/tests/test_execute_all_slices.py -k stop_or_resume`
+- **Independent Test**: `pytest -q skills/ship/tests/test_ship.py -k stop_or_resume`
 
 ## 2. Acceptance Scenarios
 

@@ -24,7 +24,7 @@ Use a **two-layer workflow**:
 2. **Execution layer**
    - `slice`
    - `guide-execution`
-   - `execute-all-slices` (optional backlog orchestrator)
+   - `ship` (optional backlog orchestrator)
    - `brief`
    - `blueprint`
    - `review-execution`
@@ -36,7 +36,7 @@ owns readiness and routing across those artifacts.
 
 After each planning phase writes or updates its repository artifacts, persist the matching metadata transition with `python3 skills/guide-planning/scripts/manage_planning.py sync-status <feature-selector> --through <expected-status>`. Use `sync-status` for normal adjacent advancement and drift repair; reserve `set-status` for explicit manual overrides and terminal execution states.
 
-The execution layer works one implementation-ready slice at a time, starting with `slice` bootstrap from approved committed planning artifacts. `execute-all-slices` can sit above that flow when a reviewed and committed feature or subfeature should be worked as one dependency-aware backlog; it should follow increment order first, then slice dependencies within the current increment, while still handing each concrete slice to the next existing single-slice owner such as `brief`, `blueprint`, repository implementation, `review-execution`, `close-slice`, or `commit`.
+The execution layer works one implementation-ready slice at a time, starting with `slice` bootstrap from approved committed planning artifacts. `ship` can sit above that flow when a reviewed and committed feature or subfeature should be worked as one dependency-aware backlog; it should follow increment order first, then slice dependencies within the current increment, while still handing each concrete slice to the next existing single-slice owner such as `brief`, `blueprint`, repository implementation, `review-execution`, `close-slice`, or `commit`.
 
 ## Recommended Workflow
 
@@ -86,7 +86,7 @@ Expected planning states:
 Recommended handoff:
 
 ```text
-guide-scope -> guide-planning -> propose/add-subfeature/assess/research/discover/design/ui-flow/breakdown/review-planning -> human approval -> commit -> slice/execute-all-slices -> guide-execution
+guide-scope -> guide-planning -> propose/add-subfeature/assess/research/discover/design/ui-flow/breakdown/review-planning -> human approval -> commit -> slice/ship -> guide-execution
 ```
 
 If the request is still speculative, cross-cutting, or not yet accepted as a canonical feature, route to `propose` first. That keeps early exploration under `docs/proposals/` instead of polluting the canonical `docs/features/` registry too early.
@@ -347,7 +347,7 @@ Once a planned slice is implementation-ready, has passed `review-planning`, and 
 Preferred handoff:
 
 ```text
-guide-planning -> breakdown -> review-planning -> human approval -> commit -> slice/execute-all-slices -> guide-execution
+guide-planning -> breakdown -> review-planning -> human approval -> commit -> slice/ship -> guide-execution
 ```
 
 `slice` should bootstrap a slice-scoped execution slice from the execution-ready work item, typically with:
@@ -365,7 +365,7 @@ python3 skills/slice/scripts/bootstrap_slice.py --slice-dir "team-slices" "<slic
 Do not jump directly from `review-planning` to `slice`; stop for explicit human approval and commit the planning artifacts first.
 
 When a reviewed and committed feature or subfeature has multiple planned slices
-and the goal is to keep progressing through the backlog, `execute-all-slices`
+and the goal is to keep progressing through the backlog, `ship`
 can resolve the remaining planned slices, resume an active mapped slice, or
 bootstrap the next ready one. It stays orchestration-only: `guide-execution`,
 `brief`, `blueprint`, `review-execution`, `close-slice`, and `commit` still own
@@ -387,7 +387,7 @@ This is where slice-scoped execution artifacts are created:
 Within that execution layer:
 
 - `guide-execution` owns routing, readiness checks, and registry state
-- `execute-all-slices` owns backlog traversal across multiple planned slices for one reviewed and committed feature or subfeature
+- `ship` owns backlog traversal across multiple planned slices for one reviewed and committed feature or subfeature
 - `brief` creates the slice-scoped `brief.md` for one execution-ready work item, including acceptance and requirement context
 - `blueprint` converts that slice-scoped brief into the final implementation packets, traceability, validation steps, and PlantUML detailed design needed for execution
 - when `.skills/execution.json` sets `auto_start_implementation` to `true`, marking the blueprint ready should immediately advance the slice into `execution_ready` and continue into repository implementation work
@@ -400,7 +400,7 @@ Keep the boundary explicit:
 - `brief` owns `brief.md` and `checklists/requirements.md`
 - `blueprint` owns the final slice-scoped execution checklist for new slices
 - `guide-execution` should validate handoffs and route work, not take over artifact authoring from the other execution skills
-- `execute-all-slices` should stop at blockers or per-slice commit checkpoints instead of silently rolling work into the next slice
+- `ship` should stop at blockers or per-slice commit checkpoints instead of silently rolling work into the next slice
 
 Execution review loop:
 

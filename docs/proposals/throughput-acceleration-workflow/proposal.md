@@ -18,7 +18,7 @@ The current workflow asks the user or agent to cross many explicit boundaries:
 - close the slice
 - commit and open a PR through separate steps
 
-The local `execute-all-slices` change moves in the right direction by reporting
+The local `ship` change moves in the right direction by reporting
 the next owner, but it does not fundamentally solve throughput on its own.
 Compared with `gstack`, the bigger gap is not one routing function. It is the
 absence of an optional accelerator layer that compresses low-risk handoffs,
@@ -44,7 +44,7 @@ planning and execution ownership model.
 
 - Turn `sirius-skills` into a broad product like `gstack`, with browser
   automation, deployment orchestration, or host-specific onboarding flows.
-- Replace `guide-planning`, `guide-execution`, or `execute-all-slices` as the
+- Replace `guide-planning`, `guide-execution`, or `ship` as the
   canonical owners of their current workflow state.
 - Remove explicit approval boundaries where the repository intentionally wants
   human confirmation.
@@ -66,13 +66,13 @@ Add a small optional accelerator layer on top of the current two-layer workflow.
   - Reason to exist: remove repeated planning handoff latency without replacing
     durable planning artifacts.
 
-- `ship`
+- `ship-slice`
   - Purpose: finish execution work from active slice or reviewed backlog to a
     clean commit and PR checkpoint.
   - Scope: drive the active execution path through verification, review,
     closure, commit, and PR preparation.
   - Behavior: use the existing execution owners where possible, call
-    `execute-all-slices` for backlog resolution when relevant, and stop only for
+    `ship` for backlog resolution when relevant, and stop only for
     real blockers or explicit approval gates.
   - Reason to exist: `sirius-skills` currently lacks a single finish-line skill
     comparable to the role `ship` plays in `gstack`.
@@ -95,7 +95,7 @@ Add a small optional accelerator layer on top of the current two-layer workflow.
     inspectable format.
 
 - **Review and execution event logs**
-  - Record enough structured history that `ship`, `learn`, and later reporting
+  - Record enough structured history that `ship-slice`, `learn`, and later reporting
     tooling can reason about past runs.
   - Keep logs supplemental; registry and artifact state remain primary.
 
@@ -107,7 +107,7 @@ Add a small optional accelerator layer on top of the current two-layer workflow.
   routing.
 - `guide-execution` remains the owner of slice readiness and execution-layer
   routing.
-- `execute-all-slices` remains the owner of backlog resolution, increment order,
+- `ship` remains the owner of backlog resolution, increment order,
   and deciding which planned slice should move next.
 - `brief`, `blueprint`, `review-execution`, `close-slice`, and `commit` remain
   the owners of their current artifacts or transitions.
@@ -118,36 +118,36 @@ Add a small optional accelerator layer on top of the current two-layer workflow.
 
 - `autoplan` owns orchestration across existing planning skills, but not
   planning registry semantics.
-- `ship` owns end-to-end execution finishing, but not the internal semantic
+- `ship-slice` owns end-to-end execution finishing, but not the internal semantic
   rules of `brief`, `blueprint`, `close-slice`, or `commit`.
 - `learn` owns learnings curation and retrieval, but not workflow state.
 - Checkpoint support owns resumable context capture, but not artifact truth.
 
 ### Boundaries To Avoid Crossing
 
-- Do not teach `execute-all-slices` to become the default implementation,
+- Do not teach `ship` to become the default implementation,
   review, closure, commit, and PR tool all by itself.
-- Do not let `ship` bypass execution state mutations by editing registries
+- Do not let `ship-slice` bypass execution state mutations by editing registries
   directly when existing owners already encapsulate those rules.
 - Do not let learnings or checkpoints become hidden replacements for repo
   planning artifacts.
 
 ## Interaction With Existing Skills
 
-### `execute-all-slices`
+### `ship`
 
-This proposal keeps `execute-all-slices` as an orchestrator, but tightens its
+This proposal keeps `ship` as an orchestrator, but tightens its
 role:
 
-- keep backlog resolution and ready-slice selection in `execute-all-slices`
+- keep backlog resolution and ready-slice selection in `ship`
 - correct its contract so it reports only owners it can actually derive today,
   or extend the execution state model until those owners are real
-- add an optional machine-readable handoff payload that `ship` can consume
+- add an optional machine-readable handoff payload that `ship-slice` can consume
 - add an optional drive mode later only if it still routes through the existing
   execution owners
 
 This means the recent local change is useful, but it should be treated as one
-building block for `ship`, not as the complete throughput answer.
+building block for `ship-slice`, not as the complete throughput answer.
 
 ### `guide-planning` and `guide-execution`
 
@@ -161,7 +161,7 @@ artifacts, validations, and state transitions.
   - add optional checkpoint and accelerator-related settings such as:
     - `checkpoint_mode`
     - `checkpoint_push`
-    - `ship_pr_mode`
+    - `ship_slice_pr_mode`
     - `autoplan_auto_decision_policy`
 
 - project-scoped learnings file
@@ -192,15 +192,15 @@ artifacts, validations, and state transitions.
 - Validate that the generated artifacts match the current manual planning
   output shape.
 
-### Phase 3: `ship` For One Slice
+### Phase 3: `ship-slice` For One Slice
 
 - Drive one active slice through verification, review, closure, commit, and PR
   preparation.
 - Reuse existing execution owners instead of replacing their semantics.
 
-### Phase 4: `ship` + Backlog Mode
+### Phase 4: `ship` + `ship-slice` Integration
 
-- Integrate `ship` with `execute-all-slices` for reviewed backlogs.
+- Integrate `ship-slice` with `ship` for reviewed backlogs.
 - Allow a maintainer to continue slice-by-slice until the next real blocker or
   commit checkpoint.
 
@@ -225,7 +225,7 @@ artifacts, validations, and state transitions.
   cleanup path is weak.
 - Learnings can become stale or misleading if they are not pruned and tied back
   to files or workflow areas.
-- `ship` could become too broad if it tries to absorb browser QA, deploy, and
+- `ship-slice` could become too broad if it tries to absorb browser QA, deploy, and
   product-specific release logic from `gstack`.
 
 ## Why This Direction Instead Of Copying `gstack`
@@ -249,5 +249,5 @@ The right borrowing strategy is:
 - The proposal intentionally spans new skills, shared runtime support, config
   surface, and workflow semantics.
 - The team may decide to adopt only part of the accelerator layer, such as
-  `autoplan` first and `ship` later.
+  `autoplan` first and `ship-slice` later.
 - Keep speculative notes here until the team decides to promote or reject it.

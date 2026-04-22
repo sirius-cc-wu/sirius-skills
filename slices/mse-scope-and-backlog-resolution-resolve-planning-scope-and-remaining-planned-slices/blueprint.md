@@ -8,7 +8,7 @@
 ## 1. Summary
 
 `mse-scope-and-backlog-resolution` established the planning-target and
-backlog-resolution foundation for `execute-all-slices`. The slice resolves one
+backlog-resolution foundation for `ship`. The slice resolves one
 feature or subfeature target, reads its planned slice lineage, excludes already
 closed execution slices, and returns the next ready slice without mutating
 planning or execution state.
@@ -20,8 +20,8 @@ planning or execution state.
   - execution metadata already records which execution slices are closed
   - no earlier batch helper resolved one planning scope into one ordered backlog
 - Target modules / files:
-  - `skills/execute-all-slices/scripts/execute_all_slices.py`
-  - `skills/execute-all-slices/tests/test_execute_all_slices.py`
+  - `skills/ship/scripts/ship.py`
+  - `skills/ship/tests/test_ship.py`
 - Constraints:
   - keep target resolution read-only
   - preserve feature vs subfeature ownership boundaries
@@ -47,7 +47,7 @@ planning or execution state.
   - [x] **S002** Read planned slice lineage and subtract already-closed execution slices.
   - [x] **S003** Return the next ready slice in deterministic planned order without writing state.
 - Validation:
-  - [x] **V001** `pytest -q skills/execute-all-slices/tests/test_execute_all_slices.py -k scope_or_backlog`
+  - [x] **V001** `pytest -q skills/ship/tests/test_ship.py -k scope_or_backlog`
 
 ## 5. Supporting Notes
 
@@ -62,4 +62,4 @@ planning or execution state.
 
 - Outcome: closed
 - Validation evidence:
-  - `pytest -q skills/execute-all-slices/tests/test_execute_all_slices.py -k scope_or_backlog`
+  - `pytest -q skills/ship/tests/test_ship.py -k scope_or_backlog`

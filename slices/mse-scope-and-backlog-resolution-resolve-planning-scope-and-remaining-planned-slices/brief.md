@@ -9,9 +9,9 @@
 
 - **Work Item**: Resolve one reviewed feature or subfeature target into one ordered remaining-slice backlog.
 - **Source Story / Increment / Slice**: `EW-01` / `I1` / `mse-scope-and-backlog-resolution`
-- **Requested Outcome**: As a maintainer, I want `execute-all-slices` to identify the active planning scope and the next ready planned slice so batch execution starts from durable repository state instead of ad hoc input.
+- **Requested Outcome**: As a maintainer, I want `ship` to identify the active planning scope and the next ready planned slice so batch execution starts from durable repository state instead of ad hoc input.
 - **Why this matters**: Later orchestration depends on one canonical view of planned slices, closed execution slices, and feature vs subfeature scope.
-- **Independent Test**: `pytest -q skills/execute-all-slices/tests/test_execute_all_slices.py -k scope_or_backlog`
+- **Independent Test**: `pytest -q skills/ship/tests/test_ship.py -k scope_or_backlog`
 
 ## 2. Acceptance Scenarios
 

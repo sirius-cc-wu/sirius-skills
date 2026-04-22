@@ -11,7 +11,7 @@
 - **Source Story / Increment / Slice**: `EW-01` / `I2` / `mse-sequential-slice-orchestration`
 - **Requested Outcome**: As a maintainer, I want the batch executor to process one ready slice at a time so multi-slice execution stays aligned with existing execution owners.
 - **Why this matters**: Batch execution should automate traversal, not absorb slice bootstrap, review, or closure ownership into a new state machine.
-- **Independent Test**: `pytest -q skills/execute-all-slices/tests/test_execute_all_slices.py -k orchestration`
+- **Independent Test**: `pytest -q skills/ship/tests/test_ship.py -k orchestration`
 
 ## 2. Acceptance Scenarios
 

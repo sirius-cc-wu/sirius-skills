@@ -14,8 +14,8 @@
     },
     {
       "proposal": "throughput-acceleration-workflow",
-      "status": "draft",
-      "updated_at": "2026-04-21T17:22:28",
+      "status": "promoted",
+      "updated_at": "2026-04-22T09:18:53",
       "path": "docs/proposals/throughput-acceleration-workflow/"
     },
     {

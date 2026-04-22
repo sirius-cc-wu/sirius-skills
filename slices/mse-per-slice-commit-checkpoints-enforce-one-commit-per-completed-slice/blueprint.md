@@ -8,7 +8,7 @@
 ## 1. Summary
 
 `mse-per-slice-commit-checkpoints` integrated a commit checkpoint into the
-`execute-all-slices` loop. After each slice closes, the orchestrator requires a
+`ship` loop. After each slice closes, the orchestrator requires a
 clean worktree checkpoint before it can advance to the next ready slice, handing
 control to `commit` when the repository is still dirty and keeping repository
 history aligned with slice boundaries.
@@ -20,8 +20,8 @@ history aligned with slice boundaries.
   - existing closure and commit flows already exist outside the orchestrator
   - the missing behavior was enforcing one commit boundary per closed slice
 - Target modules / files:
-  - `skills/execute-all-slices/scripts/execute_all_slices.py`
-  - `skills/execute-all-slices/tests/test_execute_all_slices.py`
+  - `skills/ship/scripts/ship.py`
+  - `skills/ship/tests/test_ship.py`
 - Constraints:
   - preserve the existing commit-skill boundary
   - do not advance when the worktree remains dirty
@@ -46,7 +46,7 @@ history aligned with slice boundaries.
   - [x] **S002** Stop immediately when the worktree remains dirty and hand control back to `commit`.
   - [x] **S003** Preserve exactly one commit checkpoint per closed slice during traversal.
 - Validation:
-  - [x] **V001** `pytest -q skills/execute-all-slices/tests/test_execute_all_slices.py -k commit_checkpoint`
+  - [x] **V001** `pytest -q skills/ship/tests/test_ship.py -k commit_checkpoint`
 
 ## 5. Supporting Notes
 
@@ -62,4 +62,4 @@ history aligned with slice boundaries.
 
 - Outcome: closed
 - Validation evidence:
-  - `pytest -q skills/execute-all-slices/tests/test_execute_all_slices.py -k commit_checkpoint`
+  - `pytest -q skills/ship/tests/test_ship.py -k commit_checkpoint`

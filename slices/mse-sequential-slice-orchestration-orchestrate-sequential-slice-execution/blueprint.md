@@ -8,7 +8,7 @@
 ## 1. Summary
 
 `mse-sequential-slice-orchestration` added the orchestration loop for
-`execute-all-slices`. The slice reuses backlog resolution from `mse-scope-and-backlog-resolution`,
+`ship`. The slice reuses backlog resolution from `mse-scope-and-backlog-resolution`,
 bootstraps one ready slice at a time, routes execution through the existing
 execution owners, and preserves one-active-slice semantics across the run.
 
@@ -19,8 +19,8 @@ execution owners, and preserves one-active-slice semantics across the run.
   - execution-layer skills already own slice bootstrap, review, and closure
   - the missing capability was ordered orchestration across more than one slice
 - Target modules / files:
-  - `skills/execute-all-slices/scripts/execute_all_slices.py`
-  - `skills/execute-all-slices/tests/test_execute_all_slices.py`
+  - `skills/ship/scripts/ship.py`
+  - `skills/ship/tests/test_ship.py`
 - Constraints:
   - do not create concurrent active slices
   - do not duplicate execution-layer state machines
@@ -45,7 +45,7 @@ execution owners, and preserves one-active-slice semantics across the run.
   - [x] **S002** Route bootstrap and execution through the existing owner skills.
   - [x] **S003** Advance to the next planned slice only after the current slice leaves the active state.
 - Validation:
-  - [x] **V001** `pytest -q skills/execute-all-slices/tests/test_execute_all_slices.py -k orchestration`
+  - [x] **V001** `pytest -q skills/ship/tests/test_ship.py -k orchestration`
 
 ## 5. Supporting Notes
 
@@ -61,4 +61,4 @@ execution owners, and preserves one-active-slice semantics across the run.
 
 - Outcome: closed
 - Validation evidence:
-  - `pytest -q skills/execute-all-slices/tests/test_execute_all_slices.py -k orchestration`
+  - `pytest -q skills/ship/tests/test_ship.py -k orchestration`

@@ -1,9 +1,9 @@
 ---
-name: execute-all-slices
+name: ship
 description: Resolves one reviewed feature or subfeature backlog into remaining planned slices and routes each active slice to the next owning execution step with one commit per completed slice.
 ---
 
-# Execute All Slices
+# Ship
 
 Use this skill when a maintainer wants to work through all planned slices for
 one reviewed and committed feature or subfeature.
@@ -52,11 +52,11 @@ The fourth slice adds per-slice commit checkpoints:
 ## Tooling
 
 ```bash
-python3 skills/execute-all-slices/scripts/execute_all_slices.py <target>
-python3 skills/execute-all-slices/scripts/execute_all_slices.py <target> --json
-python3 skills/execute-all-slices/scripts/execute_all_slices.py <target> --bootstrap-next
-python3 skills/execute-all-slices/scripts/execute_all_slices.py <target> --resume
-python3 skills/execute-all-slices/scripts/execute_all_slices.py <target> --scope apps/payments
+python3 skills/ship/scripts/ship.py <target>
+python3 skills/ship/scripts/ship.py <target> --json
+python3 skills/ship/scripts/ship.py <target> --bootstrap-next
+python3 skills/ship/scripts/ship.py <target> --resume
+python3 skills/ship/scripts/ship.py <target> --scope apps/payments
 ```
 
 ## Guardrails

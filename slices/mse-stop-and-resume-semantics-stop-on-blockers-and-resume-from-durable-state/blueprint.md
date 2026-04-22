@@ -8,7 +8,7 @@
 ## 1. Summary
 
 `mse-stop-and-resume-semantics` added safe stop conditions and durable
-resume behavior to `execute-all-slices`. The slice stops the batch loop on
+resume behavior to `ship`. The slice stops the batch loop on
 active-slice or dependency-blocked conditions, then resumes
 later by recalculating progress from closed slices and planning lineage rather
 than any batch-local state file.
@@ -20,8 +20,8 @@ than any batch-local state file.
   - slice metadata and registry state already record active and closed work
   - the missing behavior was stop safety and deterministic resume
 - Target modules / files:
-  - `skills/execute-all-slices/scripts/execute_all_slices.py`
-  - `skills/execute-all-slices/tests/test_execute_all_slices.py`
+  - `skills/ship/scripts/ship.py`
+  - `skills/ship/tests/test_ship.py`
 - Constraints:
   - do not invent a second progress database
   - stop before later slices start when blockers exist
@@ -46,7 +46,7 @@ than any batch-local state file.
   - [x] **S002** Recompute remaining backlog from planning lineage and closed slices on rerun.
   - [x] **S003** Resume ordered traversal only from the next ready slice after blockers clear.
 - Validation:
-  - [x] **V001** `pytest -q skills/execute-all-slices/tests/test_execute_all_slices.py -k stop_or_resume`
+  - [x] **V001** `pytest -q skills/ship/tests/test_ship.py -k stop_or_resume`
 
 ## 5. Supporting Notes
 
@@ -62,4 +62,4 @@ than any batch-local state file.
 
 - Outcome: closed
 - Validation evidence:
-  - `pytest -q skills/execute-all-slices/tests/test_execute_all_slices.py -k stop_or_resume`
+  - `pytest -q skills/ship/tests/test_ship.py -k stop_or_resume`

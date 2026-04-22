@@ -78,7 +78,7 @@ state.
 ### 3. Sequential execution orchestrator
 
 The new user-facing capability should be a dedicated skill, tentatively
-`execute-all-slices`, that operates conservatively over the ready-next planned
+`ship`, that operates conservatively over the ready-next planned
 slice set:
 
 1. bootstrap the next planned slice through the execution owner helper when no
@@ -133,7 +133,7 @@ from:
 
 ## Interfaces and dependencies
 
-- **New skill**: `skills/execute-all-slices/`
+- **New skill**: `skills/ship/`
   - resolves feature/subfeature planning scope
   - computes remaining planned slices
   - bootstraps the next ready slice or resumes the active mapped slice
@@ -198,7 +198,7 @@ Completion is inferred from existing planning and execution records.
     checkpoints
   - resume behavior after some planned slices are already closed
 - Validate targeted workflow behavior with:
-  - `pytest -q skills/execute-all-slices/tests/test_execute_all_slices.py`
+  - `pytest -q skills/ship/tests/test_ship.py`
   - targeted existing execution tests for any touched helpers
 
 ## Summary

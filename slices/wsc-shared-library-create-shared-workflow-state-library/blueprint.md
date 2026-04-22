@@ -23,7 +23,7 @@ current callers, and preserve the existing audit/trace regression behavior.
   - `skills/audit-artifacts/scripts/audit_artifacts.py` and
     `skills/trace-artifacts/scripts/trace_data.py` already depend on those
     semantics, directly or indirectly.
-  - `skills/execute-all-slices/scripts/execute_all_slices.py` and
+  - `skills/ship/scripts/ship.py` and
     `skills/repair-artifacts/scripts/repair_data.py` now also rely on the same
     parser path, so compatibility at the old import surface matters.
 - Target modules / files:
@@ -222,7 +222,7 @@ Shim --> Trace : iter_traceability_records
   - malformed metadata should continue to surface explicit reader errors
   - missing traceability files should continue to produce empty record sets
   - compatibility shim exports must remain import-compatible for unchanged
-    callers such as `repair-artifacts` and `execute-all-slices`
+    callers such as `repair-artifacts` and `ship`
 
 ### Verification Scenarios
 
