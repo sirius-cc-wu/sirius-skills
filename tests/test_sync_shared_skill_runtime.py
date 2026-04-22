@@ -37,3 +37,12 @@ def test_learn_receives_workflow_runtime() -> None:
     }
 
     assert "skills/learn/lib/workflow_runtime" in targets
+
+
+def test_ship_slice_receives_workflow_runtime() -> None:
+    targets = {
+        str(path.relative_to(REPO_ROOT))
+        for path in MODULE.WORKFLOW_RUNTIME_TARGETS
+    }
+
+    assert "skills/ship-slice/lib/workflow_runtime" in targets

@@ -32,6 +32,7 @@ def test_install_target_keeps_packaged_sync() -> None:
     assert "--skill audit-artifacts" in output
     assert "--skill learn" in output
     assert "--skill ship" in output
+    assert "--skill ship-slice" in output
 
 
 def test_install_packaged_alias_matches_install() -> None:
@@ -44,6 +45,7 @@ def test_install_packaged_alias_matches_install() -> None:
     assert "--skill audit-artifacts" in output
     assert "--skill learn" in output
     assert "--skill ship" in output
+    assert "--skill ship-slice" in output
 
 
 def test_uninstall_alias_still_uses_packaged_flow() -> None:

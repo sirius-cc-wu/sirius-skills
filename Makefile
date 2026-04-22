@@ -30,6 +30,7 @@ MANAGED_SKILLS := \
 	guide-execution \
 	learn \
 	ship \
+	ship-slice \
 	slice \
 	ui-flow
 MANAGED_SKILL_FLAGS := $(foreach skill,$(MANAGED_SKILLS),--skill $(skill))
