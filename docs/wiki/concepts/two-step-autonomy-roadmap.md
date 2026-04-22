@@ -9,16 +9,16 @@ Reduce orchestration friction from many manual commands to two high-level steps:
 
 ## Current Gap
 
-Current accelerator skills mostly reconcile state and route to the next owner:
+Current accelerator skills are split across planning and execution maturity:
 
-- `autoplan` returns `next_owner` from planning status and checkpoints runtime
-  context.
+- `autoplan` can now optionally execute the planning owner chain and stop with
+  structured boundary context.
 - `ship` resolves backlog and can bootstrap/delegate.
 - `ship-slice` resolves one active slice and checkpoints, but does not execute
   owner workflows itself.
 
-This preserves strict boundaries but forces users to issue many follow-up
-requests manually.
+This means planning can now run as one step, while execution still requires
+manual follow-up between owners.
 
 ## Target Operating Model
 
@@ -74,10 +74,9 @@ Use additive flags under existing typed configs:
 
 ## Incremental Delivery Plan
 
-1. Extend `autoplan` with owner-chain execution behind config flag.
-2. Extend `ship-slice` with owner-chain execution behind config flag.
-3. Add machine-readable "readiness dashboard" outputs for both steps.
-4. Add tests for happy path, stop boundaries, resume semantics, and stale
+1. Extend `ship-slice` with owner-chain execution behind config flag.
+2. Add machine-readable "readiness dashboard" outputs for both steps.
+3. Add tests for execution owner-chain happy path, stop boundaries, resume semantics, and stale
    checkpoint reconciliation.
 
 ## Main Sources

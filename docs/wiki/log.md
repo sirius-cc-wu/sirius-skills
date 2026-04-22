@@ -34,3 +34,10 @@ grep-friendly.
 - Added `docs/wiki/concepts/agent-skills-reference.md` with architecture-level deltas, adoptable command-UX patterns, and non-portable elements.
 - Updated `docs/wiki/features/throughput-acceleration-workflow.md` with an additional external-reference section for `agent-skills`.
 - Updated wiki index concept listings for the new reference page.
+
+## [2026-04-23] implementation-synthesis | autoplan owner-chain
+
+- Implemented optional owner-chain execution in `skills/autoplan/scripts/autoplan.py` with config/CLI controls (`execute_owner_chain`, `stop_on_owner`).
+- Added structured owner-chain boundary reporting and checkpoint/event-log context for approval, explicit owner stops, and validation/missing-input stops.
+- Added focused tests in `skills/autoplan/tests/test_autoplan.py` for owner-chain happy path and stop boundaries.
+- Updated autoplan skill docs and throughput/two-step wiki pages to reflect planning-side owner-chain implementation status.

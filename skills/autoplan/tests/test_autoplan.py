@@ -5,6 +5,7 @@ import json
 import subprocess
 import sys
 from pathlib import Path
+from typing import Any, Dict, Optional
 
 
 AUTOPLAN_SCRIPT = Path(__file__).resolve().parents[1] / "scripts" / "autoplan.py"
@@ -32,9 +33,19 @@ def init_git_repo(root: Path) -> None:
     )
 
 
-def write_planning_config(root: Path) -> None:
+def write_planning_config(
+    root: Path,
+    *,
+    autoplan_overrides: Optional[Dict[str, Any]] = None,
+) -> None:
     skills_dir = root / ".skills"
     skills_dir.mkdir(parents=True, exist_ok=True)
+    autoplan_config: Dict[str, Any] = {
+        "auto_decision_policy": "conservative",
+    }
+    if autoplan_overrides:
+        autoplan_config.update(autoplan_overrides)
+
     (skills_dir / "planning.json").write_text(
         json.dumps(
             {
@@ -42,9 +53,7 @@ def write_planning_config(root: Path) -> None:
                 "proposal_dir": "docs/proposals",
                 "design_diagram_mode": "embedded",
                 "accelerators": {
-                    "autoplan": {
-                        "auto_decision_policy": "conservative",
-                    }
+                    "autoplan": autoplan_config,
                 },
             }
         )
@@ -140,3 +149,102 @@ def test_autoplan_stops_at_planning_reviewed_boundary(tmp_path: Path, monkeypatc
     payload = json.loads(result.stdout)
     assert payload["next_owner"] == "approval"
     assert payload["action"] == "approval_required"
+
+
+def test_autoplan_owner_chain_advances_to_review_boundary(tmp_path: Path, monkeypatch) -> None:
+    init_git_repo(tmp_path)
+    write_planning_config(tmp_path)
+    feature_path = create_feature(tmp_path, monkeypatch, "discovery_pending")
+    (feature_path / "discover.md").write_text("# Discover\n", encoding="utf-8")
+    (feature_path / "system-design.md").write_text("# Design\n", encoding="utf-8")
+    (feature_path / "slice-planning.md").write_text("# Slice Planning\n", encoding="utf-8")
+    (feature_path / "slice-traceability.md").write_text("# Slice Traceability\n", encoding="utf-8")
+
+    result = run_cli(
+        tmp_path,
+        "throughput-acceleration-workflow",
+        "--execute-owner-chain",
+        "--review-note",
+        "Autoplan review pass",
+        "--json",
+    )
+
+    assert result.returncode == 0
+    payload = json.loads(result.stdout)
+    assert payload["planning_status"] == "planning_reviewed"
+    assert payload["next_owner"] == "approval"
+    assert payload["action"] == "approval_required"
+    assert payload["execute_owner_chain"] is True
+    assert payload["owner_chain"]["stop_reason"]["kind"] == "approval_boundary"
+    assert [step["owner"] for step in payload["owner_chain"]["steps"]] == [
+        "discover",
+        "design",
+        "breakdown",
+        "review-planning",
+    ]
+
+
+def test_autoplan_owner_chain_respects_stop_owner_boundary(tmp_path: Path, monkeypatch) -> None:
+    init_git_repo(tmp_path)
+    write_planning_config(
+        tmp_path,
+        autoplan_overrides={
+            "execute_owner_chain": True,
+            "stop_on_owner": ["design"],
+        },
+    )
+    feature_path = create_feature(tmp_path, monkeypatch, "discovery_pending")
+    (feature_path / "discover.md").write_text("# Discover\n", encoding="utf-8")
+
+    result = run_cli(tmp_path, "throughput-acceleration-workflow", "--json")
+
+    assert result.returncode == 0
+    payload = json.loads(result.stdout)
+    assert payload["planning_status"] == "discovery_ready"
+    assert payload["next_owner"] == "design"
+    assert payload["action"] == "run_design"
+    assert payload["owner_chain"]["stop_reason"]["kind"] == "owner_stop"
+    assert [step["owner"] for step in payload["owner_chain"]["steps"]] == ["discover"]
+
+
+def test_autoplan_owner_chain_reports_missing_required_input(tmp_path: Path, monkeypatch) -> None:
+    init_git_repo(tmp_path)
+    write_planning_config(
+        tmp_path,
+        autoplan_overrides={
+            "execute_owner_chain": True,
+        },
+    )
+    create_feature(tmp_path, monkeypatch, "discovery_pending")
+
+    result = run_cli(tmp_path, "throughput-acceleration-workflow", "--json")
+
+    assert result.returncode == 0
+    payload = json.loads(result.stdout)
+    assert payload["planning_status"] == "discovery_pending"
+    assert payload["next_owner"] == "discover"
+    assert payload["action"] == "run_discover"
+    assert payload["owner_chain"]["stop_reason"]["kind"] == "missing_required_input"
+    assert payload["owner_chain"]["steps"][0]["advanced"] is False
+
+
+def test_autoplan_owner_chain_reports_approval_when_already_reviewed(
+    tmp_path: Path, monkeypatch
+) -> None:
+    init_git_repo(tmp_path)
+    write_planning_config(
+        tmp_path,
+        autoplan_overrides={
+            "execute_owner_chain": True,
+        },
+    )
+    create_feature(tmp_path, monkeypatch, "planning_reviewed")
+
+    result = run_cli(tmp_path, "throughput-acceleration-workflow", "--json")
+
+    assert result.returncode == 0
+    payload = json.loads(result.stdout)
+    assert payload["planning_status"] == "planning_reviewed"
+    assert payload["next_owner"] == "approval"
+    assert payload["owner_chain"]["steps"] == []
+    assert payload["owner_chain"]["stop_reason"]["kind"] == "approval_boundary"

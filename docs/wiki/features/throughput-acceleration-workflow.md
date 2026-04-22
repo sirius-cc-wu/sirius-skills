@@ -91,8 +91,9 @@ Desired UX:
 
 Current status:
 
-- partially implemented (routing and checkpointing exist)
-- not yet implemented as full owner-chain execution
+- planning step is now implemented behind config/CLI owner-chain controls
+  (`accelerators.autoplan.execute_owner_chain`, `stop_on_owner`)
+- execution step is still pending owner-chain execution in `ship-slice`
 
 Roadmap link:
 
