@@ -24,6 +24,8 @@ truth.
 | Page | Summary | Main sources |
 |---|---|---|
 | `concepts/workflow-ownership-boundaries.md` | Cross-feature synthesis of planning, execution, and maintenance ownership boundaries. | planning/execution/consistency/throughput feature designs |
+| `concepts/gstack-ship-reference.md` | Reference comparison of `gstack /ship` vs `sirius-skills ship` and adoptable improvements. | `gstack/ship` + `skills/ship*` |
+| `concepts/two-step-autonomy-roadmap.md` | Proposed design to run `sirius-skills` in two high-level steps (`autoplan`, then post-approval execution autopilot). | `skills/autoplan*` + `skills/ship*` |
 
 ## Notes
 
