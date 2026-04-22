@@ -1,0 +1,14 @@
+{
+  "subfeature_id": "accelerator-transition-guardrails",
+  "parent_feature_slug": "workflow-state-consistency",
+  "status": "draft",
+  "created_at": "2026-04-23T00:50:17",
+  "updated_at": "2026-04-23T00:50:17",
+  "subfeature_type": "additive",
+  "summary": "Harden owner-chain transitions with invariant checks and deterministic stop reasons.",
+  "affected_artifacts": [],
+  "affected_story_ids": [],
+  "affected_slice_ids": [],
+  "review_note": null,
+  "finalized_at": null
+}

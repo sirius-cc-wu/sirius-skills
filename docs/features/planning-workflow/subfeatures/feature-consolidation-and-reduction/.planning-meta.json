@@ -1,0 +1,10 @@
+{
+  "feature_slug": "feature-consolidation-and-reduction",
+  "status": "discovery_pending",
+  "created_at": "2026-04-23T01:15:39",
+  "updated_at": "2026-04-23T01:15:39",
+  "requires_ui_flow": false,
+  "review_note": null,
+  "ready_slice_ids": [],
+  "related_story_ids": []
+}

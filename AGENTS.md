@@ -11,6 +11,20 @@ Default guidance for agents working in `sirius-skills`.
 - `docs/wiki/`: synthesized, durable knowledge pages derived from repo artifacts
 - top-level docs and install helpers such as `README.md`, `SKILLS_METHODOLOGY.md`, and `Makefile`
 
+## External References
+
+Use these upstream repositories as reference inputs when their patterns are
+relevant to current work:
+
+- `gstack`
+  - upstream: `https://github.com/garrytan/gstack`
+  - local sibling clone (when present): `../gstack/`
+- `agent-skills` (Addy Osmani)
+  - upstream: `git@github.com:addyosmani/agent-skills.git`
+
+Treat them as references, not source-of-truth replacements for this repo's
+artifact ownership and workflow boundaries.
+
 ## Core Rules
 
 ### Keep shared skills generic

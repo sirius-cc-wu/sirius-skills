@@ -1,0 +1,14 @@
+{
+  "subfeature_id": "feature-consolidation-and-reduction",
+  "parent_feature_slug": "planning-workflow",
+  "status": "draft",
+  "created_at": "2026-04-23T01:15:39",
+  "updated_at": "2026-04-23T01:15:39",
+  "subfeature_type": "superseding",
+  "summary": "Require explicit capability reduction and supersession accounting when adding planning capabilities.",
+  "affected_artifacts": [],
+  "affected_story_ids": [],
+  "affected_slice_ids": [],
+  "review_note": null,
+  "finalized_at": null
+}

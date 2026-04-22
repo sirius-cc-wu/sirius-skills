@@ -48,6 +48,26 @@ Reference takeaway: `sirius-skills` should keep its repo-artifact-first
 ownership model while selectively borrowing `gstack`'s stronger ship-readiness
 reporting and explicit idempotency documentation.
 
+## Agent-Skills Reference Comparison
+
+Compared against Addy Osmani `agent-skills` local clone commit `1f66d57`
+(`https://github.com/addyosmani/agent-skills`).
+
+Useful pattern signal:
+
+- command-oriented lifecycle UX (`/spec`, `/plan`, `/build`, `/test`, `/review`,
+  `/ship`) lowers user orchestration burden.
+
+Important boundary delta:
+
+- `agent-skills` is a generalized process pack and does not rely on the same
+  durable planning/execution artifact model that `sirius-skills` uses.
+
+Resulting guidance:
+
+- adopt the simplified top-level UX pattern (few user commands),
+- keep `sirius` artifact ownership and lifecycle metadata as source of truth.
+
 ## Reference-Guided Improvements
 
 High-value improvements inferred from the comparison:
@@ -88,3 +108,4 @@ Roadmap link:
 - `skills/ship-slice/SKILL.md`
 - `skills/ship-slice/scripts/ship_slice.py`
 - `gstack/ship/SKILL.md` (sibling local reference clone)
+- `andyosmali-agent-skills/README.md` (sibling local reference clone)

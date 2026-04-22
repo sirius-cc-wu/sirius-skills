@@ -1,0 +1,14 @@
+{
+  "subfeature_id": "ship-slice-owner-chain",
+  "parent_feature_slug": "throughput-acceleration-workflow",
+  "status": "draft",
+  "created_at": "2026-04-23T00:50:17",
+  "updated_at": "2026-04-23T00:50:17",
+  "subfeature_type": "additive",
+  "summary": "Execute brief/blueprint/implementation/review-execution as one owner chain behind ship-slice.",
+  "affected_artifacts": [],
+  "affected_story_ids": [],
+  "affected_slice_ids": [],
+  "review_note": null,
+  "finalized_at": null
+}

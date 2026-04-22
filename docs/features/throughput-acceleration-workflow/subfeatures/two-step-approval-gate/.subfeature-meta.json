@@ -1,0 +1,14 @@
+{
+  "subfeature_id": "two-step-approval-gate",
+  "parent_feature_slug": "throughput-acceleration-workflow",
+  "status": "draft",
+  "created_at": "2026-04-23T00:50:17",
+  "updated_at": "2026-04-23T00:50:17",
+  "subfeature_type": "additive",
+  "summary": "Enforce explicit approval boundary between planning autoplan and execution autopilot.",
+  "affected_artifacts": [],
+  "affected_story_ids": [],
+  "affected_slice_ids": [],
+  "review_note": null,
+  "finalized_at": null
+}

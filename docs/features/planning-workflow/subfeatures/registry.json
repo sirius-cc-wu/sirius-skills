@@ -8,6 +8,13 @@
       "path": "docs/features/planning-workflow/subfeatures/change-to-subfeature-migration/"
     },
     {
+      "subfeature_id": "feature-consolidation-and-reduction",
+      "status": "draft",
+      "subfeature_type": "superseding",
+      "updated_at": "2026-04-23T01:15:39",
+      "path": "docs/features/planning-workflow/subfeatures/feature-consolidation-and-reduction/"
+    },
+    {
       "subfeature_id": "proposal-workflow",
       "status": "reviewed",
       "subfeature_type": "additive",

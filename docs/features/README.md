@@ -16,8 +16,14 @@
 | split-install-modes | implemented | 2026-04-19T11:16:05 | docs/features/installation-and-configuration/subfeatures/split-install-modes/ |
 | planning-workflow | planning_reviewed | 2026-03-24T03:39:26 | docs/features/planning-workflow/ |
 | change-to-subfeature-migration | planning_reviewed | 2026-04-08T08:27:49 | docs/features/planning-workflow/subfeatures/change-to-subfeature-migration/ |
+| feature-consolidation-and-reduction | discovery_pending | 2026-04-23T01:15:39 | docs/features/planning-workflow/subfeatures/feature-consolidation-and-reduction/ |
 | proposal-workflow | planning_reviewed | 2026-03-29T00:32:50 | docs/features/planning-workflow/subfeatures/proposal-workflow/ |
 | reference-research-synthesis | implemented | 2026-04-21T01:10:07 | docs/features/planning-workflow/subfeatures/reference-research-synthesis/ |
 | subfeature-workflow | planning_reviewed | 2026-03-28T23:26:17 | docs/features/planning-workflow/subfeatures/subfeature-workflow/ |
 | throughput-acceleration-workflow | implemented | 2026-04-22T10:27:11 | docs/features/throughput-acceleration-workflow/ |
+| accelerator-readiness-dashboard | discovery_pending | 2026-04-23T00:50:17 | docs/features/throughput-acceleration-workflow/subfeatures/accelerator-readiness-dashboard/ |
+| autoplan-owner-chain | discovery_pending | 2026-04-23T00:50:16 | docs/features/throughput-acceleration-workflow/subfeatures/autoplan-owner-chain/ |
+| ship-slice-owner-chain | discovery_pending | 2026-04-23T00:50:17 | docs/features/throughput-acceleration-workflow/subfeatures/ship-slice-owner-chain/ |
+| two-step-approval-gate | discovery_pending | 2026-04-23T00:50:17 | docs/features/throughput-acceleration-workflow/subfeatures/two-step-approval-gate/ |
 | workflow-state-consistency | implemented | 2026-04-19T11:36:15 | docs/features/workflow-state-consistency/ |
+| accelerator-transition-guardrails | discovery_pending | 2026-04-23T00:50:17 | docs/features/workflow-state-consistency/subfeatures/accelerator-transition-guardrails/ |

@@ -1,0 +1,32 @@
+{
+  "subfeatures": [
+    {
+      "subfeature_id": "accelerator-readiness-dashboard",
+      "status": "draft",
+      "subfeature_type": "additive",
+      "updated_at": "2026-04-23T00:50:17",
+      "path": "docs/features/throughput-acceleration-workflow/subfeatures/accelerator-readiness-dashboard/"
+    },
+    {
+      "subfeature_id": "autoplan-owner-chain",
+      "status": "draft",
+      "subfeature_type": "additive",
+      "updated_at": "2026-04-23T00:50:16",
+      "path": "docs/features/throughput-acceleration-workflow/subfeatures/autoplan-owner-chain/"
+    },
+    {
+      "subfeature_id": "ship-slice-owner-chain",
+      "status": "draft",
+      "subfeature_type": "additive",
+      "updated_at": "2026-04-23T00:50:17",
+      "path": "docs/features/throughput-acceleration-workflow/subfeatures/ship-slice-owner-chain/"
+    },
+    {
+      "subfeature_id": "two-step-approval-gate",
+      "status": "draft",
+      "subfeature_type": "additive",
+      "updated_at": "2026-04-23T00:50:17",
+      "path": "docs/features/throughput-acceleration-workflow/subfeatures/two-step-approval-gate/"
+    }
+  ]
+}

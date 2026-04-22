@@ -27,3 +27,10 @@ grep-friendly.
 - Extended `docs/wiki/concepts/gstack-ship-reference.md` with explicit "does gstack already do this?" findings (`autoplan` + `ship` are strong pattern references but not a drop-in match for sirius planning/execution artifacts).
 - Added `docs/wiki/concepts/two-step-autonomy-roadmap.md` with a concrete staged roadmap, config surface proposal, and guardrails for implementing the two-step flow.
 - Updated throughput feature synthesis and wiki index to point to the roadmap.
+
+## [2026-04-23] reference-synthesis | addy agent-skills comparison
+
+- Compared Addy Osmani `agent-skills` (`https://github.com/addyosmani/agent-skills`) against `sirius-skills` using local clone commit `1f66d57` (matches upstream `HEAD` at research time).
+- Added `docs/wiki/concepts/agent-skills-reference.md` with architecture-level deltas, adoptable command-UX patterns, and non-portable elements.
+- Updated `docs/wiki/features/throughput-acceleration-workflow.md` with an additional external-reference section for `agent-skills`.
+- Updated wiki index concept listings for the new reference page.
