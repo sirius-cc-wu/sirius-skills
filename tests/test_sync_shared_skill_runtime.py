@@ -19,3 +19,12 @@ def test_close_slice_receives_workflow_state_runtime() -> None:
     }
 
     assert "skills/close-slice/lib/workflow_state" in targets
+
+
+def test_ship_receives_workflow_runtime() -> None:
+    targets = {
+        str(path.relative_to(REPO_ROOT))
+        for path in MODULE.WORKFLOW_RUNTIME_TARGETS
+    }
+
+    assert "skills/ship/lib/workflow_runtime" in targets

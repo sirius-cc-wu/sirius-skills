@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "generated_at": "2026-04-21T01:10:07",
+  "generated_at": "2026-04-22T09:59:00",
   "slices": [
     {
       "id": "hss-root-fallback",
@@ -359,6 +359,16 @@
       "path": "slices/rrs-wiki-synthesis-add-reusable-wiki-synthesis-flow/",
       "updated_at": "2026-04-21T01:10:07",
       "closed_at": "2026-04-21T01:10:07",
+      "archived_at": null,
+      "relations": []
+    },
+    {
+      "id": "taw-runtime-foundation",
+      "feature": "Add shared accelerator runtime support",
+      "status": "closed",
+      "path": "slices/taw-runtime-foundation-add-shared-accelerator-runtime-support/",
+      "updated_at": "2026-04-22T09:59:00",
+      "closed_at": "2026-04-22T09:59:00",
       "archived_at": null,
       "relations": []
     }

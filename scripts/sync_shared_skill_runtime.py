@@ -8,7 +8,7 @@ from pathlib import Path
 
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
-SOURCE = REPO_ROOT / "lib" / "workflow_state"
+WORKFLOW_STATE_SOURCE = REPO_ROOT / "lib" / "workflow_state"
 WORKFLOW_STATE_TARGETS = [
     REPO_ROOT / "skills" / "audit-artifacts" / "lib" / "workflow_state",
     REPO_ROOT / "skills" / "trace-artifacts" / "lib" / "workflow_state",
@@ -19,6 +19,11 @@ WORKFLOW_STATE_TARGETS = [
     REPO_ROOT / "skills" / "guide-execution" / "lib" / "workflow_state",
     REPO_ROOT / "skills" / "close-slice" / "lib" / "workflow_state",
 ]
+WORKFLOW_RUNTIME_SOURCE = REPO_ROOT / "lib" / "workflow_runtime"
+WORKFLOW_RUNTIME_TARGETS = [
+    REPO_ROOT / "skills" / "ship" / "lib" / "workflow_runtime",
+]
+SOURCE = WORKFLOW_STATE_SOURCE
 METRICS_STORE_SOURCE = (
     REPO_ROOT / "skills" / "measure-artifacts" / "scripts" / "metrics_store.py"
 )
@@ -72,8 +77,11 @@ def sync_file(source: Path, target: Path) -> str:
 
 
 def main() -> int:
-    if not SOURCE.is_dir():
-        print(f"Missing shared runtime source: {SOURCE}", file=sys.stderr)
+    if not WORKFLOW_STATE_SOURCE.is_dir():
+        print(f"Missing shared runtime source: {WORKFLOW_STATE_SOURCE}", file=sys.stderr)
+        return 1
+    if not WORKFLOW_RUNTIME_SOURCE.is_dir():
+        print(f"Missing shared runtime source: {WORKFLOW_RUNTIME_SOURCE}", file=sys.stderr)
         return 1
     if not METRICS_STORE_SOURCE.is_file():
         print(f"Missing shared runtime source: {METRICS_STORE_SOURCE}", file=sys.stderr)
@@ -81,7 +89,10 @@ def main() -> int:
 
     try:
         for target in WORKFLOW_STATE_TARGETS:
-            status = sync_one(SOURCE, target)
+            status = sync_one(WORKFLOW_STATE_SOURCE, target)
+            print(f"{status}: {target.relative_to(REPO_ROOT)}")
+        for target in WORKFLOW_RUNTIME_TARGETS:
+            status = sync_one(WORKFLOW_RUNTIME_SOURCE, target)
             print(f"{status}: {target.relative_to(REPO_ROOT)}")
         status = sync_file(METRICS_STORE_SOURCE, METRICS_STORE_TARGET)
         print(f"{status}: {METRICS_STORE_TARGET.relative_to(REPO_ROOT)}")

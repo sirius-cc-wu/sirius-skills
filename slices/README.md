@@ -38,3 +38,4 @@
 | rrs-relevance-routing | Route research only when relevant | closed | 2026-04-21T01:00:53 | 2026-04-21T01:00:53 | slices/rrs-relevance-routing-route-research-only-when-relevant/ |
 | rrs-research-consumers | Teach planning docs to cite research output | closed | 2026-04-21T01:05:08 | 2026-04-21T01:05:08 | slices/rrs-research-consumers-teach-planning-docs-to-cite-research-output/ |
 | rrs-wiki-synthesis | Add reusable wiki synthesis flow | closed | 2026-04-21T01:10:07 | 2026-04-21T01:10:07 | slices/rrs-wiki-synthesis-add-reusable-wiki-synthesis-flow/ |
+| taw-runtime-foundation | Add shared accelerator runtime support | closed | 2026-04-22T09:59:00 | 2026-04-22T09:59:00 | slices/taw-runtime-foundation-add-shared-accelerator-runtime-support/ |

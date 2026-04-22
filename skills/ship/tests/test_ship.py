@@ -166,6 +166,56 @@ def test_resolve_feature_scope_returns_first_ready_planned_slice(tmp_path, monke
     assert states["mse-sequential-slice-orchestration"] == "blocked"
 
 
+def test_runtime_foundation_ready_slice_is_reported(tmp_path, monkeypatch, capsys):
+    env = setup_repo(tmp_path, monkeypatch)
+    planning = env["planning"]
+    feature_path = env["feature_path"]
+    module = env["module"]
+
+    write_file(
+        feature_path / "slice-planning.md",
+        """# Slice Planning
+
+| Increment | Goal / User-Visible Value | Included Story IDs | Planned Slice IDs | Demo / Verification Outcome | Notes |
+| --- | --- | --- | --- | --- | --- |
+| I1 | Runtime foundation | TAW-03 | taw-runtime-foundation | test | Notes |
+
+| Slice ID | Story ID | Title | Summary | Target Area | Lane | Validation | Planned Action | Depends On | Slice Ready |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| taw-runtime-foundation | TAW-03 | Add runtime support | Summary | area | primary | test | create slice |  | yes |
+| taw-learn-skill | TAW-04 | Add learn skill | Summary | area | primary | test | create slice | taw-runtime-foundation | yes |
+""",
+    )
+    write_file(
+        feature_path / "slice-traceability.md",
+        """# Slice Traceability
+
+| Story ID | Story Size | Story Summary | Increments | Planned Slice IDs | Slice Areas | Blocked By | Execution Slice IDs | Notes |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| TAW-03 | L | Runtime support | I1 | taw-runtime-foundation | area |  |  | Notes |
+| TAW-04 | M | Learn skill | I1 | taw-learn-skill | area | taw-runtime-foundation |  | Notes |
+""",
+    )
+
+    rows = planning.parse_registry()
+    feature = planning.find_feature(rows, "execution-workflow")
+    assert feature is not None
+    ok, message = planning.update_feature_status(
+        rows,
+        feature,
+        "planning_reviewed",
+        force=True,
+        review_note="ready",
+    )
+    assert ok, message
+
+    assert run_cli(module, monkeypatch, "execution-workflow", "--json") == 0
+    payload = json.loads(capsys.readouterr().out)
+
+    assert payload["current_increment"] == "I1"
+    assert payload["ready_next"] == ["taw-runtime-foundation"]
+
+
 def test_resolve_backlog_defers_ready_slice_in_later_increment_until_earlier_increment_completes(
     tmp_path, monkeypatch, capsys
 ):
