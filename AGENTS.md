@@ -8,6 +8,7 @@ Default guidance for agents working in `sirius-skills`.
 
 - `skills/`: reusable skill definitions and helper scripts
 - `.github/`: repository guidance for GitHub tooling
+- `docs/wiki/`: synthesized, durable knowledge pages derived from repo artifacts
 - top-level docs and install helpers such as `README.md`, `SKILLS_METHODOLOGY.md`, and `Makefile`
 
 ## Core Rules
@@ -34,6 +35,20 @@ When bootstrap scaffolds a wiki, keep the wiki root aligned with the planning
 layout: derive it from the parent directory of `planning_dir` (for example,
 `docs/features` -> `docs/wiki`, `planning/features` -> `planning/wiki`) instead
 of hardcoding `docs/wiki` for every repository.
+
+### Keep wiki content synthesized
+
+Treat the wiki as a maintained knowledge layer, not as planning state or a
+replacement for canonical workflow artifacts.
+
+Rules:
+
+- keep feature-planning and execution truth in `docs/features/`, `docs/proposals/`, and `slices/`
+- keep `docs/wiki/index.md` content-oriented with discoverable page summaries
+- keep `docs/wiki/log.md` append-only and chronological using `## [YYYY-MM-DD] operation | subject`
+- prefer feature-scoped synthesis pages under `docs/wiki/features/`
+- use `docs/wiki/concepts/` for cross-cutting knowledge shared by multiple features
+- capture conclusions, tradeoffs, and deltas; do not copy raw source text into wiki pages
 
 ### Preserve ownership boundaries
 
