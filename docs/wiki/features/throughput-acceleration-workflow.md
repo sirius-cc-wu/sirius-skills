@@ -93,7 +93,10 @@ Current status:
 
 - planning step is now implemented behind config/CLI owner-chain controls
   (`accelerators.autoplan.execute_owner_chain`, `stop_on_owner`)
-- execution step is still pending owner-chain execution in `ship-slice`
+- execution step now has owner-chain routing in `ship-slice` behind
+  `accelerators.ship_slice.execute_owner_chain` and `stop_on_owner`
+- explicit approval-gate hardening and readiness dashboards remain follow-up
+  work
 
 Roadmap link:
 

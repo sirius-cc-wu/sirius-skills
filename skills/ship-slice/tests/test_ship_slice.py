@@ -5,6 +5,7 @@ import json
 import subprocess
 import sys
 from pathlib import Path
+from typing import Any, Dict, Optional
 
 
 SHIP_SLICE_SCRIPT = Path(__file__).resolve().parents[1] / "scripts" / "ship_slice.py"
@@ -33,18 +34,24 @@ def init_git_repo(root: Path) -> None:
     )
 
 
-def write_execution_config(root: Path) -> None:
+def write_execution_config(
+    root: Path,
+    *,
+    accelerators_overrides: Optional[Dict[str, Any]] = None,
+    auto_start_implementation: bool = True,
+) -> None:
     skills_dir = root / ".skills"
     skills_dir.mkdir(parents=True, exist_ok=True)
+    payload: Dict[str, Any] = {
+        "slice_dir": "slices",
+        "preferred_workflow": "TDD",
+        "auto_start_implementation": auto_start_implementation,
+    }
+    if accelerators_overrides is not None:
+        payload["accelerators"] = accelerators_overrides
+
     (skills_dir / "execution.json").write_text(
-        json.dumps(
-            {
-                "slice_dir": "slices",
-                "preferred_workflow": "TDD",
-                "auto_start_implementation": True,
-            }
-        )
-        + "\n",
+        json.dumps(payload) + "\n",
         encoding="utf-8",
     )
 
@@ -65,14 +72,23 @@ def create_slice(tmp_path: Path, monkeypatch, slice_id: str, feature: str, statu
             "- [x] requirements complete\n",
             encoding="utf-8",
         )
-    if status in {"blueprint_ready", "execution_ready", "closed"}:
-        (slice_dir / "blueprint.md").write_text("# blueprint\n", encoding="utf-8")
     rows = execution.parse_registry()
     row = execution.resolve_slice(rows, slice_id)
     assert row is not None
-    if status != "draft":
-        ok, message = execution.update_slice_status(rows, row, status, force=(status == "closed"))
+    if status in {"brief_ready", "blueprint_ready", "execution_ready", "closed"}:
+        ok, message = execution.update_slice_status(rows, row, "brief_ready")
         assert ok, message
+    if status in {"blueprint_ready", "execution_ready", "closed"}:
+        (slice_dir / "blueprint.md").write_text("# blueprint\n", encoding="utf-8")
+        ok, message = execution.update_slice_status(rows, row, "blueprint_ready")
+        assert ok, message
+    if status in {"execution_ready", "closed"} and str(row["status"]) != "execution_ready":
+        ok, message = execution.update_slice_status(rows, row, "execution_ready")
+        assert ok, message
+    if status == "closed":
+        ok, message = execution.update_slice_status(rows, row, "closed", force=True)
+        assert ok, message
+    assert str(row["status"]) == status
     return slice_dir
 
 
@@ -166,3 +182,131 @@ def test_finish_or_resume_routes_closed_dirty_slice_to_commit(
     payload = json.loads(result.stdout)
     assert payload["next_owner"] == "commit"
     assert payload["action"] == "commit_completed_slice"
+
+
+def test_ship_slice_owner_chain_advances_to_review_boundary(tmp_path: Path, monkeypatch) -> None:
+    init_git_repo(tmp_path)
+    write_execution_config(
+        tmp_path,
+        accelerators_overrides={
+            "ship_slice": {
+                "execute_owner_chain": True,
+            }
+        },
+        auto_start_implementation=False,
+    )
+    create_slice(
+        tmp_path,
+        monkeypatch,
+        "taw-ship-slice-loop",
+        "Add one-slice finishing and resume orchestration",
+        "blueprint_ready",
+    )
+
+    result = run_cli(tmp_path, "taw-ship-slice-loop", "--json")
+
+    assert result.returncode == 0
+    payload = json.loads(result.stdout)
+    assert payload["execute_owner_chain"] is True
+    assert payload["slice_status"] == "execution_ready"
+    assert payload["next_owner"] == "review-execution"
+    assert payload["action"] == "run_review_execution"
+    assert payload["owner_chain"]["stop_reason"]["kind"] == "review_boundary"
+    assert [step["owner"] for step in payload["owner_chain"]["steps"]] == [
+        "implementation"
+    ]
+
+
+def test_ship_slice_owner_chain_respects_stop_owner_boundary(
+    tmp_path: Path, monkeypatch
+) -> None:
+    init_git_repo(tmp_path)
+    write_execution_config(
+        tmp_path,
+        accelerators_overrides={
+            "ship_slice": {
+                "execute_owner_chain": True,
+                "stop_on_owner": ["implementation"],
+            }
+        },
+        auto_start_implementation=False,
+    )
+    create_slice(
+        tmp_path,
+        monkeypatch,
+        "taw-ship-slice-loop",
+        "Add one-slice finishing and resume orchestration",
+        "blueprint_ready",
+    )
+
+    result = run_cli(tmp_path, "taw-ship-slice-loop", "--json")
+
+    assert result.returncode == 0
+    payload = json.loads(result.stdout)
+    assert payload["slice_status"] == "blueprint_ready"
+    assert payload["next_owner"] == "implementation"
+    assert payload["owner_chain"]["stop_reason"]["kind"] == "owner_stop"
+    assert payload["owner_chain"]["steps"] == []
+
+
+def test_ship_slice_owner_chain_reports_missing_required_input(
+    tmp_path: Path, monkeypatch
+) -> None:
+    init_git_repo(tmp_path)
+    write_execution_config(
+        tmp_path,
+        accelerators_overrides={
+            "ship_slice": {
+                "execute_owner_chain": True,
+            }
+        },
+    )
+    create_slice(
+        tmp_path,
+        monkeypatch,
+        "taw-ship-slice-loop",
+        "Add one-slice finishing and resume orchestration",
+        "brief_ready",
+    )
+    slice_dir = tmp_path / "slices" / "taw-ship-slice-loop-add-one-slice-finishing-and-resume-orchestration"
+    blueprint_path = slice_dir / "blueprint.md"
+    if blueprint_path.exists():
+        blueprint_path.unlink()
+
+    result = run_cli(tmp_path, "taw-ship-slice-loop", "--json")
+
+    assert result.returncode == 0
+    payload = json.loads(result.stdout)
+    assert payload["slice_status"] == "brief_ready"
+    assert payload["next_owner"] == "blueprint"
+    assert payload["owner_chain"]["stop_reason"]["kind"] == "missing_required_input"
+
+
+def test_ship_slice_owner_chain_reports_commit_checkpoint(
+    tmp_path: Path, monkeypatch
+) -> None:
+    init_git_repo(tmp_path)
+    write_execution_config(
+        tmp_path,
+        accelerators_overrides={
+            "ship_slice": {
+                "execute_owner_chain": True,
+            }
+        },
+    )
+    create_slice(
+        tmp_path,
+        monkeypatch,
+        "taw-ship-slice-loop",
+        "Add one-slice finishing and resume orchestration",
+        "closed",
+    )
+    (tmp_path / "scratch.txt").write_text("dirty\n", encoding="utf-8")
+
+    result = run_cli(tmp_path, "taw-ship-slice-loop", "--json")
+
+    assert result.returncode == 0
+    payload = json.loads(result.stdout)
+    assert payload["next_owner"] == "commit"
+    assert payload["action"] == "commit_completed_slice"
+    assert payload["owner_chain"]["stop_reason"]["kind"] == "commit_checkpoint"

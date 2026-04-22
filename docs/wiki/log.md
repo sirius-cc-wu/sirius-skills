@@ -41,3 +41,10 @@ grep-friendly.
 - Added structured owner-chain boundary reporting and checkpoint/event-log context for approval, explicit owner stops, and validation/missing-input stops.
 - Added focused tests in `skills/autoplan/tests/test_autoplan.py` for owner-chain happy path and stop boundaries.
 - Updated autoplan skill docs and throughput/two-step wiki pages to reflect planning-side owner-chain implementation status.
+
+## [2026-04-23] implementation-synthesis | ship-slice owner-chain
+
+- Implemented optional execution owner-chain routing in `skills/ship-slice/scripts/ship_slice.py` with config/CLI controls (`execute_owner_chain`, `stop_on_owner`).
+- Added structured stop context for review boundaries, verification/missing-input failures, explicit owner stops, and commit checkpoints.
+- Added focused tests in `skills/ship-slice/tests/test_ship_slice.py` covering owner-chain advancement, stop boundaries, and deterministic checkpoint behavior.
+- Updated ship-slice skill docs and two-step throughput wiki pages to reflect execution-side owner-chain implementation status.

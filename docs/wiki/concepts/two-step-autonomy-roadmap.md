@@ -9,16 +9,16 @@ Reduce orchestration friction from many manual commands to two high-level steps:
 
 ## Current Gap
 
-Current accelerator skills are split across planning and execution maturity:
+Current accelerator skills now support owner-chain orchestration in both layers:
 
 - `autoplan` can now optionally execute the planning owner chain and stop with
   structured boundary context.
 - `ship` resolves backlog and can bootstrap/delegate.
-- `ship-slice` resolves one active slice and checkpoints, but does not execute
-  owner workflows itself.
+- `ship-slice` can now optionally execute one-slice execution owner-chain
+  routing and stop with structured boundary context.
 
-This means planning can now run as one step, while execution still requires
-manual follow-up between owners.
+Remaining gaps are around explicit approval-gate hardening and richer readiness
+dashboards rather than basic chain routing.
 
 ## Target Operating Model
 
@@ -74,10 +74,9 @@ Use additive flags under existing typed configs:
 
 ## Incremental Delivery Plan
 
-1. Extend `ship-slice` with owner-chain execution behind config flag.
-2. Add machine-readable "readiness dashboard" outputs for both steps.
-3. Add tests for execution owner-chain happy path, stop boundaries, resume semantics, and stale
-   checkpoint reconciliation.
+1. Add machine-readable "readiness dashboard" outputs for both steps.
+2. Add explicit approval-gate and transition-guardrail enforcement across planning/execution handoff.
+3. Extend execution chain controls for optional auto-close/auto-commit only after guardrails are in place.
 
 ## Main Sources
 

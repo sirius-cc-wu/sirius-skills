@@ -42,6 +42,22 @@ from workflow_runtime import (  # noqa: E402
 DEFAULT_RUNTIME_DIR = Path(".skills/runtime")
 DEFAULT_LEARNINGS_PATH = Path(".skills/learnings.jsonl")
 
+CHAIN_TARGET_STATUS_BY_STATE = {
+    "draft": "brief_ready",
+    "brief_ready": "blueprint_ready",
+    "blueprint_ready": "execution_ready",
+}
+
+VALID_STOP_OWNERS = {
+    "brief",
+    "blueprint",
+    "implementation",
+    "review-execution",
+    "commit",
+    "guide-execution",
+    "none",
+}
+
 
 @dataclass
 class SliceRoute:
@@ -89,6 +105,28 @@ def parse_args(argv: Sequence[str] | None = None) -> argparse.Namespace:
         action="store_true",
         help="Render machine-readable output.",
     )
+    parser.set_defaults(execute_owner_chain=None)
+    parser.add_argument(
+        "--execute-owner-chain",
+        dest="execute_owner_chain",
+        action="store_true",
+        help=(
+            "Execute one-slice owner chain through brief/blueprint/implementation routing "
+            "until a review or checkpoint boundary."
+        ),
+    )
+    parser.add_argument(
+        "--no-execute-owner-chain",
+        dest="execute_owner_chain",
+        action="store_false",
+        help="Disable owner-chain execution even when enabled in execution config.",
+    )
+    parser.add_argument(
+        "--stop-on-owner",
+        action="append",
+        default=None,
+        help="Owner boundary to stop before executing (repeatable).",
+    )
     return parser.parse_args(argv)
 
 
@@ -127,7 +165,7 @@ def runtime_paths(repo_root: Path) -> tuple[Path, Path, Path]:
 
 def inspect_slice_artifacts(slice_row: Dict[str, Any], execution_module, scope_context) -> Dict[str, bool]:
     slice_path = execution_module.slice_path_for_row(slice_row, scope_context=scope_context)
-    return execution_module.validate_slice(slice_row, scope_context=scope_context)[2] | {
+    return execution_module.validate_slice(slice_row, skip_metadata_status_check=True)[2] | {
         "slice_path_exists": slice_path.is_dir()
     }
 
@@ -138,6 +176,7 @@ def build_route(
     target_type: str,
     target_id: str,
     repo_root: Path,
+    owner_chain_mode: bool = False,
 ) -> SliceRoute:
     status = str(slice_row["status"])
     dirty_paths = git_dirty_paths(repo_root)
@@ -147,9 +186,15 @@ def build_route(
     elif status == "brief_ready":
         next_owner = "blueprint"
         action = "create_or_update_blueprint"
-    elif status in {"blueprint_ready", "execution_ready"}:
+    elif status == "blueprint_ready" and owner_chain_mode:
+        next_owner = "implementation"
+        action = "promote_to_execution_ready"
+    elif status in {"blueprint_ready", "execution_ready"} and not owner_chain_mode:
         next_owner = "implementation"
         action = "implement_validate_review_and_close"
+    elif status == "execution_ready" and owner_chain_mode:
+        next_owner = "review-execution"
+        action = "run_review_execution"
     elif status == "closed" and dirty_paths:
         next_owner = "commit"
         action = "commit_completed_slice"
@@ -195,7 +240,7 @@ def resolve_slice(
     args: argparse.Namespace,
     execution_module,
     checkpoint_path: Path,
-) -> tuple[Dict[str, Any], str, str, Optional[CheckpointRecord]]:
+) -> tuple[list[dict[str, Any]], Dict[str, Any], str, str, object, Optional[CheckpointRecord]]:
     scope_context = execution_module.resolve_execution_scope_context()
     rows = execution_module.parse_registry(scope_context=scope_context)
     handoff, checkpoint = resolve_input_payload(args, checkpoint_path)
@@ -224,7 +269,186 @@ def resolve_slice(
         raise RuntimeError("No active or requested execution slice could be resolved.")
     if not target_id:
         target_id = str(row["id"])
-    return row, target_type, target_id, checkpoint
+    return rows, row, target_type, target_id, scope_context, checkpoint
+
+
+def normalize_owner_name(raw_owner: str) -> str:
+    return raw_owner.strip().lower().replace("_", "-")
+
+
+def parse_stop_on_owners(raw_value: object) -> list[str]:
+    if raw_value is None:
+        return []
+    if isinstance(raw_value, str):
+        candidates: list[str] = [raw_value]
+    elif isinstance(raw_value, list):
+        candidates = []
+        for item in raw_value:
+            if not isinstance(item, str):
+                raise RuntimeError("ship-slice stop_on_owner entries must be strings.")
+            candidates.append(item)
+    else:
+        raise RuntimeError("ship-slice stop_on_owner must be a string or list of strings.")
+
+    normalized: list[str] = []
+    for candidate in candidates:
+        owner = normalize_owner_name(candidate)
+        if not owner:
+            continue
+        if owner not in VALID_STOP_OWNERS:
+            raise RuntimeError(
+                "Invalid ship-slice stop_on_owner value "
+                f"'{candidate}'. Valid owners: {sorted(VALID_STOP_OWNERS)}"
+            )
+        if owner not in normalized:
+            normalized.append(owner)
+    return normalized
+
+
+def classify_owner_chain_stop_kind(message: str) -> str:
+    lowered = message.lower()
+    if (
+        "missing_" in lowered
+        or "_without_" in lowered
+        or "missing " in lowered
+        or "without_" in lowered
+        or "without " in lowered
+        or "status_mismatch" in lowered
+    ):
+        return "missing_required_input"
+    if "invalid status transition" in lowered:
+        return "invalid_transition"
+    return "verification_failed"
+
+
+def execute_owner_chain(
+    rows: list[dict[str, Any]],
+    slice_row: Dict[str, Any],
+    *,
+    execution_module,
+    scope_context,
+    target_type: str,
+    target_id: str,
+    repo_root: Path,
+    stop_on_owner: list[str],
+) -> tuple[SliceRoute, list[dict[str, Any]], Optional[dict[str, Any]]]:
+    steps: list[dict[str, Any]] = []
+
+    for _ in range(len(CHAIN_TARGET_STATUS_BY_STATE) + 3):
+        route = build_route(
+            slice_row,
+            target_type=target_type,
+            target_id=target_id,
+            repo_root=repo_root,
+            owner_chain_mode=True,
+        )
+        current_status = route.slice_status
+
+        if route.next_owner in stop_on_owner:
+            return (
+                route,
+                steps,
+                {
+                    "kind": "owner_stop",
+                    "owner": route.next_owner,
+                    "status": current_status,
+                    "target_status": CHAIN_TARGET_STATUS_BY_STATE.get(current_status),
+                    "message": (
+                        f"Stopped before '{route.next_owner}' because it is configured in stop_on_owner."
+                    ),
+                },
+            )
+
+        if route.next_owner == "review-execution":
+            return (
+                route,
+                steps,
+                {
+                    "kind": "review_boundary",
+                    "owner": "review-execution",
+                    "status": current_status,
+                    "target_status": current_status,
+                    "message": "Reached review-execution boundary.",
+                },
+            )
+
+        if route.next_owner == "commit":
+            return (
+                route,
+                steps,
+                {
+                    "kind": "commit_checkpoint",
+                    "owner": "commit",
+                    "status": current_status,
+                    "target_status": current_status,
+                    "message": "Closed slice requires commit checkpoint before continuing.",
+                },
+            )
+
+        if route.next_owner in {"none", "guide-execution"}:
+            return route, steps, None
+
+        target_status = CHAIN_TARGET_STATUS_BY_STATE.get(current_status)
+        if target_status is None:
+            return route, steps, None
+
+        success, message = execution_module.update_slice_status(
+            rows,
+            slice_row,
+            target_status,
+        )
+        next_status = str(slice_row["status"])
+        advanced = next_status != current_status
+        steps.append(
+            {
+                "owner": route.next_owner,
+                "from_status": current_status,
+                "target_status": target_status,
+                "success": bool(success),
+                "advanced": advanced,
+                "result_status": next_status,
+                "message": message,
+            }
+        )
+
+        if not success or not advanced:
+            failure_route = build_route(
+                slice_row,
+                target_type=target_type,
+                target_id=target_id,
+                repo_root=repo_root,
+                owner_chain_mode=True,
+            )
+            return (
+                failure_route,
+                steps,
+                {
+                    "kind": classify_owner_chain_stop_kind(message),
+                    "owner": route.next_owner,
+                    "status": next_status,
+                    "target_status": target_status,
+                    "message": message,
+                },
+            )
+
+    safety_route = build_route(
+        slice_row,
+        target_type=target_type,
+        target_id=target_id,
+        repo_root=repo_root,
+        owner_chain_mode=True,
+    )
+    return (
+        safety_route,
+        steps,
+        {
+            "kind": "safety_stop",
+            "owner": safety_route.next_owner,
+            "status": safety_route.slice_status,
+            "target_status": None,
+            "message": "Stopped owner-chain due to unexpected loop safety boundary.",
+        },
+    )
 
 
 def write_runtime_records(
@@ -234,8 +458,9 @@ def write_runtime_records(
     route: SliceRoute,
     dirty_paths: list[str],
     learnings: list[dict[str, Any]],
+    owner_chain: Optional[dict[str, Any]],
 ) -> None:
-    event = {
+    event: Dict[str, Any] = {
         "timestamp": utc_now(),
         "skill": "ship-slice",
         "slice_id": route.slice_id,
@@ -244,23 +469,34 @@ def write_runtime_records(
         "action": route.action,
         "target_id": route.target_id,
     }
+    if owner_chain is not None:
+        event["owner_chain_enabled"] = bool(owner_chain.get("enabled", False))
+        stop_reason = owner_chain.get("stop_reason")
+        if isinstance(stop_reason, dict):
+            event["owner_chain_stop_kind"] = stop_reason.get("kind")
+            event["owner_chain_stop_owner"] = stop_reason.get("owner")
     append_event(event_log_path, event)
+
+    checkpoint_payload: Dict[str, Any] = {
+        "slice_id": route.slice_id,
+        "slice_path": route.slice_path,
+        "slice_status": route.slice_status,
+        "target_type": route.target_type,
+        "target_id": route.target_id,
+        "next_owner": route.next_owner,
+        "dirty_worktree_paths": list(dirty_paths),
+        "handoff_payload": dict(route.handoff_payload),
+        "learning_ids": [item["id"] for item in learnings],
+    }
+    if owner_chain is not None:
+        checkpoint_payload["owner_chain"] = owner_chain
+
     write_checkpoint(
         checkpoint_path,
         CheckpointRecord(
             run_id="ship-slice-active",
             state=route.action,
-            payload={
-                "slice_id": route.slice_id,
-                "slice_path": route.slice_path,
-                "slice_status": route.slice_status,
-                "target_type": route.target_type,
-                "target_id": route.target_id,
-                "next_owner": route.next_owner,
-                "dirty_worktree_paths": list(dirty_paths),
-                "handoff_payload": dict(route.handoff_payload),
-                "learning_ids": [item["id"] for item in learnings],
-            },
+            payload=checkpoint_payload,
         ),
     )
 
@@ -272,7 +508,7 @@ def main(argv: Sequence[str] | None = None) -> int:
     checkpoint_path, event_log_path, learnings_path = runtime_paths(repo_root)
 
     try:
-        slice_row, target_type, target_id, prior_checkpoint = resolve_slice(
+        rows, slice_row, target_type, target_id, scope_context, prior_checkpoint = resolve_slice(
             args,
             execution_module,
             checkpoint_path,
@@ -281,12 +517,64 @@ def main(argv: Sequence[str] | None = None) -> int:
         print(str(exc), file=sys.stderr)
         return 2
 
-    route = build_route(
-        slice_row,
-        target_type=target_type,
-        target_id=target_id,
-        repo_root=repo_root,
+    raw_config = execution_module.load_raw_config(required=False, scope_context=scope_context)
+    accelerators = raw_config.get("accelerators", {}) if isinstance(raw_config, dict) else {}
+    ship_slice_config = accelerators.get("ship_slice", {}) if isinstance(accelerators, dict) else {}
+
+    try:
+        config_execute_owner_chain = (
+            bool(ship_slice_config.get("execute_owner_chain", False))
+            if isinstance(ship_slice_config, dict)
+            else False
+        )
+        config_stop_on_owner = parse_stop_on_owners(
+            ship_slice_config.get("stop_on_owner") if isinstance(ship_slice_config, dict) else None
+        )
+    except RuntimeError as exc:
+        print(str(exc), file=sys.stderr)
+        return 2
+
+    execute_owner_chain_enabled = (
+        config_execute_owner_chain
+        if args.execute_owner_chain is None
+        else bool(args.execute_owner_chain)
     )
+    try:
+        stop_on_owner = (
+            config_stop_on_owner
+            if args.stop_on_owner is None
+            else parse_stop_on_owners(args.stop_on_owner)
+        )
+    except RuntimeError as exc:
+        print(str(exc), file=sys.stderr)
+        return 2
+
+    owner_chain: Optional[dict[str, Any]] = None
+    if execute_owner_chain_enabled:
+        route, steps, stop_reason = execute_owner_chain(
+            rows,
+            slice_row,
+            execution_module=execution_module,
+            scope_context=scope_context,
+            target_type=target_type,
+            target_id=target_id,
+            repo_root=repo_root,
+            stop_on_owner=stop_on_owner,
+        )
+        owner_chain = {
+            "enabled": True,
+            "stop_on_owner": stop_on_owner,
+            "steps": steps,
+            "stop_reason": stop_reason,
+        }
+    else:
+        route = build_route(
+            slice_row,
+            target_type=target_type,
+            target_id=target_id,
+            repo_root=repo_root,
+            owner_chain_mode=False,
+        )
 
     checkpoint_stale_reason = None
     if prior_checkpoint is not None:
@@ -312,6 +600,7 @@ def main(argv: Sequence[str] | None = None) -> int:
         route=route,
         dirty_paths=dirty_paths,
         learnings=learnings,
+        owner_chain=owner_chain,
     )
 
     payload = {
@@ -324,6 +613,8 @@ def main(argv: Sequence[str] | None = None) -> int:
         "target_type": route.target_type,
         "target_id": route.target_id,
         "handoff_payload": route.handoff_payload,
+        "execute_owner_chain": execute_owner_chain_enabled,
+        "owner_chain": owner_chain,
         "checkpoint_path": str(checkpoint_path),
         "event_log_path": str(event_log_path),
         "dirty_worktree_paths": dirty_paths,
