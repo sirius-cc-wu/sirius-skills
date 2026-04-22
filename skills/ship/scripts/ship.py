@@ -3,12 +3,14 @@
 from __future__ import annotations
 
 import argparse
+import hashlib
 import importlib.util
 import json
 import subprocess
 import sys
 import tempfile
 from dataclasses import asdict, dataclass
+from datetime import datetime, timezone
 from pathlib import Path
 from typing import Dict, List, Optional, Sequence, Tuple
 
@@ -28,6 +30,16 @@ ARTIFACT_INVENTORY_SCRIPT = (
     SKILLS_DIR / "audit-artifacts" / "scripts" / "artifact_inventory.py"
 )
 SHIP_SLICE_SCRIPT = SKILLS_DIR / "ship-slice" / "scripts" / "ship_slice.py"
+APPROVAL_GATE_FILE = ".approval-gate.json"
+APPROVAL_FINGERPRINT_FILES = (
+    "discover.md",
+    "system-design.md",
+    "ui-design.md",
+    "slice-planning.md",
+    "slice-traceability.md",
+    "user-stories.md",
+    "reference-research.md",
+)
 
 if REPO_LIB_DIR.is_dir() and str(REPO_LIB_DIR) not in sys.path:
     sys.path.insert(0, str(REPO_LIB_DIR))
@@ -63,6 +75,7 @@ class BacklogResolution:
     active_execution_slices: List[str]
     entries: List[PlannedSliceBacklogEntry]
     active_slice_handoff: Optional[Dict[str, object]]
+    approval_gate: Dict[str, object]
 
     def to_dict(self) -> Dict[str, object]:
         return {
@@ -79,6 +92,7 @@ class BacklogResolution:
             "active_slice_handoff": dict(self.active_slice_handoff)
             if self.active_slice_handoff is not None
             else None,
+            "approval_gate": dict(self.approval_gate),
         }
 
 
@@ -125,6 +139,150 @@ def load_module(script_path: Path, name: str):
     sys.modules[name] = module
     spec.loader.exec_module(module)
     return module
+
+
+def utc_now() -> str:
+    return datetime.now(timezone.utc).replace(microsecond=0).isoformat()
+
+
+def approval_gate_path(target_dir: Path) -> Path:
+    return target_dir / APPROVAL_GATE_FILE
+
+
+def compute_planning_fingerprint(target_dir: Path) -> str:
+    hasher = hashlib.sha256()
+    for filename in APPROVAL_FINGERPRINT_FILES:
+        path = target_dir / filename
+        if not path.is_file():
+            continue
+        hasher.update(f"FILE:{filename}\n".encode("utf-8"))
+        hasher.update(path.read_bytes())
+        hasher.update(b"\n")
+    return hasher.hexdigest()
+
+
+def read_approval_record(path: Path) -> Optional[Dict[str, object]]:
+    if not path.is_file():
+        return None
+    try:
+        payload = json.loads(path.read_text(encoding="utf-8"))
+    except json.JSONDecodeError:
+        return {"_parse_error": True}
+    if not isinstance(payload, dict):
+        return {"_parse_error": True}
+    return payload
+
+
+def evaluate_approval_gate(
+    *,
+    target_id: str,
+    target_path: str,
+    target_dir: Path,
+    planning_metadata: Dict[str, object],
+) -> Dict[str, object]:
+    planning_status = str(planning_metadata["status"])
+    gate_path = approval_gate_path(target_dir)
+    gate_payload: Dict[str, object] = {
+        "required": planning_status == "planning_reviewed",
+        "decision": "not_required",
+        "reason": None,
+        "planning_status": planning_status,
+        "planning_updated_at": str(planning_metadata.get("updated_at") or ""),
+        "approval_path": str(gate_path),
+    }
+    if planning_status != "planning_reviewed":
+        return gate_payload
+
+    current_fingerprint = compute_planning_fingerprint(target_dir)
+    record = read_approval_record(gate_path)
+    gate_payload["current_planning_fingerprint"] = current_fingerprint
+
+    if record is None:
+        gate_payload["decision"] = "waiting_approval"
+        gate_payload["reason"] = "approval_not_recorded"
+        return gate_payload
+    if record.get("_parse_error"):
+        gate_payload["decision"] = "invalidated"
+        gate_payload["reason"] = "approval_record_invalid"
+        return gate_payload
+
+    gate_payload["approval_record"] = dict(record)
+    gate_payload["approved_at"] = record.get("approved_at")
+    gate_payload["approval_note"] = record.get("approval_note")
+
+    if not bool(record.get("approved")):
+        gate_payload["decision"] = "waiting_approval"
+        gate_payload["reason"] = "approval_not_granted"
+        return gate_payload
+    if str(record.get("target_id") or "") != target_id:
+        gate_payload["decision"] = "invalidated"
+        gate_payload["reason"] = "target_mismatch"
+        return gate_payload
+    if str(record.get("target_path") or "") != target_path:
+        gate_payload["decision"] = "invalidated"
+        gate_payload["reason"] = "target_path_mismatch"
+        return gate_payload
+    if str(record.get("planning_status") or "") != "planning_reviewed":
+        gate_payload["decision"] = "invalidated"
+        gate_payload["reason"] = "planning_status_mismatch"
+        return gate_payload
+    if str(record.get("planning_updated_at") or "") != str(
+        planning_metadata.get("updated_at") or ""
+    ):
+        gate_payload["decision"] = "invalidated"
+        gate_payload["reason"] = "planning_metadata_changed"
+        return gate_payload
+    if str(record.get("planning_fingerprint") or "") != current_fingerprint:
+        gate_payload["decision"] = "invalidated"
+        gate_payload["reason"] = "planning_artifacts_changed"
+        return gate_payload
+
+    gate_payload["decision"] = "approved"
+    gate_payload["reason"] = "approval_valid"
+    return gate_payload
+
+
+def record_approval_decision(
+    selector: str,
+    *,
+    explicit_scope: Optional[str] = None,
+    approval_note: Optional[str] = None,
+) -> Dict[str, object]:
+    planning_module = load_module(GUIDE_PLANNING_SCRIPT, "manage_planning")
+    feature, feature_dir, metadata, _, _ = resolve_target(
+        planning_module,
+        selector,
+        explicit_scope=explicit_scope,
+    )
+    if str(metadata["status"]) != "planning_reviewed":
+        raise RuntimeError(
+            "Approval can be recorded only when planning status is "
+            f"'planning_reviewed'. Current status: '{metadata['status']}'."
+        )
+
+    target_dir = Path(feature_dir)
+    path = approval_gate_path(target_dir)
+    note = approval_note.strip() if isinstance(approval_note, str) else ""
+    payload: Dict[str, object] = {
+        "version": 1,
+        "approved": True,
+        "approved_at": utc_now(),
+        "target_id": str(feature["feature"]),
+        "target_path": str(feature["path"]),
+        "planning_status": str(metadata["status"]),
+        "planning_updated_at": str(metadata.get("updated_at") or ""),
+        "planning_fingerprint": compute_planning_fingerprint(target_dir),
+        "approval_note": note or None,
+    }
+    path.write_text(json.dumps(payload, indent=2) + "\n", encoding="utf-8")
+    return {
+        "recorded": True,
+        "approval_path": str(path),
+        "target_id": str(feature["feature"]),
+        "target_path": str(feature["path"]),
+        "approved_at": payload["approved_at"],
+        "approval_note": payload["approval_note"],
+    }
 
 
 def _split_table_row(line: str) -> List[str]:
@@ -600,6 +758,13 @@ def resolve_backlog(selector: str, explicit_scope: Optional[str] = None) -> Back
                 scope_context=scope_context,
             )
 
+    approval_gate = evaluate_approval_gate(
+        target_id=str(feature["feature"]),
+        target_path=str(feature["path"]),
+        target_dir=target_dir_path,
+        planning_metadata=metadata,
+    )
+
     return BacklogResolution(
         target_type=target_type,
         target_id=str(feature["feature"]),
@@ -612,6 +777,7 @@ def resolve_backlog(selector: str, explicit_scope: Optional[str] = None) -> Back
         active_execution_slices=active_execution_slices,
         entries=entries,
         active_slice_handoff=active_slice_handoff,
+        approval_gate=approval_gate,
     )
 
 
@@ -777,6 +943,13 @@ def bootstrap_next_slice(
         next_planned_slice_id,
     )
     refreshed_backlog = resolve_backlog(selector, explicit_scope=explicit_scope)
+    approval_required = require_approval_checkpoint(
+        refreshed_backlog,
+        scope_context=scope_context,
+        execution_module=execution_module,
+    )
+    if approval_required is not None:
+        return approval_required
     delegate_result = maybe_delegate_to_ship_slice(
         refreshed_backlog,
         scope_context=scope_context,
@@ -828,6 +1001,13 @@ def resume_execution(
             raise RuntimeError(
                 f"Mapped active execution slice could not be resolved: {active_slice_id}"
             )
+        approval_required = require_approval_checkpoint(
+            backlog,
+            scope_context=scope_context,
+            execution_module=execution_module,
+        )
+        if approval_required is not None:
+            return approval_required
         delegate_result = maybe_delegate_to_ship_slice(
             backlog,
             scope_context=scope_context,
@@ -920,6 +1100,35 @@ def require_commit_checkpoint(
     )
 
 
+def require_approval_checkpoint(
+    backlog: BacklogResolution, *, scope_context, execution_module
+) -> Optional[BootstrapResult]:
+    if backlog.active_slice_handoff is None:
+        return None
+    ship_config = ship_accelerator_config(scope_context, execution_module)
+    if not bool(ship_config.get("delegate_to_ship_slice", False)):
+        return None
+
+    gate = backlog.approval_gate
+    if not bool(gate.get("required")):
+        return None
+    if str(gate.get("decision")) == "approved":
+        return None
+
+    return BootstrapResult(
+        backlog=backlog,
+        bootstrapped_slice_id=None,
+        bootstrapped_slice_path=None,
+        slice_status=None,
+        checkpoint_slice_id=None,
+        dirty_worktree_paths=[],
+        next_owner="approval",
+        completed=False,
+        action="approval_required",
+        delegate_result=None,
+    )
+
+
 def ship_accelerator_config(scope_context, execution_module) -> Dict[str, object]:
     raw_config = execution_module.load_raw_config(required=False, scope_context=scope_context)
     accelerators = raw_config.get("accelerators", {})
@@ -1000,14 +1209,28 @@ def build_parser() -> argparse.ArgumentParser:
         action="store_true",
         help="Resume an active mapped slice or bootstrap the next ready slice.",
     )
+    parser.add_argument(
+        "--approve",
+        action="store_true",
+        help=(
+            "Record durable approval for a planning_reviewed target so delegated "
+            "execution autopilot can proceed."
+        ),
+    )
+    parser.add_argument(
+        "--approval-note",
+        help="Optional note recorded with the approval decision.",
+    )
     parser.add_argument("--json", action="store_true", help="Emit machine-readable output.")
     return parser
 
 
 def render_text(result: BacklogResolution) -> str:
+    gate = result.approval_gate
     lines = [
         f"Target: {result.target_type} {result.target_id}",
         f"Planning status: {result.planning_status}",
+        f"Approval gate: {gate.get('decision')}",
         f"Path: {result.target_path}",
         f"Increment order: {', '.join(result.increment_order) if result.increment_order else '-'}",
         f"Current increment: {result.current_increment or '-'}",
@@ -1017,6 +1240,9 @@ def render_text(result: BacklogResolution) -> str:
         "",
         "Planned slices:",
     ]
+    gate_reason = str(gate.get("reason") or "").strip()
+    if gate_reason:
+        lines.insert(3, f"Approval reason: {gate_reason}")
     for entry in result.entries:
         suffix = ""
         if entry.depends_on:
@@ -1089,6 +1315,14 @@ def render_bootstrap_text(result: BootstrapResult) -> str:
                 *[f"- {path}" for path in result.dirty_worktree_paths],
             ]
         )
+    elif result.action == "approval_required":
+        lines.extend(
+            [
+                "",
+                "Approval checkpoint required before delegated execution starts.",
+                f"Next owner: {result.next_owner}",
+            ]
+        )
     elif result.completed:
         lines.extend(["", "All planned slices are already completed."])
     else:
@@ -1102,7 +1336,14 @@ def main() -> int:
     if args.bootstrap_next and args.resume:
         print("Choose either --bootstrap-next or --resume, not both.", file=sys.stderr)
         return 2
+    approval_record: Optional[Dict[str, object]] = None
     try:
+        if args.approve:
+            approval_record = record_approval_decision(
+                args.target,
+                explicit_scope=args.scope,
+                approval_note=args.approval_note,
+            )
         if args.resume:
             result = resume_execution(args.target, explicit_scope=args.scope)
         elif args.bootstrap_next:
@@ -1115,8 +1356,15 @@ def main() -> int:
 
     if args.json:
         payload = result.to_dict() if hasattr(result, "to_dict") else result
+        if approval_record is not None and isinstance(payload, dict):
+            payload["approval_recorded"] = approval_record
         print(json.dumps(payload, indent=2))
     else:
+        if approval_record is not None:
+            print(
+                "Recorded approval at "
+                f"{approval_record['approval_path']} ({approval_record['approved_at']})."
+            )
         if isinstance(result, BootstrapResult):
             print(render_bootstrap_text(result))
         else:

@@ -48,3 +48,10 @@ grep-friendly.
 - Added structured stop context for review boundaries, verification/missing-input failures, explicit owner stops, and commit checkpoints.
 - Added focused tests in `skills/ship-slice/tests/test_ship_slice.py` covering owner-chain advancement, stop boundaries, and deterministic checkpoint behavior.
 - Updated ship-slice skill docs and two-step throughput wiki pages to reflect execution-side owner-chain implementation status.
+
+## [2026-04-23] implementation-synthesis | two-step approval gate
+
+- Implemented durable approval-gate records in `skills/ship/scripts/ship.py` using per-target `.approval-gate.json` markers.
+- Added `ship --approve [--approval-note]` to record explicit execution approval for `planning_reviewed` targets.
+- Enforced approval before delegated execution autopilot (`ship` -> `ship-slice`) and invalidated prior approvals automatically when planning artifacts change.
+- Added focused `ship` tests for approval-required delegation and post-approval invalidation behavior.

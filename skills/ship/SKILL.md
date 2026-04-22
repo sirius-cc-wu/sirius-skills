@@ -46,6 +46,12 @@ The fourth slice adds per-slice commit checkpoints:
 14. Report when an increment is complete and execution is moving on to the next
     increment.
 
+The fifth slice adds explicit two-step approval gating for delegated autopilot:
+
+15. Record durable approval decisions for `planning_reviewed` targets.
+16. Require a valid approval record before delegating into `ship-slice` autopilot.
+17. Invalidate approval automatically when planning artifacts change after approval.
+
 ## Preferred Input
 
 - a feature slug, subfeature slug, or planning packet path
@@ -58,6 +64,7 @@ python3 skills/ship/scripts/ship.py <target>
 python3 skills/ship/scripts/ship.py <target> --json
 python3 skills/ship/scripts/ship.py <target> --bootstrap-next
 python3 skills/ship/scripts/ship.py <target> --resume
+python3 skills/ship/scripts/ship.py <target> --approve --approval-note "approved for execution"
 python3 skills/ship/scripts/ship.py <target> --scope apps/payments
 ```
 
@@ -80,6 +87,8 @@ python3 skills/ship/scripts/ship.py <target> --scope apps/payments
 - Keep one-slice execution ownership in the existing `slice`, `brief`,
   `blueprint`, `guide-execution`, `review-execution`, `close-slice`, and
   `commit` skills.
+- Keep explicit human approval as a durable gate before delegated execution
+  autopilot starts from `planning_reviewed`.
 - Route to the next concrete owner, but do not absorb artifact authoring or
   closure logic that belongs to those owner skills.
 - Keep any machine-readable handoff payload derived from existing planning and

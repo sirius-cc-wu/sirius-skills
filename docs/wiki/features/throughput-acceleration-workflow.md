@@ -95,8 +95,9 @@ Current status:
   (`accelerators.autoplan.execute_owner_chain`, `stop_on_owner`)
 - execution step now has owner-chain routing in `ship-slice` behind
   `accelerators.ship_slice.execute_owner_chain` and `stop_on_owner`
-- explicit approval-gate hardening and readiness dashboards remain follow-up
-  work
+- delegated execution now enforces an explicit durable approval gate from
+  `planning_reviewed` via `ship --approve` before autopilot handoff
+- readiness dashboards remain follow-up work
 
 Roadmap link:
 

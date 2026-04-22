@@ -17,8 +17,8 @@ Current accelerator skills now support owner-chain orchestration in both layers:
 - `ship-slice` can now optionally execute one-slice execution owner-chain
   routing and stop with structured boundary context.
 
-Remaining gaps are around explicit approval-gate hardening and richer readiness
-dashboards rather than basic chain routing.
+Remaining gaps are around richer readiness dashboards and broader transition
+guardrail coverage rather than basic chain routing.
 
 ## Target Operating Model
 
@@ -75,7 +75,7 @@ Use additive flags under existing typed configs:
 ## Incremental Delivery Plan
 
 1. Add machine-readable "readiness dashboard" outputs for both steps.
-2. Add explicit approval-gate and transition-guardrail enforcement across planning/execution handoff.
+2. Extend transition-guardrail enforcement across planning/execution handoff cases beyond current approval and checkpoint boundaries.
 3. Extend execution chain controls for optional auto-close/auto-commit only after guardrails are in place.
 
 ## Main Sources
