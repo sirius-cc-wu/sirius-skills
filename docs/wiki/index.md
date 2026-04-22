@@ -16,7 +16,7 @@ truth.
 | `features/installation-and-configuration.md` | Install/config ownership model plus split install mode implications. | `docs/features/installation-and-configuration/*` |
 | `features/hierarchical-scope-support.md` | Scope-resolution design for root+nested planning/execution workspaces. | `docs/features/hierarchical-scope-support/*` |
 | `features/cross-artifact-management.md` | Cross-artifact maintenance stack and parent-vs-child status delta. | `docs/features/cross-artifact-management/*` |
-| `features/workflow-state-consistency.md` | Shared semantic reconciliation model and invariant hardening. | `docs/features/workflow-state-consistency/*` |
+| `features/workflow-state-consistency.md` | Shared semantic reconciliation model, invariant hardening, and accelerator transition guardrail normalization. | `docs/features/workflow-state-consistency/*` |
 | `features/throughput-acceleration-workflow.md` | Optional accelerator layer for faster planning/execution loops. | `docs/features/throughput-acceleration-workflow/*` |
 
 ## Concepts

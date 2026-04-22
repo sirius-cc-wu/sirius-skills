@@ -24,7 +24,17 @@ if REPO_LIB_DIR.is_dir() and str(REPO_LIB_DIR) not in sys.path:
 if SKILL_LIB_DIR.is_dir() and str(SKILL_LIB_DIR) not in sys.path:
     sys.path.append(str(SKILL_LIB_DIR))
 
-from workflow_runtime import CheckpointRecord, append_event, load_checkpoint, mark_checkpoint_stale, query_learnings, write_checkpoint  # noqa: E402
+from workflow_runtime import (  # noqa: E402
+    CheckpointRecord,
+    append_event,
+    build_accelerator_readiness,
+    classify_stop_reason_from_message,
+    load_checkpoint,
+    mark_checkpoint_stale,
+    normalize_stop_reason,
+    query_learnings,
+    write_checkpoint,
+)
 
 
 DEFAULT_RUNTIME_DIR = Path(".skills/runtime")
@@ -178,17 +188,6 @@ def parse_optional_review_note(raw_value: object) -> Optional[str]:
     return cleaned or None
 
 
-def classify_owner_chain_stop_kind(message: str) -> str:
-    lowered = message.lower()
-    if "missing required file" in lowered or "requires a non-empty review note" in lowered:
-        return "missing_required_input"
-    if "ambiguous" in lowered:
-        return "ambiguity"
-    if "invalid status transition" in lowered:
-        return "invalid_transition"
-    return "validation_failed"
-
-
 def execute_owner_chain(
     rows: list[dict[str, object]],
     feature: dict[str, object],
@@ -263,7 +262,9 @@ def execute_owner_chain(
                 next_status,
                 steps,
                 {
-                    "kind": classify_owner_chain_stop_kind(message),
+                    "kind": classify_stop_reason_from_message(
+                        message, stage="planning"
+                    ),
                     "owner": owner,
                     "status": next_status,
                     "target_status": target_status,
@@ -294,25 +295,15 @@ def execute_owner_chain(
     }
 
 
-def _dedupe(values: list[str]) -> list[str]:
-    result: list[str] = []
-    for value in values:
-        if value and value not in result:
-            result.append(value)
-    return result
-
-
 def build_readiness_payload(
     *,
     next_owner: str,
     owner_chain: Optional[dict[str, Any]],
 ) -> dict[str, Any]:
     blocked_by: list[str] = []
-    stop_reason = owner_chain.get("stop_reason") if isinstance(owner_chain, dict) else None
-    if isinstance(stop_reason, dict):
-        kind = str(stop_reason.get("kind") or "").strip()
-        if kind:
-            blocked_by.append(kind)
+    stop_reason = normalize_stop_reason(
+        owner_chain.get("stop_reason") if isinstance(owner_chain, dict) else None
+    )
 
     approval_required = next_owner == "approval"
     if approval_required:
@@ -320,22 +311,20 @@ def build_readiness_payload(
     if next_owner == "guide-planning":
         blocked_by.append("planning_resolution_required")
 
-    blocked_by = _dedupe(blocked_by)
-    can_proceed = not blocked_by and next_owner in AUTOMATABLE_OWNERS
-    return {
-        "can_proceed": can_proceed,
-        "next_owner": next_owner,
-        "blocked_by": blocked_by,
-        "stop_reason": stop_reason if isinstance(stop_reason, dict) else None,
-        "approval_gate": {
+    return build_accelerator_readiness(
+        next_owner=next_owner,
+        automatable_owners=AUTOMATABLE_OWNERS,
+        blocked_by=blocked_by,
+        stop_reason=stop_reason,
+        approval_gate={
             "required": approval_required,
             "state": "waiting_approval" if approval_required else "not_required",
         },
-        "commit_checkpoint": {
+        commit_checkpoint={
             "required": False,
             "state": "not_required",
         },
-    }
+    )
 
 
 def write_runtime_records(
@@ -458,7 +447,7 @@ def main(argv: Sequence[str] | None = None) -> int:
             "enabled": True,
             "stop_on_owner": stop_on_owner,
             "steps": steps,
-            "stop_reason": stop_reason,
+            "stop_reason": normalize_stop_reason(stop_reason),
         }
 
     next_owner, action = owner_for_status(planning_status)

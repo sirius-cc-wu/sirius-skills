@@ -105,6 +105,9 @@ Current status:
 - all three accelerator surfaces now emit a normalized `readiness` payload:
   `can_proceed`, `next_owner`, `blocked_by`, `stop_reason`,
   `approval_gate`, and `commit_checkpoint`
+- transition guardrail classification and readiness invariants are now
+  normalized through shared `workflow_runtime` helper logic used by
+  `autoplan`, `ship`, and `ship-slice`
 
 Roadmap link:
 

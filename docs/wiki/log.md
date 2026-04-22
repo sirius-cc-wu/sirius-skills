@@ -69,3 +69,11 @@ grep-friendly.
   `autoplan --execute-owner-chain` -> human review -> `ship --approve` -> `ship --resume`.
 - Clarified guide-path positioning: `guide-scope`, `guide-planning`, and `guide-execution` remain advanced/manual entrypoints rather than the default happy path.
 - Updated throughput synthesis, wiki index summary text, and `README.md` to reflect the same two-step entrypoint guidance consistently.
+
+## [2026-04-23] implementation-synthesis | accelerator transition guardrails
+
+- Added shared accelerator guardrail runtime in `lib/workflow_runtime/accelerator_guardrails.py` to centralize stop-reason classification, reason normalization, and readiness invariant construction.
+- Updated `autoplan`, `ship-slice`, and `ship` scripts to consume shared guardrail helpers instead of maintaining duplicated local classification/deduplication logic.
+- Synced shared `workflow_runtime` into packaged skill copies via `scripts/sync_shared_skill_runtime.py`.
+- Added focused shared guardrail tests (`skills/autoplan/tests/test_accelerator_guardrails.py`) and revalidated accelerator suites.
+- Updated roadmap/feature synthesis and skill guardrail docs to reflect implemented cross-accelerator transition normalization.

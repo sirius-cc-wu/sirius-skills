@@ -32,6 +32,18 @@ The feature targets high-confidence invariants first (for example, subfeature
 finalization and linked closed-slice consistency) while deferring broader
 heuristic enforcement.
 
+## Accelerator Guardrail Extension
+
+The consistency layer now also backs accelerator transition guardrails:
+
+- shared `lib/workflow_runtime/accelerator_guardrails.py` centralizes
+  stop-reason classification, reason normalization, and readiness invariant
+  construction.
+- `autoplan`, `ship-slice`, and `ship` consume the same guardrail helper for
+  deterministic `readiness.blocked_by` and normalized `stop_reason` payloads.
+- this removes duplicated stop-reason parsing logic across accelerators and
+  keeps approval/commit boundary semantics consistent in machine-readable output.
+
 ## Main Sources
 
 - `docs/features/workflow-state-consistency/discover.md`

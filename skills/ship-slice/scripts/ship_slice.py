@@ -31,8 +31,11 @@ from workflow_runtime import (  # noqa: E402
     CheckpointRecord,
     HandoffPayload,
     append_event,
+    build_accelerator_readiness,
+    classify_stop_reason_from_message,
     load_checkpoint,
     mark_checkpoint_stale,
+    normalize_stop_reason,
     query_learnings,
     read_handoff_payload,
     write_checkpoint,
@@ -306,22 +309,6 @@ def parse_stop_on_owners(raw_value: object) -> list[str]:
     return normalized
 
 
-def classify_owner_chain_stop_kind(message: str) -> str:
-    lowered = message.lower()
-    if (
-        "missing_" in lowered
-        or "_without_" in lowered
-        or "missing " in lowered
-        or "without_" in lowered
-        or "without " in lowered
-        or "status_mismatch" in lowered
-    ):
-        return "missing_required_input"
-    if "invalid status transition" in lowered:
-        return "invalid_transition"
-    return "verification_failed"
-
-
 def execute_owner_chain(
     rows: list[dict[str, Any]],
     slice_row: Dict[str, Any],
@@ -424,7 +411,9 @@ def execute_owner_chain(
                 failure_route,
                 steps,
                 {
-                    "kind": classify_owner_chain_stop_kind(message),
+                    "kind": classify_stop_reason_from_message(
+                        message, stage="execution"
+                    ),
                     "owner": route.next_owner,
                     "status": next_status,
                     "target_status": target_status,
@@ -452,25 +441,15 @@ def execute_owner_chain(
     )
 
 
-def _dedupe(values: list[str]) -> list[str]:
-    result: list[str] = []
-    for value in values:
-        if value and value not in result:
-            result.append(value)
-    return result
-
-
 def build_readiness_payload(
     *,
     route: SliceRoute,
     owner_chain: Optional[dict[str, Any]],
 ) -> dict[str, Any]:
     blocked_by: list[str] = []
-    stop_reason = owner_chain.get("stop_reason") if isinstance(owner_chain, dict) else None
-    if isinstance(stop_reason, dict):
-        kind = str(stop_reason.get("kind") or "").strip()
-        if kind:
-            blocked_by.append(kind)
+    stop_reason = normalize_stop_reason(
+        owner_chain.get("stop_reason") if isinstance(owner_chain, dict) else None
+    )
 
     commit_required = route.next_owner == "commit"
     if commit_required:
@@ -482,22 +461,20 @@ def build_readiness_payload(
     if route.next_owner == "none":
         blocked_by.append("completed")
 
-    blocked_by = _dedupe(blocked_by)
-    can_proceed = not blocked_by and route.next_owner in AUTOMATABLE_OWNERS
-    return {
-        "can_proceed": can_proceed,
-        "next_owner": route.next_owner,
-        "blocked_by": blocked_by,
-        "stop_reason": stop_reason if isinstance(stop_reason, dict) else None,
-        "approval_gate": {
+    return build_accelerator_readiness(
+        next_owner=route.next_owner,
+        automatable_owners=AUTOMATABLE_OWNERS,
+        blocked_by=blocked_by,
+        stop_reason=stop_reason,
+        approval_gate={
             "required": False,
             "state": "not_required",
         },
-        "commit_checkpoint": {
+        commit_checkpoint={
             "required": commit_required,
             "state": "waiting_commit" if commit_required else "not_required",
         },
-    }
+    )
 
 
 def write_runtime_records(
@@ -614,7 +591,7 @@ def main(argv: Sequence[str] | None = None) -> int:
             "enabled": True,
             "stop_on_owner": stop_on_owner,
             "steps": steps,
-            "stop_reason": stop_reason,
+            "stop_reason": normalize_stop_reason(stop_reason),
         }
     else:
         route = build_route(

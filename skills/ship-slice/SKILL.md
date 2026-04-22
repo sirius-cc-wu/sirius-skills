@@ -66,5 +66,7 @@ Optional CLI overrides:
 - Emit structured stop context for review boundaries, verification/missing-input
   failures, explicit owner stops, and commit checkpoints.
 - Stop at commit checkpoints instead of silently batching more work.
+- Keep stop-reason classification and readiness invariants aligned with shared
+  accelerator guardrail helpers in `workflow_runtime`.
 - Keep runtime files supplemental; do not rewrite planning or execution truth
   from checkpoint state.

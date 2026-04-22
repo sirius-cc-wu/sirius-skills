@@ -63,4 +63,6 @@ Optional CLI overrides:
 - Keep planning transitions owned by planning-layer validation and metadata.
 - Stop with structured context when owner-chain boundaries are hit (explicit
   stop owner, missing required input, validation failure, or approval).
+- Keep stop-reason classification and readiness invariants aligned with shared
+  accelerator guardrail helpers in `workflow_runtime`.
 - Prefer current planning artifacts over stale checkpoint context.

@@ -97,6 +97,9 @@ python3 skills/ship/scripts/ship.py <target> --scope apps/payments
   `commit` skills.
 - Keep explicit human approval as a durable gate before delegated execution
   autopilot starts from `planning_reviewed`.
+- Keep readiness and stop-reason guardrails aligned with the shared
+  `workflow_runtime` accelerator guardrail helper used by `autoplan` and
+  `ship-slice`.
 - Route to the next concrete owner, but do not absorb artifact authoring or
   closure logic that belongs to those owner skills.
 - Keep any machine-readable handoff payload derived from existing planning and

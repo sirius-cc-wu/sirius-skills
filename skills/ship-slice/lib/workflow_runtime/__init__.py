@@ -9,6 +9,13 @@ from workflow_runtime.learnings import (
     update_learning_state,
 )
 from workflow_runtime.locking import locked_file
+from workflow_runtime.accelerator_guardrails import (
+    build_accelerator_readiness,
+    classify_stop_reason_from_message,
+    dedupe_reason_codes,
+    normalize_reason_code,
+    normalize_stop_reason,
+)
 
 __all__ = [
     "CheckpointRecord",
@@ -16,9 +23,14 @@ __all__ = [
     "LearningRecord",
     "append_event",
     "append_learning",
+    "build_accelerator_readiness",
+    "classify_stop_reason_from_message",
+    "dedupe_reason_codes",
     "load_checkpoint",
     "locked_file",
     "mark_checkpoint_stale",
+    "normalize_reason_code",
+    "normalize_stop_reason",
     "query_learnings",
     "read_events",
     "read_handoff_payload",

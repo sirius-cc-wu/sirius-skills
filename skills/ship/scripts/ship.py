@@ -47,7 +47,12 @@ if REPO_LIB_DIR.is_dir() and str(REPO_LIB_DIR) not in sys.path:
 if SKILL_LIB_DIR.is_dir() and str(SKILL_LIB_DIR) not in sys.path:
     sys.path.append(str(SKILL_LIB_DIR))
 
-from workflow_runtime.handoff import HandoffPayload  # noqa: E402
+from workflow_runtime import (  # noqa: E402
+    HandoffPayload,
+    build_accelerator_readiness,
+    dedupe_reason_codes,
+    normalize_stop_reason,
+)
 
 
 @dataclass
@@ -134,14 +139,6 @@ class BootstrapResult:
         return payload
 
 
-def _dedupe(values: List[str]) -> List[str]:
-    result: List[str] = []
-    for value in values:
-        if value and value not in result:
-            result.append(value)
-    return result
-
-
 def _derive_next_owner(backlog: BacklogResolution) -> Optional[str]:
     if backlog.active_slice_handoff is not None:
         raw_owner = backlog.active_slice_handoff.get("next_owner")
@@ -191,19 +188,18 @@ def build_backlog_readiness(backlog: BacklogResolution) -> Dict[str, object]:
         else:
             blocked_by.append("execution_resolution_required")
 
-    blocked_by = _dedupe(blocked_by)
-    return {
-        "can_proceed": not blocked_by and next_owner in AUTOMATABLE_OWNERS,
-        "next_owner": next_owner,
-        "blocked_by": blocked_by,
-        "stop_reason": None,
-        "approval_gate": approval_gate,
-        "commit_checkpoint": {
+    return build_accelerator_readiness(
+        next_owner=next_owner,
+        automatable_owners=AUTOMATABLE_OWNERS,
+        blocked_by=blocked_by,
+        stop_reason=None,
+        approval_gate=approval_gate,
+        commit_checkpoint={
             "required": next_owner == "commit",
             "state": "waiting_commit" if next_owner == "commit" else "not_required",
             "slice_id": None,
         },
-    }
+    )
 
 
 def build_bootstrap_readiness(result: BootstrapResult) -> Dict[str, object]:
@@ -220,8 +216,7 @@ def build_bootstrap_readiness(result: BootstrapResult) -> Dict[str, object]:
                 if isinstance(item, str):
                     blocked_by.append(item)
         delegate_stop = delegate_readiness.get("stop_reason")
-        if isinstance(delegate_stop, dict):
-            stop_reason = dict(delegate_stop)
+        stop_reason = normalize_stop_reason(delegate_stop)
 
     if result.action == "approval_required":
         blocked_by.append("approval_required")
@@ -239,22 +234,21 @@ def build_bootstrap_readiness(result: BootstrapResult) -> Dict[str, object]:
     elif next_owner == "none":
         blocked_by.append("completed")
 
-    blocked_by = _dedupe(blocked_by)
     commit_required = (
         result.action == "commit_checkpoint_required" or next_owner == "commit"
     )
-    return {
-        "can_proceed": not blocked_by and next_owner in AUTOMATABLE_OWNERS,
-        "next_owner": next_owner,
-        "blocked_by": blocked_by,
-        "stop_reason": stop_reason,
-        "approval_gate": approval_gate,
-        "commit_checkpoint": {
+    return build_accelerator_readiness(
+        next_owner=next_owner,
+        automatable_owners=AUTOMATABLE_OWNERS,
+        blocked_by=dedupe_reason_codes(blocked_by),
+        stop_reason=stop_reason,
+        approval_gate=approval_gate,
+        commit_checkpoint={
             "required": commit_required,
             "state": "waiting_commit" if commit_required else "not_required",
             "slice_id": result.checkpoint_slice_id,
         },
-    }
+    )
 
 
 def load_module(script_path: Path, name: str):
