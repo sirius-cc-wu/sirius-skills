@@ -1,0 +1,10 @@
+{
+  "created_at": "2026-04-22T10:19:53",
+  "updated_at": "2026-04-22T10:24:00",
+  "status": "closed",
+  "slice_id": "taw-ship-backlog-integration",
+  "feature": "Integrate backlog delegation from ship to ship-slice",
+  "path": "slices/taw-ship-backlog-integration-integrate-backlog-delegation-from-ship-to-ship-slice/",
+  "relations": [],
+  "closed_at": "2026-04-22T10:24:00"
+}

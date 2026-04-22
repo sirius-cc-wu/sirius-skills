@@ -1077,6 +1077,74 @@ def test_resume_requires_commit_checkpoint_before_next_slice(tmp_path, monkeypat
     assert any("scratch.txt" in entry for entry in payload["dirty_worktree_paths"])
 
 
+def test_resume_delegation_routes_active_slice_through_ship_slice(
+    tmp_path, monkeypatch, capsys
+):
+    env = setup_repo(tmp_path, monkeypatch)
+    planning = env["planning"]
+    feature_path = env["feature_path"]
+    module = env["module"]
+    execution = env["execution"]
+
+    write_scope_config(
+        tmp_path,
+        "execution.json",
+        {
+            "slice_dir": "slices",
+            "preferred_workflow": "TDD",
+            "auto_start_implementation": True,
+            "accelerators": {
+                "ship": {"delegate_to_ship_slice": True},
+            },
+        },
+    )
+    write_file(
+        feature_path / "slice-planning.md",
+        """# Slice Planning
+
+| Slice ID | Story ID | Title | Summary | Target Area | Lane | Validation | Planned Action | Depends On | Slice Ready |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| mse-scope-and-backlog-resolution | EW-01 | Resolve backlog | Summary | area | primary | test | create slice |  | yes |
+""",
+    )
+    write_file(
+        feature_path / "slice-traceability.md",
+        """# Slice Traceability
+
+| Story ID | Story Size | Story Summary | Increments | Planned Slice IDs | Slice Areas | Blocked By | Execution Slice IDs | Notes |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| EW-01 | M | Summary | I1 | mse-scope-and-backlog-resolution | area |  | mse-scope-and-backlog-resolution | Notes |
+""",
+    )
+
+    rows = planning.parse_registry()
+    feature = planning.find_feature(rows, "execution-workflow")
+    assert feature is not None
+    ok, message = planning.update_feature_status(
+        rows,
+        feature,
+        "planning_reviewed",
+        force=True,
+        review_note="ready",
+    )
+    assert ok, message
+
+    _, created = execution.create_slice(
+        "mse-scope-and-backlog-resolution", "Resolve backlog"
+    )
+    assert created
+
+    assert run_cli(module, monkeypatch, "execution-workflow", "--resume", "--json") == 0
+    payload = json.loads(capsys.readouterr().out)
+
+    assert payload["action"] == "delegated_to_ship_slice"
+    assert payload["next_owner"] == "brief"
+    assert payload["delegate_result"]["next_owner"] == "brief"
+    assert payload["delegate_result"]["handoff_payload"]["execution_slice_id"] == (
+        "mse-scope-and-backlog-resolution"
+    )
+
+
 def test_resolve_backlog_allows_implemented_target(tmp_path, monkeypatch, capsys):
     env = setup_repo(tmp_path, monkeypatch)
     planning = env["planning"]

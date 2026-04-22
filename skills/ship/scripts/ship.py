@@ -7,6 +7,7 @@ import importlib.util
 import json
 import subprocess
 import sys
+import tempfile
 from dataclasses import asdict, dataclass
 from pathlib import Path
 from typing import Dict, List, Optional, Sequence, Tuple
@@ -26,6 +27,7 @@ SUBFEATURES_SCRIPT = SKILLS_DIR / "add-subfeature" / "scripts" / "manage_subfeat
 ARTIFACT_INVENTORY_SCRIPT = (
     SKILLS_DIR / "audit-artifacts" / "scripts" / "artifact_inventory.py"
 )
+SHIP_SLICE_SCRIPT = SKILLS_DIR / "ship-slice" / "scripts" / "ship_slice.py"
 
 if REPO_LIB_DIR.is_dir() and str(REPO_LIB_DIR) not in sys.path:
     sys.path.insert(0, str(REPO_LIB_DIR))
@@ -91,6 +93,7 @@ class BootstrapResult:
     next_owner: Optional[str]
     completed: bool
     action: str
+    delegate_result: Optional[Dict[str, object]] = None
 
     def to_dict(self) -> Dict[str, object]:
         payload = self.backlog.to_dict()
@@ -102,6 +105,9 @@ class BootstrapResult:
         payload["next_owner"] = self.next_owner
         payload["completed"] = self.completed
         payload["action"] = self.action
+        payload["delegate_result"] = (
+            dict(self.delegate_result) if self.delegate_result is not None else None
+        )
         payload["handoff_payload"] = (
             dict(self.backlog.active_slice_handoff["handoff_payload"])
             if self.backlog.active_slice_handoff is not None
@@ -732,6 +738,7 @@ def bootstrap_next_slice(
             next_owner=None,
             completed=completed,
             action="complete" if completed else "blocked",
+            delegate_result=None,
         )
 
     planning_module = load_module(GUIDE_PLANNING_SCRIPT, "manage_planning")
@@ -770,6 +777,11 @@ def bootstrap_next_slice(
         next_planned_slice_id,
     )
     refreshed_backlog = resolve_backlog(selector, explicit_scope=explicit_scope)
+    delegate_result = maybe_delegate_to_ship_slice(
+        refreshed_backlog,
+        scope_context=scope_context,
+        execution_module=execution_module,
+    )
     return BootstrapResult(
         backlog=refreshed_backlog,
         bootstrapped_slice_id=next_planned_slice_id,
@@ -778,12 +790,17 @@ def bootstrap_next_slice(
         checkpoint_slice_id=None,
         dirty_worktree_paths=[],
         next_owner=(
-            str(refreshed_backlog.active_slice_handoff["next_owner"])
-            if refreshed_backlog.active_slice_handoff is not None
-            else "guide-execution"
+            str(delegate_result["next_owner"])
+            if delegate_result is not None and "next_owner" in delegate_result
+            else (
+                str(refreshed_backlog.active_slice_handoff["next_owner"])
+                if refreshed_backlog.active_slice_handoff is not None
+                else "guide-execution"
+            )
         ),
         completed=False,
-        action="bootstrap_next_slice",
+        action="delegated_to_ship_slice" if delegate_result is not None else "bootstrap_next_slice",
+        delegate_result=delegate_result,
     )
 
 
@@ -811,6 +828,11 @@ def resume_execution(
             raise RuntimeError(
                 f"Mapped active execution slice could not be resolved: {active_slice_id}"
             )
+        delegate_result = maybe_delegate_to_ship_slice(
+            backlog,
+            scope_context=scope_context,
+            execution_module=execution_module,
+        )
         return BootstrapResult(
             backlog=backlog,
             bootstrapped_slice_id=active_slice_id,
@@ -819,12 +841,17 @@ def resume_execution(
             checkpoint_slice_id=None,
             dirty_worktree_paths=[],
             next_owner=(
-                str(backlog.active_slice_handoff["next_owner"])
-                if backlog.active_slice_handoff is not None
-                else "guide-execution"
+                str(delegate_result["next_owner"])
+                if delegate_result is not None and "next_owner" in delegate_result
+                else (
+                    str(backlog.active_slice_handoff["next_owner"])
+                    if backlog.active_slice_handoff is not None
+                    else "guide-execution"
+                )
             ),
             completed=False,
-            action="resume_active_slice",
+            action="delegated_to_ship_slice" if delegate_result is not None else "resume_active_slice",
+            delegate_result=delegate_result,
         )
 
     checkpoint_required = require_commit_checkpoint(backlog, str(scope_context.repo_root))
@@ -846,6 +873,7 @@ def resume_execution(
             next_owner=None,
             completed=True,
             action="complete",
+            delegate_result=None,
         )
 
     blocked = [
@@ -888,7 +916,66 @@ def require_commit_checkpoint(
         next_owner="commit",
         completed=False,
         action="commit_checkpoint_required",
+        delegate_result=None,
     )
+
+
+def ship_accelerator_config(scope_context, execution_module) -> Dict[str, object]:
+    raw_config = execution_module.load_raw_config(required=False, scope_context=scope_context)
+    accelerators = raw_config.get("accelerators", {})
+    if not isinstance(accelerators, dict):
+        return {}
+    ship_config = accelerators.get("ship", {})
+    return ship_config if isinstance(ship_config, dict) else {}
+
+
+def maybe_delegate_to_ship_slice(
+    backlog: BacklogResolution,
+    *,
+    scope_context,
+    execution_module,
+) -> Optional[Dict[str, object]]:
+    if backlog.active_slice_handoff is None or not SHIP_SLICE_SCRIPT.is_file():
+        return None
+    ship_config = ship_accelerator_config(scope_context, execution_module)
+    if not bool(ship_config.get("delegate_to_ship_slice", False)):
+        return None
+
+    handoff_payload = backlog.active_slice_handoff.get("handoff_payload")
+    if not isinstance(handoff_payload, dict):
+        return None
+
+    with tempfile.NamedTemporaryFile(
+        mode="w",
+        encoding="utf-8",
+        suffix=".json",
+        prefix="ship-handoff-",
+        delete=False,
+    ) as handle:
+        json.dump(handoff_payload, handle, indent=2)
+        handle.write("\n")
+        handoff_path = Path(handle.name)
+
+    try:
+        result = subprocess.run(
+            ["python3", str(SHIP_SLICE_SCRIPT), "--handoff", str(handoff_path), "--json"],
+            cwd=str(scope_context.repo_root),
+            check=False,
+            capture_output=True,
+            text=True,
+        )
+    finally:
+        handoff_path.unlink(missing_ok=True)
+
+    if result.returncode != 0:
+        raise RuntimeError(
+            "ship-slice delegation failed: "
+            + (result.stderr.strip() or result.stdout.strip() or "unknown error")
+        )
+    payload = json.loads(result.stdout)
+    if not isinstance(payload, dict):
+        raise RuntimeError("ship-slice delegation did not return a JSON object.")
+    return payload
 
 
 def build_parser() -> argparse.ArgumentParser:

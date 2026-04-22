@@ -1,5 +1,19 @@
 {
   "slice_dir": "slices",
   "preferred_workflow": "TDD",
-  "auto_start_implementation": true
+  "auto_start_implementation": true,
+  "accelerators": {
+    "ship": {
+      "delegate_to_ship_slice": false
+    },
+    "ship_slice": {
+      "pr_mode": "prepare_only"
+    },
+    "runtime": {
+      "checkpoint_mode": "on_stop",
+      "event_log": true,
+      "runtime_dir": ".skills/runtime",
+      "learnings_path": ".skills/learnings.jsonl"
+    }
+  }
 }
