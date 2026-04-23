@@ -128,8 +128,8 @@
     },
     {
       "feature": "delegated-execution-stop-policies",
-      "status": "planning_reviewed",
-      "updated_at": "2026-04-23T14:54:14",
+      "status": "implemented",
+      "updated_at": "2026-04-24T00:14:20",
       "path": "docs/features/throughput-acceleration-workflow/subfeatures/delegated-execution-stop-policies/"
     },
     {

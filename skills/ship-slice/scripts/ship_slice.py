@@ -64,6 +64,12 @@ VALID_STOP_OWNERS = {
     "none",
 }
 AUTOMATABLE_OWNERS = {"brief", "blueprint", "implementation"}
+VALID_CONTINUATION_POLICY_BOUNDARIES = {
+    "review_boundary",
+    "commit_checkpoint",
+}
+VALID_CONTINUATION_POLICY_ACTIONS = {"stop", "continue"}
+VALID_CONTINUATION_POLICY_SOURCES = {"default", "config"}
 
 
 @dataclass
@@ -116,6 +122,29 @@ class TerminalAutomationResult:
 
     def to_dict(self) -> Dict[str, Any]:
         return asdict(self)
+
+
+@dataclass
+class ContinuationPolicyConfig:
+    review_boundary_action: str = "stop"
+    review_boundary_source: str = "default"
+    commit_checkpoint_action: str = "stop"
+    commit_checkpoint_source: str = "default"
+
+    def decision_for(self, boundary: str) -> Dict[str, str]:
+        if boundary == "review_boundary":
+            return {
+                "boundary": "review_boundary",
+                "policy_action": self.review_boundary_action,
+                "policy_source": self.review_boundary_source,
+            }
+        if boundary == "commit_checkpoint":
+            return {
+                "boundary": "commit_checkpoint",
+                "policy_action": self.commit_checkpoint_action,
+                "policy_source": self.commit_checkpoint_source,
+            }
+        raise RuntimeError(f"Unsupported continuation-policy boundary: {boundary}")
 
 
 def load_module(script_path: Path, name: str):
@@ -361,6 +390,56 @@ def parse_terminal_automation_config(raw_config: object) -> TerminalAutomationCo
     return config
 
 
+def parse_continuation_policy_action(raw_value: object, *, boundary: str) -> str:
+    if not isinstance(raw_value, str):
+        raise RuntimeError(
+            "ship-slice continuation_policy values must be strings "
+            f"('stop' or 'continue'); got {type(raw_value).__name__} for '{boundary}'."
+        )
+    normalized = raw_value.strip().lower().replace("-", "_")
+    if normalized not in VALID_CONTINUATION_POLICY_ACTIONS:
+        raise RuntimeError(
+            "Invalid ship-slice continuation_policy value "
+            f"'{raw_value}' for '{boundary}'. "
+            f"Valid values: {sorted(VALID_CONTINUATION_POLICY_ACTIONS)}"
+        )
+    return normalized
+
+
+def parse_continuation_policy_config(raw_config: object) -> ContinuationPolicyConfig:
+    if not isinstance(raw_config, dict):
+        return ContinuationPolicyConfig()
+
+    raw_policy = raw_config.get("continuation_policy")
+    if raw_policy is None:
+        return ContinuationPolicyConfig()
+    if not isinstance(raw_policy, dict):
+        raise RuntimeError("ship-slice continuation_policy must be a JSON object.")
+
+    config = ContinuationPolicyConfig()
+    for raw_key, raw_value in raw_policy.items():
+        normalized_key = normalize_stop_reason({"kind": raw_key})
+        if normalized_key is None:
+            raise RuntimeError(
+                f"Invalid ship-slice continuation_policy boundary '{raw_key}'."
+            )
+        boundary = str(normalized_key.get("kind"))
+        if boundary not in VALID_CONTINUATION_POLICY_BOUNDARIES:
+            raise RuntimeError(
+                "Invalid ship-slice continuation_policy boundary "
+                f"'{raw_key}'. Valid boundaries: {sorted(VALID_CONTINUATION_POLICY_BOUNDARIES)}"
+            )
+        action = parse_continuation_policy_action(raw_value, boundary=boundary)
+        if boundary == "review_boundary":
+            config.review_boundary_action = action
+            config.review_boundary_source = "config"
+        elif boundary == "commit_checkpoint":
+            config.commit_checkpoint_action = action
+            config.commit_checkpoint_source = "config"
+
+    return config
+
+
 def synthesize_commit_message(
     *,
     slice_id: str,
@@ -506,6 +585,7 @@ def apply_terminal_automation(
     worktree_ownership: WorktreeOwnership,
     dirty_paths: list[str],
     terminal_config: TerminalAutomationConfig,
+    continuation_policy: ContinuationPolicyConfig,
 ) -> tuple[
     list[dict[str, Any]],
     Dict[str, Any],
@@ -530,7 +610,20 @@ def apply_terminal_automation(
     updated_route = route
     updated_ownership = worktree_ownership
     dirty_lines = list(dirty_paths)
-    should_auto_close = route.next_owner == "review-execution" and terminal_config.auto_close
+    review_policy = continuation_policy.decision_for("review_boundary")
+    should_auto_close = (
+        route.next_owner == "review-execution"
+        and terminal_config.auto_close
+        and review_policy["policy_action"] == "continue"
+    )
+    if (
+        route.next_owner == "review-execution"
+        and terminal_config.auto_close
+        and review_policy["policy_action"] == "stop"
+    ):
+        result.notes.append(
+            "Skipped auto_close because continuation_policy.review_boundary is 'stop'."
+        )
 
     if should_auto_close:
         result.attempted = True
@@ -601,6 +694,19 @@ def apply_terminal_automation(
         )
 
     if updated_route.next_owner == "commit" and terminal_config.auto_commit:
+        commit_policy = continuation_policy.decision_for("commit_checkpoint")
+        if commit_policy["policy_action"] != "continue":
+            result.notes.append(
+                "Skipped auto_commit because continuation_policy.commit_checkpoint is 'stop'."
+            )
+            return (
+                updated_rows,
+                updated_slice_row,
+                updated_route,
+                updated_ownership,
+                dirty_lines,
+                result,
+            )
         result.attempted = True
         commit_message = synthesize_commit_message(
             slice_id=route.slice_id,
@@ -840,6 +946,7 @@ def execute_owner_chain(
     repo_root: Path,
     worktree_ownership: WorktreeOwnership,
     stop_on_owner: list[str],
+    continuation_policy: ContinuationPolicyConfig,
 ) -> tuple[SliceRoute, list[dict[str, Any]], Optional[dict[str, Any]]]:
     steps: list[dict[str, Any]] = []
 
@@ -870,6 +977,7 @@ def execute_owner_chain(
             )
 
         if route.next_owner == "review-execution":
+            decision = continuation_policy.decision_for("review_boundary")
             return (
                 route,
                 steps,
@@ -878,11 +986,17 @@ def execute_owner_chain(
                     "owner": "review-execution",
                     "status": current_status,
                     "target_status": current_status,
-                    "message": "Reached review-execution boundary.",
+                    "policy_action": decision["policy_action"],
+                    "policy_source": decision["policy_source"],
+                    "message": (
+                        "Reached review-execution boundary. "
+                        f"Policy action is '{decision['policy_action']}'."
+                    ),
                 },
             )
 
         if route.next_owner == "commit":
+            decision = continuation_policy.decision_for("commit_checkpoint")
             return (
                 route,
                 steps,
@@ -891,7 +1005,12 @@ def execute_owner_chain(
                     "owner": "commit",
                     "status": current_status,
                     "target_status": current_status,
-                    "message": "Closed slice requires commit checkpoint before continuing.",
+                    "policy_action": decision["policy_action"],
+                    "policy_source": decision["policy_source"],
+                    "message": (
+                        "Closed slice requires commit checkpoint before continuing. "
+                        f"Policy action is '{decision['policy_action']}'."
+                    ),
                 },
             )
 
@@ -973,7 +1092,11 @@ def build_readiness_payload(
     terminal_automation: Optional[TerminalAutomationResult] = None,
 ) -> dict[str, Any]:
     blocked_by: list[str] = []
-    stop_reason_input = owner_chain.get("stop_reason") if isinstance(owner_chain, dict) else None
+    boundary_reason_input = (
+        owner_chain.get("stop_reason") if isinstance(owner_chain, dict) else None
+    )
+    boundary_reason = normalize_stop_reason(boundary_reason_input)
+    stop_reason_input = boundary_reason
     if terminal_automation is not None and terminal_automation.stop_reason is not None:
         stop_reason_input = terminal_automation.stop_reason
     if worktree_ownership.owned_file_conflict_paths:
@@ -982,6 +1105,8 @@ def build_readiness_payload(
             "paths": list(worktree_ownership.owned_file_conflict_paths),
         }
     stop_reason = normalize_stop_reason(stop_reason_input)
+    if boundary_reason is not None and isinstance(boundary_reason.get("kind"), str):
+        blocked_by.append(str(boundary_reason["kind"]))
 
     commit_required = route.next_owner == "commit"
     if commit_required:
@@ -993,7 +1118,7 @@ def build_readiness_payload(
     if route.next_owner == "none":
         blocked_by.append("completed")
 
-    return build_accelerator_readiness(
+    readiness = build_accelerator_readiness(
         next_owner=route.next_owner,
         automatable_owners=AUTOMATABLE_OWNERS,
         blocked_by=blocked_by,
@@ -1007,6 +1132,22 @@ def build_readiness_payload(
             "state": "waiting_commit" if commit_required else "not_required",
         },
     )
+    policy_action: Optional[str] = None
+    policy_source: Optional[str] = None
+    if boundary_reason is not None:
+        raw_action = boundary_reason.get("policy_action")
+        if isinstance(raw_action, str):
+            normalized_action = raw_action.strip().lower().replace("-", "_")
+            if normalized_action in VALID_CONTINUATION_POLICY_ACTIONS:
+                policy_action = normalized_action
+        raw_source = boundary_reason.get("policy_source")
+        if isinstance(raw_source, str):
+            normalized_source = raw_source.strip().lower().replace("-", "_")
+            if normalized_source in VALID_CONTINUATION_POLICY_SOURCES:
+                policy_source = normalized_source
+    readiness["policy_action"] = policy_action
+    readiness["policy_source"] = policy_source
+    return readiness
 
 
 def write_runtime_records(
@@ -1099,6 +1240,7 @@ def main(argv: Sequence[str] | None = None) -> int:
             ship_slice_config.get("stop_on_owner") if isinstance(ship_slice_config, dict) else None
         )
         terminal_config = parse_terminal_automation_config(ship_slice_config)
+        continuation_policy = parse_continuation_policy_config(ship_slice_config)
     except RuntimeError as exc:
         print(str(exc), file=sys.stderr)
         return 2
@@ -1132,6 +1274,7 @@ def main(argv: Sequence[str] | None = None) -> int:
             repo_root=repo_root,
             worktree_ownership=worktree_ownership,
             stop_on_owner=stop_on_owner,
+            continuation_policy=continuation_policy,
         )
         owner_chain = {
             "enabled": True,
@@ -1166,9 +1309,8 @@ def main(argv: Sequence[str] | None = None) -> int:
         worktree_ownership=worktree_ownership,
         dirty_paths=dirty_paths,
         terminal_config=terminal_config,
+        continuation_policy=continuation_policy,
     )
-    if owner_chain is not None and terminal_automation is not None and terminal_automation.attempted:
-        owner_chain["stop_reason"] = normalize_stop_reason(terminal_automation.stop_reason)
 
     checkpoint_stale_reason = None
     if prior_checkpoint is not None:

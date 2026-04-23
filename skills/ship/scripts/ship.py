@@ -171,6 +171,26 @@ def _extract_delegate_readiness(
     return readiness if isinstance(readiness, dict) else None
 
 
+def _extract_delegate_policy_metadata(
+    readiness: Optional[Dict[str, object]],
+) -> Tuple[Optional[str], Optional[str]]:
+    if not isinstance(readiness, dict):
+        return None, None
+    policy_action: Optional[str] = None
+    raw_action = readiness.get("policy_action")
+    if isinstance(raw_action, str):
+        normalized_action = raw_action.strip().lower().replace("-", "_")
+        if normalized_action in {"stop", "continue"}:
+            policy_action = normalized_action
+    policy_source: Optional[str] = None
+    raw_source = readiness.get("policy_source")
+    if isinstance(raw_source, str):
+        normalized_source = raw_source.strip().lower().replace("-", "_")
+        if normalized_source in {"default", "config"}:
+            policy_source = normalized_source
+    return policy_action, policy_source
+
+
 def build_backlog_readiness(backlog: BacklogResolution) -> Dict[str, object]:
     next_owner = _derive_next_owner(backlog)
     blocked_by: List[str] = []
@@ -188,7 +208,7 @@ def build_backlog_readiness(backlog: BacklogResolution) -> Dict[str, object]:
         else:
             blocked_by.append("execution_resolution_required")
 
-    return build_accelerator_readiness(
+    readiness = build_accelerator_readiness(
         next_owner=next_owner,
         automatable_owners=AUTOMATABLE_OWNERS,
         blocked_by=blocked_by,
@@ -200,6 +220,9 @@ def build_backlog_readiness(backlog: BacklogResolution) -> Dict[str, object]:
             "slice_id": None,
         },
     )
+    readiness["policy_action"] = None
+    readiness["policy_source"] = None
+    return readiness
 
 
 def build_bootstrap_readiness(result: BootstrapResult) -> Dict[str, object]:
@@ -209,6 +232,8 @@ def build_bootstrap_readiness(result: BootstrapResult) -> Dict[str, object]:
 
     delegate_readiness = _extract_delegate_readiness(result.delegate_result)
     stop_reason = None
+    policy_action: Optional[str] = None
+    policy_source: Optional[str] = None
     if delegate_readiness is not None:
         delegate_blocked = delegate_readiness.get("blocked_by")
         if isinstance(delegate_blocked, list):
@@ -217,6 +242,7 @@ def build_bootstrap_readiness(result: BootstrapResult) -> Dict[str, object]:
                     blocked_by.append(item)
         delegate_stop = delegate_readiness.get("stop_reason")
         stop_reason = normalize_stop_reason(delegate_stop)
+        policy_action, policy_source = _extract_delegate_policy_metadata(delegate_readiness)
 
     if result.action == "approval_required":
         blocked_by.append("approval_required")
@@ -237,7 +263,7 @@ def build_bootstrap_readiness(result: BootstrapResult) -> Dict[str, object]:
     commit_required = (
         result.action == "commit_checkpoint_required" or next_owner == "commit"
     )
-    return build_accelerator_readiness(
+    readiness = build_accelerator_readiness(
         next_owner=next_owner,
         automatable_owners=AUTOMATABLE_OWNERS,
         blocked_by=dedupe_reason_codes(blocked_by),
@@ -249,6 +275,9 @@ def build_bootstrap_readiness(result: BootstrapResult) -> Dict[str, object]:
             "slice_id": result.checkpoint_slice_id,
         },
     )
+    readiness["policy_action"] = policy_action
+    readiness["policy_source"] = policy_source
+    return readiness
 
 
 def load_module(script_path: Path, name: str):

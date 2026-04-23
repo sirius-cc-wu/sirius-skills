@@ -46,3 +46,5 @@
 | taw-autoplan | Add high-autonomy planning orchestration | closed | 2026-04-22T10:27:11 | 2026-04-22T10:27:11 | slices/taw-autoplan-add-high-autonomy-planning-orchestration/ |
 | scc-owned-change-set | ship-slice-close-commit-controls | closed | 2026-04-23T15:59:13 | 2026-04-23T15:59:13 | slices/scc-owned-change-set-ship-slice-close-commit-controls/ |
 | scc-terminal-automation | ship-slice-close-commit-controls | closed | 2026-04-23T16:57:50 | 2026-04-23T16:57:50 | slices/scc-terminal-automation-ship-slice-close-commit-controls/ |
+| dsp-policy-contract | delegated-execution-stop-policies | closed | 2026-04-24T00:14:14 | 2026-04-24T00:14:14 | slices/dsp-policy-contract-delegated-execution-stop-policies/ |
+| dsp-boundary-enforcement | delegated-execution-stop-policies | closed | 2026-04-24T00:14:14 | 2026-04-24T00:14:14 | slices/dsp-boundary-enforcement-delegated-execution-stop-policies/ |

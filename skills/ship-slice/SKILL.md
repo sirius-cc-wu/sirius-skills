@@ -21,7 +21,8 @@ current state with checkpointed runtime context.
 6. Report the next owner for the slice and write a resumable checkpoint plus
    execution event.
 7. Stop at review, close, commit, or verification boundaries unless the
-   configured terminal automation tail is both enabled and safe to continue.
+   configured continuation policy and terminal automation tail both allow safe
+   continuation.
 8. Emit a `readiness` summary in JSON output (`can_proceed`, `blocked_by`,
    `stop_reason`, approval/commit gate state) so `ship` and dashboards can
    read one-slice acceleration status without parsing owner-chain internals.
@@ -49,6 +50,10 @@ Configure owner-chain behavior in `.skills/execution.json` under
     "ship_slice": {
       "execute_owner_chain": false,
       "stop_on_owner": ["review-execution"],
+      "continuation_policy": {
+        "review_boundary": "stop",
+        "commit_checkpoint": "stop"
+      },
       "auto_format": false,
       "format_command": ["./scripts/format-owned.sh"],
       "auto_close": false,
@@ -68,6 +73,9 @@ Terminal automation notes:
 - `auto_commit` requires `auto_close`
 - `auto_format` requires `format_command`
 - formatting and staging stay scoped to the delegated run's owned file set
+- `continuation_policy.review_boundary` and
+  `continuation_policy.commit_checkpoint` accept `stop` or `continue`
+- defaults are `stop`; policy remains config-only in the first rollout
 
 ## Guardrails
 
@@ -77,9 +85,10 @@ Terminal automation notes:
   validation.
 - Emit structured stop context for review boundaries, verification/missing-input
   failures, explicit owner stops, formatter spillover, owned-file conflicts,
-  partial-success commit failures, and commit checkpoints.
-- Stop at commit checkpoints unless owned-file auto-commit is explicitly
-  enabled and succeeds.
+  partial-success commit failures, and commit checkpoints, plus policy action
+  metadata in readiness output.
+- Keep approval, owned-file conflicts, formatter spillover, and verification
+  failures as hard stops regardless of continuation policy.
 - Do not format or stage unrelated dirty files outside the owned file set.
 - Keep stop-reason classification and readiness invariants aligned with shared
   accelerator guardrail helpers in `workflow_runtime`.

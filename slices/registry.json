@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "generated_at": "2026-04-23T16:57:50",
+  "generated_at": "2026-04-24T00:14:14",
   "slices": [
     {
       "id": "hss-root-fallback",
@@ -439,6 +439,26 @@
       "path": "slices/scc-terminal-automation-ship-slice-close-commit-controls/",
       "updated_at": "2026-04-23T16:57:50",
       "closed_at": "2026-04-23T16:57:50",
+      "archived_at": null,
+      "relations": []
+    },
+    {
+      "id": "dsp-policy-contract",
+      "feature": "delegated-execution-stop-policies",
+      "status": "closed",
+      "path": "slices/dsp-policy-contract-delegated-execution-stop-policies/",
+      "updated_at": "2026-04-24T00:14:14",
+      "closed_at": "2026-04-24T00:14:14",
+      "archived_at": null,
+      "relations": []
+    },
+    {
+      "id": "dsp-boundary-enforcement",
+      "feature": "delegated-execution-stop-policies",
+      "status": "closed",
+      "path": "slices/dsp-boundary-enforcement-delegated-execution-stop-policies/",
+      "updated_at": "2026-04-24T00:14:14",
+      "closed_at": "2026-04-24T00:14:14",
       "archived_at": null,
       "relations": []
     }

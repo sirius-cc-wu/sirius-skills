@@ -85,3 +85,12 @@ grep-friendly.
 - Delegated terminal automation now supports owned-file formatting, close-slice handoff, owned-only commit staging, formatter spillover detection, and explicit close-success / commit-failure partial-success reporting.
 - Added focused `ship-slice` tests for owned-change tracking, formatter spillover, full format-close-commit happy path, invalid config, and commit-failure partial success.
 - Closed slices `scc-owned-change-set` and `scc-terminal-automation`, finalized subfeature `ship-slice-close-commit-controls`, and updated throughput/two-step/skill docs to reflect the implemented execution tail.
+
+## [2026-04-24] implementation-synthesis | delegated execution stop policies
+
+- Implemented typed delegated continuation-policy parsing in `skills/ship-slice/scripts/ship_slice.py` with config-only controls under `accelerators.ship_slice.continuation_policy` for `review_boundary` and `commit_checkpoint`.
+- Updated delegated execution behavior so `auto_close`/`auto_commit` respect continuation policy defaults and config overrides instead of bypassing boundaries implicitly.
+- Extended `ship-slice` readiness output with `policy_action` and `policy_source`, while preserving boundary visibility in `blocked_by` and stop reporting.
+- Propagated delegated policy readiness metadata through `skills/ship/scripts/ship.py` so `ship --resume` surfaces the same policy context from delegated runs.
+- Added and updated focused tests in `skills/ship-slice/tests/test_ship_slice.py` and `skills/ship/tests/test_ship.py`, then validated with `python3 -m pytest -q skills/ship/tests/test_ship.py skills/ship-slice/tests/test_ship_slice.py`.
+- Closed slices `dsp-policy-contract` and `dsp-boundary-enforcement`, finalized subfeature `delegated-execution-stop-policies`, and updated throughput roadmap/wiki synthesis to mark continuation policy delivery as implemented.

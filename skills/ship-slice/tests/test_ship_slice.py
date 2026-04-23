@@ -232,9 +232,13 @@ def test_ship_slice_owner_chain_advances_to_review_boundary(tmp_path: Path, monk
     assert payload["next_owner"] == "review-execution"
     assert payload["action"] == "run_review_execution"
     assert payload["owner_chain"]["stop_reason"]["kind"] == "review_boundary"
+    assert payload["owner_chain"]["stop_reason"]["policy_action"] == "stop"
+    assert payload["owner_chain"]["stop_reason"]["policy_source"] == "default"
     assert payload["readiness"]["can_proceed"] is False
     assert payload["readiness"]["blocked_by"] == ["review_boundary"]
     assert payload["readiness"]["stop_reason"]["kind"] == "review_boundary"
+    assert payload["readiness"]["policy_action"] == "stop"
+    assert payload["readiness"]["policy_source"] == "default"
     assert [step["owner"] for step in payload["owner_chain"]["steps"]] == [
         "implementation"
     ]
@@ -337,8 +341,80 @@ def test_ship_slice_owner_chain_reports_commit_checkpoint(
     assert payload["next_owner"] == "commit"
     assert payload["action"] == "commit_completed_slice"
     assert payload["owner_chain"]["stop_reason"]["kind"] == "commit_checkpoint"
+    assert payload["owner_chain"]["stop_reason"]["policy_action"] == "stop"
+    assert payload["owner_chain"]["stop_reason"]["policy_source"] == "default"
     assert payload["readiness"]["can_proceed"] is False
     assert payload["readiness"]["blocked_by"] == ["commit_checkpoint"]
+    assert payload["readiness"]["policy_action"] == "stop"
+    assert payload["readiness"]["policy_source"] == "default"
+
+
+def test_ship_slice_owner_chain_reports_review_policy_continue(
+    tmp_path: Path, monkeypatch
+) -> None:
+    init_git_repo(tmp_path)
+    write_execution_config(
+        tmp_path,
+        accelerators_overrides={
+            "ship_slice": {
+                "execute_owner_chain": True,
+                "continuation_policy": {"review_boundary": "continue"},
+            }
+        },
+        auto_start_implementation=False,
+    )
+    create_slice(
+        tmp_path,
+        monkeypatch,
+        "taw-ship-slice-loop",
+        "Add one-slice finishing and resume orchestration",
+        "blueprint_ready",
+    )
+
+    result = run_cli(tmp_path, "taw-ship-slice-loop", "--json")
+
+    assert result.returncode == 0
+    payload = json.loads(result.stdout)
+    assert payload["next_owner"] == "review-execution"
+    assert payload["owner_chain"]["stop_reason"]["kind"] == "review_boundary"
+    assert payload["owner_chain"]["stop_reason"]["policy_action"] == "continue"
+    assert payload["owner_chain"]["stop_reason"]["policy_source"] == "config"
+    assert payload["readiness"]["blocked_by"] == ["review_boundary"]
+    assert payload["readiness"]["policy_action"] == "continue"
+    assert payload["readiness"]["policy_source"] == "config"
+
+
+def test_ship_slice_policy_stop_prevents_terminal_auto_close(
+    tmp_path: Path, monkeypatch
+) -> None:
+    init_git_repo(tmp_path)
+    write_execution_config(
+        tmp_path,
+        accelerators_overrides={
+            "ship_slice": {
+                "execute_owner_chain": True,
+                "auto_close": True,
+                "continuation_policy": {"review_boundary": "stop"},
+            }
+        },
+        auto_start_implementation=False,
+    )
+    create_slice(
+        tmp_path,
+        monkeypatch,
+        "taw-ship-slice-loop",
+        "Add one-slice finishing and resume orchestration",
+        "execution_ready",
+    )
+
+    result = run_cli(tmp_path, "taw-ship-slice-loop", "--json")
+
+    assert result.returncode == 0
+    payload = json.loads(result.stdout)
+    assert payload["next_owner"] == "review-execution"
+    assert payload["terminal_automation"]["close_applied"] is False
+    assert payload["readiness"]["policy_action"] == "stop"
+    assert payload["readiness"]["policy_source"] == "config"
 
 
 def test_ship_slice_tracks_owned_dirty_paths_separately_from_baseline(
@@ -391,7 +467,17 @@ def test_ship_slice_reports_owned_file_conflict_when_baseline_file_changes(
     tmp_path: Path, monkeypatch
 ) -> None:
     init_git_repo(tmp_path)
-    write_execution_config(tmp_path)
+    write_execution_config(
+        tmp_path,
+        accelerators_overrides={
+            "ship_slice": {
+                "continuation_policy": {
+                    "review_boundary": "continue",
+                    "commit_checkpoint": "continue",
+                },
+            }
+        },
+    )
     create_slice(
         tmp_path,
         monkeypatch,
@@ -423,6 +509,8 @@ def test_ship_slice_reports_owned_file_conflict_when_baseline_file_changes(
         "kind": "owned_file_conflict",
         "paths": ["shared.txt"],
     }
+    assert payload["readiness"]["policy_action"] is None
+    assert payload["readiness"]["policy_source"] is None
 
 
 def test_detect_scope_spillover_flags_changes_outside_owned_paths() -> None:
@@ -479,6 +567,10 @@ def test_ship_slice_terminal_automation_formats_closes_and_commits_owned_changes
                 "auto_close": True,
                 "auto_commit": True,
                 "format_command": [str(tmp_path / "formatter.sh")],
+                "continuation_policy": {
+                    "review_boundary": "continue",
+                    "commit_checkpoint": "continue",
+                },
             }
         },
         auto_start_implementation=False,
@@ -518,7 +610,9 @@ def test_ship_slice_terminal_automation_formats_closes_and_commits_owned_changes
     assert payload["terminal_automation"]["format_applied"] is True
     assert payload["terminal_automation"]["close_applied"] is True
     assert payload["terminal_automation"]["commit_applied"] is True
-    assert payload["readiness"]["blocked_by"] == ["completed"]
+    assert payload["readiness"]["blocked_by"] == ["review_boundary", "completed"]
+    assert payload["readiness"]["policy_action"] == "continue"
+    assert payload["readiness"]["policy_source"] == "config"
     assert "owned.py" in payload["terminal_automation"]["committed_paths"]
 
     status = read_git_status(tmp_path)
@@ -548,6 +642,9 @@ def test_ship_slice_terminal_automation_reports_formatter_spillover(
                 "auto_format": True,
                 "auto_close": True,
                 "format_command": [str(tmp_path / "formatter-spill.sh")],
+                "continuation_policy": {
+                    "review_boundary": "continue",
+                },
             }
         },
         auto_start_implementation=False,
@@ -589,6 +686,8 @@ def test_ship_slice_terminal_automation_reports_formatter_spillover(
         "kind": "formatter_spillover",
         "paths": ["spill.txt"],
     }
+    assert payload["readiness"]["policy_action"] == "continue"
+    assert payload["readiness"]["policy_source"] == "config"
 
 
 def test_ship_slice_terminal_automation_reports_partial_success_when_commit_fails(
@@ -602,6 +701,10 @@ def test_ship_slice_terminal_automation_reports_partial_success_when_commit_fail
                 "execute_owner_chain": True,
                 "auto_close": True,
                 "auto_commit": True,
+                "continuation_policy": {
+                    "review_boundary": "continue",
+                    "commit_checkpoint": "continue",
+                },
             }
         },
         auto_start_implementation=False,
@@ -634,5 +737,7 @@ def test_ship_slice_terminal_automation_reports_partial_success_when_commit_fail
     assert payload["terminal_automation"]["commit_applied"] is False
     assert payload["terminal_automation"]["stop_reason"]["kind"] == "commit_failed"
     assert payload["readiness"]["stop_reason"]["kind"] == "commit_failed"
+    assert payload["readiness"]["policy_action"] == "continue"
+    assert payload["readiness"]["policy_source"] == "config"
     assert "commit_checkpoint" in payload["readiness"]["blocked_by"]
     assert "commit_failed" in payload["readiness"]["blocked_by"]

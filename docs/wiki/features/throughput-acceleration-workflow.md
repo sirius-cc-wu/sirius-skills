@@ -3,7 +3,7 @@
 ## Snapshot
 
 - Feature: `throughput-acceleration-workflow`
-- Status: `implemented` (updated `2026-04-23`)
+- Status: `implemented` (updated `2026-04-24`)
 
 ## What This Feature Establishes
 
@@ -109,6 +109,9 @@ Current status:
 - all three accelerator surfaces now emit a normalized `readiness` payload:
   `can_proceed`, `next_owner`, `blocked_by`, `stop_reason`,
   `approval_gate`, and `commit_checkpoint`
+- delegated execution now supports typed continuation policy controls for
+  `review_boundary` and `commit_checkpoint`, and readiness surfaces
+  `policy_action` plus `policy_source`
 - transition guardrail classification and readiness invariants are now
   normalized through shared `workflow_runtime` helper logic used by
   `autoplan`, `ship`, and `ship-slice`
@@ -116,8 +119,6 @@ Current status:
 Roadmap link:
 
 - see `docs/wiki/concepts/two-step-autonomy-roadmap.md`
-- remaining execution-side follow-up is `delegated-execution-stop-policies`
-  for configurable stop-vs-continue behavior at review/commit boundaries
 
 ## Main Sources
 

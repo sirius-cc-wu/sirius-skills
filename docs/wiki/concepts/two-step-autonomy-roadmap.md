@@ -29,7 +29,7 @@ Guide-path positioning:
 - The primary operator path should prefer `autoplan` and `ship` for normal
   two-step execution.
 
-## Current Gap
+## Current State
 
 Current accelerator skills now support owner-chain orchestration in both layers:
 
@@ -42,9 +42,14 @@ Current accelerator skills now support owner-chain orchestration in both layers:
   slice closure, and owned-only commit creation with deterministic partial
   success reporting.
 
-Current gaps are now focused on operator continuation-policy controls after
-those boundaries are reached; baseline readiness dashboards, transition
-guardrail normalization, and optional terminal automation are implemented.
+Continuation-policy controls are now implemented for delegated execution
+boundaries:
+
+- `accelerators.ship_slice.continuation_policy.review_boundary`
+- `accelerators.ship_slice.continuation_policy.commit_checkpoint`
+
+Readiness now surfaces both boundary stop context and policy metadata
+(`policy_action`, `policy_source`) so continuation behavior stays explicit.
 
 ## Target Operating Model
 
@@ -88,6 +93,8 @@ Use additive flags under existing typed configs:
   - `accelerators.ship.delegate_to_ship_slice` (existing)
   - `accelerators.ship_slice.execute_owner_chain` (bool)
   - `accelerators.ship_slice.stop_on_owner` (optional list)
+  - `accelerators.ship_slice.continuation_policy.review_boundary` (`stop` or `continue`)
+  - `accelerators.ship_slice.continuation_policy.commit_checkpoint` (`stop` or `continue`)
   - `accelerators.ship_slice.auto_format` (bool, default false)
   - `accelerators.ship_slice.format_command` (string or string list, required when `auto_format=true`)
   - `accelerators.ship_slice.auto_close` (bool, default false)
@@ -102,10 +109,10 @@ Use additive flags under existing typed configs:
 4. Unrelated dirty worktree state remains tolerated, but owned-file conflicts,
    formatter spillover, and owned commit checkpoints remain enforced.
 
-## Incremental Delivery Plan
+## Incremental Delivery Notes
 
-1. Add explicit operator policy toggles for when delegated runs should stop vs
-   continue at review/commit boundaries.
+1. Policy toggles for delegated stop-vs-continue at review/commit boundaries
+   are implemented.
 
 ## Main Sources
 
