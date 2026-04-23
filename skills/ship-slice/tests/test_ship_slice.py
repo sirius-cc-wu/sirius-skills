@@ -107,6 +107,17 @@ def run_cli(repo_root: Path, *args: str) -> subprocess.CompletedProcess[str]:
     )
 
 
+def read_git_status(root: Path) -> list[str]:
+    result = subprocess.run(
+        ["git", "status", "--short"],
+        cwd=root,
+        check=True,
+        capture_output=True,
+        text=True,
+    )
+    return [line.rstrip() for line in result.stdout.splitlines() if line.strip()]
+
+
 def test_finish_or_resume_from_handoff_routes_draft_slice_and_writes_runtime_files(
     tmp_path: Path, monkeypatch
 ) -> None:
@@ -431,3 +442,197 @@ def test_detect_scope_spillover_flags_changes_outside_owned_paths() -> None:
     )
 
     assert spillover == ["spill.txt"]
+
+
+def test_ship_slice_rejects_auto_commit_without_auto_close(
+    tmp_path: Path, monkeypatch
+) -> None:
+    init_git_repo(tmp_path)
+    write_execution_config(
+        tmp_path,
+        accelerators_overrides={"ship_slice": {"auto_commit": True}},
+    )
+    create_slice(
+        tmp_path,
+        monkeypatch,
+        "taw-ship-slice-loop",
+        "Add one-slice finishing and resume orchestration",
+        "closed",
+    )
+
+    result = run_cli(tmp_path, "taw-ship-slice-loop", "--json")
+
+    assert result.returncode == 2
+    assert "auto_commit requires auto_close" in result.stderr
+
+
+def test_ship_slice_terminal_automation_formats_closes_and_commits_owned_changes(
+    tmp_path: Path, monkeypatch
+) -> None:
+    init_git_repo(tmp_path)
+    write_execution_config(
+        tmp_path,
+        accelerators_overrides={
+            "ship_slice": {
+                "execute_owner_chain": True,
+                "auto_format": True,
+                "auto_close": True,
+                "auto_commit": True,
+                "format_command": [str(tmp_path / "formatter.sh")],
+            }
+        },
+        auto_start_implementation=False,
+    )
+    create_slice(
+        tmp_path,
+        monkeypatch,
+        "taw-ship-slice-loop",
+        "Add one-slice finishing and resume orchestration",
+        "execution_ready",
+    )
+    commit_all(tmp_path)
+    (tmp_path / "notes.txt").write_text("baseline\n", encoding="utf-8")
+
+    formatter = tmp_path / "formatter.sh"
+    formatter.write_text(
+        "#!/bin/sh\n"
+        "for path in \"$@\"; do\n"
+        "  printf '# formatted\\n' >> \"$path\"\n"
+        "done\n",
+        encoding="utf-8",
+    )
+    formatter.chmod(0o755)
+
+    first = run_cli(tmp_path, "taw-ship-slice-loop", "--no-execute-owner-chain", "--json")
+
+    assert first.returncode == 0
+    assert json.loads(first.stdout)["next_owner"] == "implementation"
+    (tmp_path / "owned.py").write_text("print('hi')\n", encoding="utf-8")
+
+    resumed = run_cli(tmp_path, "--resume", "--execute-owner-chain", "--json")
+
+    assert resumed.returncode == 0
+    payload = json.loads(resumed.stdout)
+    assert payload["slice_status"] == "closed"
+    assert payload["next_owner"] == "none"
+    assert payload["terminal_automation"]["format_applied"] is True
+    assert payload["terminal_automation"]["close_applied"] is True
+    assert payload["terminal_automation"]["commit_applied"] is True
+    assert payload["readiness"]["blocked_by"] == ["completed"]
+    assert "owned.py" in payload["terminal_automation"]["committed_paths"]
+
+    status = read_git_status(tmp_path)
+    assert any("notes.txt" in line for line in status)
+    assert not any("owned.py" in line for line in status)
+    assert not any("slices/" in line for line in status)
+
+    last_subject = subprocess.run(
+        ["git", "log", "-1", "--pretty=%s"],
+        cwd=tmp_path,
+        check=True,
+        capture_output=True,
+        text=True,
+    ).stdout.strip()
+    assert last_subject == "ship-slice: Complete taw-ship-slice-loop"
+
+
+def test_ship_slice_terminal_automation_reports_formatter_spillover(
+    tmp_path: Path, monkeypatch
+) -> None:
+    init_git_repo(tmp_path)
+    write_execution_config(
+        tmp_path,
+        accelerators_overrides={
+            "ship_slice": {
+                "execute_owner_chain": True,
+                "auto_format": True,
+                "auto_close": True,
+                "format_command": [str(tmp_path / "formatter-spill.sh")],
+            }
+        },
+        auto_start_implementation=False,
+    )
+    create_slice(
+        tmp_path,
+        monkeypatch,
+        "taw-ship-slice-loop",
+        "Add one-slice finishing and resume orchestration",
+        "execution_ready",
+    )
+    commit_all(tmp_path)
+
+    formatter = tmp_path / "formatter-spill.sh"
+    formatter.write_text(
+        "#!/bin/sh\n"
+        "printf '# formatted\\n' >> \"$1\"\n"
+        "printf 'spill\\n' > spill.txt\n",
+        encoding="utf-8",
+    )
+    formatter.chmod(0o755)
+
+    first = run_cli(tmp_path, "taw-ship-slice-loop", "--no-execute-owner-chain", "--json")
+
+    assert first.returncode == 0
+    (tmp_path / "owned.py").write_text("print('hi')\n", encoding="utf-8")
+
+    resumed = run_cli(tmp_path, "--resume", "--execute-owner-chain", "--json")
+
+    assert resumed.returncode == 0
+    payload = json.loads(resumed.stdout)
+    assert payload["next_owner"] == "guide-execution"
+    assert payload["terminal_automation"]["close_applied"] is False
+    assert payload["terminal_automation"]["stop_reason"] == {
+        "kind": "formatter_spillover",
+        "paths": ["spill.txt"],
+    }
+    assert payload["readiness"]["stop_reason"] == {
+        "kind": "formatter_spillover",
+        "paths": ["spill.txt"],
+    }
+
+
+def test_ship_slice_terminal_automation_reports_partial_success_when_commit_fails(
+    tmp_path: Path, monkeypatch
+) -> None:
+    init_git_repo(tmp_path)
+    write_execution_config(
+        tmp_path,
+        accelerators_overrides={
+            "ship_slice": {
+                "execute_owner_chain": True,
+                "auto_close": True,
+                "auto_commit": True,
+            }
+        },
+        auto_start_implementation=False,
+    )
+    create_slice(
+        tmp_path,
+        monkeypatch,
+        "taw-ship-slice-loop",
+        "Add one-slice finishing and resume orchestration",
+        "execution_ready",
+    )
+    commit_all(tmp_path)
+
+    first = run_cli(tmp_path, "taw-ship-slice-loop", "--no-execute-owner-chain", "--json")
+
+    assert first.returncode == 0
+
+    hook = tmp_path / ".git" / "hooks" / "pre-commit"
+    hook.write_text("#!/bin/sh\nexit 1\n", encoding="utf-8")
+    hook.chmod(0o755)
+    (tmp_path / "owned.py").write_text("print('hi')\n", encoding="utf-8")
+
+    resumed = run_cli(tmp_path, "--resume", "--execute-owner-chain", "--json")
+
+    assert resumed.returncode == 0
+    payload = json.loads(resumed.stdout)
+    assert payload["slice_status"] == "closed"
+    assert payload["next_owner"] == "commit"
+    assert payload["terminal_automation"]["close_applied"] is True
+    assert payload["terminal_automation"]["commit_applied"] is False
+    assert payload["terminal_automation"]["stop_reason"]["kind"] == "commit_failed"
+    assert payload["readiness"]["stop_reason"]["kind"] == "commit_failed"
+    assert "commit_checkpoint" in payload["readiness"]["blocked_by"]
+    assert "commit_failed" in payload["readiness"]["blocked_by"]

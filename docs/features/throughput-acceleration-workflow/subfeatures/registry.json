@@ -23,9 +23,9 @@
     },
     {
       "subfeature_id": "ship-slice-close-commit-controls",
-      "status": "reviewed",
+      "status": "finalized",
       "subfeature_type": "additive",
-      "updated_at": "2026-04-23T14:54:14",
+      "updated_at": "2026-04-23T16:57:50",
       "path": "docs/features/throughput-acceleration-workflow/subfeatures/ship-slice-close-commit-controls/"
     },
     {

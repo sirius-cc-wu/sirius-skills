@@ -1,0 +1,5 @@
+- [x] FR-001 `ship-slice` reads `auto_format`, `auto_close`, and `auto_commit`, with `auto_commit` requiring `auto_close`.
+- [x] FR-002 `auto_format` runs a path-scoped formatter against owned files only and stops on spillover.
+- [x] FR-003 `auto_close` closes the active slice through `close-slice`.
+- [x] FR-004 `auto_commit` stages and commits only owned changed files.
+- [x] FR-005 Close success plus commit failure is reported as deterministic partial success.

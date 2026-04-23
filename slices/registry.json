@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "generated_at": "2026-04-23T15:59:13",
+  "generated_at": "2026-04-23T16:57:50",
   "slices": [
     {
       "id": "hss-root-fallback",
@@ -429,6 +429,16 @@
       "path": "slices/scc-owned-change-set-ship-slice-close-commit-controls/",
       "updated_at": "2026-04-23T15:59:13",
       "closed_at": "2026-04-23T15:59:13",
+      "archived_at": null,
+      "relations": []
+    },
+    {
+      "id": "scc-terminal-automation",
+      "feature": "ship-slice-close-commit-controls",
+      "status": "closed",
+      "path": "slices/scc-terminal-automation-ship-slice-close-commit-controls/",
+      "updated_at": "2026-04-23T16:57:50",
+      "closed_at": "2026-04-23T16:57:50",
       "archived_at": null,
       "relations": []
     }

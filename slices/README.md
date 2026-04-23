@@ -45,3 +45,4 @@
 | taw-ship-backlog-integration | Integrate backlog delegation from ship to ship-slice | closed | 2026-04-22T10:24:00 | 2026-04-22T10:24:00 | slices/taw-ship-backlog-integration-integrate-backlog-delegation-from-ship-to-ship-slice/ |
 | taw-autoplan | Add high-autonomy planning orchestration | closed | 2026-04-22T10:27:11 | 2026-04-22T10:27:11 | slices/taw-autoplan-add-high-autonomy-planning-orchestration/ |
 | scc-owned-change-set | ship-slice-close-commit-controls | closed | 2026-04-23T15:59:13 | 2026-04-23T15:59:13 | slices/scc-owned-change-set-ship-slice-close-commit-controls/ |
+| scc-terminal-automation | ship-slice-close-commit-controls | closed | 2026-04-23T16:57:50 | 2026-04-23T16:57:50 | slices/scc-terminal-automation-ship-slice-close-commit-controls/ |

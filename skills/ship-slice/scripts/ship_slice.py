@@ -6,9 +6,10 @@ import argparse
 import hashlib
 import importlib.util
 import json
+import shlex
 import subprocess
 import sys
-from dataclasses import asdict, dataclass
+from dataclasses import asdict, dataclass, field
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Dict, Optional, Sequence
@@ -22,6 +23,7 @@ SKILL_LIB_DIR = SKILL_DIR / "lib"
 GUIDE_EXECUTION_SCRIPT = (
     SKILLS_DIR / "guide-execution" / "scripts" / "manage_execution.py"
 )
+CLOSE_SLICE_SCRIPT = SKILLS_DIR / "close-slice" / "scripts" / "close_slice.py"
 
 if REPO_LIB_DIR.is_dir() and str(REPO_LIB_DIR) not in sys.path:
     sys.path.insert(0, str(REPO_LIB_DIR))
@@ -86,6 +88,31 @@ class WorktreeOwnership:
     owned_file_conflict_paths: list[str]
     baseline_snapshot: Dict[str, str]
     current_snapshot: Dict[str, str]
+
+    def to_dict(self) -> Dict[str, Any]:
+        return asdict(self)
+
+
+@dataclass
+class TerminalAutomationConfig:
+    auto_format: bool = False
+    auto_close: bool = False
+    auto_commit: bool = False
+    format_command: Optional[list[str]] = None
+
+
+@dataclass
+class TerminalAutomationResult:
+    enabled: bool = False
+    attempted: bool = False
+    format_applied: bool = False
+    close_applied: bool = False
+    commit_applied: bool = False
+    formatted_paths: list[str] = field(default_factory=list)
+    committed_paths: list[str] = field(default_factory=list)
+    commit_message: Optional[str] = None
+    stop_reason: Optional[dict[str, Any]] = None
+    notes: list[str] = field(default_factory=list)
 
     def to_dict(self) -> Dict[str, Any]:
         return asdict(self)
@@ -231,29 +258,14 @@ def detect_scope_spillover(
     return spillover
 
 
-def compute_worktree_ownership(
+def compute_worktree_ownership_from_baseline(
     repo_root: Path,
-    prior_checkpoint: Optional[CheckpointRecord],
+    baseline_snapshot: Dict[str, str],
+    *,
+    baseline_from_checkpoint: bool,
 ) -> tuple[WorktreeOwnership, list[str]]:
     dirty_lines, current_snapshot = snapshot_dirty_worktree(repo_root)
     current_paths = sorted(current_snapshot)
-
-    baseline_snapshot: Dict[str, str] = {}
-    baseline_from_checkpoint = False
-    if prior_checkpoint is not None:
-        raw_ownership = prior_checkpoint.payload.get("worktree_ownership")
-        if isinstance(raw_ownership, dict):
-            raw_snapshot = raw_ownership.get("baseline_snapshot")
-            if isinstance(raw_snapshot, dict):
-                baseline_snapshot = {
-                    str(path): str(digest)
-                    for path, digest in raw_snapshot.items()
-                    if str(path).strip()
-                }
-                baseline_from_checkpoint = True
-
-    if not baseline_snapshot:
-        baseline_snapshot = dict(current_snapshot)
 
     owned_dirty_paths: list[str] = []
     unowned_dirty_paths: list[str] = []
@@ -275,10 +287,376 @@ def compute_worktree_ownership(
         owned_dirty_paths=owned_dirty_paths,
         unowned_dirty_paths=unowned_dirty_paths,
         owned_file_conflict_paths=owned_file_conflict_paths,
-        baseline_snapshot=baseline_snapshot,
+        baseline_snapshot=dict(baseline_snapshot),
         current_snapshot=current_snapshot,
     )
     return ownership, dirty_lines
+
+
+def compute_worktree_ownership(
+    repo_root: Path,
+    prior_checkpoint: Optional[CheckpointRecord],
+) -> tuple[WorktreeOwnership, list[str]]:
+    dirty_lines, current_snapshot = snapshot_dirty_worktree(repo_root)
+
+    baseline_snapshot: Dict[str, str] = {}
+    baseline_from_checkpoint = False
+    if prior_checkpoint is not None:
+        raw_ownership = prior_checkpoint.payload.get("worktree_ownership")
+        if isinstance(raw_ownership, dict):
+            raw_snapshot = raw_ownership.get("baseline_snapshot")
+            if isinstance(raw_snapshot, dict):
+                baseline_snapshot = {
+                    str(path): str(digest)
+                    for path, digest in raw_snapshot.items()
+                    if str(path).strip()
+                }
+                baseline_from_checkpoint = True
+
+    if not baseline_snapshot:
+        baseline_snapshot = dict(current_snapshot)
+
+    ownership, _ = compute_worktree_ownership_from_baseline(
+        repo_root,
+        baseline_snapshot,
+        baseline_from_checkpoint=baseline_from_checkpoint,
+    )
+    ownership.current_snapshot = current_snapshot
+    return ownership, dirty_lines
+
+
+def parse_command_config(raw_value: object, field_name: str) -> Optional[list[str]]:
+    if raw_value is None:
+        return None
+    if isinstance(raw_value, str):
+        command = [part for part in shlex.split(raw_value) if part]
+    elif isinstance(raw_value, list):
+        command = []
+        for item in raw_value:
+            if not isinstance(item, str) or not item.strip():
+                raise RuntimeError(f"ship-slice {field_name} entries must be non-empty strings.")
+            command.append(item.strip())
+    else:
+        raise RuntimeError(f"ship-slice {field_name} must be a string or list of strings.")
+    if not command:
+        raise RuntimeError(f"ship-slice {field_name} cannot be empty.")
+    return command
+
+
+def parse_terminal_automation_config(raw_config: object) -> TerminalAutomationConfig:
+    if not isinstance(raw_config, dict):
+        return TerminalAutomationConfig()
+
+    format_command = parse_command_config(raw_config.get("format_command"), "format_command")
+    config = TerminalAutomationConfig(
+        auto_format=bool(raw_config.get("auto_format", False)),
+        auto_close=bool(raw_config.get("auto_close", False)),
+        auto_commit=bool(raw_config.get("auto_commit", False)),
+        format_command=format_command,
+    )
+    if config.auto_commit and not config.auto_close:
+        raise RuntimeError("ship-slice auto_commit requires auto_close.")
+    if config.auto_format and config.format_command is None:
+        raise RuntimeError("ship-slice auto_format requires format_command.")
+    return config
+
+
+def synthesize_commit_message(
+    *,
+    slice_id: str,
+    execution_module,
+    scope_context,
+) -> str:
+    conventions = execution_module.load_conventions_config(
+        required=False, scope_context=scope_context
+    )
+    summary = f"Complete {slice_id}"
+    scope = "ship-slice"
+    issue_id = execution_module.infer_id_from_branch(conventions) or slice_id
+    template = conventions.get("commit_format")
+    if template:
+        return template.format_map(
+            {
+                "ID": issue_id,
+                "id": issue_id,
+                "scope": scope,
+                "summary": summary,
+            }
+        )
+    return f"{scope}: {summary}"
+
+
+def _manual_route_from(
+    route: SliceRoute,
+    *,
+    next_owner: str,
+    action: str,
+) -> SliceRoute:
+    return SliceRoute(
+        slice_id=route.slice_id,
+        slice_path=route.slice_path,
+        slice_status=route.slice_status,
+        next_owner=next_owner,
+        action=action,
+        target_type=route.target_type,
+        target_id=route.target_id,
+        handoff_payload=dict(route.handoff_payload),
+    )
+
+
+def run_command(
+    command: Sequence[str],
+    *,
+    cwd: Path,
+) -> subprocess.CompletedProcess[str]:
+    return subprocess.run(
+        list(command),
+        cwd=cwd,
+        check=False,
+        capture_output=True,
+        text=True,
+    )
+
+
+def run_formatter(
+    *,
+    repo_root: Path,
+    config: TerminalAutomationConfig,
+    ownership: WorktreeOwnership,
+) -> tuple[WorktreeOwnership, list[str], Optional[dict[str, Any]], bool]:
+    if not config.auto_format or not ownership.owned_dirty_paths:
+        return ownership, [f"?? {path}" for path in ownership.current_dirty_paths], None, False
+
+    before_snapshot = dict(ownership.current_snapshot)
+    result = run_command(
+        [*(config.format_command or []), *ownership.owned_dirty_paths],
+        cwd=repo_root,
+    )
+    updated_ownership, dirty_lines = compute_worktree_ownership_from_baseline(
+        repo_root,
+        ownership.baseline_snapshot,
+        baseline_from_checkpoint=ownership.baseline_from_checkpoint,
+    )
+    if result.returncode != 0:
+        message = (result.stderr or result.stdout or "Formatter command failed.").strip()
+        return (
+            updated_ownership,
+            dirty_lines,
+            {"kind": "formatter_failed", "message": message},
+            False,
+        )
+
+    spillover = detect_scope_spillover(
+        before_snapshot,
+        updated_ownership.current_snapshot,
+        allowed_paths=ownership.owned_dirty_paths,
+    )
+    if spillover:
+        return (
+            updated_ownership,
+            dirty_lines,
+            {"kind": "formatter_spillover", "paths": spillover},
+            False,
+        )
+    return updated_ownership, dirty_lines, None, True
+
+
+def run_close_slice(
+    *,
+    repo_root: Path,
+    slice_id: str,
+) -> tuple[bool, str]:
+    result = run_command(
+        ["python3", str(CLOSE_SLICE_SCRIPT), "--slice", slice_id, "--json"],
+        cwd=repo_root,
+    )
+    message = (result.stdout or result.stderr).strip()
+    if result.returncode != 0:
+        return False, message or f"Unable to close slice {slice_id}."
+    return True, message
+
+
+def run_owned_commit(
+    *,
+    repo_root: Path,
+    owned_paths: Sequence[str],
+    commit_message: str,
+) -> tuple[bool, str]:
+    if not owned_paths:
+        return True, "No owned dirty paths remain to commit."
+
+    stage = run_command(["git", "add", "--all", "--", *owned_paths], cwd=repo_root)
+    if stage.returncode != 0:
+        return False, (stage.stderr or stage.stdout or "Unable to stage owned files.").strip()
+
+    commit = run_command(["git", "commit", "-m", commit_message], cwd=repo_root)
+    if commit.returncode != 0:
+        return False, (commit.stderr or commit.stdout or "Owned commit failed.").strip()
+    return True, (commit.stdout or commit.stderr).strip()
+
+
+def apply_terminal_automation(
+    *,
+    route: SliceRoute,
+    rows: list[dict[str, Any]],
+    slice_row: Dict[str, Any],
+    execution_module,
+    scope_context,
+    repo_root: Path,
+    worktree_ownership: WorktreeOwnership,
+    dirty_paths: list[str],
+    terminal_config: TerminalAutomationConfig,
+) -> tuple[
+    list[dict[str, Any]],
+    Dict[str, Any],
+    SliceRoute,
+    WorktreeOwnership,
+    list[str],
+    TerminalAutomationResult,
+]:
+    result = TerminalAutomationResult(
+        enabled=bool(
+            terminal_config.auto_format
+            or terminal_config.auto_close
+            or terminal_config.auto_commit
+        )
+    )
+    dirty_lines = [f"?? {path}" for path in worktree_ownership.current_dirty_paths]
+    if not result.enabled:
+        return rows, slice_row, route, worktree_ownership, dirty_lines, result
+
+    updated_rows = rows
+    updated_slice_row = slice_row
+    updated_route = route
+    updated_ownership = worktree_ownership
+    dirty_lines = list(dirty_paths)
+    should_auto_close = route.next_owner == "review-execution" and terminal_config.auto_close
+
+    if should_auto_close:
+        result.attempted = True
+        if terminal_config.auto_format:
+            updated_ownership, dirty_lines, stop_reason, format_applied = run_formatter(
+                repo_root=repo_root,
+                config=terminal_config,
+                ownership=updated_ownership,
+            )
+            if format_applied:
+                result.format_applied = True
+                result.formatted_paths = list(updated_ownership.owned_dirty_paths)
+            if stop_reason is not None:
+                result.stop_reason = stop_reason
+                updated_route = _manual_route_from(
+                    route,
+                    next_owner="guide-execution",
+                    action="resolve_formatter_scope",
+                )
+                return (
+                    updated_rows,
+                    updated_slice_row,
+                    updated_route,
+                    updated_ownership,
+                    dirty_lines,
+                    result,
+                )
+
+        close_ok, close_message = run_close_slice(repo_root=repo_root, slice_id=route.slice_id)
+        result.notes.append(close_message)
+        if not close_ok:
+            result.stop_reason = {
+                "kind": classify_stop_reason_from_message(close_message, stage="execution"),
+                "message": close_message,
+            }
+            updated_route = _manual_route_from(
+                route,
+                next_owner="close-slice",
+                action="close_completed_slice",
+            )
+            return (
+                updated_rows,
+                updated_slice_row,
+                updated_route,
+                updated_ownership,
+                dirty_lines,
+                result,
+            )
+
+        result.close_applied = True
+        updated_rows = execution_module.parse_registry(scope_context=scope_context)
+        refreshed_slice = execution_module.resolve_slice(updated_rows, route.slice_id)
+        if refreshed_slice is None:
+            raise RuntimeError(f"Closed slice disappeared from registry: {route.slice_id}")
+        updated_slice_row = refreshed_slice
+        updated_ownership, dirty_lines = compute_worktree_ownership_from_baseline(
+            repo_root,
+            updated_ownership.baseline_snapshot,
+            baseline_from_checkpoint=updated_ownership.baseline_from_checkpoint,
+        )
+        updated_route = build_route(
+            updated_slice_row,
+            target_type=route.target_type,
+            target_id=route.target_id,
+            repo_root=repo_root,
+            worktree_ownership=updated_ownership,
+            owner_chain_mode=False,
+        )
+
+    if updated_route.next_owner == "commit" and terminal_config.auto_commit:
+        result.attempted = True
+        commit_message = synthesize_commit_message(
+            slice_id=route.slice_id,
+            execution_module=execution_module,
+            scope_context=scope_context,
+        )
+        result.commit_message = commit_message
+        commit_ok, commit_message_output = run_owned_commit(
+            repo_root=repo_root,
+            owned_paths=updated_ownership.owned_dirty_paths,
+            commit_message=commit_message,
+        )
+        result.notes.append(commit_message_output)
+        if not commit_ok:
+            result.stop_reason = {
+                "kind": "commit_failed",
+                "message": commit_message_output,
+            }
+            updated_route = _manual_route_from(
+                updated_route,
+                next_owner="commit",
+                action="commit_completed_slice",
+            )
+            return (
+                updated_rows,
+                updated_slice_row,
+                updated_route,
+                updated_ownership,
+                dirty_lines,
+                result,
+            )
+
+        result.commit_applied = True
+        result.committed_paths = list(updated_ownership.owned_dirty_paths)
+        updated_ownership, dirty_lines = compute_worktree_ownership_from_baseline(
+            repo_root,
+            updated_ownership.baseline_snapshot,
+            baseline_from_checkpoint=updated_ownership.baseline_from_checkpoint,
+        )
+        updated_route = build_route(
+            updated_slice_row,
+            target_type=route.target_type,
+            target_id=route.target_id,
+            repo_root=repo_root,
+            worktree_ownership=updated_ownership,
+            owner_chain_mode=False,
+        )
+
+    return (
+        updated_rows,
+        updated_slice_row,
+        updated_route,
+        updated_ownership,
+        dirty_lines,
+        result,
+    )
 
 
 def runtime_paths(repo_root: Path) -> tuple[Path, Path, Path]:
@@ -592,9 +970,12 @@ def build_readiness_payload(
     route: SliceRoute,
     owner_chain: Optional[dict[str, Any]],
     worktree_ownership: WorktreeOwnership,
+    terminal_automation: Optional[TerminalAutomationResult] = None,
 ) -> dict[str, Any]:
     blocked_by: list[str] = []
     stop_reason_input = owner_chain.get("stop_reason") if isinstance(owner_chain, dict) else None
+    if terminal_automation is not None and terminal_automation.stop_reason is not None:
+        stop_reason_input = terminal_automation.stop_reason
     if worktree_ownership.owned_file_conflict_paths:
         stop_reason_input = {
             "kind": "owned_file_conflict",
@@ -637,6 +1018,7 @@ def write_runtime_records(
     worktree_ownership: WorktreeOwnership,
     learnings: list[dict[str, Any]],
     owner_chain: Optional[dict[str, Any]],
+    terminal_automation: Optional[TerminalAutomationResult],
 ) -> None:
     event: Dict[str, Any] = {
         "timestamp": utc_now(),
@@ -656,6 +1038,8 @@ def write_runtime_records(
         if isinstance(stop_reason, dict):
             event["owner_chain_stop_kind"] = stop_reason.get("kind")
             event["owner_chain_stop_owner"] = stop_reason.get("owner")
+    if terminal_automation is not None:
+        event["terminal_automation"] = terminal_automation.to_dict()
     append_event(event_log_path, event)
 
     checkpoint_payload: Dict[str, Any] = {
@@ -672,6 +1056,8 @@ def write_runtime_records(
     }
     if owner_chain is not None:
         checkpoint_payload["owner_chain"] = owner_chain
+    if terminal_automation is not None:
+        checkpoint_payload["terminal_automation"] = terminal_automation.to_dict()
 
     write_checkpoint(
         checkpoint_path,
@@ -712,6 +1098,7 @@ def main(argv: Sequence[str] | None = None) -> int:
         config_stop_on_owner = parse_stop_on_owners(
             ship_slice_config.get("stop_on_owner") if isinstance(ship_slice_config, dict) else None
         )
+        terminal_config = parse_terminal_automation_config(ship_slice_config)
     except RuntimeError as exc:
         print(str(exc), file=sys.stderr)
         return 2
@@ -732,6 +1119,7 @@ def main(argv: Sequence[str] | None = None) -> int:
         return 2
 
     owner_chain: Optional[dict[str, Any]] = None
+    terminal_automation: Optional[TerminalAutomationResult] = None
     worktree_ownership, dirty_paths = compute_worktree_ownership(repo_root, prior_checkpoint)
     if execute_owner_chain_enabled:
         route, steps, stop_reason = execute_owner_chain(
@@ -761,6 +1149,27 @@ def main(argv: Sequence[str] | None = None) -> int:
             owner_chain_mode=False,
         )
 
+    (
+        rows,
+        slice_row,
+        route,
+        worktree_ownership,
+        dirty_paths,
+        terminal_automation,
+    ) = apply_terminal_automation(
+        route=route,
+        rows=rows,
+        slice_row=slice_row,
+        execution_module=execution_module,
+        scope_context=scope_context,
+        repo_root=repo_root,
+        worktree_ownership=worktree_ownership,
+        dirty_paths=dirty_paths,
+        terminal_config=terminal_config,
+    )
+    if owner_chain is not None and terminal_automation is not None and terminal_automation.attempted:
+        owner_chain["stop_reason"] = normalize_stop_reason(terminal_automation.stop_reason)
+
     checkpoint_stale_reason = None
     if prior_checkpoint is not None:
         prior_slice_status = str(prior_checkpoint.payload.get("slice_status") or "")
@@ -786,6 +1195,7 @@ def main(argv: Sequence[str] | None = None) -> int:
         worktree_ownership=worktree_ownership,
         learnings=learnings,
         owner_chain=owner_chain,
+        terminal_automation=terminal_automation,
     )
 
     payload = {
@@ -804,12 +1214,16 @@ def main(argv: Sequence[str] | None = None) -> int:
         "event_log_path": str(event_log_path),
         "dirty_worktree_paths": dirty_paths,
         "worktree_ownership": worktree_ownership.to_dict(),
+        "terminal_automation": (
+            terminal_automation.to_dict() if terminal_automation is not None else None
+        ),
         "learnings": learnings,
         "checkpoint_stale_reason": checkpoint_stale_reason,
         "readiness": build_readiness_payload(
             route=route,
             owner_chain=owner_chain,
             worktree_ownership=worktree_ownership,
+            terminal_automation=terminal_automation,
         ),
     }
     if args.json:
