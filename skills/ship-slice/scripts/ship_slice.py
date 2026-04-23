@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import argparse
+import hashlib
 import importlib.util
 import json
 import subprocess
@@ -73,6 +74,21 @@ class SliceRoute:
     target_type: str
     target_id: str
     handoff_payload: Dict[str, Any]
+
+
+@dataclass
+class WorktreeOwnership:
+    baseline_from_checkpoint: bool
+    baseline_dirty_paths: list[str]
+    current_dirty_paths: list[str]
+    owned_dirty_paths: list[str]
+    unowned_dirty_paths: list[str]
+    owned_file_conflict_paths: list[str]
+    baseline_snapshot: Dict[str, str]
+    current_snapshot: Dict[str, str]
+
+    def to_dict(self) -> Dict[str, Any]:
+        return asdict(self)
 
 
 def load_module(script_path: Path, name: str):
@@ -150,13 +166,119 @@ def git_repo_root() -> Path:
 
 def git_dirty_paths(repo_root: Path) -> list[str]:
     result = subprocess.run(
-        ["git", "status", "--short"],
+        ["git", "status", "--short", "--untracked-files=all"],
         cwd=repo_root,
         check=True,
         capture_output=True,
         text=True,
     )
     return [line.rstrip() for line in result.stdout.splitlines() if line.strip()]
+
+
+def dirty_line_to_path(line: str) -> str:
+    raw_path = line[3:].strip()
+    if " -> " in raw_path:
+        raw_path = raw_path.split(" -> ", 1)[1]
+    return raw_path.strip('"')
+
+
+def hash_worktree_path(repo_root: Path, relative_path: str) -> str:
+    target = repo_root / relative_path
+    if not target.exists():
+        return "missing"
+    if target.is_dir():
+        digest = hashlib.sha256()
+        for child in sorted(
+            path for path in target.rglob("*") if path.is_file() and not path.is_symlink()
+        ):
+            digest.update(str(child.relative_to(repo_root)).encode("utf-8"))
+            digest.update(b"\0")
+            digest.update(child.read_bytes())
+            digest.update(b"\0")
+        return f"dir:{digest.hexdigest()}"
+    return f"file:{hashlib.sha256(target.read_bytes()).hexdigest()}"
+
+
+def should_ignore_dirty_path(relative_path: str) -> bool:
+    return relative_path.startswith(".skills/runtime/")
+
+
+def snapshot_dirty_worktree(repo_root: Path) -> tuple[list[str], Dict[str, str]]:
+    lines: list[str] = []
+    snapshot: Dict[str, str] = {}
+    for line in git_dirty_paths(repo_root):
+        relative_path = dirty_line_to_path(line)
+        if should_ignore_dirty_path(relative_path):
+            continue
+        lines.append(line)
+        snapshot[relative_path] = hash_worktree_path(repo_root, relative_path)
+    return lines, snapshot
+
+
+def detect_scope_spillover(
+    before_snapshot: Dict[str, str],
+    after_snapshot: Dict[str, str],
+    *,
+    allowed_paths: Sequence[str],
+) -> list[str]:
+    allowed = {path for path in allowed_paths if path}
+    spillover: list[str] = []
+    for path, digest in sorted(after_snapshot.items()):
+        if before_snapshot.get(path) == digest:
+            continue
+        if path not in allowed:
+            spillover.append(path)
+    return spillover
+
+
+def compute_worktree_ownership(
+    repo_root: Path,
+    prior_checkpoint: Optional[CheckpointRecord],
+) -> tuple[WorktreeOwnership, list[str]]:
+    dirty_lines, current_snapshot = snapshot_dirty_worktree(repo_root)
+    current_paths = sorted(current_snapshot)
+
+    baseline_snapshot: Dict[str, str] = {}
+    baseline_from_checkpoint = False
+    if prior_checkpoint is not None:
+        raw_ownership = prior_checkpoint.payload.get("worktree_ownership")
+        if isinstance(raw_ownership, dict):
+            raw_snapshot = raw_ownership.get("baseline_snapshot")
+            if isinstance(raw_snapshot, dict):
+                baseline_snapshot = {
+                    str(path): str(digest)
+                    for path, digest in raw_snapshot.items()
+                    if str(path).strip()
+                }
+                baseline_from_checkpoint = True
+
+    if not baseline_snapshot:
+        baseline_snapshot = dict(current_snapshot)
+
+    owned_dirty_paths: list[str] = []
+    unowned_dirty_paths: list[str] = []
+    owned_file_conflict_paths: list[str] = []
+    for path in current_paths:
+        baseline_digest = baseline_snapshot.get(path)
+        current_digest = current_snapshot[path]
+        if baseline_digest is None:
+            owned_dirty_paths.append(path)
+        elif baseline_digest == current_digest:
+            unowned_dirty_paths.append(path)
+        else:
+            owned_file_conflict_paths.append(path)
+
+    ownership = WorktreeOwnership(
+        baseline_from_checkpoint=baseline_from_checkpoint,
+        baseline_dirty_paths=sorted(baseline_snapshot),
+        current_dirty_paths=current_paths,
+        owned_dirty_paths=owned_dirty_paths,
+        unowned_dirty_paths=unowned_dirty_paths,
+        owned_file_conflict_paths=owned_file_conflict_paths,
+        baseline_snapshot=baseline_snapshot,
+        current_snapshot=current_snapshot,
+    )
+    return ownership, dirty_lines
 
 
 def runtime_paths(repo_root: Path) -> tuple[Path, Path, Path]:
@@ -180,11 +302,24 @@ def build_route(
     target_type: str,
     target_id: str,
     repo_root: Path,
+    worktree_ownership: Optional[WorktreeOwnership] = None,
     owner_chain_mode: bool = False,
 ) -> SliceRoute:
     status = str(slice_row["status"])
-    dirty_paths = git_dirty_paths(repo_root)
-    if status == "draft":
+    ownership = worktree_ownership or WorktreeOwnership(
+        baseline_from_checkpoint=False,
+        baseline_dirty_paths=[],
+        current_dirty_paths=[],
+        owned_dirty_paths=[],
+        unowned_dirty_paths=[],
+        owned_file_conflict_paths=[],
+        baseline_snapshot={},
+        current_snapshot={},
+    )
+    if ownership.owned_file_conflict_paths:
+        next_owner = "guide-execution"
+        action = "resolve_owned_file_conflict"
+    elif status == "draft":
         next_owner = "brief"
         action = "create_or_update_brief"
     elif status == "brief_ready":
@@ -199,7 +334,14 @@ def build_route(
     elif status == "execution_ready" and owner_chain_mode:
         next_owner = "review-execution"
         action = "run_review_execution"
-    elif status == "closed" and dirty_paths:
+    elif (
+        status == "closed"
+        and not ownership.baseline_from_checkpoint
+        and ownership.current_dirty_paths
+    ):
+        next_owner = "commit"
+        action = "commit_completed_slice"
+    elif status == "closed" and ownership.owned_dirty_paths:
         next_owner = "commit"
         action = "commit_completed_slice"
     elif status == "closed":
@@ -318,6 +460,7 @@ def execute_owner_chain(
     target_type: str,
     target_id: str,
     repo_root: Path,
+    worktree_ownership: WorktreeOwnership,
     stop_on_owner: list[str],
 ) -> tuple[SliceRoute, list[dict[str, Any]], Optional[dict[str, Any]]]:
     steps: list[dict[str, Any]] = []
@@ -328,6 +471,7 @@ def execute_owner_chain(
             target_type=target_type,
             target_id=target_id,
             repo_root=repo_root,
+            worktree_ownership=worktree_ownership,
             owner_chain_mode=True,
         )
         current_status = route.slice_status
@@ -405,6 +549,7 @@ def execute_owner_chain(
                 target_type=target_type,
                 target_id=target_id,
                 repo_root=repo_root,
+                worktree_ownership=worktree_ownership,
                 owner_chain_mode=True,
             )
             return (
@@ -426,6 +571,7 @@ def execute_owner_chain(
         target_type=target_type,
         target_id=target_id,
         repo_root=repo_root,
+        worktree_ownership=worktree_ownership,
         owner_chain_mode=True,
     )
     return (
@@ -445,18 +591,23 @@ def build_readiness_payload(
     *,
     route: SliceRoute,
     owner_chain: Optional[dict[str, Any]],
+    worktree_ownership: WorktreeOwnership,
 ) -> dict[str, Any]:
     blocked_by: list[str] = []
-    stop_reason = normalize_stop_reason(
-        owner_chain.get("stop_reason") if isinstance(owner_chain, dict) else None
-    )
+    stop_reason_input = owner_chain.get("stop_reason") if isinstance(owner_chain, dict) else None
+    if worktree_ownership.owned_file_conflict_paths:
+        stop_reason_input = {
+            "kind": "owned_file_conflict",
+            "paths": list(worktree_ownership.owned_file_conflict_paths),
+        }
+    stop_reason = normalize_stop_reason(stop_reason_input)
 
     commit_required = route.next_owner == "commit"
     if commit_required:
         blocked_by.append("commit_checkpoint")
     if route.next_owner == "review-execution":
         blocked_by.append("review_boundary")
-    if route.next_owner == "guide-execution":
+    if route.next_owner == "guide-execution" and not worktree_ownership.owned_file_conflict_paths:
         blocked_by.append("execution_resolution_required")
     if route.next_owner == "none":
         blocked_by.append("completed")
@@ -483,6 +634,7 @@ def write_runtime_records(
     event_log_path: Path,
     route: SliceRoute,
     dirty_paths: list[str],
+    worktree_ownership: WorktreeOwnership,
     learnings: list[dict[str, Any]],
     owner_chain: Optional[dict[str, Any]],
 ) -> None:
@@ -494,6 +646,9 @@ def write_runtime_records(
         "next_owner": route.next_owner,
         "action": route.action,
         "target_id": route.target_id,
+        "owned_dirty_paths": list(worktree_ownership.owned_dirty_paths),
+        "unowned_dirty_paths": list(worktree_ownership.unowned_dirty_paths),
+        "owned_file_conflict_paths": list(worktree_ownership.owned_file_conflict_paths),
     }
     if owner_chain is not None:
         event["owner_chain_enabled"] = bool(owner_chain.get("enabled", False))
@@ -511,6 +666,7 @@ def write_runtime_records(
         "target_id": route.target_id,
         "next_owner": route.next_owner,
         "dirty_worktree_paths": list(dirty_paths),
+        "worktree_ownership": worktree_ownership.to_dict(),
         "handoff_payload": dict(route.handoff_payload),
         "learning_ids": [item["id"] for item in learnings],
     }
@@ -576,6 +732,7 @@ def main(argv: Sequence[str] | None = None) -> int:
         return 2
 
     owner_chain: Optional[dict[str, Any]] = None
+    worktree_ownership, dirty_paths = compute_worktree_ownership(repo_root, prior_checkpoint)
     if execute_owner_chain_enabled:
         route, steps, stop_reason = execute_owner_chain(
             rows,
@@ -585,6 +742,7 @@ def main(argv: Sequence[str] | None = None) -> int:
             target_type=target_type,
             target_id=target_id,
             repo_root=repo_root,
+            worktree_ownership=worktree_ownership,
             stop_on_owner=stop_on_owner,
         )
         owner_chain = {
@@ -599,6 +757,7 @@ def main(argv: Sequence[str] | None = None) -> int:
             target_type=target_type,
             target_id=target_id,
             repo_root=repo_root,
+            worktree_ownership=worktree_ownership,
             owner_chain_mode=False,
         )
 
@@ -619,12 +778,12 @@ def main(argv: Sequence[str] | None = None) -> int:
             states=("active", "candidate"),
         )
     ]
-    dirty_paths = git_dirty_paths(repo_root)
     write_runtime_records(
         checkpoint_path=checkpoint_path,
         event_log_path=event_log_path,
         route=route,
         dirty_paths=dirty_paths,
+        worktree_ownership=worktree_ownership,
         learnings=learnings,
         owner_chain=owner_chain,
     )
@@ -644,11 +803,13 @@ def main(argv: Sequence[str] | None = None) -> int:
         "checkpoint_path": str(checkpoint_path),
         "event_log_path": str(event_log_path),
         "dirty_worktree_paths": dirty_paths,
+        "worktree_ownership": worktree_ownership.to_dict(),
         "learnings": learnings,
         "checkpoint_stale_reason": checkpoint_stale_reason,
         "readiness": build_readiness_payload(
             route=route,
             owner_chain=owner_chain,
+            worktree_ownership=worktree_ownership,
         ),
     }
     if args.json:

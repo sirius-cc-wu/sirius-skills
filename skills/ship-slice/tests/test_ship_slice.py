@@ -34,6 +34,11 @@ def init_git_repo(root: Path) -> None:
     )
 
 
+def commit_all(root: Path, message: str = "baseline") -> None:
+    subprocess.run(["git", "add", "."], cwd=root, check=True)
+    subprocess.run(["git", "commit", "-m", message], cwd=root, check=True)
+
+
 def write_execution_config(
     root: Path,
     *,
@@ -323,3 +328,106 @@ def test_ship_slice_owner_chain_reports_commit_checkpoint(
     assert payload["owner_chain"]["stop_reason"]["kind"] == "commit_checkpoint"
     assert payload["readiness"]["can_proceed"] is False
     assert payload["readiness"]["blocked_by"] == ["commit_checkpoint"]
+
+
+def test_ship_slice_tracks_owned_dirty_paths_separately_from_baseline(
+    tmp_path: Path, monkeypatch
+) -> None:
+    init_git_repo(tmp_path)
+    write_execution_config(tmp_path)
+    create_slice(
+        tmp_path,
+        monkeypatch,
+        "taw-ship-slice-loop",
+        "Add one-slice finishing and resume orchestration",
+        "execution_ready",
+    )
+    commit_all(tmp_path)
+    (tmp_path / "notes.txt").write_text("baseline\n", encoding="utf-8")
+
+    first = run_cli(tmp_path, "taw-ship-slice-loop", "--json")
+
+    assert first.returncode == 0
+    first_payload = json.loads(first.stdout)
+    assert first_payload["next_owner"] == "implementation"
+    assert first_payload["readiness"]["blocked_by"] == []
+    assert first_payload["worktree_ownership"]["owned_dirty_paths"] == []
+    assert first_payload["worktree_ownership"]["unowned_dirty_paths"] == ["notes.txt"]
+
+    execution = load_module("manage_execution_state_test", EXECUTION_SCRIPT)
+    rows = execution.parse_registry()
+    row = execution.resolve_slice(rows, "taw-ship-slice-loop")
+    assert row is not None
+    ok, message = execution.update_slice_status(rows, row, "closed", force=True)
+    assert ok, message
+
+    (tmp_path / "owned.txt").write_text("owned\n", encoding="utf-8")
+
+    resumed = run_cli(tmp_path, "--resume", "--json")
+
+    assert resumed.returncode == 0
+    payload = json.loads(resumed.stdout)
+    assert payload["next_owner"] == "commit"
+    assert payload["action"] == "commit_completed_slice"
+    owned_paths = payload["worktree_ownership"]["owned_dirty_paths"]
+    assert "owned.txt" in owned_paths
+    assert "notes.txt" not in owned_paths
+    assert payload["worktree_ownership"]["unowned_dirty_paths"] == ["notes.txt"]
+    assert payload["readiness"]["blocked_by"] == ["commit_checkpoint"]
+
+
+def test_ship_slice_reports_owned_file_conflict_when_baseline_file_changes(
+    tmp_path: Path, monkeypatch
+) -> None:
+    init_git_repo(tmp_path)
+    write_execution_config(tmp_path)
+    create_slice(
+        tmp_path,
+        monkeypatch,
+        "taw-ship-slice-loop",
+        "Add one-slice finishing and resume orchestration",
+        "execution_ready",
+    )
+    commit_all(tmp_path)
+    shared = tmp_path / "shared.txt"
+    shared.write_text("before\n", encoding="utf-8")
+
+    first = run_cli(tmp_path, "taw-ship-slice-loop", "--json")
+
+    assert first.returncode == 0
+    first_payload = json.loads(first.stdout)
+    assert first_payload["next_owner"] == "implementation"
+    shared.write_text("after\n", encoding="utf-8")
+
+    resumed = run_cli(tmp_path, "--resume", "--json")
+
+    assert resumed.returncode == 0
+    payload = json.loads(resumed.stdout)
+    assert payload["next_owner"] == "guide-execution"
+    assert payload["action"] == "resolve_owned_file_conflict"
+    assert payload["worktree_ownership"]["owned_file_conflict_paths"] == ["shared.txt"]
+    assert payload["readiness"]["can_proceed"] is False
+    assert payload["readiness"]["blocked_by"] == ["owned_file_conflict"]
+    assert payload["readiness"]["stop_reason"] == {
+        "kind": "owned_file_conflict",
+        "paths": ["shared.txt"],
+    }
+
+
+def test_detect_scope_spillover_flags_changes_outside_owned_paths() -> None:
+    module = load_module("ship_slice_scope_test", SHIP_SLICE_SCRIPT)
+
+    spillover = module.detect_scope_spillover(
+        {
+            "owned.txt": "before-owned",
+            "baseline.txt": "before-baseline",
+        },
+        {
+            "owned.txt": "after-owned",
+            "baseline.txt": "before-baseline",
+            "spill.txt": "after-spill",
+        },
+        allowed_paths=["owned.txt"],
+    )
+
+    assert spillover == ["spill.txt"]
