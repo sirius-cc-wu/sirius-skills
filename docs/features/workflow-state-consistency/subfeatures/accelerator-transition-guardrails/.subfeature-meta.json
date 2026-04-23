@@ -1,14 +1,23 @@
 {
   "subfeature_id": "accelerator-transition-guardrails",
   "parent_feature_slug": "workflow-state-consistency",
-  "status": "draft",
+  "status": "finalized",
   "created_at": "2026-04-23T00:50:17",
-  "updated_at": "2026-04-23T00:50:17",
+  "updated_at": "2026-04-23T13:39:42",
   "subfeature_type": "additive",
   "summary": "Harden owner-chain transitions with invariant checks and deterministic stop reasons.",
-  "affected_artifacts": [],
-  "affected_story_ids": [],
-  "affected_slice_ids": [],
-  "review_note": null,
-  "finalized_at": null
+  "affected_artifacts": [
+    "lib/workflow_runtime/accelerator_guardrails.py",
+    "skills/autoplan/scripts/autoplan.py",
+    "skills/ship/scripts/ship.py",
+    "skills/ship-slice/scripts/ship_slice.py"
+  ],
+  "affected_story_ids": [
+    "WSC-01"
+  ],
+  "affected_slice_ids": [
+    "wsc-transition-guardrails"
+  ],
+  "review_note": "Planning reconciled to the implemented shared accelerator guardrail runtime and normalized transition reporting.",
+  "finalized_at": "2026-04-23T13:39:42"
 }

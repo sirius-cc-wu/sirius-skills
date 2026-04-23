@@ -2,9 +2,9 @@
   "subfeatures": [
     {
       "subfeature_id": "accelerator-transition-guardrails",
-      "status": "draft",
+      "status": "finalized",
       "subfeature_type": "additive",
-      "updated_at": "2026-04-23T00:50:17",
+      "updated_at": "2026-04-23T13:39:42",
       "path": "docs/features/workflow-state-consistency/subfeatures/accelerator-transition-guardrails/"
     }
   ]
