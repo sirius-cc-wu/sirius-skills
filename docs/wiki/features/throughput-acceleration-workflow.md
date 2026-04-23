@@ -3,7 +3,7 @@
 ## Snapshot
 
 - Feature: `throughput-acceleration-workflow`
-- Status: `implemented` (updated `2026-04-22`)
+- Status: `implemented` (updated `2026-04-23`)
 
 ## What This Feature Establishes
 
@@ -14,7 +14,8 @@ Implemented direction:
 
 - `autoplan` composes planning steps while preserving approval boundaries.
 - `ship` remains backlog orchestrator and can emit handoff payloads.
-- `ship-slice` is a one-slice finisher for implementation through close/commit.
+- `ship-slice` is a one-slice finisher that can now track owned changes,
+  optionally format owned files, delegate closure, and commit owned files only.
 - `learn` manages durable workflow learnings.
 - supplemental runtime artifacts (`.skills/runtime/*`, learnings JSONL) support
   resume/event logging without replacing repository artifacts as source of truth.
@@ -100,6 +101,9 @@ Current status:
   (`accelerators.autoplan.execute_owner_chain`, `stop_on_owner`)
 - execution step now has owner-chain routing in `ship-slice` behind
   `accelerators.ship_slice.execute_owner_chain` and `stop_on_owner`
+- delegated execution can now optionally continue through `auto_format`,
+  `auto_close`, and `auto_commit`, while scoping formatting/staging to owned
+  files and surfacing formatter spillover plus partial-success commit failures
 - delegated execution now enforces an explicit durable approval gate from
   `planning_reviewed` via `ship --approve` before autopilot handoff
 - all three accelerator surfaces now emit a normalized `readiness` payload:
@@ -112,6 +116,8 @@ Current status:
 Roadmap link:
 
 - see `docs/wiki/concepts/two-step-autonomy-roadmap.md`
+- remaining execution-side follow-up is `delegated-execution-stop-policies`
+  for configurable stop-vs-continue behavior at review/commit boundaries
 
 ## Main Sources
 

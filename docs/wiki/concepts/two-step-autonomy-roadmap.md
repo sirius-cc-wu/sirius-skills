@@ -38,10 +38,13 @@ Current accelerator skills now support owner-chain orchestration in both layers:
 - `ship` resolves backlog and can bootstrap/delegate.
 - `ship-slice` can now optionally execute one-slice execution owner-chain
   routing and stop with structured boundary context.
+- `ship-slice` can now optionally continue through owned-file formatting,
+  slice closure, and owned-only commit creation with deterministic partial
+  success reporting.
 
-Current gaps are now focused on optional close/commit automation and operator
-policy controls; baseline readiness dashboards and cross-accelerator transition
-guardrail normalization are implemented.
+Current gaps are now focused on operator continuation-policy controls after
+those boundaries are reached; baseline readiness dashboards, transition
+guardrail normalization, and optional terminal automation are implemented.
 
 ## Target Operating Model
 
@@ -71,7 +74,8 @@ optionally execute:
 - `review-execution`
 
 Then stop at existing closure/commit boundaries unless the user explicitly opts
-into continuing through `close-slice` and `commit`.
+into continuing through owned-file `auto_format`, `close-slice`, and
+`commit`.
 
 ## Suggested Configuration Surface
 
@@ -84,6 +88,8 @@ Use additive flags under existing typed configs:
   - `accelerators.ship.delegate_to_ship_slice` (existing)
   - `accelerators.ship_slice.execute_owner_chain` (bool)
   - `accelerators.ship_slice.stop_on_owner` (optional list)
+  - `accelerators.ship_slice.auto_format` (bool, default false)
+  - `accelerators.ship_slice.format_command` (string or string list, required when `auto_format=true`)
   - `accelerators.ship_slice.auto_close` (bool, default false)
   - `accelerators.ship_slice.auto_commit` (bool, default false)
 
@@ -93,12 +99,13 @@ Use additive flags under existing typed configs:
 2. Approval stays explicit between planning and execution.
 3. Any owner failure returns structured stop context instead of fallback
    guessing.
-4. Worktree cleanliness and commit checkpoint rules remain enforced.
+4. Unrelated dirty worktree state remains tolerated, but owned-file conflicts,
+   formatter spillover, and owned commit checkpoints remain enforced.
 
 ## Incremental Delivery Plan
 
-1. Extend execution chain controls for optional auto-close/auto-commit.
-2. Add explicit operator policy toggles for when delegated runs should stop vs continue at review/commit boundaries.
+1. Add explicit operator policy toggles for when delegated runs should stop vs
+   continue at review/commit boundaries.
 
 ## Main Sources
 

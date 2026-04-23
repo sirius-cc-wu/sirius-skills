@@ -77,3 +77,11 @@ grep-friendly.
 - Synced shared `workflow_runtime` into packaged skill copies via `scripts/sync_shared_skill_runtime.py`.
 - Added focused shared guardrail tests (`skills/autoplan/tests/test_accelerator_guardrails.py`) and revalidated accelerator suites.
 - Updated roadmap/feature synthesis and skill guardrail docs to reflect implemented cross-accelerator transition normalization.
+
+## [2026-04-23] implementation-synthesis | ship-slice terminal automation
+
+- Implemented delegated owned-change-set tracking in `skills/ship-slice/scripts/ship_slice.py` so resumed runs can distinguish owned dirty files from unrelated baseline dirtiness and stop on same-file ownership conflicts.
+- Added optional terminal automation controls under `accelerators.ship_slice`: `auto_format`, `auto_close`, `auto_commit`, plus path-scoped `format_command`; `auto_commit` now requires `auto_close`.
+- Delegated terminal automation now supports owned-file formatting, close-slice handoff, owned-only commit staging, formatter spillover detection, and explicit close-success / commit-failure partial-success reporting.
+- Added focused `ship-slice` tests for owned-change tracking, formatter spillover, full format-close-commit happy path, invalid config, and commit-failure partial success.
+- Closed slices `scc-owned-change-set` and `scc-terminal-automation`, finalized subfeature `ship-slice-close-commit-controls`, and updated throughput/two-step/skill docs to reflect the implemented execution tail.

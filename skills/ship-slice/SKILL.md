@@ -16,11 +16,13 @@ current state with checkpointed runtime context.
 3. Reconcile the current slice status against execution artifacts.
 4. Optionally run owner-chain orchestration for one slice (`brief`, `blueprint`,
    implementation routing) until review/checkpoint boundaries.
-5. Report the next owner for the slice and write a resumable checkpoint plus
+5. Optionally continue through owned-file formatting, delegated closure, and
+   owned-file commit when execution config enables the terminal automation tail.
+6. Report the next owner for the slice and write a resumable checkpoint plus
    execution event.
-6. Stop at review, close, commit, or verification boundaries rather than
-   replacing existing owner skills.
-7. Emit a `readiness` summary in JSON output (`can_proceed`, `blocked_by`,
+7. Stop at review, close, commit, or verification boundaries unless the
+   configured terminal automation tail is both enabled and safe to continue.
+8. Emit a `readiness` summary in JSON output (`can_proceed`, `blocked_by`,
    `stop_reason`, approval/commit gate state) so `ship` and dashboards can
    read one-slice acceleration status without parsing owner-chain internals.
 
@@ -46,7 +48,11 @@ Configure owner-chain behavior in `.skills/execution.json` under
   "accelerators": {
     "ship_slice": {
       "execute_owner_chain": false,
-      "stop_on_owner": ["review-execution"]
+      "stop_on_owner": ["review-execution"],
+      "auto_format": false,
+      "format_command": ["./scripts/format-owned.sh"],
+      "auto_close": false,
+      "auto_commit": false
     }
   }
 }
@@ -57,6 +63,12 @@ Optional CLI overrides:
 - `--execute-owner-chain` / `--no-execute-owner-chain`
 - `--stop-on-owner <owner>` (repeatable)
 
+Terminal automation notes:
+
+- `auto_commit` requires `auto_close`
+- `auto_format` requires `format_command`
+- formatting and staging stay scoped to the delegated run's owned file set
+
 ## Guardrails
 
 - Do not replace `ship` backlog resolution.
@@ -64,8 +76,11 @@ Optional CLI overrides:
 - Keep execution status transitions owned by `guide-execution` tooling and
   validation.
 - Emit structured stop context for review boundaries, verification/missing-input
-  failures, explicit owner stops, and commit checkpoints.
-- Stop at commit checkpoints instead of silently batching more work.
+  failures, explicit owner stops, formatter spillover, owned-file conflicts,
+  partial-success commit failures, and commit checkpoints.
+- Stop at commit checkpoints unless owned-file auto-commit is explicitly
+  enabled and succeeds.
+- Do not format or stage unrelated dirty files outside the owned file set.
 - Keep stop-reason classification and readiness invariants aligned with shared
   accelerator guardrail helpers in `workflow_runtime`.
 - Keep runtime files supplemental; do not rewrite planning or execution truth
