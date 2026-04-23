@@ -4,5 +4,7 @@
 |---|---|---|---|---|
 | accelerator-readiness-dashboard | finalized | additive | 2026-04-23T13:39:41 | docs/features/throughput-acceleration-workflow/subfeatures/accelerator-readiness-dashboard/ |
 | autoplan-owner-chain | finalized | additive | 2026-04-23T13:39:39 | docs/features/throughput-acceleration-workflow/subfeatures/autoplan-owner-chain/ |
+| delegated-execution-stop-policies | reviewed | additive | 2026-04-23T14:54:14 | docs/features/throughput-acceleration-workflow/subfeatures/delegated-execution-stop-policies/ |
+| ship-slice-close-commit-controls | reviewed | additive | 2026-04-23T14:54:14 | docs/features/throughput-acceleration-workflow/subfeatures/ship-slice-close-commit-controls/ |
 | ship-slice-owner-chain | finalized | additive | 2026-04-23T13:39:39 | docs/features/throughput-acceleration-workflow/subfeatures/ship-slice-owner-chain/ |
 | two-step-approval-gate | finalized | additive | 2026-04-23T13:39:40 | docs/features/throughput-acceleration-workflow/subfeatures/two-step-approval-gate/ |

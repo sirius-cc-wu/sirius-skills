@@ -7,10 +7,52 @@
       "path": "docs/features/cross-artifact-management/"
     },
     {
+      "feature": "archive-artifacts",
+      "status": "implemented",
+      "updated_at": "2026-04-18T13:36:19",
+      "path": "docs/features/cross-artifact-management/subfeatures/archive-artifacts/"
+    },
+    {
+      "feature": "audit-artifacts",
+      "status": "implemented",
+      "updated_at": "2026-04-18T13:36:18",
+      "path": "docs/features/cross-artifact-management/subfeatures/audit-artifacts/"
+    },
+    {
+      "feature": "measure-artifacts",
+      "status": "implemented",
+      "updated_at": "2026-04-18T13:36:19",
+      "path": "docs/features/cross-artifact-management/subfeatures/measure-artifacts/"
+    },
+    {
+      "feature": "repair-artifacts",
+      "status": "implemented",
+      "updated_at": "2026-04-18T13:36:19",
+      "path": "docs/features/cross-artifact-management/subfeatures/repair-artifacts/"
+    },
+    {
+      "feature": "report-artifacts",
+      "status": "implemented",
+      "updated_at": "2026-04-18T13:36:19",
+      "path": "docs/features/cross-artifact-management/subfeatures/report-artifacts/"
+    },
+    {
+      "feature": "trace-artifacts",
+      "status": "implemented",
+      "updated_at": "2026-04-18T13:36:18",
+      "path": "docs/features/cross-artifact-management/subfeatures/trace-artifacts/"
+    },
+    {
       "feature": "execution-workflow",
       "status": "implemented",
       "updated_at": "2026-04-23T13:39:42",
       "path": "docs/features/execution-workflow/"
+    },
+    {
+      "feature": "multi-slice-execution",
+      "status": "implemented",
+      "updated_at": "2026-04-14T16:33:28",
+      "path": "docs/features/execution-workflow/subfeatures/multi-slice-execution/"
     },
     {
       "feature": "hierarchical-scope-support",
@@ -25,10 +67,46 @@
       "path": "docs/features/installation-and-configuration/"
     },
     {
+      "feature": "split-install-modes",
+      "status": "implemented",
+      "updated_at": "2026-04-19T11:16:05",
+      "path": "docs/features/installation-and-configuration/subfeatures/split-install-modes/"
+    },
+    {
       "feature": "planning-workflow",
       "status": "implemented",
       "updated_at": "2026-04-23T13:39:42",
       "path": "docs/features/planning-workflow/"
+    },
+    {
+      "feature": "change-to-subfeature-migration",
+      "status": "planning_reviewed",
+      "updated_at": "2026-04-08T08:27:49",
+      "path": "docs/features/planning-workflow/subfeatures/change-to-subfeature-migration/"
+    },
+    {
+      "feature": "feature-consolidation-and-reduction",
+      "status": "discovery_pending",
+      "updated_at": "2026-04-23T01:15:39",
+      "path": "docs/features/planning-workflow/subfeatures/feature-consolidation-and-reduction/"
+    },
+    {
+      "feature": "proposal-workflow",
+      "status": "planning_reviewed",
+      "updated_at": "2026-03-29T00:32:50",
+      "path": "docs/features/planning-workflow/subfeatures/proposal-workflow/"
+    },
+    {
+      "feature": "reference-research-synthesis",
+      "status": "implemented",
+      "updated_at": "2026-04-21T01:10:07",
+      "path": "docs/features/planning-workflow/subfeatures/reference-research-synthesis/"
+    },
+    {
+      "feature": "subfeature-workflow",
+      "status": "planning_reviewed",
+      "updated_at": "2026-03-28T23:26:17",
+      "path": "docs/features/planning-workflow/subfeatures/subfeature-workflow/"
     },
     {
       "feature": "throughput-acceleration-workflow",
@@ -37,10 +115,52 @@
       "path": "docs/features/throughput-acceleration-workflow/"
     },
     {
+      "feature": "accelerator-readiness-dashboard",
+      "status": "implemented",
+      "updated_at": "2026-04-23T13:39:41",
+      "path": "docs/features/throughput-acceleration-workflow/subfeatures/accelerator-readiness-dashboard/"
+    },
+    {
+      "feature": "autoplan-owner-chain",
+      "status": "implemented",
+      "updated_at": "2026-04-23T13:39:39",
+      "path": "docs/features/throughput-acceleration-workflow/subfeatures/autoplan-owner-chain/"
+    },
+    {
+      "feature": "delegated-execution-stop-policies",
+      "status": "planning_reviewed",
+      "updated_at": "2026-04-23T14:54:14",
+      "path": "docs/features/throughput-acceleration-workflow/subfeatures/delegated-execution-stop-policies/"
+    },
+    {
+      "feature": "ship-slice-close-commit-controls",
+      "status": "planning_reviewed",
+      "updated_at": "2026-04-23T14:54:14",
+      "path": "docs/features/throughput-acceleration-workflow/subfeatures/ship-slice-close-commit-controls/"
+    },
+    {
+      "feature": "ship-slice-owner-chain",
+      "status": "implemented",
+      "updated_at": "2026-04-23T13:39:39",
+      "path": "docs/features/throughput-acceleration-workflow/subfeatures/ship-slice-owner-chain/"
+    },
+    {
+      "feature": "two-step-approval-gate",
+      "status": "implemented",
+      "updated_at": "2026-04-23T13:39:40",
+      "path": "docs/features/throughput-acceleration-workflow/subfeatures/two-step-approval-gate/"
+    },
+    {
       "feature": "workflow-state-consistency",
       "status": "implemented",
       "updated_at": "2026-04-19T11:36:15",
       "path": "docs/features/workflow-state-consistency/"
+    },
+    {
+      "feature": "accelerator-transition-guardrails",
+      "status": "implemented",
+      "updated_at": "2026-04-23T13:39:42",
+      "path": "docs/features/workflow-state-consistency/subfeatures/accelerator-transition-guardrails/"
     }
   ]
 }

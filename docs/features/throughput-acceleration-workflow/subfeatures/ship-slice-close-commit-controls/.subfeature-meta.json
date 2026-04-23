@@ -1,0 +1,35 @@
+{
+  "subfeature_id": "ship-slice-close-commit-controls",
+  "parent_feature_slug": "throughput-acceleration-workflow",
+  "status": "reviewed",
+  "created_at": "2026-04-23T14:27:19",
+  "updated_at": "2026-04-23T14:54:14",
+  "subfeature_type": "additive",
+  "summary": "Add optional auto-close and auto-commit controls for ship-slice terminal execution.",
+  "affected_artifacts": [
+    "docs/features/throughput-acceleration-workflow/discover.md",
+    "docs/features/throughput-acceleration-workflow/system-design.md",
+    "docs/features/throughput-acceleration-workflow/user-stories.md",
+    "docs/features/throughput-acceleration-workflow/slice-planning.md",
+    "docs/features/throughput-acceleration-workflow/slice-traceability.md",
+    "docs/wiki/concepts/two-step-autonomy-roadmap.md",
+    "docs/shared/config-surface-governance.md",
+    "docs/features/throughput-acceleration-workflow/subfeatures/ship-slice-owner-chain/discover.md",
+    "docs/features/throughput-acceleration-workflow/subfeatures/ship-slice-owner-chain/system-design.md",
+    ".skills/execution.json",
+    "skills/ship-slice/scripts/ship_slice.py",
+    "skills/ship-slice/tests/test_ship_slice.py",
+    "skills/close-slice/scripts/close_slice.py",
+    "skills/close-slice/tests/test_close_slice.py",
+    "skills/commit/SKILL.md"
+  ],
+  "affected_story_ids": [
+    "TAW-02"
+  ],
+  "affected_slice_ids": [
+    "taw-ship-slice-loop",
+    "taw-ship-backlog-integration"
+  ],
+  "review_note": "Planning reviewed: terminal automation stays behind explicit execution config, scopes formatting and staging to owned files, and preserves hard stops for approval, spillover, and same-file conflicts.",
+  "finalized_at": null
+}

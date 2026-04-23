@@ -15,6 +15,20 @@
       "path": "docs/features/throughput-acceleration-workflow/subfeatures/autoplan-owner-chain/"
     },
     {
+      "subfeature_id": "delegated-execution-stop-policies",
+      "status": "reviewed",
+      "subfeature_type": "additive",
+      "updated_at": "2026-04-23T14:54:14",
+      "path": "docs/features/throughput-acceleration-workflow/subfeatures/delegated-execution-stop-policies/"
+    },
+    {
+      "subfeature_id": "ship-slice-close-commit-controls",
+      "status": "reviewed",
+      "subfeature_type": "additive",
+      "updated_at": "2026-04-23T14:54:14",
+      "path": "docs/features/throughput-acceleration-workflow/subfeatures/ship-slice-close-commit-controls/"
+    },
+    {
       "subfeature_id": "ship-slice-owner-chain",
       "status": "finalized",
       "subfeature_type": "additive",
