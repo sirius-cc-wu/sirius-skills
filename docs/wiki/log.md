@@ -94,3 +94,9 @@ grep-friendly.
 - Propagated delegated policy readiness metadata through `skills/ship/scripts/ship.py` so `ship --resume` surfaces the same policy context from delegated runs.
 - Added and updated focused tests in `skills/ship-slice/tests/test_ship_slice.py` and `skills/ship/tests/test_ship.py`, then validated with `python3 -m pytest -q skills/ship/tests/test_ship.py skills/ship-slice/tests/test_ship_slice.py`.
 - Closed slices `dsp-policy-contract` and `dsp-boundary-enforcement`, finalized subfeature `delegated-execution-stop-policies`, and updated throughput roadmap/wiki synthesis to mark continuation policy delivery as implemented.
+
+## [2026-04-24] analysis-synthesis | subfeature completion drift
+
+- Analyzed why completed subfeature work can still remain `planning_reviewed` / `reviewed` in durable metadata.
+- Documented the key finding in `docs/wiki/features/workflow-state-consistency.md`: terminal subfeature sync already exists in `close-slice`, but `ship` is orchestration-only and direct repo implementation can bypass that owner-sync path entirely.
+- Captured candidate follow-up directions for later repair: terminal reconciliation in `ship`, a semantic reconcile maintenance command, stronger guardrails for agent-led multi-slice work, and documentation cleanup around subfeature completion semantics.
