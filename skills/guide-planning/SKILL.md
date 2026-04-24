@@ -32,6 +32,8 @@ Use `guide-planning` when you need to decide the next planning step before slice
 - If UI or interaction flow remains material, route to `ui-flow`.
 - If the work is still too large for execution or slices are not explicit, route to `breakdown`.
 - If planning artifacts need a readiness pass before approval and execution bootstrap, route to `review-planning`.
+  For workflow-shaping changes, expect the review pass to verify any declared
+  consolidation story before the packet can become `planning_reviewed`.
 - If planning has been reviewed but not yet explicitly approved, stop for human approval instead of advancing into execution.
 - If planning has been approved and committed and the feature already has execution-ready work items with explicit slice IDs, hand off to the execution layer through `slice`.
 - If a slice-scoped execution slice already exists, hand off to `guide-execution`.
@@ -46,6 +48,8 @@ Use `guide-planning` when you need to decide the next planning step before slice
 - Do not duplicate execution-slice lifecycle state here.
 - Stop at reviewed planning until the user approves the planning artifacts.
 - Treat planning commits as the durable checkpoint between planning and execution.
+- Keep any normalized `consolidation` summary in the existing planning or
+  subfeature metadata instead of introducing a second planning sidecar.
 - Hand off execution-layer work to `slice` or `guide-execution` instead of absorbing it into planning.
 
 Typical handoff:
@@ -77,10 +81,16 @@ Use adjacent transitions by default and repair skipped states only deliberately.
 4. Resolve the active feature using tooling or a user-provided slug/path.
 5. Confirm the folder represents one coherent feature or capability.
 6. Check optional `reference-research.md`, `discover.md`, `system-design.md`, optional `ui-design.md`, `slice-planning.md`, `slice-traceability.md`, and `.planning-meta.json` as appropriate for the current state.
+7. When the packet materially reshapes existing workflow surface, confirm any
+   durable consolidation summary in metadata matches the planning docs before
+   treating the packet as review-ready.
 
 ## Tooling
 
 Always use `scripts/manage_planning.py` in this skill directory for initialization, proposal promotion, registry synchronization, state transitions, and validation.
 
 - Use `sync-status` after `discover`, `design`, `ui-flow`, `breakdown`, and successful `review-planning` passes so metadata advances through the normal adjacent planning states instead of drifting behind the authored artifacts.
+- Use `--consolidation-json` with `set-status` or `sync-status` when the
+  reviewed packet needs a metadata-carried consolidation summary; keep that
+  summary aligned with the narrative planning docs.
 - Use `set-status` for explicit manual overrides, terminal execution states, or deliberate repair that should not be inferred from current artifacts alone.
