@@ -4,7 +4,10 @@
   "auto_start_implementation": true,
   "accelerators": {
     "ship": {
-      "delegate_to_ship_slice": false
+      "delegate_to_ship_slice": false,
+      "preflight": {
+        "mode": "off"
+      }
     },
     "ship_slice": {
       "pr_mode": "prepare_only"

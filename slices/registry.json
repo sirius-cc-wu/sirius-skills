@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "generated_at": "2026-04-24T00:14:14",
+  "generated_at": "2026-04-24T19:40:59",
   "slices": [
     {
       "id": "hss-root-fallback",
@@ -459,6 +459,16 @@
       "path": "slices/dsp-boundary-enforcement-delegated-execution-stop-policies/",
       "updated_at": "2026-04-24T00:14:14",
       "closed_at": "2026-04-24T00:14:14",
+      "archived_at": null,
+      "relations": []
+    },
+    {
+      "id": "spi-preflight-contract",
+      "feature": "Add typed ship preflight contract and readiness metadata",
+      "status": "closed",
+      "path": "slices/spi-preflight-contract-add-typed-ship-preflight-contract-and-readiness-metadata/",
+      "updated_at": "2026-04-24T19:40:59",
+      "closed_at": "2026-04-24T19:40:59",
       "archived_at": null,
       "relations": []
     }

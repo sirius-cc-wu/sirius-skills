@@ -219,6 +219,322 @@ def test_runtime_foundation_ready_slice_is_reported(tmp_path, monkeypatch, capsy
     assert payload["ready_next"] == ["taw-runtime-foundation"]
 
 
+def test_resolve_backlog_reports_disabled_preflight_by_default(
+    tmp_path, monkeypatch, capsys
+):
+    env = setup_repo(tmp_path, monkeypatch)
+    planning = env["planning"]
+    feature_path = env["feature_path"]
+    module = env["module"]
+
+    write_file(
+        feature_path / "slice-planning.md",
+        """# Slice Planning
+
+| Slice ID | Story ID | Title | Summary | Target Area | Lane | Validation | Planned Action | Depends On | Slice Ready |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| mse-scope-and-backlog-resolution | EW-01 | Resolve backlog | Summary | area | primary | test | create slice |  | yes |
+""",
+    )
+    write_file(
+        feature_path / "slice-traceability.md",
+        """# Slice Traceability
+
+| Story ID | Story Size | Story Summary | Increments | Planned Slice IDs | Slice Areas | Blocked By | Execution Slice IDs | Notes |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| EW-01 | M | Summary | I1 | mse-scope-and-backlog-resolution | area |  |  | Notes |
+""",
+    )
+
+    rows = planning.parse_registry()
+    feature = planning.find_feature(rows, "execution-workflow")
+    assert feature is not None
+    ok, message = planning.update_feature_status(
+        rows,
+        feature,
+        "planning_reviewed",
+        force=True,
+        review_note="ready",
+    )
+    assert ok, message
+
+    assert run_cli(module, monkeypatch, "execution-workflow", "--json") == 0
+    payload = json.loads(capsys.readouterr().out)
+
+    assert payload["readiness"]["preflight"] == {
+        "mode": "off",
+        "operation": "backlog_report",
+        "status": "disabled",
+        "blocking_checks": [],
+    }
+
+
+def test_bootstrap_next_reports_passed_local_only_preflight(
+    tmp_path, monkeypatch, capsys
+):
+    env = setup_repo(tmp_path, monkeypatch)
+    planning = env["planning"]
+    feature_path = env["feature_path"]
+    module = env["module"]
+
+    write_scope_config(
+        tmp_path,
+        "execution.json",
+        {
+            "slice_dir": "slices",
+            "preferred_workflow": "TDD",
+            "auto_start_implementation": True,
+            "accelerators": {
+                "ship": {
+                    "delegate_to_ship_slice": False,
+                    "preflight": {"mode": "local_only"},
+                },
+            },
+        },
+    )
+    write_file(
+        feature_path / "slice-planning.md",
+        """# Slice Planning
+
+| Slice ID | Story ID | Title | Summary | Target Area | Lane | Validation | Planned Action | Depends On | Slice Ready |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| mse-scope-and-backlog-resolution | EW-01 | Resolve backlog | Summary | area | primary | test | create slice |  | yes |
+""",
+    )
+    write_file(
+        feature_path / "slice-traceability.md",
+        """# Slice Traceability
+
+| Story ID | Story Size | Story Summary | Increments | Planned Slice IDs | Slice Areas | Blocked By | Execution Slice IDs | Notes |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| EW-01 | M | Summary | I1 | mse-scope-and-backlog-resolution | area |  |  | Notes |
+""",
+    )
+
+    rows = planning.parse_registry()
+    feature = planning.find_feature(rows, "execution-workflow")
+    assert feature is not None
+    ok, message = planning.update_feature_status(
+        rows,
+        feature,
+        "planning_reviewed",
+        force=True,
+        review_note="ready",
+    )
+    assert ok, message
+
+    assert run_cli(module, monkeypatch, "execution-workflow", "--bootstrap-next", "--json") == 0
+    payload = json.loads(capsys.readouterr().out)
+
+    assert payload["action"] == "bootstrap_next_slice"
+    assert payload["readiness"]["preflight"] == {
+        "mode": "local_only",
+        "operation": "bootstrap_next",
+        "status": "passed",
+        "blocking_checks": [],
+    }
+
+
+def test_resume_route_reports_skipped_local_only_preflight(
+    tmp_path, monkeypatch, capsys
+):
+    env = setup_repo(tmp_path, monkeypatch)
+    planning = env["planning"]
+    feature_path = env["feature_path"]
+    module = env["module"]
+    execution = env["execution"]
+
+    write_scope_config(
+        tmp_path,
+        "execution.json",
+        {
+            "slice_dir": "slices",
+            "preferred_workflow": "TDD",
+            "auto_start_implementation": True,
+            "accelerators": {
+                "ship": {
+                    "delegate_to_ship_slice": False,
+                    "preflight": {"mode": "local_only"},
+                },
+            },
+        },
+    )
+    write_file(
+        feature_path / "slice-planning.md",
+        """# Slice Planning
+
+| Slice ID | Story ID | Title | Summary | Target Area | Lane | Validation | Planned Action | Depends On | Slice Ready |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| mse-scope-and-backlog-resolution | EW-01 | Resolve backlog | Summary | area | primary | test | create slice |  | yes |
+""",
+    )
+    write_file(
+        feature_path / "slice-traceability.md",
+        """# Slice Traceability
+
+| Story ID | Story Size | Story Summary | Increments | Planned Slice IDs | Slice Areas | Blocked By | Execution Slice IDs | Notes |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| EW-01 | M | Summary | I1 | mse-scope-and-backlog-resolution | area |  | mse-scope-and-backlog-resolution | Notes |
+""",
+    )
+
+    rows = planning.parse_registry()
+    feature = planning.find_feature(rows, "execution-workflow")
+    assert feature is not None
+    ok, message = planning.update_feature_status(
+        rows,
+        feature,
+        "planning_reviewed",
+        force=True,
+        review_note="ready",
+    )
+    assert ok, message
+
+    _, created = execution.create_slice(
+        "mse-scope-and-backlog-resolution", "Resolve backlog"
+    )
+    assert created
+
+    assert run_cli(module, monkeypatch, "execution-workflow", "--resume", "--json") == 0
+    payload = json.loads(capsys.readouterr().out)
+
+    assert payload["action"] == "resume_active_slice"
+    assert payload["readiness"]["preflight"] == {
+        "mode": "local_only",
+        "operation": "resume_route",
+        "status": "skipped",
+        "blocking_checks": [],
+    }
+
+
+def test_resume_delegation_reports_blocked_local_only_preflight_on_approval_guardrail(
+    tmp_path, monkeypatch, capsys
+):
+    env = setup_repo(tmp_path, monkeypatch)
+    planning = env["planning"]
+    feature_path = env["feature_path"]
+    module = env["module"]
+    execution = env["execution"]
+
+    write_scope_config(
+        tmp_path,
+        "execution.json",
+        {
+            "slice_dir": "slices",
+            "preferred_workflow": "TDD",
+            "auto_start_implementation": True,
+            "accelerators": {
+                "ship": {
+                    "delegate_to_ship_slice": True,
+                    "preflight": {"mode": "local_only"},
+                },
+            },
+        },
+    )
+    write_file(
+        feature_path / "slice-planning.md",
+        """# Slice Planning
+
+| Slice ID | Story ID | Title | Summary | Target Area | Lane | Validation | Planned Action | Depends On | Slice Ready |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| mse-scope-and-backlog-resolution | EW-01 | Resolve backlog | Summary | area | primary | test | create slice |  | yes |
+""",
+    )
+    write_file(
+        feature_path / "slice-traceability.md",
+        """# Slice Traceability
+
+| Story ID | Story Size | Story Summary | Increments | Planned Slice IDs | Slice Areas | Blocked By | Execution Slice IDs | Notes |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| EW-01 | M | Summary | I1 | mse-scope-and-backlog-resolution | area |  | mse-scope-and-backlog-resolution | Notes |
+""",
+    )
+
+    rows = planning.parse_registry()
+    feature = planning.find_feature(rows, "execution-workflow")
+    assert feature is not None
+    ok, message = planning.update_feature_status(
+        rows,
+        feature,
+        "planning_reviewed",
+        force=True,
+        review_note="ready",
+    )
+    assert ok, message
+
+    _, created = execution.create_slice(
+        "mse-scope-and-backlog-resolution", "Resolve backlog"
+    )
+    assert created
+
+    assert run_cli(module, monkeypatch, "execution-workflow", "--resume", "--json") == 0
+    payload = json.loads(capsys.readouterr().out)
+
+    assert payload["action"] == "approval_required"
+    assert payload["readiness"]["preflight"] == {
+        "mode": "local_only",
+        "operation": "delegate_resume",
+        "status": "blocked",
+        "blocking_checks": ["approval_required"],
+    }
+
+
+def test_invalid_preflight_mode_fails_fast(tmp_path, monkeypatch, capsys):
+    env = setup_repo(tmp_path, monkeypatch)
+    planning = env["planning"]
+    feature_path = env["feature_path"]
+    module = env["module"]
+
+    write_scope_config(
+        tmp_path,
+        "execution.json",
+        {
+            "slice_dir": "slices",
+            "preferred_workflow": "TDD",
+            "auto_start_implementation": True,
+            "accelerators": {
+                "ship": {
+                    "delegate_to_ship_slice": False,
+                    "preflight": {"mode": "remote"},
+                },
+            },
+        },
+    )
+    write_file(
+        feature_path / "slice-planning.md",
+        """# Slice Planning
+
+| Slice ID | Story ID | Title | Summary | Target Area | Lane | Validation | Planned Action | Depends On | Slice Ready |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| mse-scope-and-backlog-resolution | EW-01 | Resolve backlog | Summary | area | primary | test | create slice |  | yes |
+""",
+    )
+    write_file(
+        feature_path / "slice-traceability.md",
+        """# Slice Traceability
+
+| Story ID | Story Size | Story Summary | Increments | Planned Slice IDs | Slice Areas | Blocked By | Execution Slice IDs | Notes |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| EW-01 | M | Summary | I1 | mse-scope-and-backlog-resolution | area |  |  | Notes |
+""",
+    )
+
+    rows = planning.parse_registry()
+    feature = planning.find_feature(rows, "execution-workflow")
+    assert feature is not None
+    ok, message = planning.update_feature_status(
+        rows,
+        feature,
+        "planning_reviewed",
+        force=True,
+        review_note="ready",
+    )
+    assert ok, message
+
+    assert run_cli(module, monkeypatch, "execution-workflow", "--json") == 2
+    assert "Invalid ship preflight mode 'remote'" in capsys.readouterr().err
+
+
 def test_resolve_backlog_defers_ready_slice_in_later_increment_until_earlier_increment_completes(
     tmp_path, monkeypatch, capsys
 ):

@@ -41,6 +41,9 @@ APPROVAL_FINGERPRINT_FILES = (
     "reference-research.md",
 )
 AUTOMATABLE_OWNERS = {"brief", "blueprint", "implementation"}
+SUPPORTED_PREFLIGHT_MODES = {"off", "local_only"}
+MUTATION_CAPABLE_PREFLIGHT_OPERATIONS = {"bootstrap_next", "delegate_resume"}
+PREFLIGHT_BLOCKING_REASONS = {"approval_required", "commit_checkpoint"}
 
 if REPO_LIB_DIR.is_dir() and str(REPO_LIB_DIR) not in sys.path:
     sys.path.insert(0, str(REPO_LIB_DIR))
@@ -82,6 +85,8 @@ class BacklogResolution:
     entries: List[PlannedSliceBacklogEntry]
     active_slice_handoff: Optional[Dict[str, object]]
     approval_gate: Dict[str, object]
+    preflight_mode: str
+    delegate_to_ship_slice: bool
 
     def to_dict(self) -> Dict[str, object]:
         return {
@@ -114,6 +119,7 @@ class BootstrapResult:
     next_owner: Optional[str]
     completed: bool
     action: str
+    requested_command: str
     delegate_result: Optional[Dict[str, object]] = None
 
     def to_dict(self) -> Dict[str, object]:
@@ -191,6 +197,78 @@ def _extract_delegate_policy_metadata(
     return policy_action, policy_source
 
 
+def normalize_preflight_mode(ship_config: Dict[str, object]) -> str:
+    raw_preflight = ship_config.get("preflight")
+    if raw_preflight is None:
+        return "off"
+    if not isinstance(raw_preflight, dict):
+        raise RuntimeError(
+            "Invalid ship preflight config: accelerators.ship.preflight must be an object."
+        )
+    raw_mode = raw_preflight.get("mode")
+    if raw_mode is None:
+        return "off"
+    normalized_mode = str(raw_mode).strip().lower().replace("-", "_")
+    if normalized_mode not in SUPPORTED_PREFLIGHT_MODES:
+        raise RuntimeError(
+            "Invalid ship preflight mode "
+            f"'{raw_mode}'. Supported values: {sorted(SUPPORTED_PREFLIGHT_MODES)}"
+        )
+    return normalized_mode
+
+
+def classify_preflight_operation_for_backlog() -> str:
+    return "backlog_report"
+
+
+def classify_preflight_operation_for_result(result: BootstrapResult) -> str:
+    if result.completed or result.action == "complete":
+        return "complete"
+    if result.action == "blocked":
+        return "blocked"
+    if result.requested_command == "bootstrap_next":
+        return "bootstrap_next"
+    if result.action == "bootstrap_next_slice":
+        return "bootstrap_next"
+    if result.action == "commit_checkpoint_required":
+        if not result.backlog.active_execution_slices:
+            return "bootstrap_next"
+        return "delegate_resume" if result.backlog.delegate_to_ship_slice else "resume_route"
+    if result.backlog.delegate_to_ship_slice and (
+        result.action in {"delegated_to_ship_slice", "approval_required"}
+        or result.backlog.active_slice_handoff is not None
+    ):
+        return "delegate_resume"
+    if result.backlog.active_slice_handoff is not None:
+        return "resume_route"
+    return "blocked"
+
+
+def build_preflight_summary(
+    *, mode: str, operation: str, blocked_by: Sequence[object]
+) -> Dict[str, object]:
+    normalized_blockers = dedupe_reason_codes(blocked_by)
+    blocking_checks = [
+        blocker for blocker in normalized_blockers if blocker in PREFLIGHT_BLOCKING_REASONS
+    ]
+    if mode == "off":
+        status = "disabled"
+        blocking_checks = []
+    elif operation not in MUTATION_CAPABLE_PREFLIGHT_OPERATIONS:
+        status = "skipped"
+        blocking_checks = []
+    elif blocking_checks:
+        status = "blocked"
+    else:
+        status = "passed"
+    return {
+        "mode": mode,
+        "operation": operation,
+        "status": status,
+        "blocking_checks": blocking_checks,
+    }
+
+
 def build_backlog_readiness(backlog: BacklogResolution) -> Dict[str, object]:
     next_owner = _derive_next_owner(backlog)
     blocked_by: List[str] = []
@@ -222,6 +300,11 @@ def build_backlog_readiness(backlog: BacklogResolution) -> Dict[str, object]:
     )
     readiness["policy_action"] = None
     readiness["policy_source"] = None
+    readiness["preflight"] = build_preflight_summary(
+        mode=backlog.preflight_mode,
+        operation=classify_preflight_operation_for_backlog(),
+        blocked_by=readiness["blocked_by"],
+    )
     return readiness
 
 
@@ -277,6 +360,11 @@ def build_bootstrap_readiness(result: BootstrapResult) -> Dict[str, object]:
     )
     readiness["policy_action"] = policy_action
     readiness["policy_source"] = policy_source
+    readiness["preflight"] = build_preflight_summary(
+        mode=result.backlog.preflight_mode,
+        operation=classify_preflight_operation_for_result(result),
+        blocked_by=readiness["blocked_by"],
+    )
     return readiness
 
 
@@ -758,6 +846,8 @@ def resolve_backlog(selector: str, explicit_scope: Optional[str] = None) -> Back
     execution_rows = execution_module.parse_registry(scope_context=scope_context)
     execution_status_by_id = {str(row["id"]): str(row["status"]) for row in execution_rows}
     planning_rows = planning_module.parse_registry(scope_context=scope_context)
+    ship_config = ship_accelerator_config(scope_context, execution_module)
+    preflight_mode = normalize_preflight_mode(ship_config)
     sibling_subfeature_rows: Optional[List[Dict[str, object]]] = None
     if target_type == "subfeature":
         sibling_subfeature_rows = subfeature_module.load_registry(
@@ -927,6 +1017,8 @@ def resolve_backlog(selector: str, explicit_scope: Optional[str] = None) -> Back
         entries=entries,
         active_slice_handoff=active_slice_handoff,
         approval_gate=approval_gate,
+        preflight_mode=preflight_mode,
+        delegate_to_ship_slice=bool(ship_config.get("delegate_to_ship_slice", False)),
     )
 
 
@@ -1053,6 +1145,7 @@ def bootstrap_next_slice(
             next_owner=None,
             completed=completed,
             action="complete" if completed else "blocked",
+            requested_command="bootstrap_next",
             delegate_result=None,
         )
 
@@ -1061,7 +1154,9 @@ def bootstrap_next_slice(
     _, target_dir, _, scope_context, _ = resolve_target(
         planning_module, selector, explicit_scope
     )
-    checkpoint_required = require_commit_checkpoint(backlog, str(scope_context.repo_root))
+    checkpoint_required = require_commit_checkpoint(
+        backlog, str(scope_context.repo_root), requested_command="bootstrap_next"
+    )
     if checkpoint_required is not None:
         return checkpoint_required
 
@@ -1096,6 +1191,7 @@ def bootstrap_next_slice(
         refreshed_backlog,
         scope_context=scope_context,
         execution_module=execution_module,
+        requested_command="bootstrap_next",
     )
     if approval_required is not None:
         return approval_required
@@ -1122,6 +1218,7 @@ def bootstrap_next_slice(
         ),
         completed=False,
         action="delegated_to_ship_slice" if delegate_result is not None else "bootstrap_next_slice",
+        requested_command="bootstrap_next",
         delegate_result=delegate_result,
     )
 
@@ -1154,6 +1251,7 @@ def resume_execution(
             backlog,
             scope_context=scope_context,
             execution_module=execution_module,
+            requested_command="resume",
         )
         if approval_required is not None:
             return approval_required
@@ -1180,10 +1278,13 @@ def resume_execution(
             ),
             completed=False,
             action="delegated_to_ship_slice" if delegate_result is not None else "resume_active_slice",
+            requested_command="resume",
             delegate_result=delegate_result,
         )
 
-    checkpoint_required = require_commit_checkpoint(backlog, str(scope_context.repo_root))
+    checkpoint_required = require_commit_checkpoint(
+        backlog, str(scope_context.repo_root), requested_command="resume"
+    )
     if checkpoint_required is not None:
         return checkpoint_required
 
@@ -1202,6 +1303,7 @@ def resume_execution(
             next_owner=None,
             completed=True,
             action="complete",
+            requested_command="resume",
             delegate_result=None,
         )
 
@@ -1227,7 +1329,7 @@ def read_dirty_worktree_paths(repo_root: str) -> List[str]:
 
 
 def require_commit_checkpoint(
-    backlog: BacklogResolution, repo_root: str
+    backlog: BacklogResolution, repo_root: str, *, requested_command: str
 ) -> Optional[BootstrapResult]:
     completed_entries = [entry for entry in backlog.entries if entry.state == "completed"]
     if not completed_entries:
@@ -1245,12 +1347,17 @@ def require_commit_checkpoint(
         next_owner="commit",
         completed=False,
         action="commit_checkpoint_required",
+        requested_command=requested_command,
         delegate_result=None,
     )
 
 
 def require_approval_checkpoint(
-    backlog: BacklogResolution, *, scope_context, execution_module
+    backlog: BacklogResolution,
+    *,
+    scope_context,
+    execution_module,
+    requested_command: str,
 ) -> Optional[BootstrapResult]:
     if backlog.active_slice_handoff is None:
         return None
@@ -1274,6 +1381,7 @@ def require_approval_checkpoint(
         next_owner="approval",
         completed=False,
         action="approval_required",
+        requested_command=requested_command,
         delegate_result=None,
     )
 

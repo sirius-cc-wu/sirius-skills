@@ -48,3 +48,4 @@
 | scc-terminal-automation | ship-slice-close-commit-controls | closed | 2026-04-23T16:57:50 | 2026-04-23T16:57:50 | slices/scc-terminal-automation-ship-slice-close-commit-controls/ |
 | dsp-policy-contract | delegated-execution-stop-policies | closed | 2026-04-24T00:14:14 | 2026-04-24T00:14:14 | slices/dsp-policy-contract-delegated-execution-stop-policies/ |
 | dsp-boundary-enforcement | delegated-execution-stop-policies | closed | 2026-04-24T00:14:14 | 2026-04-24T00:14:14 | slices/dsp-boundary-enforcement-delegated-execution-stop-policies/ |
+| spi-preflight-contract | Add typed ship preflight contract and readiness metadata | closed | 2026-04-24T19:40:59 | 2026-04-24T19:40:59 | slices/spi-preflight-contract-add-typed-ship-preflight-contract-and-readiness-metadata/ |

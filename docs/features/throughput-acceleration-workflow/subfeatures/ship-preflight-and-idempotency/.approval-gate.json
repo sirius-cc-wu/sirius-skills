@@ -1,0 +1,11 @@
+{
+  "version": 1,
+  "approved": true,
+  "approved_at": "2026-04-24T11:22:35+00:00",
+  "target_id": "ship-preflight-and-idempotency",
+  "target_path": "docs/features/throughput-acceleration-workflow/subfeatures/ship-preflight-and-idempotency/",
+  "planning_status": "planning_reviewed",
+  "planning_updated_at": "2026-04-24T17:47:11",
+  "planning_fingerprint": "76cf8b368d699482edad3b0f0eec592ead1e623f83f984e0119beba2b20b85a0",
+  "approval_note": "Approved in chat on 2026-04-24; execute slices in increment order with one commit per completed slice."
+}
