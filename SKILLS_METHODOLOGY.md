@@ -34,6 +34,12 @@ The planning layer keeps scope, design, decomposition, increment planning, and
 optional durable reference comparison in repo documents, and `guide-planning`
 owns readiness and routing across those artifacts.
 
+When planning work consolidates, narrows, or supersedes older workflow
+surface, keep the user-facing route singular: `guide-scope` stays the optional
+scope resolver, `guide-planning` stays the canonical planning entrypoint, and
+older surfaces should be described as historical or migration-only unless a
+planning packet explicitly documents a temporary parallel transition.
+
 After each planning phase writes or updates its repository artifacts, persist the matching metadata transition with `python3 skills/guide-planning/scripts/manage_planning.py sync-status <feature-selector> --through <expected-status>`. Use `sync-status` for normal adjacent advancement and drift repair; reserve `set-status` for explicit manual overrides and terminal execution states.
 
 The execution layer works one implementation-ready slice at a time, starting with `slice` bootstrap from approved committed planning artifacts. `ship` can sit above that flow when a reviewed and committed feature or subfeature should be worked as one dependency-aware backlog; it should follow increment order first, then slice dependencies within the current increment, while still handing each concrete slice to the next existing single-slice owner such as `brief`, `blueprint`, repository implementation, `review-execution`, `close-slice`, or `commit`.
@@ -72,6 +78,7 @@ Its job is to:
 - verify the current planning artifacts and metadata
 - decide whether the next step is `propose`, `add-subfeature`, `assess`, `research`, `discover`, `design`, `ui-flow`, `breakdown`, `review-planning`, or an approval/commit stop before execution begins
 - keep planning handoff decisions durable through explicit readiness states
+- keep the canonical planning surface explicit when reviewed work narrows or supersedes older workflow paths
 
 Expected planning states:
 

@@ -116,6 +116,12 @@ These skills sit **before** the execution-slice skills:
 - planning layer: `guide-scope`, `guide-planning`, `propose`, `add-subfeature`, `migrate-subfeatures`, `assess`, `research`, `discover`, `design`, `ui-flow`, `breakdown`, `review-planning`
 - execution layer: `slice`, `guide-execution`, `ship`, `brief`, `blueprint`, `review-execution`, `close-slice`
 
+Canonical planning surface:
+
+- use `guide-scope` when repository scope is ambiguous
+- use `guide-planning` as the canonical planning entrypoint once scope is resolved
+- when a planning packet consolidates or narrows older workflow surface, keep one user-facing route and describe superseded surfaces as historical, migration-only, or archival context instead of implied parallel paths
+
 
 Recommended boundary:
 
@@ -126,6 +132,7 @@ Recommended boundary:
 - bootstrap one execution slice per executable slice
 - use `guide-scope` as the optional scope-aware entrypoint when multi-scope routing or explicit scope choice matters
 - let `guide-planning` own feature-planning readiness and routing inside the planning layer
+- when consolidation simplifies the planning surface, update docs so one path stays canonical and older surfaces are clearly historical rather than silently co-active
 - let `guide-execution` own slice readiness and state transitions within the execution layer
 - let `ship` orchestrate one reviewed and committed feature or subfeature backlog without absorbing the owning execution steps
 

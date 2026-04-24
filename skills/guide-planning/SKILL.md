@@ -5,7 +5,7 @@ description: Resolves feature planning state, promotes accepted proposals into c
 
 # Guide Planning
 
-Use this skill as the planning-layer entrypoint when you need to decide the next planning step for one feature planning folder.
+Use this skill as the planning-layer canonical entrypoint when you need to decide the next planning step for one feature planning folder.
 
 ## Responsibilities
 
@@ -15,6 +15,7 @@ Use this skill as the planning-layer entrypoint when you need to decide the next
 4. Route feature-scoped work to `propose`, `add-subfeature`, `assess`, `research`, `discover`, `design`, `ui-flow`, `breakdown`, or `review-planning`, then stop for approval/commit before execution begins.
 5. Persist planning readiness state when a phase is complete.
 6. Keep planning handoff decisions durable in the repository instead of transient chat state.
+7. When planning surface is consolidated, keep one canonical planning route and treat superseded surfaces as historical context instead of parallel entrypoints.
 
 ## Entry Decision Guide
 
@@ -50,6 +51,10 @@ Use `guide-planning` when you need to decide the next planning step before slice
 - Treat planning commits as the durable checkpoint between planning and execution.
 - Keep any normalized `consolidation` summary in the existing planning or
   subfeature metadata instead of introducing a second planning sidecar.
+- When reviewed planning narrows or supersedes older workflow surface, route
+  maintainers through this entrypoint and describe older surfaces as
+  historical, migration-only, or archival context unless an explicit
+  transition plan says both remain active temporarily.
 - Hand off execution-layer work to `slice` or `guide-execution` instead of absorbing it into planning.
 
 Typical handoff:
