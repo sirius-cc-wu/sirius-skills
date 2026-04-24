@@ -133,6 +133,12 @@
       "path": "docs/features/throughput-acceleration-workflow/subfeatures/delegated-execution-stop-policies/"
     },
     {
+      "feature": "ship-preflight-and-idempotency",
+      "status": "planning_reviewed",
+      "updated_at": "2026-04-24T17:47:11",
+      "path": "docs/features/throughput-acceleration-workflow/subfeatures/ship-preflight-and-idempotency/"
+    },
+    {
       "feature": "ship-slice-close-commit-controls",
       "status": "implemented",
       "updated_at": "2026-04-23T16:57:50",
