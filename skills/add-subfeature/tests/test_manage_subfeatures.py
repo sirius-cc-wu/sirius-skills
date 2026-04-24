@@ -117,6 +117,7 @@ def test_add_creates_durable_subfeature_and_updates_planning_registry(tmp_path, 
     assert metadata["status"] == "draft"
     assert metadata["subfeature_type"] == "superseding"
     assert metadata["summary"] == "Replace the legacy checkout path"
+    assert metadata["consolidation"] is None
     assert planning_meta["feature_slug"] == "replace-legacy-flow"
     assert planning_meta["status"] == "discovery_pending"
     assert registry["subfeatures"][0]["subfeature_id"] == "replace-legacy-flow"
@@ -245,6 +246,57 @@ def test_reviewed_requires_review_note_and_validate_reports_success(tmp_path, mo
         ["manage_subfeatures.py", "validate", "checkout", "replace-legacy-flow"],
     )
     assert module.main() == 0
+
+
+def test_set_status_persists_normalized_consolidation_summary(tmp_path, monkeypatch):
+    module = load_module(SCRIPT_PATH, "manage_subfeatures")
+    monkeypatch.chdir(tmp_path)
+    feature_dir = setup_feature(tmp_path)
+
+    assert run_cli(module, "manage_subfeatures.py", monkeypatch, "add", "checkout", "replace-legacy-flow") == 0
+    subfeature_dir = feature_dir / "subfeatures" / "replace-legacy-flow"
+    write_file(subfeature_dir / "impact-analysis.md")
+
+    assert run_cli(
+        module,
+        "manage_subfeatures.py",
+        monkeypatch,
+        "set-status",
+        "checkout",
+        "replace-legacy-flow",
+        "impact_ready",
+        "--consolidation-json",
+        json.dumps(
+            {
+                "disposition": "superseding",
+                "targets": [
+                    {
+                        "kind": "artifact",
+                        "ref": "docs/features/checkout/discover.md",
+                        "change": "narrows",
+                    }
+                ],
+                "historical_artifacts": ["docs/features/checkout/legacy.md"],
+                "surface_simplifications": ["use one checkout path"],
+                "justification": "Avoids parallel child workflows.",
+            }
+        ),
+    ) == 0
+
+    metadata = json.loads((subfeature_dir / ".subfeature-meta.json").read_text(encoding="utf-8"))
+    assert metadata["consolidation"] == {
+        "disposition": "superseding",
+        "targets": [
+            {
+                "kind": "artifact",
+                "ref": "docs/features/checkout/discover.md",
+                "change": "narrows",
+            }
+        ],
+        "historical_artifacts": ["docs/features/checkout/legacy.md"],
+        "surface_simplifications": ["use one checkout path"],
+        "justification": "Avoids parallel child workflows.",
+    }
 
 
 def test_finalized_warns_when_linked_execution_slices_remain_open(

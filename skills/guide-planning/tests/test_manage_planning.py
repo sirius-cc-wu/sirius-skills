@@ -178,6 +178,7 @@ def test_add_creates_feature_metadata_and_registry_entries(tmp_path, monkeypatch
     assert metadata["status"] == "discovery_pending"
     assert metadata["requires_ui_flow"] is False
     assert metadata["related_story_ids"] == []
+    assert metadata["consolidation"] is None
     assert registry["features"][0]["feature"] == "habit-tracker"
 
 
@@ -210,6 +211,62 @@ def test_read_metadata_accepts_legacy_ready_task_ids(tmp_path, monkeypatch):
 
     assert metadata["ready_slice_ids"] == ["HAB-101"]
     assert metadata["related_story_ids"] == ["HAB-01"]
+
+
+def test_set_status_persists_normalized_consolidation_summary(tmp_path, monkeypatch):
+    module = load_manage_planning_module()
+    monkeypatch.chdir(tmp_path)
+
+    assert run_cli(module, monkeypatch, "init") == 0
+    assert run_cli(module, monkeypatch, "add", "habit-tracker") == 0
+    write_file(tmp_path / "docs" / "features" / "habit-tracker" / "discover.md")
+
+    assert (
+        run_cli(
+            module,
+            monkeypatch,
+            "set-status",
+            "habit-tracker",
+            "discovery_ready",
+            "--consolidation-json",
+            json.dumps(
+                {
+                    "disposition": "superseding",
+                    "targets": [
+                        {
+                            "kind": "skill",
+                            "ref": "guide-planning",
+                            "change": "supersedes",
+                        }
+                    ],
+                    "historical_artifacts": ["docs/features/legacy.md"],
+                    "surface_simplifications": ["use one entrypoint"],
+                    "justification": "Removes parallel planning entrypoints.",
+                }
+            ),
+        )
+        == 0
+    )
+
+    metadata = json.loads(
+        (tmp_path / "docs" / "features" / "habit-tracker" / ".planning-meta.json").read_text(
+            encoding="utf-8"
+        )
+    )
+
+    assert metadata["consolidation"] == {
+        "disposition": "superseding",
+        "targets": [
+            {
+                "kind": "skill",
+                "ref": "guide-planning",
+                "change": "supersedes",
+            }
+        ],
+        "historical_artifacts": ["docs/features/legacy.md"],
+        "surface_simplifications": ["use one entrypoint"],
+        "justification": "Removes parallel planning entrypoints.",
+    }
 
 
 def test_slice_ready_warns_when_closed_execution_slices_leave_feature_out_of_sync(

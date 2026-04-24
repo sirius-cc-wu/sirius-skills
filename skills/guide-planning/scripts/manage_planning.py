@@ -34,6 +34,12 @@ DEFAULT_PLANNING_DIR = "docs/features"
 DEFAULT_PROPOSAL_DIR = "docs/proposals"
 DEFAULT_DESIGN_DIAGRAM_MODE = "embedded"
 VALID_DESIGN_DIAGRAM_MODES = {"embedded", "linked_svg"}
+VALID_CONSOLIDATION_DISPOSITIONS = {
+    "additive",
+    "narrowing",
+    "superseding",
+    "replacement",
+}
 CONFIG_DIR = ".skills"
 CONFIG_FILE = os.path.join(CONFIG_DIR, "planning.json")
 SCOPE_RUNTIME_PATH = Path(__file__).resolve().with_name("scope_runtime.py")
@@ -189,6 +195,98 @@ def normalize_story_ids(value: object) -> List[str]:
             raise RuntimeError("Related story IDs must contain non-empty strings.")
         normalized.append(item.strip())
     return list(dict.fromkeys(normalized))
+
+
+def normalize_string_list_field(value: object, field_name: str) -> List[str]:
+    if value is None or value == "":
+        return []
+    if not isinstance(value, list):
+        raise RuntimeError(f"{field_name} must be stored as a list.")
+    normalized: List[str] = []
+    for item in value:
+        if not isinstance(item, str) or not item.strip():
+            raise RuntimeError(f"{field_name} must contain non-empty strings.")
+        normalized.append(item.strip())
+    return list(dict.fromkeys(normalized))
+
+
+def normalize_required_string_field(value: object, field_name: str) -> str:
+    if not isinstance(value, str) or not value.strip():
+        raise RuntimeError(f"{field_name} must be a non-empty string.")
+    return value.strip()
+
+
+def normalize_consolidation_disposition(value: object) -> str:
+    if not isinstance(value, str):
+        raise RuntimeError("Consolidation disposition must be a string.")
+    normalized = value.strip().lower()
+    if normalized not in VALID_CONSOLIDATION_DISPOSITIONS:
+        raise RuntimeError(
+            "Consolidation disposition must be one of "
+            f"{sorted(VALID_CONSOLIDATION_DISPOSITIONS)}."
+        )
+    return normalized
+
+
+def normalize_consolidation_targets(value: object) -> List[Dict[str, str]]:
+    if value is None or value == "":
+        return []
+    if not isinstance(value, list):
+        raise RuntimeError("Consolidation targets must be stored as a list.")
+    normalized: List[Dict[str, str]] = []
+    for item in value:
+        if not isinstance(item, dict):
+            raise RuntimeError("Each consolidation target must be a JSON object.")
+        normalized.append(
+            {
+                "kind": normalize_required_string_field(
+                    item.get("kind"), "Consolidation target kind"
+                ),
+                "ref": normalize_required_string_field(
+                    item.get("ref"), "Consolidation target ref"
+                ),
+                "change": normalize_required_string_field(
+                    item.get("change"), "Consolidation target change"
+                ),
+            }
+        )
+    deduped: List[Dict[str, str]] = []
+    seen = set()
+    for item in normalized:
+        key = (item["kind"], item["ref"], item["change"])
+        if key in seen:
+            continue
+        seen.add(key)
+        deduped.append(item)
+    return deduped
+
+
+def normalize_consolidation_summary(value: object) -> Optional[Dict[str, object]]:
+    if value is None or value == "":
+        return None
+    if not isinstance(value, dict):
+        raise RuntimeError("Consolidation summary must be a JSON object.")
+    return {
+        "disposition": normalize_consolidation_disposition(value.get("disposition")),
+        "targets": normalize_consolidation_targets(value.get("targets")),
+        "historical_artifacts": normalize_string_list_field(
+            value.get("historical_artifacts"), "Historical artifacts"
+        ),
+        "surface_simplifications": normalize_string_list_field(
+            value.get("surface_simplifications"), "Surface simplifications"
+        ),
+        "justification": normalize_review_note(value.get("justification")),
+    }
+
+
+def parse_consolidation_json_arg(value: Optional[str]) -> Optional[Dict[str, object]]:
+    if value is None:
+        return None
+    try:
+        payload = json.loads(value)
+    except json.JSONDecodeError as exc:
+        raise RuntimeError("Consolidation summary must be valid JSON.") from exc
+    return normalize_consolidation_summary(payload)
 
 
 def load_raw_config(
@@ -446,6 +544,7 @@ def build_metadata(feature_slug: str, requires_ui_flow: bool = False) -> Dict[st
         "review_note": None,
         "ready_slice_ids": [],
         "related_story_ids": [],
+        "consolidation": None,
     }
 
 
@@ -472,6 +571,7 @@ def normalize_metadata(payload: object) -> Dict[str, object]:
             payload.get("ready_slice_ids", payload.get("ready_task_ids"))
         ),
         "related_story_ids": normalize_story_ids(payload.get("related_story_ids")),
+        "consolidation": normalize_consolidation_summary(payload.get("consolidation")),
     }
 
 
@@ -748,6 +848,7 @@ def apply_metadata_overrides(
     review_note: Optional[str] = None,
     slice_ids: Optional[List[str]] = None,
     requires_ui_flow: Optional[bool] = None,
+    consolidation: Optional[Dict[str, object]] = None,
 ) -> Dict[str, object]:
     updated_metadata = dict(metadata)
     if review_note is not None:
@@ -756,6 +857,8 @@ def apply_metadata_overrides(
         updated_metadata["ready_slice_ids"] = normalize_slice_ids(slice_ids)
     if requires_ui_flow is not None:
         updated_metadata["requires_ui_flow"] = requires_ui_flow
+    if consolidation is not None:
+        updated_metadata["consolidation"] = normalize_consolidation_summary(consolidation)
     return updated_metadata
 
 
@@ -767,6 +870,7 @@ def update_feature_status(
     review_note: Optional[str] = None,
     slice_ids: Optional[List[str]] = None,
     requires_ui_flow: Optional[bool] = None,
+    consolidation: Optional[Dict[str, object]] = None,
     scope_context: Optional[object] = None,
 ) -> Tuple[bool, str]:
     feature_dir = feature_dir_for_row(feature, scope_context=scope_context)
@@ -791,6 +895,8 @@ def update_feature_status(
         updated_metadata["ready_slice_ids"] = []
     if requires_ui_flow is not None:
         updated_metadata["requires_ui_flow"] = requires_ui_flow
+    if consolidation is not None:
+        updated_metadata["consolidation"] = normalize_consolidation_summary(consolidation)
 
     ok, issues, _ = validate_feature_state(feature_dir, updated_metadata)
     if not force and not ok:
@@ -812,6 +918,7 @@ def sync_feature_status(
     review_note: Optional[str] = None,
     slice_ids: Optional[List[str]] = None,
     requires_ui_flow: Optional[bool] = None,
+    consolidation: Optional[Dict[str, object]] = None,
     scope_context: Optional[object] = None,
 ) -> Tuple[bool, str]:
     feature_dir = feature_dir_for_row(feature, scope_context=scope_context)
@@ -841,6 +948,7 @@ def sync_feature_status(
         review_note=review_note,
         slice_ids=slice_ids,
         requires_ui_flow=requires_ui_flow,
+        consolidation=consolidation,
     )
     current_ok, current_issues, _ = validate_feature_state(feature_dir, updated_metadata)
     if not current_ok:
@@ -1084,6 +1192,7 @@ def cmd_set_status(args: argparse.Namespace) -> int:
         review_note=args.review_note,
         slice_ids=args.slice_id if args.slice_id else None,
         requires_ui_flow=requires_ui_flow,
+        consolidation=parse_consolidation_json_arg(args.consolidation_json),
         scope_context=scope_context,
     )
     stream = sys.stdout if success else sys.stderr
@@ -1151,6 +1260,7 @@ def cmd_sync_status(args: argparse.Namespace) -> int:
         review_note=args.review_note,
         slice_ids=args.slice_id if args.slice_id else None,
         requires_ui_flow=requires_ui_flow,
+        consolidation=parse_consolidation_json_arg(args.consolidation_json),
         scope_context=scope_context,
     )
     stream = sys.stdout if success else sys.stderr
@@ -1208,6 +1318,10 @@ def build_parser() -> argparse.ArgumentParser:
         default=[],
         help="Ready slice ID for slice bootstrap. Repeatable.",
     )
+    set_p.add_argument(
+        "--consolidation-json",
+        help="Normalized consolidation summary as a JSON object.",
+    )
     ui_group = set_p.add_mutually_exclusive_group()
     ui_group.add_argument(
         "--require-ui-flow",
@@ -1261,6 +1375,10 @@ def build_parser() -> argparse.ArgumentParser:
         action="append",
         default=[],
         help="Ready slice ID to persist before attempting slice_ready. Repeatable.",
+    )
+    sync_p.add_argument(
+        "--consolidation-json",
+        help="Normalized consolidation summary as a JSON object.",
     )
     sync_ui_group = sync_p.add_mutually_exclusive_group()
     sync_ui_group.add_argument(

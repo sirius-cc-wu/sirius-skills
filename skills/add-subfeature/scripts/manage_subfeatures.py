@@ -81,6 +81,12 @@ SUBFEATURE_TYPE_ALIASES = {
     "superseding": "superseding",
     "replacement": "replacement",
 }
+VALID_CONSOLIDATION_DISPOSITIONS = {
+    "additive",
+    "narrowing",
+    "superseding",
+    "replacement",
+}
 PLANNING_STATUS_BY_SUBFEATURE_STATUS = {
     "draft": "discovery_pending",
     "impact_ready": "discovery_ready",
@@ -162,6 +168,88 @@ def normalize_string_list(value: object, field_name: str) -> List[str]:
             raise RuntimeError(f"{field_name} must contain non-empty strings.")
         normalized.append(item.strip())
     return list(dict.fromkeys(normalized))
+
+
+def normalize_consolidation_disposition(value: object) -> str:
+    if not isinstance(value, str):
+        raise RuntimeError("Consolidation disposition must be a string.")
+    normalized = value.strip().lower()
+    if normalized not in VALID_CONSOLIDATION_DISPOSITIONS:
+        raise RuntimeError(
+            "Consolidation disposition must be one of "
+            f"{sorted(VALID_CONSOLIDATION_DISPOSITIONS)}."
+        )
+    return normalized
+
+
+def normalize_required_string(value: object, field_name: str) -> str:
+    normalized = normalize_optional_string(value, field_name)
+    if not normalized:
+        raise RuntimeError(f"{field_name} must be a non-empty string.")
+    return normalized
+
+
+def normalize_consolidation_targets(value: object) -> List[Dict[str, str]]:
+    if value is None or value == "":
+        return []
+    if not isinstance(value, list):
+        raise RuntimeError("Consolidation targets must be stored as a list.")
+    normalized: List[Dict[str, str]] = []
+    for item in value:
+        if not isinstance(item, dict):
+            raise RuntimeError("Each consolidation target must be a JSON object.")
+        normalized.append(
+            {
+                "kind": normalize_required_string(
+                    item.get("kind"), "Consolidation target kind"
+                ),
+                "ref": normalize_required_string(
+                    item.get("ref"), "Consolidation target ref"
+                ),
+                "change": normalize_required_string(
+                    item.get("change"), "Consolidation target change"
+                ),
+            }
+        )
+    deduped: List[Dict[str, str]] = []
+    seen = set()
+    for item in normalized:
+        key = (item["kind"], item["ref"], item["change"])
+        if key in seen:
+            continue
+        seen.add(key)
+        deduped.append(item)
+    return deduped
+
+
+def normalize_consolidation_summary(value: object) -> Optional[Dict[str, object]]:
+    if value is None or value == "":
+        return None
+    if not isinstance(value, dict):
+        raise RuntimeError("Consolidation summary must be a JSON object.")
+    return {
+        "disposition": normalize_consolidation_disposition(value.get("disposition")),
+        "targets": normalize_consolidation_targets(value.get("targets")),
+        "historical_artifacts": normalize_string_list(
+            value.get("historical_artifacts"), "Historical artifacts"
+        ),
+        "surface_simplifications": normalize_string_list(
+            value.get("surface_simplifications"), "Surface simplifications"
+        ),
+        "justification": normalize_optional_string(
+            value.get("justification"), "Consolidation justification"
+        ),
+    }
+
+
+def parse_consolidation_json_arg(value: Optional[str]) -> Optional[Dict[str, object]]:
+    if value is None:
+        return None
+    try:
+        payload = json.loads(value)
+    except json.JSONDecodeError as exc:
+        raise RuntimeError("Consolidation summary must be valid JSON.") from exc
+    return normalize_consolidation_summary(payload)
 
 
 def normalize_path(path: str) -> str:
@@ -285,6 +373,7 @@ def build_metadata(
         "affected_artifacts": [],
         "affected_story_ids": [],
         "affected_slice_ids": [],
+        "consolidation": None,
         "review_note": None,
         "finalized_at": None,
     }
@@ -326,6 +415,7 @@ def normalize_metadata(payload: object) -> Dict[str, object]:
         "affected_slice_ids": normalize_string_list(
             payload.get("affected_slice_ids"), "Affected slice IDs"
         ),
+        "consolidation": normalize_consolidation_summary(payload.get("consolidation")),
         "review_note": normalize_optional_string(payload.get("review_note"), "Review note"),
         "finalized_at": normalize_optional_timestamp(payload.get("finalized_at")),
     }
@@ -574,6 +664,7 @@ def update_subfeature_status(
     affected_artifacts: Optional[List[str]] = None,
     affected_story_ids: Optional[List[str]] = None,
     affected_slice_ids: Optional[List[str]] = None,
+    consolidation: Optional[Dict[str, object]] = None,
 ) -> Tuple[bool, str]:
     rows = load_registry(feature_dir)
     selected = find_subfeature(rows, str(subfeature["subfeature_id"]))
@@ -612,6 +703,8 @@ def update_subfeature_status(
         updated_metadata["affected_slice_ids"] = normalize_string_list(
             affected_slice_ids, "Affected slice IDs"
         )
+    if consolidation is not None:
+        updated_metadata["consolidation"] = normalize_consolidation_summary(consolidation)
     if status == "finalized":
         updated_metadata["finalized_at"] = timestamp
 
@@ -707,6 +800,7 @@ def cmd_set_status(args: argparse.Namespace) -> int:
             affected_artifacts=args.affected_artifact if args.affected_artifact else None,
             affected_story_ids=args.story_id if args.story_id else None,
             affected_slice_ids=args.slice_id if args.slice_id else None,
+            consolidation=parse_consolidation_json_arg(args.consolidation_json),
         )
     except (RuntimeError, ValueError) as exc:
         print(str(exc), file=sys.stderr)
@@ -788,6 +882,11 @@ def build_parser() -> argparse.ArgumentParser:
     )
     status_p.add_argument(
         "--slice-id", action="append", default=[], help="Affected slice ID. Repeatable."
+    )
+    status_p.add_argument(
+        "--consolidation-json",
+        default=None,
+        help="Normalized consolidation summary as a JSON object.",
     )
     status_p.add_argument(
         "--force",
