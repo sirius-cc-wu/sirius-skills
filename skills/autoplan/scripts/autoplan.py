@@ -5,6 +5,8 @@ from __future__ import annotations
 import argparse
 import importlib.util
 import json
+import re
+import shlex
 import subprocess
 import sys
 from datetime import datetime, timezone
@@ -188,6 +190,12 @@ def parse_optional_review_note(raw_value: object) -> Optional[str]:
     return cleaned or None
 
 
+def extract_missing_required_files(message: str) -> list[str]:
+    if not message:
+        return []
+    return sorted({match for match in re.findall(r"Missing required file '([^']+)'", message)})
+
+
 def execute_owner_chain(
     rows: list[dict[str, object]],
     feature: dict[str, object],
@@ -327,6 +335,53 @@ def build_readiness_payload(
     )
 
 
+def build_owner_handoff(
+    *,
+    target_id: str,
+    target_path: str,
+    next_owner: str,
+    execute_owner_chain_enabled: bool,
+    owner_chain: Optional[dict[str, Any]],
+) -> Optional[dict[str, Any]]:
+    if not execute_owner_chain_enabled or next_owner not in AUTOMATABLE_OWNERS:
+        return None
+    if not isinstance(owner_chain, dict) or not owner_chain.get("enabled"):
+        return None
+
+    stop_reason = normalize_stop_reason(owner_chain.get("stop_reason"))
+    if stop_reason is None:
+        return None
+
+    reason_kind = str(stop_reason.get("kind") or "").strip()
+    reason_owner = str(stop_reason.get("owner") or "").strip()
+    if reason_kind in {"approval_boundary", "owner_stop"}:
+        return None
+    if reason_owner and reason_owner != next_owner:
+        return None
+
+    message = str(stop_reason.get("message") or "").strip()
+    missing_files = extract_missing_required_files(message)
+    bootstrap_commands: list[str] = []
+
+    if next_owner == "breakdown" and missing_files:
+        required = {"slice-planning.md", "slice-traceability.md"}
+        if required.issubset(set(missing_files)):
+            bootstrap_commands.append(
+                "python3 skills/breakdown/scripts/scaffold_breakdown.py "
+                f"{shlex.quote(target_path)}"
+            )
+
+    return {
+        "should_invoke_skill": True,
+        "owner": next_owner,
+        "target_id": target_id,
+        "target_path": target_path,
+        "stop_reason": stop_reason,
+        "missing_files": missing_files,
+        "bootstrap_commands": bootstrap_commands,
+    }
+
+
 def write_runtime_records(
     checkpoint_path: Path,
     event_log_path: Path,
@@ -338,6 +393,7 @@ def write_runtime_records(
     learnings: list[dict[str, Any]],
     auto_decision_policy: str,
     owner_chain: Optional[dict[str, Any]],
+    owner_handoff: Optional[dict[str, Any]],
 ) -> None:
     event: dict[str, Any] = {
         "timestamp": utc_now(),
@@ -353,6 +409,9 @@ def write_runtime_records(
         if isinstance(stop_reason, dict):
             event["owner_chain_stop_kind"] = stop_reason.get("kind")
             event["owner_chain_stop_owner"] = stop_reason.get("owner")
+    if owner_handoff is not None:
+        event["owner_handoff_owner"] = owner_handoff.get("owner")
+        event["owner_handoff_kind"] = owner_handoff.get("stop_reason", {}).get("kind")
     append_event(event_log_path, event)
 
     checkpoint_payload: dict[str, Any] = {
@@ -364,6 +423,8 @@ def write_runtime_records(
     }
     if owner_chain is not None:
         checkpoint_payload["owner_chain"] = owner_chain
+    if owner_handoff is not None:
+        checkpoint_payload["owner_handoff"] = owner_handoff
 
     write_checkpoint(
         checkpoint_path,
@@ -451,6 +512,13 @@ def main(argv: Sequence[str] | None = None) -> int:
         }
 
     next_owner, action = owner_for_status(planning_status)
+    owner_handoff = build_owner_handoff(
+        target_id=target_id,
+        target_path=str(feature["path"]),
+        next_owner=next_owner,
+        execute_owner_chain_enabled=execute_owner_chain_enabled,
+        owner_chain=owner_chain,
+    )
     checkpoint_stale_reason: Optional[str] = None
     if prior_checkpoint is not None:
         prior_status = str(prior_checkpoint.payload.get("planning_status") or "")
@@ -478,6 +546,7 @@ def main(argv: Sequence[str] | None = None) -> int:
         learnings=learnings,
         auto_decision_policy=auto_decision_policy,
         owner_chain=owner_chain,
+        owner_handoff=owner_handoff,
     )
 
     payload = {
@@ -490,6 +559,7 @@ def main(argv: Sequence[str] | None = None) -> int:
         "auto_decision_policy": auto_decision_policy,
         "execute_owner_chain": execute_owner_chain_enabled,
         "owner_chain": owner_chain,
+        "owner_handoff": owner_handoff,
         "checkpoint_path": str(checkpoint_path),
         "event_log_path": str(event_log_path),
         "learnings": learnings,

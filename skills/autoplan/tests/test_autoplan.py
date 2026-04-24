@@ -152,6 +152,7 @@ def test_autoplan_stops_at_planning_reviewed_boundary(tmp_path: Path, monkeypatc
     payload = json.loads(result.stdout)
     assert payload["next_owner"] == "approval"
     assert payload["action"] == "approval_required"
+    assert payload["owner_handoff"] is None
     assert payload["readiness"]["can_proceed"] is False
     assert payload["readiness"]["blocked_by"] == ["approval_boundary"]
     assert payload["readiness"]["approval_gate"]["required"] is True
@@ -212,6 +213,7 @@ def test_autoplan_owner_chain_respects_stop_owner_boundary(tmp_path: Path, monke
     assert payload["planning_status"] == "discovery_ready"
     assert payload["next_owner"] == "design"
     assert payload["action"] == "run_design"
+    assert payload["owner_handoff"] is None
     assert payload["owner_chain"]["stop_reason"]["kind"] == "owner_stop"
     assert payload["readiness"]["can_proceed"] is False
     assert payload["readiness"]["blocked_by"] == ["owner_stop"]
@@ -236,9 +238,49 @@ def test_autoplan_owner_chain_reports_missing_required_input(tmp_path: Path, mon
     assert payload["next_owner"] == "discover"
     assert payload["action"] == "run_discover"
     assert payload["owner_chain"]["stop_reason"]["kind"] == "missing_required_input"
+    assert payload["owner_handoff"] == {
+        "should_invoke_skill": True,
+        "owner": "discover",
+        "target_id": "throughput-acceleration-workflow",
+        "target_path": "docs/features/throughput-acceleration-workflow/",
+        "stop_reason": payload["owner_chain"]["stop_reason"],
+        "missing_files": ["discover.md"],
+        "bootstrap_commands": [],
+    }
     assert payload["readiness"]["can_proceed"] is False
     assert payload["readiness"]["blocked_by"] == ["missing_required_input"]
     assert payload["owner_chain"]["steps"][0]["advanced"] is False
+
+
+def test_autoplan_owner_chain_suggests_breakdown_scaffold_handoff(
+    tmp_path: Path, monkeypatch
+) -> None:
+    init_git_repo(tmp_path)
+    write_planning_config(
+        tmp_path,
+        autoplan_overrides={
+            "execute_owner_chain": True,
+        },
+    )
+    create_feature(tmp_path, monkeypatch, "design_ready")
+
+    result = run_cli(tmp_path, "throughput-acceleration-workflow", "--json")
+
+    assert result.returncode == 0
+    payload = json.loads(result.stdout)
+    assert payload["planning_status"] == "design_ready"
+    assert payload["next_owner"] == "breakdown"
+    assert payload["owner_chain"]["stop_reason"]["kind"] == "missing_required_input"
+    assert payload["owner_handoff"]["should_invoke_skill"] is True
+    assert payload["owner_handoff"]["owner"] == "breakdown"
+    assert payload["owner_handoff"]["missing_files"] == [
+        "slice-planning.md",
+        "slice-traceability.md",
+    ]
+    assert payload["owner_handoff"]["bootstrap_commands"] == [
+        "python3 skills/breakdown/scripts/scaffold_breakdown.py "
+        "docs/features/throughput-acceleration-workflow/"
+    ]
 
 
 def test_autoplan_owner_chain_reports_approval_when_already_reviewed(
@@ -261,5 +303,6 @@ def test_autoplan_owner_chain_reports_approval_when_already_reviewed(
     assert payload["next_owner"] == "approval"
     assert payload["owner_chain"]["steps"] == []
     assert payload["owner_chain"]["stop_reason"]["kind"] == "approval_boundary"
+    assert payload["owner_handoff"] is None
     assert payload["readiness"]["can_proceed"] is False
     assert payload["readiness"]["blocked_by"] == ["approval_boundary"]

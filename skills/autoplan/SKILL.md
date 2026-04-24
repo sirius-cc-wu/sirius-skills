@@ -56,6 +56,36 @@ Optional CLI overrides:
 - `--stop-on-owner <owner>` (repeatable)
 - `--review-note <text>` (used when advancing to `planning_reviewed`)
 
+## Workflow
+
+1. Run `autoplan.py <target> --json` (or `--resume --json` when resuming) and
+   inspect the JSON output instead of treating the script as the whole owner
+   chain.
+2. If `execute_owner_chain` is disabled, report the routed `next_owner` and
+   stop.
+3. If `owner_handoff.should_invoke_skill` is true, treat that as an instruction
+   to continue the owner chain by invoking the returned planning skill instead
+   of stopping at the first `missing_required_input` boundary.
+4. Before invoking `breakdown`, run any `owner_handoff.bootstrap_commands`
+   first. This is especially important when the only blocker is the missing
+   scaffold pair:
+   - `slice-planning.md`
+   - `slice-traceability.md`
+5. Invoke the returned owner skill (`discover`, `design`, `breakdown`, or
+   `review-planning`) and let that skill author or repair the planning
+   artifacts it owns.
+6. After the owner skill completes, rerun `autoplan.py <target> --json` and
+   continue looping until one of these explicit stop boundaries is reached:
+   - `approval_boundary`
+   - `owner_stop`
+   - a non-automatable owner
+   - an unresolved ambiguity or validation failure that the owner skill could
+     not repair
+
+`autoplan.py` remains the checkpointing and readiness source of truth, but the
+skill is responsible for actually chaining into downstream planning-owner
+skills.
+
 ## Guardrails
 
 - Do not replace `guide-planning` as the source of planning truth.
@@ -63,6 +93,9 @@ Optional CLI overrides:
 - Keep planning transitions owned by planning-layer validation and metadata.
 - Stop with structured context when owner-chain boundaries are hit (explicit
   stop owner, missing required input, validation failure, or approval).
+- Do not stop just because `autoplan.py` reported `missing_required_input` for
+  the next automatable owner; if `owner_handoff.should_invoke_skill` is true,
+  that owner is expected to create or repair the missing artifacts.
 - Keep stop-reason classification and readiness invariants aligned with shared
   accelerator guardrail helpers in `workflow_runtime`.
 - Prefer current planning artifacts over stale checkpoint context.
