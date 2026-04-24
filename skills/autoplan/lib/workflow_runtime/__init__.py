@@ -9,6 +9,7 @@ from workflow_runtime.learnings import (
     update_learning_state,
 )
 from workflow_runtime.locking import locked_file
+from workflow_runtime.worktree_scope import detect_scope_spillover, snapshot_dirty_worktree
 from workflow_runtime.accelerator_guardrails import (
     build_accelerator_readiness,
     classify_stop_reason_from_message,
@@ -25,6 +26,7 @@ __all__ = [
     "append_learning",
     "build_accelerator_readiness",
     "classify_stop_reason_from_message",
+    "detect_scope_spillover",
     "dedupe_reason_codes",
     "load_checkpoint",
     "locked_file",
@@ -35,6 +37,7 @@ __all__ = [
     "read_events",
     "read_handoff_payload",
     "read_learnings",
+    "snapshot_dirty_worktree",
     "update_learning_state",
     "write_checkpoint",
     "write_handoff_payload",

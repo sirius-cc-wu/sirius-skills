@@ -32,9 +32,10 @@ Read these references when relevant:
 
 - Apply high-signal fixes; skip false positives/low-value items.
 - Preserve external behavior unless asked otherwise.
-- When simplifying only part of a Rust diff, check for other dirty Rust files
-  before formatting. If unrelated Rust work is already dirty, prefer
-  `rustfmt <touched-files>` over repo-wide `cargo fmt`.
+- When simplifying only part of a diff, decide the intended file set before
+  running a formatter or fixer. Prefer path-scoped commands when the tool
+  supports them, and stop if formatting spills into files outside the intended
+  set.
 - Run relevant tests/lint/type checks for touched scope.
 - End with a short summary of fixes, skips, and checks (or confirm code is already clean).
 
