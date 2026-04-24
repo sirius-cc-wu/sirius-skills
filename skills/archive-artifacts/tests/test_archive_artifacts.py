@@ -85,6 +85,17 @@ def setup_repo(tmp_path: Path, monkeypatch):
 
     feature_dir, _ = planning.create_feature("checkout")
     feature_path = Path(feature_dir)
+    feature_metadata = planning.read_metadata(feature_dir)
+    feature_metadata["consolidation"] = {
+        "disposition": "narrowing",
+        "targets": [
+            {"kind": "subfeature", "ref": "checkout/subfeatures/replace-legacy-flow", "change": "narrows"}
+        ],
+        "historical_artifacts": ["docs/features/checkout/discover.md"],
+        "surface_simplifications": ["keep the feature packet canonical"],
+        "justification": "The feature still owns the baseline.",
+    }
+    planning.write_metadata(feature_dir, feature_metadata)
     write_file(feature_path / "system-design.md", "# System Design\n\nBaseline feature design.\n")
     write_file(
         feature_path / "slice-planning.md",
@@ -114,6 +125,17 @@ def setup_repo(tmp_path: Path, monkeypatch):
         scope_context,
     )
     subfeature_path = Path(subfeature_dir)
+    subfeature_metadata = subfeatures.read_metadata(subfeature_dir)
+    subfeature_metadata["consolidation"] = {
+        "disposition": "superseding",
+        "targets": [
+            {"kind": "feature", "ref": "checkout", "change": "narrows"}
+        ],
+        "historical_artifacts": ["docs/features/checkout/system-design.md"],
+        "surface_simplifications": ["route maintainers through the subfeature packet"],
+        "justification": "The old flow should become historical context.",
+    }
+    subfeatures.write_metadata(subfeature_dir, subfeature_metadata)
     write_file(subfeature_path / "system-design.md", "# System Design\n\nBaseline subfeature design.\n")
     write_file(
         subfeature_path / "slice-planning.md",
@@ -276,3 +298,15 @@ def test_cli_json_filters_one_artifact_type(tmp_path, monkeypatch, capsys):
 
     assert payload["summary"]["candidate_count"] == 1
     assert payload["candidates"][0]["artifact_type"] == "feature"
+
+
+def test_archive_candidates_surface_consolidation_context(tmp_path, monkeypatch):
+    env = setup_repo(tmp_path, monkeypatch)
+
+    payload = env["archive"].build_archive_result(artifact_type="subfeature")
+
+    candidate = payload["candidates"][0]
+    assert candidate["consolidation"]["disposition"] == "superseding"
+    assert "historical artifact" in candidate["reason"]
+    rendered = env["archive"].render_text(payload)
+    assert "consolidation=superseding" in rendered

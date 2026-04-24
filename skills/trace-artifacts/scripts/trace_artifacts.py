@@ -58,6 +58,31 @@ def run_trace(artifact_type: Optional[str] = None, artifact_id: Optional[str] = 
 
 
 def render_text(result: Dict[str, object]) -> str:
+    def node_suffix(node: Dict[str, object]) -> str:
+        details = node.get("details")
+        if not isinstance(details, dict):
+            return ""
+        consolidation = details.get("consolidation")
+        if not isinstance(consolidation, dict):
+            return ""
+        targets = consolidation.get("targets", [])
+        historical = consolidation.get("historical_artifacts", [])
+        return (
+            " "
+            f"[consolidation={consolidation.get('disposition', 'unknown')}, "
+            f"targets={len(targets) if isinstance(targets, list) else 0}, "
+            f"historical={len(historical) if isinstance(historical, list) else 0}]"
+        )
+
+    def edge_suffix(edge: Dict[str, object]) -> str:
+        details = edge.get("details")
+        if not isinstance(details, dict):
+            return ""
+        target_ref = details.get("target_ref")
+        if not isinstance(target_ref, str) or not target_ref.strip():
+            return ""
+        return f" ({target_ref})"
+
     lines: List[str] = []
     target = result.get("target")
     if isinstance(target, dict):
@@ -81,14 +106,16 @@ def render_text(result: Dict[str, object]) -> str:
     lines.append("Nodes:")
     for node in result["nodes"]:
         path_suffix = f" ({node['path']})" if node["path"] else ""
-        lines.append(f"- {node['artifact_type']}:{node['artifact_id']}{path_suffix}")
+        lines.append(
+            f"- {node['artifact_type']}:{node['artifact_id']}{path_suffix}{node_suffix(node)}"
+        )
 
     lines.append("Edges:")
     if result["edges"]:
         for edge in result["edges"]:
             lines.append(
                 f"- {edge['source_type']}:{edge['source_id']} -[{edge['relation']}]-> "
-                f"{edge['target_type']}:{edge['target_id']}"
+                f"{edge['target_type']}:{edge['target_id']}{edge_suffix(edge)}"
             )
     else:
         lines.append("- none")

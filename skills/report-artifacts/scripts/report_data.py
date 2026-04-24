@@ -42,6 +42,7 @@ class ReportRecord:
     updated_at: Optional[str]
     parent_feature: Optional[str]
     is_stale: bool
+    consolidation: Optional[Dict[str, object]] = None
     implementation_metrics: Optional[Dict[str, object]] = None
 
     def to_dict(self) -> Dict[str, object]:
@@ -53,6 +54,7 @@ class ReportRecord:
             "updated_at": self.updated_at,
             "parent_feature": self.parent_feature,
             "is_stale": self.is_stale,
+            "consolidation": self.consolidation,
             "implementation_metrics": self.implementation_metrics,
         }
 
@@ -99,6 +101,57 @@ def _load_metrics_sidecar(path: Path) -> Optional[Dict[str, object]]:
         return None
 
 
+def _normalize_string_list(value: object) -> List[str]:
+    if not isinstance(value, list):
+        return []
+    normalized: List[str] = []
+    seen = set()
+    for item in value:
+        if not isinstance(item, str):
+            continue
+        candidate = item.strip()
+        if not candidate or candidate in seen:
+            continue
+        seen.add(candidate)
+        normalized.append(candidate)
+    return normalized
+
+
+def _extract_consolidation_summary(metadata: Optional[Dict[str, object]]) -> Optional[Dict[str, object]]:
+    if not isinstance(metadata, dict):
+        return None
+    raw = metadata.get("consolidation")
+    if not isinstance(raw, dict):
+        return None
+    disposition = raw.get("disposition")
+    if not isinstance(disposition, str) or not disposition.strip():
+        return None
+    targets: List[Dict[str, str]] = []
+    for item in raw.get("targets", []):
+        if not isinstance(item, dict):
+            continue
+        kind = item.get("kind")
+        ref = item.get("ref")
+        change = item.get("change")
+        if not all(isinstance(field, str) and field.strip() for field in (kind, ref, change)):
+            continue
+        targets.append(
+            {
+                "kind": kind.strip(),
+                "ref": ref.strip(),
+                "change": change.strip(),
+            }
+        )
+    justification = raw.get("justification")
+    return {
+        "disposition": disposition.strip().lower(),
+        "targets": targets,
+        "historical_artifacts": _normalize_string_list(raw.get("historical_artifacts")),
+        "surface_simplifications": _normalize_string_list(raw.get("surface_simplifications")),
+        "justification": justification.strip() if isinstance(justification, str) and justification.strip() else None,
+    }
+
+
 def load_report_records(
     artifact_types: Optional[Sequence[str]] = None,
     stale_days: int = 30,
@@ -124,6 +177,7 @@ def load_report_records(
                     updated_at=metadata.get("updated_at") if isinstance(metadata.get("updated_at"), str) else None,
                     parent_feature=parent_feature if isinstance(parent_feature, str) and parent_feature.strip() else None,
                     is_stale=is_stale(metadata.get("updated_at"), stale_days, now),
+                    consolidation=_extract_consolidation_summary(metadata),
                 )
             )
 
@@ -141,6 +195,7 @@ def load_report_records(
                     updated_at=metadata.get("updated_at") if isinstance(metadata.get("updated_at"), str) else None,
                     parent_feature=feature_dir.name,
                     is_stale=is_stale(metadata.get("updated_at"), stale_days, now),
+                    consolidation=_extract_consolidation_summary(metadata),
                     implementation_metrics=_load_metrics_sidecar(feature_dir),
                 )
             )
@@ -167,6 +222,7 @@ def load_report_records(
                         if isinstance(parent_feature, str) and parent_feature.strip()
                         else None,
                         is_stale=is_stale(metadata.get("updated_at"), stale_days, now),
+                        consolidation=_extract_consolidation_summary(metadata),
                         implementation_metrics=_load_metrics_sidecar(subfeature_dir),
                     )
                 )
@@ -186,6 +242,7 @@ def load_report_records(
                     updated_at=updated_at if isinstance(updated_at, str) else None,
                     parent_feature=str(row.get("feature", "")) or None,
                     is_stale=is_stale(updated_at, stale_days, now),
+                    consolidation=None,
                 )
             )
 

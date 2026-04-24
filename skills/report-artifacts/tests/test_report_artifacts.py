@@ -101,6 +101,15 @@ def setup_repo(tmp_path: Path, monkeypatch):
     planning_metadata = planning.read_metadata(feature_dir)
     planning_metadata["status"] = "planning_reviewed"
     planning_metadata["updated_at"] = "2026-02-10T00:00:00"
+    planning_metadata["consolidation"] = {
+        "disposition": "narrowing",
+        "targets": [
+            {"kind": "subfeature", "ref": "checkout/subfeatures/replace-legacy-flow", "change": "narrows"}
+        ],
+        "historical_artifacts": ["docs/features/checkout/discover.md"],
+        "surface_simplifications": ["keep the checkout feature canonical"],
+        "justification": "The parent packet remains the main planning surface.",
+    }
     planning.write_metadata(feature_dir, planning_metadata)
 
     scope_context = planning.SCOPE_RUNTIME.resolve_scope_context()
@@ -117,6 +126,15 @@ def setup_repo(tmp_path: Path, monkeypatch):
     subfeature_metadata = subfeatures.read_metadata(subfeature_dir)
     subfeature_metadata["status"] = "reviewed"
     subfeature_metadata["updated_at"] = "2026-02-14T00:00:00"
+    subfeature_metadata["consolidation"] = {
+        "disposition": "superseding",
+        "targets": [
+            {"kind": "feature", "ref": "checkout", "change": "narrows"}
+        ],
+        "historical_artifacts": ["docs/features/checkout/system-design.md"],
+        "surface_simplifications": ["route planners through the subfeature delta"],
+        "justification": "The prior flow should become historical context.",
+    }
     subfeatures.write_metadata(subfeature_dir, subfeature_metadata)
 
     execution.create_slice("CHK-101", "checkout")
@@ -245,6 +263,29 @@ def test_cli_json_groups_by_parent_for_selected_artifact_type(tmp_path, monkeypa
 
     assert payload["summary"]["total"] == 1
     assert groups["checkout"]["count"] == 1
+
+
+def test_run_report_includes_consolidation_summary_for_planning_records(tmp_path, monkeypatch):
+    env = setup_repo(tmp_path, monkeypatch)
+
+    payload = env["report"].build_report_result(
+        artifact_types=["feature", "subfeature"],
+        group_by="overview",
+        stale_days=30,
+        now=datetime(2026, 2, 15),
+    )
+
+    records = {
+        (record["artifact_type"], record["artifact_id"]): record
+        for record in payload["records"]
+    }
+
+    assert records[("feature", "checkout")]["consolidation"]["disposition"] == "narrowing"
+    assert records[("subfeature", "replace-legacy-flow")]["consolidation"][
+        "historical_artifacts"
+    ] == ["docs/features/checkout/system-design.md"]
+    rendered = env["report"].render_text(payload)
+    assert "consolidation=narrowing" in rendered
 
 
 def test_cli_rejects_non_positive_stale_days(tmp_path, monkeypatch):

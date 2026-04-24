@@ -51,6 +51,17 @@ def parse_args() -> argparse.Namespace:
 
 
 def render_text(result: Dict[str, object]) -> str:
+    def consolidation_suffix(candidate: Dict[str, object]) -> str:
+        consolidation = candidate.get("consolidation")
+        if not isinstance(consolidation, dict):
+            return ""
+        historical = consolidation.get("historical_artifacts", [])
+        return (
+            " "
+            f"[consolidation={consolidation.get('disposition', 'unknown')}, "
+            f"historical={len(historical) if isinstance(historical, list) else 0}]"
+        )
+
     lines = [
         f"Archive candidates: {result['summary']['candidate_count']}",
         f"Directly archivable now: {result['summary']['archivable_count']}",
@@ -61,6 +72,7 @@ def render_text(result: Dict[str, object]) -> str:
         lines.append(
             f"- {candidate['artifact_type']}:{candidate['artifact_id']} "
             f"[{candidate['status']}{archivable_suffix}] ({candidate['path']})"
+            f"{consolidation_suffix(candidate)}"
         )
     if result["applied"]:
         lines.append(f"Applied: {result['applied']['message']}")

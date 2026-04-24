@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 
 import sys
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Dict, Iterable, List, Optional, Set, Tuple
 
@@ -47,14 +47,18 @@ class TraceNode:
     artifact_id: str
     path: str
     label: str
+    details: Dict[str, object] = field(default_factory=dict)
 
-    def to_dict(self) -> Dict[str, str]:
-        return {
+    def to_dict(self) -> Dict[str, object]:
+        payload: Dict[str, object] = {
             "artifact_type": self.artifact_type,
             "artifact_id": self.artifact_id,
             "path": self.path,
             "label": self.label,
         }
+        if self.details:
+            payload["details"] = dict(self.details)
+        return payload
 
 
 @dataclass
@@ -65,7 +69,7 @@ class TraceEdge:
     target_id: str
     relation: str
     source_path: str
-    details: Dict[str, str]
+    details: Dict[str, object]
 
     def to_dict(self) -> Dict[str, object]:
         payload: Dict[str, object] = {
@@ -110,8 +114,120 @@ def _safe_read_metadata(reader, path: Path) -> Optional[Dict[str, object]]:
         return None
 
 
+def _normalize_string_list(value: object) -> List[str]:
+    if not isinstance(value, list):
+        return []
+    normalized: List[str] = []
+    seen = set()
+    for item in value:
+        if not isinstance(item, str):
+            continue
+        candidate = item.strip()
+        if not candidate or candidate in seen:
+            continue
+        seen.add(candidate)
+        normalized.append(candidate)
+    return normalized
+
+
+def _normalize_consolidation_summary(metadata: Optional[Dict[str, object]]) -> Optional[Dict[str, object]]:
+    if not isinstance(metadata, dict):
+        return None
+    raw = metadata.get("consolidation")
+    if not isinstance(raw, dict):
+        return None
+    disposition = raw.get("disposition")
+    if not isinstance(disposition, str) or not disposition.strip():
+        return None
+    targets: List[Dict[str, str]] = []
+    for item in raw.get("targets", []):
+        if not isinstance(item, dict):
+            continue
+        kind = item.get("kind")
+        ref = item.get("ref")
+        change = item.get("change")
+        if not all(isinstance(field, str) and field.strip() for field in (kind, ref, change)):
+            continue
+        targets.append(
+            {
+                "kind": kind.strip(),
+                "ref": ref.strip(),
+                "change": change.strip(),
+            }
+        )
+    justification = raw.get("justification")
+    return {
+        "disposition": disposition.strip().lower(),
+        "targets": targets,
+        "historical_artifacts": _normalize_string_list(raw.get("historical_artifacts")),
+        "surface_simplifications": _normalize_string_list(raw.get("surface_simplifications")),
+        "justification": justification.strip() if isinstance(justification, str) and justification.strip() else None,
+    }
+
+
+def _consolidation_target_type(kind: str) -> Optional[str]:
+    try:
+        return normalize_artifact_type(kind)
+    except ValueError:
+        return None
+
+
+def _consolidation_target_id(target_type: str, ref: str) -> str:
+    normalized_ref = ref.strip().rstrip("/")
+    if "/" not in normalized_ref:
+        return normalized_ref
+    if target_type in {"feature", "subfeature"}:
+        return normalized_ref.split("/")[-1]
+    return normalized_ref.split("/")[-1]
+
+
+def _add_consolidation_metadata(
+    graph: "TraceGraph",
+    artifact_type: str,
+    artifact_id: str,
+    path: str,
+    summary: Optional[Dict[str, object]],
+) -> None:
+    if summary is None:
+        return
+    add_node(
+        graph,
+        artifact_type,
+        artifact_id,
+        path,
+        artifact_id,
+        details={"consolidation": summary},
+    )
+    for target in summary["targets"]:
+        target_type = _consolidation_target_type(target["kind"])
+        if target_type is None:
+            continue
+        target_id = _consolidation_target_id(target_type, target["ref"])
+        add_node(graph, target_type, target_id)
+        add_edge(
+            graph,
+            artifact_type,
+            artifact_id,
+            target_type,
+            target_id,
+            target["change"],
+            path,
+            target_ref=target["ref"],
+            target_kind=target["kind"],
+            disposition=summary["disposition"],
+            historical_artifacts=list(summary["historical_artifacts"]),
+            surface_simplifications=list(summary["surface_simplifications"]),
+            justification=summary["justification"],
+        )
+
+
 def add_node(
-    graph: TraceGraph, artifact_type: str, artifact_id: str, path: str = "", label: Optional[str] = None
+    graph: TraceGraph,
+    artifact_type: str,
+    artifact_id: str,
+    path: str = "",
+    label: Optional[str] = None,
+    details: Optional[Dict[str, object]] = None,
 ) -> None:
     key = node_key(artifact_type, artifact_id)
     existing = graph.nodes.get(key)
@@ -121,12 +237,15 @@ def add_node(
             artifact_id=artifact_id,
             path=path,
             label=label or artifact_id,
+            details=dict(details or {}),
         )
         return
     if not existing.path and path:
         existing.path = path
     if existing.label == existing.artifact_id and label:
         existing.label = label
+    if details:
+        existing.details.update(details)
 
 
 def add_edge(
@@ -137,7 +256,7 @@ def add_edge(
     target_id: str,
     relation: str,
     source_path: str,
-    **details: str,
+    **details: object,
 ) -> None:
     add_node(graph, source_type, source_id)
     add_node(graph, target_type, target_id)
@@ -149,7 +268,7 @@ def add_edge(
             target_id=target_id,
             relation=relation,
             source_path=source_path,
-            details={key: value for key, value in details.items() if value},
+            details={key: value for key, value in details.items() if value not in (None, "", [], {})},
         )
     )
 
@@ -167,6 +286,7 @@ def build_trace_graph() -> TraceGraph:
             proposal_dir.name,
         )
     for feature_dir in inventory.feature_dirs:
+        metadata = _safe_read_metadata(inventory.context.planning.read_metadata, feature_dir)
         add_node(
             graph,
             "feature",
@@ -174,13 +294,28 @@ def build_trace_graph() -> TraceGraph:
             normalize_dir_relpath(feature_dir),
             feature_dir.name,
         )
+        _add_consolidation_metadata(
+            graph,
+            "feature",
+            feature_dir.name,
+            normalize_dir_relpath(feature_dir),
+            _normalize_consolidation_summary(metadata),
+        )
     for subfeature_dir in iter_subfeature_dirs(inventory):
+        metadata = _safe_read_metadata(inventory.context.subfeatures.read_metadata, subfeature_dir)
         add_node(
             graph,
             "subfeature",
             subfeature_dir.name,
             normalize_dir_relpath(subfeature_dir),
             subfeature_dir.name,
+        )
+        _add_consolidation_metadata(
+            graph,
+            "subfeature",
+            subfeature_dir.name,
+            normalize_dir_relpath(subfeature_dir),
+            _normalize_consolidation_summary(metadata),
         )
     for row in inventory.slice_rows:
         add_node(

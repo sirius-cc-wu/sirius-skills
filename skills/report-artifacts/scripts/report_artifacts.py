@@ -79,6 +79,19 @@ def run_report(
 
 
 def render_text(result: Dict[str, object]) -> str:
+    def consolidation_suffix(record: Dict[str, object]) -> str:
+        consolidation = record.get("consolidation")
+        if not isinstance(consolidation, dict):
+            return ""
+        targets = consolidation.get("targets", [])
+        historical = consolidation.get("historical_artifacts", [])
+        return (
+            " "
+            f"[consolidation={consolidation.get('disposition', 'unknown')}, "
+            f"targets={len(targets) if isinstance(targets, list) else 0}, "
+            f"historical={len(historical) if isinstance(historical, list) else 0}]"
+        )
+
     def metrics_suffix(record: Dict[str, object]) -> str:
         metrics = record.get("implementation_metrics")
         if not isinstance(metrics, dict):
@@ -121,6 +134,7 @@ def render_text(result: Dict[str, object]) -> str:
             f"- {record['artifact_type']}:{record['artifact_id']} "
             f"[{record['status']}{stale_marker}] ({record['path']}{parent_suffix})"
             f"{metrics_suffix(record)}"
+            f"{consolidation_suffix(record)}"
         )
     if result.get("check_packaged_parity") and result["installed_parity"]:
         lines.append("Installed parity:")

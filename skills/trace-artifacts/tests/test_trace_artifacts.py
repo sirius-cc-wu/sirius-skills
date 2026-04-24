@@ -73,6 +73,17 @@ def setup_repo(tmp_path: Path, monkeypatch):
     feature_dir, _ = planning.create_feature("checkout")
     feature_path = Path(feature_dir)
     (feature_path / "discover.md").write_text("# Discover\n", encoding="utf-8")
+    feature_metadata = planning.read_metadata(feature_dir)
+    feature_metadata["consolidation"] = {
+        "disposition": "narrowing",
+        "targets": [
+            {"kind": "subfeature", "ref": "checkout/subfeatures/replace-legacy-flow", "change": "narrows"}
+        ],
+        "historical_artifacts": ["docs/features/checkout/discover.md"],
+        "surface_simplifications": ["keep one checkout planning path"],
+        "justification": "The checkout baseline should stay canonical.",
+    }
+    planning.write_metadata(feature_dir, feature_metadata)
     planning.sync_registry()
 
     proposal_dir, _ = propose.create_proposal(
@@ -122,6 +133,17 @@ def setup_repo(tmp_path: Path, monkeypatch):
         }
     ]
     execution.write_slice_metadata(execution.slice_path_for_row(source_slice), metadata)
+    subfeature_metadata = subfeatures.read_metadata(subfeature_dir)
+    subfeature_metadata["consolidation"] = {
+        "disposition": "superseding",
+        "targets": [
+            {"kind": "feature", "ref": "checkout", "change": "narrows"},
+        ],
+        "historical_artifacts": ["docs/features/checkout/system-design.md"],
+        "surface_simplifications": ["route maintainers through the subfeature packet"],
+        "justification": "The old flow should become historical context.",
+    }
+    subfeatures.write_metadata(subfeature_dir, subfeature_metadata)
 
     return {
         "trace": trace,
@@ -162,7 +184,13 @@ def test_run_trace_targets_subfeature_with_planned_and_execution_slices(tmp_path
     assert "checkout" in node_ids(payload, "feature")
     assert "CHK-201" in node_ids(payload, "planned-slice")
     assert "CHK-101" in node_ids(payload, "slice")
-    assert {"subfeature_of", "plans_slice", "bootstrapped_as"}.issubset(edge_relations(payload))
+    assert payload["target"]["details"]["consolidation"]["disposition"] == "superseding"
+    assert payload["target"]["details"]["consolidation"]["historical_artifacts"] == [
+        "docs/features/checkout/system-design.md"
+    ]
+    assert {"subfeature_of", "plans_slice", "bootstrapped_as", "narrows"}.issubset(
+        edge_relations(payload)
+    )
 
 
 def test_cli_json_summary_includes_slice_relations(tmp_path, monkeypatch, capsys):
@@ -174,6 +202,16 @@ def test_cli_json_summary_includes_slice_relations(tmp_path, monkeypatch, capsys
     assert payload["ok"] is True
     assert payload["summary"]["node_counts"]["planned-slice"] == 1
     assert "supersedes" in payload["summary"]["edge_counts"]
+
+
+def test_render_text_surfaces_consolidation_context(tmp_path, monkeypatch):
+    env = setup_repo(tmp_path, monkeypatch)
+
+    payload = env["trace"].run_trace("feature", "checkout")
+    rendered = env["trace"].render_text(payload)
+
+    assert "consolidation=narrowing" in rendered
+    assert "historical=1" in rendered
 
 
 def test_cli_fails_for_missing_target(tmp_path, monkeypatch, capsys):
