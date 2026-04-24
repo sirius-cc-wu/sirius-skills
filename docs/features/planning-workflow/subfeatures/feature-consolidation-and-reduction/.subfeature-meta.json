@@ -1,14 +1,31 @@
 {
   "subfeature_id": "feature-consolidation-and-reduction",
   "parent_feature_slug": "planning-workflow",
-  "status": "draft",
+  "status": "reviewed",
   "created_at": "2026-04-23T01:15:39",
-  "updated_at": "2026-04-23T01:15:39",
+  "updated_at": "2026-04-24T11:30:04",
   "subfeature_type": "superseding",
   "summary": "Require explicit capability reduction and supersession accounting when adding planning capabilities.",
-  "affected_artifacts": [],
-  "affected_story_ids": [],
-  "affected_slice_ids": [],
-  "review_note": null,
+  "affected_artifacts": [
+    "docs/features/planning-workflow/discover.md",
+    "docs/features/planning-workflow/system-design.md",
+    "docs/features/planning-workflow/user-stories.md",
+    "docs/features/planning-workflow/slice-planning.md",
+    "docs/features/planning-workflow/slice-traceability.md"
+  ],
+  "affected_story_ids": [
+    "FCR-01",
+    "FCR-02",
+    "FCR-03",
+    "FCR-04"
+  ],
+  "affected_slice_ids": [
+    "fcr-declaration-contract",
+    "fcr-metadata-summary",
+    "fcr-review-gate",
+    "fcr-canonical-surface",
+    "fcr-history-consumers"
+  ],
+  "review_note": "Planning artifacts reviewed: consolidation declaration, metadata carrier choice, review enforcement, and breakdown sequencing are coherent; start execution bootstrap with fcr-declaration-contract and fcr-metadata-summary.",
   "finalized_at": null
 }
