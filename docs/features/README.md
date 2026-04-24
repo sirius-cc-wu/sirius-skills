@@ -16,7 +16,7 @@
 | split-install-modes | implemented | 2026-04-19T11:16:05 | docs/features/installation-and-configuration/subfeatures/split-install-modes/ |
 | planning-workflow | implemented | 2026-04-23T13:39:42 | docs/features/planning-workflow/ |
 | change-to-subfeature-migration | planning_reviewed | 2026-04-08T08:27:49 | docs/features/planning-workflow/subfeatures/change-to-subfeature-migration/ |
-| feature-consolidation-and-reduction | planning_reviewed | 2026-04-24T11:30:04 | docs/features/planning-workflow/subfeatures/feature-consolidation-and-reduction/ |
+| feature-consolidation-and-reduction | implemented | 2026-04-24T13:54:49 | docs/features/planning-workflow/subfeatures/feature-consolidation-and-reduction/ |
 | proposal-workflow | planning_reviewed | 2026-03-29T00:32:50 | docs/features/planning-workflow/subfeatures/proposal-workflow/ |
 | reference-research-synthesis | implemented | 2026-04-21T01:10:07 | docs/features/planning-workflow/subfeatures/reference-research-synthesis/ |
 | subfeature-workflow | planning_reviewed | 2026-03-28T23:26:17 | docs/features/planning-workflow/subfeatures/subfeature-workflow/ |
