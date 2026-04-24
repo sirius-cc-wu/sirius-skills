@@ -112,7 +112,21 @@ Stored in `slices/<slice-id>-<slug>/`
 
 ---
 
-## Why This Matters
+## 9. The Two-Step Accelerator Fast Path
+
+When accelerator config is enabled, the default operator flow can collapse to
+two high-level steps:
+
+1. `autoplan --execute-owner-chain` drives planning until the explicit approval boundary.
+2. After approval, `ship --approve` records the gate and `ship --resume` drives execution until the next manual boundary.
+
+`guide-scope`, `guide-planning`, and `guide-execution` still matter, but they
+become the recovery and fine-grained control path rather than the default happy
+path.
+
+---
+
+## 10. Why This Matters
 
 - **Traceability**: Every line of code maps back to a requirement in a brief.
 - **Durability**: Even after a feature is done, the "Why" (Design) and "How" (Blueprint) remain in the repo.
@@ -122,10 +136,11 @@ Stored in `slices/<slice-id>-<slug>/`
 
 ---
 
-## Getting Started
+## 11. Getting Started
 
 Check the methodology for more details:
 `SKILLS_METHODOLOGY.md`
 
-Use `guide-scope` when you want the workflow to pick the right surface, or
-`guide-planning` when you already know the work belongs in planning.
+Use `autoplan` for the default accelerator path when it is enabled, `guide-scope`
+when you want the workflow to pick the right manual surface, or `guide-planning`
+when you already know the work belongs in planning.

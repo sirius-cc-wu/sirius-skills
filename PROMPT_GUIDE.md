@@ -15,17 +15,24 @@ Good prompts do three things clearly:
 2. identify the feature, subfeature, slice, or path
 3. say what outcome you want the agent to produce
 
-When in doubt, prefer **routing prompts** first:
+When in doubt, prefer the **shortest happy-path prompt** first:
 
-- use `guide-scope` when the repository may have multiple scopes
-- use `guide-planning` when you know the work is planning-layer work
-- use `guide-execution` when you know the work is execution-layer work
+- use `autoplan` when you want planning to continue to the next explicit boundary
 - use `ship` when reviewed planning is already committed and you want to work the remaining backlog one planned slice at a time
+- use `guide-scope` when the repository may have multiple scopes
+- use `guide-planning` when you need manual planning-layer routing
+- use `guide-execution` when you need manual execution-layer routing
 - use `archive-artifacts` when you want to summarize and archive closed slices without losing durable history
 
 ## Start with the simplest useful prompt
 
-If you are not sure which planning skill should run next:
+If planning is already in progress and you want the default accelerator path:
+
+```text
+Use `autoplan` for `checkout-redesign` and continue until the next planning boundary.
+```
+
+If you are not sure which planning skill should run next and need manual routing:
 
 ```text
 Use `guide-planning` to decide the next step for `checkout-redesign`.
@@ -143,9 +150,21 @@ Remember the workflow boundary:
 - approved planning is committed
 - only then should execution bootstrap begin
 
+If accelerator mode is enabled and the planning target already exists, prefer:
+
+```text
+Use `autoplan` for `checkout-redesign` and continue until the approval boundary.
+```
+
 ### 7. Execution-layer prompts
 
 Use these only after planning is approved and committed.
+
+For the default accelerator path, use:
+
+```text
+Use `ship` for `docs/features/checkout/subfeatures/replace-legacy-flow/` and continue until a blocker, preflight stop, or per-slice commit checkpoint stops the run.
+```
 
 ```text
 Use `slice` to bootstrap the next execution slice for `checkout-redesign`.
@@ -174,6 +193,8 @@ Keep the boundary explicit:
 - it reports the next concrete owner for the active slice instead of forcing you to re-decide that handoff
 - it stops when the backlog is blocked or when a completed slice still needs its own commit checkpoint
 - it routes through the existing execution owners instead of replacing them
+
+If you need manual execution routing for one active slice:
 
 ```text
 Use `guide-execution` to decide the next step for slice `CHK-12-form-state-refactor`.
@@ -243,9 +264,10 @@ Weak:
 Help me with routing.
 ```
 
-## When to prefer a guide skill
+## When to fall back to a guide skill
 
-Use a guide skill when you know the layer but not the exact next operation.
+Use a guide skill when the accelerator path is not the right fit and you know
+the layer but not the exact next operation.
 
 ### Prefer `guide-scope`
 
@@ -280,10 +302,10 @@ When:
 
 ## Practical recipes
 
-### “I have an accepted feature idea”
+### “I already have a planning target and want it advanced”
 
 ```text
-Use `guide-planning` for `checkout-redesign` and route to the right next planning skill.
+Use `autoplan` for `checkout-redesign` and continue until the next planning boundary.
 ```
 
 ### “I want design first, no discover doc”
@@ -332,4 +354,5 @@ Use `archive-artifacts` with `--artifact-type feature --artifact-id checkout --a
 
 If you know the exact artifact you want, prompt the specific skill.
 
-If you know only the workflow layer, prompt the corresponding guide skill.
+If accelerator flow is not the right fit and you know only the workflow layer,
+prompt the corresponding guide skill.

@@ -1,6 +1,6 @@
 # sirius-skills
 
-`sirius-skills` is a generic-first skill collection for spec-driven development, planning, implementation support, and repository workflows.
+`sirius-skills` is a generic-first skill collection for spec-driven development, planning, implementation support, and repository workflows, including an implemented two-step accelerator path built around `autoplan` and `ship`.
 
 ## Installing skills
 
@@ -72,12 +72,16 @@ The managed repo-first skill set is grouped into:
 - artifact maintenance: `skills/audit-artifacts/`, `skills/measure-artifacts/`, `skills/trace-artifacts/`, `skills/report-artifacts/`, `skills/repair-artifacts/`, `skills/archive-artifacts/`
 - planning layer: `skills/guide-scope/`, `skills/guide-planning/`, `skills/propose/`, `skills/add-subfeature/`, `skills/migrate-subfeatures/`, `skills/assess/`, `skills/research/`, `skills/discover/`, `skills/design/`, `skills/ui-flow/`, `skills/breakdown/`, `skills/review-planning/`
 - execution layer: `skills/slice/`, `skills/guide-execution/`, `skills/ship/`, `skills/brief/`, `skills/blueprint/`, `skills/review-execution/`, `skills/close-slice/`
-- accelerator utilities: `skills/autoplan/`, `skills/learn/`, `skills/ship-slice/`
 
 If a project has no extra configuration, these skills should still work with generic conventions.
 
 For the operational guide to using the skills together, see `SKILLS_METHODOLOGY.md`.
 For developer-facing examples of how to prompt the skills, see `PROMPT_GUIDE.md`.
+
+When accelerator config is enabled, the intended happy path is two operator steps:
+use `autoplan` to drive planning to the approval boundary, then after explicit
+approval use `ship --approve` and `ship --resume` to drive execution until the
+next manual boundary.
 
 ## Shared skill references
 
@@ -146,7 +150,20 @@ Proposal staging defaults to `docs/proposals/<proposal-slug>/` unless
 the active planning scope's `.skills/planning.json` defines a different
 `proposal_dir`.
 
-Preferred repo workflow:
+Default operator path (when accelerators are enabled):
+
+1. `python3 skills/autoplan/scripts/autoplan.py <target> --execute-owner-chain --json`
+2. review planning artifacts, then approve explicitly
+3. `python3 skills/ship/scripts/ship.py <target> --approve --approval-note "<note>" --json`
+4. `python3 skills/ship/scripts/ship.py <target> --resume --json`
+5. repeat `ship --resume` until `readiness.blocked_by` or `readiness.preflight`
+   reports a manual boundary
+
+`guide-scope`, `guide-planning`, and `guide-execution` remain valid but are
+best treated as fallback/manual control paths for ambiguity resolution,
+recovery, or fine-grained intervention.
+
+Manual repo workflow (explicit control path):
 
 1. In multi-scope repositories, `guide-scope` can resolve the active scope, stop on ambiguity, and hand off to `guide-planning`, `guide-execution`, or `bootstrap` without changing their ownership rules. In single-scope repositories it remains optional.
 2. `guide-planning` resolves the feature planning folder, validates planning readiness, and routes to the right planning skill.
@@ -166,18 +183,6 @@ Preferred repo workflow:
 16. `review-execution` checks implementation and validation outcomes against the slice-scoped execution artifacts before closure.
 17. `close-slice` closes completed execution slices and records durable closure metadata.
 18. After closure, keep the subfeature planning folder and closed slice artifacts in place. If a repository wants later cleanup or archival, handle that through maintenance tooling such as `archive-artifacts`, not a dedicated subfeature-finalization skill.
-
-Two-step accelerator fast path (when enabled):
-
-1. `python3 skills/autoplan/scripts/autoplan.py <target> --execute-owner-chain --json`
-2. review planning artifacts, then approve explicitly
-3. `python3 skills/ship/scripts/ship.py <target> --approve --approval-note "<note>" --json`
-4. `python3 skills/ship/scripts/ship.py <target> --resume --json`
-5. repeat `ship --resume` until a boundary in `readiness.blocked_by` requires manual intervention
-
-`guide-scope`, `guide-planning`, and `guide-execution` remain valid but are
-best treated as advanced/manual control paths for ambiguity resolution,
-recovery, or fine-grained intervention.
 
 For repositories that still contain legacy `changes/` packets from the old
 workflow, `migrate-subfeatures` can scan and convert those legacy planning
@@ -260,6 +265,22 @@ Example:
 }
 ```
 
+Accelerator example:
+
+```json
+{
+  "planning_dir": "docs/features",
+  "proposal_dir": "docs/proposals",
+  "design_diagram_mode": "embedded",
+  "accelerators": {
+    "autoplan": {
+      "execute_owner_chain": true,
+      "stop_on_owner": ["review-planning"]
+    }
+  }
+}
+```
+
 Projects can add `.skills/conventions.json` in the repository root to describe their local conventions.
 
 Generic default slice naming now assumes scope-prefixed planned slice IDs:
@@ -281,7 +302,36 @@ Example:
 }
 ```
 
-Example:
+Accelerator example:
+
+```json
+{
+  "slice_dir": "slices",
+  "preferred_workflow": "TDD",
+  "auto_start_implementation": true,
+  "accelerators": {
+    "ship": {
+      "delegate_to_ship_slice": true,
+      "preflight": {
+        "mode": "local_only"
+      }
+    },
+    "ship_slice": {
+      "execute_owner_chain": true,
+      "stop_on_owner": ["review-execution"],
+      "continuation_policy": {
+        "review_boundary": "stop",
+        "commit_checkpoint": "stop"
+      },
+      "auto_format": false,
+      "auto_close": false,
+      "auto_commit": false
+    }
+  }
+}
+```
+
+Conventions example:
 
 ```json
 {
@@ -294,10 +344,11 @@ Example:
 }
 ```
 
-Current Phase 1 usage:
+Current configuration usage:
 
 - `skills/guide-scope/SKILL.md` documents the optional scope-aware entrypoint for routing multi-scope work into planning, execution, or bootstrap
 - planning-layer skills resolve `.skills/planning.json` from the nearest scope, then fall back to the repository root when inside a Git worktree; `planning_dir` still defaults to `docs/features/<feature-slug>/`
+- `skills/autoplan/SKILL.md` documents `.skills/planning.json` fields under `accelerators.autoplan`, including `execute_owner_chain` and `stop_on_owner`
 - `skills/propose/scripts/manage_proposals.py` reads the active scope's `.skills/planning.json` field `proposal_dir` when present and otherwise defaults to `docs/proposals/<proposal-slug>/`
 - `skills/guide-planning/scripts/manage_planning.py` reads the active scope's `.skills/planning.json` for `planning_dir` and maintains planning readiness metadata under `<feature_path>/.planning-meta.json`
 - `skills/design/SKILL.md` reads `.skills/planning.json` field `design_diagram_mode`; `embedded` keeps fenced PlantUML in `system-design.md`, while `linked_svg` writes `.puml` and `.svg` files under `<feature_path>/figures/`, links the SVGs from `system-design.md`, and keeps those SVGs on an explicit white canvas
@@ -305,6 +356,8 @@ Current Phase 1 usage:
 - `skills/slice/scripts/bootstrap_slice.py` resolves the nearest execution scope, reuses inherited scoped execution config when present, and only initializes `.skills/execution.json` locally when no execution config exists in the scope chain
 - `skills/guide-execution/scripts/manage_execution.py` resolves `.skills/execution.json`, `.skills/conventions.json`, and `slice_dir` from the active execution scope so nested scopes keep local slice registries and folders
 - when `auto_start_implementation` is `true`, `skills/guide-execution/scripts/manage_execution.py set-status <slice> blueprint_ready` auto-advances the slice into `execution_ready`
+- `skills/ship/SKILL.md` documents `.skills/execution.json` fields under `accelerators.ship`, including `delegate_to_ship_slice` and `preflight.mode`
+- `skills/ship-slice/SKILL.md` documents `.skills/execution.json` fields under `accelerators.ship_slice`, including `execute_owner_chain`, `stop_on_owner`, `continuation_policy`, `auto_format`, `format_command`, `auto_close`, and `auto_commit`
 - `skills/guide-execution/scripts/manage_execution.py` uses `branch_extract_pattern` during `add` when the file is present
 - `skills/commit/SKILL.md` documents how `commit_format` can override the generic default
 - `skills/create-pr/SKILL.md` documents how `pr_title_format`, `branch_extract_pattern`, and `id_pattern` can define stricter PR conventions

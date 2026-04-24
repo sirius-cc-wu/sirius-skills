@@ -44,7 +44,20 @@ After each planning phase writes or updates its repository artifacts, persist th
 
 The execution layer works one implementation-ready slice at a time, starting with `slice` bootstrap from approved committed planning artifacts. `ship` can sit above that flow when a reviewed and committed feature or subfeature should be worked as one dependency-aware backlog; it should follow increment order first, then slice dependencies within the current increment, while still handing each concrete slice to the next existing single-slice owner such as `brief`, `blueprint`, repository implementation, `review-execution`, `close-slice`, or `commit`.
 
-## Recommended Workflow
+When accelerators are enabled, the default operator path compresses to two
+operator steps:
+
+1. `autoplan --execute-owner-chain` drives planning to the explicit approval boundary.
+2. After review and approval, `ship --approve` and `ship --resume` drive execution until the next manual boundary.
+
+`guide-scope`, `guide-planning`, and `guide-execution` remain the canonical
+manual fallback surfaces for ambiguous scope, recovery, and fine-grained
+intervention.
+
+## Manual Workflow
+
+Use this path when the accelerator flow is unavailable, intentionally disabled,
+or needs explicit operator intervention.
 
 ### 0. Resolve scope with guide-scope when needed
 
@@ -70,7 +83,8 @@ you can still enter directly through `guide-planning` or `guide-execution`.
 
 ### 1. Route planning with guide-planning
 
-Use `guide-planning` as the planning-layer entrypoint when you need to decide what should happen next for a feature.
+Use `guide-planning` as the manual planning-layer entrypoint when you need to
+decide what should happen next for a feature.
 
 Its job is to:
 
@@ -94,6 +108,12 @@ Recommended handoff:
 
 ```text
 guide-scope -> guide-planning -> propose/add-subfeature/assess/research/discover/design/ui-flow/breakdown/review-planning -> human approval -> commit -> slice/ship -> guide-execution
+```
+
+Accelerator fast path:
+
+```text
+autoplan --execute-owner-chain -> human approval -> ship --approve -> ship --resume
 ```
 
 If the request is still speculative, cross-cutting, or not yet accepted as a canonical feature, route to `propose` first. That keeps early exploration under `docs/proposals/` instead of polluting the canonical `docs/features/` registry too early.
@@ -378,9 +398,15 @@ bootstrap the next ready one. It stays orchestration-only: `guide-execution`,
 `brief`, `blueprint`, `review-execution`, `close-slice`, and `commit` still own
 their existing steps.
 
+When `.skills/execution.json` enables delegated owner-chain execution,
+re-running `ship --resume` becomes the normal execution autopilot loop: `ship`
+handles backlog readiness and preflight, then `ship-slice` owns downstream
+review, formatting, close, and commit boundaries according to its configured
+continuation policy.
+
 ### 7. Execute with guide-execution
 
-After a slice exists, use the execution layer:
+After a slice exists, use the manual execution layer:
 
 1. `guide-execution`
 2. `brief`
