@@ -19,6 +19,8 @@ Read these references when relevant:
 2. Inspect parent planning artifacts under `docs/features/<feature-slug>/`.
 3. Identify affected baseline artifacts, story IDs, planned slice IDs, and increment IDs.
 4. Capture inherited constraints, especially existing ownership of configuration and state surfaces that the subfeature should reuse.
+5. Make explicit whether the subfeature keeps, narrows, supersedes, or replaces
+   existing parent workflow surface and what becomes active versus historical.
 5. Write `impact-analysis.md` inside the selected subfeature folder.
 6. Synchronize the discovered impact lists back into `.subfeature-meta.json`.
 
@@ -39,6 +41,9 @@ Read these references when relevant:
 2. Inspect parent feature docs such as `discover.md`, `system-design.md`, `user-stories.md`, `slice-planning.md`, and `slice-traceability.md`.
 3. When the subfeature touches configuration or startup behavior, identify existing typed carriers, compatibility boundaries, and parent-owned control surfaces before design starts.
 4. Write `impact-analysis.md` with baseline files reviewed, candidate affected stories, increments, slices, inherited constraints, and impact notes.
+   For narrowing or superseding work, record which parent behavior remains the
+   baseline, which behavior becomes historical, and which parent slices should
+   stay as contextual references only.
 5. Persist the discovered artifact, story, and slice lists into the subfeature metadata.
 6. Advance the subfeature to `impact_ready` when the artifact is complete.
 

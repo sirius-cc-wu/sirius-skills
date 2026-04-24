@@ -125,6 +125,8 @@ def test_add_creates_durable_subfeature_and_updates_planning_registry(tmp_path, 
         for row in planning_registry["features"]
     )
     assert "## Subfeature Execution Planning" in discover
+    assert "## Consolidation Expectations" in discover
+    assert "user-facing simplification" in discover
 
 
 def test_impact_ready_requires_impact_analysis_and_syncs_planning_status(tmp_path, monkeypatch, capsys):

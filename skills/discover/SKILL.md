@@ -37,6 +37,11 @@ Resolve `<feature_path>` from the repository planning layout:
 - Record success criteria and constraints explicitly.
 - Separate confirmed facts from assumptions and open questions.
 - Name candidate stories in a way that later decomposition can preserve traceability.
+- When the current feature or subfeature materially reshapes an existing
+  workflow or planning surface, record what it supersedes, narrows, removes, or
+  deliberately leaves additive and why.
+- For workflow-shaping changes, identify any artifact movement or user-facing
+  simplification expectations early instead of leaving them for review to infer.
 - When `reference-research.md` exists for the current feature or subfeature,
   treat it as durable context for upstream-informed goals, constraints, and
   tradeoffs instead of re-deriving the same comparison in chat.

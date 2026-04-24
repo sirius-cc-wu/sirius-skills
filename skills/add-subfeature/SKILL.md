@@ -37,6 +37,9 @@ folder instead of direct in-place edits to the parent feature plan.
 2. Initialize the feature-local subfeature registry with `manage_subfeatures.py init-feature <feature>` when needed.
 3. Create the durable child planning folder with `manage_subfeatures.py add <feature> <subfeature-id>`.
 4. Write the requested child capability in the subfeature-local `discover.md`.
+   For `narrowing`, `superseding`, or `replacement` work, declare what existing
+   capability, artifact, command path, or validation path is affected and what
+   simplification or retirement the child capability is expected to produce.
 5. Hand off to `assess`, `design`, `breakdown`, and `review-planning` using the selected subfeature folder.
 
 ## Source of Truth Rules
@@ -76,3 +79,5 @@ python3 skills/add-subfeature/scripts/manage_subfeatures.py validate \
 - Do not treat subfeatures as execution slices.
 - Do not overwrite parent feature docs during subfeature bootstrap.
 - Do not use this skill to create speculative work that should stay under `docs/proposals/`.
+- Do not leave narrowing or superseding intent implicit when the subfeature type
+  already indicates that existing workflow surface is being reshaped.
