@@ -34,7 +34,9 @@ def write_planning_config(scope_root: Path):
     )
 
 
-def write_transition_guardrail_feature(tmp_path: Path, slice_id: str):
+def write_transition_guardrail_feature(
+    tmp_path: Path, slice_id: str, *, subfeature_status: str = "reviewed"
+):
     feature_dir = tmp_path / "docs" / "features" / "checkout"
     subfeature_dir = feature_dir / "subfeatures" / "replace-legacy-flow"
     subfeature_dir.mkdir(parents=True, exist_ok=True)
@@ -73,7 +75,7 @@ def write_transition_guardrail_feature(tmp_path: Path, slice_id: str):
             {
                 "parent_feature_slug": "checkout",
                 "subfeature_id": "replace-legacy-flow",
-                "status": "reviewed",
+                "status": subfeature_status,
                 "created_at": "2026-01-01T00:00:00",
                 "updated_at": "2026-01-01T00:00:00",
                 "subfeature_type": "replacement",
@@ -82,7 +84,9 @@ def write_transition_guardrail_feature(tmp_path: Path, slice_id: str):
                 "affected_story_ids": [],
                 "affected_slice_ids": [slice_id],
                 "review_note": "ready",
-                "finalized_at": None,
+                "finalized_at": (
+                    "2026-01-01T00:00:00" if subfeature_status == "finalized" else None
+                ),
             }
         )
         + "\n",
@@ -312,7 +316,7 @@ def test_closing_slice_records_closed_at_and_updates_registry(tmp_path, monkeypa
     assert "| DEMO | Demo Feature | closed |" in readme
 
 
-def test_closing_slice_blocks_when_linked_subfeature_is_not_finalized(
+def test_closing_slice_blocks_when_linked_subfeature_is_not_reviewed(
     tmp_path, monkeypatch, capsys
 ):
     module = load_manage_specs_module()
@@ -334,13 +338,41 @@ def test_closing_slice_blocks_when_linked_subfeature_is_not_finalized(
     assert run_cli(module, monkeypatch, "set-status", "DEMO", "blueprint_ready") == 0
     assert run_cli(module, monkeypatch, "set-status", "DEMO", "execution_ready") == 0
 
-    write_transition_guardrail_feature(tmp_path, "DEMO")
+    write_transition_guardrail_feature(tmp_path, "DEMO", subfeature_status="breakdown_ready")
 
     exit_code = run_cli(module, monkeypatch, "set-status", "DEMO", "closed")
     captured = capsys.readouterr()
 
     assert exit_code == 2
-    assert "transition_subfeature_finalize_required" in captured.err
+    assert "transition_subfeature_review_required" in captured.err
+
+
+def test_closing_slice_allows_linked_reviewed_subfeature(tmp_path, monkeypatch, capsys):
+    module = load_manage_specs_module()
+    monkeypatch.chdir(tmp_path)
+    write_planning_config(tmp_path)
+
+    assert run_cli(module, monkeypatch, "init", "slices") == 0
+    assert run_cli(module, monkeypatch, "add", "DEMO", "Demo Feature") == 0
+
+    slice_dir = tmp_path / "slices" / "DEMO-demo-feature"
+    (slice_dir / "brief.md").write_text("# brief\n", encoding="utf-8")
+    (slice_dir / "checklists").mkdir()
+    (slice_dir / "checklists" / "requirements.md").write_text(
+        "- [x] requirements complete\n", encoding="utf-8"
+    )
+    assert run_cli(module, monkeypatch, "set-status", "DEMO", "brief_ready") == 0
+
+    (slice_dir / "blueprint.md").write_text("# plan\n", encoding="utf-8")
+    assert run_cli(module, monkeypatch, "set-status", "DEMO", "blueprint_ready") == 0
+    assert run_cli(module, monkeypatch, "set-status", "DEMO", "execution_ready") == 0
+
+    write_transition_guardrail_feature(tmp_path, "DEMO", subfeature_status="reviewed")
+
+    assert run_cli(module, monkeypatch, "set-status", "DEMO", "closed") == 0
+    captured = capsys.readouterr()
+
+    assert "transition_subfeature_review_required" not in captured.err
 
 
 def test_archive_slice_moves_closed_slice_and_updates_registry(tmp_path, monkeypatch):
