@@ -135,7 +135,7 @@
     {
       "feature": "ship-preflight-and-idempotency",
       "status": "slice_ready",
-      "updated_at": "2026-04-24T19:25:59",
+      "updated_at": "2026-04-24T19:43:39",
       "path": "docs/features/throughput-acceleration-workflow/subfeatures/ship-preflight-and-idempotency/"
     },
     {

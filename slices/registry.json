@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "generated_at": "2026-04-24T19:40:59",
+  "generated_at": "2026-04-24T19:53:24",
   "slices": [
     {
       "id": "hss-root-fallback",
@@ -469,6 +469,16 @@
       "path": "slices/spi-preflight-contract-add-typed-ship-preflight-contract-and-readiness-metadata/",
       "updated_at": "2026-04-24T19:40:59",
       "closed_at": "2026-04-24T19:40:59",
+      "archived_at": null,
+      "relations": []
+    },
+    {
+      "id": "spi-mutation-gating",
+      "feature": "Gate bootstrap and delegated resume with local-only preflight",
+      "status": "closed",
+      "path": "slices/spi-mutation-gating-gate-bootstrap-and-delegated-resume-with-local-only-preflight/",
+      "updated_at": "2026-04-24T19:53:24",
+      "closed_at": "2026-04-24T19:53:24",
       "archived_at": null,
       "relations": []
     }

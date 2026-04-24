@@ -1,0 +1,10 @@
+{
+  "created_at": "2026-04-24T19:42:38",
+  "updated_at": "2026-04-24T19:53:24",
+  "status": "closed",
+  "slice_id": "spi-mutation-gating",
+  "feature": "Gate bootstrap and delegated resume with local-only preflight",
+  "path": "slices/spi-mutation-gating-gate-bootstrap-and-delegated-resume-with-local-only-preflight/",
+  "relations": [],
+  "closed_at": "2026-04-24T19:53:24"
+}

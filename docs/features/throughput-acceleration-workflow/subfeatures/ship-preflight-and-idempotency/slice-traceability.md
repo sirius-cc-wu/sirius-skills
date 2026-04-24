@@ -25,7 +25,7 @@ ownership outside repository planning artifacts.
 | --- | --- | --- | --- | --- | --- | --- | --- | --- |
 | SPI-01 | M | Document a typed rerun contract for `ship` | I3 | spi-operator-contracts | `skills/ship/SKILL.md`, `docs/wiki/` | spi-mutation-gating |  | Docs should reflect the final implemented behavior, not just the design |
 | SPI-02 | M | Add optional preflight before mutation-capable `ship` operations | I1 | spi-preflight-contract | `.skills/execution.json`, `skills/ship/` | taw-ship-backlog-integration, taw-runtime-foundation | spi-preflight-contract | Establish config and readiness shape before enforcing blocks |
-| SPI-02 | M | Add optional preflight before mutation-capable `ship` operations | I2 | spi-mutation-gating | `skills/ship/`, `skills/ship-slice/` | spi-preflight-contract, taw-ship-slice-loop |  | Uses existing approval and commit guardrails as canonical blocker reasons |
+| SPI-02 | M | Add optional preflight before mutation-capable `ship` operations | I2 | spi-mutation-gating | `skills/ship/`, `skills/ship-slice/` | spi-preflight-contract, taw-ship-slice-loop | spi-mutation-gating | Uses existing approval and commit guardrails as canonical blocker reasons |
 | SPI-03 | S | Keep preflight opt-in and repo-owned through typed config | I1 | spi-preflight-contract | `.skills/execution.json`, `skills/ship/` | taw-runtime-foundation |  | Typed ownership is satisfied by the same contract slice as SPI-02 |
 | SPI-04 | S | Reflect rerun and preflight behavior in operator guidance | I3 | spi-operator-contracts | `skills/ship/SKILL.md`, `docs/wiki/` | spi-mutation-gating |  | Roadmap and feature wiki should match the shipped operator contract |
 

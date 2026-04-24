@@ -335,6 +335,109 @@ def test_bootstrap_next_reports_passed_local_only_preflight(
     }
 
 
+def test_bootstrap_next_reports_preflight_phase_for_commit_checkpoint_block(
+    tmp_path, monkeypatch, capsys
+):
+    env = setup_repo(tmp_path, monkeypatch)
+    subfeatures = env["subfeatures"]
+    feature_path = env["feature_path"]
+    subfeature_path = env["subfeature_path"]
+    module = env["module"]
+    execution = env["execution"]
+
+    write_scope_config(
+        tmp_path,
+        "execution.json",
+        {
+            "slice_dir": "slices",
+            "preferred_workflow": "TDD",
+            "auto_start_implementation": True,
+            "accelerators": {
+                "ship": {
+                    "delegate_to_ship_slice": False,
+                    "preflight": {"mode": "local_only"},
+                },
+            },
+        },
+    )
+    write_file(
+        subfeature_path / "slice-planning.md",
+        """# Slice Planning
+
+| Slice ID | Story ID | Title | Summary | Target Area | Lane | Validation | Planned Action | Depends On | Slice Ready |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| mse-scope-and-backlog-resolution | EW-01 | Resolve scope | Summary | area | primary | test | create slice |  | yes |
+| mse-sequential-slice-orchestration | EW-01 | Orchestrate slices | Summary | area | primary | test | create slice | mse-scope-and-backlog-resolution | yes |
+""",
+    )
+    write_file(
+        subfeature_path / "slice-traceability.md",
+        """# Slice Traceability
+
+| Story ID | Story Size | Story Summary | Increments | Planned Slice IDs | Slice Areas | Blocked By | Execution Slice IDs | Notes |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| EW-01 | M | Summary | I1 | mse-scope-and-backlog-resolution | area |  | mse-scope-and-backlog-resolution | Notes |
+| EW-01 | M | Summary | I2 | mse-sequential-slice-orchestration | area | mse-scope-and-backlog-resolution |  | Notes |
+""",
+    )
+
+    rows = subfeatures.load_registry(str(feature_path))
+    subfeature = subfeatures.find_subfeature(rows, "multi-slice-execution")
+    assert subfeature is not None
+    success, message = subfeatures.update_subfeature_status(
+        env["planning"],
+        str(feature_path),
+        subfeature,
+        "reviewed",
+        env["planning"].SCOPE_RUNTIME.resolve_scope_context(),
+        force=True,
+        review_note="ready",
+        affected_artifacts=[
+            "docs/features/execution-workflow/discover.md",
+            "docs/features/execution-workflow/system-design.md",
+            "docs/features/execution-workflow/user-stories.md",
+        ],
+        affected_story_ids=["EW-01"],
+    )
+    assert success, message
+
+    _, created = execution.create_slice(
+        "mse-scope-and-backlog-resolution", "Resolve scope"
+    )
+    assert created
+    execution_rows = execution.parse_registry()
+    slice_row = execution.resolve_slice(
+        execution_rows, "mse-scope-and-backlog-resolution"
+    )
+    assert slice_row is not None
+    success, message = execution.update_slice_status(
+        execution_rows, slice_row, "closed", force=True
+    )
+    assert success, message
+    write_file(tmp_path / "scratch.txt", "tracked\n")
+    git_commit_all(tmp_path, "fixture: close first slice")
+    write_file(tmp_path / "scratch.txt", "dirty\n")
+
+    assert (
+        run_cli(module, monkeypatch, "multi-slice-execution", "--bootstrap-next", "--json")
+        == 0
+    )
+    payload = json.loads(capsys.readouterr().out)
+
+    assert payload["action"] == "commit_checkpoint_required"
+    assert payload["readiness"]["blocked_by"] == ["commit_checkpoint"]
+    assert payload["readiness"]["stop_reason"] == {
+        "kind": "commit_checkpoint",
+        "phase": "preflight",
+    }
+    assert payload["readiness"]["preflight"] == {
+        "mode": "local_only",
+        "operation": "bootstrap_next",
+        "status": "blocked",
+        "blocking_checks": ["commit_checkpoint"],
+    }
+
+
 def test_resume_route_reports_skipped_local_only_preflight(
     tmp_path, monkeypatch, capsys
 ):
@@ -471,6 +574,10 @@ def test_resume_delegation_reports_blocked_local_only_preflight_on_approval_guar
     payload = json.loads(capsys.readouterr().out)
 
     assert payload["action"] == "approval_required"
+    assert payload["readiness"]["stop_reason"] == {
+        "kind": "approval_required",
+        "phase": "preflight",
+    }
     assert payload["readiness"]["preflight"] == {
         "mode": "local_only",
         "operation": "delegate_resume",

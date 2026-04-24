@@ -269,6 +269,21 @@ def build_preflight_summary(
     }
 
 
+def build_preflight_stop_reason(
+    *, mode: str, operation: str, preflight_summary: Dict[str, object], stop_reason: object
+) -> Optional[Dict[str, object]]:
+    if normalize_stop_reason(stop_reason) is not None:
+        return normalize_stop_reason(stop_reason)
+    if mode != "local_only" or operation not in MUTATION_CAPABLE_PREFLIGHT_OPERATIONS:
+        return None
+    if str(preflight_summary.get("status")) != "blocked":
+        return None
+    blocking_checks = preflight_summary.get("blocking_checks")
+    if not isinstance(blocking_checks, list) or not blocking_checks:
+        return None
+    return {"kind": str(blocking_checks[0]), "phase": "preflight"}
+
+
 def build_backlog_readiness(backlog: BacklogResolution) -> Dict[str, object]:
     next_owner = _derive_next_owner(backlog)
     blocked_by: List[str] = []
@@ -343,13 +358,25 @@ def build_bootstrap_readiness(result: BootstrapResult) -> Dict[str, object]:
     elif next_owner == "none":
         blocked_by.append("completed")
 
-    commit_required = (
-        result.action == "commit_checkpoint_required" or next_owner == "commit"
+    normalized_blocked_by = dedupe_reason_codes(blocked_by)
+    operation = classify_preflight_operation_for_result(result)
+    preflight = build_preflight_summary(
+        mode=result.backlog.preflight_mode,
+        operation=operation,
+        blocked_by=normalized_blocked_by,
     )
+    stop_reason = build_preflight_stop_reason(
+        mode=result.backlog.preflight_mode,
+        operation=operation,
+        preflight_summary=preflight,
+        stop_reason=stop_reason,
+    )
+
+    commit_required = result.action == "commit_checkpoint_required" or next_owner == "commit"
     readiness = build_accelerator_readiness(
         next_owner=next_owner,
         automatable_owners=AUTOMATABLE_OWNERS,
-        blocked_by=dedupe_reason_codes(blocked_by),
+        blocked_by=normalized_blocked_by,
         stop_reason=stop_reason,
         approval_gate=approval_gate,
         commit_checkpoint={
@@ -360,11 +387,7 @@ def build_bootstrap_readiness(result: BootstrapResult) -> Dict[str, object]:
     )
     readiness["policy_action"] = policy_action
     readiness["policy_source"] = policy_source
-    readiness["preflight"] = build_preflight_summary(
-        mode=result.backlog.preflight_mode,
-        operation=classify_preflight_operation_for_result(result),
-        blocked_by=readiness["blocked_by"],
-    )
+    readiness["preflight"] = preflight
     return readiness
 
 
