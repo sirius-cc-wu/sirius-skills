@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import subprocess
 import sys
 from pathlib import Path
 
@@ -14,11 +15,13 @@ from workflow_runtime import (
     LearningRecord,
     append_event,
     append_learning,
+    detect_scope_spillover,
     load_checkpoint,
     mark_checkpoint_stale,
     query_learnings,
     read_events,
     read_handoff_payload,
+    snapshot_dirty_worktree,
     update_learning_state,
     write_checkpoint,
     write_handoff_payload,
@@ -92,3 +95,68 @@ def test_learning_queries_and_state_updates(tmp_path: Path) -> None:
     updated = update_learning_state(path, "L001", "active")
     assert updated.state == "active"
     assert [record.state for record in query_learnings(path, states=["active"])] == ["active"]
+
+
+def test_detect_scope_spillover_reports_changes_outside_allowed_paths() -> None:
+    before_snapshot = {
+        "owned.py": "file:before-owned",
+        "baseline.txt": "file:before-baseline",
+    }
+    after_snapshot = {
+        "owned.py": "file:after-owned",
+        "baseline.txt": "file:before-baseline",
+        "spill.txt": "file:new-spill",
+    }
+
+    assert detect_scope_spillover(
+        before_snapshot,
+        after_snapshot,
+        allowed_paths=["owned.py"],
+    ) == ["spill.txt"]
+
+
+def test_snapshot_dirty_worktree_respects_ignored_prefixes(tmp_path: Path) -> None:
+    subprocess.run(["git", "init"], cwd=tmp_path, check=True, capture_output=True, text=True)
+    subprocess.run(
+        ["git", "config", "user.name", "Test User"],
+        cwd=tmp_path,
+        check=True,
+        capture_output=True,
+        text=True,
+    )
+    subprocess.run(
+        ["git", "config", "user.email", "test@example.com"],
+        cwd=tmp_path,
+        check=True,
+        capture_output=True,
+        text=True,
+    )
+
+    tracked = tmp_path / "tracked.txt"
+    tracked.write_text("baseline\n", encoding="utf-8")
+    subprocess.run(
+        ["git", "add", "tracked.txt"],
+        cwd=tmp_path,
+        check=True,
+        capture_output=True,
+        text=True,
+    )
+    subprocess.run(
+        ["git", "commit", "-m", "baseline"],
+        cwd=tmp_path,
+        check=True,
+        capture_output=True,
+        text=True,
+    )
+
+    (tmp_path / ".skills" / "runtime").mkdir(parents=True)
+    (tmp_path / ".skills" / "runtime" / "checkpoint.json").write_text("{}", encoding="utf-8")
+    tracked.write_text("changed\n", encoding="utf-8")
+
+    dirty_lines, snapshot = snapshot_dirty_worktree(
+        tmp_path,
+        ignored_prefixes=(".skills/runtime/",),
+    )
+
+    assert all(".skills/runtime/" not in line for line in dirty_lines)
+    assert sorted(snapshot) == ["tracked.txt"]

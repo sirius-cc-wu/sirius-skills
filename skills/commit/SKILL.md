@@ -18,6 +18,7 @@ Before committing, always verify exactly what is staged.
 Adhere to the project mandates (e.g. `AGENTS.md`):
 - **No Compilation Warnings:** Run build checks (e.g. `cargo check`, `npm run lint`) to ensure the code compiles without warnings.
 - **Tests Pass:** Ensure all relevant tests pass.
+- **Formatter safety:** If you need to run a formatter or fixer before commit, scope it to the intended file set when the tool supports path arguments. If the formatter rewrites files outside that intended set, stop and treat that as spillover instead of silently committing unrelated cleanup.
 
 ### 3. Crafting the Commit Message
 Follow these standards for all commit messages:

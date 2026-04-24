@@ -73,6 +73,8 @@ Terminal automation notes:
 - `auto_commit` requires `auto_close`
 - `auto_format` requires `format_command`
 - formatting and staging stay scoped to the delegated run's owned file set
+- formatter safety is path-scoped and language-agnostic; the configured command
+  can target any language as long as it accepts owned paths
 - `continuation_policy.review_boundary` and
   `continuation_policy.commit_checkpoint` accept `stop` or `continue`
 - defaults are `stop`; policy remains config-only in the first rollout

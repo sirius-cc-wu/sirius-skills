@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 import argparse
-import hashlib
 import importlib.util
 import json
 import shlex
@@ -36,11 +35,13 @@ from workflow_runtime import (  # noqa: E402
     append_event,
     build_accelerator_readiness,
     classify_stop_reason_from_message,
+    detect_scope_spillover,
     load_checkpoint,
     mark_checkpoint_stale,
     normalize_stop_reason,
     query_learnings,
     read_handoff_payload,
+    snapshot_dirty_worktree as runtime_snapshot_dirty_worktree,
     write_checkpoint,
 )
 
@@ -220,71 +221,11 @@ def git_repo_root() -> Path:
     return Path(result.stdout.strip())
 
 
-def git_dirty_paths(repo_root: Path) -> list[str]:
-    result = subprocess.run(
-        ["git", "status", "--short", "--untracked-files=all"],
-        cwd=repo_root,
-        check=True,
-        capture_output=True,
-        text=True,
-    )
-    return [line.rstrip() for line in result.stdout.splitlines() if line.strip()]
-
-
-def dirty_line_to_path(line: str) -> str:
-    raw_path = line[3:].strip()
-    if " -> " in raw_path:
-        raw_path = raw_path.split(" -> ", 1)[1]
-    return raw_path.strip('"')
-
-
-def hash_worktree_path(repo_root: Path, relative_path: str) -> str:
-    target = repo_root / relative_path
-    if not target.exists():
-        return "missing"
-    if target.is_dir():
-        digest = hashlib.sha256()
-        for child in sorted(
-            path for path in target.rglob("*") if path.is_file() and not path.is_symlink()
-        ):
-            digest.update(str(child.relative_to(repo_root)).encode("utf-8"))
-            digest.update(b"\0")
-            digest.update(child.read_bytes())
-            digest.update(b"\0")
-        return f"dir:{digest.hexdigest()}"
-    return f"file:{hashlib.sha256(target.read_bytes()).hexdigest()}"
-
-
-def should_ignore_dirty_path(relative_path: str) -> bool:
-    return relative_path.startswith(".skills/runtime/")
-
-
 def snapshot_dirty_worktree(repo_root: Path) -> tuple[list[str], Dict[str, str]]:
-    lines: list[str] = []
-    snapshot: Dict[str, str] = {}
-    for line in git_dirty_paths(repo_root):
-        relative_path = dirty_line_to_path(line)
-        if should_ignore_dirty_path(relative_path):
-            continue
-        lines.append(line)
-        snapshot[relative_path] = hash_worktree_path(repo_root, relative_path)
-    return lines, snapshot
-
-
-def detect_scope_spillover(
-    before_snapshot: Dict[str, str],
-    after_snapshot: Dict[str, str],
-    *,
-    allowed_paths: Sequence[str],
-) -> list[str]:
-    allowed = {path for path in allowed_paths if path}
-    spillover: list[str] = []
-    for path, digest in sorted(after_snapshot.items()):
-        if before_snapshot.get(path) == digest:
-            continue
-        if path not in allowed:
-            spillover.append(path)
-    return spillover
+    return runtime_snapshot_dirty_worktree(
+        repo_root,
+        ignored_prefixes=(".skills/runtime/",),
+    )
 
 
 def compute_worktree_ownership_from_baseline(
