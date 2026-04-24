@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "generated_at": "2026-04-24T19:53:24",
+  "generated_at": "2026-04-24T19:59:33",
   "slices": [
     {
       "id": "hss-root-fallback",
@@ -479,6 +479,16 @@
       "path": "slices/spi-mutation-gating-gate-bootstrap-and-delegated-resume-with-local-only-preflight/",
       "updated_at": "2026-04-24T19:53:24",
       "closed_at": "2026-04-24T19:53:24",
+      "archived_at": null,
+      "relations": []
+    },
+    {
+      "id": "spi-operator-contracts",
+      "feature": "Document rerun semantics and preflight behavior",
+      "status": "closed",
+      "path": "slices/spi-operator-contracts-document-rerun-semantics-and-preflight-behavior/",
+      "updated_at": "2026-04-24T19:59:33",
+      "closed_at": "2026-04-24T19:59:33",
       "archived_at": null,
       "relations": []
     }

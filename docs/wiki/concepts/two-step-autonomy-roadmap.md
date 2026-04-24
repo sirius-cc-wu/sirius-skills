@@ -19,7 +19,9 @@ Use this as the default happy-path UX when accelerators are enabled:
 4. Start execution autopilot:
    `python3 skills/ship/scripts/ship.py <target> --resume --json`
 5. Re-run `ship --resume` until `readiness.blocked_by` reports a boundary
-   requiring manual action (for example `commit_checkpoint`).
+   requiring manual action (for example `commit_checkpoint`), or until
+   `readiness.preflight` reports that ship-local preflight stopped before
+   mutation.
 
 Guide-path positioning:
 
@@ -36,6 +38,13 @@ Current accelerator skills now support owner-chain orchestration in both layers:
 - `autoplan` can now optionally execute the planning owner chain and stop with
   structured boundary context.
 - `ship` resolves backlog and can bootstrap/delegate.
+- `ship` now documents a typed rerun contract that separates read-only
+  recomputation, guarded mutation, and delegated side effects.
+- `ship` now emits nested `readiness.preflight` context, with repo-owned
+  `accelerators.ship.preflight.mode` values `off` and `local_only`.
+- local-only preflight can stop `--bootstrap-next` or mutation-capable
+  `--resume` before mutation while preserving canonical blocker codes and
+  marking `stop_reason.phase=preflight`.
 - `ship-slice` can now optionally execute one-slice execution owner-chain
   routing and stop with structured boundary context.
 - `ship-slice` can now optionally continue through owned-file formatting,
@@ -91,6 +100,7 @@ Use additive flags under existing typed configs:
   - `accelerators.autoplan.stop_on_owner` (optional list)
 - `.skills/execution.json`:
   - `accelerators.ship.delegate_to_ship_slice` (existing)
+  - `accelerators.ship.preflight.mode` (`off` or `local_only`)
   - `accelerators.ship_slice.execute_owner_chain` (bool)
   - `accelerators.ship_slice.stop_on_owner` (optional list)
   - `accelerators.ship_slice.continuation_policy.review_boundary` (`stop` or `continue`)
@@ -106,7 +116,9 @@ Use additive flags under existing typed configs:
 2. Approval stays explicit between planning and execution.
 3. Any owner failure returns structured stop context instead of fallback
    guessing.
-4. Unrelated dirty worktree state remains tolerated, but owned-file conflicts,
+4. Ship-local preflight may stop before mutation, but it must reuse canonical
+   blocker codes instead of inventing a second blocker taxonomy.
+5. Unrelated dirty worktree state remains tolerated, but owned-file conflicts,
    formatter spillover, and owned commit checkpoints remain enforced.
 
 ## Incremental Delivery Notes

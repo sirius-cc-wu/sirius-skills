@@ -78,9 +78,13 @@ High-value improvements inferred from the comparison:
    handoff) in one quick dashboard. Status: implemented via `readiness` JSON in
    `autoplan`, `ship`, and `ship-slice`.
 2. Document idempotency contracts in `skills/ship/SKILL.md` as explicit rerun
-   guarantees (what is always recomputed vs what is mutation-only).
+   guarantees (what is always recomputed vs what is mutation-only). Status:
+   implemented; `ship` now distinguishes read-only recomputation, guarded
+   mutation, and delegated side effects.
 3. Add an optional preflight branch-freshness check (config-driven, non-default)
    before `--bootstrap-next`, without turning `ship` into PR/deploy automation.
+   Status: partially implemented as repo-owned `accelerators.ship.preflight.mode`
+   with `off` and `local_only`; remote freshness remains future work.
 4. Keep PR creation, release, and changelog ownership external to `ship`; do not
    import `gstack`'s branch-release responsibilities into this backlog resolver.
 
@@ -109,6 +113,9 @@ Current status:
 - all three accelerator surfaces now emit a normalized `readiness` payload:
   `can_proceed`, `next_owner`, `blocked_by`, `stop_reason`,
   `approval_gate`, and `commit_checkpoint`
+- `ship` now emits nested `readiness.preflight` metadata, classifies rerun
+  operations, and marks ship-local blocked mutation paths with
+  `stop_reason.phase=preflight`
 - delegated execution now supports typed continuation policy controls for
   `review_boundary` and `commit_checkpoint`, and readiness surfaces
   `policy_action` plus `policy_source`

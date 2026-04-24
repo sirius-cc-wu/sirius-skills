@@ -76,6 +76,50 @@ python3 skills/ship/scripts/ship.py <target> --approve --approval-note "approved
 python3 skills/ship/scripts/ship.py <target> --scope apps/payments
 ```
 
+## Rerun Contract
+
+Treat `ship` as deterministic with respect to current repository artifacts, but
+not as universally side-effect free.
+
+- **Read-only recomputation**
+  - `python3 skills/ship/scripts/ship.py <target>`
+  - `python3 skills/ship/scripts/ship.py <target> --json`
+  - route-only `--resume` when an active slice already exists and `ship` is only
+    handing that slice to the next owner without bootstrapping or delegating
+- **Guarded mutation**
+  - `--approve` records or refreshes the durable approval record for a
+    `planning_reviewed` target
+  - `--bootstrap-next` may create one next-ready execution slice and write the
+    mapped execution slice ID back into `slice-traceability.md`
+  - `--resume` may bootstrap the next slice when no active mapped slice exists
+- **Delegated side effects**
+  - when `accelerators.ship.delegate_to_ship_slice` is enabled, `--resume` may
+    hand execution to `ship-slice`, which then owns downstream execution
+    boundaries
+
+## Preflight Contract
+
+`ship` now exposes one repo-owned preflight surface under
+`accelerators.ship.preflight.mode`.
+
+Supported values:
+
+- `off` (default)
+- `local_only`
+
+Behavior:
+
+- `ship <target>` / `ship --json` remain backlog-resolution only and report
+  `readiness.preflight.status=disabled` or `skipped`
+- local-only preflight applies only to mutation-capable paths:
+  `--bootstrap-next` and mutation-capable `--resume`
+- when local-only preflight blocks on ship-local guardrails, `ship` keeps the
+  canonical blocker codes (`approval_required`, `commit_checkpoint`) and marks
+  `readiness.stop_reason.phase=preflight`
+- route-only resume remains non-blocking and reports preflight as `skipped`
+- once `ship` delegates into `ship-slice`, downstream stop-policy behavior such
+  as `review_boundary` remains owned by `ship-slice`, not by ship preflight
+
 ## Guardrails
 
 - Resolve exactly one planning scope; do not guess across ambiguous scopes.
@@ -100,6 +144,8 @@ python3 skills/ship/scripts/ship.py <target> --scope apps/payments
 - Keep readiness and stop-reason guardrails aligned with the shared
   `workflow_runtime` accelerator guardrail helper used by `autoplan` and
   `ship-slice`.
+- Keep `accelerators.ship.preflight.mode` repo-owned; do not add CLI flags or
+  environment-variable overrides for the same policy.
 - Route to the next concrete owner, but do not absorb artifact authoring or
   closure logic that belongs to those owner skills.
 - Keep any machine-readable handoff payload derived from existing planning and
