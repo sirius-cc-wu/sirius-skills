@@ -1,6 +1,6 @@
 ---
 name: autoplan
-description: Reconcile one planning target, optionally execute planning owners in sequence, and persist checkpointed resume context until the approval boundary.
+description: Reconcile one planning target, optionally execute planning owners in sequence, and persist checkpointed resume context through approval and planning-commit handoff.
 ---
 
 # Autoplan
@@ -15,10 +15,12 @@ stack with checkpointed resume support.
 3. Surface the next planning owner based on the current planning status.
 4. Optionally execute the planning owner chain (`discover`, `design`,
    `breakdown`, `review-planning`) in sequence until a hard boundary is hit.
-5. Stop explicitly at the `planning_reviewed` approval boundary.
-6. Write runtime checkpoint and event-log context for resume, including owner-chain
+5. Evaluate the durable human-approval gate for `planning_reviewed` targets.
+6. After approval is recorded, hand approved-but-uncommitted planning back to the
+   `commit` owner before execution begins.
+7. Write runtime checkpoint and event-log context for resume, including owner-chain
    stop context when owner-chain mode is enabled.
-7. Emit a `readiness` summary in JSON output (`can_proceed`, `blocked_by`,
+8. Emit a `readiness` summary in JSON output (`can_proceed`, `blocked_by`,
    `stop_reason`, approval/commit gate state) so upstream orchestrators can
    detect whether autoplan can continue automatically.
 
@@ -28,6 +30,7 @@ stack with checkpointed resume support.
 python3 skills/autoplan/scripts/autoplan.py throughput-acceleration-workflow --json
 python3 skills/autoplan/scripts/autoplan.py --resume --json
 python3 skills/autoplan/scripts/autoplan.py throughput-acceleration-workflow --execute-owner-chain --review-note "Planning reviewed" --json
+python3 skills/autoplan/scripts/autoplan.py throughput-acceleration-workflow --approve --approval-note "approved for execution" --json
 ```
 
 ## Configuration
@@ -55,6 +58,8 @@ Optional CLI overrides:
 - `--execute-owner-chain` / `--no-execute-owner-chain`
 - `--stop-on-owner <owner>` (repeatable)
 - `--review-note <text>` (used when advancing to `planning_reviewed`)
+- `--approve`
+- `--approval-note <text>`
 
 ## Workflow
 
@@ -76,11 +81,18 @@ Optional CLI overrides:
    artifacts it owns.
 6. After the owner skill completes, rerun `autoplan.py <target> --json` and
    continue looping until one of these explicit stop boundaries is reached:
-   - `approval_boundary`
+   - `approval_required`
+   - `commit_checkpoint`
    - `owner_stop`
    - a non-automatable owner
    - an unresolved ambiguity or validation failure that the owner skill could
      not repair
+7. When `next_owner=approval`, stop for explicit human approval. Record that
+   approval with `autoplan.py <target> --approve [--approval-note "..."] --json`.
+8. When `next_owner=commit`, invoke the existing `commit` skill so the approved
+   planning artifacts and durable approval record are committed before execution.
+9. Once approval is valid and the planning commit checkpoint is clear, hand off
+   to `slice` or `ship` for execution bootstrap.
 
 `autoplan.py` remains the checkpointing and readiness source of truth, but the
 skill is responsible for actually chaining into downstream planning-owner
@@ -89,10 +101,11 @@ skills.
 ## Guardrails
 
 - Do not replace `guide-planning` as the source of planning truth.
-- Keep approval as an explicit stop boundary.
+- Keep approval as an explicit human gate and planning commit as the durable
+  checkpoint before execution.
 - Keep planning transitions owned by planning-layer validation and metadata.
 - Stop with structured context when owner-chain boundaries are hit (explicit
-  stop owner, missing required input, validation failure, or approval).
+   stop owner, missing required input, validation failure, or approval).
 - Do not stop just because `autoplan.py` reported `missing_required_input` for
   the next automatable owner; if `owner_handoff.should_invoke_skill` is true,
   that owner is expected to create or repair the missing artifacts.

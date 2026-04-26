@@ -109,6 +109,11 @@ def run_cli(repo_root: Path, *args: str) -> subprocess.CompletedProcess[str]:
     )
 
 
+def commit_all(repo_root: Path, message: str = "checkpoint") -> None:
+    subprocess.run(["git", "add", "-A"], cwd=repo_root, check=True)
+    subprocess.run(["git", "commit", "--quiet", "-m", message], cwd=repo_root, check=True)
+
+
 def test_autoplan_routes_discovery_pending_to_discover(tmp_path: Path, monkeypatch) -> None:
     init_git_repo(tmp_path)
     write_planning_config(tmp_path)
@@ -153,9 +158,13 @@ def test_autoplan_stops_at_planning_reviewed_boundary(tmp_path: Path, monkeypatc
     assert payload["next_owner"] == "approval"
     assert payload["action"] == "approval_required"
     assert payload["owner_handoff"] is None
+    assert payload["approval_gate"]["decision"] == "waiting_approval"
+    assert payload["approval_gate"]["reason"] == "approval_not_recorded"
     assert payload["readiness"]["can_proceed"] is False
-    assert payload["readiness"]["blocked_by"] == ["approval_boundary"]
+    assert payload["readiness"]["blocked_by"] == ["approval_required"]
     assert payload["readiness"]["approval_gate"]["required"] is True
+    assert payload["readiness"]["approval_gate"]["state"] == "waiting_approval"
+    assert payload["readiness"]["stop_reason"]["kind"] == "approval_required"
 
 
 def test_autoplan_owner_chain_advances_to_review_boundary(tmp_path: Path, monkeypatch) -> None:
@@ -183,9 +192,10 @@ def test_autoplan_owner_chain_advances_to_review_boundary(tmp_path: Path, monkey
     assert payload["action"] == "approval_required"
     assert payload["execute_owner_chain"] is True
     assert payload["owner_chain"]["stop_reason"]["kind"] == "approval_boundary"
+    assert payload["approval_gate"]["decision"] == "waiting_approval"
     assert payload["readiness"]["can_proceed"] is False
-    assert payload["readiness"]["blocked_by"] == ["approval_boundary"]
-    assert payload["readiness"]["stop_reason"]["kind"] == "approval_boundary"
+    assert payload["readiness"]["blocked_by"] == ["approval_required"]
+    assert payload["readiness"]["stop_reason"]["kind"] == "approval_required"
     assert [step["owner"] for step in payload["owner_chain"]["steps"]] == [
         "discover",
         "design",
@@ -304,5 +314,84 @@ def test_autoplan_owner_chain_reports_approval_when_already_reviewed(
     assert payload["owner_chain"]["steps"] == []
     assert payload["owner_chain"]["stop_reason"]["kind"] == "approval_boundary"
     assert payload["owner_handoff"] is None
+    assert payload["approval_gate"]["decision"] == "waiting_approval"
     assert payload["readiness"]["can_proceed"] is False
-    assert payload["readiness"]["blocked_by"] == ["approval_boundary"]
+    assert payload["readiness"]["blocked_by"] == ["approval_required"]
+
+
+def test_autoplan_approve_records_gate_and_requires_commit(
+    tmp_path: Path, monkeypatch
+) -> None:
+    init_git_repo(tmp_path)
+    write_planning_config(tmp_path)
+    create_feature(tmp_path, monkeypatch, "planning_reviewed")
+    commit_all(tmp_path, "Initial planning packet")
+
+    result = run_cli(
+        tmp_path,
+        "throughput-acceleration-workflow",
+        "--approve",
+        "--approval-note",
+        "approved for execution",
+        "--json",
+    )
+
+    assert result.returncode == 0
+    payload = json.loads(result.stdout)
+    assert payload["next_owner"] == "commit"
+    assert payload["action"] == "commit_planning"
+    assert payload["approval_gate"]["decision"] == "approved"
+    assert payload["approval_gate"]["approval_note"] == "approved for execution"
+    assert payload["readiness"]["blocked_by"] == ["commit_checkpoint"]
+    assert payload["readiness"]["stop_reason"]["kind"] == "commit_checkpoint"
+    assert payload["readiness"]["commit_checkpoint"]["required"] is True
+    assert any(".approval-gate.json" in line for line in payload["dirty_worktree_paths"])
+
+
+def test_autoplan_hands_off_to_slice_after_approved_planning_is_committed(
+    tmp_path: Path, monkeypatch
+) -> None:
+    init_git_repo(tmp_path)
+    write_planning_config(tmp_path)
+    create_feature(tmp_path, monkeypatch, "planning_reviewed")
+    commit_all(tmp_path, "Initial planning packet")
+
+    approved = run_cli(tmp_path, "throughput-acceleration-workflow", "--approve", "--json")
+    assert approved.returncode == 0
+    commit_all(tmp_path, "Approve planning packet")
+
+    result = run_cli(tmp_path, "throughput-acceleration-workflow", "--json")
+
+    assert result.returncode == 0
+    payload = json.loads(result.stdout)
+    assert payload["next_owner"] == "slice"
+    assert payload["action"] == "bootstrap_slice"
+    assert payload["approval_gate"]["decision"] == "approved"
+    assert payload["readiness"]["blocked_by"] == []
+    assert payload["readiness"]["commit_checkpoint"]["required"] is False
+    assert payload["readiness"]["approval_gate"]["state"] == "approved"
+
+
+def test_autoplan_invalidates_stale_approval_after_planning_changes(
+    tmp_path: Path, monkeypatch
+) -> None:
+    init_git_repo(tmp_path)
+    write_planning_config(tmp_path)
+    feature_path = create_feature(tmp_path, monkeypatch, "planning_reviewed")
+    commit_all(tmp_path, "Initial planning packet")
+
+    approved = run_cli(tmp_path, "throughput-acceleration-workflow", "--approve", "--json")
+    assert approved.returncode == 0
+    commit_all(tmp_path, "Approve planning packet")
+    (feature_path / "discover.md").write_text("# Discover\nChanged after approval\n", encoding="utf-8")
+
+    result = run_cli(tmp_path, "throughput-acceleration-workflow", "--json")
+
+    assert result.returncode == 0
+    payload = json.loads(result.stdout)
+    assert payload["next_owner"] == "approval"
+    assert payload["action"] == "approval_required"
+    assert payload["approval_gate"]["decision"] == "invalidated"
+    assert payload["approval_gate"]["reason"] == "planning_artifacts_changed"
+    assert payload["readiness"]["blocked_by"] == ["approval_required"]
+    assert payload["readiness"]["approval_gate"]["state"] == "invalidated"

@@ -17,6 +17,13 @@ from workflow_runtime.accelerator_guardrails import (
     normalize_reason_code,
     normalize_stop_reason,
 )
+from workflow_runtime.planning_approval import (
+    approval_gate_path,
+    compute_planning_fingerprint,
+    evaluate_planning_approval_gate,
+    read_approval_record,
+    write_planning_approval_record,
+)
 
 __all__ = [
     "CheckpointRecord",
@@ -26,19 +33,24 @@ __all__ = [
     "append_learning",
     "build_accelerator_readiness",
     "classify_stop_reason_from_message",
+    "compute_planning_fingerprint",
     "detect_scope_spillover",
     "dedupe_reason_codes",
+    "evaluate_planning_approval_gate",
     "load_checkpoint",
     "locked_file",
     "mark_checkpoint_stale",
     "normalize_reason_code",
     "normalize_stop_reason",
     "query_learnings",
+    "read_approval_record",
     "read_events",
     "read_handoff_payload",
     "read_learnings",
     "snapshot_dirty_worktree",
     "update_learning_state",
+    "approval_gate_path",
     "write_checkpoint",
     "write_handoff_payload",
+    "write_planning_approval_record",
 ]

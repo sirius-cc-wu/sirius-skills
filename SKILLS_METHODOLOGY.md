@@ -44,11 +44,15 @@ After each planning phase writes or updates its repository artifacts, persist th
 
 The execution layer works one implementation-ready slice at a time, starting with `slice` bootstrap from approved committed planning artifacts. `ship` can sit above that flow when a reviewed and committed feature or subfeature should be worked as one dependency-aware backlog; it should follow increment order first, then slice dependencies within the current increment, while still handing each concrete slice to the next existing single-slice owner such as `brief`, `blueprint`, repository implementation, `review-execution`, `close-slice`, or `commit`.
 
-When accelerators are enabled, the default operator path compresses to two
-operator steps:
+When accelerators are enabled, the default operator path compresses to one
+planning accelerator surface and one execution accelerator surface, with an
+explicit approval-and-commit checkpoint between them:
 
-1. `autoplan --execute-owner-chain` drives planning to the explicit approval boundary.
-2. After review and approval, `ship --approve` and `ship --resume` drive execution until the next manual boundary.
+1. `autoplan --execute-owner-chain` drives planning to review-ready state.
+2. After human approval, `autoplan --approve` records approval and hands the
+   packet back to `commit` until the approved planning artifacts are committed.
+3. Once that checkpoint is clear, `ship --resume` drives execution until the
+   next manual boundary.
 
 `guide-scope`, `guide-planning`, and `guide-execution` remain the canonical
 manual fallback surfaces for ambiguous scope, recovery, and fine-grained
@@ -113,7 +117,7 @@ guide-scope -> guide-planning -> propose/add-subfeature/assess/research/discover
 Accelerator fast path:
 
 ```text
-autoplan --execute-owner-chain -> human approval -> ship --approve -> ship --resume
+autoplan --execute-owner-chain -> human approval -> autoplan --approve -> commit -> ship --resume
 ```
 
 If the request is still speculative, cross-cutting, or not yet accepted as a canonical feature, route to `propose` first. That keeps early exploration under `docs/proposals/` instead of polluting the canonical `docs/features/` registry too early.

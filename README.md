@@ -78,10 +78,10 @@ If a project has no extra configuration, these skills should still work with gen
 For the operational guide to using the skills together, see `SKILLS_METHODOLOGY.md`.
 For developer-facing examples of how to prompt the skills, see `PROMPT_GUIDE.md`.
 
-When accelerator config is enabled, the intended happy path is two operator steps:
-use `autoplan` to drive planning to the approval boundary, then after explicit
-approval use `ship --approve` and `ship --resume` to drive execution until the
-next manual boundary.
+When accelerator config is enabled, the intended happy path is: use `autoplan`
+to drive planning to review-ready state, rerun `autoplan --approve` after
+explicit human approval so it can hand off the planning commit checkpoint, then
+use `ship --resume` once the approved planning artifacts are committed.
 
 ## Shared skill references
 

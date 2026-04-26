@@ -31,10 +31,12 @@ from workflow_runtime import (  # noqa: E402
     append_event,
     build_accelerator_readiness,
     classify_stop_reason_from_message,
+    evaluate_planning_approval_gate,
     load_checkpoint,
     mark_checkpoint_stale,
     normalize_stop_reason,
     query_learnings,
+    write_planning_approval_record,
     write_checkpoint,
 )
 
@@ -104,6 +106,16 @@ def parse_args(argv: Sequence[str] | None = None) -> argparse.Namespace:
         default=None,
         help="Optional review note used when advancing into planning_reviewed.",
     )
+    parser.add_argument(
+        "--approve",
+        action="store_true",
+        help="Record or refresh the durable approval record for a planning_reviewed target.",
+    )
+    parser.add_argument(
+        "--approval-note",
+        default=None,
+        help="Optional note recorded with the approval decision.",
+    )
     return parser.parse_args(argv)
 
 
@@ -127,6 +139,18 @@ def runtime_paths(repo_root: Path) -> tuple[Path, Path, Path]:
     event_log_path = runtime_dir / "execution-log.jsonl"
     learnings_path = repo_root / DEFAULT_LEARNINGS_PATH
     return checkpoint_path, event_log_path, learnings_path
+
+
+def read_dirty_worktree_paths(repo_root: Path) -> list[str]:
+    result = subprocess.run(
+        ["git", "-C", str(repo_root), "status", "--short", "--untracked-files=all"],
+        check=False,
+        capture_output=True,
+        text=True,
+    )
+    if result.returncode != 0:
+        raise RuntimeError("Unable to inspect git worktree state for planning commit checkpoint.")
+    return [line.rstrip() for line in result.stdout.splitlines() if line.strip()]
 
 
 def resolve_target(args: argparse.Namespace, checkpoint_path: Path, planning_module):
@@ -306,16 +330,32 @@ def execute_owner_chain(
 def build_readiness_payload(
     *,
     next_owner: str,
+    approval_gate: dict[str, Any],
+    dirty_worktree_paths: list[str],
     owner_chain: Optional[dict[str, Any]],
 ) -> dict[str, Any]:
     blocked_by: list[str] = []
-    stop_reason = normalize_stop_reason(
-        owner_chain.get("stop_reason") if isinstance(owner_chain, dict) else None
-    )
-
     approval_required = next_owner == "approval"
+    commit_required = next_owner == "commit"
+    approval_state = str(approval_gate.get("decision") or "").strip()
+
     if approval_required:
-        blocked_by.append("approval_boundary")
+        blocked_by.append("approval_required")
+        stop_reason = {
+            "kind": "approval_required",
+            "reason": approval_gate.get("reason"),
+            "approval_path": approval_gate.get("approval_path"),
+        }
+    elif commit_required:
+        blocked_by.append("commit_checkpoint")
+        stop_reason = {
+            "kind": "commit_checkpoint",
+            "dirty_worktree_paths": dirty_worktree_paths,
+        }
+    else:
+        stop_reason = normalize_stop_reason(
+            owner_chain.get("stop_reason") if isinstance(owner_chain, dict) else None
+        )
     if next_owner == "guide-planning":
         blocked_by.append("planning_resolution_required")
 
@@ -325,12 +365,14 @@ def build_readiness_payload(
         blocked_by=blocked_by,
         stop_reason=stop_reason,
         approval_gate={
-            "required": approval_required,
-            "state": "waiting_approval" if approval_required else "not_required",
+            "required": bool(approval_gate.get("required", False)),
+            "state": approval_state or ("waiting_approval" if approval_required else "not_required"),
+            "reason": approval_gate.get("reason"),
+            "approval_path": approval_gate.get("approval_path"),
         },
         commit_checkpoint={
-            "required": False,
-            "state": "not_required",
+            "required": commit_required,
+            "state": "waiting_commit" if commit_required else "not_required",
         },
     )
 
@@ -511,7 +553,44 @@ def main(argv: Sequence[str] | None = None) -> int:
             "stop_reason": normalize_stop_reason(stop_reason),
         }
 
-    next_owner, action = owner_for_status(planning_status)
+    feature_dir = Path(planning_module.feature_dir_for_row(feature, scope_context=scope_context))
+    metadata = planning_module.read_metadata(str(feature_dir))
+    planning_status = str(metadata["status"])
+
+    if args.approve:
+        if planning_status != "planning_reviewed":
+            print(
+                "Approval can be recorded only when planning status is 'planning_reviewed'. "
+                f"Current status: '{planning_status}'.",
+                file=sys.stderr,
+            )
+            return 2
+        write_planning_approval_record(
+            target_id=target_id,
+            target_path=str(feature["path"]),
+            target_dir=feature_dir,
+            planning_metadata=metadata,
+            approval_note=args.approval_note,
+        )
+
+    approval_gate = evaluate_planning_approval_gate(
+        target_id=target_id,
+        target_path=str(feature["path"]),
+        target_dir=feature_dir,
+        planning_metadata=metadata,
+    )
+    dirty_worktree_paths = read_dirty_worktree_paths(repo_root)
+
+    if planning_status == "planning_reviewed":
+        if str(approval_gate.get("decision") or "") != "approved":
+            next_owner, action = "approval", "approval_required"
+        elif dirty_worktree_paths:
+            next_owner, action = "commit", "commit_planning"
+        else:
+            next_owner, action = "slice", "bootstrap_slice"
+    else:
+        next_owner, action = owner_for_status(planning_status)
+
     owner_handoff = build_owner_handoff(
         target_id=target_id,
         target_path=str(feature["path"]),
@@ -564,8 +643,12 @@ def main(argv: Sequence[str] | None = None) -> int:
         "event_log_path": str(event_log_path),
         "learnings": learnings,
         "checkpoint_stale_reason": checkpoint_stale_reason,
+        "approval_gate": approval_gate,
+        "dirty_worktree_paths": dirty_worktree_paths,
         "readiness": build_readiness_payload(
             next_owner=next_owner,
+            approval_gate=approval_gate,
+            dirty_worktree_paths=dirty_worktree_paths,
             owner_chain=owner_chain,
         ),
     }
