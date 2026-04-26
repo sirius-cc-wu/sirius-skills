@@ -26,6 +26,10 @@ def write_scope_config(scope_root: Path, filename: str, data: dict):
     (skills_dir / filename).write_text(json.dumps(data) + "\n", encoding="utf-8")
 
 
+def write_agents(scope_root: Path, content: str):
+    (scope_root / "AGENTS.md").write_text(content, encoding="utf-8")
+
+
 def test_default_mode_writes_generic_config_files(tmp_path, monkeypatch):
     module = load_module()
     monkeypatch.chdir(tmp_path)
@@ -177,12 +181,14 @@ def test_bootstrap_with_wiki_scaffolds_docs_wiki(tmp_path, monkeypatch):
 
     assert (tmp_path / "docs" / "wiki" / "features").is_dir()
     assert (tmp_path / "docs" / "wiki" / "concepts").is_dir()
+    assert (tmp_path / "docs" / "wiki" / "concepts" / "architecture").is_dir()
 
     index_text = (tmp_path / "docs" / "wiki" / "index.md").read_text(
         encoding="utf-8"
     )
     log_text = (tmp_path / "docs" / "wiki" / "log.md").read_text(encoding="utf-8")
 
+    assert "## Architecture" in index_text
     assert "## Features" in index_text
     assert "docs/features/" in index_text
     assert "docs/proposals/" in index_text
@@ -204,6 +210,7 @@ def test_bootstrap_with_wiki_preserves_existing_index_and_log(tmp_path, monkeypa
 
     assert (wiki_dir / "features").is_dir()
     assert (wiki_dir / "concepts").is_dir()
+    assert (wiki_dir / "concepts" / "architecture").is_dir()
     assert (wiki_dir / "index.md").read_text(encoding="utf-8") == "custom index\n"
     assert (wiki_dir / "log.md").read_text(encoding="utf-8") == "custom log\n"
 
@@ -228,6 +235,7 @@ def test_bootstrap_with_wiki_uses_parent_of_custom_planning_dir(tmp_path, monkey
     wiki_dir = tmp_path / "planning" / "wiki"
     assert (wiki_dir / "features").is_dir()
     assert (wiki_dir / "concepts").is_dir()
+    assert (wiki_dir / "concepts" / "architecture").is_dir()
 
 
 def test_bootstrap_child_scope_inherits_parent_configs_before_applying_overrides(
@@ -361,12 +369,61 @@ def test_bootstrap_with_wiki_uses_inherited_scope_paths_in_index(
     wiki_dir = child_scope / "planning" / "wiki"
     assert (wiki_dir / "features").is_dir()
     assert (wiki_dir / "concepts").is_dir()
+    assert (wiki_dir / "concepts" / "architecture").is_dir()
 
     index_text = (wiki_dir / "index.md").read_text(encoding="utf-8")
 
+    assert "## Architecture" in index_text
     assert "planning/features/" in index_text
     assert "planning/proposals/" in index_text
     assert "team-slices/" in index_text
+
+
+def test_bootstrap_with_wiki_patches_existing_agents_md(tmp_path, monkeypatch):
+    module = load_module()
+    monkeypatch.chdir(tmp_path)
+    write_agents(tmp_path, "# AGENTS.md\n\n## Existing guidance\n")
+
+    assert run_cli(module, monkeypatch, "--mode", "default", "--wiki") == 0
+
+    agents_text = (tmp_path / "AGENTS.md").read_text(encoding="utf-8")
+
+    assert "## Wiki architecture pages" in agents_text
+    assert "`docs/wiki/concepts/architecture/`" in agents_text
+    assert "`docs/wiki/concepts/`" in agents_text
+
+
+def test_bootstrap_with_wiki_replaces_managed_agents_block_without_duplication(
+    tmp_path, monkeypatch
+):
+    module = load_module()
+    monkeypatch.chdir(tmp_path)
+    write_agents(
+        tmp_path,
+        "# AGENTS.md\n\n"
+        "<!-- sirius-skills bootstrap wiki architecture start -->\n"
+        "stale block\n"
+        "<!-- sirius-skills bootstrap wiki architecture end -->\n",
+    )
+
+    assert (
+        run_cli(
+            module,
+            monkeypatch,
+            "--mode",
+            "default",
+            "--planning-dir",
+            "planning/features",
+            "--wiki",
+        )
+        == 0
+    )
+
+    agents_text = (tmp_path / "AGENTS.md").read_text(encoding="utf-8")
+
+    assert agents_text.count("## Wiki architecture pages") == 1
+    assert "`planning/wiki/concepts/architecture/`" in agents_text
+    assert "stale block" not in agents_text
 
 
 def test_invalid_existing_json_returns_error(tmp_path, monkeypatch, capsys):

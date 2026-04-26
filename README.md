@@ -251,7 +251,9 @@ Use `skills/bootstrap/` when you want an agent to bootstrap the repo's
 supported `.skills/planning.json`, `.skills/execution.json`, and
 `.skills/conventions.json` files. The skill supports a generic `default` mode,
 a Jira-oriented `jira` mode, and an `ask` mode that makes the agent stop and
-ask the user which preset to apply before writing config.
+ask the user which preset to apply before writing config. When wiki scaffolding
+is requested, bootstrap also creates the derived wiki skeleton and patches an
+existing target-repo `AGENTS.md` with a small architecture-wiki guidance block.
 
 Projects can add `.skills/planning.json` in the repository root to configure planning-layer layout.
 

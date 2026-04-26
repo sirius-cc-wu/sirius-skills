@@ -5,6 +5,7 @@ from __future__ import annotations
 import argparse
 import importlib.util
 import json
+import re
 import sys
 from pathlib import Path, PurePosixPath
 from typing import Any
@@ -17,6 +18,8 @@ DEFAULT_SLICE_DIR = "slices"
 DEFAULT_WORKFLOW = "TDD"
 DEFAULT_AUTO_START_IMPLEMENTATION = True
 DEFAULT_WIKI_DIR_NAME = "wiki"
+BOOTSTRAP_AGENTS_START = "<!-- sirius-skills bootstrap wiki architecture start -->"
+BOOTSTRAP_AGENTS_END = "<!-- sirius-skills bootstrap wiki architecture end -->"
 VALID_DESIGN_DIAGRAM_MODES = ("embedded", "linked_svg")
 
 DEFAULT_JIRA_CONVENTIONS = {
@@ -127,7 +130,8 @@ def parse_args() -> argparse.Namespace:
         default=False,
         help=(
             "Create a lightweight wiki scaffold next to the planning feature "
-            "directory, with features, concepts, index.md, and log.md."
+            "directory, with features, concepts, concepts/architecture, index.md, "
+            "and log.md."
         ),
     )
     return parser.parse_args()
@@ -269,6 +273,7 @@ def scaffold_wiki(
     wiki_dir = repo_root / Path(derive_wiki_dir(planning_dir))
     (wiki_dir / "features").mkdir(parents=True, exist_ok=True)
     (wiki_dir / "concepts").mkdir(parents=True, exist_ok=True)
+    (wiki_dir / "concepts" / "architecture").mkdir(parents=True, exist_ok=True)
 
     index_content = f"""# Wiki Index
 
@@ -278,6 +283,11 @@ re-deriving answers from raw planning artifacts or upstream references.
 It is intentionally separate from `{planning_dir}/`, `{proposal_dir}/`, and
 `{slice_dir}/`, which remain the canonical planning and execution sources of
 truth.
+
+## Architecture
+
+| Page | Summary | Main sources |
+|---|---|---|
 
 ## Features
 
@@ -305,6 +315,48 @@ grep-friendly.
 
     write_text_file_if_missing(wiki_dir / "index.md", index_content)
     write_text_file_if_missing(wiki_dir / "log.md", log_content)
+
+
+def render_agents_wiki_section(wiki_dir: str) -> str:
+    architecture_dir = f"{wiki_dir}/concepts/architecture/"
+    concepts_dir = f"{wiki_dir}/concepts/"
+    return f"""{BOOTSTRAP_AGENTS_START}
+## Wiki architecture pages
+
+When this repository uses the wiki scaffold, keep implementation-sourced or
+code-only architecture/design pages under `{architecture_dir}`.
+
+Use `{concepts_dir}` for broader cross-cutting concept pages, pattern surveys,
+or reference-informed synthesis. Keep `index.md` clear about the distinction so
+readers can tell whether a page is code-only architecture or broader concept
+material.
+{BOOTSTRAP_AGENTS_END}
+"""
+
+
+def patch_agents_for_wiki(repo_root: Path, planning_dir: str) -> bool:
+    agents_path = repo_root / "AGENTS.md"
+    if not agents_path.exists():
+        return False
+
+    contents = agents_path.read_text(encoding="utf-8")
+    section = render_agents_wiki_section(derive_wiki_dir(planning_dir)).strip()
+    pattern = re.compile(
+        rf"{re.escape(BOOTSTRAP_AGENTS_START)}.*?{re.escape(BOOTSTRAP_AGENTS_END)}",
+        re.DOTALL,
+    )
+
+    if pattern.search(contents):
+        updated = pattern.sub(section, contents)
+    else:
+        separator = "" if contents.endswith("\n\n") else "\n\n"
+        updated = f"{contents.rstrip()}{separator}{section}\n"
+
+    if updated == contents:
+        return False
+
+    agents_path.write_text(updated, encoding="utf-8")
+    return True
 
 
 def main() -> int:
@@ -354,6 +406,7 @@ def main() -> int:
             planning_config["proposal_dir"],
             execution_config["slice_dir"],
         )
+        agents_updated = patch_agents_for_wiki(repo_root, planning_config["planning_dir"])
 
     message = (
         "Configured .skills/planning.json, .skills/execution.json, and "
@@ -361,6 +414,8 @@ def main() -> int:
     )
     if args.wiki:
         message += f" Created {wiki_dir}/ scaffold."
+        if agents_updated:
+            message += " Updated AGENTS.md wiki guidance."
 
     print(message)
     return 0

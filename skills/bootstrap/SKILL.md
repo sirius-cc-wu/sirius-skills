@@ -8,8 +8,11 @@ description: Bootstraps `.skills/planning.json`, `.skills/execution.json`, and `
 This skill configures the repository-local `.skills/` files used by `sirius-skills`.
 
 When requested, it also scaffolds a lightweight wiki layer with `features/`,
-`concepts/`, `index.md`, and `log.md`. The wiki root is derived from the parent
-directory of `planning_dir`, so it stays next to the feature planning tree.
+`concepts/`, `concepts/architecture/`, `index.md`, and `log.md`. The wiki root
+is derived from the parent directory of `planning_dir`, so it stays next to the
+feature planning tree. When the target repository already has an `AGENTS.md`,
+bootstrap also patches it with a small wiki-architecture guidance block derived
+from that same wiki root.
 
 It supports three modes:
 
@@ -81,10 +84,14 @@ Examples:
 The scaffold layout under that derived root is:
 
 - wiki root: `<planning-parent>/wiki`
+- architecture pages: `<planning-parent>/wiki/concepts/architecture`
 - feature synthesis pages: `<planning-parent>/wiki/features`
 - cross-cutting concept pages: `<planning-parent>/wiki/concepts`
 - wiki index: `<planning-parent>/wiki/index.md`
 - append-only log: `<planning-parent>/wiki/log.md`
+- repository guidance patch: `AGENTS.md` gains or refreshes a bootstrap-managed
+  section pointing architecture pages at the derived wiki root when `AGENTS.md`
+  already exists
 
 Do not assume the wiki should be created unless the user asked for it.
 
@@ -131,8 +138,12 @@ After running the helper:
 - read back the written JSON files
 - confirm the mode-specific values are present
 - when `--wiki` was used, confirm `<wiki-root>/index.md`,
-  `<wiki-root>/log.md`, `<wiki-root>/features/`, and
+  `<wiki-root>/log.md`, `<wiki-root>/features/`,
+  `<wiki-root>/concepts/architecture/`, and
   `<wiki-root>/concepts/` exist
+- when `AGENTS.md` already exists, confirm it now mentions the derived
+  `<wiki-root>/concepts/architecture/` path without duplicating the bootstrap
+  guidance block on reruns
 - summarize the result for the user
 
 If the helper reports invalid existing JSON, surface that error instead of overwriting the file blindly.
@@ -161,10 +172,14 @@ When `--wiki` is used, successful runs should also leave the repository with:
 - `<wiki-root>/index.md`
 - `<wiki-root>/log.md`
 - `<wiki-root>/features/`
+- `<wiki-root>/concepts/architecture/`
 - `<wiki-root>/concepts/`
+- an updated `AGENTS.md` wiki-architecture section when `AGENTS.md` already
+  exists
 
-The generated wiki scaffold is intentionally generic. Repositories can refine
-their wiki rules and page placement in `AGENTS.md` later without changing the
+The generated wiki scaffold is intentionally generic. Bootstrap now adds a small
+default `AGENTS.md` guidance block when that file already exists, and
+repositories can refine the rest of their wiki rules later without changing the
 bootstrap defaults.
 
 When `.skills/planning.json` includes `design_diagram_mode: "linked_svg"`, planning/design skills should place diagram source and generated SVGs under `<feature_path>/figures/`, link the SVGs from `system-design.md`, and keep the figures on an explicit white background using `skinparam backgroundColor white` plus a white SVG canvas rect.
@@ -190,8 +205,10 @@ Action:
 1. Use `default` mode.
 2. Run the helper with `--wiki`.
 3. Confirm the wiki scaffold uses the directory derived from the parent of
-   `planning_dir` (for the default layout, `docs/wiki/features/` and
-   `docs/wiki/concepts/`).
+   `planning_dir` (for the default layout, `docs/wiki/features/`,
+   `docs/wiki/concepts/`, and `docs/wiki/concepts/architecture/`).
+4. Confirm an existing `AGENTS.md` now points architecture pages at the same
+   derived wiki root.
 
 ### Example 3: Jira setup
 
