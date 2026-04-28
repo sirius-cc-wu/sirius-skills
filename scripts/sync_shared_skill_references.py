@@ -12,6 +12,7 @@ SOURCE = REPO_ROOT / "docs/shared/config-surface-governance.md"
 TARGETS = [
     REPO_ROOT / "skills/assess/references/config-surface-governance.md",
     REPO_ROOT / "skills/design/references/config-surface-governance.md",
+    REPO_ROOT / "skills/governance-update/references/config-surface-governance.md",
     REPO_ROOT / "skills/review-planning/references/config-surface-governance.md",
     REPO_ROOT / "skills/simplify/references/config-surface-governance.md",
 ]
