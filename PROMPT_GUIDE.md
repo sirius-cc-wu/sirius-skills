@@ -23,6 +23,8 @@ When in doubt, prefer the **shortest happy-path prompt** first:
 - use `guide-planning` when you need manual planning-layer routing
 - use `guide-execution` when you need manual execution-layer routing
 - use `archive-artifacts` when you want to summarize and archive closed slices without losing durable history
+- use `governance-update` when repeated drift means the real fix is a durable
+  repo rule, not only a one-off artifact rewrite
 
 ## Start with the simplest useful prompt
 
@@ -241,6 +243,28 @@ In scope apply mode, the skill:
 - carries over embedded PlantUML figures directly into `system-design.md`
 - archives the slice folders through the execution archive helper
 
+### 9. Tighten repo governance after repeated drift
+
+Use this when the problem is recurring enough that the repository should gain a
+durable rule in `AGENTS.md`, `.skills/*.json`, or another top-level governance
+surface.
+
+```text
+Use `governance-update` to add a repo rule in `AGENTS.md` so UI design artifacts default to a simpler MVP interaction model instead of expanding into mini-apps.
+```
+
+```text
+Use `governance-update` to review repeated config-surface drift across `AGENTS.md`, `.skills/conventions.json`, and recent planning docs, then tighten the narrowest governance surface that should own the rule.
+```
+
+Good additions to the prompt:
+
+- the repeated problem pattern
+- 1-3 concrete examples that show the drift
+- the preferred governance surface when you already know it
+- whether the rule should stay generic-first or become explicitly repo-local
+- the non-goals, so the governance update does not sprawl into unrelated policy
+
 ## What to include in a strong prompt
 
 Include whichever of these matter:
@@ -348,6 +372,12 @@ Use `ship` for `checkout-redesign` and continue through the planned slices until
 
 ```text
 Use `archive-artifacts` with `--artifact-type feature --artifact-id checkout --apply` and summarize the archived slices into the feature `system-design.md`.
+```
+
+### “This keeps happening; add a durable repo rule instead of fixing one artifact”
+
+```text
+Use `governance-update` to review the repeated UI-design drift in `docs/features/terminal-ui/` and tighten `AGENTS.md` with a simple MVP-first UI design rule.
 ```
 
 ## Short rule of thumb
