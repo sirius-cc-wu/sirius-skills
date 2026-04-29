@@ -36,11 +36,15 @@ from workflow_runtime import (  # noqa: E402
     build_accelerator_readiness,
     classify_stop_reason_from_message,
     detect_scope_spillover,
+    is_failure_reason,
     load_checkpoint,
     mark_checkpoint_stale,
     normalize_stop_reason,
     query_learnings,
     read_handoff_payload,
+    record_failure,
+    record_failure_for_stop_reason,
+    render_failure_summary,
     snapshot_dirty_worktree as runtime_snapshot_dirty_worktree,
     write_checkpoint,
 )
@@ -219,6 +223,50 @@ def git_repo_root() -> Path:
         text=True,
     )
     return Path(result.stdout.strip())
+
+
+def emit_failure_response(
+    *,
+    args: argparse.Namespace,
+    event_log_path: Path,
+    reason_code: str,
+    message: str,
+    target_id: str = "",
+    slice_id: str = "",
+    next_owner: str = "",
+    owner: str = "",
+    evidence_refs: Sequence[str] | None = None,
+) -> int:
+    context = record_failure(
+        event_log_path,
+        skill="ship-slice",
+        stage="execution",
+        reason_code=reason_code,
+        message=message,
+        target_id=target_id,
+        slice_id=slice_id,
+        next_owner=next_owner,
+        owner=owner,
+        evidence_refs=evidence_refs,
+    )
+    if args.json:
+        print(
+            json.dumps(
+                {
+                    "event_log_path": str(event_log_path),
+                    "failure_context": context.to_dict(),
+                    "ok": False,
+                    "skill": "ship-slice",
+                    "slice_id": slice_id,
+                    "stage": "execution",
+                    "target_id": target_id,
+                },
+                indent=2,
+                sort_keys=True,
+            )
+        )
+    print(render_failure_summary(context), file=sys.stderr)
+    return 2
 
 
 def snapshot_dirty_worktree(repo_root: Path) -> tuple[list[str], Dict[str, str]]:
@@ -1164,8 +1212,13 @@ def main(argv: Sequence[str] | None = None) -> int:
             checkpoint_path,
         )
     except RuntimeError as exc:
-        print(str(exc), file=sys.stderr)
-        return 2
+        return emit_failure_response(
+            args=args,
+            event_log_path=event_log_path,
+            reason_code="resolution_failed",
+            message=str(exc),
+            slice_id=args.selector or "",
+        )
 
     raw_config = execution_module.load_raw_config(required=False, scope_context=scope_context)
     accelerators = raw_config.get("accelerators", {}) if isinstance(raw_config, dict) else {}
@@ -1183,8 +1236,14 @@ def main(argv: Sequence[str] | None = None) -> int:
         terminal_config = parse_terminal_automation_config(ship_slice_config)
         continuation_policy = parse_continuation_policy_config(ship_slice_config)
     except RuntimeError as exc:
-        print(str(exc), file=sys.stderr)
-        return 2
+        return emit_failure_response(
+            args=args,
+            event_log_path=event_log_path,
+            reason_code="invalid_configuration",
+            message=str(exc),
+            target_id=target_id,
+            slice_id=str(slice_row["id"]),
+        )
 
     execute_owner_chain_enabled = (
         config_execute_owner_chain
@@ -1198,131 +1257,189 @@ def main(argv: Sequence[str] | None = None) -> int:
             else parse_stop_on_owners(args.stop_on_owner)
         )
     except RuntimeError as exc:
-        print(str(exc), file=sys.stderr)
-        return 2
+        return emit_failure_response(
+            args=args,
+            event_log_path=event_log_path,
+            reason_code="invalid_configuration",
+            message=str(exc),
+            target_id=target_id,
+            slice_id=str(slice_row["id"]),
+        )
 
-    owner_chain: Optional[dict[str, Any]] = None
-    terminal_automation: Optional[TerminalAutomationResult] = None
-    worktree_ownership, dirty_paths = compute_worktree_ownership(repo_root, prior_checkpoint)
-    if execute_owner_chain_enabled:
-        route, steps, stop_reason = execute_owner_chain(
+    try:
+        owner_chain: Optional[dict[str, Any]] = None
+        terminal_automation: Optional[TerminalAutomationResult] = None
+        worktree_ownership, dirty_paths = compute_worktree_ownership(repo_root, prior_checkpoint)
+        if execute_owner_chain_enabled:
+            route, steps, stop_reason = execute_owner_chain(
+                rows,
+                slice_row,
+                execution_module=execution_module,
+                scope_context=scope_context,
+                target_type=target_type,
+                target_id=target_id,
+                repo_root=repo_root,
+                worktree_ownership=worktree_ownership,
+                stop_on_owner=stop_on_owner,
+                continuation_policy=continuation_policy,
+            )
+            owner_chain = {
+                "enabled": True,
+                "stop_on_owner": stop_on_owner,
+                "steps": steps,
+                "stop_reason": normalize_stop_reason(stop_reason),
+            }
+        else:
+            route = build_route(
+                slice_row,
+                target_type=target_type,
+                target_id=target_id,
+                repo_root=repo_root,
+                worktree_ownership=worktree_ownership,
+                owner_chain_mode=False,
+            )
+
+        (
             rows,
             slice_row,
+            route,
+            worktree_ownership,
+            dirty_paths,
+            terminal_automation,
+        ) = apply_terminal_automation(
+            route=route,
+            rows=rows,
+            slice_row=slice_row,
             execution_module=execution_module,
             scope_context=scope_context,
-            target_type=target_type,
-            target_id=target_id,
             repo_root=repo_root,
             worktree_ownership=worktree_ownership,
-            stop_on_owner=stop_on_owner,
+            dirty_paths=dirty_paths,
+            terminal_config=terminal_config,
             continuation_policy=continuation_policy,
         )
-        owner_chain = {
-            "enabled": True,
-            "stop_on_owner": stop_on_owner,
-            "steps": steps,
-            "stop_reason": normalize_stop_reason(stop_reason),
-        }
-    else:
-        route = build_route(
-            slice_row,
-            target_type=target_type,
-            target_id=target_id,
-            repo_root=repo_root,
-            worktree_ownership=worktree_ownership,
-            owner_chain_mode=False,
-        )
 
-    (
-        rows,
-        slice_row,
-        route,
-        worktree_ownership,
-        dirty_paths,
-        terminal_automation,
-    ) = apply_terminal_automation(
-        route=route,
-        rows=rows,
-        slice_row=slice_row,
-        execution_module=execution_module,
-        scope_context=scope_context,
-        repo_root=repo_root,
-        worktree_ownership=worktree_ownership,
-        dirty_paths=dirty_paths,
-        terminal_config=terminal_config,
-        continuation_policy=continuation_policy,
-    )
+        checkpoint_stale_reason = None
+        if prior_checkpoint is not None:
+            prior_slice_status = str(prior_checkpoint.payload.get("slice_status") or "")
+            if prior_slice_status and prior_slice_status != route.slice_status:
+                checkpoint_stale_reason = (
+                    f"slice status changed from {prior_slice_status} to {route.slice_status}"
+                )
+                mark_checkpoint_stale(checkpoint_path, checkpoint_stale_reason)
 
-    checkpoint_stale_reason = None
-    if prior_checkpoint is not None:
-        prior_slice_status = str(prior_checkpoint.payload.get("slice_status") or "")
-        if prior_slice_status and prior_slice_status != route.slice_status:
-            checkpoint_stale_reason = (
-                f"slice status changed from {prior_slice_status} to {route.slice_status}"
+        learnings = [
+            record.to_dict()
+            for record in query_learnings(
+                learnings_path,
+                scope=target_id,
+                states=("active", "candidate"),
             )
-            mark_checkpoint_stale(checkpoint_path, checkpoint_stale_reason)
-
-    learnings = [
-        record.to_dict()
-        for record in query_learnings(
-            learnings_path,
-            scope=target_id,
-            states=("active", "candidate"),
+        ]
+        write_runtime_records(
+            checkpoint_path=checkpoint_path,
+            event_log_path=event_log_path,
+            route=route,
+            dirty_paths=dirty_paths,
+            worktree_ownership=worktree_ownership,
+            learnings=learnings,
+            owner_chain=owner_chain,
+            terminal_automation=terminal_automation,
         )
-    ]
-    write_runtime_records(
-        checkpoint_path=checkpoint_path,
-        event_log_path=event_log_path,
-        route=route,
-        dirty_paths=dirty_paths,
-        worktree_ownership=worktree_ownership,
-        learnings=learnings,
-        owner_chain=owner_chain,
-        terminal_automation=terminal_automation,
-    )
 
-    payload = {
-        "run_id": "ship-slice-active",
-        "slice_id": route.slice_id,
-        "slice_path": route.slice_path,
-        "slice_status": route.slice_status,
-        "next_owner": route.next_owner,
-        "action": route.action,
-        "target_type": route.target_type,
-        "target_id": route.target_id,
-        "handoff_payload": route.handoff_payload,
-        "execute_owner_chain": execute_owner_chain_enabled,
-        "owner_chain": owner_chain,
-        "checkpoint_path": str(checkpoint_path),
-        "event_log_path": str(event_log_path),
-        "dirty_worktree_paths": dirty_paths,
-        "worktree_ownership": worktree_ownership.to_dict(),
-        "terminal_automation": (
-            terminal_automation.to_dict() if terminal_automation is not None else None
-        ),
-        "learnings": learnings,
-        "checkpoint_stale_reason": checkpoint_stale_reason,
-        "readiness": build_readiness_payload(
+        readiness = build_readiness_payload(
             route=route,
             owner_chain=owner_chain,
             worktree_ownership=worktree_ownership,
             terminal_automation=terminal_automation,
-        ),
-    }
-    if args.json:
-        print(json.dumps(payload, indent=2, sort_keys=True))
-    else:
-        print(
-            "\n".join(
-                [
-                    f"Slice: {route.slice_id}",
-                    f"Status: {route.slice_status}",
-                    f"Next owner: {route.next_owner}",
-                    f"Action: {route.action}",
-                ]
-            )
         )
-    return 0
+        failure_context = (
+            record_failure_for_stop_reason(
+                event_log_path,
+                skill="ship-slice",
+                stage="execution",
+                stop_reason=owner_chain.get("stop_reason") if owner_chain is not None else None,
+                target_id=target_id,
+                slice_id=route.slice_id,
+                next_owner=route.next_owner,
+            )
+            if owner_chain is not None
+            else None
+        )
+        if failure_context is None and terminal_automation is not None:
+            failure_context = record_failure_for_stop_reason(
+                event_log_path,
+                skill="ship-slice",
+                stage="execution",
+                stop_reason=terminal_automation.stop_reason,
+                target_id=target_id,
+                slice_id=route.slice_id,
+                next_owner=route.next_owner,
+            )
+        if failure_context is None and is_failure_reason(
+            readiness.get("stop_reason", {}).get("kind")
+            if isinstance(readiness.get("stop_reason"), dict)
+            else None
+        ):
+            failure_context = record_failure_for_stop_reason(
+                event_log_path,
+                skill="ship-slice",
+                stage="execution",
+                stop_reason=readiness.get("stop_reason"),
+                target_id=target_id,
+                slice_id=route.slice_id,
+                next_owner=route.next_owner,
+            )
+
+        payload = {
+            "run_id": "ship-slice-active",
+            "slice_id": route.slice_id,
+            "slice_path": route.slice_path,
+            "slice_status": route.slice_status,
+            "next_owner": route.next_owner,
+            "action": route.action,
+            "target_type": route.target_type,
+            "target_id": route.target_id,
+            "handoff_payload": route.handoff_payload,
+            "execute_owner_chain": execute_owner_chain_enabled,
+            "owner_chain": owner_chain,
+            "checkpoint_path": str(checkpoint_path),
+            "event_log_path": str(event_log_path),
+            "dirty_worktree_paths": dirty_paths,
+            "failure_context": (
+                failure_context.to_dict() if failure_context is not None else None
+            ),
+            "worktree_ownership": worktree_ownership.to_dict(),
+            "terminal_automation": (
+                terminal_automation.to_dict() if terminal_automation is not None else None
+            ),
+            "learnings": learnings,
+            "checkpoint_stale_reason": checkpoint_stale_reason,
+            "readiness": readiness,
+        }
+        if args.json:
+            print(json.dumps(payload, indent=2, sort_keys=True))
+        else:
+            print(
+                "\n".join(
+                    [
+                        f"Slice: {route.slice_id}",
+                        f"Status: {route.slice_status}",
+                        f"Next owner: {route.next_owner}",
+                        f"Action: {route.action}",
+                    ]
+                )
+            )
+        return 0
+    except RuntimeError as exc:
+        return emit_failure_response(
+            args=args,
+            event_log_path=event_log_path,
+            reason_code="runtime_error",
+            message=str(exc),
+            target_id=target_id,
+            slice_id=str(slice_row["id"]),
+        )
 
 
 if __name__ == "__main__":

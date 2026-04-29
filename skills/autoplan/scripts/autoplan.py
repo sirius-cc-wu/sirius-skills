@@ -36,6 +36,9 @@ from workflow_runtime import (  # noqa: E402
     mark_checkpoint_stale,
     normalize_stop_reason,
     query_learnings,
+    record_failure,
+    record_failure_for_stop_reason,
+    render_failure_summary,
     write_planning_approval_record,
     write_checkpoint,
 )
@@ -139,6 +142,47 @@ def runtime_paths(repo_root: Path) -> tuple[Path, Path, Path]:
     event_log_path = runtime_dir / "execution-log.jsonl"
     learnings_path = repo_root / DEFAULT_LEARNINGS_PATH
     return checkpoint_path, event_log_path, learnings_path
+
+
+def emit_failure_response(
+    *,
+    args: argparse.Namespace,
+    event_log_path: Path,
+    reason_code: str,
+    message: str,
+    target_id: str = "",
+    next_owner: str = "",
+    owner: str = "",
+    evidence_refs: Sequence[str] | None = None,
+) -> int:
+    context = record_failure(
+        event_log_path,
+        skill="autoplan",
+        stage="planning",
+        reason_code=reason_code,
+        message=message,
+        target_id=target_id,
+        next_owner=next_owner,
+        owner=owner,
+        evidence_refs=evidence_refs,
+    )
+    if args.json:
+        print(
+            json.dumps(
+                {
+                    "event_log_path": str(event_log_path),
+                    "failure_context": context.to_dict(),
+                    "ok": False,
+                    "skill": "autoplan",
+                    "stage": "planning",
+                    "target_id": target_id,
+                },
+                indent=2,
+                sort_keys=True,
+            )
+        )
+    print(render_failure_summary(context), file=sys.stderr)
+    return 2
 
 
 def read_dirty_worktree_paths(repo_root: Path) -> list[str]:
@@ -489,8 +533,13 @@ def main(argv: Sequence[str] | None = None) -> int:
             args, checkpoint_path, planning_module
         )
     except RuntimeError as exc:
-        print(str(exc), file=sys.stderr)
-        return 2
+        return emit_failure_response(
+            args=args,
+            event_log_path=event_log_path,
+            reason_code="resolution_failed",
+            message=str(exc),
+            target_id=args.target or "",
+        )
 
     raw_config = planning_module.load_raw_config(required=False, scope_context=scope_context)
     accelerators = raw_config.get("accelerators", {}) if isinstance(raw_config, dict) else {}
@@ -510,8 +559,13 @@ def main(argv: Sequence[str] | None = None) -> int:
             autoplan_config.get("review_note") if isinstance(autoplan_config, dict) else None
         )
     except RuntimeError as exc:
-        print(str(exc), file=sys.stderr)
-        return 2
+        return emit_failure_response(
+            args=args,
+            event_log_path=event_log_path,
+            reason_code="invalid_configuration",
+            message=str(exc),
+            target_id=str(feature["feature"]),
+        )
 
     execute_owner_chain_enabled = (
         config_execute_owner_chain
@@ -530,142 +584,183 @@ def main(argv: Sequence[str] | None = None) -> int:
             else parse_optional_review_note(args.review_note)
         )
     except RuntimeError as exc:
-        print(str(exc), file=sys.stderr)
-        return 2
+        return emit_failure_response(
+            args=args,
+            event_log_path=event_log_path,
+            reason_code="invalid_configuration",
+            message=str(exc),
+            target_id=str(feature["feature"]),
+        )
 
     target_id = str(feature["feature"])
-    planning_status = str(metadata["status"])
-    owner_chain: Optional[dict[str, Any]] = None
+    try:
+        planning_status = str(metadata["status"])
+        owner_chain: Optional[dict[str, Any]] = None
 
-    if execute_owner_chain_enabled:
-        planning_status, steps, stop_reason = execute_owner_chain(
-            rows,
-            feature,
-            planning_module=planning_module,
-            scope_context=scope_context,
-            stop_on_owner=stop_on_owner,
-            review_note=review_note,
-        )
-        owner_chain = {
-            "enabled": True,
-            "stop_on_owner": stop_on_owner,
-            "steps": steps,
-            "stop_reason": normalize_stop_reason(stop_reason),
-        }
-
-    feature_dir = Path(planning_module.feature_dir_for_row(feature, scope_context=scope_context))
-    metadata = planning_module.read_metadata(str(feature_dir))
-    planning_status = str(metadata["status"])
-
-    if args.approve:
-        if planning_status != "planning_reviewed":
-            print(
-                "Approval can be recorded only when planning status is 'planning_reviewed'. "
-                f"Current status: '{planning_status}'.",
-                file=sys.stderr,
+        if execute_owner_chain_enabled:
+            planning_status, steps, stop_reason = execute_owner_chain(
+                rows,
+                feature,
+                planning_module=planning_module,
+                scope_context=scope_context,
+                stop_on_owner=stop_on_owner,
+                review_note=review_note,
             )
-            return 2
-        write_planning_approval_record(
+            owner_chain = {
+                "enabled": True,
+                "stop_on_owner": stop_on_owner,
+                "steps": steps,
+                "stop_reason": normalize_stop_reason(stop_reason),
+            }
+
+        feature_dir = Path(planning_module.feature_dir_for_row(feature, scope_context=scope_context))
+        metadata = planning_module.read_metadata(str(feature_dir))
+        planning_status = str(metadata["status"])
+
+        if args.approve:
+            if planning_status != "planning_reviewed":
+                return emit_failure_response(
+                    args=args,
+                    event_log_path=event_log_path,
+                    reason_code="invalid_transition",
+                    message=(
+                        "Approval can be recorded only when planning status is "
+                        f"'planning_reviewed'. Current status: '{planning_status}'."
+                    ),
+                    target_id=target_id,
+                    next_owner="approval",
+                )
+            write_planning_approval_record(
+                target_id=target_id,
+                target_path=str(feature["path"]),
+                target_dir=feature_dir,
+                planning_metadata=metadata,
+                approval_note=args.approval_note,
+            )
+
+        approval_gate = evaluate_planning_approval_gate(
             target_id=target_id,
             target_path=str(feature["path"]),
             target_dir=feature_dir,
             planning_metadata=metadata,
-            approval_note=args.approval_note,
         )
+        dirty_worktree_paths = read_dirty_worktree_paths(repo_root)
 
-    approval_gate = evaluate_planning_approval_gate(
-        target_id=target_id,
-        target_path=str(feature["path"]),
-        target_dir=feature_dir,
-        planning_metadata=metadata,
-    )
-    dirty_worktree_paths = read_dirty_worktree_paths(repo_root)
-
-    if planning_status == "planning_reviewed":
-        if str(approval_gate.get("decision") or "") != "approved":
-            next_owner, action = "approval", "approval_required"
-        elif dirty_worktree_paths:
-            next_owner, action = "commit", "commit_planning"
+        if planning_status == "planning_reviewed":
+            if str(approval_gate.get("decision") or "") != "approved":
+                next_owner, action = "approval", "approval_required"
+            elif dirty_worktree_paths:
+                next_owner, action = "commit", "commit_planning"
+            else:
+                next_owner, action = "slice", "bootstrap_slice"
         else:
-            next_owner, action = "slice", "bootstrap_slice"
-    else:
-        next_owner, action = owner_for_status(planning_status)
+            next_owner, action = owner_for_status(planning_status)
 
-    owner_handoff = build_owner_handoff(
-        target_id=target_id,
-        target_path=str(feature["path"]),
-        next_owner=next_owner,
-        execute_owner_chain_enabled=execute_owner_chain_enabled,
-        owner_chain=owner_chain,
-    )
-    checkpoint_stale_reason: Optional[str] = None
-    if prior_checkpoint is not None:
-        prior_status = str(prior_checkpoint.payload.get("planning_status") or "")
-        if prior_status and prior_status != planning_status:
-            checkpoint_stale_reason = (
-                f"planning status changed from {prior_status} to {planning_status}"
-            )
-            mark_checkpoint_stale(checkpoint_path, checkpoint_stale_reason)
-
-    learnings = [
-        record.to_dict()
-        for record in query_learnings(
-            learnings_path,
-            scope=target_id,
-            states=("active", "candidate"),
+        owner_handoff = build_owner_handoff(
+            target_id=target_id,
+            target_path=str(feature["path"]),
+            next_owner=next_owner,
+            execute_owner_chain_enabled=execute_owner_chain_enabled,
+            owner_chain=owner_chain,
         )
-    ]
-    write_runtime_records(
-        checkpoint_path,
-        event_log_path,
-        target_id=target_id,
-        planning_status=planning_status,
-        next_owner=next_owner,
-        action=action,
-        learnings=learnings,
-        auto_decision_policy=auto_decision_policy,
-        owner_chain=owner_chain,
-        owner_handoff=owner_handoff,
-    )
+        checkpoint_stale_reason: Optional[str] = None
+        if prior_checkpoint is not None:
+            prior_status = str(prior_checkpoint.payload.get("planning_status") or "")
+            if prior_status and prior_status != planning_status:
+                checkpoint_stale_reason = (
+                    f"planning status changed from {prior_status} to {planning_status}"
+                )
+                mark_checkpoint_stale(checkpoint_path, checkpoint_stale_reason)
 
-    payload = {
-        "run_id": "autoplan-active",
-        "target_id": target_id,
-        "target_path": str(feature["path"]),
-        "planning_status": planning_status,
-        "next_owner": next_owner,
-        "action": action,
-        "auto_decision_policy": auto_decision_policy,
-        "execute_owner_chain": execute_owner_chain_enabled,
-        "owner_chain": owner_chain,
-        "owner_handoff": owner_handoff,
-        "checkpoint_path": str(checkpoint_path),
-        "event_log_path": str(event_log_path),
-        "learnings": learnings,
-        "checkpoint_stale_reason": checkpoint_stale_reason,
-        "approval_gate": approval_gate,
-        "dirty_worktree_paths": dirty_worktree_paths,
-        "readiness": build_readiness_payload(
+        learnings = [
+            record.to_dict()
+            for record in query_learnings(
+                learnings_path,
+                scope=target_id,
+                states=("active", "candidate"),
+            )
+        ]
+        write_runtime_records(
+            checkpoint_path,
+            event_log_path,
+            target_id=target_id,
+            planning_status=planning_status,
+            next_owner=next_owner,
+            action=action,
+            learnings=learnings,
+            auto_decision_policy=auto_decision_policy,
+            owner_chain=owner_chain,
+            owner_handoff=owner_handoff,
+        )
+
+        readiness = build_readiness_payload(
             next_owner=next_owner,
             approval_gate=approval_gate,
             dirty_worktree_paths=dirty_worktree_paths,
             owner_chain=owner_chain,
-        ),
-    }
-    if args.json:
-        print(json.dumps(payload, indent=2, sort_keys=True))
-    else:
-        print(
-            "\n".join(
-                [
-                    f"Target: {target_id}",
-                    f"Planning status: {planning_status}",
-                    f"Next owner: {next_owner}",
-                    f"Action: {action}",
-                ]
-            )
         )
-    return 0
+        failure_context = (
+            record_failure_for_stop_reason(
+                event_log_path,
+                skill="autoplan",
+                stage="planning",
+                stop_reason=owner_chain.get("stop_reason") if owner_chain is not None else None,
+                target_id=target_id,
+                next_owner=next_owner,
+                evidence_refs=(
+                    owner_handoff.get("missing_files")
+                    if isinstance(owner_handoff, dict)
+                    else None
+                ),
+            )
+            if owner_chain is not None
+            else None
+        )
+
+        payload = {
+            "run_id": "autoplan-active",
+            "target_id": target_id,
+            "target_path": str(feature["path"]),
+            "planning_status": planning_status,
+            "next_owner": next_owner,
+            "action": action,
+            "auto_decision_policy": auto_decision_policy,
+            "execute_owner_chain": execute_owner_chain_enabled,
+            "owner_chain": owner_chain,
+            "owner_handoff": owner_handoff,
+            "checkpoint_path": str(checkpoint_path),
+            "event_log_path": str(event_log_path),
+            "failure_context": (
+                failure_context.to_dict() if failure_context is not None else None
+            ),
+            "learnings": learnings,
+            "checkpoint_stale_reason": checkpoint_stale_reason,
+            "approval_gate": approval_gate,
+            "dirty_worktree_paths": dirty_worktree_paths,
+            "readiness": readiness,
+        }
+        if args.json:
+            print(json.dumps(payload, indent=2, sort_keys=True))
+        else:
+            print(
+                "\n".join(
+                    [
+                        f"Target: {target_id}",
+                        f"Planning status: {planning_status}",
+                        f"Next owner: {next_owner}",
+                        f"Action: {action}",
+                    ]
+                )
+            )
+        return 0
+    except RuntimeError as exc:
+        return emit_failure_response(
+            args=args,
+            event_log_path=event_log_path,
+            reason_code="runtime_error",
+            message=str(exc),
+            target_id=target_id,
+        )
 
 
 if __name__ == "__main__":

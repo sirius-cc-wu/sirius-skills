@@ -1,5 +1,13 @@
 from workflow_runtime.checkpoints import CheckpointRecord, load_checkpoint, mark_checkpoint_stale, write_checkpoint
 from workflow_runtime.event_log import append_event, read_events
+from workflow_runtime.failures import (
+    FailureContext,
+    build_failure_context,
+    is_failure_reason,
+    record_failure,
+    record_failure_for_stop_reason,
+    render_failure_summary,
+)
 from workflow_runtime.handoff import HandoffPayload, read_handoff_payload, write_handoff_payload
 from workflow_runtime.learnings import (
     LearningRecord,
@@ -27,16 +35,19 @@ from workflow_runtime.planning_approval import (
 
 __all__ = [
     "CheckpointRecord",
+    "FailureContext",
     "HandoffPayload",
     "LearningRecord",
     "append_event",
     "append_learning",
+    "build_failure_context",
     "build_accelerator_readiness",
     "classify_stop_reason_from_message",
     "compute_planning_fingerprint",
     "detect_scope_spillover",
     "dedupe_reason_codes",
     "evaluate_planning_approval_gate",
+    "is_failure_reason",
     "load_checkpoint",
     "locked_file",
     "mark_checkpoint_stale",
@@ -47,6 +58,9 @@ __all__ = [
     "read_events",
     "read_handoff_payload",
     "read_learnings",
+    "record_failure",
+    "record_failure_for_stop_reason",
+    "render_failure_summary",
     "snapshot_dirty_worktree",
     "update_learning_state",
     "approval_gate_path",

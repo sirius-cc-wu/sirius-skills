@@ -11,16 +11,19 @@ if str(LIB_DIR) not in sys.path:
 
 from workflow_runtime import (
     CheckpointRecord,
+    FailureContext,
     HandoffPayload,
     LearningRecord,
     append_event,
     append_learning,
     detect_scope_spillover,
+    is_failure_reason,
     load_checkpoint,
     mark_checkpoint_stale,
     query_learnings,
     read_events,
     read_handoff_payload,
+    record_failure,
     snapshot_dirty_worktree,
     update_learning_state,
     write_checkpoint,
@@ -95,6 +98,33 @@ def test_learning_queries_and_state_updates(tmp_path: Path) -> None:
     updated = update_learning_state(path, "L001", "active")
     assert updated.state == "active"
     assert [record.state for record in query_learnings(path, states=["active"])] == ["active"]
+
+
+def test_record_failure_appends_failure_event_with_suggestions(tmp_path: Path) -> None:
+    path = tmp_path / "execution-log.jsonl"
+
+    context = record_failure(
+        path,
+        skill="autoplan",
+        stage="planning",
+        reason_code="missing_required_input",
+        message="discover.md is missing",
+        target_id="throughput-acceleration-workflow",
+        next_owner="discover",
+        evidence_refs=["discover.md"],
+    )
+
+    assert isinstance(context, FailureContext)
+    assert context.reason_code == "missing_required_input"
+    assert context.logged_to == str(path)
+    assert context.recovery_suggestions
+    assert context.improvement_suggestions
+    assert is_failure_reason(context.reason_code) is True
+    events = read_events(path)
+    assert events[-1]["event"] == "failure"
+    assert events[-1]["reason_code"] == "missing_required_input"
+    assert events[-1]["target_id"] == "throughput-acceleration-workflow"
+    assert events[-1]["recovery_suggestions"]
 
 
 def test_detect_scope_spillover_reports_changes_outside_allowed_paths() -> None:

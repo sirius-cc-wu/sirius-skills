@@ -107,6 +107,14 @@ def run_cli(repo_root: Path, *args: str) -> subprocess.CompletedProcess[str]:
     )
 
 
+def read_jsonl(path: Path) -> list[dict[str, Any]]:
+    return [
+        json.loads(line)
+        for line in path.read_text(encoding="utf-8").splitlines()
+        if line.strip()
+    ]
+
+
 def read_git_status(root: Path) -> list[str]:
     result = subprocess.run(
         ["git", "status", "--short"],
@@ -309,8 +317,14 @@ def test_ship_slice_owner_chain_reports_missing_required_input(
     assert payload["slice_status"] == "brief_ready"
     assert payload["next_owner"] == "blueprint"
     assert payload["owner_chain"]["stop_reason"]["kind"] == "missing_required_input"
+    assert payload["failure_context"]["reason_code"] == "missing_required_input"
+    assert payload["failure_context"]["recovery_suggestions"]
     assert payload["readiness"]["can_proceed"] is False
     assert payload["readiness"]["blocked_by"] == ["missing_required_input"]
+    events = read_jsonl(Path(payload["event_log_path"]))
+    assert events[-1]["event"] == "failure"
+    assert events[-1]["reason_code"] == "missing_required_input"
+    assert events[-1]["slice_id"] == "taw-ship-slice-loop"
 
 
 def test_ship_slice_owner_chain_reports_commit_checkpoint(
@@ -552,6 +566,12 @@ def test_ship_slice_rejects_auto_commit_without_auto_close(
 
     assert result.returncode == 2
     assert "auto_commit requires auto_close" in result.stderr
+    payload = json.loads(result.stdout)
+    assert payload["ok"] is False
+    assert payload["failure_context"]["reason_code"] == "invalid_configuration"
+    events = read_jsonl(Path(payload["event_log_path"]))
+    assert events[-1]["event"] == "failure"
+    assert events[-1]["reason_code"] == "invalid_configuration"
 
 
 def test_ship_slice_terminal_automation_formats_closes_and_commits_owned_changes(

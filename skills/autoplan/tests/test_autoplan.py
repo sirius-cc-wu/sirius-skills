@@ -109,6 +109,14 @@ def run_cli(repo_root: Path, *args: str) -> subprocess.CompletedProcess[str]:
     )
 
 
+def read_jsonl(path: Path) -> list[dict[str, Any]]:
+    return [
+        json.loads(line)
+        for line in path.read_text(encoding="utf-8").splitlines()
+        if line.strip()
+    ]
+
+
 def commit_all(repo_root: Path, message: str = "checkpoint") -> None:
     subprocess.run(["git", "add", "-A"], cwd=repo_root, check=True)
     subprocess.run(["git", "commit", "--quiet", "-m", message], cwd=repo_root, check=True)
@@ -257,9 +265,15 @@ def test_autoplan_owner_chain_reports_missing_required_input(tmp_path: Path, mon
         "missing_files": ["discover.md"],
         "bootstrap_commands": [],
     }
+    assert payload["failure_context"]["reason_code"] == "missing_required_input"
+    assert payload["failure_context"]["recovery_suggestions"]
     assert payload["readiness"]["can_proceed"] is False
     assert payload["readiness"]["blocked_by"] == ["missing_required_input"]
     assert payload["owner_chain"]["steps"][0]["advanced"] is False
+    events = read_jsonl(Path(payload["event_log_path"]))
+    assert events[-1]["event"] == "failure"
+    assert events[-1]["reason_code"] == "missing_required_input"
+    assert events[-1]["target_id"] == "throughput-acceleration-workflow"
 
 
 def test_autoplan_owner_chain_suggests_breakdown_scaffold_handoff(
@@ -395,3 +409,23 @@ def test_autoplan_invalidates_stale_approval_after_planning_changes(
     assert payload["approval_gate"]["reason"] == "planning_artifacts_changed"
     assert payload["readiness"]["blocked_by"] == ["approval_required"]
     assert payload["readiness"]["approval_gate"]["state"] == "invalidated"
+
+
+def test_autoplan_invalid_configuration_logs_failure_context(
+    tmp_path: Path, monkeypatch
+) -> None:
+    init_git_repo(tmp_path)
+    write_planning_config(tmp_path, autoplan_overrides={"stop_on_owner": [123]})
+    create_feature(tmp_path, monkeypatch, "discovery_pending")
+
+    result = run_cli(tmp_path, "throughput-acceleration-workflow", "--json")
+
+    assert result.returncode == 2
+    assert "stop_on_owner entries must be strings" in result.stderr
+    payload = json.loads(result.stdout)
+    assert payload["ok"] is False
+    assert payload["failure_context"]["reason_code"] == "invalid_configuration"
+    assert payload["failure_context"]["improvement_suggestions"]
+    events = read_jsonl(Path(payload["event_log_path"]))
+    assert events[-1]["event"] == "failure"
+    assert events[-1]["reason_code"] == "invalid_configuration"

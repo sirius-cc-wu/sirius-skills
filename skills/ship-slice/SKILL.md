@@ -26,6 +26,8 @@ current state with checkpointed runtime context.
 8. Emit a `readiness` summary in JSON output (`can_proceed`, `blocked_by`,
    `stop_reason`, approval/commit gate state) so `ship` and dashboards can
    read one-slice acceleration status without parsing owner-chain internals.
+9. Log failure events in the runtime log with recovery and improvement
+   suggestions when `ship-slice` exits non-zero or hits a failure stop reason.
 
 ## Tooling
 
@@ -89,6 +91,8 @@ Terminal automation notes:
   failures, explicit owner stops, formatter spillover, owned-file conflicts,
   partial-success commit failures, and commit checkpoints, plus policy action
   metadata in readiness output.
+- Keep raw failure incidents in runtime logs; promote only durable patterns into
+  curated learnings later.
 - Keep approval, owned-file conflicts, formatter spillover, and verification
   failures as hard stops regardless of continuation policy.
 - Do not format or stage unrelated dirty files outside the owned file set.

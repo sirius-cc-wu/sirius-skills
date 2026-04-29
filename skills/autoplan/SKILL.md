@@ -23,6 +23,8 @@ stack with checkpointed resume support.
 8. Emit a `readiness` summary in JSON output (`can_proceed`, `blocked_by`,
    `stop_reason`, approval/commit gate state) so upstream orchestrators can
    detect whether autoplan can continue automatically.
+9. Log failure events in the runtime log with recovery and improvement
+   suggestions when `autoplan` exits non-zero or stops on a failure boundary.
 
 ## Tooling
 
@@ -106,6 +108,8 @@ skills.
 - Keep planning transitions owned by planning-layer validation and metadata.
 - Stop with structured context when owner-chain boundaries are hit (explicit
    stop owner, missing required input, validation failure, or approval).
+- Keep raw failure incidents in runtime logs; use durable learnings only for
+  curated patterns worth keeping.
 - Do not stop just because `autoplan.py` reported `missing_required_input` for
   the next automatable owner; if `owner_handoff.should_invoke_skill` is true,
   that owner is expected to create or repair the missing artifacts.
