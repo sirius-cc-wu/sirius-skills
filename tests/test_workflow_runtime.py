@@ -14,6 +14,7 @@ from workflow_runtime import (
     FailureContext,
     HandoffPayload,
     LearningRecord,
+    RequestHandoffRecord,
     append_event,
     append_learning,
     detect_scope_spillover,
@@ -23,11 +24,13 @@ from workflow_runtime import (
     query_learnings,
     read_events,
     read_handoff_payload,
+    read_request_handoff,
     record_failure,
     snapshot_dirty_worktree,
     update_learning_state,
     write_checkpoint,
     write_handoff_payload,
+    write_request_handoff,
 )
 
 
@@ -47,6 +50,30 @@ def test_handoff_payload_round_trip(tmp_path: Path) -> None:
     write_handoff_payload(path, payload)
 
     loaded = read_handoff_payload(path)
+    assert loaded == payload
+
+
+def test_request_handoff_round_trip(tmp_path: Path) -> None:
+    path = tmp_path / "request-handoff.json"
+    payload = RequestHandoffRecord(
+        request_id="autoplan:throughput-acceleration-workflow",
+        source_skill="autoplan",
+        target_id="throughput-acceleration-workflow",
+        target_path="docs/features/throughput-acceleration-workflow/",
+        route_decision="open_or_continue_subfeature",
+        next_owner="guide-planning",
+        action="resolve_follow_on_delta",
+        updated_at="2026-04-29T09:00:00Z",
+        classification="follow_on_delta",
+        planning_status="implemented",
+        reason="Parent feature is already implemented; follow-on work should open a subfeature.",
+        evidence_refs=["src/runtime/mod.rs", "docs/features/throughput-acceleration-workflow/"],
+        open_questions=["Which subfeature slug should own the follow-on fix?"],
+    )
+
+    write_request_handoff(path, payload)
+
+    loaded = read_request_handoff(path)
     assert loaded == payload
 
 

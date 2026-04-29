@@ -34,6 +34,10 @@ Route from `guide-scope` using these rules:
 
 - If the next work is feature planning, proposal management, promotion,
   discovery, design, breakdown, or slice bootstrap, route to `guide-planning`.
+- If the user is reporting a new issue, regression, or follow-on capability for
+  an existing implemented feature, route to `guide-planning` so it can decide
+  whether `add-subfeature` is required; do not jump straight to archive or
+  treat the existing packet as the active execution scope automatically.
 - If an execution slice already exists or execution-layer readiness is the next
   question, route to `guide-execution`.
 - If the request is to initialize or update `.skills/` configuration for the
@@ -51,6 +55,8 @@ planning or execution, `guide-scope` is optional and direct entry through
   fallback rules already implemented by repository tooling.
 - Surface candidate scopes or ask for an explicit scope path when ambiguity
   matters.
+- Prefer planning-layer routing over archive/execution shortcuts when the same
+  feature is already shipped but the current request is new delta work.
 - Do not mutate planning metadata, slice metadata, or config files directly
   unless the downstream routed skill owns that work.
 - Do not replace `guide-planning`, `guide-execution`, or `bootstrap`; route into
@@ -73,9 +79,12 @@ guide-scope -> bootstrap
    inside the repository.
 3. When slug-only lookups or nested-scope context make the target ambiguous,
    stop and ask the user to choose the scope explicitly.
-4. Keep scope labels relative to the repository root so downstream handoffs stay
+4. If the request is a follow-on fix or missing behavior report for shipped work,
+   route into planning so downstream skills can open subfeature-scoped delta work
+   instead of defaulting to archive or stale execution state.
+5. Keep scope labels relative to the repository root so downstream handoffs stay
    readable.
-5. Route into the downstream skill without changing its lifecycle ownership.
+6. Route into the downstream skill without changing its lifecycle ownership.
 
 ## Tooling
 

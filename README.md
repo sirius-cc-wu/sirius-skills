@@ -83,6 +83,12 @@ to drive planning to review-ready state, rerun `autoplan --approve` after
 explicit human approval so it can hand off the planning commit checkpoint, then
 use `ship --resume` once the approved planning artifacts are committed.
 
+Shared runtime state under `.skills/runtime/` is the cross-agent transient
+handoff surface. Keep durable feature/subfeature truth in repo planning docs,
+but use structured runtime files such as checkpoints, event logs, and
+`request-handoff.json` for resumable request-level routing that should not
+depend on one agent's private scratch plan.
+
 ## Shared skill references
 
 Some guidance is kept as a canonical shared reference under `docs/shared/` and

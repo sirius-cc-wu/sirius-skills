@@ -16,6 +16,7 @@ Use this skill as the planning-layer canonical entrypoint when you need to decid
 5. Persist planning readiness state when a phase is complete.
 6. Keep planning handoff decisions durable in the repository instead of transient chat state.
 7. When planning surface is consolidated, keep one canonical planning route and treat superseded surfaces as historical context instead of parallel entrypoints.
+8. Treat new issues against implemented or archived features as follow-on delta work, not as a reason to mutate or archive the old packet in place.
 
 ## Entry Decision Guide
 
@@ -25,9 +26,11 @@ Use `guide-planning` when you need to decide the next planning step before slice
 - If the work is still speculative, exploratory, or not yet accepted as a canonical feature, route to `propose`.
 - If the user wants an accepted proposal promoted into canonical planning, perform that promotion here and then route to `discover`.
 - If the request adds or reshapes a durable child capability under an existing feature, route to `add-subfeature`.
+- If the user reports a bug, regression, missing behavior, or concrete runtime failure against an existing canonical feature, especially one already marked `implemented` or already archived, treat that as follow-on delta work and route to `add-subfeature` before editing the old packet further.
 - If an active subfeature exists and the parent-feature impact is not yet explicit, route to `assess`.
 - If the user explicitly asks for reference-project research or wiki synthesis, if the target overlaps checked-in `references/` patterns and has no durable `reference-research.md` yet, or if discovery/design depends on choosing between multiple upstream patterns, route to `research`.
 - If the work is a small repo-local change whose shape does not depend on upstream comparison, skip `research` and continue directly into the normal planning path.
+- If the user supplied a concrete error message, failing command, or missing runtime path, verify the current code/runtime seam first before deciding the request is only a planning-doc update.
 - If the problem, outcomes, or constraints are still being framed, route to `discover`.
 - If the architecture, interfaces, or validation strategy are still unresolved, route to `design`.
 - If UI or interaction flow remains material, route to `ui-flow`.
@@ -51,6 +54,8 @@ Use `guide-planning` when you need to decide the next planning step before slice
 - Treat planning commits as the durable checkpoint between planning and execution.
 - Keep any normalized `consolidation` summary in the existing planning or
   subfeature metadata instead of introducing a second planning sidecar.
+- Do not treat an implemented or archived feature packet as the active home for new delta work; open or continue a subfeature instead.
+- Do not suggest `archive-artifacts` as the next step while handling a newly reported fix or follow-on capability request for the same feature.
 - When reviewed planning narrows or supersedes older workflow surface, route
   maintainers through this entrypoint and describe older surfaces as
   historical, migration-only, or archival context unless an explicit
@@ -86,7 +91,9 @@ Use adjacent transitions by default and repair skipped states only deliberately.
 4. Resolve the active feature using tooling or a user-provided slug/path.
 5. Confirm the folder represents one coherent feature or capability.
 6. Check optional `reference-research.md`, `discover.md`, `system-design.md`, optional `ui-design.md`, `slice-planning.md`, `slice-traceability.md`, and `.planning-meta.json` as appropriate for the current state.
-7. When the packet materially reshapes existing workflow surface, confirm any
+7. If the target feature is already `implemented`, has archived slices, or the request is framed as a new bugfix/follow-on issue, decide first whether the right durable target is a new or existing subfeature rather than in-place edits to the parent packet.
+8. When the user provided a concrete runtime failure or missing-path report, inspect the current implementation seam before choosing between subfeature planning, execution handoff, or archival.
+9. When the packet materially reshapes existing workflow surface, confirm any
    durable consolidation summary in metadata matches the planning docs before
    treating the packet as review-ready.
 

@@ -124,6 +124,22 @@ If the request is still speculative, cross-cutting, or not yet accepted as a can
 
 If the request is changing an existing canonical feature instead of starting net-new planning work, route to `add-subfeature` first. That skill creates a feature-local subfeature and keeps the canonical feature folder as the durable source of truth.
 
+Treat bug reports, regressions, and missing-runtime-path issues on an already
+implemented or archived feature as the same kind of follow-on work: verify the
+current seam, then open or continue a subfeature instead of mutating the parent
+packet in place or jumping to archive flow.
+
+When the user provides a concrete failure message, failing command, or missing
+runtime path, check the live implementation before deciding the request is only
+planning drift. If the user wording is ambiguous between "plan this" and "fix
+this now", ask one clarifying question instead of assuming planning-only work.
+
+For cross-agent transient routing state, prefer structured files under
+`.skills/runtime/` over agent-local markdown scratch plans. Keep durable truth
+in feature/subfeature artifacts, but use runtime files such as checkpoints,
+event logs, and `request-handoff.json` when another agent or later run needs to
+pick up the latest request-level route decision.
+
 After a subfeature exists, use `assess` before subfeature-local design when you need an explicit record of affected baseline artifacts, stories, increments, and slices.
 
 Use `research` only when upstream comparison can materially change the planning

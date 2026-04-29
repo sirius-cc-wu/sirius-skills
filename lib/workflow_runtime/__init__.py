@@ -9,6 +9,11 @@ from workflow_runtime.failures import (
     render_failure_summary,
 )
 from workflow_runtime.handoff import HandoffPayload, read_handoff_payload, write_handoff_payload
+from workflow_runtime.request_handoff import (
+    RequestHandoffRecord,
+    read_request_handoff,
+    write_request_handoff,
+)
 from workflow_runtime.learnings import (
     LearningRecord,
     append_learning,
@@ -38,6 +43,7 @@ __all__ = [
     "FailureContext",
     "HandoffPayload",
     "LearningRecord",
+    "RequestHandoffRecord",
     "append_event",
     "append_learning",
     "build_failure_context",
@@ -57,6 +63,7 @@ __all__ = [
     "read_approval_record",
     "read_events",
     "read_handoff_payload",
+    "read_request_handoff",
     "read_learnings",
     "record_failure",
     "record_failure_for_stop_reason",
@@ -66,5 +73,6 @@ __all__ = [
     "approval_gate_path",
     "write_checkpoint",
     "write_handoff_payload",
+    "write_request_handoff",
     "write_planning_approval_record",
 ]

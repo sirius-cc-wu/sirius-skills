@@ -80,3 +80,7 @@ Exit behavior:
   not rely on source or archive path bullets to explain the result.
 - Keep archival explicit and scoped; do not bulk archive across unrelated
   features by default.
+- Do not treat archival as the default next step when the current user request
+  is a new fix, regression, or follow-on capability for the same shipped
+  feature; route that case back to `guide-planning`/`add-subfeature` unless the
+  user explicitly asked to archive anyway.

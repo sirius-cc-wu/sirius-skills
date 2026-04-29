@@ -8,6 +8,10 @@ description: Starts and manages durable subfeatures for an existing feature with
 Use this skill when an existing canonical feature needs a durable child planning
 folder instead of direct in-place edits to the parent feature plan.
 
+This is also the default follow-on path when the parent feature is already
+implemented or archived but the user is reporting a new bug, regression, or
+missing capability on top of that shipped work.
+
 ## Responsibilities
 
 1. Resolve the parent feature planning folder under the repository planning layout.
@@ -40,6 +44,9 @@ folder instead of direct in-place edits to the parent feature plan.
    For `narrowing`, `superseding`, or `replacement` work, declare what existing
    capability, artifact, command path, or validation path is affected and what
    simplification or retirement the child capability is expected to produce.
+   For bugfix or missing-behavior follow-on work, make the current failure and
+   the expected repaired behavior explicit so later planning does not collapse
+   back into the archived parent narrative.
 5. Hand off to `assess`, `design`, `breakdown`, and `review-planning` using the selected subfeature folder.
 
 ## Source of Truth Rules
@@ -79,5 +86,7 @@ python3 skills/add-subfeature/scripts/manage_subfeatures.py validate \
 - Do not treat subfeatures as execution slices.
 - Do not overwrite parent feature docs during subfeature bootstrap.
 - Do not use this skill to create speculative work that should stay under `docs/proposals/`.
+- Do not fold a newly reported fix back into an implemented or archived parent
+  packet without a durable child scope.
 - Do not leave narrowing or superseding intent implicit when the subfeature type
   already indicates that existing workflow surface is being reshaped.

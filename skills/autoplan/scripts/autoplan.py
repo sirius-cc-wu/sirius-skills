@@ -28,6 +28,7 @@ if SKILL_LIB_DIR.is_dir() and str(SKILL_LIB_DIR) not in sys.path:
 
 from workflow_runtime import (  # noqa: E402
     CheckpointRecord,
+    RequestHandoffRecord,
     append_event,
     build_accelerator_readiness,
     classify_stop_reason_from_message,
@@ -41,6 +42,7 @@ from workflow_runtime import (  # noqa: E402
     render_failure_summary,
     write_planning_approval_record,
     write_checkpoint,
+    write_request_handoff,
 )
 
 
@@ -136,12 +138,13 @@ def git_repo_root() -> Path:
     return Path(result.stdout.strip())
 
 
-def runtime_paths(repo_root: Path) -> tuple[Path, Path, Path]:
+def runtime_paths(repo_root: Path) -> tuple[Path, Path, Path, Path]:
     runtime_dir = repo_root / DEFAULT_RUNTIME_DIR
     checkpoint_path = runtime_dir / "checkpoints" / "autoplan-active.json"
     event_log_path = runtime_dir / "execution-log.jsonl"
+    request_handoff_path = runtime_dir / "request-handoff.json"
     learnings_path = repo_root / DEFAULT_LEARNINGS_PATH
-    return checkpoint_path, event_log_path, learnings_path
+    return checkpoint_path, event_log_path, request_handoff_path, learnings_path
 
 
 def emit_failure_response(
@@ -213,6 +216,8 @@ def resolve_target(args: argparse.Namespace, checkpoint_path: Path, planning_mod
 
 
 def owner_for_status(status: str) -> tuple[str, str]:
+    if status == "implemented":
+        return "guide-planning", "resolve_follow_on_delta"
     return STATUS_TO_OWNER.get(status, ("guide-planning", "resolve_planning_state"))
 
 
@@ -468,16 +473,111 @@ def build_owner_handoff(
     }
 
 
+def build_request_handoff_record(
+    *,
+    target_id: str,
+    target_path: str,
+    planning_status: str,
+    next_owner: str,
+    action: str,
+    approval_gate: dict[str, Any],
+    owner_chain: Optional[dict[str, Any]],
+    owner_handoff: Optional[dict[str, Any]],
+) -> RequestHandoffRecord:
+    stop_reason = normalize_stop_reason(
+        owner_chain.get("stop_reason") if isinstance(owner_chain, dict) else None
+    )
+    stop_reason_payload = stop_reason if isinstance(stop_reason, dict) else {}
+    evidence_refs: list[str] = []
+    if isinstance(owner_handoff, dict):
+        missing_files = owner_handoff.get("missing_files")
+        if isinstance(missing_files, list):
+            evidence_refs.extend(
+                item.strip()
+                for item in missing_files
+                if isinstance(item, str) and item.strip()
+            )
+
+    classification = "request_route"
+    route_decision = "continue_planning"
+    summary = None
+    reason = None
+    open_questions: list[str] = []
+
+    if planning_status == "implemented":
+        classification = "follow_on_delta"
+        route_decision = "open_or_continue_subfeature"
+        summary = (
+            "Parent feature is already implemented. New requests on this feature should "
+            "open or continue a subfeature instead of mutating the old packet in place."
+        )
+        reason = (
+            "Implemented planning state is terminal for the parent packet; route back "
+            "through guide-planning so follow-on work can land under add-subfeature."
+        )
+        open_questions.append("Which subfeature should own this follow-on change?")
+    elif next_owner == "approval":
+        classification = "approval_boundary"
+        route_decision = "record_approval"
+        summary = "Planning is review-ready and waiting for explicit approval."
+        reason = str(approval_gate.get("reason") or "approval_not_recorded")
+    elif next_owner == "commit":
+        classification = "commit_checkpoint"
+        route_decision = "commit_planning"
+        summary = "Approved planning is waiting for a commit checkpoint before execution."
+        reason = "dirty_worktree_paths_present"
+    elif next_owner == "slice":
+        classification = "execution_bootstrap"
+        route_decision = "bootstrap_slice"
+        summary = "Planning is approved and committed; execution bootstrap is next."
+        reason = "planning_ready_for_execution"
+    elif isinstance(owner_handoff, dict):
+        classification = "owner_handoff"
+        route_decision = f"invoke_{next_owner}"
+        summary = f"Owner handoff is ready for '{next_owner}'."
+        reason = str(stop_reason_payload.get("kind") or "owner_handoff")
+    elif next_owner == "guide-planning":
+        classification = "planning_resolution"
+        route_decision = "resolve_planning_state"
+        summary = "Planning state needs manual routing before automation can continue."
+        reason = str(stop_reason_payload.get("kind") or "planning_resolution_required")
+    else:
+        classification = "request_route"
+        route_decision = f"invoke_{next_owner}"
+        summary = f"Continue with planning owner '{next_owner}'."
+        reason = str(stop_reason_payload.get("kind") or action)
+
+    return RequestHandoffRecord(
+        request_id=f"autoplan:{target_id}",
+        source_skill="autoplan",
+        target_id=target_id,
+        target_path=target_path,
+        route_decision=route_decision,
+        next_owner=next_owner,
+        action=action,
+        updated_at=utc_now(),
+        classification=classification,
+        planning_status=planning_status,
+        summary=summary,
+        reason=reason,
+        evidence_refs=evidence_refs,
+        open_questions=open_questions,
+    )
+
+
 def write_runtime_records(
     checkpoint_path: Path,
     event_log_path: Path,
+    request_handoff_path: Path,
     *,
     target_id: str,
+    target_path: str,
     planning_status: str,
     next_owner: str,
     action: str,
     learnings: list[dict[str, Any]],
     auto_decision_policy: str,
+    approval_gate: dict[str, Any],
     owner_chain: Optional[dict[str, Any]],
     owner_handoff: Optional[dict[str, Any]],
 ) -> None:
@@ -499,6 +599,20 @@ def write_runtime_records(
         event["owner_handoff_owner"] = owner_handoff.get("owner")
         event["owner_handoff_kind"] = owner_handoff.get("stop_reason", {}).get("kind")
     append_event(event_log_path, event)
+
+    write_request_handoff(
+        request_handoff_path,
+        build_request_handoff_record(
+            target_id=target_id,
+            target_path=target_path,
+            planning_status=planning_status,
+            next_owner=next_owner,
+            action=action,
+            approval_gate=approval_gate,
+            owner_chain=owner_chain,
+            owner_handoff=owner_handoff,
+        ),
+    )
 
     checkpoint_payload: dict[str, Any] = {
         "target_id": target_id,
@@ -526,7 +640,9 @@ def main(argv: Sequence[str] | None = None) -> int:
     args = parse_args(argv)
     planning_module = load_module(GUIDE_PLANNING_SCRIPT, "manage_planning_for_autoplan")
     repo_root = git_repo_root()
-    checkpoint_path, event_log_path, learnings_path = runtime_paths(repo_root)
+    checkpoint_path, event_log_path, request_handoff_path, learnings_path = runtime_paths(
+        repo_root
+    )
 
     try:
         rows, feature, scope_context, metadata, prior_checkpoint = resolve_target(
@@ -683,12 +799,15 @@ def main(argv: Sequence[str] | None = None) -> int:
         write_runtime_records(
             checkpoint_path,
             event_log_path,
+            request_handoff_path,
             target_id=target_id,
+            target_path=str(feature["path"]),
             planning_status=planning_status,
             next_owner=next_owner,
             action=action,
             learnings=learnings,
             auto_decision_policy=auto_decision_policy,
+            approval_gate=approval_gate,
             owner_chain=owner_chain,
             owner_handoff=owner_handoff,
         )
@@ -730,6 +849,7 @@ def main(argv: Sequence[str] | None = None) -> int:
             "owner_handoff": owner_handoff,
             "checkpoint_path": str(checkpoint_path),
             "event_log_path": str(event_log_path),
+            "request_handoff_path": str(request_handoff_path),
             "failure_context": (
                 failure_context.to_dict() if failure_context is not None else None
             ),

@@ -117,6 +117,10 @@ def read_jsonl(path: Path) -> list[dict[str, Any]]:
     ]
 
 
+def read_json(path: Path) -> dict[str, Any]:
+    return json.loads(path.read_text(encoding="utf-8"))
+
+
 def commit_all(repo_root: Path, message: str = "checkpoint") -> None:
     subprocess.run(["git", "add", "-A"], cwd=repo_root, check=True)
     subprocess.run(["git", "commit", "--quiet", "-m", message], cwd=repo_root, check=True)
@@ -133,6 +137,11 @@ def test_autoplan_routes_discovery_pending_to_discover(tmp_path: Path, monkeypat
     payload = json.loads(result.stdout)
     assert payload["next_owner"] == "discover"
     assert Path(payload["checkpoint_path"]).is_file()
+    request_handoff = Path(payload["request_handoff_path"])
+    assert request_handoff.is_file()
+    handoff_payload = read_json(request_handoff)
+    assert handoff_payload["route_decision"] == "invoke_discover"
+    assert handoff_payload["classification"] == "request_route"
     assert payload["readiness"]["can_proceed"] is True
     assert payload["readiness"]["blocked_by"] == []
     assert payload["readiness"]["approval_gate"]["required"] is False
@@ -167,6 +176,9 @@ def test_autoplan_stops_at_planning_reviewed_boundary(tmp_path: Path, monkeypatc
     assert payload["action"] == "approval_required"
     assert payload["owner_handoff"] is None
     assert payload["approval_gate"]["decision"] == "waiting_approval"
+    handoff_payload = read_json(Path(payload["request_handoff_path"]))
+    assert handoff_payload["classification"] == "approval_boundary"
+    assert handoff_payload["route_decision"] == "record_approval"
     assert payload["approval_gate"]["reason"] == "approval_not_recorded"
     assert payload["readiness"]["can_proceed"] is False
     assert payload["readiness"]["blocked_by"] == ["approval_required"]
@@ -266,6 +278,10 @@ def test_autoplan_owner_chain_reports_missing_required_input(tmp_path: Path, mon
         "bootstrap_commands": [],
     }
     assert payload["failure_context"]["reason_code"] == "missing_required_input"
+    handoff_payload = read_json(Path(payload["request_handoff_path"]))
+    assert handoff_payload["classification"] == "owner_handoff"
+    assert handoff_payload["route_decision"] == "invoke_discover"
+    assert handoff_payload["evidence_refs"] == ["discover.md"]
     assert payload["failure_context"]["recovery_suggestions"]
     assert payload["readiness"]["can_proceed"] is False
     assert payload["readiness"]["blocked_by"] == ["missing_required_input"]
@@ -331,6 +347,42 @@ def test_autoplan_owner_chain_reports_approval_when_already_reviewed(
     assert payload["approval_gate"]["decision"] == "waiting_approval"
     assert payload["readiness"]["can_proceed"] is False
     assert payload["readiness"]["blocked_by"] == ["approval_required"]
+
+
+def test_autoplan_routes_implemented_target_back_to_follow_on_delta_resolution(
+    tmp_path: Path, monkeypatch
+) -> None:
+    init_git_repo(tmp_path)
+    write_planning_config(tmp_path)
+    create_feature(tmp_path, monkeypatch, "planning_reviewed")
+
+    planning = load_module("manage_planning_for_implemented_autoplan_test", PLANNING_SCRIPT)
+    rows = planning.parse_registry()
+    feature = planning.find_feature(rows, "throughput-acceleration-workflow")
+    assert feature is not None
+    ok, message = planning.update_feature_status(
+        rows,
+        feature,
+        "implemented",
+        force=True,
+    )
+    assert ok, message
+
+    result = run_cli(tmp_path, "throughput-acceleration-workflow", "--json")
+
+    assert result.returncode == 0
+    payload = json.loads(result.stdout)
+    assert payload["planning_status"] == "implemented"
+    assert payload["next_owner"] == "guide-planning"
+    assert payload["action"] == "resolve_follow_on_delta"
+    assert payload["readiness"]["blocked_by"] == ["planning_resolution_required"]
+    handoff_payload = read_json(Path(payload["request_handoff_path"]))
+    assert handoff_payload["classification"] == "follow_on_delta"
+    assert handoff_payload["route_decision"] == "open_or_continue_subfeature"
+    assert handoff_payload["next_owner"] == "guide-planning"
+    assert handoff_payload["open_questions"] == [
+        "Which subfeature should own this follow-on change?"
+    ]
 
 
 def test_autoplan_approve_records_gate_and_requires_commit(

@@ -25,6 +25,12 @@ stack with checkpointed resume support.
    detect whether autoplan can continue automatically.
 9. Log failure events in the runtime log with recovery and improvement
    suggestions when `autoplan` exits non-zero or stops on a failure boundary.
+10. Refuse to treat already-implemented planning as the active owner chain when
+    the real request is follow-on delta work for that feature; send that case
+    back through `guide-planning` to open or continue a subfeature.
+11. Write a shared `.skills/runtime/request-handoff.json` summary so another
+    agent can resume from the latest planning route without relying on
+    agent-local scratch plans.
 
 ## Tooling
 
@@ -95,6 +101,22 @@ Optional CLI overrides:
    planning artifacts and durable approval record are committed before execution.
 9. Once approval is valid and the planning commit checkpoint is clear, hand off
    to `slice` or `ship` for execution bootstrap.
+10. If the target is already `implemented` and the user is actually reporting a
+    new fix, regression, or missing behavior on that feature, stop and route
+    back to `guide-planning`/`add-subfeature` instead of resuming the old
+    feature packet or suggesting archive/ship.
+
+## Runtime outputs
+
+`autoplan` writes shared runtime state under `.skills/runtime/`, including:
+
+- `checkpoints/autoplan-active.json`
+- `execution-log.jsonl`
+- `request-handoff.json`
+
+Use `request-handoff.json` for the latest request-level route decision when a
+later agent needs to continue the same planning request without depending on a
+private plan-mode scratch file.
 
 `autoplan.py` remains the checkpointing and readiness source of truth, but the
 skill is responsible for actually chaining into downstream planning-owner
@@ -116,3 +138,6 @@ skills.
 - Keep stop-reason classification and readiness invariants aligned with shared
   accelerator guardrail helpers in `workflow_runtime`.
 - Prefer current planning artifacts over stale checkpoint context.
+- Do not use an `implemented` target as proof that nothing remains to do when
+  the user is describing new delta work; implemented status on the parent
+  feature is a signal to open a follow-on subfeature, not to archive first.

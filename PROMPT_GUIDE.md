@@ -121,6 +121,14 @@ Use `add-subfeature` to create `replace-legacy-flow` under `checkout`.
 Use `assess` for subfeature `replace-legacy-flow` under `checkout`.
 ```
 
+If the feature is already shipped and the user is reporting a new bug,
+regression, or missing path, prefer a prompt that keeps the follow-on route
+explicit:
+
+```text
+Use `guide-planning` for `checkout` and treat this request as follow-on delta work. Verify the reported failure, then open a subfeature instead of editing or archiving the parent packet in place.
+```
+
 ```text
 Use `research` for `docs/features/checkout/subfeatures/replace-legacy-flow/` when upstream reference comparison should be captured durably before discovery or design continues.
 ```
