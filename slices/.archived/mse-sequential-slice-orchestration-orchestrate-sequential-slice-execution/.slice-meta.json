@@ -1,0 +1,12 @@
+{
+  "created_at": "2026-04-14T16:33:28",
+  "updated_at": "2026-05-01T19:39:57",
+  "status": "closed",
+  "slice_id": "mse-sequential-slice-orchestration",
+  "feature": "Orchestrate sequential slice execution",
+  "path": "slices/.archived/mse-sequential-slice-orchestration-orchestrate-sequential-slice-execution/",
+  "relations": [],
+  "closed_at": "2026-04-14T16:33:28",
+  "archived_at": "2026-05-01T19:39:57",
+  "archived_from": "slices/mse-sequential-slice-orchestration-orchestrate-sequential-slice-execution/"
+}

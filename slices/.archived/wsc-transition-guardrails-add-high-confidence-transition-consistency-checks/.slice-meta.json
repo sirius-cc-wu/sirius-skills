@@ -1,0 +1,12 @@
+{
+  "created_at": "2026-04-19T00:41:56",
+  "updated_at": "2026-05-01T19:33:12",
+  "status": "closed",
+  "slice_id": "wsc-transition-guardrails",
+  "feature": "Add high-confidence transition consistency checks",
+  "path": "slices/.archived/wsc-transition-guardrails-add-high-confidence-transition-consistency-checks/",
+  "relations": [],
+  "closed_at": "2026-04-19T00:58:24",
+  "archived_at": "2026-05-01T19:33:12",
+  "archived_from": "slices/wsc-transition-guardrails-add-high-confidence-transition-consistency-checks/"
+}

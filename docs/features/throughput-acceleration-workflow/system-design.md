@@ -506,3 +506,72 @@ orchestrator and does not depend on `ship-slice` for its core responsibility.
 invoked by `ship`. A separate `workflow_runtime` package provides checkpoints,
 event logs, and learnings while leaving planning and execution artifacts as the
 authoritative workflow state.
+
+<!-- archived-slice-summaries:start -->
+## Archived Slice Summaries
+
+<!-- archived-slice-summary:taw-autoplan:start -->
+### `taw-autoplan`: Add high-autonomy planning orchestration
+
+#### Detailed Design Summary
+
+`taw-autoplan` introduces the planning-side accelerator above `guide-planning`. The first version resolves one planning target, reads durable learnings, persists checkpoint and event-log context, reports the next planning owner, and stops explicitly at the approval boundary.
+<!-- archived-slice-summary:taw-autoplan:end -->
+
+<!-- archived-slice-summary:taw-learn-skill:start -->
+### `taw-learn-skill`: Add durable learnings skill
+
+#### Work Item Summary
+
+- **Work Item**: Add an explicit `learn` skill that queries, promotes, and
+- **Source Story / Increment / Slice**: `TAW-04` / `I1` / `taw-learn-skill`
+- **Requested Outcome**: As a repeat user of `sirius-skills`, I want one
+- **Why this matters**: Later accelerator skills are supposed to reuse explicit
+- **Independent Test**: `pytest -q skills/learn/tests/test_learn.py`
+
+#### Detailed Design Summary
+
+`taw-learn-skill` adds the first explicit human-facing owner for repo-scoped workflow learnings. The slice introduces a `learn` skill with `query`, `promote`, and `prune` commands on top of `workflow_runtime.learnings`, wires the shared runtime into packaged installs for the new skill, and updates the managed skill lists and tests that describe available repo skills.
+<!-- archived-slice-summary:taw-learn-skill:end -->
+
+<!-- archived-slice-summary:taw-runtime-foundation:start -->
+### `taw-runtime-foundation`: Add shared accelerator runtime support
+
+#### Work Item Summary
+
+- **Work Item**: Add the shared supplemental runtime package that later
+- **Source Story / Increment / Slice**: `TAW-03` / `I1` /
+- **Requested Outcome**: As a maintainer working across long sessions, I want
+- **Why this matters**: The throughput design depends on supplemental runtime
+- **Independent Test**: `pytest -q tests/test_install_target_modes.py skills/ship/tests/test_ship.py -k runtime`
+
+#### Detailed Design Summary
+
+`taw-runtime-foundation` establishes the shared supplemental runtime layer for future accelerator skills. The slice introduces `lib/workflow_runtime/`, extends packaged runtime syncing so consuming skills can ship that runtime, and adds the baseline tests needed to keep the new runtime explicit and self-contained.
+<!-- archived-slice-summary:taw-runtime-foundation:end -->
+
+<!-- archived-slice-summary:taw-ship-backlog-integration:start -->
+### `taw-ship-backlog-integration`: Integrate backlog delegation from ship to ship-slice
+
+#### Detailed Design Summary
+
+`taw-ship-backlog-integration` makes the one-slice finisher reachable from backlog mode. `ship` stays responsible for backlog traversal, but it can now optionally hand the active slice to `ship-slice` when execution config enables delegation.
+<!-- archived-slice-summary:taw-ship-backlog-integration:end -->
+
+<!-- archived-slice-summary:taw-ship-handoff:start -->
+### `taw-ship-handoff`: Extend ship with machine-readable handoff payloads
+
+#### Detailed Design Summary
+
+`taw-ship-handoff` adds the first explicit machine-readable handoff contract to `ship`. The slice keeps the existing human-facing backlog output and next-owner logic intact while emitting a stable `handoff_payload` derived from the active slice and the planned-slice backlog entry.
+<!-- archived-slice-summary:taw-ship-handoff:end -->
+
+<!-- archived-slice-summary:taw-ship-slice-loop:start -->
+### `taw-ship-slice-loop`: Add one-slice finishing and resume orchestration
+
+#### Detailed Design Summary
+
+`taw-ship-slice-loop` introduces the first explicit `ship-slice` skill. The skill resolves one active slice, reuses the `ship` handoff payload contract, reads durable learnings, writes checkpoint and event-log records, and reports the next owner for the slice without taking over backlog traversal.
+<!-- archived-slice-summary:taw-ship-slice-loop:end -->
+
+<!-- archived-slice-summaries:end -->

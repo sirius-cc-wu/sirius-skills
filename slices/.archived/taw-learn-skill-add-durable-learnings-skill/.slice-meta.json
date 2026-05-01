@@ -1,0 +1,12 @@
+{
+  "created_at": "2026-04-22T10:02:33",
+  "updated_at": "2026-05-01T19:31:39",
+  "status": "closed",
+  "slice_id": "taw-learn-skill",
+  "feature": "Add durable learnings skill",
+  "path": "slices/.archived/taw-learn-skill-add-durable-learnings-skill/",
+  "relations": [],
+  "closed_at": "2026-04-22T10:08:56",
+  "archived_at": "2026-05-01T19:31:39",
+  "archived_from": "slices/taw-learn-skill-add-durable-learnings-skill/"
+}

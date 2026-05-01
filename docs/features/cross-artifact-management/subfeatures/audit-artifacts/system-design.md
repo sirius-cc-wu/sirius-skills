@@ -243,3 +243,53 @@ AuditCli --> Execution
 Execution --> SliceData
 @enduml
 ```
+
+<!-- archived-slice-summaries:start -->
+## Archived Slice Summaries
+
+<!-- archived-slice-summary:aat-cross-artifact-audit:start -->
+### `aat-cross-artifact-audit`: Build the cross-artifact audit command
+
+#### Work Item Summary
+
+- **Work Item**: Add a read-only audit capability for proposals, features,
+- **Source Story / Increment / Slice**: CAM-01 / I1 /
+- **Requested Outcome**: A maintainer can run one audit-oriented capability and
+- **Why this matters**: Durable workflow artifacts are now spread across
+- **Independent Test**: A fixture repo with missing files, registry drift, and
+
+#### Detailed Design Summary
+
+CAM-01 adds a reusable, read-only audit capability for the repository's durable workflow artifacts. The slice should introduce a shared artifact inventory helper under `skills/audit-artifacts/`, reuse the existing owner-script validators for proposals, features, subfeatures, and slices, add cross-artifact registry/link checks, and ship a user-facing `audit-artifacts` skill plus installation/docs wiring.
+
+#### Blueprint Figures
+
+```plantuml
+@startuml
+actor Maintainer
+participant "audit_artifacts.py" as Audit
+participant "artifact_inventory.py" as Inventory
+participant "manage_proposals.py" as Proposals
+participant "manage_planning.py" as Planning
+participant "manage_subfeatures.py" as Subfeatures
+participant "manage_execution.py" as Execution
+
+Maintainer -> Audit: run audit [--artifact-type ...] [--json]
+Audit -> Inventory: build inventory
+Inventory -> Proposals: load proposal registry + metadata roots
+Inventory -> Planning: load planning registry + feature roots
+Inventory -> Subfeatures: load subfeature registry + metadata roots
+Inventory -> Execution: load slice registry + relation metadata roots
+Inventory --> Audit: normalized inventory
+Audit -> Proposals: validate proposal artifacts
+Audit -> Planning: validate canonical feature artifacts
+Audit -> Subfeatures: validate subfeature artifacts
+Audit -> Execution: validate slice artifacts
+Audit -> Execution: audit_relations(...)
+Audit -> Audit: add registry and broken-link findings
+Audit --> Maintainer: text summary or JSON findings
+@enduml
+```
+<!-- archived-slice-summary:aat-cross-artifact-audit:end -->
+
+<!-- archived-slice-summaries:end -->

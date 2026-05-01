@@ -389,3 +389,94 @@ operationally brittle.
 completed features and subfeatures. Its main contribution is not workflow
 automation; it is durable, explicit measurement that later reporting,
 archiving, and workflow-improvement capabilities can trust and reuse.
+
+<!-- archived-slice-summaries:start -->
+## Archived Slice Summaries
+
+<!-- archived-slice-summary:mea-metrics-consumers:start -->
+### `mea-metrics-consumers`: Wire measure-artifacts skill and reporting consumers
+
+#### Work Item Summary
+
+- **Work Item**: Expose the new metrics foundation through a user-facing `measure-artifacts` skill and let `report-artifacts` reuse persisted metrics when they exist
+- **Source Story / Increment / Slice**: `CAM-06` / `I2` / `mea-metrics-consumers`
+- **Requested Outcome**: As a maintainer, I want to run `measure-artifacts` directly for a completed feature or subfeature and see those persisted metrics appear in reporting output so workflow evidence becomes reusable instead of hidden behind internal helpers.
+- **Why this matters**: The foundation slice creates the evidence model, but the capability is not yet usable or visible to maintainers until the CLI, skill definition, and first consumer are wired.
+- **Independent Test**: Run the `measure-artifacts` and `report-artifacts` test modules and confirm the CLI emits text/JSON output, write mode persists the sidecar, and reporting includes the persisted metrics without mutating lifecycle ownership.
+
+#### Detailed Design Summary
+
+`mea-metrics-consumers` turns the foundation measurement engine into a usable repository capability. This slice should add the user-facing `measure-artifacts` skill and CLI, expose text/JSON plus explicit write mode, enrich `report-artifacts` with optional persisted metrics, and wire the new skill into repo install/docs surfaces.
+
+#### Blueprint Figures
+
+```plantuml
+@startuml
+actor Maintainer
+participant "measure_artifacts.py" as MeasureCli
+participant "metrics_engine.py" as Engine
+participant "metrics_store.py" as Store
+participant "report_data.py" as ReportData
+collections "implementation-metrics.json" as Sidecar
+
+Maintainer -> MeasureCli: run measure-artifacts [--json] [--write]
+MeasureCli -> Engine: build metrics record
+Engine --> MeasureCli: normalized record
+MeasureCli -> Store: write sidecar [when --write]
+Store -> Sidecar: persist deterministic JSON
+MeasureCli --> Maintainer: text or JSON output
+
+Maintainer -> ReportData: build report result
+ReportData -> Store: read sidecar [optional]
+Store -> Sidecar: load metrics if present
+ReportData --> Maintainer: report records enriched with optional metrics
+@enduml
+```
+<!-- archived-slice-summary:mea-metrics-consumers:end -->
+
+<!-- archived-slice-summary:mea-metrics-foundation:start -->
+### `mea-metrics-foundation`: Build metrics record and sidecar engine
+
+#### Work Item Summary
+
+- **Work Item**: Establish the durable metrics record, derivation rules, and sidecar persistence model for `measure-artifacts`
+- **Source Story / Increment / Slice**: `CAM-06` / `I1` / `mea-metrics-foundation`
+- **Requested Outcome**: As a maintainer, I want completed features and subfeatures to produce a stable `implementation-metrics.json` record for story size, slice count, execution mode, and churn availability so later reporting can reuse high-confidence workflow evidence.
+- **Why this matters**: The subfeature cannot compare guided and direct implementation or support later reporting unless the reusable evidence model exists first.
+- **Independent Test**: Run `measure-artifacts` foundation tests against fixture planning and execution packets and confirm the computed sidecar content is deterministic, preserves unsupported or unavailable values explicitly, and writes the same normalized record on repeated runs.
+
+#### Detailed Design Summary
+
+`mea-metrics-foundation` establishes the reusable evidence model behind the future `measure-artifacts` capability. This slice should add the internal measurement modules under `skills/measure-artifacts/`, derive story-size, planned-slice, linked-slice, and execution-mode metrics from existing planning and execution artifacts, persist deterministic `implementation-metrics.json` sidecars, and ship fixture-driven tests that keep unavailable or unsupported inputs explicit.
+
+#### Blueprint Figures
+
+```plantuml
+@startuml
+actor Maintainer
+participant "metrics_engine.py" as Engine
+participant "artifact_inventory.py" as Inventory
+participant "manage_planning.py /\nmanage_subfeatures.py" as PlanningOwners
+participant "manage_execution.py" as Execution
+participant "metrics_store.py" as Store
+database "planning packet" as PlanningPacket
+database "slice registry + metadata" as SliceData
+collections "implementation-metrics.json" as Sidecar
+
+Maintainer -> Engine: measure completed target
+Engine -> PlanningOwners: resolve target + metadata
+PlanningOwners --> Engine: completed feature/subfeature packet
+Engine -> Inventory: parse traceability records
+Inventory --> Engine: story sizes + planned/execution slice ids
+Engine -> Execution: load linked slice evidence
+Execution --> Engine: execution statuses + metadata
+Engine -> Engine: derive score, counts, mode, unavailable churn
+Engine -> Store: normalize record [optional write]
+Store -> Sidecar: write deterministic JSON
+Store --> Engine: normalized record
+Engine --> Maintainer: metrics record
+@enduml
+```
+<!-- archived-slice-summary:mea-metrics-foundation:end -->
+
+<!-- archived-slice-summaries:end -->

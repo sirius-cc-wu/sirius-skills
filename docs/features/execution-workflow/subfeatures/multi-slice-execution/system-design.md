@@ -208,3 +208,72 @@ execution workflow, not a new execution state model. It uses existing planning
 and execution artifacts as durable truth, executes one slice at a time, and
 keeps Git history aligned with slice boundaries by requiring one commit per
 completed slice.
+
+<!-- archived-slice-summaries:start -->
+## Archived Slice Summaries
+
+<!-- archived-slice-summary:mse-per-slice-commit-checkpoints:start -->
+### `mse-per-slice-commit-checkpoints`: Enforce one commit per completed slice
+
+#### Work Item Summary
+
+- **Work Item**: Require a clean commit checkpoint after each closed slice before the batch loop advances.
+- **Source Story / Increment / Slice**: `EW-04` / `I3` / `mse-per-slice-commit-checkpoints`
+- **Requested Outcome**: As a maintainer, I want every completed slice in a batch run to become its own Git checkpoint so the history remains aligned with slice boundaries.
+- **Why this matters**: Batch execution should preserve the same durable closure and commit discipline expected from one-slice-at-a-time work.
+- **Independent Test**: `pytest -q skills/ship/tests/test_ship.py -k commit_checkpoint`
+
+#### Detailed Design Summary
+
+`mse-per-slice-commit-checkpoints` integrated a commit checkpoint into the `ship` loop. After each slice closes, the orchestrator requires a clean worktree checkpoint before it can advance to the next ready slice, handing control to `commit` when the repository is still dirty and keeping repository history aligned with slice boundaries.
+<!-- archived-slice-summary:mse-per-slice-commit-checkpoints:end -->
+
+<!-- archived-slice-summary:mse-scope-and-backlog-resolution:start -->
+### `mse-scope-and-backlog-resolution`: Resolve planning scope and remaining planned slices
+
+#### Work Item Summary
+
+- **Work Item**: Resolve one reviewed feature or subfeature target into one ordered remaining-slice backlog.
+- **Source Story / Increment / Slice**: `EW-01` / `I1` / `mse-scope-and-backlog-resolution`
+- **Requested Outcome**: As a maintainer, I want `ship` to identify the active planning scope and the next ready planned slice so batch execution starts from durable repository state instead of ad hoc input.
+- **Why this matters**: Later orchestration depends on one canonical view of planned slices, closed execution slices, and feature vs subfeature scope.
+- **Independent Test**: `pytest -q skills/ship/tests/test_ship.py -k scope_or_backlog`
+
+#### Detailed Design Summary
+
+`mse-scope-and-backlog-resolution` established the planning-target and backlog-resolution foundation for `ship`. The slice resolves one feature or subfeature target, reads its planned slice lineage, excludes already closed execution slices, and returns the next ready slice without mutating planning or execution state.
+<!-- archived-slice-summary:mse-scope-and-backlog-resolution:end -->
+
+<!-- archived-slice-summary:mse-sequential-slice-orchestration:start -->
+### `mse-sequential-slice-orchestration`: Orchestrate sequential slice execution
+
+#### Work Item Summary
+
+- **Work Item**: Drive one planned slice at a time through slice bootstrap and execution handoff.
+- **Source Story / Increment / Slice**: `EW-01` / `I2` / `mse-sequential-slice-orchestration`
+- **Requested Outcome**: As a maintainer, I want the batch executor to process one ready slice at a time so multi-slice execution stays aligned with existing execution owners.
+- **Why this matters**: Batch execution should automate traversal, not absorb slice bootstrap, review, or closure ownership into a new state machine.
+- **Independent Test**: `pytest -q skills/ship/tests/test_ship.py -k orchestration`
+
+#### Detailed Design Summary
+
+`mse-sequential-slice-orchestration` added the orchestration loop for `ship`. The slice reuses backlog resolution from `mse-scope-and-backlog-resolution`, bootstraps one ready slice at a time, routes execution through the existing execution owners, and preserves one-active-slice semantics across the run.
+<!-- archived-slice-summary:mse-sequential-slice-orchestration:end -->
+
+<!-- archived-slice-summary:mse-stop-and-resume-semantics:start -->
+### `mse-stop-and-resume-semantics`: Stop on blockers and resume from durable state
+
+#### Work Item Summary
+
+- **Work Item**: Stop batch execution safely on blockers and resume from durable slice state.
+- **Source Story / Increment / Slice**: `EW-03` / `I2` / `mse-stop-and-resume-semantics`
+- **Requested Outcome**: As a maintainer, I want the batch executor to stop on active-slice or dependency blockers and resume later from closed-slice state instead of maintaining a second progress ledger.
+- **Why this matters**: Multi-slice execution is only trustworthy if interruptions do not create hidden progress or skip blocked work.
+- **Independent Test**: `pytest -q skills/ship/tests/test_ship.py -k stop_or_resume`
+
+#### Detailed Design Summary
+
+`mse-stop-and-resume-semantics` added safe stop conditions and durable resume behavior to `ship`. The slice stops the batch loop on active-slice or dependency-blocked conditions, then resumes later by recalculating progress from closed slices and planning lineage rather than any batch-local state file.
+<!-- archived-slice-summary:mse-stop-and-resume-semantics:end -->
+
+<!-- archived-slice-summaries:end -->
