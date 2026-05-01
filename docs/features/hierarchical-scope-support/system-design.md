@@ -303,7 +303,7 @@ participant "guide-planning CLI" as Planning
 participant "Scope Resolver" as Scope
 participant "Planning Helper" as Helper
 database "child docs/features/registry.json" as Registry
-file "child docs/features/<feature>/.planning-meta.json" as Meta
+collections "child docs/features/{feature}/.planning-meta.json" as Meta
 
 User -> Planning: set-status/add/promote-proposal\n(--scope optional)
 Planning -> Scope: resolve_scope(cwd, --scope, --target-scope?)
@@ -315,3 +315,295 @@ Helper --> Planning: result
 Planning --> User: success or explicit ambiguity error
 @enduml
 ```
+
+<!-- archived-slice-summaries:start -->
+## Archived Slice Summaries
+
+<!-- archived-slice-summary:hss-config-inheritance:start -->
+### `hss-config-inheritance`: Merge parent and child .skills config by scope
+
+#### Work Item Summary
+
+- **Work Item**: Merge parent and child `.skills` config values through the scope chain with child override precedence.
+- **Source Story / Increment / Slice**: HSS-06 / I2 / hss-config-inheritance
+- **Requested Outcome**: As a project adopter working with nested scopes, child scopes inherit parent planning, execution, and conventions config by default while still being able to override specific keys locally.
+- **Why this matters**: Nested scopes are not practical if every child scope must repeat the full `.skills` configuration instead of inheriting generic defaults.
+- **Independent Test**: Planning, proposal, bootstrap, and execution helpers read merged config from the scope chain, preserve unknown keys, and resolve inherited relative paths against the active scope root.
+
+#### Detailed Design Summary
+
+HSS-06 config inheritance adds a merged config view across the active scope chain. Parent scopes provide defaults for planning, execution, and conventions config, while child scopes override only the keys they define. Inherited relative paths still resolve against the active scope root.
+
+#### Blueprint Figures
+
+```plantuml
+@startuml
+actor User
+participant Command
+participant "scope_runtime.py" as Scope
+database "root/.skills/*.json" as RootConfig
+database "child/.skills/*.json" as ChildConfig
+
+User -> Command: run command inside child scope
+Command -> Scope: resolve_scope_context(cwd)
+Command -> Scope: load merged config for scope chain
+Scope -> RootConfig: read root defaults
+Scope -> ChildConfig: overlay child-defined keys
+Scope --> Command: merged config view
+Command --> User: effective config resolved against child scope root
+@enduml
+```
+<!-- archived-slice-summary:hss-config-inheritance:end -->
+
+<!-- archived-slice-summary:hss-guide-scope:start -->
+### `hss-guide-scope`: Add one scope-aware entry skill
+
+#### Work Item Summary
+
+- **Work Item**: Add a `guide-scope` skill that resolves the active scope and routes work into planning, execution, or bootstrap without duplicating their ownership rules.
+- **Source Story / Increment / Slice**: HSS-05 / I4 / hss-guide-scope
+- **Requested Outcome**: As a maintainer working in a multi-scope repository, I can enter through one scope-aware skill that discovers the current scope, handles ambiguity, and then hands off cleanly to the correct downstream workflow skill.
+- **Why this matters**: The scope runtime is now stable for planning and execution, so users need one documented entrypoint instead of remembering where scope matters across multiple workflows.
+- **Independent Test**: The new `skills/guide-scope/SKILL.md` plus top-level docs explain when to use `guide-scope`, how it resolves scope, and how it hands off to `guide-planning`, `guide-execution`, or `bootstrap` without changing existing planning/execution behavior.
+
+#### Detailed Design Summary
+
+HSS-05 adds `guide-scope` as an optional scope-aware entry skill for multi-scope repositories. The implementation should stay thin: document how to resolve the active scope, stop on ambiguity, and hand off to `guide-planning`, `guide-execution`, or `bootstrap`, then align the top-level repo docs and managed skill installation list with that new entrypoint.
+<!-- archived-slice-summary:hss-guide-scope:end -->
+
+<!-- archived-slice-summary:hss-local-registries:start -->
+### `hss-local-registries`: Keep planning and proposal registries local to each scope
+
+#### Work Item Summary
+
+- **Work Item**: Make each explicit scope own its own planning and proposal registries and metadata.
+- **Source Story / Increment / Slice**: HSS-02 / I1 / hss-local-registries
+- **Requested Outcome**: As a subproject owner, when a nested directory defines its own `.skills/`, planning and proposal helpers write features, proposals, and registry updates inside that scope instead of reusing the repository-root planning area.
+- **Why this matters**: Hierarchical scope support only becomes useful once nested scopes can keep their own planning state independent from the repository root.
+- **Independent Test**: Planning and proposal commands run against a nested explicit scope create and read local `docs/features/` and `docs/proposals/` registries without mutating the root scope registries.
+
+#### Detailed Design Summary
+
+HSS-02 hardens explicit child-scope ownership for planning and proposal artifacts. A nested scope that declares its own `.skills/planning.json` should create and update its own `docs/features/` and `docs/proposals/` registries and metadata without mutating the repository-root registries.
+
+#### Blueprint Figures
+
+```plantuml
+@startuml
+actor User
+participant "manage_planning.py /\nmanage_proposals.py" as Command
+participant "scope_runtime.py" as Scope
+database "child/.skills/planning.json" as ChildConfig
+database "child/docs/*/registry.json" as ChildRegistry
+database "root/docs/*/registry.json" as RootRegistry
+
+User -> Command: run command inside child scope
+Command -> Scope: resolve_scope_context(cwd)
+Scope -> ChildConfig: nearest planning config found
+Scope --> Command: scope_root = child scope
+Command -> ChildRegistry: read/write child-local registry
+Command -> RootRegistry: no write
+Command --> User: child scope artifact created/updated
+@enduml
+```
+<!-- archived-slice-summary:hss-local-registries:end -->
+
+<!-- archived-slice-summary:hss-nearest-scope:start -->
+### `hss-nearest-scope`: Default CLI operations to the nearest enclosing scope
+
+#### Work Item Summary
+
+- **Work Item**: Make planning and proposal helpers default to the nearest enclosing explicit scope from the current working directory.
+- **Source Story / Increment / Slice**: HSS-03 / I1 / hss-nearest-scope
+- **Requested Outcome**: As an agent operating from inside a subdirectory of a child scope, planning and proposal commands land in that child scope's local artifacts without requiring the user to run from the scope root.
+- **Why this matters**: Local registries are only practical when commands keep working from ordinary nested working directories inside the selected scope.
+- **Independent Test**: Running planning and proposal commands from a directory nested beneath a child scope writes to the nearest enclosing child scope registries while preserving root fallback outside that child scope.
+
+#### Detailed Design Summary
+
+HSS-03 proves that planning and proposal commands resolve the **nearest enclosing** explicit scope from the current working directory. Work run from a directory inside a child scope should use that child scope's registries, while work run elsewhere in the repository should still fall back to the repository root.
+
+#### Blueprint Figures
+
+```plantuml
+@startuml
+actor User
+participant Command
+participant "scope_runtime.py" as Scope
+database "child/.skills/planning.json" as ChildConfig
+database "root/.skills/planning.json" as RootConfig
+
+User -> Command: run from child/subdir/workspace
+Command -> Scope: resolve_scope_context(cwd)
+Scope -> Scope: walk ancestors upward
+Scope -> ChildConfig: first matching config
+Scope --> Command: scope_root = child
+Command --> User: child scope chosen
+
+User -> Command: run from repo/sibling/path
+Command -> Scope: resolve_scope_context(cwd)
+Scope -> Scope: walk ancestors upward
+Scope -> RootConfig: no child config on ancestor chain
+Scope --> Command: scope_root = repo root
+Command --> User: root fallback chosen
+@enduml
+```
+<!-- archived-slice-summary:hss-nearest-scope:end -->
+
+<!-- archived-slice-summary:hss-promotion-targeting:start -->
+### `hss-promotion-targeting`: Support explicit cross-scope promotion targets
+
+#### Work Item Summary
+
+- **Work Item**: Allow proposal promotion to target a different canonical planning scope only when the user explicitly provides a target scope.
+- **Source Story / Increment / Slice**: HSS-04 / I2 / hss-promotion-targeting
+- **Requested Outcome**: As a planner promoting a proposal from one scope into canonical planning elsewhere, I can supply `--target-scope` for the feature destination, while same-scope promotion stays the default when no target scope is provided.
+- **Why this matters**: Cross-scope promotion is powerful but unsafe if it can happen implicitly; the destination scope must be an explicit user choice.
+- **Independent Test**: Proposal promotion creates canonical planning in the proposal scope by default, and only creates canonical planning in another scope when `--target-scope` is provided.
+
+#### Detailed Design Summary
+
+HSS-04 promotion targeting makes cross-scope proposal promotion explicit. The current promotion flow already defaults to creating canonical feature planning in the proposal’s own scope. This slice adds `--target-scope` so users can deliberately create canonical planning in another valid scope, while invalid target paths fail cleanly.
+
+#### Blueprint Figures
+
+```plantuml
+@startuml
+actor User
+participant "manage_planning.py" as Planning
+participant "manage_proposals.py" as Proposals
+participant "scope_runtime.py" as Scope
+
+User -> Planning: promote-proposal <slug> --scope <proposal-scope>
+Planning -> Proposals: resolve proposal in source scope
+alt no --target-scope
+  Planning -> Scope: use proposal scope as target
+  Planning -> Planning: create feature in same scope
+else --target-scope provided
+  Planning -> Scope: resolve explicit target scope
+  Planning -> Planning: create feature in target scope
+end
+Planning -> Proposals: mark proposal promoted in source scope
+Planning --> User: promotion result
+@enduml
+```
+<!-- archived-slice-summary:hss-promotion-targeting:end -->
+
+<!-- archived-slice-summary:hss-root-fallback:start -->
+### `hss-root-fallback`: Add scope runtime with root fallback
+
+#### Work Item Summary
+
+- **Work Item**: Introduce a scope-resolution baseline that preserves current repository-root planning behavior.
+- **Source Story / Increment / Slice**: HSS-01 / I1 / hss-root-fallback
+- **Requested Outcome**: As a repository maintainer, when a repository uses the current single-scope layout, planning and proposal helpers continue to operate against the repository root while a reusable scope runtime is introduced.
+- **Why this matters**: The hierarchy-aware workflow needs a compatibility-safe foundation before nested scopes, ambiguity checks, and scoped execution can be layered on top.
+- **Independent Test**: Root-scoped planning and proposal commands behave the same as today in a repository without nested local scopes, and the expected planning/proposal tests pass.
+
+#### Detailed Design Summary
+
+Introduce a shared scope-runtime helper that resolves the repository-root planning scope for the current single-scope workflow, then move planning and proposal config/registry path resolution onto that helper without changing the current command surface.
+
+#### Blueprint Figures
+
+```plantuml
+@startuml
+actor User
+participant "manage_planning.py /\nmanage_proposals.py" as Command
+participant "Scope Runtime" as Scope
+database ".skills/planning.json" as Config
+database "docs/*/registry.json" as Registry
+
+User -> Command: run command from repo root or nested dir
+Command -> Scope: resolve_scope_context(cwd)
+Scope -> Scope: search ancestors for .skills/planning.json
+Scope --> Command: scope_root = repo root
+Command -> Config: read resolved planning config
+Command -> Registry: read/write paths rooted at scope_root
+Command --> User: same single-scope behavior preserved
+@enduml
+```
+<!-- archived-slice-summary:hss-root-fallback:end -->
+
+<!-- archived-slice-summary:hss-scope-selection:start -->
+### `hss-scope-selection`: Require explicit scope selection for ambiguous lookups
+
+#### Work Item Summary
+
+- **Work Item**: Detect ambiguous multi-scope feature and proposal lookups and require explicit scope selection.
+- **Source Story / Increment / Slice**: HSS-04 / I2 / hss-scope-selection
+- **Requested Outcome**: As a planner working in a repository with nested scopes, slug-only lookups stop with candidate scope information when more than one scope could match, and commands allow an explicit `--scope` to resolve the correct scope.
+- **Why this matters**: Once multiple scopes can own local planning state, slug-only updates must fail safely instead of relying on an implicit or accidental scope choice.
+- **Independent Test**: Ambiguous feature and proposal lookups fail with candidate scope paths, while `--scope` allows the same operations to complete against the intended scope.
+
+#### Detailed Design Summary
+
+HSS-04 adds safe ambiguity handling for multi-scope feature and proposal lookups. Slug-only selectors that could match more than one plausible scope must stop with candidate scope information, while an additive `--scope` flag lets the user explicitly choose the intended scope.
+
+#### Blueprint Figures
+
+```plantuml
+@startuml
+actor User
+participant Command
+participant "scope_runtime.py" as Scope
+database "active scope registry" as Active
+database "nested scope registries" as Nested
+
+User -> Command: set-status <slug>
+Command -> Scope: resolve_scope_context(cwd, explicit_scope=None)
+Command -> Scope: list plausible nested scopes
+Command -> Active: search active scope registry
+Command -> Nested: search descendant scope registries
+alt more than one match
+  Command --> User: ambiguity error with candidate scopes
+else explicit --scope provided
+  Command -> Scope: resolve_scope_context(cwd, explicit_scope)
+  Command -> Active: search selected scope only
+  Command --> User: command succeeds
+else one active-scope match
+  Command --> User: command succeeds
+end
+@enduml
+```
+<!-- archived-slice-summary:hss-scope-selection:end -->
+
+<!-- archived-slice-summary:hss-scoped-execution:start -->
+### `hss-scoped-execution`: Keep slices and execution registries local to the resolved scope
+
+#### Work Item Summary
+
+- **Work Item**: Apply the resolved execution scope to guide-execution and slice bootstrap so nested scopes manage their own slice registries and slice folders.
+- **Source Story / Increment / Slice**: HSS-06 / I3 / hss-scoped-execution
+- **Requested Outcome**: As a maintainer working inside a nested scope, execution commands and slice bootstrap use that scope's effective `execution.json`, `conventions.json`, and `slice_dir` instead of falling back to one repository-root execution area.
+- **Why this matters**: Config inheritance alone is not enough if execution helpers still write slices and registry state into the repository-root `slices/` tree.
+- **Independent Test**: Running guide-execution or bootstrap-slice from a child scope creates and updates slices in that child scope's resolved slice directory while root-scope behavior remains unchanged.
+
+#### Detailed Design Summary
+
+HSS-06 scoped execution moves execution runtime state onto the resolved scope. Guide-execution should stop reading and writing a single repository-root registry, and `bootstrap_slice.py` should bootstrap against the same scoped execution context. Parent config inheritance from hss-config-inheritance stays in place, but the new behavior change in this slice is where execution state is stored and resolved.
+
+#### Blueprint Figures
+
+```plantuml
+@startuml
+actor User
+participant "manage_execution.py" as Exec
+participant "scope_runtime.py" as Scope
+participant "bootstrap_slice.py" as Bootstrap
+database "child/.skills/execution.json" as ChildConfig
+database "child/<slice_dir>/registry.json" as ChildRegistry
+
+User -> Exec: run add/set-status inside child scope
+Exec -> Scope: resolve_scope_context(cwd)
+Exec -> Scope: load merged execution config
+Scope -> ChildConfig: resolve effective child scope config
+Exec -> ChildRegistry: read/write scoped registry
+User -> Bootstrap: bootstrap slice inside child scope
+Bootstrap -> Exec: reuse scoped config + registry helpers
+Exec -> ChildRegistry: create scoped slice + metadata
+@enduml
+```
+<!-- archived-slice-summary:hss-scoped-execution:end -->
+
+<!-- archived-slice-summaries:end -->

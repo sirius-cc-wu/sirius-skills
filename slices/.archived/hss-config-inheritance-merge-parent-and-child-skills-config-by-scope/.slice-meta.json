@@ -1,0 +1,12 @@
+{
+  "created_at": "2026-04-04T04:04:29",
+  "updated_at": "2026-05-01T19:26:58",
+  "status": "closed",
+  "slice_id": "hss-config-inheritance",
+  "feature": "Merge parent and child .skills config by scope",
+  "path": "slices/.archived/hss-config-inheritance-merge-parent-and-child-skills-config-by-scope/",
+  "relations": [],
+  "closed_at": "2026-04-04T04:22:07",
+  "archived_at": "2026-05-01T19:26:58",
+  "archived_from": "slices/hss-config-inheritance-merge-parent-and-child-skills-config-by-scope/"
+}

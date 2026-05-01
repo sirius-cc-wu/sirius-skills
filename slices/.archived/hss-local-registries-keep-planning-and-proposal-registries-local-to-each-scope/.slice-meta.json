@@ -1,0 +1,12 @@
+{
+  "created_at": "2026-04-04T03:37:13",
+  "updated_at": "2026-05-01T19:26:58",
+  "status": "closed",
+  "slice_id": "hss-local-registries",
+  "feature": "Keep planning and proposal registries local to each scope",
+  "path": "slices/.archived/hss-local-registries-keep-planning-and-proposal-registries-local-to-each-scope/",
+  "relations": [],
+  "closed_at": "2026-04-04T03:42:38",
+  "archived_at": "2026-05-01T19:26:58",
+  "archived_from": "slices/hss-local-registries-keep-planning-and-proposal-registries-local-to-each-scope/"
+}

@@ -1,0 +1,12 @@
+{
+  "created_at": "2026-04-04T03:43:18",
+  "updated_at": "2026-05-01T19:26:58",
+  "status": "closed",
+  "slice_id": "hss-nearest-scope",
+  "feature": "Default CLI operations to the nearest enclosing scope",
+  "path": "slices/.archived/hss-nearest-scope-default-cli-operations-to-the-nearest-enclosing-scope/",
+  "relations": [],
+  "closed_at": "2026-04-04T03:47:16",
+  "archived_at": "2026-05-01T19:26:58",
+  "archived_from": "slices/hss-nearest-scope-default-cli-operations-to-the-nearest-enclosing-scope/"
+}

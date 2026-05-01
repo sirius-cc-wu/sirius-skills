@@ -2,14 +2,14 @@
 
 | ID | Feature | Status | Updated | Closed | Path |
 |---|---|---|---|---|---|
-| hss-root-fallback | Add scope runtime with root fallback | closed | 2026-04-04T03:33:16 | 2026-04-04T03:33:16 | slices/hss-root-fallback-add-scope-runtime-with-root-fallback/ |
-| hss-local-registries | Keep planning and proposal registries local to each scope | closed | 2026-04-04T03:42:38 | 2026-04-04T03:42:38 | slices/hss-local-registries-keep-planning-and-proposal-registries-local-to-each-scope/ |
-| hss-nearest-scope | Default CLI operations to the nearest enclosing scope | closed | 2026-04-04T03:47:16 | 2026-04-04T03:47:16 | slices/hss-nearest-scope-default-cli-operations-to-the-nearest-enclosing-scope/ |
-| hss-scope-selection | Require explicit scope selection for ambiguous lookups | closed | 2026-04-04T03:59:57 | 2026-04-04T03:59:57 | slices/hss-scope-selection-require-explicit-scope-selection-for-ambiguous-lookups/ |
-| hss-promotion-targeting | Support explicit cross-scope promotion targets | closed | 2026-04-04T04:03:51 | 2026-04-04T04:03:51 | slices/hss-promotion-targeting-support-explicit-cross-scope-promotion-targets/ |
-| hss-config-inheritance | Merge parent and child .skills config by scope | closed | 2026-04-04T04:22:07 | 2026-04-04T04:22:07 | slices/hss-config-inheritance-merge-parent-and-child-skills-config-by-scope/ |
-| hss-scoped-execution | Keep slices and execution registries local to the resolved scope | closed | 2026-04-04T04:37:40 | 2026-04-04T04:37:40 | slices/hss-scoped-execution-keep-slices-and-execution-registries-local-to-the-resolved-scope/ |
-| hss-guide-scope | Add one scope-aware entry skill | closed | 2026-04-04T04:45:19 | 2026-04-04T04:45:19 | slices/hss-guide-scope-add-one-scope-aware-entry-skill/ |
+| hss-root-fallback | Add scope runtime with root fallback | closed | 2026-05-01T19:26:58 | 2026-04-04T03:33:16 | slices/.archived/hss-root-fallback-add-scope-runtime-with-root-fallback/ |
+| hss-local-registries | Keep planning and proposal registries local to each scope | closed | 2026-05-01T19:26:58 | 2026-04-04T03:42:38 | slices/.archived/hss-local-registries-keep-planning-and-proposal-registries-local-to-each-scope/ |
+| hss-nearest-scope | Default CLI operations to the nearest enclosing scope | closed | 2026-05-01T19:26:58 | 2026-04-04T03:47:16 | slices/.archived/hss-nearest-scope-default-cli-operations-to-the-nearest-enclosing-scope/ |
+| hss-scope-selection | Require explicit scope selection for ambiguous lookups | closed | 2026-05-01T19:26:58 | 2026-04-04T03:59:57 | slices/.archived/hss-scope-selection-require-explicit-scope-selection-for-ambiguous-lookups/ |
+| hss-promotion-targeting | Support explicit cross-scope promotion targets | closed | 2026-05-01T19:26:58 | 2026-04-04T04:03:51 | slices/.archived/hss-promotion-targeting-support-explicit-cross-scope-promotion-targets/ |
+| hss-config-inheritance | Merge parent and child .skills config by scope | closed | 2026-05-01T19:26:58 | 2026-04-04T04:22:07 | slices/.archived/hss-config-inheritance-merge-parent-and-child-skills-config-by-scope/ |
+| hss-scoped-execution | Keep slices and execution registries local to the resolved scope | closed | 2026-05-01T19:26:58 | 2026-04-04T04:37:40 | slices/.archived/hss-scoped-execution-keep-slices-and-execution-registries-local-to-the-resolved-scope/ |
+| hss-guide-scope | Add one scope-aware entry skill | closed | 2026-05-01T19:26:58 | 2026-04-04T04:45:19 | slices/.archived/hss-guide-scope-add-one-scope-aware-entry-skill/ |
 | aat-cross-artifact-audit | audit-artifacts | closed | 2026-04-11T23:30:02 | 2026-04-11T23:30:02 | slices/aat-cross-artifact-audit-audit-artifacts/ |
 | tat-trace-artifact-lineage | trace-artifacts | closed | 2026-04-11T23:40:32 | 2026-04-11T23:40:32 | slices/tat-trace-artifact-lineage-trace-artifacts/ |
 | rpt-artifact-state-report | report-artifacts | closed | 2026-04-11T23:48:13 | 2026-04-11T23:48:13 | slices/rpt-artifact-state-report-report-artifacts/ |

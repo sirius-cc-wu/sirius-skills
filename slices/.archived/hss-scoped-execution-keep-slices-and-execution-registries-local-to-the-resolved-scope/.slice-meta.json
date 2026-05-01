@@ -1,0 +1,12 @@
+{
+  "created_at": "2026-04-04T04:24:44",
+  "updated_at": "2026-05-01T19:26:58",
+  "status": "closed",
+  "slice_id": "hss-scoped-execution",
+  "feature": "Keep slices and execution registries local to the resolved scope",
+  "path": "slices/.archived/hss-scoped-execution-keep-slices-and-execution-registries-local-to-the-resolved-scope/",
+  "relations": [],
+  "closed_at": "2026-04-04T04:37:40",
+  "archived_at": "2026-05-01T19:26:58",
+  "archived_from": "slices/hss-scoped-execution-keep-slices-and-execution-registries-local-to-the-resolved-scope/"
+}

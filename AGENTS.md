@@ -16,6 +16,10 @@ Default guidance for agents working in `sirius-skills`.
 Use these upstream repositories as reference inputs when their patterns are
 relevant to current work:
 
+Local tooling note:
+- `http://127.0.0.1:8080` hosts a reachable PlantUML server for diagram rendering during local work.
+- When writing UML, validate correctness by checking the diagram against the local PlantUML server when practical.
+
 - `gstack`
   - upstream: `https://github.com/garrytan/gstack`
   - local sibling clone (when present): `../gstack/`
