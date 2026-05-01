@@ -100,3 +100,12 @@ grep-friendly.
 - Analyzed why completed subfeature work can still remain `planning_reviewed` / `reviewed` in durable metadata.
 - Documented the key finding in `docs/wiki/features/workflow-state-consistency.md`: terminal subfeature sync already exists in `close-slice`, but `ship` is orchestration-only and direct repo implementation can bypass that owner-sync path entirely.
 - Captured candidate follow-up directions for later repair: terminal reconciliation in `ship`, a semantic reconcile maintenance command, stronger guardrails for agent-led multi-slice work, and documentation cleanup around subfeature completion semantics.
+
+## [2026-05-01] docs-repair | audit inconsistency cleanup
+
+- Ran `audit-artifacts --json` and identified structural/documentation inconsistencies across the parent cross-artifact feature packet, hierarchical scope traceability, split-install subfeature metadata, and one closed slice missing a core doc artifact.
+- Repaired the cross-artifact-management parent packet by adding `system-design.md`, `slice-planning.md`, and `slice-traceability.md` so feature validation matches the implemented child maintenance stack.
+- Split grouped planned-slice rows in `docs/features/hierarchical-scope-support/slice-traceability.md` into one row per planned slice so audit mapping is deterministic.
+- Updated `docs/features/installation-and-configuration/subfeatures/split-install-modes/.subfeature-meta.json` so `affected_slice_ids` matches the actual closed `sim-*` execution slices.
+- Restored a minimal `README.md` for the closed `sim-parity-scope` slice so closed-slice validation has the expected core artifact surface.
+- Updated synthesized wiki feature pages to reflect the repaired planning/doc state.

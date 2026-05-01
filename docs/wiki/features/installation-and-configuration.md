@@ -33,9 +33,10 @@ This feature defines integration boundaries for adopting `sirius-skills`:
 
 ## Notable Delta
 
-The parent packet still reports `planning_reviewed`, but the split-install child
-is `implemented`, indicating implementation has advanced beyond the original
-baseline packet.
+The split-install subfeature is implemented and its execution lineage is now
+aligned with the actual `sim-*` slices recorded in subfeature traceability and
+closed slice history. The parent packet can still lag the child in lifecycle
+status, but the documented execution mapping is consistent again.
 
 ## Main Sources
 

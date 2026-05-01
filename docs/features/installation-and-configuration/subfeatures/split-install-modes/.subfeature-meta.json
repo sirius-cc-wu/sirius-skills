@@ -23,12 +23,13 @@
     "IC-04"
   ],
   "affected_slice_ids": [
-    "iac-install",
-    "iac-planning-config",
-    "iac-execution-config",
-    "iac-conventions-config",
-    "iac-plugin-convention",
-    "iac-doc-alignment"
+    "sim-local-helper",
+    "sim-local-docs",
+    "sim-packaged-targets",
+    "sim-packaged-compat",
+    "sim-runtime-scope",
+    "sim-parity-scope",
+    "sim-migration-guidance"
   ],
   "review_note": "Planning reviewed: generic install-local versus install-packaged naming is coherent, install stays a compatibility alias for the first rollout, and local skill-home selection remains a helper/Makefile override instead of a new durable config surface.",
   "finalized_at": "2026-04-19T11:16:05"

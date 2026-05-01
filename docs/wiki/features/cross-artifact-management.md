@@ -3,7 +3,7 @@
 ## Snapshot
 
 - Feature: `cross-artifact-management`
-- Parent status: `discovery_pending` (updated `2026-04-11`)
+- Parent status: `implemented` (updated `2026-04-23`)
 - Child capability statuses: six implemented/finalized subfeatures
 
 ## What This Feature Establishes
@@ -34,9 +34,10 @@ Implemented child capabilities provide the operational stack:
 
 ## Notable Delta
 
-Parent state is still `discovery_pending` while all currently defined subfeatures
-are implemented. The practical capability stack has advanced ahead of parent
-packet status and should eventually be reconciled in planning metadata.
+The parent packet has now been structurally reconciled with the implemented
+child capability stack. The main remaining nuance is that most concrete
+execution history still lives in the finalized child subfeatures rather than in
+this umbrella packet.
 
 ## Main Sources
 

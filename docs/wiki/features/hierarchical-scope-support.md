@@ -26,9 +26,10 @@ execution operations:
 
 ## Current Planning State
 
-This packet is execution-ready but not implemented. The design is detailed and
-additive: it can be rolled out by making existing helpers scope-aware rather
-than rewriting planning or execution semantics.
+The feature is implemented in practice, and its parent traceability now uses
+one row per planned slice so audits can deterministically map each closed
+hierarchical-scope execution slice back to planning without grouped-slice
+ambiguity.
 
 ## Main Sources
 
