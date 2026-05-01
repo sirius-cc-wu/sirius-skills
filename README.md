@@ -6,12 +6,16 @@
 
 Install the managed skills with the packaged workflow:
 
+This installs all skills listed in `skills/*/SKILL.md` that are part of the managed packaged set, including `governance-update` and `research`.
+
 ```bash
 make install
 ```
 
 This uses `npx skills add` to register the managed skills after refreshing the
-shared runtime and shared references that packaged installs depend on.
+shared runtime and shared references that packaged installs depend on. The
+managed packaged set is sourced from `MANAGED_SKILLS` in `Makefile`, so keep
+that list in sync when adding or retiring packaged skills.
 
 To remove the managed packaged install later:
 
@@ -36,6 +40,7 @@ Current command map:
 
 - default packaged use: `make install` / `make uninstall`
 - explicit packaged aliases: `make install-packaged` / `make uninstall-packaged`
+- current managed packaged list also includes `governance-update` and `research`
 
 Current parity guidance:
 

@@ -33,7 +33,9 @@ MANAGED_SKILLS := \
 	ship \
 	ship-slice \
 	slice \
-	ui-flow
+	ui-flow \
+	governance-update \
+	research
 MANAGED_SKILL_FLAGS := $(foreach skill,$(MANAGED_SKILLS),--skill $(skill))
 
 install: sync-shared-runtime sync-shared-references
