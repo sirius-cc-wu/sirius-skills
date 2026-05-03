@@ -56,44 +56,27 @@ Resolve `<feature_path>` from the repository planning layout:
 - When `reference-research.md` exists for the current feature or subfeature,
   treat it as durable context for upstream-informed goals, constraints, and
   tradeoffs instead of re-deriving the same comparison in chat.
-- Default to a durable discover structure that downstream planning can scan
-  consistently instead of one-off prose shape.
-- When the feature materially reshapes an existing workflow surface, identify
-  the current baseline, what the new packet supersedes or narrows, and how user
-  expectations should simplify afterward.
 - Prefer writing explicit sections such as assumptions, resolved decisions,
   open questions, and candidate stories when they materially affect later
   design or breakdown work.
 
-## Recommended `discover.md` structure
+## Discovery quality bar
 
-Use explicit headings whenever the feature is large enough to benefit from them.
-For most canonical features, prefer a structure close to:
+Prefer explicit headings whenever the feature is large enough to benefit from
+them. For most canonical features, `discover.md` should cover:
 
-1. `Problem statement`
-2. `Related stories` or `Candidate stories`
-3. `Repository context`
-   - confirmed facts
-   - reference conclusions already captured locally
-   - working assumptions
-   - current workflow surface this feature reshapes, when relevant
-4. `Desired outcomes`
-5. `Non-goals`
-6. `Users and stakeholders`
-7. `Proposed capability shape`
-   - user experience
-   - recommended architecture or scope shape
-   - scope boundaries
-8. `Constraints`
-9. `Risks`
-10. `Assumptions`
-11. `Open questions`
-12. `Resolved decisions`
-13. `Success criteria`
-14. `Recommended next planning step`
+- the problem and desired outcomes
+- repository and reference context
+- users, stakeholders, constraints, and risks
+- scope boundaries and non-goals
+- current workflow baseline and what the feature supersedes or narrows, when
+  workflow shape is changing
+- assumptions, open questions, and resolved decisions when they matter
+- candidate stories and the next planning step
 
-You do not need every heading for every target, especially tiny additive
-subfeatures, but this is the quality bar for new feature discovery work.
+Do not treat that as a rigid required heading list. Small additive subfeatures
+may use a reduced form as long as the discovery still gives downstream design
+and breakdown enough durable context.
 
 ## Recommended `user-stories.md` usage
 
@@ -116,7 +99,7 @@ Prefer:
 2. Inspect the repository, existing docs, optional `reference-research.md`, and
    other relevant context.
 3. Write `discover.md` with explicit problem framing, actors, goals,
-   constraints, risks, assumptions, and next-step guidance.
+   constraints, risks, and next-step guidance.
 4. Create `user-stories.md` with stable story identifiers unless the packet is
    intentionally too small for story-level planning; when omitting it, state
    why in `discover.md`.
