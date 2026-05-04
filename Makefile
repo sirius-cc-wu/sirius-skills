@@ -25,6 +25,7 @@ MANAGED_SKILLS := \
 	guide-planning \
 	propose \
 	blueprint \
+	reconcile-execution \
 	review-execution \
 	review-planning \
 	simplify \
