@@ -60,6 +60,16 @@ The sixth slice adds a machine-readable readiness dashboard:
     `review_boundary`, etc.) without replacing planning/execution source-of-truth
     artifacts.
 
+The seventh slice adds explicit terminal finalization:
+
+20. Finalize one completed `implemented` feature or subfeature explicitly through
+    `--finalize`.
+21. Require a durable execution reconciliation record in `system-design.md`
+    before archive.
+22. Stop on `reconcile-execution` when the canonical design has not yet been
+    reconciled with completed slice execution.
+23. Invoke `archive-artifacts` only after reconciliation passes.
+
 ## Preferred Input
 
 - a feature slug, subfeature slug, or planning packet path
@@ -72,6 +82,7 @@ python3 skills/ship/scripts/ship.py <target>
 python3 skills/ship/scripts/ship.py <target> --json
 python3 skills/ship/scripts/ship.py <target> --bootstrap-next
 python3 skills/ship/scripts/ship.py <target> --resume
+python3 skills/ship/scripts/ship.py <target> --finalize
 python3 skills/ship/scripts/ship.py <target> --approve --approval-note "approved for execution"
 python3 skills/ship/scripts/ship.py <target> --scope apps/payments
 ```
@@ -92,6 +103,8 @@ not as universally side-effect free.
   - `--bootstrap-next` may create one next-ready execution slice and write the
     mapped execution slice ID back into `slice-traceability.md`
   - `--resume` may bootstrap the next slice when no active mapped slice exists
+  - `--finalize` may archive a completed `implemented` target after the durable
+    reconciliation gate passes
 - **Delegated side effects**
   - when `accelerators.ship.delegate_to_ship_slice` is enabled, `--resume` may
     hand execution to `ship-slice`, which then owns downstream execution
@@ -112,7 +125,7 @@ Behavior:
 - `ship <target>` / `ship --json` remain backlog-resolution only and report
   `readiness.preflight.status=disabled` or `skipped`
 - local-only preflight applies only to mutation-capable paths:
-  `--bootstrap-next` and mutation-capable `--resume`
+  `--bootstrap-next`, mutation-capable `--resume`, and `--finalize`
 - when local-only preflight blocks on ship-local guardrails, `ship` keeps the
   canonical blocker codes (`approval_required`, `commit_checkpoint`) and marks
   `readiness.stop_reason.phase=preflight`
@@ -136,9 +149,13 @@ Behavior:
   dependency-ready slice exists.
 - Require a clean worktree before continuing past a completed mapped slice so one
   commit still represents one completed execution slice.
+- Require a durable `execution-reconciliation` block in `system-design.md`
+  before terminal archive mutation.
 - Keep one-slice execution ownership in the existing `slice`, `brief`,
   `blueprint`, `guide-execution`, `review-execution`, `close-slice`, and
   `commit` skills.
+- Keep terminal reconciliation owned by `reconcile-execution` and archive
+  mutation owned by `archive-artifacts`, even when `ship` orchestrates both.
 - Keep explicit human approval as a durable gate before delegated execution
   autopilot starts from `planning_reviewed`.
 - Keep readiness and stop-reason guardrails aligned with the shared

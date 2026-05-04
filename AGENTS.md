@@ -91,6 +91,17 @@ When you change a skill or helper:
 - update any top-level docs that describe the behavior
 - remove stale examples in the same change when practical
 
+### Reconcile before archive
+
+When a feature or subfeature has completed all planned slices and is about to be
+archived:
+
+- reconcile the final implementation against the canonical `system-design.md`
+- record that review durably in an `execution-reconciliation` block inside
+  `system-design.md`
+- do not archive closed slices until that reconciliation block declares
+  `Status: aligned` and names the reviewed planned slice IDs
+
 ### Prefer backward-compatible changes
 
 Favor additive changes, compatibility shims, and normalization over abrupt

@@ -28,10 +28,19 @@ ARTIFACT_INVENTORY_SCRIPT = (
     SKILLS_DIR / "audit-artifacts" / "scripts" / "artifact_inventory.py"
 )
 SHIP_SLICE_SCRIPT = SKILLS_DIR / "ship-slice" / "scripts" / "ship_slice.py"
+ARCHIVE_DATA_SCRIPT = (
+    SKILLS_DIR / "archive-artifacts" / "scripts" / "archive_data.py"
+)
 AUTOMATABLE_OWNERS = {"brief", "blueprint", "implementation"}
 SUPPORTED_PREFLIGHT_MODES = {"off", "local_only"}
-MUTATION_CAPABLE_PREFLIGHT_OPERATIONS = {"bootstrap_next", "delegate_resume"}
+MUTATION_CAPABLE_PREFLIGHT_OPERATIONS = {
+    "bootstrap_next",
+    "delegate_resume",
+    "finalize",
+}
 PREFLIGHT_BLOCKING_REASONS = {"approval_required", "commit_checkpoint"}
+EXECUTION_RECONCILIATION_START = "<!-- execution-reconciliation:start -->"
+EXECUTION_RECONCILIATION_END = "<!-- execution-reconciliation:end -->"
 
 if REPO_LIB_DIR.is_dir() and str(REPO_LIB_DIR) not in sys.path:
     sys.path.insert(0, str(REPO_LIB_DIR))
@@ -111,6 +120,8 @@ class BootstrapResult:
     action: str
     requested_command: str
     delegate_result: Optional[Dict[str, object]] = None
+    finalization: Optional[Dict[str, object]] = None
+    archive_result: Optional[Dict[str, object]] = None
 
     def to_dict(self) -> Dict[str, object]:
         payload = self.backlog.to_dict()
@@ -124,6 +135,12 @@ class BootstrapResult:
         payload["action"] = self.action
         payload["delegate_result"] = (
             dict(self.delegate_result) if self.delegate_result is not None else None
+        )
+        payload["finalization"] = (
+            dict(self.finalization) if self.finalization is not None else None
+        )
+        payload["archive_result"] = (
+            dict(self.archive_result) if self.archive_result is not None else None
         )
         payload["handoff_payload"] = (
             dict(self.backlog.active_slice_handoff["handoff_payload"])
@@ -212,6 +229,8 @@ def classify_preflight_operation_for_backlog() -> str:
 
 
 def classify_preflight_operation_for_result(result: BootstrapResult) -> str:
+    if result.requested_command == "finalize":
+        return "finalize"
     if result.completed or result.action == "complete":
         return "complete"
     if result.action == "blocked":
@@ -334,6 +353,13 @@ def build_bootstrap_readiness(result: BootstrapResult) -> Dict[str, object]:
 
     if result.action == "approval_required":
         blocked_by.append("approval_required")
+    elif result.action == "reconciliation_required":
+        blocked_by.append("feature_reconciliation_required")
+        if stop_reason is None:
+            stop_reason = {
+                "kind": "feature_reconciliation_required",
+                "phase": "finalization",
+            }
     elif result.action == "commit_checkpoint_required":
         blocked_by.append("commit_checkpoint")
     elif result.action == "blocked":
@@ -1292,6 +1318,184 @@ def ship_accelerator_config(scope_context, execution_module) -> Dict[str, object
     return ship_config if isinstance(ship_config, dict) else {}
 
 
+def _normalize_reconciliation_key(value: str) -> str:
+    return " ".join(value.strip().lower().split())
+
+
+def _relative_display_path(path: Path) -> str:
+    try:
+        return str(path.relative_to(Path.cwd()))
+    except ValueError:
+        return str(path)
+
+
+def _extract_execution_reconciliation_block(markdown: str) -> Optional[str]:
+    start = markdown.find(EXECUTION_RECONCILIATION_START)
+    if start < 0:
+        return None
+    end = markdown.find(EXECUTION_RECONCILIATION_END, start)
+    if end < 0:
+        return None
+    body_start = start + len(EXECUTION_RECONCILIATION_START)
+    return markdown[body_start:end].strip()
+
+
+def _parse_execution_reconciliation_fields(block_text: str) -> Dict[str, str]:
+    fields: Dict[str, str] = {}
+    for line in block_text.splitlines():
+        stripped = line.strip()
+        if not stripped or stripped.startswith("-") or ":" not in stripped:
+            continue
+        key, value = stripped.split(":", 1)
+        fields[_normalize_reconciliation_key(key)] = value.strip()
+    return fields
+
+
+def inspect_execution_reconciliation(
+    target_dir: Path, backlog: BacklogResolution
+) -> Dict[str, object]:
+    design_path = target_dir / "system-design.md"
+    expected_planned_slice_ids = [entry.planned_slice_id for entry in backlog.entries]
+    summary: Dict[str, object] = {
+        "required": True,
+        "owner": "reconcile-execution",
+        "path": _relative_display_path(design_path),
+        "expected_planned_slice_ids": expected_planned_slice_ids,
+        "reviewed_planned_slice_ids": [],
+        "missing_planned_slice_ids": list(expected_planned_slice_ids),
+        "unexpected_planned_slice_ids": [],
+        "status": "missing_design",
+        "archivable": False,
+        "reason": "Missing system-design.md for execution reconciliation.",
+    }
+    if not design_path.exists():
+        return summary
+
+    summary["status"] = "missing_block"
+    summary["reason"] = (
+        "Missing execution reconciliation block in system-design.md."
+    )
+    markdown = design_path.read_text(encoding="utf-8")
+    block_text = _extract_execution_reconciliation_block(markdown)
+    if block_text is None:
+        return summary
+
+    fields = _parse_execution_reconciliation_fields(block_text)
+    raw_status = fields.get("status", "")
+    normalized_status = raw_status.strip().lower().replace("-", "_")
+    reviewed_planned_slice_ids = _split_cell_values(
+        fields.get("reviewed planned slice ids", "")
+    )
+    expected_set = set(expected_planned_slice_ids)
+    reviewed_set = set(reviewed_planned_slice_ids)
+    missing_planned_slice_ids = [
+        slice_id for slice_id in expected_planned_slice_ids if slice_id not in reviewed_set
+    ]
+    unexpected_planned_slice_ids = [
+        slice_id for slice_id in reviewed_planned_slice_ids if slice_id not in expected_set
+    ]
+    summary.update(
+        {
+            "reviewed_planned_slice_ids": reviewed_planned_slice_ids,
+            "missing_planned_slice_ids": missing_planned_slice_ids,
+            "unexpected_planned_slice_ids": unexpected_planned_slice_ids,
+        }
+    )
+    if normalized_status != "aligned":
+        summary["status"] = "invalid_status"
+        summary["reason"] = (
+            "Execution reconciliation must declare 'Status: aligned' before archive."
+        )
+        return summary
+    if missing_planned_slice_ids or unexpected_planned_slice_ids:
+        summary["status"] = "coverage_mismatch"
+        summary["reason"] = (
+            "Execution reconciliation coverage does not match the completed planned slice IDs."
+        )
+        return summary
+
+    summary["status"] = "aligned"
+    summary["archivable"] = True
+    summary["reason"] = "Execution reconciliation is aligned and covers all planned slices."
+    return summary
+
+
+def finalize_target(
+    selector: str, explicit_scope: Optional[str] = None
+) -> BootstrapResult:
+    backlog = resolve_backlog(selector, explicit_scope=explicit_scope)
+    if backlog.active_execution_slices:
+        raise RuntimeError(
+            "Cannot finalize while mapped execution slices are still active: "
+            + ", ".join(backlog.active_execution_slices)
+        )
+    if backlog.planning_status != "implemented":
+        raise RuntimeError(
+            f"Planning target '{backlog.target_id}' must be in 'implemented' status before finalization. "
+            f"Current status: '{backlog.planning_status}'."
+        )
+    if not backlog.entries or not all(entry.state == "completed" for entry in backlog.entries):
+        raise RuntimeError(
+            "Cannot finalize while planned slices remain unfinished."
+        )
+
+    planning_module = load_module(GUIDE_PLANNING_SCRIPT, "manage_planning")
+    _, target_dir, _, scope_context, _ = resolve_target(
+        planning_module, selector, explicit_scope
+    )
+    checkpoint_required = require_commit_checkpoint(
+        backlog, str(scope_context.repo_root), requested_command="finalize"
+    )
+    if checkpoint_required is not None:
+        return checkpoint_required
+
+    reconciliation = inspect_execution_reconciliation(Path(target_dir), backlog)
+    if not bool(reconciliation.get("archivable")):
+        return BootstrapResult(
+            backlog=backlog,
+            bootstrapped_slice_id=None,
+            bootstrapped_slice_path=None,
+            slice_status=None,
+            checkpoint_slice_id=None,
+            dirty_worktree_paths=[],
+            next_owner="reconcile-execution",
+            completed=False,
+            action="reconciliation_required",
+            requested_command="finalize",
+            delegate_result=None,
+            finalization=reconciliation,
+            archive_result=None,
+        )
+
+    archive_module = load_module(ARCHIVE_DATA_SCRIPT, "archive_data")
+    try:
+        archive_result = archive_module.build_archive_result(
+            backlog.target_type, backlog.target_id, True
+        )
+    except archive_module.ArchiveUsageError as exc:
+        raise RuntimeError(str(exc))
+
+    refreshed_backlog = resolve_backlog(selector, explicit_scope=explicit_scope)
+    refreshed_reconciliation = inspect_execution_reconciliation(
+        Path(target_dir), refreshed_backlog
+    )
+    return BootstrapResult(
+        backlog=refreshed_backlog,
+        bootstrapped_slice_id=None,
+        bootstrapped_slice_path=None,
+        slice_status=None,
+        checkpoint_slice_id=None,
+        dirty_worktree_paths=[],
+        next_owner="none",
+        completed=True,
+        action="archived",
+        requested_command="finalize",
+        delegate_result=None,
+        finalization=refreshed_reconciliation,
+        archive_result=archive_result,
+    )
+
+
 def maybe_delegate_to_ship_slice(
     backlog: BacklogResolution,
     *,
@@ -1362,6 +1566,14 @@ def build_parser() -> argparse.ArgumentParser:
         "--resume",
         action="store_true",
         help="Resume an active mapped slice or bootstrap the next ready slice.",
+    )
+    parser.add_argument(
+        "--finalize",
+        action="store_true",
+        help=(
+            "Require a durable execution reconciliation record for a completed implemented "
+            "target, then archive its closed slices."
+        ),
     )
     parser.add_argument(
         "--approve",
@@ -1477,6 +1689,40 @@ def render_bootstrap_text(result: BootstrapResult) -> str:
                 f"Next owner: {result.next_owner}",
             ]
         )
+    elif result.action == "reconciliation_required":
+        finalization = result.finalization or {}
+        lines.extend(
+            [
+                "",
+                "Execution reconciliation is required before archive.",
+                f"Next owner: {result.next_owner}",
+                f"Reconciliation status: {finalization.get('status', 'unknown')}",
+                f"Reconciliation path: {finalization.get('path', '-')}",
+                f"Reason: {finalization.get('reason', '-')}",
+            ]
+        )
+        missing_ids = finalization.get("missing_planned_slice_ids")
+        if isinstance(missing_ids, list) and missing_ids:
+            lines.append(
+                "Missing planned slice coverage: " + ", ".join(str(item) for item in missing_ids)
+            )
+        unexpected_ids = finalization.get("unexpected_planned_slice_ids")
+        if isinstance(unexpected_ids, list) and unexpected_ids:
+            lines.append(
+                "Unexpected planned slice coverage: "
+                + ", ".join(str(item) for item in unexpected_ids)
+            )
+    elif result.action == "archived":
+        archive_result = result.archive_result or {}
+        applied = archive_result.get("applied") if isinstance(archive_result, dict) else None
+        message = applied.get("message") if isinstance(applied, dict) else None
+        lines.extend(
+            [
+                "",
+                "Finalization complete.",
+                str(message or "Archived completed target after reconciliation."),
+            ]
+        )
     elif result.completed:
         lines.extend(["", "All planned slices are already completed."])
     else:
@@ -1487,8 +1733,14 @@ def render_bootstrap_text(result: BootstrapResult) -> str:
 def main() -> int:
     parser = build_parser()
     args = parser.parse_args()
-    if args.bootstrap_next and args.resume:
-        print("Choose either --bootstrap-next or --resume, not both.", file=sys.stderr)
+    selected_actions = sum(
+        1 for flag in (args.bootstrap_next, args.resume, args.finalize) if flag
+    )
+    if selected_actions > 1:
+        print(
+            "Choose at most one of --bootstrap-next, --resume, or --finalize.",
+            file=sys.stderr,
+        )
         return 2
     approval_record: Optional[Dict[str, object]] = None
     try:
@@ -1500,6 +1752,8 @@ def main() -> int:
             )
         if args.resume:
             result = resume_execution(args.target, explicit_scope=args.scope)
+        elif args.finalize:
+            result = finalize_target(args.target, explicit_scope=args.scope)
         elif args.bootstrap_next:
             result = bootstrap_next_slice(args.target, explicit_scope=args.scope)
         else:

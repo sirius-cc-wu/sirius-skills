@@ -42,6 +42,23 @@ def write_file(path: Path, content: str):
     path.write_text(content, encoding="utf-8")
 
 
+def write_reconciliation_block(
+    design_path: Path, planned_slice_ids: list[str], *, status: str = "aligned"
+):
+    body = (
+        "\n<!-- execution-reconciliation:start -->\n"
+        f"Status: {status}\n"
+        f"Reviewed Planned Slice IDs: {', '.join(planned_slice_ids)}\n"
+        "Summary:\n"
+        "- feature-level design and completed slice execution have been reconciled\n"
+        "<!-- execution-reconciliation:end -->\n"
+    )
+    design_path.write_text(
+        design_path.read_text(encoding="utf-8") + body,
+        encoding="utf-8",
+    )
+
+
 def init_git_repo(root: Path):
     subprocess.run(["git", "init", "--quiet"], cwd=root, check=True)
     subprocess.run(
@@ -116,6 +133,53 @@ def setup_repo(tmp_path: Path, monkeypatch):
         "feature_path": feature_path,
         "subfeature_path": subfeature_path,
     }
+
+
+def setup_completed_implemented_feature(env):
+    planning = env["planning"]
+    execution = env["execution"]
+    feature_path = env["feature_path"]
+
+    write_file(
+        feature_path / "slice-planning.md",
+        """# Slice Planning
+
+| Slice ID | Story ID | Title | Summary | Target Area | Lane | Validation | Planned Action | Depends On | Slice Ready |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| mse-scope-and-backlog-resolution | EW-01 | Resolve backlog | Summary | area | primary | test | create slice |  | yes |
+""",
+    )
+    write_file(
+        feature_path / "slice-traceability.md",
+        """# Slice Traceability
+
+| Story ID | Story Size | Story Summary | Increments | Planned Slice IDs | Slice Areas | Blocked By | Execution Slice IDs | Notes |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| EW-01 | M | Summary | I1 | mse-scope-and-backlog-resolution | area |  | mse-scope-and-backlog-resolution | Notes |
+""",
+    )
+
+    rows = planning.parse_registry()
+    feature = planning.find_feature(rows, "execution-workflow")
+    assert feature is not None
+    ok, message = planning.update_feature_status(
+        rows,
+        feature,
+        "implemented",
+        force=True,
+        review_note="done",
+    )
+    assert ok, message
+
+    _, created = execution.create_slice("mse-scope-and-backlog-resolution", "Resolve backlog")
+    assert created
+    execution_rows = execution.parse_registry()
+    slice_row = execution.resolve_slice(execution_rows, "mse-scope-and-backlog-resolution")
+    assert slice_row is not None
+    success, message = execution.update_slice_status(
+        execution_rows, slice_row, "closed", force=True
+    )
+    assert success, message
 
 
 def test_resolve_feature_scope_returns_first_ready_planned_slice(tmp_path, monkeypatch, capsys):
@@ -1833,51 +1897,8 @@ def test_resume_delegation_invalidates_approval_when_planning_changes(
 
 def test_resolve_backlog_allows_implemented_target(tmp_path, monkeypatch, capsys):
     env = setup_repo(tmp_path, monkeypatch)
-    planning = env["planning"]
-    feature_path = env["feature_path"]
     module = env["module"]
-    execution = env["execution"]
-
-    write_file(
-        feature_path / "slice-planning.md",
-        """# Slice Planning
-
-| Slice ID | Story ID | Title | Summary | Target Area | Lane | Validation | Planned Action | Depends On | Slice Ready |
-| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| mse-scope-and-backlog-resolution | EW-01 | Resolve backlog | Summary | area | primary | test | create slice |  | yes |
-""",
-    )
-    write_file(
-        feature_path / "slice-traceability.md",
-        """# Slice Traceability
-
-| Story ID | Story Size | Story Summary | Increments | Planned Slice IDs | Slice Areas | Blocked By | Execution Slice IDs | Notes |
-| --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| EW-01 | M | Summary | I1 | mse-scope-and-backlog-resolution | area |  | mse-scope-and-backlog-resolution | Notes |
-""",
-    )
-
-    rows = planning.parse_registry()
-    feature = planning.find_feature(rows, "execution-workflow")
-    assert feature is not None
-    ok, message = planning.update_feature_status(
-        rows,
-        feature,
-        "implemented",
-        force=True,
-        review_note="done",
-    )
-    assert ok, message
-
-    _, created = execution.create_slice("mse-scope-and-backlog-resolution", "Resolve backlog")
-    assert created
-    execution_rows = execution.parse_registry()
-    slice_row = execution.resolve_slice(execution_rows, "mse-scope-and-backlog-resolution")
-    assert slice_row is not None
-    success, message = execution.update_slice_status(
-        execution_rows, slice_row, "closed", force=True
-    )
-    assert success, message
+    setup_completed_implemented_feature(env)
 
     assert run_cli(module, monkeypatch, "execution-workflow", "--json") == 0
     payload = json.loads(capsys.readouterr().out)
@@ -1888,3 +1909,66 @@ def test_resolve_backlog_allows_implemented_target(tmp_path, monkeypatch, capsys
     assert payload["readiness"]["can_proceed"] is False
     assert payload["readiness"]["next_owner"] == "none"
     assert payload["readiness"]["blocked_by"] == ["completed"]
+
+
+def test_finalize_requires_execution_reconciliation_before_archive(
+    tmp_path, monkeypatch, capsys
+):
+    env = setup_repo(tmp_path, monkeypatch)
+    module = env["module"]
+    setup_completed_implemented_feature(env)
+    git_commit_all(tmp_path, "fixture: complete implemented feature")
+
+    assert run_cli(module, monkeypatch, "execution-workflow", "--finalize", "--json") == 0
+    payload = json.loads(capsys.readouterr().out)
+
+    assert payload["action"] == "reconciliation_required"
+    assert payload["next_owner"] == "reconcile-execution"
+    assert payload["readiness"]["can_proceed"] is False
+    assert payload["readiness"]["blocked_by"] == ["feature_reconciliation_required"]
+    assert payload["readiness"]["stop_reason"] == {
+        "kind": "feature_reconciliation_required",
+        "phase": "finalization",
+    }
+    assert payload["finalization"]["status"] == "missing_block"
+    assert payload["finalization"]["expected_planned_slice_ids"] == [
+        "mse-scope-and-backlog-resolution"
+    ]
+
+
+def test_finalize_archives_completed_target_after_aligned_reconciliation(
+    tmp_path, monkeypatch, capsys
+):
+    env = setup_repo(tmp_path, monkeypatch)
+    execution = env["execution"]
+    feature_path = env["feature_path"]
+    module = env["module"]
+    setup_completed_implemented_feature(env)
+    write_reconciliation_block(
+        feature_path / "system-design.md",
+        ["mse-scope-and-backlog-resolution"],
+    )
+    git_commit_all(tmp_path, "fixture: reconcile completed feature")
+
+    assert run_cli(module, monkeypatch, "execution-workflow", "--finalize", "--json") == 0
+    payload = json.loads(capsys.readouterr().out)
+
+    assert payload["action"] == "archived"
+    assert payload["completed"] is True
+    assert payload["archive_result"]["applied"]["archived_slice_ids"] == [
+        "mse-scope-and-backlog-resolution"
+    ]
+    assert payload["finalization"]["status"] == "aligned"
+
+    execution_rows = execution.parse_registry()
+    slice_row = execution.resolve_slice(
+        execution_rows, "mse-scope-and-backlog-resolution"
+    )
+    assert slice_row is not None
+    assert str(slice_row["path"]).startswith(
+        "slices/.archived/mse-scope-and-backlog-resolution-"
+    )
+
+    design_text = (feature_path / "system-design.md").read_text(encoding="utf-8")
+    assert "<!-- execution-reconciliation:start -->" in design_text
+    assert "<!-- archived-slice-summaries:start -->" in design_text
