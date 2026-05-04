@@ -290,6 +290,64 @@ def test_build_archive_result_applies_subfeature_archive_and_updates_system_desi
     assert "Document the replacement flow design before archival." in design_text
 
 
+def test_feature_archive_default_mode_does_not_copy_structural_diagrams(tmp_path, monkeypatch):
+    env = setup_repo(tmp_path, monkeypatch)
+
+    structural_block = (
+        "\n## Structural Context\n\n"
+        "```plantuml\n"
+        "@startuml\n"
+        'component "Checkout Structural Context" as CSC\n'
+        "@enduml\n"
+        "```\n"
+    )
+    design_path = env["feature_dir"] / "system-design.md"
+    design_path.write_text(
+        design_path.read_text(encoding="utf-8") + structural_block,
+        encoding="utf-8",
+    )
+
+    env["archive"].build_archive_result(
+        artifact_type="feature",
+        artifact_id="checkout",
+        apply=True,
+    )
+
+    design_text = design_path.read_text(encoding="utf-8")
+    assert design_text.count("Checkout Structural Context") == 1
+    assert "### Structural Context" not in design_text
+
+
+def test_feature_archive_opt_in_copies_existing_structural_diagrams(tmp_path, monkeypatch):
+    env = setup_repo(tmp_path, monkeypatch)
+
+    structural_block = (
+        "\n## Structural Context\n\n"
+        "```plantuml\n"
+        "@startuml\n"
+        'component "Checkout Structural Context" as CSC\n'
+        "@enduml\n"
+        "```\n"
+    )
+    design_path = env["feature_dir"] / "system-design.md"
+    design_path.write_text(
+        design_path.read_text(encoding="utf-8") + structural_block,
+        encoding="utf-8",
+    )
+
+    payload = env["archive"].build_archive_result(
+        artifact_type="feature",
+        artifact_id="checkout",
+        apply=True,
+        include_structural_diagrams=True,
+    )
+
+    design_text = design_path.read_text(encoding="utf-8")
+    assert payload["applied"]["structural_diagrams_included"] == 1
+    assert "### Structural Context" in design_text
+    assert design_text.count("Checkout Structural Context") == 2
+
+
 def test_cli_json_filters_one_artifact_type(tmp_path, monkeypatch, capsys):
     env = setup_repo(tmp_path, monkeypatch)
 

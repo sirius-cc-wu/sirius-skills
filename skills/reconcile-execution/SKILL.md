@@ -55,6 +55,10 @@ Rules:
    operator-visible outcomes.
 4. Update `system-design.md` until it matches the final behavior or explicitly
    explains any intentional deviation.
+   - When the final design relies on sequence-heavy execution behavior, keep at
+     least one structural class/component-style diagram in the canonical
+     `system-design.md` so later archive summaries do not have to invent that
+     context.
 5. Add or refresh the reconciliation block with `Status: aligned` and the full
    set of reviewed planned slice IDs.
 
@@ -65,5 +69,8 @@ Rules:
   `system-design.md`.
 - Do not mark the reconciliation block `aligned` while known behavior drift is
   still unresolved.
+- Do not defer missing structural context to `archive-artifacts`; preserve or
+  add the canonical class/component-style diagram here when execution depends on
+  it.
 - Keep the reconciliation record generic and durable; avoid project-local review
   ceremony or tracker-specific fields.

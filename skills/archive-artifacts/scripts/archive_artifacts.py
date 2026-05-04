@@ -43,6 +43,15 @@ def parse_args() -> argparse.Namespace:
         help="Archive one supported target instead of only reporting candidates.",
     )
     parser.add_argument(
+        "--include-structural-diagrams",
+        action="store_true",
+        help=(
+            "When applying a feature or subfeature archive, preserve existing "
+            "class/component-style PlantUML diagrams from the blueprint or "
+            "canonical system-design.md inside the archived summary appendix."
+        ),
+    )
+    parser.add_argument(
         "--json",
         action="store_true",
         help="Emit machine-readable output.",
@@ -82,7 +91,12 @@ def render_text(result: Dict[str, object]) -> str:
 def main() -> int:
     args = parse_args()
     try:
-        result = build_archive_result(args.artifact_type, args.artifact_id, args.apply)
+        result = build_archive_result(
+            args.artifact_type,
+            args.artifact_id,
+            args.apply,
+            include_structural_diagrams=args.include_structural_diagrams,
+        )
     except ArchiveUsageError as exc:
         print(str(exc), file=sys.stderr)
         return ERROR_EXIT_CODE

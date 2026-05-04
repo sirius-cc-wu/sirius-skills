@@ -168,6 +168,18 @@ def _dedupe_preserve_order(values: List[str]) -> List[str]:
     return ordered
 
 
+def _dedupe_text_blocks(values: List[str]) -> List[str]:
+    seen = set()
+    ordered: List[str] = []
+    for value in values:
+        candidate = value.strip()
+        if not candidate or candidate in seen:
+            continue
+        seen.add(candidate)
+        ordered.append(candidate)
+    return ordered
+
+
 def _extract_slice_ids_from_planning_text(markdown: str) -> List[str]:
     lines = markdown.splitlines()
     in_slice_table = False
@@ -468,6 +480,38 @@ def _extract_blueprint_figures(blueprint_text: str) -> List[str]:
     return figures
 
 
+def _is_structural_plantuml(block: str) -> bool:
+    structural_markers = (
+        r"(?m)^\s*class\s+",
+        r"(?m)^\s*component\s+",
+        r"(?m)^\s*interface\s+",
+        r"(?m)^\s*entity\s+",
+        r"(?m)^\s*package\s+",
+        r"(?m)^\s*node\s+",
+        r"(?m)^\s*artifact\s+",
+        r"(?m)^\s*rectangle\s+",
+        r"(?m)^\s*database\s+",
+        r"(?m)^\s*frame\s+",
+        r"(?m)^\s*cloud\s+",
+        r"(?m)^\s*folder\s+",
+        r"(?m)^\s*collections\s+",
+        r"(?m)^\s*queue\s+",
+        r"(?m)^\s*skinparam\s+componentStyle\b",
+        r"(?m)^\s*skinparam\s+classAttributeIconSize\b",
+    )
+    return any(re.search(pattern, block) for pattern in structural_markers)
+
+
+def _extract_structural_figures(text: str) -> List[str]:
+    return _dedupe_text_blocks(
+        [
+            match.group(0).strip()
+            for match in PLANTUML_BLOCK_PATTERN.finditer(text)
+            if _is_structural_plantuml(match.group(0))
+        ]
+    )
+
+
 def _prepare_slice_summary(inventory, row: Dict[str, object]) -> PreparedSliceSummary:
     slice_dir = inventory.context.execution.slice_path_for_row(row)
     brief_path = Path(slice_dir) / "brief.md"
@@ -524,13 +568,28 @@ def _load_existing_summary_blocks(design_text: str) -> Dict[str, str]:
     }
 
 
-def _write_summary_appendix(design_path: Path, blocks: Dict[str, str]) -> None:
+def _write_summary_appendix(
+    design_path: Path,
+    blocks: Dict[str, str],
+    structural_figures: Optional[List[str]] = None,
+) -> None:
     design_text = design_path.read_text(encoding="utf-8")
     existing_blocks = _load_existing_summary_blocks(design_text)
     existing_blocks.update(blocks)
 
     ordered_ids = list(existing_blocks.keys())
     managed_lines = [ARCHIVE_SUMMARIES_START, "## Archived Slice Summaries", ""]
+    preserved_structural_figures = _dedupe_text_blocks(structural_figures or [])
+    if preserved_structural_figures:
+        managed_lines.append("### Structural Context")
+        managed_lines.append("")
+        managed_lines.append(
+            "The following existing structural diagrams were preserved to anchor the behavior-focused archived slice summaries."
+        )
+        managed_lines.append("")
+        for figure in preserved_structural_figures:
+            managed_lines.append(figure)
+            managed_lines.append("")
     for slice_id in ordered_ids:
         managed_lines.append(existing_blocks[slice_id])
         managed_lines.append("")
@@ -551,12 +610,23 @@ def _apply_scope_archive(
     inventory,
     artifact_type: str,
     artifact_id: str,
+    include_structural_diagrams: bool = False,
 ) -> Dict[str, object]:
     target = _resolve_scope_target(inventory, artifact_type, artifact_id)
     prepared_summaries = [
         _prepare_slice_summary(inventory, row)
         for row in sorted(target.closed_slice_rows, key=lambda row: str(row["id"]))
     ]
+    preserved_structural_figures: List[str] = []
+    if include_structural_diagrams:
+        for summary in prepared_summaries:
+            preserved_structural_figures.extend(
+                _extract_structural_figures(summary.blueprint_text)
+            )
+        preserved_structural_figures.extend(
+            _extract_structural_figures(target.design_path.read_text(encoding="utf-8"))
+        )
+        preserved_structural_figures = _dedupe_text_blocks(preserved_structural_figures)
 
     rows = inventory.context.execution.load_registry_json(inventory.context.slice_registry)
     archived_slice_ids: List[str] = []
@@ -574,9 +644,13 @@ def _apply_scope_archive(
         summary.slice_id: _render_slice_summary_block(summary)
         for summary in prepared_summaries
     }
-    _write_summary_appendix(target.design_path, rendered_blocks)
+    _write_summary_appendix(
+        target.design_path,
+        rendered_blocks,
+        structural_figures=preserved_structural_figures,
+    )
 
-    return {
+    applied = {
         "artifact_type": artifact_type,
         "artifact_id": target.artifact_id,
         "path": target.path,
@@ -587,12 +661,16 @@ def _apply_scope_archive(
             f"{artifact_type}:{target.artifact_id}"
         ),
     }
+    if include_structural_diagrams:
+        applied["structural_diagrams_included"] = len(preserved_structural_figures)
+    return applied
 
 
 def build_archive_result(
     artifact_type: Optional[str] = None,
     artifact_id: Optional[str] = None,
     apply: bool = False,
+    include_structural_diagrams: bool = False,
 ) -> Dict[str, object]:
     if artifact_id and not artifact_type:
         raise ArchiveUsageError("Use --artifact-type with --artifact-id.")
@@ -630,7 +708,12 @@ def build_archive_result(
                 "message": message,
             }
         else:
-            applied = _apply_scope_archive(inventory, artifact_type, artifact_id)
+            applied = _apply_scope_archive(
+                inventory,
+                artifact_type,
+                artifact_id,
+                include_structural_diagrams=include_structural_diagrams,
+            )
 
     return {
         "ok": True,

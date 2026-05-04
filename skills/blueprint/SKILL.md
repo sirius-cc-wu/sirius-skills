@@ -46,6 +46,9 @@ Resolve `<slice_path>` through `guide-execution`.
 - Use PlantUML as the UML language whenever you include detailed design diagrams.
 - Prefer slice-scoped detailed design diagrams such as class, sequence, state, or activity diagrams when they help explain non-trivial implementation work.
 - Keep execution-layer diagrams focused on the active work item rather than the whole feature.
+- When the detailed design depends mainly on sequence/activity/state behavior
+  across multiple objects or services, include at least one structural
+  class/component-style diagram that anchors those interactions.
 
 ## Planning Gates
 
@@ -76,7 +79,7 @@ Failed gates must be fixed or explicitly waived with rationale.
 1. Resolve the active slice with `guide-execution`.
 2. Read `brief.md` and scan the target codebase.
 3. Fill `plan-template.md`.
-4. Add PlantUML detailed design where structure, behavior, or state transitions need extra precision.
+4. Add PlantUML detailed design where structure, behavior, or state transitions need extra precision, and pair sequence-heavy designs with at least one structural class/component-style view.
 5. Validate traceability and gates.
 6. Update the slice through `guide-execution` when the blueprint is ready.
 7. If `auto_start_implementation` is enabled, continue directly into repository implementation work after the handoff; otherwise stop when the plan is actionable and ready for execution.

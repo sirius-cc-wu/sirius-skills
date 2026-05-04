@@ -55,6 +55,13 @@ python3 skills/archive-artifacts/scripts/archive_artifacts.py \
   --artifact-id audit-artifacts \
   --apply
 
+# Optional: preserve existing structural class/component diagrams too
+python3 skills/archive-artifacts/scripts/archive_artifacts.py \
+  --artifact-type subfeature \
+  --artifact-id audit-artifacts \
+  --apply \
+  --include-structural-diagrams
+
 # Emit machine-readable output
 python3 skills/archive-artifacts/scripts/archive_artifacts.py --json
 ```
@@ -76,6 +83,9 @@ Exit behavior:
   folders directly here.
 - For feature and subfeature apply mode, summarize slice history into
   `system-design.md` before archiving the targeted closed slices.
+- Keep structural-diagram carry-forward opt-in and limited to preserving
+  existing class/component-style PlantUML from blueprint or canonical
+  `system-design.md`; do not synthesize new diagrams during archive.
 - Keep archived slice summaries self-contained inside `system-design.md`; do
   not rely on source or archive path bullets to explain the result.
 - Keep archival explicit and scoped; do not bulk archive across unrelated
