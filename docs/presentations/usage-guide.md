@@ -79,6 +79,7 @@ Default planned slice IDs should use a scope-prefixed format such as
 *Where durable history is reported, repaired, and archived.*
 
 **Key Skills:**
+- `governance-update`: Tightens repo-level workflow rules when repeated drift exposes a policy gap.
 - `report-artifacts`: Summarizes proposals, features, subfeatures, and slices.
 - `audit-artifacts`: Finds drift, missing files, and broken links.
 - `repair-artifacts`: Repairs registries from valid durable state.
@@ -108,7 +109,12 @@ Stored in `slices/<slice-id>-<slug>/`
 9.  **Optional Batch Orchestration**: `ship` can keep working a reviewed and committed backlog one mapped slice at a time, but it stops at blockers and per-slice commit checkpoints.
 10. **Execute**: `brief` -> `blueprint` -> (Code) -> `review-execution`.
 11. **Close**: `close-slice` marks the slice done and preserves the execution context.
-12. **Maintain Durable History**: `archive-artifacts` can later summarize closed slices into `system-design.md` and move them into the archive area.
+12. **Reconcile Feature Closeout**: `reconcile-execution` aligns the canonical `system-design.md` with completed slice execution before feature-level archive.
+13. **Maintain Durable History**: `ship --finalize` can require that reconciliation and then route `archive-artifacts` to summarize closed slices into `system-design.md` and move them into the archive area.
+
+When the same closeout drift shows up across features, use `governance-update`
+to tighten the repo rule. `bootstrap` is not the owner for that policy; it only
+sets up the initial repo control surfaces.
 
 ---
 

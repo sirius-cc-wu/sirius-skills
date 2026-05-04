@@ -253,6 +253,7 @@ Examples of repo-native prompts that fit the current workflow:
 - "Review planning for the `replace-legacy-flow` subfeature before slice bootstrap."
 - "Use `ship` for `docs/features/checkout/subfeatures/replace-legacy-flow/` and continue until a blocker or per-slice commit checkpoint stops the run."
 - "Finalize subfeature `replace-legacy-flow` under `checkout` after its planned slices are closed."
+- "Use `governance-update` to add a repo rule that completed features must be reconciled against `system-design.md` before archive."
 - "Scan the repo for legacy `changes/` packets that still need migration."
 - "Dry-run migration of old `changes/` packets under `checkout` into durable subfeatures."
 
@@ -267,6 +268,13 @@ a Jira-oriented `jira` mode, and an `ask` mode that makes the agent stop and
 ask the user which preset to apply before writing config. When wiki scaffolding
 is requested, bootstrap also creates the derived wiki skeleton and patches an
 existing target-repo `AGENTS.md` with a small architecture-wiki guidance block.
+
+Use `skills/governance-update/` when the real fix is a durable repo rule rather
+than another one-off artifact edit. A good example is repeated
+design-versus-execution drift at feature closeout: governance should define the
+`reconcile-execution` / `ship --finalize` / `archive-artifacts` owner boundary,
+while `bootstrap` should stay limited to initial repo setup and should not
+invent that policy by default.
 
 Projects can add `.skills/planning.json` in the repository root to configure planning-layer layout.
 

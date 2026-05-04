@@ -22,7 +22,8 @@ When in doubt, prefer the **shortest happy-path prompt** first:
 - use `guide-scope` when the repository may have multiple scopes
 - use `guide-planning` when you need manual planning-layer routing
 - use `guide-execution` when you need manual execution-layer routing
-- use `archive-artifacts` when you want to summarize and archive closed slices without losing durable history
+- use `ship --finalize` when a completed feature or subfeature should be reconciled and archived through the preferred closeout path
+- use `archive-artifacts` when you want explicit maintenance-layer archival without the `ship` closeout orchestration
 - use `governance-update` when repeated drift means the real fix is a durable
   repo rule, not only a one-off artifact rewrite
 
@@ -227,13 +228,27 @@ Use `close-slice` for slice `CHK-12-form-state-refactor`.
 ```
 
 `close-slice` is non-destructive. It closes the slice and preserves its working
-context. Use `archive-artifacts` later if you want to move closed slices out of
-the active execution area.
+context. For feature or subfeature closeout, use `reconcile-execution` and then
+`ship --finalize` before moving closed slices out of the active execution area.
 
 ### 8. Archive and summarize closed slices
 
-Use this when closed slices should leave the active slice area, but their work
-items and design should still be visible in planning docs.
+Use this when feature or subfeature closeout has reached terminal reconciliation
+and the closed slices should leave the active slice area, but their work items
+and design should still be visible in planning docs.
+
+Preferred closeout path:
+
+```text
+Use `reconcile-execution` for `checkout` and align the canonical `system-design.md` with the completed slice execution before archive.
+```
+
+```text
+Use `ship` for `checkout` with `--finalize` after reconciliation is recorded.
+```
+
+Use direct `archive-artifacts` prompts when you explicitly want maintenance-
+layer archival behavior rather than the preferred `ship` closeout path.
 
 ```text
 Use `archive-artifacts` with `--artifact-type feature --artifact-id checkout --apply` to summarize and archive all closed planned slices for `checkout`.
@@ -263,6 +278,10 @@ Use `governance-update` to add a repo rule in `AGENTS.md` so UI design artifacts
 
 ```text
 Use `governance-update` to review repeated config-surface drift across `AGENTS.md`, `.skills/conventions.json`, and recent planning docs, then tighten the narrowest governance surface that should own the rule.
+```
+
+```text
+Use `governance-update` to add a repo rule that completed features must be reconciled against canonical `system-design.md` before `ship --finalize` or `archive-artifacts` can archive their closed slices.
 ```
 
 Good additions to the prompt:
@@ -376,7 +395,13 @@ Use `slice` to bootstrap the next approved slice for `checkout-redesign`.
 Use `ship` for `checkout-redesign` and continue through the planned slices until a blocker or per-slice commit checkpoint stops the run.
 ```
 
-### “Move closed slices out of the active area but keep their design history”
+### “Close out a completed feature and archive its closed slices”
+
+```text
+Use `reconcile-execution` for `checkout`, then use `ship` with `--finalize` once the reconciliation block is recorded.
+```
+
+### “Move closed slices out of the active area with explicit maintenance tooling”
 
 ```text
 Use `archive-artifacts` with `--artifact-type feature --artifact-id checkout --apply` and summarize the archived slices into the feature `system-design.md`.

@@ -24,7 +24,9 @@ Read these references when relevant:
    `AGENTS.md`, `.skills/conventions.json`, or closely related top-level docs.
 4. Keep rules specific, minimal, and enforceable instead of adding broad
    preference lists.
-5. Explain the intended future behavior change and explicit non-goals.
+5. When the gap is really about workflow ownership, say which skill or surface
+   should enforce the rule and which surfaces should only document it.
+6. Explain the intended future behavior change and explicit non-goals.
 
 ## Preferred Inputs
 
@@ -51,9 +53,12 @@ Read these references when relevant:
    - concrete enough to guide future work
    - short enough to stay readable
    - generic-first unless the repository explicitly needs local policy
-6. Update any top-level docs or examples that enumerate the affected governance
+6. When the gap is recurring design-versus-execution drift at feature closeout,
+   prefer a rule that requires canonical design reconciliation before archive
+   and name the owner boundary explicitly.
+7. Update any top-level docs or examples that enumerate the affected governance
    surface or promise the old behavior.
-7. Summarize:
+8. Summarize:
    - the governance surface updated
    - the new or changed rule
    - what future behavior it should steer
@@ -67,6 +72,9 @@ Read these references when relevant:
 - Keep shared skills generic; do not hardcode company-specific trackers, naming
   rules, or workflow steps unless the repo explicitly opts into them.
 - Prefer defaults, heuristics, and examples over giant checklists.
+- If the policy is "reconcile before archive," keep governance focused on the
+  rule and owner boundaries; do not move archive or reconciliation logic into
+  `governance-update` itself.
 - Treat new configuration surfaces as suspicious; if governance touches config,
   preserve existing typed ownership and document the owning boundary clearly.
 - If a better fix is “update one artifact” or “create one new skill,” say so
