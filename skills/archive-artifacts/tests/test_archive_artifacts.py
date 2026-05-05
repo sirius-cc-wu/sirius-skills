@@ -152,9 +152,12 @@ def setup_repo(tmp_path: Path, monkeypatch):
         "checkout",
         "# Slice Specification: Archive checkout flow\n\n"
         "## 1. Work Item Summary\n\n"
-        "- **Work Item**: Archive checkout flow\n"
-        "- **Requested Outcome**: Preserve the checkout slice as durable planning history.\n"
-        "- **Why this matters**: The feature docs should retain the implementation summary.\n",
+        "- **Work Item**: Archive checkout flow so the closed slice remains easy\n"
+        "  to understand after it moves out of the active execution area.\n"
+        "- **Requested Outcome**: Preserve the checkout slice as durable planning\n"
+        "  history.\n"
+        "- **Why this matters**: The feature docs should retain the implementation\n"
+        "  summary.\n",
         "# Implementation Plan: Archive checkout flow\n\n"
         "## 1. Summary\n\n"
         "Capture the execution design for the checkout archive flow in one durable place.\n\n"
@@ -177,8 +180,10 @@ def setup_repo(tmp_path: Path, monkeypatch):
         "replace-legacy-flow",
         "# Slice Specification: Replace legacy flow\n\n"
         "## 1. Work Item Summary\n\n"
-        "- **Work Item**: Replace legacy flow\n"
-        "- **Requested Outcome**: Keep a durable summary in the subfeature design doc.\n",
+        "- **Work Item**: Replace legacy flow without losing the archived design\n"
+        "  intent.\n"
+        "- **Requested Outcome**: Keep a durable summary in the subfeature design\n"
+        "  doc.\n",
         "# Implementation Plan: Replace legacy flow\n\n"
         "## 1. Summary\n\n"
         "Document the replacement flow design before archival.\n",
@@ -259,6 +264,10 @@ def test_build_archive_result_applies_feature_archive_and_updates_system_design(
     assert not subfeature_row["path"].startswith("slices/.archived/SUB-201")
     assert "## Archived Slice Summaries" in design_text
     assert "`CHK-101`: Archive checkout flow" in design_text
+    assert (
+        "Archive checkout flow so the closed slice remains easy to understand after it moves out of the active execution area."
+        in design_text
+    )
     assert "Preserve the checkout slice as durable planning history." in design_text
     assert "Capture the execution design for the checkout archive flow" in design_text
     assert "```plantuml" in design_text
@@ -287,6 +296,7 @@ def test_build_archive_result_applies_subfeature_archive_and_updates_system_desi
     assert payload["applied"]["archived_slice_ids"] == ["SUB-201"]
     assert archived_row["path"].startswith("slices/.archived/SUB-201-replace-legacy-flow/")
     assert "`SUB-201`: Replace legacy flow" in design_text
+    assert "Replace legacy flow without losing the archived design intent." in design_text
     assert "Document the replacement flow design before archival." in design_text
 
 

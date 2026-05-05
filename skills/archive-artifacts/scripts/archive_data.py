@@ -440,10 +440,22 @@ def _extract_brief_items(brief_text: str) -> List[str]:
     if body is None:
         return []
     items: List[str] = []
+    current_parts: List[str] = []
     for line in body.splitlines():
         stripped = line.strip()
         if stripped.startswith("- "):
-            items.append(stripped[2:].strip())
+            if current_parts:
+                items.append(" ".join(current_parts))
+            current_parts = [stripped[2:].strip()]
+            continue
+        if current_parts and stripped and not stripped.startswith("#"):
+            current_parts.append(stripped)
+            continue
+        if current_parts:
+            items.append(" ".join(current_parts))
+            current_parts = []
+    if current_parts:
+        items.append(" ".join(current_parts))
     return items[:5]
 
 
