@@ -88,12 +88,13 @@ Resolve `<feature_path>` as either:
 3. Compare discovery intent, design direction, and breakdown outputs for contradictions or missing handoff details, including duplicate configuration surfaces, consolidation drift, or parent/subfeature ownership drift.
 4. Record findings directly in the planning docs already used by the team. For subfeatures, write those findings back into the subfeature-local docs.
 5. Update the affected planning artifacts so the reviewed state is durable, including any `consolidation` metadata summary when the packet already relies on one.
-6. When the outcome is ready for approval, persist the readiness note in the planning docs and run `python3 skills/guide-planning/scripts/manage_planning.py sync-status <feature-selector> --through planning_reviewed --review-note "<readiness note>"`. If the reviewed packet depends on a metadata-carried consolidation summary, include the same normalized summary there as part of the ready state. If blockers remain, leave the metadata status unchanged.
+6. When the outcome is ready for approval, persist the readiness note in the planning docs. For canonical features, run `python3 skills/guide-planning/scripts/manage_planning.py sync-status <feature-selector> --through planning_reviewed --review-note "<readiness note>"`. For subfeatures, run `python3 skills/add-subfeature/scripts/manage_subfeatures.py set-status <feature-selector> <subfeature-id> reviewed --review-note "<readiness note>"`. If the reviewed packet depends on a metadata-carried consolidation summary, include the same normalized summary there as part of the ready state. If blockers remain, leave the metadata status unchanged.
 7. Stop when the work is ready for human approval and planning commit, or return it to `discover`, `design`, or `breakdown` as needed.
 
 ## Guardrails
 
 - Do not create slice-scoped execution slices directly; stop at reviewed planning and hand off to `slice` only after explicit approval and planning commit.
+- Do not treat a reviewed subfeature as implicitly approved; explicit human approval should later be recorded through `manage_subfeatures.py approve ...` before `slice` bootstrap.
 - Do not commit planning artifacts automatically from review output; the approval checkpoint comes first.
 - Do not invent new lifecycle states for review; use findings and explicit readiness notes instead.
 - Do not leave blocking review outcomes only in chat or transient notes.

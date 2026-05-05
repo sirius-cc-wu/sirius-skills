@@ -81,7 +81,6 @@ SUBFEATURE_STATUS_TO_PLANNING_STATUS = {
     "impact_ready": "discovery_ready",
     "design_ready": "design_ready",
     "breakdown_ready": "breakdown_ready",
-    "reviewed": "planning_reviewed",
     "finalized": "implemented",
 }
 
@@ -178,6 +177,35 @@ def normalize_review_note(value: object) -> Optional[str]:
         raise RuntimeError("Review note must be a string when present.")
     cleaned = re.sub(r"\s+", " ", value.strip())
     return cleaned or None
+
+
+def normalize_subfeature_approval_status(value: object, raw_status: str) -> str:
+    if value in {None, ""}:
+        return "approved" if raw_status == "finalized" else "pending"
+    if not isinstance(value, str):
+        raise RuntimeError("Subfeature approval status must be a string when present.")
+    normalized = value.strip().lower()
+    if normalized not in {"pending", "approved"}:
+        raise RuntimeError(
+            "Subfeature approval status must be one of ['approved', 'pending']."
+        )
+    return normalized
+
+
+def derive_subfeature_planning_status(
+    raw_status: str, approval_status: str, ready_slice_ids: List[str]
+) -> str:
+    normalized_status = raw_status.strip().lower()
+    if normalized_status == "reviewed":
+        if approval_status == "approved" and ready_slice_ids:
+            return "slice_ready"
+        return "planning_reviewed"
+    planning_status = SUBFEATURE_STATUS_TO_PLANNING_STATUS.get(normalized_status)
+    if planning_status is None:
+        raise RuntimeError(
+            f"Subfeature status '{raw_status}' cannot be mapped into planning metadata."
+        )
+    return planning_status
 
 
 def normalize_slice_ids(value: object) -> List[str]:
@@ -569,11 +597,13 @@ def _derived_subfeature_metadata(feature_dir: str) -> Optional[Dict[str, object]
     raw_status = payload.get("status")
     if not isinstance(raw_status, str):
         raise RuntimeError("Subfeature metadata field 'status' must be a string.")
-    planning_status = SUBFEATURE_STATUS_TO_PLANNING_STATUS.get(raw_status.strip().lower())
-    if planning_status is None:
-        raise RuntimeError(
-            f"Subfeature status '{raw_status}' cannot be mapped into planning metadata."
-        )
+    approval_status = normalize_subfeature_approval_status(
+        payload.get("approval_status"), raw_status.strip().lower()
+    )
+    ready_slice_ids = normalize_slice_ids(payload.get("ready_slice_ids"))
+    planning_status = derive_subfeature_planning_status(
+        raw_status, approval_status, ready_slice_ids
+    )
     return {
         "feature_slug": validate_feature_slug(subfeature_id),
         "status": planning_status,
@@ -583,7 +613,7 @@ def _derived_subfeature_metadata(feature_dir: str) -> Optional[Dict[str, object]
         or now_timestamp(),
         "requires_ui_flow": False,
         "review_note": normalize_review_note(payload.get("review_note")),
-        "ready_slice_ids": [],
+        "ready_slice_ids": ready_slice_ids if planning_status == "slice_ready" else [],
         "related_story_ids": [],
         "consolidation": normalize_consolidation_summary(payload.get("consolidation")),
     }

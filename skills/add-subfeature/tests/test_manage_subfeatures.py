@@ -116,8 +116,10 @@ def test_add_creates_durable_subfeature_and_updates_planning_registry(tmp_path, 
     assert metadata["subfeature_id"] == "replace-legacy-flow"
     assert metadata["parent_feature_slug"] == "checkout"
     assert metadata["status"] == "draft"
+    assert metadata["approval_status"] == "pending"
     assert metadata["subfeature_type"] == "superseding"
     assert metadata["summary"] == "Replace the legacy checkout path"
+    assert metadata["ready_slice_ids"] == []
     assert metadata["consolidation"] is None
     assert not (subfeature_dir / ".planning-meta.json").exists()
     assert planning_meta["feature_slug"] == "replace-legacy-flow"
@@ -258,7 +260,7 @@ def test_reviewed_requires_review_note_and_validate_reports_success(tmp_path, mo
         "replace-legacy-flow",
         "reviewed",
         "--review-note",
-        "Reviewed and ready for durable subfeature execution.",
+        "Reviewed and awaiting explicit human approval.",
     ) == 0
 
     monkeypatch.setattr(
@@ -267,6 +269,85 @@ def test_reviewed_requires_review_note_and_validate_reports_success(tmp_path, mo
         ["manage_subfeatures.py", "validate", "checkout", "replace-legacy-flow"],
     )
     assert module.main() == 0
+
+
+def test_approve_records_human_approval_and_slice_ready_handoff(tmp_path, monkeypatch):
+    module = load_module(SCRIPT_PATH, "manage_subfeatures")
+    planning_module = load_module(PLANNING_SCRIPT_PATH, "manage_planning_for_approval")
+    monkeypatch.chdir(tmp_path)
+    feature_dir = setup_feature(tmp_path)
+
+    assert run_cli(module, "manage_subfeatures.py", monkeypatch, "add", "checkout", "replace-legacy-flow") == 0
+    subfeature_dir = feature_dir / "subfeatures" / "replace-legacy-flow"
+    write_file(subfeature_dir / "impact-analysis.md")
+    write_file(subfeature_dir / "system-design.md")
+    write_file(subfeature_dir / "slice-planning.md")
+    write_file(subfeature_dir / "slice-traceability.md")
+
+    assert run_cli(
+        module,
+        "manage_subfeatures.py",
+        monkeypatch,
+        "set-status",
+        "checkout",
+        "replace-legacy-flow",
+        "impact_ready",
+    ) == 0
+    assert run_cli(
+        module,
+        "manage_subfeatures.py",
+        monkeypatch,
+        "set-status",
+        "checkout",
+        "replace-legacy-flow",
+        "design_ready",
+    ) == 0
+    assert run_cli(
+        module,
+        "manage_subfeatures.py",
+        monkeypatch,
+        "set-status",
+        "checkout",
+        "replace-legacy-flow",
+        "breakdown_ready",
+    ) == 0
+    assert run_cli(
+        module,
+        "manage_subfeatures.py",
+        monkeypatch,
+        "set-status",
+        "checkout",
+        "replace-legacy-flow",
+        "reviewed",
+        "--review-note",
+        "Reviewed and awaiting explicit human approval.",
+    ) == 0
+
+    assert run_cli(
+        module,
+        "manage_subfeatures.py",
+        monkeypatch,
+        "approve",
+        "checkout",
+        "replace-legacy-flow",
+        "--approved-by",
+        "maintainer",
+        "--approval-note",
+        "Approved for execution bootstrap.",
+        "--slice-id",
+        "CHK-201",
+    ) == 0
+
+    metadata = json.loads((subfeature_dir / ".subfeature-meta.json").read_text(encoding="utf-8"))
+    planning_meta = planning_module.read_metadata(str(subfeature_dir))
+
+    assert metadata["approval_status"] == "approved"
+    assert metadata["approved_by"] == "maintainer"
+    assert metadata["approval_note"] == "Approved for execution bootstrap."
+    assert metadata["ready_slice_ids"] == ["CHK-201"]
+    assert metadata["approved_at"]
+    assert planning_meta["status"] == "slice_ready"
+    assert planning_meta["ready_slice_ids"] == ["CHK-201"]
 
 
 def test_set_status_persists_normalized_consolidation_summary(tmp_path, monkeypatch):
@@ -381,7 +462,7 @@ def test_finalized_warns_when_linked_execution_slices_remain_open(
         "replace-legacy-flow",
         "reviewed",
         "--review-note",
-        "Reviewed and ready for durable subfeature execution.",
+        "Reviewed and awaiting explicit human approval.",
     ) == 0
 
     slices_dir = tmp_path / "slices"

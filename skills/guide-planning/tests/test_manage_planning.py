@@ -228,6 +228,7 @@ def test_read_metadata_derives_subfeature_planning_view_from_subfeature_metadata
                 "subfeature_id": "replace-legacy-flow",
                 "parent_feature_slug": "checkout",
                 "status": "reviewed",
+                "approval_status": "pending",
                 "created_at": "2026-01-01T00:00:00",
                 "updated_at": "2026-01-02T00:00:00",
                 "subfeature_type": "additive",
@@ -235,8 +236,12 @@ def test_read_metadata_derives_subfeature_planning_view_from_subfeature_metadata
                 "affected_artifacts": [],
                 "affected_story_ids": [],
                 "affected_slice_ids": [],
-                "review_note": "Reviewed and ready.",
+                "ready_slice_ids": [],
+                "review_note": "Reviewed and awaiting explicit human approval.",
                 "consolidation": None,
+                "approved_at": None,
+                "approved_by": None,
+                "approval_note": None,
                 "finalized_at": None,
             }
         )
@@ -248,8 +253,48 @@ def test_read_metadata_derives_subfeature_planning_view_from_subfeature_metadata
 
     assert metadata["feature_slug"] == "replace-legacy-flow"
     assert metadata["status"] == "planning_reviewed"
-    assert metadata["review_note"] == "Reviewed and ready."
+    assert metadata["review_note"] == "Reviewed and awaiting explicit human approval."
     assert metadata["ready_slice_ids"] == []
+
+
+def test_read_metadata_derives_subfeature_slice_ready_after_approval(tmp_path, monkeypatch):
+    module = load_manage_planning_module()
+    monkeypatch.chdir(tmp_path)
+
+    write_planning_config(tmp_path)
+    subfeature_dir = tmp_path / "docs" / "features" / "checkout" / "subfeatures" / "replace-legacy-flow"
+    subfeature_dir.mkdir(parents=True, exist_ok=True)
+    (subfeature_dir / ".subfeature-meta.json").write_text(
+        json.dumps(
+            {
+                "subfeature_id": "replace-legacy-flow",
+                "parent_feature_slug": "checkout",
+                "status": "reviewed",
+                "approval_status": "approved",
+                "created_at": "2026-01-01T00:00:00",
+                "updated_at": "2026-01-02T00:00:00",
+                "subfeature_type": "additive",
+                "summary": "Replace legacy flow",
+                "affected_artifacts": [],
+                "affected_story_ids": [],
+                "affected_slice_ids": [],
+                "ready_slice_ids": ["CHK-201"],
+                "review_note": "Reviewed and awaiting explicit human approval.",
+                "consolidation": None,
+                "approved_at": "2026-01-03T00:00:00",
+                "approved_by": "maintainer",
+                "approval_note": "Approved for execution bootstrap.",
+                "finalized_at": None,
+            }
+        )
+        + "\n",
+        encoding="utf-8",
+    )
+
+    metadata = module.read_metadata(str(subfeature_dir))
+
+    assert metadata["status"] == "slice_ready"
+    assert metadata["ready_slice_ids"] == ["CHK-201"]
 
 
 def test_set_status_rejects_subfeature_direct_mutation(tmp_path, monkeypatch, capsys):
@@ -282,6 +327,7 @@ def test_set_status_rejects_subfeature_direct_mutation(tmp_path, monkeypatch, ca
                 "subfeature_id": "replace-legacy-flow",
                 "parent_feature_slug": "checkout",
                 "status": "reviewed",
+                "approval_status": "pending",
                 "created_at": "2026-01-01T00:00:00",
                 "updated_at": "2026-01-02T00:00:00",
                 "subfeature_type": "additive",
@@ -289,8 +335,12 @@ def test_set_status_rejects_subfeature_direct_mutation(tmp_path, monkeypatch, ca
                 "affected_artifacts": [],
                 "affected_story_ids": [],
                 "affected_slice_ids": [],
-                "review_note": "Reviewed and ready.",
+                "ready_slice_ids": [],
+                "review_note": "Reviewed and awaiting explicit human approval.",
                 "consolidation": None,
+                "approved_at": None,
+                "approved_by": None,
+                "approval_note": None,
                 "finalized_at": None,
             }
         )

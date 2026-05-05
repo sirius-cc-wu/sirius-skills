@@ -73,6 +73,11 @@ STATUS_ALIASES = {
     "review-ready": "reviewed",
     "finalized": "finalized",
 }
+APPROVAL_STATUSES = {"pending", "approved"}
+APPROVAL_STATUS_ALIASES = {
+    "pending": "pending",
+    "approved": "approved",
+}
 SUBFEATURE_TYPES = {"additive", "narrowing", "superseding", "replacement"}
 SUBFEATURE_TYPE_ALIASES = {
     "additive": "additive",
@@ -129,6 +134,19 @@ def normalize_subfeature_type(value: str) -> str:
     return SUBFEATURE_TYPE_ALIASES[normalized]
 
 
+def normalize_approval_status(value: object, status: Optional[str] = None) -> str:
+    if value in {None, ""}:
+        return "approved" if status == "finalized" else "pending"
+    if not isinstance(value, str):
+        raise RuntimeError("Approval status must be a string when present.")
+    normalized = value.strip().lower()
+    if normalized not in APPROVAL_STATUS_ALIASES:
+        raise RuntimeError(
+            f"Invalid approval status '{value}'. Valid statuses: {sorted(APPROVAL_STATUSES)}"
+        )
+    return APPROVAL_STATUS_ALIASES[normalized]
+
+
 def normalize_optional_timestamp(value: object) -> Optional[str]:
     if value is None or value == "" or value == "-":
         return None
@@ -157,6 +175,10 @@ def normalize_string_list(value: object, field_name: str) -> List[str]:
             raise RuntimeError(f"{field_name} must contain non-empty strings.")
         normalized.append(item.strip())
     return list(dict.fromkeys(normalized))
+
+
+def merge_string_lists(existing: List[str], updates: List[str]) -> List[str]:
+    return list(dict.fromkeys([*existing, *updates]))
 
 
 def normalize_consolidation_disposition(value: object) -> str:
@@ -355,6 +377,7 @@ def build_metadata(
         "subfeature_id": validate_slug(subfeature_id, "Subfeature ID"),
         "parent_feature_slug": validate_slug(parent_feature_slug, "Parent feature slug"),
         "status": "draft",
+        "approval_status": "pending",
         "created_at": timestamp,
         "updated_at": timestamp,
         "subfeature_type": normalize_subfeature_type(subfeature_type),
@@ -362,8 +385,12 @@ def build_metadata(
         "affected_artifacts": [],
         "affected_story_ids": [],
         "affected_slice_ids": [],
+        "ready_slice_ids": [],
         "consolidation": None,
         "review_note": None,
+        "approved_at": None,
+        "approved_by": None,
+        "approval_note": None,
         "finalized_at": None,
     }
 
@@ -381,16 +408,24 @@ def normalize_metadata(payload: object) -> Dict[str, object]:
             "Subfeature metadata field 'parent_feature_slug' must be a string."
         )
 
+    status = normalize_status(str(payload.get("status", "")))
+    approval_status = normalize_approval_status(payload.get("approval_status"), status=status)
+    finalized_at = normalize_optional_timestamp(payload.get("finalized_at"))
+    updated_at = normalize_optional_timestamp(payload.get("updated_at")) or now_timestamp()
+    approved_at = normalize_optional_timestamp(payload.get("approved_at"))
+    if approval_status == "approved" and approved_at is None:
+        approved_at = finalized_at or updated_at
+
     return {
         "subfeature_id": validate_slug(subfeature_id, "Subfeature ID"),
         "parent_feature_slug": validate_slug(
             parent_feature_slug, "Parent feature slug"
         ),
-        "status": normalize_status(str(payload.get("status", ""))),
+        "status": status,
+        "approval_status": approval_status,
         "created_at": normalize_optional_timestamp(payload.get("created_at"))
         or now_timestamp(),
-        "updated_at": normalize_optional_timestamp(payload.get("updated_at"))
-        or now_timestamp(),
+        "updated_at": updated_at,
         "subfeature_type": normalize_subfeature_type(
             str(payload.get("subfeature_type", "additive"))
         ),
@@ -404,9 +439,17 @@ def normalize_metadata(payload: object) -> Dict[str, object]:
         "affected_slice_ids": normalize_string_list(
             payload.get("affected_slice_ids"), "Affected slice IDs"
         ),
+        "ready_slice_ids": normalize_string_list(
+            payload.get("ready_slice_ids"), "Ready slice IDs"
+        ),
         "consolidation": normalize_consolidation_summary(payload.get("consolidation")),
         "review_note": normalize_optional_string(payload.get("review_note"), "Review note"),
-        "finalized_at": normalize_optional_timestamp(payload.get("finalized_at")),
+        "approved_at": approved_at,
+        "approved_by": normalize_optional_string(payload.get("approved_by"), "Approved by"),
+        "approval_note": normalize_optional_string(
+            payload.get("approval_note"), "Approval note"
+        ),
+        "finalized_at": finalized_at,
     }
 
 
@@ -554,6 +597,61 @@ def validate_subfeature_state(
             else "Reviewed state requires a non-empty review note.",
         )
 
+    approval_status = str(metadata.get("approval_status") or "pending")
+    approved_at = metadata.get("approved_at")
+    approved_by = metadata.get("approved_by")
+    approval_note = metadata.get("approval_note")
+    ready_slice_ids = metadata.get("ready_slice_ids")
+
+    approval_allowed = status_index >= STATUS_SEQUENCE.index("reviewed")
+    if approval_status == "approved":
+        record_check(
+            "approval_state",
+            approval_allowed,
+            "Approval recorded after planning review."
+            if approval_allowed
+            else "Approval cannot be recorded before the subfeature reaches 'reviewed'.",
+        )
+        record_check(
+            "approved_at",
+            isinstance(approved_at, str) and bool(approved_at.strip()),
+            "Approval timestamp recorded."
+            if isinstance(approved_at, str) and bool(approved_at.strip())
+            else "Approved subfeatures require a non-empty approved_at timestamp.",
+        )
+    else:
+        record_check(
+            "pending_approval_timestamp",
+            approved_at is None,
+            "Pending approval has no approval timestamp."
+            if approved_at is None
+            else "Pending approval must not keep an approved_at timestamp.",
+        )
+        record_check(
+            "pending_approval_actor",
+            approved_by is None,
+            "Pending approval has no approver recorded."
+            if approved_by is None
+            else "Pending approval must not keep an approved_by value.",
+        )
+        record_check(
+            "pending_approval_note",
+            approval_note is None,
+            "Pending approval has no approval note."
+            if approval_note is None
+            else "Pending approval must not keep an approval_note value.",
+        )
+
+    has_ready_slice_ids = isinstance(ready_slice_ids, list) and len(ready_slice_ids) > 0
+    if has_ready_slice_ids:
+        record_check(
+            "ready_slice_ids",
+            approval_status == "approved" and approval_allowed,
+            "Ready slice IDs recorded for approved execution handoff."
+            if approval_status == "approved" and approval_allowed
+            else "Ready slice IDs require an approved reviewed subfeature.",
+        )
+
     return not issues, issues, checks
 
 
@@ -664,7 +762,16 @@ def update_subfeature_status(
         )
     if consolidation is not None:
         updated_metadata["consolidation"] = normalize_consolidation_summary(consolidation)
+    if status == "reviewed" and current_status != "reviewed":
+        updated_metadata["approval_status"] = "pending"
+        updated_metadata["approved_at"] = None
+        updated_metadata["approved_by"] = None
+        updated_metadata["approval_note"] = None
+        updated_metadata["ready_slice_ids"] = []
     if status == "finalized":
+        if str(updated_metadata.get("approval_status") or "pending") != "approved":
+            updated_metadata["approval_status"] = "approved"
+            updated_metadata["approved_at"] = timestamp
         updated_metadata["finalized_at"] = timestamp
 
     ok, issues, _ = validate_subfeature_state(subfeature_dir, updated_metadata)
@@ -683,6 +790,75 @@ def update_subfeature_status(
     message = f"Updated {selected['subfeature_id']} to status '{status}'"
     transition_result = evaluate_subfeature_transition(str(selected["subfeature_id"]), status)
     return True, format_transition_message(message, transition_result)
+
+
+def update_subfeature_approval(
+    manage_planning,
+    feature_dir: str,
+    subfeature: Dict[str, object],
+    scope_context: object,
+    ready_slice_ids: Optional[List[str]] = None,
+    approval_note: Optional[str] = None,
+    approved_by: Optional[str] = None,
+    require_existing_approval: bool = False,
+) -> Tuple[bool, str]:
+    rows = load_registry(feature_dir)
+    selected = find_subfeature(rows, str(subfeature["subfeature_id"]))
+    if not selected:
+        return False, f"Subfeature disappeared from registry: {subfeature['subfeature_id']}"
+
+    subfeature_dir = subfeature_dir_for_row(selected, scope_context)
+    metadata = read_metadata(subfeature_dir)
+    current_status = str(metadata["status"])
+    if current_status not in {"reviewed", "finalized"}:
+        return (
+            False,
+            "Human approval can be recorded only after the subfeature reaches 'reviewed'.",
+        )
+
+    current_approval_status = str(metadata.get("approval_status") or "pending")
+    if require_existing_approval and current_approval_status != "approved":
+        return (
+            False,
+            f"Subfeature '{selected['subfeature_id']}' must record explicit human approval before slice bootstrap.",
+        )
+
+    updated_metadata = dict(metadata)
+    updated_metadata["approval_status"] = "approved"
+    if updated_metadata.get("approved_at") is None:
+        updated_metadata["approved_at"] = now_timestamp()
+    if approved_by is not None:
+        updated_metadata["approved_by"] = normalize_optional_string(approved_by, "Approved by")
+    if approval_note is not None:
+        updated_metadata["approval_note"] = normalize_optional_string(
+            approval_note, "Approval note"
+        )
+    if ready_slice_ids is not None:
+        updated_metadata["ready_slice_ids"] = merge_string_lists(
+            list(updated_metadata.get("ready_slice_ids") or []),
+            normalize_string_list(ready_slice_ids, "Ready slice IDs"),
+        )
+    if current_status == "finalized" and updated_metadata.get("finalized_at") is None:
+        updated_metadata["finalized_at"] = updated_metadata["approved_at"]
+    updated_metadata["updated_at"] = now_timestamp()
+
+    ok, issues, _ = validate_subfeature_state(subfeature_dir, updated_metadata)
+    if not ok:
+        return False, "Cannot record approval: " + "; ".join(issues)
+
+    write_metadata(subfeature_dir, updated_metadata)
+    selected["updated_at"] = updated_metadata["updated_at"]
+    write_registry(feature_dir, rows)
+    manage_planning.sync_registry(scope_context=scope_context)
+
+    ready_slice_summary = list(updated_metadata.get("ready_slice_ids") or [])
+    if ready_slice_summary:
+        return (
+            True,
+            f"Recorded approval for {selected['subfeature_id']} with ready slices: "
+            + ", ".join(ready_slice_summary),
+        )
+    return True, f"Recorded approval for {selected['subfeature_id']}"
 
 
 def cmd_init_feature(args: argparse.Namespace) -> int:
@@ -753,6 +929,33 @@ def cmd_set_status(args: argparse.Namespace) -> int:
             affected_story_ids=args.story_id if args.story_id else None,
             affected_slice_ids=args.slice_id if args.slice_id else None,
             consolidation=parse_consolidation_json_arg(args.consolidation_json),
+        )
+    except (RuntimeError, ValueError) as exc:
+        print(str(exc), file=sys.stderr)
+        return 2
+
+    stream = sys.stdout if success else sys.stderr
+    print(message, file=stream)
+    return 0 if success else 2
+
+
+def cmd_approve(args: argparse.Namespace) -> int:
+    manage_planning = load_manage_planning_module()
+    try:
+        feature_dir, _, scope_context = resolve_parent_feature(manage_planning, args.feature)
+        rows = load_registry(feature_dir)
+        subfeature = find_subfeature(rows, args.subfeature)
+        if not subfeature:
+            print(f"Subfeature not found: {args.subfeature}", file=sys.stderr)
+            return 2
+        success, message = update_subfeature_approval(
+            manage_planning,
+            feature_dir,
+            subfeature,
+            scope_context,
+            ready_slice_ids=args.slice_id if args.slice_id else None,
+            approval_note=args.approval_note,
+            approved_by=args.approved_by,
         )
     except (RuntimeError, ValueError) as exc:
         print(str(exc), file=sys.stderr)
@@ -846,6 +1049,29 @@ def build_parser() -> argparse.ArgumentParser:
         help="Allow deliberate repair when the subfeature is not in the normal state.",
     )
 
+    approve_p = subparsers.add_parser(
+        "approve",
+        help="Record explicit human approval and optional ready slice IDs for a reviewed subfeature",
+    )
+    approve_p.add_argument("feature", help="Parent feature slug, folder name, or path")
+    approve_p.add_argument("subfeature", help="Subfeature ID, folder name, or path")
+    approve_p.add_argument(
+        "--approved-by",
+        default=None,
+        help="Optional approver identity or handle for the approval record.",
+    )
+    approve_p.add_argument(
+        "--approval-note",
+        default=None,
+        help="Optional approval note describing the approval outcome.",
+    )
+    approve_p.add_argument(
+        "--slice-id",
+        action="append",
+        default=[],
+        help="Ready slice ID to record as part of the approved execution handoff. Repeatable.",
+    )
+
     validate_p = subparsers.add_parser(
         "validate", help="Validate one subfeature registry row and metadata packet"
     )
@@ -865,6 +1091,8 @@ def main() -> int:
         return cmd_add(args)
     if args.command == "set-status":
         return cmd_set_status(args)
+    if args.command == "approve":
+        return cmd_approve(args)
     if args.command == "validate":
         return cmd_validate(args)
 

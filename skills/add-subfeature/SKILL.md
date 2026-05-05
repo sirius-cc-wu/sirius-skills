@@ -47,6 +47,7 @@ missing capability on top of that shipped work.
    the expected repaired behavior explicit so later planning does not collapse
    back into the archived parent narrative.
 5. Hand off to `assess`, `design`, `breakdown`, and `review-planning` using the selected subfeature folder.
+6. After review passes, keep the subfeature at `reviewed` until a human explicitly approves it, then record that approval in `.subfeature-meta.json` before `slice` bootstrap.
 
 ## Source of Truth Rules
 
@@ -54,6 +55,7 @@ missing capability on top of that shipped work.
 - Treat `docs/features/<feature-slug>/subfeatures/<subfeature-id>/` as a durable planning folder, not a temporary delta and not an execution slice.
 - Do not silently fold subfeature docs back into the parent feature docs.
 - Let the subfeature folder keep its own lifecycle through `.subfeature-meta.json`.
+- Keep human approval and ready-slice handoff for reviewed subfeatures in `.subfeature-meta.json`; do not restore a nested `.planning-meta.json`.
 - Treat any planning-layer view of a subfeature as derived state, not a second writable source of truth.
 
 ## Tooling
@@ -75,6 +77,12 @@ python3 skills/add-subfeature/scripts/manage_subfeatures.py add \
 python3 skills/add-subfeature/scripts/manage_subfeatures.py set-status \
   "<feature-slug>" "<subfeature-id>" impact_ready
 
+# After review passes, record explicit human approval and any ready slice IDs
+python3 skills/add-subfeature/scripts/manage_subfeatures.py approve \
+  "<feature-slug>" "<subfeature-id>" \
+  --approval-note "Approved for slice bootstrap" \
+  --slice-id "<slice-id>"
+
 # Validate one subfeature
 python3 skills/add-subfeature/scripts/manage_subfeatures.py validate \
   "<feature-slug>" "<subfeature-id>"
@@ -84,6 +92,7 @@ python3 skills/add-subfeature/scripts/manage_subfeatures.py validate \
 
 - Do not use this skill for net-new feature discovery; use `guide-planning` and `discover` for that.
 - Do not treat subfeatures as execution slices.
+- Do not treat `reviewed` as implicit approval; reviewed subfeatures still need explicit human approval before slice bootstrap.
 - Do not overwrite parent feature docs during subfeature bootstrap.
 - Do not use this skill to create speculative work that should stay under `docs/proposals/`.
 - Do not fold a newly reported fix back into an implemented or archived parent

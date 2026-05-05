@@ -18,6 +18,12 @@ PLANNING_SCRIPT_PATH = (
     / "scripts"
     / "manage_planning.py"
 )
+SUBFEATURE_SCRIPT_PATH = (
+    Path(__file__).resolve().parents[2]
+    / "add-subfeature"
+    / "scripts"
+    / "manage_subfeatures.py"
+)
 
 
 def load_execution_module():
@@ -33,6 +39,16 @@ def load_execution_module():
 def load_planning_module():
     spec = importlib.util.spec_from_file_location(
         "manage_planning", PLANNING_SCRIPT_PATH
+    )
+    module = importlib.util.module_from_spec(spec)
+    assert spec.loader is not None
+    spec.loader.exec_module(module)
+    return module
+
+
+def load_subfeature_module():
+    spec = importlib.util.spec_from_file_location(
+        "manage_subfeatures", SUBFEATURE_SCRIPT_PATH
     )
     module = importlib.util.module_from_spec(spec)
     assert spec.loader is not None
@@ -105,11 +121,44 @@ def sync_planning_handoff(feature_name: str, slice_id: str) -> Optional[Dict[str
     feature_dir = planning.feature_dir_for_row(feature, scope_context=scope_context)
     metadata = planning.read_metadata(feature_dir)
     current_status = str(metadata["status"])
+    is_subfeature = Path(planning.subfeature_metadata_path_for(feature_dir)).exists()
     if current_status not in {"planning_reviewed", "slice_ready"}:
         raise RuntimeError(
-            f"Planning feature '{feature['feature']}' must be in 'planning_reviewed' "
-            f"or 'slice_ready' before slice bootstrap. Current status: '{current_status}'."
+            f"{'Subfeature' if is_subfeature else 'Planning feature'} '{feature['feature']}' "
+            "must be in 'planning_reviewed' or 'slice_ready' before slice bootstrap. "
+            f"Current status: '{current_status}'."
         )
+
+    if is_subfeature:
+        subfeatures = load_subfeature_module()
+        subfeature_metadata = subfeatures.read_metadata(feature_dir)
+        parent_feature_dir, _, subfeature_scope_context = subfeatures.resolve_parent_feature(
+            planning, str(subfeature_metadata["parent_feature_slug"])
+        )
+        subfeature_rows = subfeatures.load_registry(parent_feature_dir)
+        subfeature_row = subfeatures.find_subfeature(
+            subfeature_rows, str(subfeature_metadata["subfeature_id"])
+        )
+        if subfeature_row is None:
+            raise RuntimeError(
+                f"Subfeature registry row not found for '{subfeature_metadata['subfeature_id']}'."
+            )
+        ok, message = subfeatures.update_subfeature_approval(
+            planning,
+            parent_feature_dir,
+            subfeature_row,
+            subfeature_scope_context,
+            ready_slice_ids=[slice_id],
+            require_existing_approval=True,
+        )
+        if not ok:
+            raise RuntimeError(message)
+        updated_metadata = planning.read_metadata(feature_dir)
+        return {
+            "feature": feature["feature"],
+            "status": updated_metadata["status"],
+            "ready_slice_ids": list(updated_metadata.get("ready_slice_ids") or []),
+        }
 
     ready_slice_ids = list(metadata.get("ready_slice_ids") or [])
     if slice_id not in ready_slice_ids:

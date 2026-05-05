@@ -105,7 +105,7 @@ Stored in `slices/<slice-id>-<slug>/`
 5.  **Review**: `review-planning` confirms the plan or subfeature is ready.
 6.  **Approve**: A human explicitly approves the reviewed planning artifacts.
 7.  **Commit Planning**: Commit the approved planning artifacts before execution starts.
-8.  **Bootstrap**: `slice` creates the next execution folder and syncs the matching feature or subfeature planning state to `slice_ready`.
+8.  **Bootstrap**: `slice` creates the next execution folder. For canonical features it syncs planning metadata to `slice_ready`; for reviewed subfeatures it requires explicit approval already recorded in `.subfeature-meta.json` and then records the chosen ready slice ID there so the derived planning view becomes `slice_ready`.
 9.  **Optional Batch Orchestration**: `ship` can keep working a reviewed and committed backlog one mapped slice at a time, but it stops at blockers and per-slice commit checkpoints.
 10. **Execute**: `brief` -> `blueprint` -> (Code) -> `review-execution`.
 11. **Close**: `close-slice` marks the slice done and preserves the execution context.

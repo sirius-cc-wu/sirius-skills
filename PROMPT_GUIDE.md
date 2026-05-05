@@ -158,6 +158,7 @@ Remember the workflow boundary:
 
 - `review-planning` stops at readiness review
 - a human approves
+- if the target is a subfeature, record that approval in `.subfeature-meta.json` with `manage_subfeatures.py approve ...`
 - approved planning is committed
 - only then should execution bootstrap begin
 

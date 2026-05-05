@@ -40,9 +40,9 @@ scope resolver, `guide-planning` stays the canonical planning entrypoint, and
 older surfaces should be described as historical or migration-only unless a
 planning packet explicitly documents a temporary parallel transition.
 
-After each planning phase writes or updates its repository artifacts, persist the matching metadata transition with `python3 skills/guide-planning/scripts/manage_planning.py sync-status <feature-selector> --through <expected-status>`. Use `sync-status` for normal adjacent advancement and drift repair; reserve `set-status` for explicit manual overrides and terminal execution states.
+After each planning phase writes or updates its repository artifacts, persist the matching metadata transition with the owner script for that planning scope. Canonical features should use `python3 skills/guide-planning/scripts/manage_planning.py sync-status <feature-selector> --through <expected-status>`. Subfeatures should use `python3 skills/add-subfeature/scripts/manage_subfeatures.py set-status <feature-selector> <subfeature-id> <expected-status>` through `reviewed`, then `python3 skills/add-subfeature/scripts/manage_subfeatures.py approve ...` to record explicit approval and any ready slice IDs. Use adjacent advancement by default and reserve explicit overrides for deliberate repair or terminal execution states.
 
-The execution layer works one implementation-ready slice at a time, starting with `slice` bootstrap from approved committed planning artifacts. `ship` can sit above that flow when a reviewed and committed feature or subfeature should be worked as one dependency-aware backlog; it should follow increment order first, then slice dependencies within the current increment, while still handing each concrete slice to the next existing single-slice owner such as `brief`, `blueprint`, repository implementation, `review-execution`, `close-slice`, or `commit`.
+The execution layer works one implementation-ready slice at a time, starting with `slice` bootstrap from approved committed planning artifacts. For reviewed subfeatures, that approval must be recorded in `.subfeature-meta.json` before bootstrap. `ship` can sit above that flow when an approved and committed feature or subfeature should be worked as one dependency-aware backlog; it should follow increment order first, then slice dependencies within the current increment, while still handing each concrete slice to the next existing single-slice owner such as `brief`, `blueprint`, repository implementation, `review-execution`, `close-slice`, or `commit`.
 
 When accelerators are enabled, the default operator path compresses to one
 planning accelerator surface and one execution accelerator surface, with an
@@ -409,7 +409,7 @@ If execution config has not been initialized yet and the default `slices/` locat
 python3 skills/slice/scripts/bootstrap_slice.py --slice-dir "team-slices" "<slice-id>" "<slice-name>"
 ```
 
-Do not jump directly from `review-planning` to `slice`; stop for explicit human approval and commit the planning artifacts first.
+Do not jump directly from `review-planning` to `slice`; stop for explicit human approval and commit the planning artifacts first. For subfeatures, record that approval through `manage_subfeatures.py approve ...` before slice bootstrap so the derived planning view can become `slice_ready`.
 
 When a reviewed and committed feature or subfeature has multiple planned slices
 and the goal is to keep progressing through the backlog, `ship`

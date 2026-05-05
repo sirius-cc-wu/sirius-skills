@@ -48,7 +48,7 @@ Use `guide-planning` when you need to decide the next planning step before slice
 
 - Own the transition from accepted proposal to canonical feature planning.
 - Keep feature-planning readiness in planning metadata.
-- For subfeatures, treat `.subfeature-meta.json` as the writable lifecycle source and only use `guide-planning`'s metadata view as a derived projection.
+- For subfeatures, treat `.subfeature-meta.json` as the writable lifecycle source and only use `guide-planning`'s metadata view as a derived projection. That derived view should stay `planning_reviewed` until explicit approval is recorded in subfeature metadata, and only become `slice_ready` once approved reviewed work also has ready slice IDs recorded.
 - Keep `research` advisory within the existing planning lifecycle instead of introducing a new readiness state.
 - Do not duplicate execution-slice lifecycle state here.
 - Stop at reviewed planning until the user approves the planning artifacts.
@@ -82,7 +82,7 @@ guide-planning -> propose/add-subfeature/assess/research/discover -> design -> u
 Use adjacent transitions by default and repair skipped states only deliberately.
 
 - `planning_reviewed` means the planning packet has passed readiness review and is waiting for explicit human approval.
-- `slice_ready` means the approved planning artifacts are committed and at least one execution-ready work item is selected for execution bootstrap.
+- `slice_ready` means the approved planning artifacts are committed and at least one execution-ready work item is selected for execution bootstrap. For subfeatures, derive this from reviewed status plus approval metadata and recorded ready slice IDs in `.subfeature-meta.json`.
 
 ## Preflight
 

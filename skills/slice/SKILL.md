@@ -36,6 +36,7 @@ Before bootstrapping, confirm:
 3. The work item does not still need major decomposition, architecture discovery, or planning review.
 4. The chosen slice ID, if provided, should be preserved exactly.
 5. The planning artifacts were explicitly approved and committed before bootstrap.
+6. For subfeatures, explicit approval must already be recorded in `.subfeature-meta.json`; `reviewed` alone is not enough.
 
 ## Workflow
 
@@ -56,6 +57,7 @@ python3 skills/slice/scripts/bootstrap_slice.py --slice-dir "team-slices" "<slic
 5. Hand off to `guide-execution` to author `brief.md` and `blueprint.md`.
 
 `bootstrap_slice.py` keeps the ownership boundary intact by delegating registry creation, slice creation, and validation to `skills/guide-execution/scripts/manage_execution.py`.
+For reviewed subfeatures, it also expects approval metadata to be present already and records the chosen ready slice ID back into `.subfeature-meta.json` so the derived planning view becomes `slice_ready`.
 
 ## Guardrails
 
