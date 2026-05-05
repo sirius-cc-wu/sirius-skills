@@ -156,6 +156,73 @@ def _planning_status_preview(
     return preview_records
 
 
+def _subfeature_planning_status_preview(
+    inventory: Inventory,
+    selected: Set[str],
+) -> List[SemanticPreviewRecord]:
+    if "subfeature" not in selected:
+        return []
+    preview_records: List[SemanticPreviewRecord] = []
+    slice_rows_by_id = {
+        str(row.get("id") or "").strip(): dict(row)
+        for row in inventory.slice_rows
+        if str(row.get("id") or "").strip()
+    }
+    for feature_dir in inventory.feature_dirs:
+        for subfeature_dir in inventory.subfeature_dirs_by_feature.get(feature_dir.name, []):
+            planning_metadata, preview_record = _safe_read_metadata(
+                inventory.context.planning.read_metadata,
+                "subfeature",
+                subfeature_dir.name,
+                subfeature_dir,
+            )
+            if preview_record is not None or planning_metadata is None:
+                continue
+            traceability_records = parse_traceability_records(
+                subfeature_dir / "slice-traceability.md",
+                "subfeature",
+                subfeature_dir.name,
+                normalize_dir_relpath(subfeature_dir),
+            )
+            execution_slice_ids = sorted(
+                {
+                    slice_id
+                    for record in traceability_records
+                    for slice_id in record.execution_slice_ids
+                    if slice_id in slice_rows_by_id
+                }
+            )
+            if not execution_slice_ids:
+                continue
+            all_closed = all(
+                str(slice_rows_by_id[slice_id].get("status") or "") == "closed"
+                for slice_id in execution_slice_ids
+            )
+            current_status = str(planning_metadata.get("status") or "")
+            suggested_status = "implemented" if all_closed else "slice_ready"
+            status_is_current = (
+                current_status == "implemented"
+                if all_closed
+                else current_status in {"slice_ready", "implemented"}
+            )
+            if status_is_current:
+                continue
+            preview_records.append(
+                SemanticPreviewRecord(
+                    artifact_type="subfeature",
+                    artifact_id=subfeature_dir.name,
+                    path=normalize_dir_relpath(subfeature_dir),
+                    code="repair_subfeature_planning_status_handoff",
+                    message=(
+                        "Preview only: update subfeature .planning-meta.json status "
+                        f"from '{current_status}' to '{suggested_status}' to match "
+                        f"traced execution slices: {', '.join(execution_slice_ids)}."
+                    ),
+                )
+            )
+    return preview_records
+
+
 def _traceability_preview(
     inventory: Inventory,
     selected: Set[str],
@@ -241,5 +308,6 @@ def build_semantic_preview(
             feature_paths_by_slug,
         )
     )
+    preview_records.extend(_subfeature_planning_status_preview(inventory, selected))
     preview_records.extend(_traceability_preview(inventory, selected))
     return _dedupe_preview_records(preview_records)
