@@ -51,7 +51,6 @@ REGISTRY_HEADER = (
 )
 METADATA_FILE = ".planning-meta.json"
 SUBFEATURE_METADATA_FILE = ".subfeature-meta.json"
-SUBFEATURES_DIR_NAME = "subfeatures"
 FEATURE_SLUG_PATTERN = re.compile(r"^[A-Za-z0-9][A-Za-z0-9._-]*$")
 STATUS_SEQUENCE = [
     "discovery_pending",
