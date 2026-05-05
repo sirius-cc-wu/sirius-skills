@@ -150,7 +150,7 @@ def collect_story_ids(feature_dir: Path) -> List[str]:
     return dedupe(story_ids)
 
 
-def collect_slice_ids(feature_dir: Path, manage_subfeatures) -> List[str]:
+def collect_slice_ids(feature_dir: Path, manage_planning) -> List[str]:
     slice_ids: List[str] = []
     slice_planning_text = read_text_if_exists(feature_dir / "slice-planning.md")
     slice_ids.extend(
@@ -159,9 +159,11 @@ def collect_slice_ids(feature_dir: Path, manage_subfeatures) -> List[str]:
         )
     )
 
-    feature_meta_path = feature_dir / manage_subfeatures.FEATURE_META_FILE
-    if feature_meta_path.exists():
-        payload = json.loads(feature_meta_path.read_text(encoding="utf-8"))
+    try:
+        payload = manage_planning.read_metadata(str(feature_dir))
+    except RuntimeError:
+        payload = None
+    if isinstance(payload, dict):
         ready_slice_ids = payload.get("ready_slice_ids", [])
         if isinstance(ready_slice_ids, list):
             slice_ids.extend(item for item in ready_slice_ids if isinstance(item, str))
@@ -267,7 +269,7 @@ def main() -> int:
         )
         affected_story_ids = dedupe(collect_story_ids(feature_dir) + list(args.story_id))
         affected_slice_ids = dedupe(
-            collect_slice_ids(feature_dir, manage_subfeatures) + list(args.slice_id)
+            collect_slice_ids(feature_dir, manage_planning) + list(args.slice_id)
         )
         increment_ids = collect_increment_ids(feature_dir)
 

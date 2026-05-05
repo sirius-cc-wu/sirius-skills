@@ -213,6 +213,99 @@ def test_read_metadata_accepts_legacy_ready_task_ids(tmp_path, monkeypatch):
     assert metadata["related_story_ids"] == ["HAB-01"]
 
 
+def test_read_metadata_derives_subfeature_planning_view_from_subfeature_metadata(
+    tmp_path, monkeypatch
+):
+    module = load_manage_planning_module()
+    monkeypatch.chdir(tmp_path)
+
+    write_planning_config(tmp_path)
+    subfeature_dir = tmp_path / "docs" / "features" / "checkout" / "subfeatures" / "replace-legacy-flow"
+    subfeature_dir.mkdir(parents=True, exist_ok=True)
+    (subfeature_dir / ".subfeature-meta.json").write_text(
+        json.dumps(
+            {
+                "subfeature_id": "replace-legacy-flow",
+                "parent_feature_slug": "checkout",
+                "status": "reviewed",
+                "created_at": "2026-01-01T00:00:00",
+                "updated_at": "2026-01-02T00:00:00",
+                "subfeature_type": "additive",
+                "summary": "Replace legacy flow",
+                "affected_artifacts": [],
+                "affected_story_ids": [],
+                "affected_slice_ids": [],
+                "review_note": "Reviewed and ready.",
+                "consolidation": None,
+                "finalized_at": None,
+            }
+        )
+        + "\n",
+        encoding="utf-8",
+    )
+
+    metadata = module.read_metadata(str(subfeature_dir))
+
+    assert metadata["feature_slug"] == "replace-legacy-flow"
+    assert metadata["status"] == "planning_reviewed"
+    assert metadata["review_note"] == "Reviewed and ready."
+    assert metadata["ready_slice_ids"] == []
+
+
+def test_set_status_rejects_subfeature_direct_mutation(tmp_path, monkeypatch, capsys):
+    module = load_manage_planning_module()
+    monkeypatch.chdir(tmp_path)
+
+    write_planning_config(tmp_path)
+    feature_dir = tmp_path / "docs" / "features" / "checkout"
+    feature_dir.mkdir(parents=True, exist_ok=True)
+    (feature_dir / ".planning-meta.json").write_text(
+        json.dumps(
+            {
+                "feature_slug": "checkout",
+                "status": "planning_reviewed",
+                "created_at": "2026-01-01T00:00:00",
+                "updated_at": "2026-01-01T00:00:00",
+                "requires_ui_flow": False,
+                "review_note": "ready",
+                "ready_slice_ids": ["CHK-101"],
+            }
+        )
+        + "\n",
+        encoding="utf-8",
+    )
+    subfeature_dir = feature_dir / "subfeatures" / "replace-legacy-flow"
+    subfeature_dir.mkdir(parents=True, exist_ok=True)
+    (subfeature_dir / ".subfeature-meta.json").write_text(
+        json.dumps(
+            {
+                "subfeature_id": "replace-legacy-flow",
+                "parent_feature_slug": "checkout",
+                "status": "reviewed",
+                "created_at": "2026-01-01T00:00:00",
+                "updated_at": "2026-01-02T00:00:00",
+                "subfeature_type": "additive",
+                "summary": "Replace legacy flow",
+                "affected_artifacts": [],
+                "affected_story_ids": [],
+                "affected_slice_ids": [],
+                "review_note": "Reviewed and ready.",
+                "consolidation": None,
+                "finalized_at": None,
+            }
+        )
+        + "\n",
+        encoding="utf-8",
+    )
+    module.sync_registry()
+
+    exit_code = run_cli(module, monkeypatch, "set-status", "replace-legacy-flow", "implemented")
+    captured = capsys.readouterr()
+
+    assert exit_code == 2
+    assert "use add-subfeature set-status instead" in captured.err
+
+
 def test_set_status_persists_normalized_consolidation_summary(tmp_path, monkeypatch):
     module = load_manage_planning_module()
     monkeypatch.chdir(tmp_path)

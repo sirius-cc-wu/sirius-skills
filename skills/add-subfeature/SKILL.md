@@ -18,7 +18,7 @@ missing capability on top of that shipped work.
 2. Initialize the feature-local `subfeatures/` registry when it does not exist yet.
 3. Create one durable subfeature under `docs/features/<feature>/subfeatures/<subfeature-id>/`.
 4. Maintain machine-readable subfeature metadata for parent-child and impact context.
-5. Seed the subfeature as a real planning folder with its own `.planning-meta.json`.
+5. Seed the subfeature as a real planning folder with `.subfeature-meta.json` as its lifecycle source of truth.
 
 ## Preferred Input
 
@@ -32,7 +32,6 @@ missing capability on top of that shipped work.
 - `<feature_path>/subfeatures/README.md`
 - `<feature_path>/subfeatures/registry.json`
 - `<feature_path>/subfeatures/<subfeature-id>/discover.md`
-- `<feature_path>/subfeatures/<subfeature-id>/.planning-meta.json`
 - `<feature_path>/subfeatures/<subfeature-id>/.subfeature-meta.json`
 
 ## Workflow
@@ -54,7 +53,8 @@ missing capability on top of that shipped work.
 - Keep `docs/features/<feature-slug>/` as the parent feature planning folder.
 - Treat `docs/features/<feature-slug>/subfeatures/<subfeature-id>/` as a durable planning folder, not a temporary delta and not an execution slice.
 - Do not silently fold subfeature docs back into the parent feature docs.
-- Let the subfeature folder keep its own planning lifecycle through `.planning-meta.json`.
+- Let the subfeature folder keep its own lifecycle through `.subfeature-meta.json`.
+- Treat any planning-layer view of a subfeature as derived state, not a second writable source of truth.
 
 ## Tooling
 

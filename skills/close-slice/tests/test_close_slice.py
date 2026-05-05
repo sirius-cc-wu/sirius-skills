@@ -42,7 +42,6 @@ def write_transition_guardrail_feature(
     feature_status: str = "planning_reviewed",
     feature_ready_slice_ids: list[str] | None = None,
     subfeature_status: str = "reviewed",
-    subfeature_planning_status: str = "planning_reviewed",
     include_subfeature: bool = True,
 ):
     feature_dir = tmp_path / "docs" / "features" / "checkout"
@@ -84,21 +83,6 @@ def write_transition_guardrail_feature(
     (subfeature_dir / "impact-analysis.md").write_text("# Impact\n", encoding="utf-8")
     (subfeature_dir / "system-design.md").write_text("# Design\n", encoding="utf-8")
     (subfeature_dir / "slice-planning.md").write_text("# Slice Planning\n", encoding="utf-8")
-    (subfeature_dir / ".planning-meta.json").write_text(
-        json.dumps(
-            {
-                "feature_slug": "replace-legacy-flow",
-                "status": subfeature_planning_status,
-                "created_at": "2026-01-01T00:00:00",
-                "updated_at": "2026-01-01T00:00:00",
-                "requires_ui_flow": False,
-                "review_note": "ready",
-                "ready_slice_ids": [],
-            }
-        )
-        + "\n",
-        encoding="utf-8",
-    )
     (subfeature_dir / ".subfeature-meta.json").write_text(
         json.dumps(
             {
@@ -245,7 +229,6 @@ def test_close_slice_blocks_when_linked_subfeature_is_not_finalized(
         tmp_path,
         "DEMO",
         subfeature_status="draft",
-        subfeature_planning_status="discovery_pending",
     )
 
     exit_code = run_cli(close_slice, monkeypatch, "--slice", "DEMO")
@@ -350,7 +333,6 @@ def test_close_slice_finalizes_reviewed_subfeature_when_last_slice_closes(
         feature_status="planning_reviewed",
         feature_ready_slice_ids=[],
         subfeature_status="reviewed",
-        subfeature_planning_status="planning_reviewed",
     )
 
     assert run_cli(close_slice, monkeypatch, "--slice", "DEMO") == 0
@@ -361,12 +343,12 @@ def test_close_slice_finalizes_reviewed_subfeature_when_last_slice_closes(
     subfeature_metadata = json.loads(
         (subfeature_dir / ".subfeature-meta.json").read_text(encoding="utf-8")
     )
-    planning_metadata = json.loads(
-        (subfeature_dir / ".planning-meta.json").read_text(encoding="utf-8")
-    )
+    planning = load_module(MANAGE_PLANNING_PATH, "manage_planning_close_slice_subfeature")
+    planning_metadata = planning.read_metadata(str(subfeature_dir))
 
     assert subfeature_metadata["status"] == "finalized"
     assert subfeature_metadata["affected_slice_ids"] == ["DEMO"]
     assert subfeature_metadata["finalized_at"]
+    assert not (subfeature_dir / ".planning-meta.json").exists()
     assert planning_metadata["status"] == "implemented"
     assert planning_metadata["ready_slice_ids"] == []

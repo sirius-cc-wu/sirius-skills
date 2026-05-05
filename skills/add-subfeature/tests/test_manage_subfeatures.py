@@ -86,6 +86,7 @@ def test_init_feature_creates_subfeature_registry_files(tmp_path, monkeypatch):
 
 def test_add_creates_durable_subfeature_and_updates_planning_registry(tmp_path, monkeypatch):
     module = load_module(SCRIPT_PATH, "manage_subfeatures")
+    planning_module = load_module(PLANNING_SCRIPT_PATH, "manage_planning_for_add")
     monkeypatch.chdir(tmp_path)
     feature_dir = setup_feature(tmp_path)
 
@@ -107,10 +108,10 @@ def test_add_creates_durable_subfeature_and_updates_planning_registry(tmp_path, 
 
     subfeature_dir = feature_dir / "subfeatures" / "replace-legacy-flow"
     metadata = json.loads((subfeature_dir / ".subfeature-meta.json").read_text(encoding="utf-8"))
-    planning_meta = json.loads((subfeature_dir / ".planning-meta.json").read_text(encoding="utf-8"))
     registry = json.loads((feature_dir / "subfeatures" / "registry.json").read_text(encoding="utf-8"))
     planning_registry = json.loads((tmp_path / "docs" / "features" / "registry.json").read_text(encoding="utf-8"))
     discover = (subfeature_dir / "discover.md").read_text(encoding="utf-8")
+    planning_meta = planning_module.read_metadata(str(subfeature_dir))
 
     assert metadata["subfeature_id"] == "replace-legacy-flow"
     assert metadata["parent_feature_slug"] == "checkout"
@@ -118,6 +119,7 @@ def test_add_creates_durable_subfeature_and_updates_planning_registry(tmp_path, 
     assert metadata["subfeature_type"] == "superseding"
     assert metadata["summary"] == "Replace the legacy checkout path"
     assert metadata["consolidation"] is None
+    assert not (subfeature_dir / ".planning-meta.json").exists()
     assert planning_meta["feature_slug"] == "replace-legacy-flow"
     assert planning_meta["status"] == "discovery_pending"
     assert registry["subfeatures"][0]["subfeature_id"] == "replace-legacy-flow"
@@ -132,6 +134,7 @@ def test_add_creates_durable_subfeature_and_updates_planning_registry(tmp_path, 
 
 def test_impact_ready_requires_impact_analysis_and_syncs_planning_status(tmp_path, monkeypatch, capsys):
     module = load_module(SCRIPT_PATH, "manage_subfeatures")
+    planning_module = load_module(PLANNING_SCRIPT_PATH, "manage_planning_for_impact")
     monkeypatch.chdir(tmp_path)
     feature_dir = setup_feature(tmp_path)
 
@@ -164,15 +167,33 @@ def test_impact_ready_requires_impact_analysis_and_syncs_planning_status(tmp_pat
         "CHK-01",
     ) == 0
 
-    planning_meta = json.loads(
-        (
-            feature_dir
-            / "subfeatures"
-            / "replace-legacy-flow"
-            / ".planning-meta.json"
-        ).read_text(encoding="utf-8")
+    planning_meta = planning_module.read_metadata(
+        str(feature_dir / "subfeatures" / "replace-legacy-flow")
     )
     assert planning_meta["status"] == "discovery_ready"
+
+
+def test_guide_planning_rejects_mutating_subfeature_status(tmp_path, monkeypatch, capsys):
+    module = load_module(SCRIPT_PATH, "manage_subfeatures")
+    planning_module = load_module(PLANNING_SCRIPT_PATH, "manage_planning_for_guardrail")
+    monkeypatch.chdir(tmp_path)
+    feature_dir = setup_feature(tmp_path)
+
+    assert run_cli(module, "manage_subfeatures.py", monkeypatch, "add", "checkout", "replace-legacy-flow") == 0
+    write_file(feature_dir / "subfeatures" / "replace-legacy-flow" / "impact-analysis.md")
+
+    exit_code = run_cli(
+        planning_module,
+        "manage_planning.py",
+        monkeypatch,
+        "set-status",
+        "replace-legacy-flow",
+        "planning_reviewed",
+    )
+    captured = capsys.readouterr()
+
+    assert exit_code == 2
+    assert "use add-subfeature set-status instead" in captured.err
 
 
 def test_reviewed_requires_review_note_and_validate_reports_success(tmp_path, monkeypatch, capsys):

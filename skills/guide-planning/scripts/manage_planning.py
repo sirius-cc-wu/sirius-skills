@@ -50,6 +50,8 @@ REGISTRY_HEADER = (
     "|---|---|---|---|\n"
 )
 METADATA_FILE = ".planning-meta.json"
+SUBFEATURE_METADATA_FILE = ".subfeature-meta.json"
+SUBFEATURES_DIR_NAME = "subfeatures"
 FEATURE_SLUG_PATTERN = re.compile(r"^[A-Za-z0-9][A-Za-z0-9._-]*$")
 STATUS_SEQUENCE = [
     "discovery_pending",
@@ -74,6 +76,14 @@ STATUS_ALIASES = {
     "reviewed": "planning_reviewed",
     "slice_ready": "slice_ready",
     "implemented": "implemented",
+}
+SUBFEATURE_STATUS_TO_PLANNING_STATUS = {
+    "draft": "discovery_pending",
+    "impact_ready": "discovery_ready",
+    "design_ready": "design_ready",
+    "breakdown_ready": "breakdown_ready",
+    "reviewed": "planning_reviewed",
+    "finalized": "implemented",
 }
 
 
@@ -498,11 +508,17 @@ def discover_feature_dirs(planning_dir: str) -> List[str]:
     root = Path(planning_dir)
     if not root.exists():
         return []
-    return sorted(
+    discovered_paths = {
         str(metadata_path.parent)
         for metadata_path in root.rglob(METADATA_FILE)
         if metadata_path.is_file()
+    }
+    discovered_paths.update(
+        str(metadata_path.parent)
+        for metadata_path in root.rglob(SUBFEATURE_METADATA_FILE)
+        if metadata_path.is_file()
     )
+    return sorted(discovered_paths)
 
 
 def sync_registry(
@@ -531,6 +547,47 @@ def sync_registry(
 
 def metadata_path_for(feature_dir: str) -> str:
     return os.path.join(feature_dir, METADATA_FILE)
+
+
+def subfeature_metadata_path_for(feature_dir: str) -> str:
+    return os.path.join(feature_dir, SUBFEATURE_METADATA_FILE)
+
+
+def _derived_subfeature_metadata(feature_dir: str) -> Optional[Dict[str, object]]:
+    path = subfeature_metadata_path_for(feature_dir)
+    if not os.path.exists(path):
+        return None
+    try:
+        with open(path, "r", encoding="utf-8") as f:
+            payload = json.load(f)
+    except json.JSONDecodeError as exc:
+        raise RuntimeError("Subfeature metadata is not valid JSON.") from exc
+    if not isinstance(payload, dict):
+        raise RuntimeError("Subfeature metadata must be a JSON object.")
+    subfeature_id = payload.get("subfeature_id")
+    if not isinstance(subfeature_id, str):
+        raise RuntimeError("Subfeature metadata field 'subfeature_id' must be a string.")
+    raw_status = payload.get("status")
+    if not isinstance(raw_status, str):
+        raise RuntimeError("Subfeature metadata field 'status' must be a string.")
+    planning_status = SUBFEATURE_STATUS_TO_PLANNING_STATUS.get(raw_status.strip().lower())
+    if planning_status is None:
+        raise RuntimeError(
+            f"Subfeature status '{raw_status}' cannot be mapped into planning metadata."
+        )
+    return {
+        "feature_slug": validate_feature_slug(subfeature_id),
+        "status": planning_status,
+        "created_at": normalize_optional_timestamp(payload.get("created_at"))
+        or now_timestamp(),
+        "updated_at": normalize_optional_timestamp(payload.get("updated_at"))
+        or now_timestamp(),
+        "requires_ui_flow": False,
+        "review_note": normalize_review_note(payload.get("review_note")),
+        "ready_slice_ids": [],
+        "related_story_ids": [],
+        "consolidation": normalize_consolidation_summary(payload.get("consolidation")),
+    }
 
 
 def build_metadata(feature_slug: str, requires_ui_flow: bool = False) -> Dict[str, object]:
@@ -576,6 +633,9 @@ def normalize_metadata(payload: object) -> Dict[str, object]:
 
 
 def read_metadata(feature_dir: str) -> Dict[str, object]:
+    derived_subfeature_metadata = _derived_subfeature_metadata(feature_dir)
+    if derived_subfeature_metadata is not None:
+        return derived_subfeature_metadata
     path = metadata_path_for(feature_dir)
     if not os.path.exists(path):
         raise RuntimeError(f"Planning metadata not found at '{path}'.")
@@ -588,6 +648,11 @@ def read_metadata(feature_dir: str) -> Dict[str, object]:
 
 
 def write_metadata(feature_dir: str, metadata: Dict[str, object]) -> None:
+    if os.path.exists(subfeature_metadata_path_for(feature_dir)):
+        raise RuntimeError(
+            "Subfeature planning state is derived from '.subfeature-meta.json'; "
+            "use add-subfeature to update subfeatures."
+        )
     os.makedirs(feature_dir, exist_ok=True)
     with open(metadata_path_for(feature_dir), "w", encoding="utf-8") as f:
         json.dump(metadata, f, indent=2)
@@ -874,6 +939,12 @@ def update_feature_status(
     scope_context: Optional[object] = None,
 ) -> Tuple[bool, str]:
     feature_dir = feature_dir_for_row(feature, scope_context=scope_context)
+    if os.path.exists(subfeature_metadata_path_for(feature_dir)):
+        return (
+            False,
+            "Subfeature planning state is derived from '.subfeature-meta.json'; "
+            "use add-subfeature set-status instead.",
+        )
     metadata = read_metadata(feature_dir)
     current_status = str(metadata["status"])
 
@@ -922,6 +993,12 @@ def sync_feature_status(
     scope_context: Optional[object] = None,
 ) -> Tuple[bool, str]:
     feature_dir = feature_dir_for_row(feature, scope_context=scope_context)
+    if os.path.exists(subfeature_metadata_path_for(feature_dir)):
+        return (
+            False,
+            "Subfeature planning state is derived from '.subfeature-meta.json'; "
+            "use add-subfeature set-status instead.",
+        )
     metadata = read_metadata(feature_dir)
     current_status = str(metadata["status"])
 

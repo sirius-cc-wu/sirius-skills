@@ -178,7 +178,9 @@ def test_migrate_converts_legacy_change_packet_and_resyncs_registries(
 
     subfeature_dir = feature_dir / "subfeatures" / "replace-legacy-flow"
     metadata = json.loads((subfeature_dir / ".subfeature-meta.json").read_text(encoding="utf-8"))
-    planning_meta = json.loads((subfeature_dir / ".planning-meta.json").read_text(encoding="utf-8"))
+    planning_meta = load_module(PLANNING_SCRIPT, "manage_planning_for_migrate").read_metadata(
+        str(subfeature_dir)
+    )
     subfeature_registry = json.loads((feature_dir / "subfeatures" / "registry.json").read_text(encoding="utf-8"))
     planning_registry = json.loads((tmp_path / "docs" / "features" / "registry.json").read_text(encoding="utf-8"))
 
@@ -188,6 +190,7 @@ def test_migrate_converts_legacy_change_packet_and_resyncs_registries(
     assert metadata["parent_feature_slug"] == "checkout"
     assert metadata["status"] == "reviewed"
     assert metadata["subfeature_type"] == "superseding"
+    assert not (subfeature_dir / ".planning-meta.json").exists()
     assert planning_meta["status"] == "planning_reviewed"
     assert (subfeature_dir / "discover.md").exists()
     assert not (feature_dir / "changes").exists()
@@ -209,10 +212,13 @@ def test_migrate_closed_change_maps_to_finalized(tmp_path, monkeypatch, capsys):
 
     subfeature_dir = feature_dir / "subfeatures" / "replace-legacy-flow"
     metadata = json.loads((subfeature_dir / ".subfeature-meta.json").read_text(encoding="utf-8"))
-    planning_meta = json.loads((subfeature_dir / ".planning-meta.json").read_text(encoding="utf-8"))
+    planning_meta = load_module(PLANNING_SCRIPT, "manage_planning_for_migrate_closed").read_metadata(
+        str(subfeature_dir)
+    )
 
     assert metadata["status"] == "finalized"
     assert metadata["finalized_at"] == "2026-01-04T00:00:00"
+    assert not (subfeature_dir / ".planning-meta.json").exists()
     assert planning_meta["status"] == "implemented"
 
 

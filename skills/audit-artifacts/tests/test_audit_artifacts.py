@@ -489,7 +489,6 @@ def test_run_audit_reports_subfeature_closed_execution_drift(tmp_path, monkeypat
 
     assert result["ok"] is False
     assert "subfeature_affected_slice_ids_out_of_sync" in finding_codes(result)
-    assert "subfeature_planning_status_precedes_execution" in finding_codes(result)
     assert "subfeature_status_precedes_closed_execution" in finding_codes(result)
     assert any(
         finding["artifact_type"] == "subfeature"

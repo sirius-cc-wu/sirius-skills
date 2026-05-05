@@ -48,6 +48,7 @@ Use `guide-planning` when you need to decide the next planning step before slice
 
 - Own the transition from accepted proposal to canonical feature planning.
 - Keep feature-planning readiness in planning metadata.
+- For subfeatures, treat `.subfeature-meta.json` as the writable lifecycle source and only use `guide-planning`'s metadata view as a derived projection.
 - Keep `research` advisory within the existing planning lifecycle instead of introducing a new readiness state.
 - Do not duplicate execution-slice lifecycle state here.
 - Stop at reviewed planning until the user approves the planning artifacts.
@@ -90,7 +91,7 @@ Use adjacent transitions by default and repair skipped states only deliberately.
 3. Ensure the planning registry exists.
 4. Resolve the active feature using tooling or a user-provided slug/path.
 5. Confirm the folder represents one coherent feature or capability.
-6. Check optional `reference-research.md`, `discover.md`, `system-design.md`, optional `ui-design.md`, `slice-planning.md`, `slice-traceability.md`, and `.planning-meta.json` as appropriate for the current state.
+6. Check optional `reference-research.md`, `discover.md`, `system-design.md`, optional `ui-design.md`, `slice-planning.md`, `slice-traceability.md`, and `.planning-meta.json` as appropriate for the current state. For subfeatures, rely on the derived planning view rather than editing a nested `.planning-meta.json` file directly.
 7. If the target feature is already `implemented`, has archived slices, or the request is framed as a new bugfix/follow-on issue, decide first whether the right durable target is a new or existing subfeature rather than in-place edits to the parent packet.
 8. When the user provided a concrete runtime failure or missing-path report, inspect the current implementation seam before choosing between subfeature planning, execution handoff, or archival.
 9. When the packet materially reshapes existing workflow surface, confirm any

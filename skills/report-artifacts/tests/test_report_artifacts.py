@@ -428,11 +428,11 @@ def test_run_report_surfaces_subfeature_planning_semantic_preview(
     )
 
     assert payload["summary"]["semantic_preview_count"] == 1
-    assert payload["semantic_preview"][0]["code"] == "repair_subfeature_planning_status_handoff"
+    assert payload["semantic_preview"][0]["code"] == "repair_subfeature_status_handoff"
 
     assert run_cli(env["report"], monkeypatch, "--artifact-type", "subfeature") == 0
     output = capsys.readouterr().out
-    assert "repair_subfeature_planning_status_handoff" in output
+    assert "repair_subfeature_status_handoff" in output
 
 
 def test_workflow_state_validation_hook_runs_from_repo_root_and_returns_exit_code(monkeypatch):

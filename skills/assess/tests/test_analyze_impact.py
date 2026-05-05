@@ -112,13 +112,15 @@ def test_analyze_generates_impact_analysis_and_updates_metadata(tmp_path, monkey
     subfeature_dir = feature_dir / "subfeatures" / "replace-legacy-flow"
     impact_text = (subfeature_dir / "impact-analysis.md").read_text(encoding="utf-8")
     metadata = json.loads((subfeature_dir / ".subfeature-meta.json").read_text(encoding="utf-8"))
-    planning_meta = json.loads((subfeature_dir / ".planning-meta.json").read_text(encoding="utf-8"))
+    planning_module = load_module(PLANNING_SCRIPT, "manage_planning_for_assess")
+    planning_meta = planning_module.read_metadata(str(subfeature_dir))
 
     assert "docs/features/checkout/discover.md" in impact_text
     assert "`CHK-01`" in impact_text
     assert "`CHK-102`" in impact_text
     assert "`I1`" in impact_text
     assert metadata["status"] == "impact_ready"
+    assert not (subfeature_dir / ".planning-meta.json").exists()
     assert planning_meta["status"] == "discovery_ready"
     assert metadata["affected_artifacts"] == [
         "docs/features/checkout/discover.md",

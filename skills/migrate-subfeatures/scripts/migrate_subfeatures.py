@@ -277,18 +277,6 @@ def convert_legacy_metadata(
     return metadata, legacy_status
 
 
-def build_planning_metadata(manage_planning, manage_subfeatures, subfeature_id: str, metadata: Dict[str, object]) -> Dict[str, object]:
-    planning_metadata = manage_planning.build_metadata(subfeature_id, requires_ui_flow=False)
-    planning_metadata["created_at"] = metadata["created_at"]
-    planning_metadata["updated_at"] = metadata["updated_at"]
-    planning_metadata["status"] = manage_subfeatures.PLANNING_STATUS_BY_SUBFEATURE_STATUS[
-        str(metadata["status"])
-    ]
-    planning_metadata["review_note"] = metadata.get("review_note")
-    planning_metadata["ready_slice_ids"] = []
-    return planning_metadata
-
-
 def build_report_item(
     feature_slug: str,
     legacy_dir: Path,
@@ -523,9 +511,6 @@ def migrate_change_packet(
         feature_slug,
         manage_subfeatures,
     )
-    planning_metadata = build_planning_metadata(
-        manage_planning, manage_subfeatures, change_id, metadata
-    )
 
     manage_subfeatures.ensure_subfeature_registry(feature_dir)
     if target_dir.exists():
@@ -533,7 +518,6 @@ def migrate_change_packet(
 
     try:
         target_dir.mkdir(parents=True, exist_ok=False)
-        manage_planning.write_metadata(str(target_dir), planning_metadata)
         copy_legacy_contents(legacy_dir, target_dir)
         manage_subfeatures.write_metadata(str(target_dir), metadata)
         ok, issues, _ = manage_subfeatures.validate_subfeature_state(

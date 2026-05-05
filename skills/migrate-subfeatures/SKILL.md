@@ -14,7 +14,7 @@ current durable `subfeatures/` model.
 1. Resolve one feature or the full planning tree.
 2. Detect legacy `changes/<change-id>/` packets.
 3. Convert legacy `.feature-change-meta.json` into `.subfeature-meta.json`.
-4. Create `.planning-meta.json` for migrated subfeatures.
+4. Create migrated subfeature folders whose lifecycle is stored in `.subfeature-meta.json`.
 5. Rebuild feature-local subfeature registries and resync the planning registry.
 
 ## Preferred Input

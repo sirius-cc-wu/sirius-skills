@@ -45,7 +45,6 @@ REGISTRY_HEADER = (
     "|---|---|---|---|---|\n"
 )
 METADATA_FILE = ".subfeature-meta.json"
-FEATURE_META_FILE = ".planning-meta.json"
 DISCOVER_FILE = "discover.md"
 IMPACT_FILE = "impact-analysis.md"
 DESIGN_FILE = "system-design.md"
@@ -87,16 +86,6 @@ VALID_CONSOLIDATION_DISPOSITIONS = {
     "superseding",
     "replacement",
 }
-PLANNING_STATUS_BY_SUBFEATURE_STATUS = {
-    "draft": "discovery_pending",
-    "impact_ready": "discovery_ready",
-    "design_ready": "design_ready",
-    "breakdown_ready": "breakdown_ready",
-    "reviewed": "planning_reviewed",
-    "finalized": "implemented",
-}
-
-
 def now_timestamp() -> str:
     return datetime.now().isoformat(timespec="seconds")
 
@@ -540,13 +529,6 @@ def validate_subfeature_state(
     ok, detail = validate_required_file(subfeature_dir, DISCOVER_FILE)
     record_check("discover", ok, detail)
 
-    planning_meta_exists = os.path.exists(os.path.join(subfeature_dir, FEATURE_META_FILE))
-    record_check(
-        "planning_metadata",
-        planning_meta_exists,
-        "Planning metadata exists." if planning_meta_exists else "Missing .planning-meta.json.",
-    )
-
     if status_index >= STATUS_SEQUENCE.index("impact_ready"):
         ok, detail = validate_required_file(subfeature_dir, IMPACT_FILE)
         record_check("impact_analysis", ok, detail)
@@ -581,24 +563,6 @@ def can_transition(current: str, target: str) -> bool:
     return STATUS_SEQUENCE.index(target) - STATUS_SEQUENCE.index(current) == 1
 
 
-def sync_planning_state(
-    manage_planning,
-    subfeature_dir: str,
-    status: str,
-    timestamp: str,
-    review_note: Optional[str],
-    clear_ready_slice_ids: bool = False,
-) -> None:
-    planning_metadata = manage_planning.read_metadata(subfeature_dir)
-    planning_metadata["status"] = PLANNING_STATUS_BY_SUBFEATURE_STATUS[status]
-    planning_metadata["updated_at"] = timestamp
-    if review_note is not None:
-        planning_metadata["review_note"] = review_note
-    if clear_ready_slice_ids:
-        planning_metadata["ready_slice_ids"] = []
-    manage_planning.write_metadata(subfeature_dir, planning_metadata)
-
-
 def create_subfeature(
     manage_planning,
     feature_dir: str,
@@ -614,12 +578,7 @@ def create_subfeature(
         return subfeature_dir_for_row(existing, scope_context), False
 
     subfeature_dir = os.path.join(feature_dir, SUBFEATURES_DIR_NAME, subfeature_id)
-    manage_planning.create_feature_at_path(
-        subfeature_dir,
-        subfeature_id,
-        requires_ui_flow=False,
-        scope_context=scope_context,
-    )
+    os.makedirs(subfeature_dir, exist_ok=True)
     metadata = build_metadata(
         parent_feature_slug,
         subfeature_id,
@@ -713,16 +672,9 @@ def update_subfeature_status(
         return False, "Cannot set status: " + "; ".join(issues)
 
     write_metadata(subfeature_dir, updated_metadata)
-    sync_planning_state(
-        manage_planning,
-        subfeature_dir,
-        status,
-        timestamp,
-        normalize_optional_string(review_note, "Review note")
-        if review_note is not None
-        else None,
-        clear_ready_slice_ids=status == "finalized",
-    )
+    legacy_planning_meta_path = Path(subfeature_dir) / ".planning-meta.json"
+    if legacy_planning_meta_path.exists():
+        legacy_planning_meta_path.unlink()
     selected["status"] = status
     selected["subfeature_type"] = updated_metadata["subfeature_type"]
     selected["updated_at"] = timestamp

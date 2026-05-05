@@ -18,7 +18,7 @@ def _selected_types(raw_types: Sequence[str]) -> Set[str]:
 def _safe_read_metadata(reader, artifact_type: str, artifact_id: str, path: Path):
     try:
         return reader(str(path)), None
-    except RuntimeError:
+    except (RuntimeError, ValueError):
         return None, SemanticPreviewRecord(
             artifact_type=artifact_type,
             artifact_id=artifact_id,
@@ -170,13 +170,13 @@ def _subfeature_planning_status_preview(
     }
     for feature_dir in inventory.feature_dirs:
         for subfeature_dir in inventory.subfeature_dirs_by_feature.get(feature_dir.name, []):
-            planning_metadata, preview_record = _safe_read_metadata(
-                inventory.context.planning.read_metadata,
+            metadata, preview_record = _safe_read_metadata(
+                inventory.context.subfeatures.read_metadata,
                 "subfeature",
                 subfeature_dir.name,
                 subfeature_dir,
             )
-            if preview_record is not None or planning_metadata is None:
+            if preview_record is not None or metadata is None:
                 continue
             traceability_records = parse_traceability_records(
                 subfeature_dir / "slice-traceability.md",
@@ -198,12 +198,12 @@ def _subfeature_planning_status_preview(
                 str(slice_rows_by_id[slice_id].get("status") or "") == "closed"
                 for slice_id in execution_slice_ids
             )
-            current_status = str(planning_metadata.get("status") or "")
-            suggested_status = "implemented" if all_closed else "slice_ready"
+            current_status = str(metadata.get("status") or "")
+            suggested_status = "finalized" if all_closed else "reviewed"
             status_is_current = (
-                current_status == "implemented"
+                current_status == "finalized"
                 if all_closed
-                else current_status in {"slice_ready", "implemented"}
+                else current_status in {"reviewed", "finalized"}
             )
             if status_is_current:
                 continue
@@ -212,9 +212,9 @@ def _subfeature_planning_status_preview(
                     artifact_type="subfeature",
                     artifact_id=subfeature_dir.name,
                     path=normalize_dir_relpath(subfeature_dir),
-                    code="repair_subfeature_planning_status_handoff",
+                    code="repair_subfeature_status_handoff",
                     message=(
-                        "Preview only: update subfeature .planning-meta.json status "
+                        "Preview only: update subfeature status "
                         f"from '{current_status}' to '{suggested_status}' to match "
                         f"traced execution slices: {', '.join(execution_slice_ids)}."
                     ),
