@@ -29,6 +29,12 @@ def load_module(path: Path, name: str):
     return module
 
 
+def clear_workflow_state_modules():
+    for name in list(sys.modules):
+        if name == "workflow_state" or name.startswith("workflow_state."):
+            del sys.modules[name]
+
+
 def copy_skill_for_isolated_import(tmp_path: Path, skill_name: str) -> Path:
     source_root = Path(__file__).resolve().parents[1]
     isolated_root = tmp_path / skill_name
@@ -63,6 +69,7 @@ def setup_repo(tmp_path: Path, monkeypatch):
     planning = load_module(PLANNING_SCRIPT, "manage_planning")
     subfeatures = load_module(SUBFEATURE_SCRIPT, "manage_subfeatures")
     execution = load_module(EXECUTION_SCRIPT, "manage_execution")
+    clear_workflow_state_modules()
     report = load_module(SCRIPT_PATH, "report_artifacts")
     report_parity = report.build_report_result.__globals__["inspect_installed_skill_parity"]
     monkeypatch.setitem(
@@ -168,6 +175,35 @@ def archive_closed_slice(execution, slice_id: str) -> dict:
     archived, _, updated_slice = execution.archive_slice(rows, slice_row)
     assert archived is True
     return updated_slice
+
+
+def write_subfeature_traceability(
+    tmp_path: Path, *, planned_slice_ids: list[str], execution_slice_ids: list[str]
+):
+    planned = ", ".join(planned_slice_ids)
+    execution = ", ".join(execution_slice_ids)
+    traceability_path = (
+        tmp_path
+        / "docs"
+        / "features"
+        / "checkout"
+        / "subfeatures"
+        / "replace-legacy-flow"
+        / "slice-traceability.md"
+    )
+    traceability_path.write_text(
+        "\n".join(
+            [
+                "# Slice Traceability",
+                "",
+                "| Story ID | Increments | Planned Slice IDs | Execution Slice IDs | Notes |",
+                "| --- | --- | --- | --- | --- |",
+                f"| CHK-01 | I1 | {planned} | {execution} | Test row |",
+                "",
+            ]
+        ),
+        encoding="utf-8",
+    )
 
 
 def test_run_report_overview_counts_by_type_and_staleness(tmp_path, monkeypatch):
@@ -372,6 +408,31 @@ def test_run_report_surfaces_semantic_preview_separately(tmp_path, monkeypatch, 
     output = capsys.readouterr().out
     assert "Semantic preview:" in output
     assert "repair_planning_status_handoff" in output
+
+
+def test_run_report_surfaces_subfeature_planning_semantic_preview(
+    tmp_path, monkeypatch, capsys
+):
+    env = setup_repo(tmp_path, monkeypatch)
+    write_subfeature_traceability(
+        tmp_path,
+        planned_slice_ids=["CHK-101"],
+        execution_slice_ids=["CHK-101"],
+    )
+
+    payload = env["report"].build_report_result(
+        artifact_types=["subfeature"],
+        group_by="overview",
+        stale_days=30,
+        now=datetime(2026, 2, 15),
+    )
+
+    assert payload["summary"]["semantic_preview_count"] == 1
+    assert payload["semantic_preview"][0]["code"] == "repair_subfeature_planning_status_handoff"
+
+    assert run_cli(env["report"], monkeypatch, "--artifact-type", "subfeature") == 0
+    output = capsys.readouterr().out
+    assert "repair_subfeature_planning_status_handoff" in output
 
 
 def test_workflow_state_validation_hook_runs_from_repo_root_and_returns_exit_code(monkeypatch):

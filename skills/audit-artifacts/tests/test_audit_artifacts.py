@@ -28,6 +28,12 @@ def load_module(path: Path, name: str):
     return module
 
 
+def clear_workflow_state_modules():
+    for name in list(sys.modules):
+        if name == "workflow_state" or name.startswith("workflow_state."):
+            del sys.modules[name]
+
+
 def copy_skill_for_isolated_import(tmp_path: Path, skill_name: str) -> Path:
     source_root = Path(__file__).resolve().parents[1]
     isolated_root = tmp_path / skill_name
@@ -86,6 +92,7 @@ def setup_repo(
     planning = load_module(PLANNING_SCRIPT, "manage_planning")
     subfeatures = load_module(SUBFEATURE_SCRIPT, "manage_subfeatures")
     execution = load_module(EXECUTION_SCRIPT, "manage_execution")
+    clear_workflow_state_modules()
     audit = load_module(SCRIPT_PATH, "audit_artifacts")
     audit_parity = audit.inspect_installed_skill_parity
     monkeypatch.setattr(audit, "inspect_installed_skill_parity", lambda installed_skills=None: [])
@@ -482,6 +489,7 @@ def test_run_audit_reports_subfeature_closed_execution_drift(tmp_path, monkeypat
 
     assert result["ok"] is False
     assert "subfeature_affected_slice_ids_out_of_sync" in finding_codes(result)
+    assert "subfeature_planning_status_precedes_execution" in finding_codes(result)
     assert "subfeature_status_precedes_closed_execution" in finding_codes(result)
     assert any(
         finding["artifact_type"] == "subfeature"

@@ -260,6 +260,13 @@ def _safe_read_metadata(reader, artifact_type: str, artifact_id: str, path: Path
         )
 
 
+def _safe_read_optional_metadata(reader, path: Path) -> Optional[Dict[str, object]]:
+    try:
+        return reader(str(path))
+    except (RuntimeError, ValueError):
+        return None
+
+
 def _audit_proposals(
     inventory: Inventory, findings: List[Finding], selected: Set[str]
 ) -> Dict[str, Dict[str, object]]:
@@ -350,10 +357,12 @@ def _audit_features(
 
 def _audit_subfeatures(
     inventory: Inventory, findings: List[Finding], selected: Set[str]
-) -> Dict[str, Dict[str, object]]:
+) -> Tuple[Dict[str, Dict[str, object]], Dict[str, Dict[str, object]]]:
     metadata_by_path: Dict[str, Dict[str, object]] = {}
+    planning_metadata_by_path: Dict[str, Dict[str, object]] = {}
     for subfeature_dir in iter_subfeature_dirs(inventory):
         subfeature_id = subfeature_dir.name
+        relpath = normalize_dir_relpath(subfeature_dir)
         metadata, error_finding = _safe_read_metadata(
             inventory.context.subfeatures.read_metadata,
             "subfeature",
@@ -374,7 +383,13 @@ def _audit_subfeatures(
             )
             continue
         assert metadata is not None
-        metadata_by_path[normalize_dir_relpath(subfeature_dir)] = metadata
+        metadata_by_path[relpath] = metadata
+        planning_metadata = _safe_read_optional_metadata(
+            inventory.context.planning.read_metadata,
+            subfeature_dir,
+        )
+        if planning_metadata is not None:
+            planning_metadata_by_path[relpath] = planning_metadata
         ok, issues, _ = inventory.context.subfeatures.validate_subfeature_state(
             str(subfeature_dir), metadata
         )
@@ -386,13 +401,13 @@ def _audit_subfeatures(
                 selected,
                 "subfeature",
                 subfeature_id,
-                normalize_dir_relpath(subfeature_dir),
+                relpath,
                 "validation",
                 "subfeature_validation",
                 "error",
                 issue,
             )
-    return metadata_by_path
+    return metadata_by_path, planning_metadata_by_path
 
 
 def _audit_slices(
@@ -466,6 +481,7 @@ def _audit_cross_links(
     proposal_metadata: Dict[str, Dict[str, object]],
     feature_metadata: Dict[str, Dict[str, object]],
     subfeature_metadata: Dict[str, Dict[str, object]],
+    subfeature_planning_metadata: Dict[str, Dict[str, object]],
 ) -> None:
     canonical_feature_slugs = {
         str(metadata["feature_slug"]) for metadata in feature_metadata.values() if "feature_slug" in metadata
@@ -652,6 +668,27 @@ def _audit_cross_links(
                     f"{', '.join(execution_slice_ids)}."
                 ),
             )
+        planning_metadata = subfeature_planning_metadata.get(relpath)
+        if planning_metadata is None:
+            continue
+        planning_status = str(planning_metadata.get("status") or "")
+        if planning_status in {"slice_ready", "implemented"}:
+            continue
+        add_finding(
+            findings,
+            selected,
+            "subfeature",
+            subfeature_id,
+            relpath,
+            "cross_layer_drift",
+            "subfeature_planning_status_precedes_execution",
+            "warning",
+            (
+                "Subfeature planning status "
+                f"'{planning_status}' in .planning-meta.json predates execution handoff, "
+                f"but closed execution slices already exist: {', '.join(execution_slice_ids)}."
+            ),
+        )
 
     for feature_slug, rows in slice_rows_by_feature.items():
         if feature_slug not in canonical_feature_slugs:
@@ -869,7 +906,9 @@ def run_audit(
 
     proposal_metadata = _audit_proposals(inventory, findings, selected)
     feature_metadata = _audit_features(inventory, findings, selected)
-    subfeature_metadata = _audit_subfeatures(inventory, findings, selected)
+    subfeature_metadata, subfeature_planning_metadata = _audit_subfeatures(
+        inventory, findings, selected
+    )
     _audit_slices(inventory, findings, selected)
     _audit_cross_links(
         inventory,
@@ -878,6 +917,7 @@ def run_audit(
         proposal_metadata,
         feature_metadata,
         subfeature_metadata,
+        subfeature_planning_metadata,
     )
     _audit_relations(inventory, findings, selected)
     if check_packaged_parity:
