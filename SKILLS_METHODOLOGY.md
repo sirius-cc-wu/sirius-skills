@@ -25,6 +25,7 @@ Use a **two-layer workflow**:
    - `slice`
    - `guide-execution`
    - `ship` (optional backlog orchestrator)
+   - `ship-worktree` (optional dedicated-worktree wrapper around `ship`)
    - `brief`
    - `blueprint`
    - `review-execution`
@@ -42,7 +43,7 @@ planning packet explicitly documents a temporary parallel transition.
 
 After each planning phase writes or updates its repository artifacts, persist the matching metadata transition with the owner script for that planning scope. Canonical features should use `python3 skills/guide-planning/scripts/manage_planning.py sync-status <feature-selector> --through <expected-status>`. Subfeatures should use `python3 skills/add-subfeature/scripts/manage_subfeatures.py set-status <feature-selector> <subfeature-id> <expected-status>` through `reviewed`, then `python3 skills/add-subfeature/scripts/manage_subfeatures.py approve ...` to record explicit approval and any ready slice IDs. Use adjacent advancement by default and reserve explicit overrides for deliberate repair or terminal execution states.
 
-The execution layer works one implementation-ready slice at a time, starting with `slice` bootstrap from approved committed planning artifacts. For reviewed subfeatures, that approval must be recorded in `.subfeature-meta.json` before bootstrap. `ship` can sit above that flow when an approved and committed feature or subfeature should be worked as one dependency-aware backlog; it should follow increment order first, then slice dependencies within the current increment, while still handing each concrete slice to the next existing single-slice owner such as `brief`, `blueprint`, repository implementation, `review-execution`, `close-slice`, or `commit`.
+The execution layer works one implementation-ready slice at a time, starting with `slice` bootstrap from approved committed planning artifacts. For reviewed subfeatures, that approval must be recorded in `.subfeature-meta.json` before bootstrap. `ship` can sit above that flow when an approved and committed feature or subfeature should be worked as one dependency-aware backlog; it should follow increment order first, then slice dependencies within the current increment, while still handing each concrete slice to the next existing single-slice owner such as `brief`, `blueprint`, repository implementation, `review-execution`, `close-slice`, or `commit`. When the same backlog should execute on its own git branch and checkout, `ship-worktree` can sit one layer above `ship` to create or reuse a dedicated worktree, run `ship` there, and later hand the branch off to PR creation.
 
 When accelerators are enabled, the default operator path compresses to one
 planning accelerator surface and one execution accelerator surface, with an
@@ -53,6 +54,9 @@ explicit approval-and-commit checkpoint between them:
    packet back to `commit` until the approved planning artifacts are committed.
 3. Once that checkpoint is clear, `ship --resume` drives execution until the
    next manual boundary.
+4. When the target should execute on its own branch and checkout,
+   `ship-worktree --resume` can wrap that same execution path inside a
+   dedicated worktree and later hand the branch off to PR creation.
 
 `guide-scope`, `guide-planning`, and `guide-execution` remain the canonical
 manual fallback surfaces for ambiguous scope, recovery, and fine-grained
@@ -113,6 +117,10 @@ Recommended handoff:
 ```text
 guide-scope -> guide-planning -> propose/add-subfeature/assess/research/discover/design/ui-flow/breakdown/review-planning -> human approval -> commit -> slice/ship -> guide-execution
 ```
+
+When the repository prefers one feature or subfeature per worktree branch,
+substitute `ship-worktree` for direct `ship` entry after the planning commit
+checkpoint.
 
 Accelerator fast path:
 

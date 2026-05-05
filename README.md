@@ -73,10 +73,10 @@ The intended direction is:
 The managed repo-first skill set is grouped into:
 
 - repo utilities: `skills/bootstrap/`, `skills/commit/`, `skills/create-pr/`, `skills/governance-update/`, `skills/simplify/`
-- accelerator utilities: `skills/autoplan/`, `skills/learn/`, `skills/ship-slice/`
+- accelerator utilities: `skills/autoplan/`, `skills/learn/`, `skills/ship-slice/`, `skills/ship-worktree/`
 - artifact maintenance: `skills/audit-artifacts/`, `skills/measure-artifacts/`, `skills/trace-artifacts/`, `skills/report-artifacts/`, `skills/repair-artifacts/`, `skills/archive-artifacts/`
 - planning layer: `skills/guide-scope/`, `skills/guide-planning/`, `skills/propose/`, `skills/add-subfeature/`, `skills/migrate-subfeatures/`, `skills/assess/`, `skills/research/`, `skills/discover/`, `skills/design/`, `skills/ui-flow/`, `skills/breakdown/`, `skills/review-planning/`
-- execution layer: `skills/slice/`, `skills/guide-execution/`, `skills/ship/`, `skills/brief/`, `skills/blueprint/`, `skills/review-execution/`, `skills/reconcile-execution/`, `skills/close-slice/`
+- execution layer: `skills/slice/`, `skills/guide-execution/`, `skills/ship/`, `skills/ship-worktree/`, `skills/brief/`, `skills/blueprint/`, `skills/review-execution/`, `skills/reconcile-execution/`, `skills/close-slice/`
 
 If a project has no extra configuration, these skills should still work with generic conventions.
 
@@ -86,7 +86,9 @@ For developer-facing examples of how to prompt the skills, see `PROMPT_GUIDE.md`
 When accelerator config is enabled, the intended happy path is: use `autoplan`
 to drive planning to review-ready state, rerun `autoplan --approve` after
 explicit human approval so it can hand off the planning commit checkpoint, then
-use `ship --resume` once the approved planning artifacts are committed.
+use `ship --resume` once the approved planning artifacts are committed, or use
+`ship-worktree` when execution should move into a dedicated git worktree tied to
+that feature or subfeature.
 
 Shared runtime state under `.skills/runtime/` is the cross-agent transient
 handoff surface. Keep durable feature/subfeature truth in repo planning docs,
@@ -129,7 +131,7 @@ For repositories that use repo-first planning, the recommended short-name planni
 These skills sit **before** the execution-slice skills:
 
 - planning layer: `guide-scope`, `guide-planning`, `propose`, `add-subfeature`, `migrate-subfeatures`, `assess`, `research`, `discover`, `design`, `ui-flow`, `breakdown`, `review-planning`
-- execution layer: `slice`, `guide-execution`, `ship`, `brief`, `blueprint`, `review-execution`, `reconcile-execution`, `close-slice`
+- execution layer: `slice`, `guide-execution`, `ship`, `ship-worktree`, `brief`, `blueprint`, `review-execution`, `reconcile-execution`, `close-slice`
 
 Canonical planning surface:
 
@@ -167,10 +169,14 @@ Default operator path (when accelerators are enabled):
 2. review planning artifacts, then approve explicitly
 3. `python3 skills/ship/scripts/ship.py <target> --approve --approval-note "<note>" --json`
 4. `python3 skills/ship/scripts/ship.py <target> --resume --json`
-5. repeat `ship --resume` until `readiness.blocked_by` or `readiness.preflight`
-   reports a manual boundary
-6. once the target is `implemented` and all planned slices are closed, run
-   `python3 skills/ship/scripts/ship.py <target> --finalize --json`
+5. or `python3 skills/ship-worktree/scripts/ship_worktree.py <target> --resume --json`
+   when the implementation should live on a dedicated worktree branch
+6. repeat `ship --resume` or `ship-worktree --resume` until `readiness.blocked_by`
+   or `readiness.preflight` reports a manual boundary
+7. once the target is `implemented` and all planned slices are closed, run
+   `python3 skills/ship/scripts/ship.py <target> --finalize --json`, or keep
+   the worktree wrapper in control with
+   `python3 skills/ship-worktree/scripts/ship_worktree.py <target> --finalize --create-pr --json`
 
 `guide-scope`, `guide-planning`, and `guide-execution` remain valid but are
 best treated as fallback/manual control paths for ambiguity resolution,
@@ -193,9 +199,10 @@ Manual repo workflow (explicit control path):
 13. `slice` validates approved, committed execution-ready input, bootstraps a slice-scoped execution slice, and hands off to `guide-execution`.
 14. `guide-execution` routes slice-scoped execution through `brief` to capture slice intent and acceptance, then through `blueprint` to produce the final execution artifact. When `.skills/execution.json` enables `auto_start_implementation`, that handoff continues directly into implementation after the blueprint is marked ready.
 15. `ship` is the optional batch entrypoint when a reviewed and committed feature or subfeature backlog should be worked one planned slice at a time. It respects increment order first, then slice dependencies within the current increment, resumes or bootstraps one mapped slice, reports the next concrete execution owner for that slice, and stops at blockers or commit checkpoints. Its JSON output also includes a machine-readable `handoff_payload` for the active slice so future accelerators can consume the same routing contract without changing `ship` ownership.
-16. `review-execution` checks implementation and validation outcomes against the slice-scoped execution artifacts before closure.
-17. `close-slice` closes completed execution slices and records durable closure metadata.
-18. `reconcile-execution` records durable design-versus-execution alignment in `system-design.md`, and `ship --finalize` can then route `archive-artifacts` to summarize and archive the closed slices.
+16. `ship-worktree` is the optional wrapper entrypoint when that same reviewed and committed backlog should execute in a dedicated git worktree branch. It owns worktree lifecycle and PR handoff, but still delegates slice backlog execution to `ship`.
+17. `review-execution` checks implementation and validation outcomes against the slice-scoped execution artifacts before closure.
+18. `close-slice` closes completed execution slices and records durable closure metadata.
+19. `reconcile-execution` records durable design-versus-execution alignment in `system-design.md`, and `ship --finalize` can then route `archive-artifacts` to summarize and archive the closed slices.
 
 For repositories that still contain legacy `changes/` packets from the old
 workflow, `migrate-subfeatures` can scan and convert those legacy planning
@@ -207,6 +214,12 @@ In the repo-native flow, `guide-planning` owns feature-planning readiness and ro
 Execution follows the same pattern: `guide-execution` owns routing, readiness, and registry state, while `brief`, `blueprint`, `review-execution`, `reconcile-execution`, and `close-slice` own execution-side artifacts and closure/reconciliation metadata. With `auto_start_implementation`, `guide-execution` can promote a slice from `blueprint_ready` to `execution_ready` as the signal to begin coding immediately.
 
 `ship` sits above that single-slice flow as an optional orchestrator. It resolves one reviewed and committed feature or subfeature backlog, resumes or bootstraps one mapped execution slice at a time, and hands that slice to the next concrete owner such as `brief`, `blueprint`, repository implementation, `guide-execution`, `review-execution`, `reconcile-execution`, `close-slice`, or `commit`. It does not replace those owners. When the target is completed and `implemented`, `ship --finalize` can require reconciliation and then route the terminal archive step through `archive-artifacts`.
+
+`ship-worktree` sits one layer above that orchestrator when the same target
+should execute in a dedicated git worktree. It keeps the original branch as the
+PR base, reuses a target-named worktree branch and path, runs `ship` inside that
+checkout, and can hand the finished worktree branch off to PR creation without
+moving backlog ownership out of `ship`.
 
 By default, new execution slices are created under `slices/` unless `.skills/execution.json` overrides the location.
 

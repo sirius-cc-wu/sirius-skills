@@ -32,6 +32,7 @@ MANAGED_SKILLS := \
 	guide-execution \
 	learn \
 	ship \
+	ship-worktree \
 	ship-slice \
 	slice \
 	ui-flow \

@@ -23,6 +23,15 @@ from workflow_runtime.learnings import (
 )
 from workflow_runtime.locking import locked_file
 from workflow_runtime.worktree_scope import detect_scope_spillover, snapshot_dirty_worktree
+from workflow_runtime.worktree_session import (
+    WorktreeSessionRecord,
+    build_worktree_target_key,
+    read_worktree_session,
+    resolve_git_common_dir,
+    worktree_session_dir,
+    worktree_session_record_path,
+    write_worktree_session,
+)
 from workflow_runtime.accelerator_guardrails import (
     build_accelerator_readiness,
     classify_stop_reason_from_message,
@@ -44,8 +53,10 @@ __all__ = [
     "HandoffPayload",
     "LearningRecord",
     "RequestHandoffRecord",
+    "WorktreeSessionRecord",
     "append_event",
     "append_learning",
+    "build_worktree_target_key",
     "build_failure_context",
     "build_accelerator_readiness",
     "classify_stop_reason_from_message",
@@ -64,15 +75,20 @@ __all__ = [
     "read_events",
     "read_handoff_payload",
     "read_request_handoff",
+    "read_worktree_session",
     "read_learnings",
     "record_failure",
     "record_failure_for_stop_reason",
+    "resolve_git_common_dir",
     "render_failure_summary",
     "snapshot_dirty_worktree",
     "update_learning_state",
     "approval_gate_path",
+    "worktree_session_dir",
+    "worktree_session_record_path",
     "write_checkpoint",
     "write_handoff_payload",
     "write_request_handoff",
     "write_planning_approval_record",
+    "write_worktree_session",
 ]

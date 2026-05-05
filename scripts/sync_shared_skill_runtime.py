@@ -25,6 +25,7 @@ WORKFLOW_RUNTIME_TARGETS = [
     REPO_ROOT / "skills" / "learn" / "lib" / "workflow_runtime",
     REPO_ROOT / "skills" / "ship-slice" / "lib" / "workflow_runtime",
     REPO_ROOT / "skills" / "autoplan" / "lib" / "workflow_runtime",
+    REPO_ROOT / "skills" / "ship-worktree" / "lib" / "workflow_runtime",
 ]
 SOURCE = WORKFLOW_STATE_SOURCE
 METRICS_STORE_SOURCE = (
