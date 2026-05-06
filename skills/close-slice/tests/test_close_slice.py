@@ -121,7 +121,7 @@ def setup_execution_ready_slice(tmp_path, monkeypatch):
 
     slice_dir = tmp_path / "slices" / "DEMO-demo-feature"
     (slice_dir / "brief.md").write_text(
-        "# Slice Brief: Demo Feature\n\n"
+        "# Slice Contract: Demo Feature\n\n"
         "## 3. Functional Requirements\n\n"
         "- **FR-001**: System MUST store closure metadata.\n",
         encoding="utf-8",

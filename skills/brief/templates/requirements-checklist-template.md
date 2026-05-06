@@ -1,6 +1,6 @@
 # Brief Checklist: [WORK ITEM NAME]
 
-**Purpose**: Validate that the slice-scoped `brief.md` is ready for planning
+**Purpose**: Validate that the slice-scoped `brief.md` is ready as a lean slice contract for `blueprint`
 **Created**: [DATE]  
 **Brief**: [link to brief.md]
 
@@ -25,11 +25,12 @@
 - [ ] Assumptions are documented
 - [ ] Dependencies are documented
 - [ ] Open clarifications are 0 preferred, or <= 3 if critical
+- [ ] No architecture, file-plan, or implementation-step content leaked into the brief
 
 ## Readiness
 
 - [ ] The brief describes one independently valuable work item
-- [ ] Brief is ready for planning
+- [ ] Brief is ready for `blueprint`
 
 ## Notes
 

@@ -1,11 +1,13 @@
 ---
 name: brief
-description: Creates and validates slice-scoped briefs.
+description: Creates and validates lean slice-scoped briefs.
 ---
 
 # Brief
 
-Use this skill to turn one execution-ready work item into a complete `brief.md`.
+Use this skill to turn one execution-ready work item into a concise `brief.md`.
+`brief` defines the slice contract: what outcome the slice must deliver, how success will be recognized, and what assumptions or dependencies shape the work.
+It should stay intentionally lighter than `blueprint`.
 
 ## Responsibilities
 
@@ -30,6 +32,30 @@ Resolve `<slice_path>` through `guide-execution`.
 
 `guide-execution` should resolve the active slice and enforce readiness gates, but it should not take over brief authoring that belongs to `brief`.
 
+## What `brief` should capture
+
+Keep `brief.md` focused on the minimum contract needed to guide implementation and later review:
+
+- slice summary and requested outcome
+- user value or operational value
+- acceptance scenarios
+- testable functional requirements
+- key assumptions and dependencies
+- edge cases that materially affect expected behavior
+- traceability back to the originating story, increment, or planned slice
+
+For simple slices, prefer a compact brief that still satisfies the validation gates rather than expanding every section to full detail.
+
+## What `brief` must avoid
+
+Do not turn `brief.md` into a technical plan. Keep these concerns in `blueprint.md` instead:
+
+- architecture decisions
+- file or module change plans
+- implementation options or tradeoff analysis
+- ordered coding steps or execution packets
+- low-level technical validation strategy beyond the independent test and acceptance contract
+
 ## Authoring Rules
 
 - Focus on user value, expected behavior, and outcomes.
@@ -38,6 +64,7 @@ Resolve `<slice_path>` through `guide-execution`.
 - Capture traceability back to the originating story, increment, or slice when available.
 - Record assumptions explicitly.
 - Keep unresolved clarifications to a maximum of 3, and only for critical decisions.
+- Prefer concise wording over exhaustive prose.
 
 ## Clarification Protocol
 
@@ -57,8 +84,9 @@ Before handoff, confirm:
 5. Checklist is updated to reflect current status
 
 ## Workflow
+
 1. Resolve the active slice with `guide-execution`.
-2. Fill `brief-template.md`.
+2. Fill `brief-template.md` with a lean slice contract.
 3. Create or update the requirements checklist.
 4. Run validation and revise if needed.
-5. Stop when the brief is ready for planning.
+5. Stop when the brief is ready for `blueprint`.

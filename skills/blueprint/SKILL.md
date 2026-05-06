@@ -11,10 +11,10 @@ When `.skills/execution.json` sets `auto_start_implementation` to `true`, the bl
 
 ## Responsibilities
 
-1. Read the active slice's `brief.md`.
+1. Read the active slice's `brief.md` as the slice contract.
 2. Produce `<slice_path>/blueprint.md`.
 3. Make implementation decisions explicit.
-4. Map requirements to execution and validation.
+4. Map each brief requirement to execution and validation.
 5. Capture slice-scoped detailed design diagrams in PlantUML when they clarify implementation.
 
 ## Required Output
@@ -38,6 +38,8 @@ Resolve `<slice_path>` through `guide-execution`.
 
 ## Planning Rules
 
+- Treat `brief.md` as the source of truth for slice intent, expected behavior, and acceptance.
+- Do not duplicate large narrative sections from `brief.md`; reference and translate them into implementation detail.
 - Use the existing codebase and target module as context.
 - Keep file paths concrete where possible.
 - Every requirement must map to implementation work.
@@ -49,6 +51,7 @@ Resolve `<slice_path>` through `guide-execution`.
 - When the detailed design depends mainly on sequence/activity/state behavior
   across multiple objects or services, include at least one structural
   class/component-style diagram that anchors those interactions.
+- Keep depth proportional to implementation risk and complexity; simple slices can use a lighter blueprint as long as traceability and validation stay explicit.
 
 ## Planning Gates
 
@@ -78,7 +81,7 @@ Failed gates must be fixed or explicitly waived with rationale.
 
 1. Resolve the active slice with `guide-execution`.
 2. Read `brief.md` and scan the target codebase.
-3. Fill `plan-template.md`.
+3. Fill `plan-template.md` without recreating the brief narrative.
 4. Add PlantUML detailed design where structure, behavior, or state transitions need extra precision, and pair sequence-heavy designs with at least one structural class/component-style view.
 5. Validate traceability and gates.
 6. Update the slice through `guide-execution` when the blueprint is ready.

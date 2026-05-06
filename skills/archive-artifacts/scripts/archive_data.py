@@ -418,7 +418,8 @@ def _extract_heading_title(text: str, default: str) -> str:
         if not stripped.startswith("#"):
             continue
         title = stripped.lstrip("#").strip()
-        if title.lower().startswith("slice specification:"):
+        lowered = title.lower()
+        if lowered.startswith("slice specification:") or lowered.startswith("slice contract:"):
             return title.split(":", 1)[1].strip() or default
         return title or default
     return default
@@ -437,6 +438,8 @@ def _extract_section_body(text: str, heading: str) -> Optional[str]:
 
 def _extract_brief_items(brief_text: str) -> List[str]:
     body = _extract_section_body(brief_text, "1. Work Item Summary")
+    if body is None:
+        body = _extract_section_body(brief_text, "1. Summary")
     if body is None:
         return []
     items: List[str] = []

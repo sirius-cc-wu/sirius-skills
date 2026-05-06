@@ -7,7 +7,7 @@
 
 ## 1. Summary
 
-[Short summary of the feature, implementation shape, and goal]
+[Short summary of the implementation approach for this slice. Do not restate the full brief; build on it.]
 
 ## 2. Technical Context
 
@@ -38,6 +38,8 @@
 - Notes:
 
 ## 4. Requirement Traceability
+
+Map each brief requirement once into concrete implementation and validation.
 
 | Requirement | Implementation Steps | Validation |
 | --- | --- | --- |

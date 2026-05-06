@@ -449,8 +449,8 @@ Within that execution layer:
 
 - `guide-execution` owns routing, readiness checks, and registry state
 - `ship` owns backlog traversal across multiple planned slices for one reviewed and committed feature or subfeature
-- `brief` creates the slice-scoped `brief.md` for one execution-ready work item, including acceptance and requirement context
-- `blueprint` converts that slice-scoped brief into the final implementation packets, traceability, validation steps, and PlantUML detailed design needed for execution
+- `brief` creates the slice-scoped `brief.md` as a lean contract for one execution-ready work item: value, expected behavior, acceptance criteria, assumptions, and traceability
+- `blueprint` converts that slice-scoped brief into the final implementation packets, technical decisions, traceability, validation steps, and PlantUML detailed design needed for execution
 - when `.skills/execution.json` sets `auto_start_implementation` to `true`, marking the blueprint ready should immediately advance the slice into `execution_ready` and continue into repository implementation work
 - `review-execution` owns the explicit implementation-versus-brief review outcome
 - `close-slice` owns slice closure metadata

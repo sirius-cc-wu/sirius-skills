@@ -150,8 +150,8 @@ def setup_repo(tmp_path: Path, monkeypatch):
         execution,
         "CHK-101",
         "checkout",
-        "# Slice Specification: Archive checkout flow\n\n"
-        "## 1. Work Item Summary\n\n"
+        "# Slice Contract: Archive checkout flow\n\n"
+        "## 1. Summary\n\n"
         "- **Work Item**: Archive checkout flow so the closed slice remains easy\n"
         "  to understand after it moves out of the active execution area.\n"
         "- **Requested Outcome**: Preserve the checkout slice as durable planning\n"
@@ -178,8 +178,8 @@ def setup_repo(tmp_path: Path, monkeypatch):
         execution,
         "SUB-201",
         "replace-legacy-flow",
-        "# Slice Specification: Replace legacy flow\n\n"
-        "## 1. Work Item Summary\n\n"
+        "# Slice Contract: Replace legacy flow\n\n"
+        "## 1. Summary\n\n"
         "- **Work Item**: Replace legacy flow without losing the archived design\n"
         "  intent.\n"
         "- **Requested Outcome**: Keep a durable summary in the subfeature design\n"

@@ -213,11 +213,11 @@ Use `guide-execution` to decide the next step for slice `CHK-12-form-state-refac
 ```
 
 ```text
-Use `brief` for slice `CHK-12-form-state-refactor`.
+Use `brief` for slice `CHK-12-form-state-refactor` and keep it focused on the slice contract: expected behavior, acceptance, assumptions, and traceability.
 ```
 
 ```text
-Use `blueprint` for slice `CHK-12-form-state-refactor`.
+Use `blueprint` for slice `CHK-12-form-state-refactor` and turn the approved brief into a concrete implementation and validation plan.
 ```
 
 ```text
