@@ -55,6 +55,7 @@ from workflow_runtime import (  # noqa: E402
     normalize_stop_reason,
     write_planning_approval_record,
 )
+from workflow_state import sync_completed_owners  # noqa: E402
 
 
 @dataclass
@@ -1429,14 +1430,21 @@ def finalize_target(
             "Cannot finalize while mapped execution slices are still active: "
             + ", ".join(backlog.active_execution_slices)
         )
+    if not backlog.entries or not all(entry.state == "completed" for entry in backlog.entries):
+        raise RuntimeError(
+            "Cannot finalize while planned slices remain unfinished."
+        )
+
+    sync_results = sync_completed_owners(
+        owner_type=backlog.target_type, owner_id=backlog.target_id
+    )
+    if sync_results:
+        backlog = resolve_backlog(selector, explicit_scope=explicit_scope)
+
     if backlog.planning_status != "implemented":
         raise RuntimeError(
             f"Planning target '{backlog.target_id}' must be in 'implemented' status before finalization. "
             f"Current status: '{backlog.planning_status}'."
-        )
-    if not backlog.entries or not all(entry.state == "completed" for entry in backlog.entries):
-        raise RuntimeError(
-            "Cannot finalize while planned slices remain unfinished."
         )
 
     planning_module = load_module(GUIDE_PLANNING_SCRIPT, "manage_planning")

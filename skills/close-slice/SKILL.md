@@ -1,6 +1,6 @@
 ---
 name: close-slice
-description: Closes the active execution slice with validation and records durable closure metadata without mutating planning-layer completion state.
+description: Closes the active execution slice with validation and records durable closure metadata while invoking shared owner-completion reconciliation.
 ---
 
 # Close Slice
@@ -22,6 +22,9 @@ Use this skill when implementation is complete and you want to close an executio
 ## Artifact Ownership
 
 `close-slice` owns closure metadata updates and relation-bearing slice closure.
+After closure, it invokes the shared `workflow_state.owner_completion` hook so
+feature and subfeature completion can be reconciled from traceability plus
+closed execution slices.
 
 `guide-execution` should route into closure only after execution review is complete; it should not replace `close-slice` by mutating closure state directly outside normal registry/status tooling.
 
@@ -30,11 +33,12 @@ Use this skill when implementation is complete and you want to close an executio
 1. Resolve the target slice explicitly, or use the active slice.
 2. Run `manage_execution.py validate-slice`.
 3. If the slice is not already `closed`, close it through tooling.
-4. If relation-bearing closure is requested:
+4. Run shared owner-completion reconciliation for planning owners linked to the closed slice.
+5. If relation-bearing closure is requested:
     - record explicit slice relations such as `supersedes` or `replaces_partially`
     - require explicit impact confirmation unless forced
     - run relation auditing through the execution registry tooling
-5. Return the closed slice outcome and the retained source artifacts.
+6. Return the closed slice outcome, owner-sync results, and the retained source artifacts.
 
 ## Tooling
 

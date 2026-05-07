@@ -64,11 +64,14 @@ The seventh slice adds explicit terminal finalization:
 
 20. Finalize one completed `implemented` feature or subfeature explicitly through
     `--finalize`.
-21. Require a durable execution reconciliation record in `system-design.md`
+21. Before requiring terminal planning status, run shared owner-completion
+    reconciliation so a target with all traced execution slices closed can be
+    promoted through the same shared completion hook used by `close-slice`.
+22. Require a durable execution reconciliation record in `system-design.md`
     before archive.
-22. Stop on `reconcile-execution` when the canonical design has not yet been
+23. Stop on `reconcile-execution` when the canonical design has not yet been
     reconciled with completed slice execution.
-23. Invoke `archive-artifacts` only after reconciliation passes.
+24. Invoke `archive-artifacts` only after reconciliation passes.
 
 ## Preferred Input
 
@@ -103,8 +106,9 @@ not as universally side-effect free.
   - `--bootstrap-next` may create one next-ready execution slice and write the
     mapped execution slice ID back into `slice-traceability.md`
   - `--resume` may bootstrap the next slice when no active mapped slice exists
-  - `--finalize` may archive a completed `implemented` target after the durable
-    reconciliation gate passes
+  - `--finalize` may first reconcile completed owner status from closed traced
+    execution slices, then archive a completed `implemented` target after the
+    durable reconciliation gate passes
 - **Delegated side effects**
   - when `accelerators.ship.delegate_to_ship_slice` is enabled, `--resume` may
     hand execution to `ship-slice`, which then owns downstream execution
@@ -140,6 +144,8 @@ Behavior:
   capability beyond explicit `--bootstrap-next` orchestration.
 - Treat planning and execution registries as the source of truth for backlog and
   completion state.
+- Use shared owner-completion reconciliation for terminal planning status; do
+  not duplicate feature/subfeature completion promotion logic inside `ship`.
 - Respect increment ordering first and slice dependency order second; do not
   bootstrap a later-increment slice while an earlier increment still has
   unfinished planned slices.

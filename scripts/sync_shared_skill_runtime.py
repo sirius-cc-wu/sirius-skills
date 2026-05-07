@@ -18,6 +18,7 @@ WORKFLOW_STATE_TARGETS = [
     REPO_ROOT / "skills" / "add-subfeature" / "lib" / "workflow_state",
     REPO_ROOT / "skills" / "guide-execution" / "lib" / "workflow_state",
     REPO_ROOT / "skills" / "close-slice" / "lib" / "workflow_state",
+    REPO_ROOT / "skills" / "ship" / "lib" / "workflow_state",
 ]
 WORKFLOW_RUNTIME_SOURCE = REPO_ROOT / "lib" / "workflow_runtime"
 WORKFLOW_RUNTIME_TARGETS = [

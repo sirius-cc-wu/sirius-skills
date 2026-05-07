@@ -201,8 +201,8 @@ Manual repo workflow (explicit control path):
 15. `ship` is the optional batch entrypoint when a reviewed and committed feature or subfeature backlog should be worked one planned slice at a time. It respects increment order first, then slice dependencies within the current increment, resumes or bootstraps one mapped slice, reports the next concrete execution owner for that slice, and stops at blockers or commit checkpoints. Its JSON output also includes a machine-readable `handoff_payload` for the active slice so future accelerators can consume the same routing contract without changing `ship` ownership.
 16. `ship-worktree` is the optional wrapper entrypoint when that same reviewed and committed backlog should execute in a dedicated git worktree branch. It owns worktree lifecycle and PR handoff, but still delegates slice backlog execution to `ship`.
 17. `review-execution` checks implementation and validation outcomes against the slice-scoped execution artifacts before closure.
-18. `close-slice` closes completed execution slices and records durable closure metadata.
-19. `reconcile-execution` records durable design-versus-execution alignment in `system-design.md`, and `ship --finalize` can then route `archive-artifacts` to summarize and archive the closed slices.
+18. `close-slice` closes completed execution slices, records durable closure metadata, and invokes shared owner-completion reconciliation for linked planning owners.
+19. `reconcile-execution` records durable design-versus-execution alignment in `system-design.md`, and `ship --finalize` can first run the same shared owner-completion reconciliation before routing `archive-artifacts` to summarize and archive the closed slices.
 
 For repositories that still contain legacy `changes/` packets from the old
 workflow, `migrate-subfeatures` can scan and convert those legacy planning

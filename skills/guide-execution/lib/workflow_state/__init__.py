@@ -23,6 +23,7 @@ from workflow_state.models import (
     TransitionCheckResult,
     TraceabilityRecord,
 )
+from workflow_state.owner_completion import sync_completed_owners, sync_owner_completion
 from workflow_state.parity import discover_installed_skills, inspect_installed_skill_parity
 from workflow_state.semantic_preview import build_semantic_preview
 from workflow_state.transitions import (
@@ -61,4 +62,6 @@ __all__ = [
     "parse_traceability_records",
     "planning_row_artifact_type",
     "resolve_context",
+    "sync_completed_owners",
+    "sync_owner_completion",
 ]
