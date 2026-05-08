@@ -54,6 +54,11 @@ layout: derive it from the parent directory of `planning_dir` (for example,
 `docs/features` -> `docs/wiki`, `planning/features` -> `planning/wiki`) instead
 of hardcoding `docs/wiki` for every repository.
 
+When documenting or demonstrating first-time repository setup for
+`sirius-skills`, treat `bootstrap` as the starting step and request wiki
+scaffolding in the same run so `.skills/` config, the derived wiki root, and
+the related `AGENTS.md` guidance land together from the start.
+
 ### Keep wiki content synthesized
 
 Treat the wiki as a maintained knowledge layer, not as planning state or a
