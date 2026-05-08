@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 import json
 import sys
 from dataclasses import dataclass
@@ -66,14 +66,21 @@ def selected_types(raw_types: Sequence[str]) -> Set[str]:
 def parse_timestamp(value: object) -> Optional[datetime]:
     if not isinstance(value, str) or not value.strip():
         return None
-    return datetime.fromisoformat(value)
+    parsed = datetime.fromisoformat(value)
+    if parsed.tzinfo is None:
+        return parsed.replace(tzinfo=timezone.utc)
+    return parsed.astimezone(timezone.utc)
 
 
 def is_stale(updated_at: Optional[str], stale_days: int, now: Optional[datetime] = None) -> bool:
     timestamp = parse_timestamp(updated_at)
     if timestamp is None:
         return False
-    reference = now or datetime.now()
+    reference = now or datetime.now(timezone.utc)
+    if reference.tzinfo is None:
+        reference = reference.replace(tzinfo=timezone.utc)
+    else:
+        reference = reference.astimezone(timezone.utc)
     return timestamp <= reference - timedelta(days=stale_days)
 
 

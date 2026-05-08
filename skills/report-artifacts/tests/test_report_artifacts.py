@@ -279,6 +279,25 @@ def test_run_report_preserves_raw_subfeature_status_when_reader_rejects_it(tmp_p
     assert report["records"][0]["status"] == "planning_reviewed"
 
 
+def test_run_report_handles_timezone_aware_updated_at_values(tmp_path, monkeypatch):
+    env = setup_repo(tmp_path, monkeypatch)
+    proposal_meta_path = tmp_path / "docs" / "proposals" / "checkout-audit" / ".proposal-meta.json"
+    payload = json.loads(proposal_meta_path.read_text(encoding="utf-8"))
+    payload["updated_at"] = "2026-02-14T23:00:00+08:00"
+    proposal_meta_path.write_text(json.dumps(payload) + "\n", encoding="utf-8")
+
+    report = env["report"].build_report_result(
+        artifact_types=["proposal"],
+        group_by="overview",
+        stale_days=1,
+        now=datetime(2026, 2, 15),
+    )
+
+    assert report["summary"]["total"] == 1
+    assert report["summary"]["stale"] == 0
+    assert report["records"][0]["updated_at"] == "2026-02-14T23:00:00+08:00"
+
+
 def test_cli_json_groups_by_parent_for_selected_artifact_type(tmp_path, monkeypatch, capsys):
     env = setup_repo(tmp_path, monkeypatch)
 

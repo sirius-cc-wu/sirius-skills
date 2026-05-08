@@ -138,12 +138,15 @@ def test_build_repair_result_applies_registry_repairs(tmp_path, monkeypatch):
     payload = env["repair"].build_repair_result(apply=True)
 
     proposal_rows = env["propose"].load_registry()
+    planning_rows = env["planning"].parse_registry()
     _, _, slice_registry = env["execution"].get_registry_paths(required_config=False)
     slice_rows = env["execution"].load_registry_json(slice_registry)
 
     assert payload["summary"]["applied_actions"] == 4
     assert len(proposal_rows) == 1
     assert proposal_rows[0]["proposal"] == "checkout-audit"
+    assert {row["feature"] for row in planning_rows} == {"checkout", "replace-legacy-flow"}
+    assert any("/subfeatures/replace-legacy-flow/" in row["path"] for row in planning_rows)
     assert len(slice_rows) == 1
     assert slice_rows[0]["id"] == "CHK-101"
     assert payload["summary"]["suggested_repairs"] == 0

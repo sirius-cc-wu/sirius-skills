@@ -119,25 +119,20 @@ def _rebuild_proposal_rows(inventory, skipped: List[SkippedArtifact]) -> List[Di
 
 
 def _rebuild_feature_rows(inventory, skipped: List[SkippedArtifact]) -> List[Dict[str, object]]:
+    planning = inventory.context.planning
+    scope_context = planning.SCOPE_RUNTIME.resolve_scope_context()
     rows: List[Dict[str, object]] = []
-    for feature_dir in inventory.feature_dirs:
+    planning_dir = str(inventory.context.planning_root)
+    for feature_dir in planning.discover_feature_dirs(planning_dir):
+        feature_path = Path(feature_dir)
         metadata, skipped_artifact = _safe_read_metadata(
-            inventory.context.planning.read_metadata, "feature", feature_dir.name, feature_dir
+            planning.read_metadata, "feature", feature_path.name, feature_path
         )
         if skipped_artifact is not None:
             skipped.append(skipped_artifact)
             continue
-        rows.append(
-            inventory.context.planning.normalize_registry_row(
-                {
-                    "feature": feature_dir.name,
-                    "status": metadata.get("status", "discovery_pending"),
-                    "updated_at": metadata.get("updated_at"),
-                    "path": normalize_dir_relpath(feature_dir),
-                }
-            )
-        )
-    return sorted(rows, key=lambda row: str(row["path"]))
+        rows.append(planning.build_registry_row(feature_dir, metadata, scope_context))
+    return sorted(rows, key=lambda row: (str(row["path"]), str(row.get("updated_at") or "")))
 
 
 def _rebuild_subfeature_rows(inventory, skipped: List[SkippedArtifact]) -> Dict[str, List[Dict[str, object]]]:
