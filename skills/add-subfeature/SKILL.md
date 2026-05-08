@@ -19,6 +19,7 @@ missing capability on top of that shipped work.
 3. Create one durable subfeature under `docs/features/<feature>/subfeatures/<subfeature-id>/`.
 4. Maintain machine-readable subfeature metadata for parent-child and impact context.
 5. Seed the subfeature as a real planning folder with `.subfeature-meta.json` as its lifecycle source of truth.
+6. Make the bootstrap `discover.md` unmistakably a scaffold until `discover` authors the real packet.
 
 ## Preferred Input
 
@@ -39,15 +40,16 @@ missing capability on top of that shipped work.
 1. Resolve the parent feature.
 2. Initialize the feature-local subfeature registry with `manage_subfeatures.py init-feature <feature>` when needed.
 3. Create the durable child planning folder with `manage_subfeatures.py add <feature> <subfeature-id>`.
-4. Write the requested child capability in the subfeature-local `discover.md`.
+4. Treat the generated `discover.md` as a bootstrap stub, not finished discovery. Replace it with the real discovery packet via `discover`.
+5. Write the requested child capability in the subfeature-local `discover.md`.
    For `narrowing`, `superseding`, or `replacement` work, declare what existing
    capability, artifact, command path, or validation path is affected and what
    simplification or retirement the child capability is expected to produce.
    For bugfix or missing-behavior follow-on work, make the current failure and
    the expected repaired behavior explicit so later planning does not collapse
    back into the archived parent narrative.
-5. Hand off to `assess`, `design`, `breakdown`, and `review-planning` using the selected subfeature folder.
-6. After review passes, keep the subfeature at `reviewed` until a human explicitly approves it, then record that approval in `.subfeature-meta.json` before `slice` bootstrap.
+6. Hand off to `assess`, `design`, `breakdown`, and `review-planning` using the selected subfeature folder.
+7. After review passes, keep the subfeature at `reviewed` until a human explicitly approves it, then record that approval in `.subfeature-meta.json` before `slice` bootstrap.
 
 ## Source of Truth Rules
 

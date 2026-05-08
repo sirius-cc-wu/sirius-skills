@@ -20,6 +20,7 @@ SKILLS_DIR = SKILL_DIR.parent
 REPO_LIB_DIR = SKILLS_DIR.parent / "lib"
 SKILL_LIB_DIR = SKILL_DIR / "lib"
 GUIDE_PLANNING_SCRIPT = SKILLS_DIR / "guide-planning" / "scripts" / "manage_planning.py"
+ADD_SUBFEATURE_SCRIPT = SKILLS_DIR / "add-subfeature" / "scripts" / "manage_subfeatures.py"
 
 if REPO_LIB_DIR.is_dir() and str(REPO_LIB_DIR) not in sys.path:
     sys.path.insert(0, str(REPO_LIB_DIR))
@@ -48,6 +49,8 @@ from workflow_runtime import (  # noqa: E402
 
 DEFAULT_RUNTIME_DIR = Path(".skills/runtime")
 DEFAULT_LEARNINGS_PATH = Path(".skills/learnings.jsonl")
+SUBFEATURE_METADATA_FILE = ".subfeature-meta.json"
+DISCOVER_STUB_MARKER = "<!-- add-subfeature:discover-stub -->"
 
 
 STATUS_TO_OWNER = {
@@ -65,8 +68,20 @@ OWNER_TRANSITIONS = {
     "breakdown_ready": ("review-planning", "planning_reviewed"),
 }
 
-VALID_OWNER_NAMES = {owner for owner, _ in STATUS_TO_OWNER.values()}
-AUTOMATABLE_OWNERS = {"discover", "design", "breakdown", "review-planning"}
+SUBFEATURE_STATUS_TO_OWNER = {
+    "impact_ready": ("design", "run_design"),
+    "design_ready": ("breakdown", "run_breakdown"),
+    "breakdown_ready": ("review-planning", "run_review_planning"),
+    "reviewed": ("approval", "approval_required"),
+    "finalized": ("guide-planning", "resolve_follow_on_delta"),
+}
+
+VALID_OWNER_NAMES = (
+    {owner for owner, _ in STATUS_TO_OWNER.values()}
+    | {owner for owner, _ in SUBFEATURE_STATUS_TO_OWNER.values()}
+    | {"assess"}
+)
+AUTOMATABLE_OWNERS = {"discover", "assess", "design", "breakdown", "review-planning"}
 
 
 def load_module(script_path: Path, name: str):
@@ -92,7 +107,7 @@ def parse_args(argv: Sequence[str] | None = None) -> argparse.Namespace:
         "--execute-owner-chain",
         dest="execute_owner_chain",
         action="store_true",
-        help="Execute discover/design/breakdown/review-planning in sequence until a stop boundary.",
+        help="Execute the planning owner chain in sequence until a stop boundary.",
     )
     parser.add_argument(
         "--no-execute-owner-chain",
@@ -109,12 +124,12 @@ def parse_args(argv: Sequence[str] | None = None) -> argparse.Namespace:
     parser.add_argument(
         "--review-note",
         default=None,
-        help="Optional review note used when advancing into planning_reviewed.",
+        help="Optional review note used when advancing into a reviewed planning state.",
     )
     parser.add_argument(
         "--approve",
         action="store_true",
-        help="Record or refresh the durable approval record for a planning_reviewed target.",
+        help="Record or refresh the durable approval record for a reviewed planning target.",
     )
     parser.add_argument(
         "--approval-note",
@@ -221,6 +236,46 @@ def owner_for_status(status: str) -> tuple[str, str]:
     return STATUS_TO_OWNER.get(status, ("guide-planning", "resolve_planning_state"))
 
 
+def is_subfeature_target(feature_dir: Path) -> bool:
+    return (feature_dir / SUBFEATURE_METADATA_FILE).is_file()
+
+
+def discover_is_stub(feature_dir: Path) -> bool:
+    discover_path = feature_dir / "discover.md"
+    if not discover_path.is_file():
+        return True
+    return DISCOVER_STUB_MARKER in discover_path.read_text(encoding="utf-8")
+
+
+def read_subfeature_state(feature_dir: Path, subfeature_module) -> dict[str, Any]:
+    raw_metadata = subfeature_module.read_metadata(str(feature_dir))
+    return {
+        "raw_metadata": raw_metadata,
+        "raw_status": str(raw_metadata["status"]),
+        "approval_status": str(raw_metadata.get("approval_status") or "pending"),
+        "ready_slice_ids": list(raw_metadata.get("ready_slice_ids") or []),
+        "discover_is_stub": discover_is_stub(feature_dir),
+    }
+
+
+def owner_for_subfeature_state(subfeature_state: dict[str, Any]) -> tuple[str, str]:
+    raw_status = str(subfeature_state["raw_status"])
+    if raw_status == "draft":
+        if subfeature_state["discover_is_stub"]:
+            return "discover", "run_discover"
+        return "assess", "run_assess"
+    if raw_status == "reviewed":
+        if (
+            str(subfeature_state["approval_status"]) == "approved"
+            and subfeature_state["ready_slice_ids"]
+        ):
+            return "guide-planning", "resolve_planning_state"
+    owner = SUBFEATURE_STATUS_TO_OWNER.get(raw_status)
+    if owner is None:
+        raise RuntimeError(f"Unsupported subfeature status for autoplan: '{raw_status}'.")
+    return owner
+
+
 def normalize_owner_name(raw_owner: str) -> str:
     return raw_owner.strip().lower().replace("_", "-")
 
@@ -269,7 +324,7 @@ def extract_missing_required_files(message: str) -> list[str]:
     return sorted({match for match in re.findall(r"Missing required file '([^']+)'", message)})
 
 
-def execute_owner_chain(
+def execute_feature_owner_chain(
     rows: list[dict[str, object]],
     feature: dict[str, object],
     *,
@@ -374,6 +429,179 @@ def execute_owner_chain(
         "target_status": str(metadata["status"]),
         "message": "Stopped owner-chain due to unexpected loop safety boundary.",
     }
+
+
+def execute_subfeature_owner_chain(
+    feature_dir: Path,
+    *,
+    planning_module,
+    subfeature_module,
+    stop_on_owner: list[str],
+    review_note: Optional[str],
+) -> tuple[str, list[dict[str, Any]], Optional[dict[str, Any]]]:
+    steps: list[dict[str, Any]] = []
+    subfeature_state = read_subfeature_state(feature_dir, subfeature_module)
+    raw_metadata = subfeature_state["raw_metadata"]
+    parent_feature_dir, _, subfeature_scope_context = subfeature_module.resolve_parent_feature(
+        planning_module, str(raw_metadata["parent_feature_slug"])
+    )
+    subfeature_rows = subfeature_module.load_registry(parent_feature_dir)
+    subfeature_row = subfeature_module.find_subfeature(
+        subfeature_rows, str(raw_metadata["subfeature_id"])
+    )
+    if subfeature_row is None:
+        raise RuntimeError(
+            f"Subfeature '{raw_metadata['subfeature_id']}' is missing from the parent registry."
+        )
+
+    for _ in range(len(SUBFEATURE_STATUS_TO_OWNER) + 2):
+        subfeature_state = read_subfeature_state(feature_dir, subfeature_module)
+        raw_status = str(subfeature_state["raw_status"])
+
+        if raw_status == "reviewed":
+            return (
+                raw_status,
+                steps,
+                {
+                    "kind": "approval_boundary",
+                    "owner": "approval",
+                    "status": raw_status,
+                    "target_status": raw_status,
+                    "message": "Reached reviewed approval boundary for subfeature planning.",
+                },
+            )
+        if raw_status == "finalized":
+            return raw_status, steps, None
+        if raw_status == "draft" and subfeature_state["discover_is_stub"]:
+            return (
+                raw_status,
+                steps,
+                {
+                    "kind": "artifact_stub",
+                    "owner": "discover",
+                    "status": raw_status,
+                    "target_status": raw_status,
+                    "message": (
+                        "Subfeature discovery is still the add-subfeature bootstrap stub; "
+                        "run discover to author the real discovery packet."
+                    ),
+                },
+            )
+
+        if raw_status == "draft":
+            owner, target_status = "assess", "impact_ready"
+        elif raw_status == "impact_ready":
+            owner, target_status = "design", "design_ready"
+        elif raw_status == "design_ready":
+            owner, target_status = "breakdown", "breakdown_ready"
+        elif raw_status == "breakdown_ready":
+            owner, target_status = "review-planning", "reviewed"
+        else:
+            raise RuntimeError(f"Unsupported subfeature status for owner-chain: '{raw_status}'.")
+
+        if owner in stop_on_owner:
+            return (
+                raw_status,
+                steps,
+                {
+                    "kind": "owner_stop",
+                    "owner": owner,
+                    "status": raw_status,
+                    "target_status": target_status,
+                    "message": (
+                        f"Stopped before '{owner}' because it is configured in stop_on_owner."
+                    ),
+                },
+            )
+
+        transition_review_note = review_note if target_status == "reviewed" else None
+        success, message = subfeature_module.update_subfeature_status(
+            planning_module,
+            parent_feature_dir,
+            subfeature_row,
+            target_status,
+            subfeature_scope_context,
+            force=False,
+            review_note=transition_review_note,
+        )
+        next_raw_status = str(subfeature_module.read_metadata(str(feature_dir))["status"])
+        advanced = next_raw_status != raw_status
+        steps.append(
+            {
+                "owner": owner,
+                "from_status": raw_status,
+                "target_status": target_status,
+                "success": bool(success),
+                "advanced": advanced,
+                "result_status": next_raw_status,
+                "message": message,
+            }
+        )
+
+        if not success or not advanced:
+            return (
+                next_raw_status,
+                steps,
+                {
+                    "kind": classify_stop_reason_from_message(message, stage="planning"),
+                    "owner": owner,
+                    "status": next_raw_status,
+                    "target_status": target_status,
+                    "message": message,
+                },
+            )
+
+        if next_raw_status == "reviewed":
+            return (
+                next_raw_status,
+                steps,
+                {
+                    "kind": "approval_boundary",
+                    "owner": "approval",
+                    "status": next_raw_status,
+                    "target_status": next_raw_status,
+                    "message": "Reached reviewed approval boundary for subfeature planning.",
+                },
+            )
+
+    current_status = str(subfeature_module.read_metadata(str(feature_dir))["status"])
+    return current_status, steps, {
+        "kind": "safety_stop",
+        "owner": "guide-planning",
+        "status": current_status,
+        "target_status": current_status,
+        "message": "Stopped owner-chain due to unexpected subfeature loop safety boundary.",
+    }
+
+
+def evaluate_subfeature_approval_gate(
+    *,
+    feature_dir: Path,
+    subfeature_state: dict[str, Any],
+) -> dict[str, Any]:
+    raw_metadata = dict(subfeature_state["raw_metadata"])
+    raw_status = str(subfeature_state["raw_status"])
+    approval_status = str(subfeature_state["approval_status"])
+    gate_payload: dict[str, Any] = {
+        "required": raw_status == "reviewed",
+        "decision": "not_required",
+        "reason": None,
+        "planning_status": "planning_reviewed" if raw_status == "reviewed" else raw_status,
+        "planning_updated_at": str(raw_metadata.get("updated_at") or ""),
+        "approval_path": str(feature_dir / SUBFEATURE_METADATA_FILE),
+    }
+    if raw_status != "reviewed":
+        return gate_payload
+
+    gate_payload["approved_at"] = raw_metadata.get("approved_at")
+    gate_payload["approval_note"] = raw_metadata.get("approval_note")
+    if approval_status == "approved":
+        gate_payload["decision"] = "approved"
+        gate_payload["reason"] = "approval_valid"
+    else:
+        gate_payload["decision"] = "waiting_approval"
+        gate_payload["reason"] = "approval_not_recorded"
+    return gate_payload
 
 
 def build_readiness_payload(
@@ -710,18 +938,33 @@ def main(argv: Sequence[str] | None = None) -> int:
 
     target_id = str(feature["feature"])
     try:
+        feature_dir = Path(planning_module.feature_dir_for_row(feature, scope_context=scope_context))
+        subfeature_module = (
+            load_module(ADD_SUBFEATURE_SCRIPT, "manage_subfeatures_for_autoplan")
+            if is_subfeature_target(feature_dir)
+            else None
+        )
         planning_status = str(metadata["status"])
         owner_chain: Optional[dict[str, Any]] = None
 
         if execute_owner_chain_enabled:
-            planning_status, steps, stop_reason = execute_owner_chain(
-                rows,
-                feature,
-                planning_module=planning_module,
-                scope_context=scope_context,
-                stop_on_owner=stop_on_owner,
-                review_note=review_note,
-            )
+            if subfeature_module is None:
+                planning_status, steps, stop_reason = execute_feature_owner_chain(
+                    rows,
+                    feature,
+                    planning_module=planning_module,
+                    scope_context=scope_context,
+                    stop_on_owner=stop_on_owner,
+                    review_note=review_note,
+                )
+            else:
+                planning_status, steps, stop_reason = execute_subfeature_owner_chain(
+                    feature_dir,
+                    planning_module=planning_module,
+                    subfeature_module=subfeature_module,
+                    stop_on_owner=stop_on_owner,
+                    review_note=review_note,
+                )
             owner_chain = {
                 "enabled": True,
                 "stop_on_owner": stop_on_owner,
@@ -729,40 +972,106 @@ def main(argv: Sequence[str] | None = None) -> int:
                 "stop_reason": normalize_stop_reason(stop_reason),
             }
 
-        feature_dir = Path(planning_module.feature_dir_for_row(feature, scope_context=scope_context))
         metadata = planning_module.read_metadata(str(feature_dir))
         planning_status = str(metadata["status"])
+        subfeature_state = (
+            read_subfeature_state(feature_dir, subfeature_module)
+            if subfeature_module is not None
+            else None
+        )
 
         if args.approve:
-            if planning_status != "planning_reviewed":
-                return emit_failure_response(
-                    args=args,
-                    event_log_path=event_log_path,
-                    reason_code="invalid_transition",
-                    message=(
-                        "Approval can be recorded only when planning status is "
-                        f"'planning_reviewed'. Current status: '{planning_status}'."
-                    ),
+            if subfeature_module is None:
+                if planning_status != "planning_reviewed":
+                    return emit_failure_response(
+                        args=args,
+                        event_log_path=event_log_path,
+                        reason_code="invalid_transition",
+                        message=(
+                            "Approval can be recorded only when planning status is "
+                            f"'planning_reviewed'. Current status: '{planning_status}'."
+                        ),
+                        target_id=target_id,
+                        next_owner="approval",
+                    )
+                write_planning_approval_record(
                     target_id=target_id,
-                    next_owner="approval",
+                    target_path=str(feature["path"]),
+                    target_dir=feature_dir,
+                    planning_metadata=metadata,
+                    approval_note=args.approval_note,
                 )
-            write_planning_approval_record(
+            else:
+                assert subfeature_state is not None
+                if str(subfeature_state["raw_status"]) != "reviewed":
+                    return emit_failure_response(
+                        args=args,
+                        event_log_path=event_log_path,
+                        reason_code="invalid_transition",
+                        message=(
+                            "Approval can be recorded only when subfeature status is "
+                            f"'reviewed'. Current status: '{subfeature_state['raw_status']}'."
+                        ),
+                        target_id=target_id,
+                        next_owner="approval",
+                    )
+                raw_metadata = subfeature_state["raw_metadata"]
+                parent_feature_dir, _, subfeature_scope_context = subfeature_module.resolve_parent_feature(
+                    planning_module, str(raw_metadata["parent_feature_slug"])
+                )
+                subfeature_rows = subfeature_module.load_registry(parent_feature_dir)
+                subfeature_row = subfeature_module.find_subfeature(
+                    subfeature_rows, str(raw_metadata["subfeature_id"])
+                )
+                if subfeature_row is None:
+                    raise RuntimeError(
+                        f"Subfeature '{raw_metadata['subfeature_id']}' is missing from the parent registry."
+                    )
+                success, message = subfeature_module.update_subfeature_approval(
+                    planning_module,
+                    parent_feature_dir,
+                    subfeature_row,
+                    subfeature_scope_context,
+                    approval_note=args.approval_note,
+                )
+                if not success:
+                    raise RuntimeError(message)
+
+            metadata = planning_module.read_metadata(str(feature_dir))
+            planning_status = str(metadata["status"])
+            subfeature_state = (
+                read_subfeature_state(feature_dir, subfeature_module)
+                if subfeature_module is not None
+                else None
+            )
+
+        approval_gate = (
+            evaluate_planning_approval_gate(
                 target_id=target_id,
                 target_path=str(feature["path"]),
                 target_dir=feature_dir,
                 planning_metadata=metadata,
-                approval_note=args.approval_note,
             )
-
-        approval_gate = evaluate_planning_approval_gate(
-            target_id=target_id,
-            target_path=str(feature["path"]),
-            target_dir=feature_dir,
-            planning_metadata=metadata,
+            if subfeature_module is None
+            else evaluate_subfeature_approval_gate(
+                feature_dir=feature_dir,
+                subfeature_state=subfeature_state,
+            )
         )
         dirty_worktree_paths = read_dirty_worktree_paths(repo_root)
 
-        if planning_status == "planning_reviewed":
+        if (
+            subfeature_state is not None
+            and str(subfeature_state["raw_status"]) == "reviewed"
+            and not subfeature_state["ready_slice_ids"]
+        ):
+            if str(approval_gate.get("decision") or "") != "approved":
+                next_owner, action = "approval", "approval_required"
+            elif dirty_worktree_paths:
+                next_owner, action = "commit", "commit_planning"
+            else:
+                next_owner, action = "slice", "bootstrap_slice"
+        elif planning_status == "planning_reviewed":
             if str(approval_gate.get("decision") or "") != "approved":
                 next_owner, action = "approval", "approval_required"
             elif dirty_worktree_paths:
@@ -770,7 +1079,11 @@ def main(argv: Sequence[str] | None = None) -> int:
             else:
                 next_owner, action = "slice", "bootstrap_slice"
         else:
-            next_owner, action = owner_for_status(planning_status)
+            next_owner, action = (
+                owner_for_subfeature_state(subfeature_state)
+                if subfeature_state is not None
+                else owner_for_status(planning_status)
+            )
 
         owner_handoff = build_owner_handoff(
             target_id=target_id,
@@ -840,6 +1153,7 @@ def main(argv: Sequence[str] | None = None) -> int:
             "run_id": "autoplan-active",
             "target_id": target_id,
             "target_path": str(feature["path"]),
+            "target_kind": "subfeature" if subfeature_state is not None else "feature",
             "planning_status": planning_status,
             "next_owner": next_owner,
             "action": action,
@@ -859,17 +1173,28 @@ def main(argv: Sequence[str] | None = None) -> int:
             "dirty_worktree_paths": dirty_worktree_paths,
             "readiness": readiness,
         }
+        if subfeature_state is not None:
+            payload["subfeature_status"] = str(subfeature_state["raw_status"])
+            payload["subfeature_approval_status"] = str(subfeature_state["approval_status"])
+            payload["subfeature_discover_stub"] = bool(subfeature_state["discover_is_stub"])
         if args.json:
             print(json.dumps(payload, indent=2, sort_keys=True))
         else:
             print(
                 "\n".join(
-                    [
+                    item
+                    for item in [
                         f"Target: {target_id}",
+                        (
+                            f"Subfeature status: {subfeature_state['raw_status']}"
+                            if subfeature_state is not None
+                            else None
+                        ),
                         f"Planning status: {planning_status}",
                         f"Next owner: {next_owner}",
                         f"Action: {action}",
                     ]
+                    if item is not None
                 )
             )
         return 0

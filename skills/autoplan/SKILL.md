@@ -13,8 +13,10 @@ stack with checkpointed resume support.
 1. Resolve one planning target through the existing planning registry.
 2. Read active and candidate learnings for the target scope.
 3. Surface the next planning owner based on the current planning status.
-4. Optionally execute the planning owner chain (`discover`, `design`,
-   `breakdown`, `review-planning`) in sequence until a hard boundary is hit.
+4. Optionally execute the planning owner chain in sequence until a hard
+   boundary is hit. For canonical features that chain is `discover -> design
+   -> breakdown -> review-planning`; for subfeatures it is normally
+   `discover -> assess -> design -> breakdown -> review-planning`.
 5. Evaluate the durable human-approval gate for `planning_reviewed` targets.
 6. After approval is recorded, hand approved-but-uncommitted planning back to the
    `commit` owner before execution begins.
@@ -84,9 +86,9 @@ Optional CLI overrides:
    scaffold pair:
    - `slice-planning.md`
    - `slice-traceability.md`
-5. Invoke the returned owner skill (`discover`, `design`, `breakdown`, or
-   `review-planning`) and let that skill author or repair the planning
-   artifacts it owns.
+5. Invoke the returned owner skill (`discover`, `assess`, `design`,
+   `breakdown`, or `review-planning`) and let that skill author or repair the
+   planning artifacts it owns.
 6. After the owner skill completes, rerun `autoplan.py <target> --json` and
    continue looping until one of these explicit stop boundaries is reached:
    - `approval_required`
@@ -105,6 +107,9 @@ Optional CLI overrides:
     new fix, regression, or missing behavior on that feature, stop and route
     back to `guide-planning`/`add-subfeature` instead of resuming the old
     feature packet or suggesting archive/ship.
+11. Treat subfeature planning state as owned by `.subfeature-meta.json`. Do not
+    try to mutate a subfeature through `manage_planning.py sync-status`; use
+    subfeature-aware routing and approval instead.
 
 ## Runtime outputs
 

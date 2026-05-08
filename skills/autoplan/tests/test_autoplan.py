@@ -12,6 +12,9 @@ AUTOPLAN_SCRIPT = Path(__file__).resolve().parents[1] / "scripts" / "autoplan.py
 PLANNING_SCRIPT = (
     Path(__file__).resolve().parents[2] / "guide-planning" / "scripts" / "manage_planning.py"
 )
+ADD_SUBFEATURE_SCRIPT = (
+    Path(__file__).resolve().parents[2] / "add-subfeature" / "scripts" / "manage_subfeatures.py"
+)
 
 
 def load_module(name: str, path: Path):
@@ -109,6 +112,16 @@ def run_cli(repo_root: Path, *args: str) -> subprocess.CompletedProcess[str]:
     )
 
 
+def run_add_subfeature_cli(repo_root: Path, *args: str) -> subprocess.CompletedProcess[str]:
+    return subprocess.run(
+        ["python3", str(ADD_SUBFEATURE_SCRIPT), *args],
+        cwd=repo_root,
+        check=False,
+        capture_output=True,
+        text=True,
+    )
+
+
 def read_jsonl(path: Path) -> list[dict[str, Any]]:
     return [
         json.loads(line)
@@ -124,6 +137,42 @@ def read_json(path: Path) -> dict[str, Any]:
 def commit_all(repo_root: Path, message: str = "checkpoint") -> None:
     subprocess.run(["git", "add", "-A"], cwd=repo_root, check=True)
     subprocess.run(["git", "commit", "--quiet", "-m", message], cwd=repo_root, check=True)
+
+
+def create_subfeature(
+    tmp_path: Path,
+    monkeypatch,
+    *,
+    subfeature_id: str = "transcript-copy-simplification",
+    authored_discover: bool = False,
+) -> Path:
+    feature_path = create_feature(tmp_path, monkeypatch, "planning_reviewed")
+    result = run_add_subfeature_cli(
+        tmp_path,
+        "add",
+        "throughput-acceleration-workflow",
+        subfeature_id,
+        "--type",
+        "narrowing",
+        "--summary",
+        "Simplify transcript copy behavior",
+    )
+    assert result.returncode == 0, result.stderr
+    subfeature_path = feature_path / "subfeatures" / subfeature_id
+    if authored_discover:
+        (subfeature_path / "discover.md").write_text(
+            "# Discover: Transcript Copy Simplification\n\n"
+            "## Problem\n\n"
+            "Ctrl-S forces users through an awkward toggle.\n\n"
+            "## Next Step\n\n"
+            "Assess the impact of retiring the toggle.\n",
+            encoding="utf-8",
+        )
+        (subfeature_path / "user-stories.md").write_text(
+            "# User Stories\n\n- TUI-001 Simplify transcript copy.\n",
+            encoding="utf-8",
+        )
+    return subfeature_path
 
 
 def test_autoplan_routes_discovery_pending_to_discover(tmp_path: Path, monkeypatch) -> None:
@@ -481,3 +530,65 @@ def test_autoplan_invalid_configuration_logs_failure_context(
     events = read_jsonl(Path(payload["event_log_path"]))
     assert events[-1]["event"] == "failure"
     assert events[-1]["reason_code"] == "invalid_configuration"
+
+
+def test_autoplan_routes_subfeature_stub_back_to_discover(
+    tmp_path: Path, monkeypatch
+) -> None:
+    init_git_repo(tmp_path)
+    write_planning_config(tmp_path)
+    subfeature_path = create_subfeature(tmp_path, monkeypatch)
+
+    result = run_cli(tmp_path, str(subfeature_path.relative_to(tmp_path)), "--json")
+
+    assert result.returncode == 0
+    payload = json.loads(result.stdout)
+    assert payload["target_kind"] == "subfeature"
+    assert payload["planning_status"] == "discovery_pending"
+    assert payload["subfeature_status"] == "draft"
+    assert payload["subfeature_discover_stub"] is True
+    assert payload["next_owner"] == "discover"
+    assert payload["action"] == "run_discover"
+
+
+def test_autoplan_routes_authored_subfeature_discovery_to_assess(
+    tmp_path: Path, monkeypatch
+) -> None:
+    init_git_repo(tmp_path)
+    write_planning_config(tmp_path)
+    subfeature_path = create_subfeature(tmp_path, monkeypatch, authored_discover=True)
+
+    result = run_cli(tmp_path, str(subfeature_path.relative_to(tmp_path)), "--json")
+
+    assert result.returncode == 0
+    payload = json.loads(result.stdout)
+    assert payload["target_kind"] == "subfeature"
+    assert payload["planning_status"] == "discovery_pending"
+    assert payload["subfeature_status"] == "draft"
+    assert payload["subfeature_discover_stub"] is False
+    assert payload["next_owner"] == "assess"
+    assert payload["action"] == "run_assess"
+
+
+def test_autoplan_owner_chain_hands_off_authored_subfeature_to_assess(
+    tmp_path: Path, monkeypatch
+) -> None:
+    init_git_repo(tmp_path)
+    write_planning_config(
+        tmp_path,
+        autoplan_overrides={
+            "execute_owner_chain": True,
+        },
+    )
+    subfeature_path = create_subfeature(tmp_path, monkeypatch, authored_discover=True)
+
+    result = run_cli(tmp_path, str(subfeature_path.relative_to(tmp_path)), "--json")
+
+    assert result.returncode == 0
+    payload = json.loads(result.stdout)
+    assert payload["next_owner"] == "assess"
+    assert payload["action"] == "run_assess"
+    assert payload["owner_chain"]["stop_reason"]["kind"] == "missing_required_input"
+    assert payload["owner_handoff"]["should_invoke_skill"] is True
+    assert payload["owner_handoff"]["owner"] == "assess"
+    assert payload["owner_handoff"]["missing_files"] == ["impact-analysis.md"]

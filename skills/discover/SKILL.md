@@ -22,6 +22,11 @@ Expected companion output for most canonical features:
 
 - `<feature_path>/user-stories.md`
 
+For subfeatures created by `add-subfeature`, the initial `discover.md` may
+already exist as a bootstrap scaffold marked by
+`<!-- add-subfeature:discover-stub -->`. Replace that stub with the real
+discovery packet instead of treating the placeholder as completed discovery.
+
 Treat `user-stories.md` as the default, not the exception, when:
 
 - the feature has multiple capabilities or story candidates
@@ -103,8 +108,11 @@ Prefer:
 4. Create `user-stories.md` with stable story identifiers unless the packet is
    intentionally too small for story-level planning; when omitting it, state
    why in `discover.md`.
-5. Run `python3 skills/guide-planning/scripts/manage_planning.py sync-status <feature-selector> --through discovery_ready` so `.planning-meta.json` records that discovery is complete.
-6. Stop when the work is concrete enough for `design`.
+5. For canonical features, run `python3 skills/guide-planning/scripts/manage_planning.py sync-status <feature-selector> --through discovery_ready` so `.planning-meta.json` records that discovery is complete.
+6. For subfeatures under `.../subfeatures/<subfeature-id>/`, do not try to force `discovery_ready` through `manage_planning.py`. Subfeature lifecycle stays in `.subfeature-meta.json`, authored discovery still leaves the raw subfeature at `draft`, and the next owner is typically `assess`.
+7. Stop when the work is concrete enough for the next planning owner:
+   - canonical feature: `design`
+   - subfeature: usually `assess`
 
 ## Guardrails
 

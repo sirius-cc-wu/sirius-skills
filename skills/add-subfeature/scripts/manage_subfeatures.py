@@ -50,6 +50,7 @@ IMPACT_FILE = "impact-analysis.md"
 DESIGN_FILE = "system-design.md"
 SLICE_PLANNING_FILE = "slice-planning.md"
 SLICE_TRACEABILITY_FILE = "slice-traceability.md"
+DISCOVER_STUB_MARKER = "<!-- add-subfeature:discover-stub -->"
 SLUG_PATTERN = re.compile(r"^[A-Za-z0-9][A-Za-z0-9._-]*$")
 STATUS_SEQUENCE = [
     "draft",
@@ -508,7 +509,10 @@ def write_discover_stub(
     title = subfeature_id.replace("-", " ").strip().title()
     summary_line = summary or "Describe why this existing feature needs a durable subfeature."
     content = (
+        f"{DISCOVER_STUB_MARKER}\n"
         f"# Discover: {title}\n\n"
+        "> Bootstrap stub created by `add-subfeature`.\n"
+        "> Replace this scaffold with the real discovery packet via the `discover` skill.\n\n"
         "## Parent Feature\n\n"
         f"- Feature: `{parent_feature_slug}`\n"
         f"- Subfeature ID: `{subfeature_id}`\n"

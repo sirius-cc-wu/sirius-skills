@@ -129,6 +129,9 @@ def test_add_creates_durable_subfeature_and_updates_planning_registry(tmp_path, 
         row["path"] == "docs/features/checkout/subfeatures/replace-legacy-flow/"
         for row in planning_registry["features"]
     )
+    assert discover.startswith("<!-- add-subfeature:discover-stub -->")
+    assert "Bootstrap stub created by `add-subfeature`." in discover
+    assert "Replace this scaffold with the real discovery packet via the `discover` skill." in discover
     assert "## Subfeature Execution Planning" in discover
     assert "## Consolidation Expectations" in discover
     assert "user-facing simplification" in discover
