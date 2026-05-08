@@ -77,7 +77,7 @@ Map each brief requirement once into concrete implementation and validation.
 
 ### Detailed Design Diagrams (PlantUML)
 
-- [Include when the work benefits from detailed structure or interaction diagrams]
+- [Required: include at least one diagram that lets a reviewer understand the slice quickly]
 - Diagram purpose:
 - Diagram type:
 

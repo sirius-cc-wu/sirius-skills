@@ -19,7 +19,7 @@ Read these references when relevant:
 2. Capture architecture, interfaces, data flow, and constraints.
 3. Make major tradeoffs, risks, and assumptions explicit.
 4. Define the validation strategy needed before implementation starts.
-5. Produce feature-scoped PlantUML diagrams that clarify the system design.
+5. Produce at least one feature-scoped PlantUML diagram so reviewers can understand the system design quickly.
 6. Make failure handling, recovery behavior, and concurrency invariants explicit when they materially affect correctness.
 7. Reuse existing typed configuration and state carriers before introducing new control surfaces.
 
@@ -80,7 +80,8 @@ python3 skills/design/scripts/scaffold_design.py "<feature-selector-or-path>" --
 - When `reference-research.md` exists and affects the chosen approach, preserve
   its borrowing-path decision and tradeoffs in `system-design.md` instead of
   silently re-deriving or replacing them.
-- Use PlantUML as the UML language whenever you include diagrams.
+- Use PlantUML as the UML language for the required design diagrams.
+- Include at least one feature-level diagram in every `system-design.md`, choosing the simplest component, package, sequence, state, or deployment view that communicates the design quickly.
 - If `design_diagram_mode` is `embedded`, include system-design diagrams directly in `system-design.md` with fenced `plantuml` blocks.
 - If `design_diagram_mode` is `linked_svg`, write the PlantUML source files under `<feature_path>/figures/`, generate matching SVGs into the same directory, and link those SVGs from `system-design.md` with relative Markdown image links such as `![Component diagram](figures/component-diagram.svg)`.
 - In `linked_svg` mode, keep figure backgrounds explicitly white: set `skinparam backgroundColor white` in PlantUML, and ensure each emitted SVG includes an explicit white canvas rect such as `<rect fill="#FFFFFF" height="100%" width="100%" x="0" y="0"/>` so rendered diagrams do not inherit transparent or dark backgrounds.
@@ -104,7 +105,7 @@ python3 skills/design/scripts/scaffold_design.py "<feature-selector-or-path>" --
    - current-state design for documenting existing implemented behavior
 5. Write `system-design.md` using the structure in `references/system-design-template.md`, adding the behavioral guidance from `references/behavioral-systems.md` and `references/config-surface-governance.md` when applicable.
    When the packet has no `system-design.md` yet, you may scaffold the file first with `python3 skills/design/scripts/scaffold_design.py <feature-selector-or-path>` and then replace the placeholders with the real design.
-6. Add PlantUML system-design diagrams or linked SVG figures, depending on configuration.
+6. Add at least one PlantUML system-design diagram or linked SVG figure, depending on configuration.
 7. Refine story boundaries when the design changes implementation shape.
 8. Run `python3 skills/guide-planning/scripts/manage_planning.py sync-status <feature-selector> --through design_ready`. If UI flow is required and `ui-design.md` is still missing, treat the blocked transition as a signal to hand off to `ui-flow` before claiming design readiness.
 9. Stop when the work is concrete enough for `breakdown`.

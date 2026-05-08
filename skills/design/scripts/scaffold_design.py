@@ -146,8 +146,20 @@ def build_scaffold(
 
 ## Architecture
 
-- Describe the major structural decision, ownership boundaries, and any diagrams that should be added.
+- Describe the major structural decision, ownership boundaries, and the required diagram set.
 - Call out whether the packet reuses an existing parent or sibling feature seam.
+
+## System design diagrams
+
+- Include at least one feature-level PlantUML diagram that lets a reviewer understand the design quickly.
+- Diagram purpose:
+- Diagram type:
+
+```plantuml
+@startuml
+' Replace with a feature-scoped component, package, sequence, state, or deployment diagram
+@enduml
+```
 
 ## Interfaces and dependencies
 

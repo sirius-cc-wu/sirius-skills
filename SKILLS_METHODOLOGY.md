@@ -575,7 +575,7 @@ By default, `guide-execution` uses `slices/`; projects can override that by sett
 - Use **PlantUML** as the standard UML language in both layers.
 - In the planning layer, keep UML diagrams feature-scoped and embed them in `system-design.md` unless a separate adjacent `.puml` file is clearly easier to maintain.
 - In the execution layer, keep UML diagrams slice-scoped and place detailed design diagrams in `blueprint.md`.
-- Prefer diagrams that answer a concrete question for the current phase rather than diagramming everything by default.
+- Require at least one diagram in both layers, and choose the simplest diagram set that answers the key question for the current phase without diagramming everything.
 
 ### Example layout
 

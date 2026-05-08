@@ -223,10 +223,10 @@ moving backlog ownership out of `ship`.
 
 By default, new execution slices are created under `slices/` unless `.skills/execution.json` overrides the location.
 
-When UML diagrams are useful, use **PlantUML**:
+Use **PlantUML** for required UML diagrams:
 
-- `design` should produce feature-scoped system-design diagrams in `system-design.md`
-- `blueprint` should produce slice-scoped detailed-design diagrams in `blueprint.md`
+- `design` should always produce at least one feature-scoped system-design diagram in `system-design.md`
+- `blueprint` should always produce at least one slice-scoped detailed-design diagram in `blueprint.md`
 
 By default, `design` embeds PlantUML directly in `system-design.md`. If `.skills/planning.json` sets `"design_diagram_mode": "linked_svg"`, `design` should instead write `.puml` and `.svg` files under `<feature_path>/figures/` and link the SVGs from `system-design.md`. In that mode, keep diagrams on an explicit white background by setting `skinparam backgroundColor white` in PlantUML and ensuring the rendered SVG includes a white canvas rect.
 

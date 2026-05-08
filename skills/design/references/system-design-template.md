@@ -30,6 +30,7 @@ Always include:
 - which configuration and state surfaces own each externally supplied value
 - constraints that affect execution, rollout, or safety
 - how the design will be validated
+- at least one feature-level PlantUML diagram that lets a reviewer understand the design quickly
 
 ## Framing mode
 
@@ -60,14 +61,14 @@ A strong `system-design.md` should let a reviewer answer these questions quickly
 
 ## Diagram guidance
 
-Choose diagrams that clarify real design risk:
+Every `system-design.md` should include at least one feature-level PlantUML diagram. Choose the lightest diagram set that still makes the design easy to scan:
 
 - component or package diagrams for structure and ownership
 - sequence diagrams for request flow, integration flow, or failure handling
 - state diagrams for lifecycle-heavy features
 - deployment diagrams for topology or network placement
 
-Do not add diagrams that merely restate section prose without improving precision.
+Do not omit diagrams entirely, and do not add diagrams that merely restate section prose without improving precision.
 
 When `.skills/planning.json` uses `design_diagram_mode: "linked_svg"`, keep the
 generated figures visually stable across themes:
