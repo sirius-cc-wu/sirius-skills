@@ -64,4 +64,7 @@ For reviewed subfeatures, it also expects approval metadata to be present alread
 - Do not invent extra slice states to mirror external execution lifecycles.
 - Do not skip `guide-execution`; this skill prepares and bootstraps the slice, but `guide-execution` still owns execution readiness and routing.
 - Do not bootstrap directly from uncommitted planning output.
+- Treat the "planning output is committed" check as target-scoped to the active
+  feature or subfeature packet so unrelated repository dirt does not block the
+  execution handoff.
 - If the input work item is still too large, send it back to `guide-planning` or `breakdown`.

@@ -175,6 +175,36 @@ def create_subfeature(
     return subfeature_path
 
 
+def prepare_approved_subfeature(
+    tmp_path: Path,
+    monkeypatch,
+    *,
+    ready_slice_ids: Optional[list[str]] = None,
+) -> Path:
+    subfeature_path = create_subfeature(tmp_path, monkeypatch, authored_discover=True)
+    (subfeature_path / "impact-analysis.md").write_text("# Impact Analysis\n", encoding="utf-8")
+    (subfeature_path / "system-design.md").write_text("# Design\n", encoding="utf-8")
+    (subfeature_path / "slice-planning.md").write_text("# Slice Planning\n", encoding="utf-8")
+    (subfeature_path / "slice-traceability.md").write_text(
+        "# Slice Traceability\n", encoding="utf-8"
+    )
+    metadata_path = subfeature_path / ".subfeature-meta.json"
+    metadata = read_json(metadata_path)
+    metadata.update(
+        {
+            "status": "reviewed",
+            "approval_status": "approved",
+            "review_note": "Ready for approval.",
+            "approved_at": "2026-01-03T00:00:00",
+            "approved_by": "maintainer",
+            "approval_note": "Approved for execution bootstrap.",
+            "ready_slice_ids": ready_slice_ids or ["TCS-001"],
+        }
+    )
+    metadata_path.write_text(json.dumps(metadata) + "\n", encoding="utf-8")
+    return subfeature_path
+
+
 def test_autoplan_routes_discovery_pending_to_discover(tmp_path: Path, monkeypatch) -> None:
     init_git_repo(tmp_path)
     write_planning_config(tmp_path)
@@ -325,6 +355,7 @@ def test_autoplan_owner_chain_reports_missing_required_input(tmp_path: Path, mon
         "stop_reason": payload["owner_chain"]["stop_reason"],
         "missing_files": ["discover.md"],
         "bootstrap_commands": [],
+        "bootstrap_commands_executed": [],
     }
     assert payload["failure_context"]["reason_code"] == "missing_required_input"
     handoff_payload = read_json(Path(payload["request_handoff_path"]))
@@ -339,6 +370,39 @@ def test_autoplan_owner_chain_reports_missing_required_input(tmp_path: Path, mon
     assert events[-1]["event"] == "failure"
     assert events[-1]["reason_code"] == "missing_required_input"
     assert events[-1]["target_id"] == "throughput-acceleration-workflow"
+
+
+def test_autoplan_owner_chain_suggests_design_scaffold_handoff(
+    tmp_path: Path, monkeypatch
+) -> None:
+    init_git_repo(tmp_path)
+    write_planning_config(
+        tmp_path,
+        autoplan_overrides={
+            "execute_owner_chain": True,
+        },
+    )
+    feature_path = create_feature(tmp_path, monkeypatch, "discovery_pending")
+    (feature_path / "discover.md").write_text("# Discover\n", encoding="utf-8")
+
+    result = run_cli(tmp_path, "throughput-acceleration-workflow", "--json")
+
+    assert result.returncode == 0
+    payload = json.loads(result.stdout)
+    assert (feature_path / "system-design.md").is_file()
+    assert payload["planning_status"] == "discovery_ready"
+    assert payload["next_owner"] == "design"
+    assert payload["owner_chain"]["stop_reason"]["kind"] == "bootstrap_applied"
+    assert payload["owner_handoff"]["should_invoke_skill"] is True
+    assert payload["owner_handoff"]["owner"] == "design"
+    assert payload["owner_handoff"]["missing_files"] == ["system-design.md"]
+    assert payload["owner_handoff"]["bootstrap_commands"] == []
+    assert payload["owner_handoff"]["bootstrap_commands_executed"] == [
+        "python3 skills/design/scripts/scaffold_design.py "
+        "docs/features/throughput-acceleration-workflow/"
+    ]
+    assert payload["failure_context"] is None
+    assert payload["readiness"]["can_proceed"] is True
 
 
 def test_autoplan_owner_chain_suggests_breakdown_scaffold_handoff(
@@ -357,19 +421,24 @@ def test_autoplan_owner_chain_suggests_breakdown_scaffold_handoff(
 
     assert result.returncode == 0
     payload = json.loads(result.stdout)
+    assert (tmp_path / "docs" / "features" / "throughput-acceleration-workflow" / "slice-planning.md").is_file()
+    assert (tmp_path / "docs" / "features" / "throughput-acceleration-workflow" / "slice-traceability.md").is_file()
     assert payload["planning_status"] == "design_ready"
     assert payload["next_owner"] == "breakdown"
-    assert payload["owner_chain"]["stop_reason"]["kind"] == "missing_required_input"
+    assert payload["owner_chain"]["stop_reason"]["kind"] == "bootstrap_applied"
     assert payload["owner_handoff"]["should_invoke_skill"] is True
     assert payload["owner_handoff"]["owner"] == "breakdown"
     assert payload["owner_handoff"]["missing_files"] == [
         "slice-planning.md",
         "slice-traceability.md",
     ]
-    assert payload["owner_handoff"]["bootstrap_commands"] == [
+    assert payload["owner_handoff"]["bootstrap_commands"] == []
+    assert payload["owner_handoff"]["bootstrap_commands_executed"] == [
         "python3 skills/breakdown/scripts/scaffold_breakdown.py "
         "docs/features/throughput-acceleration-workflow/"
     ]
+    assert payload["failure_context"] is None
+    assert payload["readiness"]["can_proceed"] is True
 
 
 def test_autoplan_owner_chain_reports_approval_when_already_reviewed(
@@ -592,3 +661,50 @@ def test_autoplan_owner_chain_hands_off_authored_subfeature_to_assess(
     assert payload["owner_handoff"]["should_invoke_skill"] is True
     assert payload["owner_handoff"]["owner"] == "assess"
     assert payload["owner_handoff"]["missing_files"] == ["impact-analysis.md"]
+
+
+def test_autoplan_requires_commit_for_approved_subfeature_before_slice(
+    tmp_path: Path, monkeypatch
+) -> None:
+    init_git_repo(tmp_path)
+    write_planning_config(tmp_path)
+    subfeature_path = prepare_approved_subfeature(tmp_path, monkeypatch, ready_slice_ids=["TCS-001"])
+    commit_all(tmp_path, "Initial subfeature packet")
+
+    metadata_path = subfeature_path / ".subfeature-meta.json"
+    metadata = read_json(metadata_path)
+    metadata["approval_note"] = "Approved and waiting for planning commit."
+    metadata_path.write_text(json.dumps(metadata) + "\n", encoding="utf-8")
+
+    result = run_cli(tmp_path, str(subfeature_path.relative_to(tmp_path)), "--json")
+
+    assert result.returncode == 0
+    payload = json.loads(result.stdout)
+    assert payload["planning_status"] == "slice_ready"
+    assert payload["next_owner"] == "commit"
+    assert payload["action"] == "commit_planning"
+    assert payload["approval_gate"]["decision"] == "approved"
+    assert payload["readiness"]["blocked_by"] == ["commit_checkpoint"]
+    assert payload["readiness"]["stop_reason"]["kind"] == "commit_checkpoint"
+    assert payload["readiness"]["commit_checkpoint"]["required"] is True
+    assert any(".subfeature-meta.json" in line for line in payload["dirty_worktree_paths"])
+
+
+def test_autoplan_hands_off_to_slice_after_approved_subfeature_is_committed(
+    tmp_path: Path, monkeypatch
+) -> None:
+    init_git_repo(tmp_path)
+    write_planning_config(tmp_path)
+    subfeature_path = prepare_approved_subfeature(tmp_path, monkeypatch, ready_slice_ids=["TCS-001"])
+    commit_all(tmp_path, "Approve subfeature planning packet")
+
+    result = run_cli(tmp_path, str(subfeature_path.relative_to(tmp_path)), "--json")
+
+    assert result.returncode == 0
+    payload = json.loads(result.stdout)
+    assert payload["planning_status"] == "slice_ready"
+    assert payload["next_owner"] == "slice"
+    assert payload["action"] == "bootstrap_slice"
+    assert payload["approval_gate"]["decision"] == "approved"
+    assert payload["readiness"]["blocked_by"] == []
+    assert payload["readiness"]["commit_checkpoint"]["required"] is False

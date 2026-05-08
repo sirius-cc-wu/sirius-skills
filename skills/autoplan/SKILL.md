@@ -33,6 +33,9 @@ stack with checkpointed resume support.
 11. Write a shared `.skills/runtime/request-handoff.json` summary so another
     agent can resume from the latest planning route without relying on
     agent-local scratch plans.
+12. When the user explicitly asks for `autoplan`, carry the packet through the
+    downstream planning owners in the same turn until an explicit stop boundary
+    is reached; do not stop after only reporting `next_owner`.
 
 ## Tooling
 
@@ -81,6 +84,12 @@ Optional CLI overrides:
 3. If `owner_handoff.should_invoke_skill` is true, treat that as an instruction
    to continue the owner chain by invoking the returned planning skill instead
    of stopping at the first `missing_required_input` boundary.
+   When the user asked for `autoplan` by name, this continuation is required
+   unless the stop boundary is explicitly non-automatable.
+   `autoplan.py` may also apply safe bootstrap helpers automatically before the
+   owner handoff when the blocker is a predictable missing planning artifact
+   such as `system-design.md`, `slice-planning.md`, or
+   `slice-traceability.md`.
 4. Before invoking `breakdown`, run any `owner_handoff.bootstrap_commands`
    first. This is especially important when the only blocker is the missing
    scaffold pair:
@@ -101,6 +110,9 @@ Optional CLI overrides:
    approval with `autoplan.py <target> --approve [--approval-note "..."] --json`.
 8. When `next_owner=commit`, invoke the existing `commit` skill so the approved
    planning artifacts and durable approval record are committed before execution.
+   Treat that commit checkpoint as target-scoped to the active planning packet
+   so unrelated dirty work elsewhere in the repository does not block the
+   planning handoff.
 9. Once approval is valid and the planning commit checkpoint is clear, hand off
    to `slice` or `ship` for execution bootstrap.
 10. If the target is already `implemented` and the user is actually reporting a
@@ -110,6 +122,29 @@ Optional CLI overrides:
 11. Treat subfeature planning state as owned by `.subfeature-meta.json`. Do not
     try to mutate a subfeature through `manage_planning.py sync-status`; use
     subfeature-aware routing and approval instead.
+
+## Execution Contract
+
+When the user explicitly requests `autoplan`, treat the request as "run the
+planning owner chain for me," not as "tell me which owner comes next."
+
+That means:
+
+- invoke `autoplan.py`
+- if it hands off to an automatable owner such as `discover`, `assess`,
+  `design`, `breakdown`, or `review-planning`, run that owner in the same turn
+- rerun `autoplan.py` after each owner completes
+- continue until one of these real stop boundaries is reached:
+  - `approval_required`
+  - `commit_checkpoint`
+  - `owner_stop`
+  - a non-automatable owner
+  - a blocker that genuinely requires user input or repo-specific judgment
+- if `autoplan.py` already reports `bootstrap_commands_executed`, do not rerun
+  the same safe scaffold step manually; continue with the returned owner
+
+A response that only reports `next_owner` is incomplete when the user asked for
+`autoplan` and the returned owner is still automatable in the current turn.
 
 ## Runtime outputs
 

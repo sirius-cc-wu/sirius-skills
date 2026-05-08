@@ -1,5 +1,6 @@
 import importlib.util
 import json
+import subprocess
 import sys
 from pathlib import Path
 
@@ -42,6 +43,21 @@ def write_scope_config(scope_root: Path, filename: str, data: dict):
 
 def write_planning_file(feature_dir: Path, filename: str, content: str):
     (feature_dir / filename).write_text(content, encoding="utf-8")
+
+
+def init_git_repo(root: Path) -> None:
+    subprocess.run(["git", "init", "--quiet"], cwd=root, check=True)
+    subprocess.run(["git", "config", "user.name", "Copilot Test"], cwd=root, check=True)
+    subprocess.run(
+        ["git", "config", "user.email", "copilot@example.test"],
+        cwd=root,
+        check=True,
+    )
+
+
+def commit_all(root: Path, message: str = "checkpoint") -> None:
+    subprocess.run(["git", "add", "-A"], cwd=root, check=True)
+    subprocess.run(["git", "commit", "--quiet", "-m", message], cwd=root, check=True)
 
 
 def setup_planning_feature(
@@ -242,6 +258,51 @@ def test_bootstrap_syncs_approved_subfeature_to_slice_ready(tmp_path, monkeypatc
         subfeature_id="environment-injection",
         approval_status="approved",
     )
+    planning = load_planning_module()
+
+    assert run_cli(module, monkeypatch, "ENV-01", "environment-injection") == 0
+
+    subfeature_metadata = json.loads(
+        (subfeature_dir / ".subfeature-meta.json").read_text(encoding="utf-8")
+    )
+    planning_metadata = planning.read_metadata(str(subfeature_dir))
+
+    assert planning_metadata["status"] == "slice_ready"
+    assert planning_metadata["ready_slice_ids"] == ["ENV-01"]
+    assert subfeature_metadata["ready_slice_ids"] == ["ENV-01"]
+
+
+def test_bootstrap_blocks_dirty_approved_subfeature_until_planning_is_committed(
+    tmp_path, monkeypatch, capsys
+):
+    init_git_repo(tmp_path)
+    module = load_module()
+    setup_reviewed_subfeature(
+        tmp_path,
+        monkeypatch,
+        feature_slug="host-safe-validation",
+        subfeature_id="environment-injection",
+        approval_status="approved",
+    )
+
+    exit_code = run_cli(module, monkeypatch, "ENV-01", "environment-injection")
+    captured = capsys.readouterr()
+
+    assert exit_code == 2
+    assert "Planning artifacts must be committed before slice bootstrap." in captured.err
+
+
+def test_bootstrap_allows_committed_approved_subfeature_in_git_repo(tmp_path, monkeypatch):
+    init_git_repo(tmp_path)
+    module = load_module()
+    subfeature_dir = setup_reviewed_subfeature(
+        tmp_path,
+        monkeypatch,
+        feature_slug="host-safe-validation",
+        subfeature_id="environment-injection",
+        approval_status="approved",
+    )
+    commit_all(tmp_path, "Commit approved planning packet")
     planning = load_planning_module()
 
     assert run_cli(module, monkeypatch, "ENV-01", "environment-injection") == 0

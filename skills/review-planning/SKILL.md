@@ -49,6 +49,15 @@ Resolve `<feature_path>` as either:
 - updated planning docs under `<feature_path>/`
 - explicit review findings or a readiness note recorded in the planning docs
 
+## Tooling
+
+```bash
+# Record a reviewed state for a feature or subfeature after review findings are resolved
+python3 skills/review-planning/scripts/record_review.py \
+  "<feature-selector-or-path>" \
+  --review-note "Ready for approval"
+```
+
 ## Review Rules
 
 - Confirm the business intent, constraints, and success criteria are still coherent across the planning artifacts.
@@ -88,7 +97,7 @@ Resolve `<feature_path>` as either:
 3. Compare discovery intent, design direction, and breakdown outputs for contradictions or missing handoff details, including duplicate configuration surfaces, consolidation drift, or parent/subfeature ownership drift.
 4. Record findings directly in the planning docs already used by the team. For subfeatures, write those findings back into the subfeature-local docs.
 5. Update the affected planning artifacts so the reviewed state is durable, including any `consolidation` metadata summary when the packet already relies on one.
-6. When the outcome is ready for approval, persist the readiness note in the planning docs. For canonical features, run `python3 skills/guide-planning/scripts/manage_planning.py sync-status <feature-selector> --through planning_reviewed --review-note "<readiness note>"`. For subfeatures, run `python3 skills/add-subfeature/scripts/manage_subfeatures.py set-status <feature-selector> <subfeature-id> reviewed --review-note "<readiness note>"`. If the reviewed packet depends on a metadata-carried consolidation summary, include the same normalized summary there as part of the ready state. If blockers remain, leave the metadata status unchanged.
+6. When the outcome is ready for approval, persist the readiness note in the planning docs. You may use `python3 skills/review-planning/scripts/record_review.py <feature-selector-or-path> --review-note "<readiness note>"` as the default entrypoint. For canonical features, that wrapper records `planning_reviewed`; for subfeatures, it records `reviewed`. If the reviewed packet depends on a metadata-carried consolidation summary, include the same normalized summary there as part of the ready state. If blockers remain, leave the metadata status unchanged.
 7. Stop when the work is ready for human approval and planning commit, or return it to `discover`, `design`, or `breakdown` as needed.
 
 ## Guardrails

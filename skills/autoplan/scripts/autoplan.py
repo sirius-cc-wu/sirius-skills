@@ -203,9 +203,18 @@ def emit_failure_response(
     return 2
 
 
-def read_dirty_worktree_paths(repo_root: Path) -> list[str]:
+def read_dirty_worktree_paths(repo_root: Path, target_path: Path | None = None) -> list[str]:
+    command = ["git", "-C", str(repo_root), "status", "--short", "--untracked-files=all"]
+    if target_path is not None:
+        try:
+            relative_target = target_path.resolve().relative_to(repo_root.resolve())
+        except ValueError as exc:
+            raise RuntimeError(
+                "Planning commit checkpoint target must stay inside the git repository root."
+            ) from exc
+        command.extend(["--", str(relative_target)])
     result = subprocess.run(
-        ["git", "-C", str(repo_root), "status", "--short", "--untracked-files=all"],
+        command,
         check=False,
         capture_output=True,
         text=True,
@@ -324,17 +333,91 @@ def extract_missing_required_files(message: str) -> list[str]:
     return sorted({match for match in re.findall(r"Missing required file '([^']+)'", message)})
 
 
+def bootstrap_specs_for_owner(
+    *,
+    owner: str,
+    target_path: str,
+    missing_files: Sequence[str],
+) -> list[tuple[list[str], str]]:
+    specs: list[tuple[list[str], str]] = []
+    missing = set(missing_files)
+    if owner == "breakdown":
+        required = {"slice-planning.md", "slice-traceability.md"}
+        if required.issubset(missing):
+            display = (
+                "python3 skills/breakdown/scripts/scaffold_breakdown.py "
+                f"{shlex.quote(target_path)}"
+            )
+            specs.append(
+                (
+                    [
+                        "python3",
+                        str(SKILLS_DIR / "breakdown" / "scripts" / "scaffold_breakdown.py"),
+                        target_path,
+                    ],
+                    display,
+                )
+            )
+    if owner == "design" and "system-design.md" in missing:
+        display = (
+            "python3 skills/design/scripts/scaffold_design.py "
+            f"{shlex.quote(target_path)}"
+        )
+        specs.append(
+            (
+                [
+                    "python3",
+                    str(SKILLS_DIR / "design" / "scripts" / "scaffold_design.py"),
+                    target_path,
+                ],
+                display,
+            )
+        )
+    return specs
+
+
+def execute_safe_bootstrap(
+    *,
+    owner: str,
+    target_path: str,
+    missing_files: Sequence[str],
+    repo_root: Path,
+) -> list[str]:
+    executed_commands: list[str] = []
+    for argv, display in bootstrap_specs_for_owner(
+        owner=owner, target_path=target_path, missing_files=missing_files
+    ):
+        result = subprocess.run(
+            argv,
+            cwd=repo_root,
+            check=False,
+            capture_output=True,
+            text=True,
+        )
+        if result.returncode != 0:
+            stderr = result.stderr.strip()
+            stdout = result.stdout.strip()
+            detail = stderr or stdout or "bootstrap command failed"
+            raise RuntimeError(
+                f"Safe bootstrap for owner '{owner}' failed while running '{display}': {detail}"
+            )
+        executed_commands.append(display)
+    return executed_commands
+
+
 def execute_feature_owner_chain(
     rows: list[dict[str, object]],
     feature: dict[str, object],
     *,
     planning_module,
+    repo_root: Path,
     scope_context,
     stop_on_owner: list[str],
     review_note: Optional[str],
 ) -> tuple[str, list[dict[str, Any]], Optional[dict[str, Any]]]:
     steps: list[dict[str, Any]] = []
     feature_dir = planning_module.feature_dir_for_row(feature, scope_context=scope_context)
+    target_path = str(feature["path"])
 
     for _ in range(len(OWNER_TRANSITIONS) + 1):
         metadata = planning_module.read_metadata(feature_dir)
@@ -394,6 +477,30 @@ def execute_feature_owner_chain(
         steps.append(step)
 
         if not success or not advanced:
+            missing_files = extract_missing_required_files(message)
+            executed_bootstrap_commands = execute_safe_bootstrap(
+                owner=owner,
+                target_path=target_path,
+                missing_files=missing_files,
+                repo_root=repo_root,
+            )
+            if executed_bootstrap_commands:
+                return (
+                    next_status,
+                    steps,
+                    {
+                        "kind": "bootstrap_applied",
+                        "owner": owner,
+                        "status": next_status,
+                        "target_status": target_status,
+                        "message": (
+                            f"Applied safe bootstrap commands for '{owner}'. "
+                            "Continue with the owner workflow."
+                        ),
+                        "missing_files": missing_files,
+                        "bootstrap_commands_executed": executed_bootstrap_commands,
+                    },
+                )
             return (
                 next_status,
                 steps,
@@ -405,6 +512,7 @@ def execute_feature_owner_chain(
                     "status": next_status,
                     "target_status": target_status,
                     "message": message,
+                    "missing_files": missing_files,
                 },
             )
 
@@ -435,7 +543,9 @@ def execute_subfeature_owner_chain(
     feature_dir: Path,
     *,
     planning_module,
+    repo_root: Path,
     subfeature_module,
+    target_path: str,
     stop_on_owner: list[str],
     review_note: Optional[str],
 ) -> tuple[str, list[dict[str, Any]], Optional[dict[str, Any]]]:
@@ -539,6 +649,30 @@ def execute_subfeature_owner_chain(
         )
 
         if not success or not advanced:
+            missing_files = extract_missing_required_files(message)
+            executed_bootstrap_commands = execute_safe_bootstrap(
+                owner=owner,
+                target_path=target_path,
+                missing_files=missing_files,
+                repo_root=repo_root,
+            )
+            if executed_bootstrap_commands:
+                return (
+                    next_raw_status,
+                    steps,
+                    {
+                        "kind": "bootstrap_applied",
+                        "owner": owner,
+                        "status": next_raw_status,
+                        "target_status": target_status,
+                        "message": (
+                            f"Applied safe bootstrap commands for '{owner}'. "
+                            "Continue with the owner workflow."
+                        ),
+                        "missing_files": missing_files,
+                        "bootstrap_commands_executed": executed_bootstrap_commands,
+                    },
+                )
             return (
                 next_raw_status,
                 steps,
@@ -548,6 +682,7 @@ def execute_subfeature_owner_chain(
                     "status": next_raw_status,
                     "target_status": target_status,
                     "message": message,
+                    "missing_files": missing_files,
                 },
             )
 
@@ -633,6 +768,8 @@ def build_readiness_payload(
         stop_reason = normalize_stop_reason(
             owner_chain.get("stop_reason") if isinstance(owner_chain, dict) else None
         )
+        if isinstance(stop_reason, dict) and str(stop_reason.get("kind") or "") == "bootstrap_applied":
+            stop_reason = None
     if next_owner == "guide-planning":
         blocked_by.append("planning_resolution_required")
 
@@ -679,16 +816,35 @@ def build_owner_handoff(
         return None
 
     message = str(stop_reason.get("message") or "").strip()
-    missing_files = extract_missing_required_files(message)
-    bootstrap_commands: list[str] = []
-
-    if next_owner == "breakdown" and missing_files:
-        required = {"slice-planning.md", "slice-traceability.md"}
-        if required.issubset(set(missing_files)):
-            bootstrap_commands.append(
-                "python3 skills/breakdown/scripts/scaffold_breakdown.py "
-                f"{shlex.quote(target_path)}"
-            )
+    raw_missing_files = stop_reason.get("missing_files")
+    if isinstance(raw_missing_files, list):
+        missing_files = [
+            item.strip()
+            for item in raw_missing_files
+            if isinstance(item, str) and item.strip()
+        ]
+    else:
+        missing_files = extract_missing_required_files(message)
+    bootstrap_commands = [
+        display
+        for _, display in bootstrap_specs_for_owner(
+            owner=next_owner,
+            target_path=target_path,
+            missing_files=missing_files,
+        )
+    ]
+    raw_executed_commands = stop_reason.get("bootstrap_commands_executed")
+    bootstrap_commands_executed = (
+        [
+            item.strip()
+            for item in raw_executed_commands
+            if isinstance(item, str) and item.strip()
+        ]
+        if isinstance(raw_executed_commands, list)
+        else []
+    )
+    if bootstrap_commands_executed:
+        bootstrap_commands = []
 
     return {
         "should_invoke_skill": True,
@@ -698,6 +854,7 @@ def build_owner_handoff(
         "stop_reason": stop_reason,
         "missing_files": missing_files,
         "bootstrap_commands": bootstrap_commands,
+        "bootstrap_commands_executed": bootstrap_commands_executed,
     }
 
 
@@ -953,6 +1110,7 @@ def main(argv: Sequence[str] | None = None) -> int:
                     rows,
                     feature,
                     planning_module=planning_module,
+                    repo_root=repo_root,
                     scope_context=scope_context,
                     stop_on_owner=stop_on_owner,
                     review_note=review_note,
@@ -961,7 +1119,9 @@ def main(argv: Sequence[str] | None = None) -> int:
                 planning_status, steps, stop_reason = execute_subfeature_owner_chain(
                     feature_dir,
                     planning_module=planning_module,
+                    repo_root=repo_root,
                     subfeature_module=subfeature_module,
+                    target_path=str(feature["path"]),
                     stop_on_owner=stop_on_owner,
                     review_note=review_note,
                 )
@@ -1058,13 +1218,9 @@ def main(argv: Sequence[str] | None = None) -> int:
                 subfeature_state=subfeature_state,
             )
         )
-        dirty_worktree_paths = read_dirty_worktree_paths(repo_root)
+        dirty_worktree_paths = read_dirty_worktree_paths(repo_root, feature_dir)
 
-        if (
-            subfeature_state is not None
-            and str(subfeature_state["raw_status"]) == "reviewed"
-            and not subfeature_state["ready_slice_ids"]
-        ):
+        if subfeature_state is not None and str(subfeature_state["raw_status"]) == "reviewed":
             if str(approval_gate.get("decision") or "") != "approved":
                 next_owner, action = "approval", "approval_required"
             elif dirty_worktree_paths:
@@ -1145,7 +1301,15 @@ def main(argv: Sequence[str] | None = None) -> int:
                     else None
                 ),
             )
-            if owner_chain is not None
+            if (
+                owner_chain is not None
+                and str(
+                    (owner_chain.get("stop_reason") or {}).get("kind")
+                    if isinstance(owner_chain, dict)
+                    else ""
+                )
+                != "bootstrap_applied"
+            )
             else None
         )
 

@@ -1,6 +1,7 @@
 import argparse
 import importlib.util
 import json
+import subprocess
 import sys
 from pathlib import Path
 from typing import Dict, List, Optional, Tuple
@@ -54,6 +55,46 @@ def load_subfeature_module():
     assert spec.loader is not None
     spec.loader.exec_module(module)
     return module
+
+
+def git_repo_root_for(path: Path) -> Optional[Path]:
+    result = subprocess.run(
+        ["git", "-C", str(path), "rev-parse", "--show-toplevel"],
+        check=False,
+        capture_output=True,
+        text=True,
+    )
+    if result.returncode != 0:
+        return None
+    return Path(result.stdout.strip())
+
+
+def target_dirty_worktree_paths(path: Path) -> List[str]:
+    repo_root = git_repo_root_for(path)
+    if repo_root is None:
+        return []
+    try:
+        relative_path = path.resolve().relative_to(repo_root.resolve())
+    except ValueError:
+        return []
+    result = subprocess.run(
+        [
+            "git",
+            "-C",
+            str(repo_root),
+            "status",
+            "--short",
+            "--untracked-files=all",
+            "--",
+            str(relative_path),
+        ],
+        check=False,
+        capture_output=True,
+        text=True,
+    )
+    if result.returncode != 0:
+        raise RuntimeError("Unable to inspect git worktree state for slice bootstrap.")
+    return [line.rstrip() for line in result.stdout.splitlines() if line.strip()]
 
 
 def parse_bootstrap_args(
@@ -127,6 +168,12 @@ def sync_planning_handoff(feature_name: str, slice_id: str) -> Optional[Dict[str
             f"{'Subfeature' if is_subfeature else 'Planning feature'} '{feature['feature']}' "
             "must be in 'planning_reviewed' or 'slice_ready' before slice bootstrap. "
             f"Current status: '{current_status}'."
+        )
+    dirty_worktree_paths = target_dirty_worktree_paths(Path(feature_dir))
+    if dirty_worktree_paths:
+        raise RuntimeError(
+            "Planning artifacts must be committed before slice bootstrap. "
+            f"Dirty target paths: {', '.join(dirty_worktree_paths)}"
         )
 
     if is_subfeature:
