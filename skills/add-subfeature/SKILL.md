@@ -1,12 +1,16 @@
 ---
 name: add-subfeature
-description: Starts and manages durable subfeatures for an existing feature without replacing the parent feature folder.
+description: Canonical workflow for creating and managing durable subfeatures under an existing feature. Use this whenever the user asks to add, create, start, open, or bootstrap a subfeature so downstream planning skills keep the expected metadata and discover-stub lifecycle.
 ---
 
 # Add Subfeature
 
-Use this skill when an existing canonical feature needs a durable child planning
-folder instead of direct in-place edits to the parent feature plan.
+Use this skill whenever an existing canonical feature needs a new durable child
+planning folder.
+
+This is the canonical creation path for subfeatures. If the user asks to add,
+create, start, open, or bootstrap a subfeature, use this skill instead of
+hand-authoring the subfeature folder or lifecycle metadata.
 
 This is also the default follow-on path when the parent feature is already
 implemented or archived but the user is reporting a new bug, regression, or
