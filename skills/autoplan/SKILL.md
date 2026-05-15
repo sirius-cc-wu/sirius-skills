@@ -1,6 +1,6 @@
 ---
 name: autoplan
-description: Reconcile one planning target, optionally execute planning owners in sequence, and persist checkpointed resume context through approval and planning-commit handoff.
+description: Reconcile one planning target, optionally execute planning owners in sequence, and persist checkpointed resume context through approval, optional auto-commit handoff, and planning-commit handoff.
 ---
 
 # Autoplan
@@ -36,6 +36,9 @@ stack with checkpointed resume support.
 12. When the user explicitly asks for `autoplan`, carry the packet through the
     downstream planning owners in the same turn until an explicit stop boundary
     is reached; do not stop after only reporting `next_owner`.
+13. When approval is recorded through `--approve` and the next step is the
+    planning commit checkpoint, auto-chain directly into the commit handoff
+    instead of forcing a second explicit autoplan invocation.
 
 ## Tooling
 
@@ -112,7 +115,8 @@ Optional CLI overrides:
    planning artifacts and durable approval record are committed before execution.
    Treat that commit checkpoint as target-scoped to the active planning packet
    so unrelated dirty work elsewhere in the repository does not block the
-   planning handoff.
+   planning handoff. When approval was just recorded through `--approve`, treat
+   this commit handoff as auto-chainable in the same autoplan request.
 9. Once approval is valid and the planning commit checkpoint is clear, hand off
    to `slice` or `ship` for execution bootstrap.
 10. If the target is already `implemented` and the user is actually reporting a
@@ -127,6 +131,9 @@ Optional CLI overrides:
 
 When the user explicitly requests `autoplan`, treat the request as "run the
 planning owner chain for me," not as "tell me which owner comes next."
+
+If the request uses `--approve`, continue through the commit handoff in the
+same request when the next owner becomes `commit`.
 
 That means:
 

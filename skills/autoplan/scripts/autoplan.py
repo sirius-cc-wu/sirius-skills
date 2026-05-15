@@ -1139,8 +1139,10 @@ def main(argv: Sequence[str] | None = None) -> int:
             if subfeature_module is not None
             else None
         )
+        approval_recorded = False
 
         if args.approve:
+            approval_recorded = True
             if subfeature_module is None:
                 if planning_status != "planning_reviewed":
                     return emit_failure_response(
@@ -1223,14 +1225,14 @@ def main(argv: Sequence[str] | None = None) -> int:
         if subfeature_state is not None and str(subfeature_state["raw_status"]) == "reviewed":
             if str(approval_gate.get("decision") or "") != "approved":
                 next_owner, action = "approval", "approval_required"
-            elif dirty_worktree_paths:
+            elif dirty_worktree_paths or approval_recorded:
                 next_owner, action = "commit", "commit_planning"
             else:
                 next_owner, action = "slice", "bootstrap_slice"
         elif planning_status == "planning_reviewed":
             if str(approval_gate.get("decision") or "") != "approved":
                 next_owner, action = "approval", "approval_required"
-            elif dirty_worktree_paths:
+            elif dirty_worktree_paths or approval_recorded:
                 next_owner, action = "commit", "commit_planning"
             else:
                 next_owner, action = "slice", "bootstrap_slice"
