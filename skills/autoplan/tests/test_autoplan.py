@@ -532,6 +532,32 @@ def test_autoplan_approve_records_gate_and_requires_commit(
     assert any(".approval-gate.json" in line for line in payload["dirty_worktree_paths"])
 
 
+def test_autoplan_approve_auto_chains_to_commit_handoff_even_without_dirty_worktree(
+    tmp_path: Path, monkeypatch
+) -> None:
+    init_git_repo(tmp_path)
+    write_planning_config(tmp_path)
+    create_feature(tmp_path, monkeypatch, "planning_reviewed")
+    commit_all(tmp_path, "Initial planning packet")
+
+    result = run_cli(
+        tmp_path,
+        "throughput-acceleration-workflow",
+        "--approve",
+        "--approval-note",
+        "approved for execution",
+        "--json",
+    )
+
+    assert result.returncode == 0
+    payload = json.loads(result.stdout)
+    assert payload["next_owner"] == "commit"
+    assert payload["action"] == "commit_planning"
+    assert payload["approval_gate"]["decision"] == "approved"
+    assert payload["action"] == "commit_planning"
+    assert payload["approval_gate"]["decision"] == "approved"
+
+
 def test_autoplan_hands_off_to_slice_after_approved_planning_is_committed(
     tmp_path: Path, monkeypatch
 ) -> None:

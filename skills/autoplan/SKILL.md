@@ -116,7 +116,9 @@ Optional CLI overrides:
    Treat that commit checkpoint as target-scoped to the active planning packet
    so unrelated dirty work elsewhere in the repository does not block the
    planning handoff. When approval was just recorded through `--approve`, treat
-   this commit handoff as auto-chainable in the same autoplan request.
+   this commit handoff as auto-chainable in the same autoplan request, and the
+   skill wrapper should proceed directly into the commit skill instead of
+   stopping after only reporting `commit_planning`.
 9. Once approval is valid and the planning commit checkpoint is clear, hand off
    to `slice` or `ship` for execution bootstrap.
 10. If the target is already `implemented` and the user is actually reporting a

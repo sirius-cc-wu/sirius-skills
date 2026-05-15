@@ -162,6 +162,15 @@ def runtime_paths(repo_root: Path) -> tuple[Path, Path, Path, Path]:
     return checkpoint_path, event_log_path, request_handoff_path, learnings_path
 
 
+def approval_triggered_commit_handoff(
+    *,
+    approval_recorded: bool,
+    next_owner: str,
+    action: str,
+) -> bool:
+    return approval_recorded and next_owner == "commit" and action == "commit_planning"
+
+
 def emit_failure_response(
     *,
     args: argparse.Namespace,
