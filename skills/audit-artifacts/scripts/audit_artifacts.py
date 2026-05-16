@@ -645,6 +645,42 @@ def _audit_cross_links(
                     f"traceability ({traced})."
                 ),
             )
+
+        approval_note_sources = {
+            "subfeature metadata approval_note": str(metadata.get("approval_note") or "").strip(),
+        }
+        approval_gate_path = Path(relpath) / ".approval-gate.json"
+        approval_gate_metadata = None
+        if approval_gate_path.is_file():
+            try:
+                approval_gate_metadata = json.loads(approval_gate_path.read_text(encoding="utf-8"))
+            except json.JSONDecodeError:
+                approval_gate_metadata = None
+        if approval_gate_metadata is not None:
+            approval_note_sources["approval gate approval_note"] = str(
+                approval_gate_metadata.get("approval_note") or ""
+            ).strip()
+        for source_label, approval_note in approval_note_sources.items():
+            if not approval_note:
+                continue
+            closed_mentions = [
+                slice_id for slice_id in closed_execution_slice_ids if slice_id in approval_note
+            ]
+            if closed_mentions:
+                add_finding(
+                    findings,
+                    selected,
+                    "subfeature",
+                    subfeature_id,
+                    relpath,
+                    "cross_layer_drift",
+                    "subfeature_approval_note_mentions_closed_slice",
+                    "warning",
+                    (
+                        f"{source_label} still references already-closed execution slices: "
+                        f"{', '.join(sorted(closed_mentions))}."
+                    ),
+                )
         if subfeature_status != "finalized":
             add_finding(
                 findings,

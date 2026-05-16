@@ -497,6 +497,49 @@ def test_run_audit_reports_subfeature_closed_execution_drift(tmp_path, monkeypat
     )
 
 
+def test_run_audit_reports_stale_subfeature_approval_note_for_closed_slice(tmp_path, monkeypatch):
+    env = setup_repo(tmp_path, monkeypatch)
+
+    create_closed_slice(env["execution"], tmp_path, "CHK-201", "Replace Legacy Flow")
+    write_subfeature_traceability(
+        env["subfeature_dir"],
+        planned_slice_ids=["CHK-201"],
+        execution_slice_ids=["CHK-201"],
+    )
+
+    approval_gate_path = env["subfeature_dir"] / ".approval-gate.json"
+    approval_gate_path.write_text(
+        json.dumps(
+            {
+                "version": 1,
+                "approved": True,
+                "approved_at": "2026-01-03T00:00:00+00:00",
+                "target_id": "replace-legacy-flow",
+                "target_path": str(env["subfeature_dir"].as_posix()) + "/",
+                "planning_status": "planning_reviewed",
+                "planning_updated_at": "2026-01-03T00:00:00",
+                "planning_fingerprint": "abc123",
+                "approval_note": "CHK-201 implemented and committed. Proceeding to CHK-201.",
+            }
+        )
+        + "\n",
+        encoding="utf-8",
+    )
+
+    result = env["audit"].run_audit(["subfeature"])
+
+    assert result["ok"] is False
+    assert "subfeature_approval_note_mentions_closed_slice" in finding_codes(result)
+    finding = next(
+        finding
+        for finding in result["findings"]
+        if finding["code"] == "subfeature_approval_note_mentions_closed_slice"
+    )
+    assert finding["artifact_id"] == "replace-legacy-flow"
+    assert "approval gate approval_note" in finding["message"]
+    assert "CHK-201" in finding["message"]
+
+
 def test_run_audit_reports_missing_traceability_execution_slice_for_subfeature(
     tmp_path, monkeypatch
 ):
