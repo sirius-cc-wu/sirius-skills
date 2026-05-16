@@ -16,7 +16,7 @@ Implemented child capabilities provide the operational stack:
 
 | Subfeature | Status | Synthesis |
 |---|---|---|
-| `audit-artifacts` | `implemented` | Read-only health checks across artifact inventory, validation, link integrity, and registry drift. |
+| `audit-artifacts` | `implemented` | Read-only health checks across artifact inventory, validation, link integrity, registry drift, and stale approval-note detection after slice closure. |
 | `trace-artifacts` | `implemented` | Typed lineage graph across proposal, feature, subfeature, planned slice, and execution slice links. |
 | `report-artifacts` | `implemented` | Operational summaries by type/status/parent with stale detection and active-vs-historical distinction. |
 | `repair-artifacts` | `implemented` | Conservative dry-run/apply rebuild of derived registries and README tables from durable metadata. |
@@ -34,10 +34,10 @@ Implemented child capabilities provide the operational stack:
 
 ## Notable Delta
 
-The parent packet has now been structurally reconciled with the implemented
-child capability stack. The main remaining nuance is that most concrete
-execution history still lives in the finalized child subfeatures rather than in
-this umbrella packet.
+The maintenance layer now explicitly treats stale approval-gate notes as
+cross-layer drift when a subfeature's traced execution slices are already
+closed. That closes a blind spot where execution truth had advanced, but the
+remaining approval note still advertised obsolete next-slice guidance.
 
 ## Main Sources
 

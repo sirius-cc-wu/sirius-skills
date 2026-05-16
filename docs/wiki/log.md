@@ -1,9 +1,8 @@
-# Wiki Log
+## [2026-05-16] implementation-synthesis | audit stale approval-note drift
 
-Append-only record of wiki maintenance.
-
-Use entries like `## [YYYY-MM-DD] operation | subject` so the log stays
-grep-friendly.
+- Extended `skills/audit-artifacts/scripts/audit_artifacts.py` so subfeature audits flag approval notes that still mention already-closed traced execution slices.
+- Added a regression test in `skills/audit-artifacts/tests/test_audit_artifacts.py` covering stale `.approval-gate.json` slice references after closure.
+- Updated `docs/wiki/features/cross-artifact-management.md` and `docs/wiki/index.md` so the synthesized maintenance-layer docs describe the new stale approval-note detection behavior.
 
 ## [2026-04-23] synthesis | feature packet baseline
 
