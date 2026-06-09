@@ -17,6 +17,8 @@ durable history without broad cleanup side effects.
    helper.
 4. Summarize closed slices for one feature or subfeature into `system-design.md`
    before archiving them.
+5. Remove or archive the corresponding `slice-planning.md` and
+   `slice-traceability.md` artifacts after the summary is captured.
 
 ## Preferred Input
 
@@ -83,6 +85,8 @@ Exit behavior:
   folders directly here.
 - For feature and subfeature apply mode, summarize slice history into
   `system-design.md` before archiving the targeted closed slices.
+- After summarizing, clean up the targeted `slice-planning.md` and
+  `slice-traceability.md` files so the archival set is complete.
 - Keep structural-diagram carry-forward opt-in and limited to preserving
   existing class/component-style PlantUML from blueprint or canonical
   `system-design.md`; do not synthesize new diagrams during archive.
