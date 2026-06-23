@@ -2,6 +2,27 @@
 
 `sirius-skills` is a generic-first skill collection for spec-driven development, planning, implementation support, and repository workflows, including an implemented two-step accelerator path built around `autoplan` and `ship`.
 
+## Python CLI
+
+The repository can also be installed as a Python package that provides a single
+`sirius-skills` command:
+
+```bash
+python3 -m pip install -e .
+sirius-skills --help
+```
+
+The CLI discovers runnable Python helpers under `scripts/` and
+`skills/*/scripts/` and exposes them as subcommands, while leaving the original
+script paths available for compatibility. For example:
+
+```bash
+sirius-skills autoplan <target> --execute-owner-chain --json
+sirius-skills manage-planning <args>
+sirius-skills validate-workflow-state
+sirius-skills sync-shared-runtime
+```
+
 ## Installing skills
 
 Install the managed skills with the packaged workflow:

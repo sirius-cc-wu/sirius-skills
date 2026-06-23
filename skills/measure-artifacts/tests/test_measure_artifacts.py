@@ -180,9 +180,6 @@ def create_finalized_subfeature_target(env):
     subfeature_metadata["status"] = "finalized"
     subfeatures.write_metadata(subfeature_dir, subfeature_metadata)
 
-    planning_metadata = planning.read_metadata(subfeature_dir)
-    planning_metadata["status"] = "implemented"
-    planning.write_metadata(subfeature_dir, planning_metadata)
     planning.sync_registry()
     return subfeature_path
 
