@@ -81,13 +81,13 @@ The seventh slice adds explicit terminal finalization:
 ## Tooling
 
 ```bash
-python3 skills/ship/scripts/ship.py <target>
-python3 skills/ship/scripts/ship.py <target> --json
-python3 skills/ship/scripts/ship.py <target> --bootstrap-next
-python3 skills/ship/scripts/ship.py <target> --resume
-python3 skills/ship/scripts/ship.py <target> --finalize
-python3 skills/ship/scripts/ship.py <target> --approve --approval-note "approved for execution"
-python3 skills/ship/scripts/ship.py <target> --scope apps/payments
+sirius ship <target>
+sirius ship <target> --json
+sirius ship <target> --bootstrap-next
+sirius ship <target> --resume
+sirius ship <target> --finalize
+sirius ship <target> --approve --approval-note "approved for execution"
+sirius ship <target> --scope apps/payments
 ```
 
 ## Rerun Contract
@@ -96,8 +96,8 @@ Treat `ship` as deterministic with respect to current repository artifacts, but
 not as universally side-effect free.
 
 - **Read-only recomputation**
-  - `python3 skills/ship/scripts/ship.py <target>`
-  - `python3 skills/ship/scripts/ship.py <target> --json`
+  - `sirius ship <target>`
+  - `sirius ship <target> --json`
   - route-only `--resume` when an active slice already exists and `ship` is only
     handing that slice to the next owner without bootstrapping or delegating
 - **Guarded mutation**

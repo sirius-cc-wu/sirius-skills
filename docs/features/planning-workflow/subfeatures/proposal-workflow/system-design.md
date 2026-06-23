@@ -67,7 +67,7 @@ user is deliberately repairing state.
 
 - `skills/propose/SKILL.md`
   - defines when to use `propose`
-- `skills/propose/scripts/manage_proposals.py`
+- `sirius manage-proposals`
   - manages proposal registry, metadata, and validation
 - `docs/proposals/README.md`
   - human-readable proposal registry
@@ -77,7 +77,7 @@ user is deliberately repairing state.
   - proposal lifecycle metadata
 - `skills/guide-planning/SKILL.md`
   - promotes accepted proposals into canonical planning and routes to `discover`
-- `skills/bootstrap/scripts/bootstrap.py`
+- `sirius bootstrap`
   - writes default `proposal_dir`
 
 ## Validation Rules

@@ -53,7 +53,7 @@ Resolve `<feature_path>` as either:
 
 ```bash
 # Record a reviewed state for a feature or subfeature after review findings are resolved
-python3 skills/review-planning/scripts/record_review.py \
+sirius record-review \
   "<feature-selector-or-path>" \
   --review-note "Ready for approval"
 ```
@@ -97,7 +97,7 @@ python3 skills/review-planning/scripts/record_review.py \
 3. Compare discovery intent, design direction, and breakdown outputs for contradictions or missing handoff details, including duplicate configuration surfaces, consolidation drift, or parent/subfeature ownership drift.
 4. Record findings directly in the planning docs already used by the team. For subfeatures, write those findings back into the subfeature-local docs.
 5. Update the affected planning artifacts so the reviewed state is durable, including any `consolidation` metadata summary when the packet already relies on one.
-6. When the outcome is ready for approval, persist the readiness note in the planning docs. You may use `python3 skills/review-planning/scripts/record_review.py <feature-selector-or-path> --review-note "<readiness note>"` as the default entrypoint. For canonical features, that wrapper records `planning_reviewed`; for subfeatures, it records `reviewed`. If the reviewed packet depends on a metadata-carried consolidation summary, include the same normalized summary there as part of the ready state. If blockers remain, leave the metadata status unchanged.
+6. When the outcome is ready for approval, persist the readiness note in the planning docs. You may use `sirius record-review <feature-selector-or-path> --review-note "<readiness note>"` as the default entrypoint. For canonical features, that wrapper records `planning_reviewed`; for subfeatures, it records `reviewed`. If the reviewed packet depends on a metadata-carried consolidation summary, include the same normalized summary there as part of the ready state. If blockers remain, leave the metadata status unchanged.
 7. Stop when the work is ready for human approval and planning commit, or return it to `discover`, `design`, or `breakdown` as needed.
 
 ## Guardrails

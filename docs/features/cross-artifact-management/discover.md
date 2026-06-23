@@ -92,13 +92,13 @@ keep it healthy over time.
 
 ## Confirmed Signals in Repo
 
-- `skills/propose/scripts/manage_proposals.py` already owns proposal registry
+- `sirius manage-proposals` already owns proposal registry
   state and validation.
-- `skills/guide-planning/scripts/manage_planning.py` already owns feature
+- `sirius manage-planning` already owns feature
   registry state and proposal promotion.
-- `skills/add-subfeature/scripts/manage_subfeatures.py` already owns feature
+- `sirius manage-subfeatures` already owns feature
   child packets and subfeature metadata.
-- `skills/guide-execution/scripts/manage_execution.py` already owns slice
+- `sirius manage-execution` already owns slice
   registry state and relation metadata, including `audit-relations`.
 - Closed slices and durable subfeature planning folders are retained by default,
   so cross-artifact maintenance should stay explicit rather than piggybacking on

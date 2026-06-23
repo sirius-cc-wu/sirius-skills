@@ -44,16 +44,16 @@ closed execution slices.
 
 ```bash
 # Close the active slice
-python3 <path-to-close-slice>/scripts/close_slice.py
+sirius close-slice
 
 # Close a slice while explicitly confirming that it supersedes an older one
-python3 <path-to-close-slice>/scripts/close_slice.py --slice "<slice-id-or-path>" --relate supersedes "<old-slice-id-or-path>" --confirm-impact
+sirius close-slice --slice "<slice-id-or-path>" --relate supersedes "<old-slice-id-or-path>" --confirm-impact
 
 # Close a slice with a partial replacement relation scoped to one story/requirement
-python3 <path-to-close-slice>/scripts/close_slice.py --slice "<slice-id-or-path>" --relate replaces_partially "<old-slice-id-or-path>" --story-title "Story 2 - Legacy flow" --requirement-id FR-002 --selector "legacy checkout path" --confirm-impact
+sirius close-slice --slice "<slice-id-or-path>" --relate replaces_partially "<old-slice-id-or-path>" --story-title "Story 2 - Legacy flow" --requirement-id FR-002 --selector "legacy checkout path" --confirm-impact
 
 # Output JSON for downstream tooling
-python3 <path-to-close-slice>/scripts/close_slice.py --json
+sirius close-slice --json
 ```
 
 Use `--confirm-impact` when closure also changes the semantic validity of older execution slices. Use `--force` only for deliberate repair when the slice lifecycle is temporarily inconsistent and you have already verified the intent with the user.

@@ -8,7 +8,7 @@ from pathlib import Path
 
 
 REPO_ROOT = Path(__file__).resolve().parents[3]
-SCRIPT_PATH = REPO_ROOT / "skills" / "learn" / "scripts" / "learn.py"
+SCRIPT_PATH = REPO_ROOT / "src" / "sirius_skills" / "commands" / "learn.py"
 
 
 def load_module(name: str, path: Path):

@@ -91,7 +91,7 @@ conditions should block before bootstrap or delegated execution begins.
 - parent `system-design.md`
 - parent `user-stories.md`
 - `skills/ship/SKILL.md`
-- `skills/ship/scripts/ship.py`
+- `sirius ship`
 - `skills/ship-slice/SKILL.md`
 - `docs/wiki/concepts/two-step-autonomy-roadmap.md`
 - `docs/wiki/features/throughput-acceleration-workflow.md`

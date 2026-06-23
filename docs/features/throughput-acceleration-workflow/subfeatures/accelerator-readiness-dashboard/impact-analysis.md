@@ -7,9 +7,9 @@ the accelerator entrypoints.
 
 ## Affected Areas
 
-- `skills/autoplan/scripts/autoplan.py`
-- `skills/ship/scripts/ship.py`
-- `skills/ship-slice/scripts/ship_slice.py`
+- `sirius autoplan`
+- `sirius ship`
+- `sirius ship-slice`
 - accelerator test suites and wiki guidance
 
 ## Impact

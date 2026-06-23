@@ -116,16 +116,16 @@ repositories continue to work without a mandatory extra step.
 - **Scope runtime**
   - shared helper that resolves the active scope and merged config view
 - **Planning helpers**
-  - `skills/guide-planning/scripts/manage_planning.py`
+  - `sirius manage-planning`
   - consume resolved planning paths instead of reading one repo-root config
 - **Proposal helpers**
-  - `skills/propose/scripts/manage_proposals.py`
+  - `sirius manage-proposals`
   - read and update proposal registries inside the resolved scope
 - **Execution helpers**
-  - `skills/guide-execution/scripts/manage_execution.py`
+  - `sirius manage-execution`
   - consume scope-local execution and conventions config
 - **Bootstrap**
-  - `skills/bootstrap/scripts/bootstrap.py`
+  - `sirius bootstrap`
   - initializes `.skills/` inside a selected scope while preserving existing
     keys
 - **Scope entry skill**

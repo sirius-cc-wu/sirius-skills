@@ -34,10 +34,10 @@
 | Slice ID | Story ID | Title | Summary | Target Area | Lane | Validation | Planned Action | Depends On | Slice Ready |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
 | pfw-proposal-registry | PFW-01 | Create proposal registry and storage | Add `docs/proposals/` registry files and proposal-scoped folder creation. | `skills/propose/`, `docs/proposals/` | primary | `pytest -q skills/propose/tests/test_manage_proposals.py` | completed |  | yes |
-| pfw-proposal-lifecycle | PFW-03 | Enforce proposal lifecycle and validation | Track proposal states, review notes, and validation gates in `.proposal-meta.json`. | `skills/propose/scripts/manage_proposals.py` | primary | `pytest -q skills/propose/tests/test_manage_proposals.py` | completed | pfw-proposal-registry | yes |
+| pfw-proposal-lifecycle | PFW-03 | Enforce proposal lifecycle and validation | Track proposal states, review notes, and validation gates in `.proposal-meta.json`. | `sirius manage-proposals` | primary | `pytest -q skills/propose/tests/test_manage_proposals.py` | completed | pfw-proposal-registry | yes |
 | pfw-guide-routing | PFW-02 | Route speculative work through propose | Update planning docs and skill routing so early ideas use `propose`. | `README.md`, `SKILLS_METHODOLOGY.md`, `skills/guide-planning/SKILL.md` | primary | doc review + related pytest coverage | completed | pfw-proposal-registry | yes |
 | pfw-config-support | PFW-05 | Support configurable proposal storage | Extend `.skills/planning.json` and bootstrap defaults with `proposal_dir`. | `.skills/planning.json`, `skills/bootstrap/` | primary | `pytest -q skills/bootstrap/tests/test_bootstrap.py` | completed | pfw-proposal-registry | yes |
-| pfw-proposal-promotion | PFW-04 | Promote accepted proposals into features | Add explicit promotion from proposal staging into canonical feature planning. | `skills/guide-planning/scripts/manage_planning.py` | primary | `pytest -q skills/propose/tests/test_manage_proposals.py skills/guide-planning/tests/test_manage_planning.py` | completed | pfw-guide-routing, pfw-proposal-lifecycle, pfw-config-support | yes |
+| pfw-proposal-promotion | PFW-04 | Promote accepted proposals into features | Add explicit promotion from proposal staging into canonical feature planning. | `sirius manage-planning` | primary | `pytest -q skills/propose/tests/test_manage_proposals.py skills/guide-planning/tests/test_manage_planning.py` | completed | pfw-guide-routing, pfw-proposal-lifecycle, pfw-config-support | yes |
 
 ## 5. Dependency Notes
 

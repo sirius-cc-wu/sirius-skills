@@ -598,7 +598,7 @@ skinparam backgroundColor white
 
 actor Maintainer
 participant "make validate-workflow-state" as Make
-participant "scripts/validate_workflow_state.py" as Hook
+participant "sirius validate-workflow-state" as Hook
 participant "pytest" as Pytest
 collections "workflow consistency suites" as Suites
 

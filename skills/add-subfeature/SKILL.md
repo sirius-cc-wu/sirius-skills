@@ -68,29 +68,29 @@ missing capability on top of that shipped work.
 
 ```bash
 # Initialize the subfeature registry for a canonical feature
-python3 skills/add-subfeature/scripts/manage_subfeatures.py init-feature "<feature-slug>"
+sirius manage-subfeatures init-feature "<feature-slug>"
 
 # Create a new additive subfeature
-python3 skills/add-subfeature/scripts/manage_subfeatures.py add "<feature-slug>" "<subfeature-id>"
+sirius manage-subfeatures add "<feature-slug>" "<subfeature-id>"
 
 # Create a superseding subfeature with a short summary
-python3 skills/add-subfeature/scripts/manage_subfeatures.py add \
+sirius manage-subfeatures add \
   "<feature-slug>" "<subfeature-id>" \
   --type superseding \
   --summary "Replace legacy checkout path with a durable child capability"
 
 # Advance subfeature state once required artifacts exist
-python3 skills/add-subfeature/scripts/manage_subfeatures.py set-status \
+sirius manage-subfeatures set-status \
   "<feature-slug>" "<subfeature-id>" impact_ready
 
 # After review passes, record explicit human approval and any ready slice IDs
-python3 skills/add-subfeature/scripts/manage_subfeatures.py approve \
+sirius manage-subfeatures approve \
   "<feature-slug>" "<subfeature-id>" \
   --approval-note "Approved for slice bootstrap" \
   --slice-id "<slice-id>"
 
 # Validate one subfeature
-python3 skills/add-subfeature/scripts/manage_subfeatures.py validate \
+sirius manage-subfeatures validate \
   "<feature-slug>" "<subfeature-id>"
 ```
 

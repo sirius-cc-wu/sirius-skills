@@ -79,16 +79,16 @@ Only continue beyond proposal work if the user explicitly asks to:
 
 ```bash
 # Initialize proposal config and registry
-python3 skills/propose/scripts/manage_proposals.py init
+sirius manage-proposals init
 
 # Create a proposal
-python3 skills/propose/scripts/manage_proposals.py add "workflow-capability-upgrades"
+sirius manage-proposals add "workflow-capability-upgrades"
 
 # Mark a proposal as reviewed or accepted
-python3 skills/propose/scripts/manage_proposals.py set-status "workflow-capability-upgrades" reviewed --review-note "Scoped as a capability candidate."
+sirius manage-proposals set-status "workflow-capability-upgrades" reviewed --review-note "Scoped as a capability candidate."
 
 # Validate one proposal packet
-python3 skills/propose/scripts/manage_proposals.py validate-proposal "workflow-capability-upgrades"
+sirius manage-proposals validate-proposal "workflow-capability-upgrades"
 ```
 
 ## Guardrails

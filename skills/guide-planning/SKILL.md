@@ -100,7 +100,7 @@ Use adjacent transitions by default and repair skipped states only deliberately.
 
 ## Tooling
 
-Always use `scripts/manage_planning.py` in this skill directory for initialization, proposal promotion, registry synchronization, state transitions, and validation.
+Always use `sirius manage-planning` for initialization, proposal promotion, registry synchronization, state transitions, and validation.
 
 - Use `sync-status` after `discover`, `design`, `ui-flow`, `breakdown`, and successful `review-planning` passes so metadata advances through the normal adjacent planning states instead of drifting behind the authored artifacts.
 - Use `--consolidation-json` with `set-status` or `sync-status` when the

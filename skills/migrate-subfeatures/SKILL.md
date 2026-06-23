@@ -41,18 +41,18 @@ current durable `subfeatures/` model.
 
 ```bash
 # Scan one feature for legacy change packets
-python3 skills/migrate-subfeatures/scripts/migrate_subfeatures.py scan "checkout"
+sirius migrate-subfeatures scan "checkout"
 
 # Scan the whole planning tree
-python3 skills/migrate-subfeatures/scripts/migrate_subfeatures.py scan --all
+sirius migrate-subfeatures scan --all
 
 # Preview migration without writing changes
-python3 skills/migrate-subfeatures/scripts/migrate_subfeatures.py migrate \
+sirius migrate-subfeatures migrate \
   "checkout" \
   --dry-run
 
 # Migrate every legacy feature in the planning tree
-python3 skills/migrate-subfeatures/scripts/migrate_subfeatures.py migrate --all
+sirius migrate-subfeatures migrate --all
 ```
 
 ## Guardrails

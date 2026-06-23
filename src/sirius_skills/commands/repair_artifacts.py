@@ -1,27 +1,20 @@
-from __future__ import annotations
+#!/usr/bin/env python3
 
 import argparse
 import json
 import sys
 from pathlib import Path
-from typing import Dict, Sequence
-
-from sirius_skills.paths import package_root
+from typing import Dict
 
 
-def _ensure_helper_paths() -> None:
-    root = package_root()
-    script_dir = root / "skills" / "repair-artifacts" / "scripts"
-    if str(script_dir) not in sys.path:
-        sys.path.insert(0, str(script_dir))
+SCRIPT_DIR = Path(__file__).resolve().parent
+if str(SCRIPT_DIR) not in sys.path:
+    sys.path.insert(0, str(SCRIPT_DIR))
+
+from sirius_skills.commands.repair_data import VALID_ARTIFACT_TYPES, build_repair_result  # noqa: E402
 
 
-_ensure_helper_paths()
-
-from repair_data import VALID_ARTIFACT_TYPES, build_repair_result  # noqa: E402
-
-
-def parse_args(argv: Sequence[str] | None = None) -> argparse.Namespace:
+def parse_args(argv=None) -> argparse.Namespace:
     parser = argparse.ArgumentParser(
         description=(
             "Preview and optionally repair active workflow registries from durable "
@@ -69,9 +62,7 @@ def render_text(result: Dict[str, object]) -> str:
     if result["skipped"]:
         lines.append("Skipped:")
         for skipped in result["skipped"]:
-            lines.append(
-                f"- {skipped['artifact_type']}:{skipped['artifact_id']} ({skipped['message']})"
-            )
+            lines.append(f"- {skipped['artifact_type']}:{skipped['artifact_id']} ({skipped['message']})")
     semantic_preview = result.get("semantic_preview", result.get("suggestions", []))
     if semantic_preview:
         lines.append("Semantic preview:")
@@ -83,7 +74,7 @@ def render_text(result: Dict[str, object]) -> str:
     return "\n".join(lines)
 
 
-def main(argv: Sequence[str] | None = None) -> int:
+def main(argv=None) -> int:
     args = parse_args(argv)
     result = build_repair_result(artifact_types=args.artifact_type, apply=args.apply)
     if args.json:
@@ -91,3 +82,7 @@ def main(argv: Sequence[str] | None = None) -> int:
     else:
         print(render_text(result))
     return 0
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())

@@ -19,18 +19,18 @@ history. `archive-artifacts` adds that next step conservatively.
 
 ## Affected existing artifacts
 
-- `skills/guide-execution/scripts/manage_execution.py`
-- `skills/propose/scripts/manage_proposals.py`
-- `skills/add-subfeature/scripts/manage_subfeatures.py`
-- `skills/audit-artifacts/scripts/artifact_inventory.py`
+- `sirius manage-execution`
+- `sirius manage-proposals`
+- `sirius manage-subfeatures`
+- `sirius_skills.commands.artifact_inventory`
 - `docs/features/cross-artifact-management/discover.md`
 - `docs/features/cross-artifact-management/user-stories.md`
 
 ## New artifacts likely required
 
 - `skills/archive-artifacts/SKILL.md`
-- `skills/archive-artifacts/scripts/archive_data.py`
-- `skills/archive-artifacts/scripts/archive_artifacts.py`
+- `sirius_skills.commands.archive_data`
+- `sirius archive-artifacts`
 - `skills/archive-artifacts/tests/test_archive_artifacts.py`
 
 ## Risks and constraints

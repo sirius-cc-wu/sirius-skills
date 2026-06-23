@@ -28,9 +28,9 @@ bootstrapping execution slices.
 - `skills/report-artifacts/SKILL.md`
 - `skills/archive-artifacts/SKILL.md`
 - `skills/close-slice/SKILL.md`
-- `skills/guide-planning/scripts/manage_planning.py`
-- `skills/add-subfeature/scripts/manage_subfeatures.py`
-- `skills/guide-execution/scripts/manage_execution.py`
+- `sirius manage-planning`
+- `sirius manage-subfeatures`
+- `sirius manage-execution`
 
 ## 1. Planning Scope
 

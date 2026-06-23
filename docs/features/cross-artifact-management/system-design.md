@@ -67,9 +67,9 @@ behavior is implemented through finalized subfeatures:
 
 ## Validation Strategy
 
-- Use `python3 skills/audit-artifacts/scripts/audit_artifacts.py` for read-only
+- Use `sirius audit-artifacts` for read-only
   artifact health inspection.
-- Use `python3 skills/repair-artifacts/scripts/repair_artifacts.py` to preview
+- Use `sirius repair-artifacts` to preview
   whether derived registries or README tables have drifted from durable
   metadata.
 - Validate finalized subfeature behavior in the corresponding skill test suites.

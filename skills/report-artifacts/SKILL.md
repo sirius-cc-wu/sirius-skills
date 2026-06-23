@@ -28,18 +28,18 @@ instead of manually inspecting multiple workflow registries.
 
 ```bash
 # Overview report
-python3 skills/report-artifacts/scripts/report_artifacts.py
+sirius report-artifacts
 
 # Group by lifecycle status
-python3 skills/report-artifacts/scripts/report_artifacts.py --group-by status
+sirius report-artifacts --group-by status
 
 # Group one artifact type by parent feature
-python3 skills/report-artifacts/scripts/report_artifacts.py \
+sirius report-artifacts \
   --artifact-type subfeature \
   --group-by parent
 
 # Emit machine-readable output with a custom stale threshold
-python3 skills/report-artifacts/scripts/report_artifacts.py --stale-days 21 --json
+sirius report-artifacts --stale-days 21 --json
 ```
 
 ## Output

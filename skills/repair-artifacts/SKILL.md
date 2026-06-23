@@ -25,18 +25,18 @@ audit finds registry or readme drift.
 
 ```bash
 # Preview a full repair plan
-python3 skills/repair-artifacts/scripts/repair_artifacts.py
+sirius repair-artifacts
 
 # Preview selected artifact layers
-python3 skills/repair-artifacts/scripts/repair_artifacts.py \
+sirius repair-artifacts \
   --artifact-type proposal \
   --artifact-type slice
 
 # Apply the selected repairs
-python3 skills/repair-artifacts/scripts/repair_artifacts.py --apply
+sirius repair-artifacts --apply
 
 # Emit machine-readable output
-python3 skills/repair-artifacts/scripts/repair_artifacts.py --json
+sirius repair-artifacts --json
 ```
 
 ## Output

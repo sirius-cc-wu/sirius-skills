@@ -35,7 +35,7 @@ The repository is designed as a reusable skill collection, but successful adopti
 
 - `Makefile` now defines `make install-packaged` and `make uninstall-packaged` for the explicit packaged flow.
 - `Makefile` uses `make install` and `make uninstall` as the default packaged entrypoints.
-- Packaged installs rely on the shared-runtime sync step so skills such as `close-slice` carry `workflow_state` when installed.
+- Packaged installs rely on the centralized packaged runtime so skills such as `close-slice` carry `workflow_state` when installed.
 - `README.md` documents generic-first workflow and config surfaces.
 - `AGENTS.md` emphasizes configuration over hardcoding and preserving ownership boundaries.
 - `skills/commit/`, `skills/create-pr/`, `skills/guide-planning/`, and `skills/guide-execution/` all consume configuration in controlled ways.

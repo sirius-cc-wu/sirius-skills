@@ -26,23 +26,23 @@ execution slices.
 
 ```bash
 # Summarize the current lineage graph
-python3 skills/trace-artifacts/scripts/trace_artifacts.py
+sirius trace-artifacts
 
 # Trace one artifact
-python3 skills/trace-artifacts/scripts/trace_artifacts.py \
+sirius trace-artifacts \
   --artifact-type subfeature \
   --artifact-id replace-legacy-flow
 
 # Trace one planned or execution slice
-python3 skills/trace-artifacts/scripts/trace_artifacts.py \
+sirius trace-artifacts \
   --artifact-type planned-slice \
   --artifact-id tat-trace-artifact-lineage
-python3 skills/trace-artifacts/scripts/trace_artifacts.py \
+sirius trace-artifacts \
   --artifact-type slice \
   --artifact-id tat-trace-artifact-lineage
 
 # Emit machine-readable lineage output
-python3 skills/trace-artifacts/scripts/trace_artifacts.py --json
+sirius trace-artifacts --json
 ```
 
 ## Output

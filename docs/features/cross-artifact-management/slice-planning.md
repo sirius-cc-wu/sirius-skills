@@ -42,12 +42,12 @@ implemented child maintenance capabilities remain the primary execution surface.
 
 | Slice ID | Story ID | Title | Summary | Target Area | Lane | Validation | Planned Action | Depends On | Slice Ready |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| cam-audit | CAM-01 | Audit artifact health | Parent traceability placeholder for finalized `audit-artifacts` capability. | `subfeatures/audit-artifacts/` | parent-traceability | `python3 skills/audit-artifacts/scripts/audit_artifacts.py --json` | keep historical trace only |  | yes |
-| cam-trace | CAM-02 | Trace artifact lineage | Parent traceability placeholder for finalized `trace-artifacts` capability. | `subfeatures/trace-artifacts/` | parent-traceability | `python3 skills/trace-artifacts/scripts/trace_artifacts.py --help` | keep historical trace only | cam-audit | yes |
-| cam-report | CAM-03 | Report artifact state | Parent traceability placeholder for finalized `report-artifacts` capability. | `subfeatures/report-artifacts/` | parent-traceability | `python3 skills/report-artifacts/scripts/report_artifacts.py --help` | keep historical trace only | cam-audit | yes |
-| cam-repair | CAM-04 | Repair artifact drift | Parent traceability placeholder for finalized `repair-artifacts` capability. | `subfeatures/repair-artifacts/` | parent-traceability | `python3 skills/repair-artifacts/scripts/repair_artifacts.py --json` | keep historical trace only | cam-audit | yes |
-| cam-archive | CAM-05 | Archive durable history safely | Parent traceability placeholder for finalized `archive-artifacts` capability. | `subfeatures/archive-artifacts/` | parent-traceability | `python3 skills/archive-artifacts/scripts/archive_artifacts.py --help` | keep historical trace only | cam-report | yes |
-| cam-measure | CAM-06 | Measure workflow evidence | Parent traceability placeholder for finalized `measure-artifacts` capability. | `subfeatures/measure-artifacts/` | parent-traceability | `python3 skills/measure-artifacts/scripts/measure_artifacts.py --help` | keep historical trace only | cam-report | yes |
+| cam-audit | CAM-01 | Audit artifact health | Parent traceability placeholder for finalized `audit-artifacts` capability. | `subfeatures/audit-artifacts/` | parent-traceability | `sirius audit-artifacts --json` | keep historical trace only |  | yes |
+| cam-trace | CAM-02 | Trace artifact lineage | Parent traceability placeholder for finalized `trace-artifacts` capability. | `subfeatures/trace-artifacts/` | parent-traceability | `sirius trace-artifacts --help` | keep historical trace only | cam-audit | yes |
+| cam-report | CAM-03 | Report artifact state | Parent traceability placeholder for finalized `report-artifacts` capability. | `subfeatures/report-artifacts/` | parent-traceability | `sirius report-artifacts --help` | keep historical trace only | cam-audit | yes |
+| cam-repair | CAM-04 | Repair artifact drift | Parent traceability placeholder for finalized `repair-artifacts` capability. | `subfeatures/repair-artifacts/` | parent-traceability | `sirius repair-artifacts --json` | keep historical trace only | cam-audit | yes |
+| cam-archive | CAM-05 | Archive durable history safely | Parent traceability placeholder for finalized `archive-artifacts` capability. | `subfeatures/archive-artifacts/` | parent-traceability | `sirius archive-artifacts --help` | keep historical trace only | cam-report | yes |
+| cam-measure | CAM-06 | Measure workflow evidence | Parent traceability placeholder for finalized `measure-artifacts` capability. | `subfeatures/measure-artifacts/` | parent-traceability | `sirius measure-artifacts --help` | keep historical trace only | cam-report | yes |
 
 ## 5. Dependency Notes
 

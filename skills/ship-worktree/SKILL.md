@@ -24,11 +24,11 @@ worktree instead of on the current branch.
 ## Tooling
 
 ```bash
-python3 skills/ship-worktree/scripts/ship_worktree.py <target> --json
-python3 skills/ship-worktree/scripts/ship_worktree.py <target> --resume --json
-python3 skills/ship-worktree/scripts/ship_worktree.py <target> --finalize --json
-python3 skills/ship-worktree/scripts/ship_worktree.py <target> --create-pr --json
-python3 skills/ship-worktree/scripts/ship_worktree.py <target> --resume --create-pr --json
+sirius ship-worktree <target> --json
+sirius ship-worktree <target> --resume --json
+sirius ship-worktree <target> --finalize --json
+sirius ship-worktree <target> --create-pr --json
+sirius ship-worktree <target> --resume --create-pr --json
 ```
 
 ## Configuration

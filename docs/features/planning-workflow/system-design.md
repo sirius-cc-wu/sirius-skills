@@ -27,7 +27,7 @@ The planning workflow is a feature-scoped orchestration layer. `guide-planning` 
 - `manage_planning.py set-status` advances lifecycle state only when artifact gates are satisfied.
 - `.planning-meta.json` records `related_story_ids` so feature-level story context remains durable even if execution slices are later archived or pruned.
 - `implemented` is a canonical feature state owned by planning metadata, not a slice execution state.
-- `breakdown/scripts/scaffold_breakdown.py` provides deterministic breakdown templates.
+- `breakdown/sirius scaffold-breakdown` provides deterministic breakdown templates.
 
 ## Constraints and Tradeoffs
 
@@ -39,7 +39,7 @@ The planning workflow is a feature-scoped orchestration layer. `guide-planning` 
 
 - Use `skills/guide-planning/tests/test_manage_planning.py` for planning state-gate behavior.
 - Use `skills/breakdown/tests/test_scaffold_breakdown.py` for deterministic scaffold behavior.
-- Validate each feature with `python3 skills/guide-planning/scripts/manage_planning.py validate-feature <feature-slug>`.
+- Validate each feature with `sirius manage-planning validate-feature <feature-slug>`.
 
 ## PlantUML
 

@@ -7,7 +7,7 @@ into a durable subfeature packet.
 
 ## Affected Areas
 
-- `skills/ship-slice/scripts/ship_slice.py`
+- `sirius ship-slice`
 - `skills/ship-slice/tests/test_ship_slice.py`
 - `skills/ship-slice/SKILL.md`
 - `docs/wiki/concepts/two-step-autonomy-roadmap.md`

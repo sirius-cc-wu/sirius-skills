@@ -120,7 +120,7 @@ artifacts, but it is not a promise that every command is side-effect free.
 
 ### Existing interfaces reused
 
-- `skills/ship/scripts/ship.py`
+- `sirius ship`
 - `skills/ship/SKILL.md`
 - `skills/ship/tests/test_ship.py`
 - existing `workflow_runtime.build_accelerator_readiness(...)`

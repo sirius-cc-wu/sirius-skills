@@ -10,7 +10,7 @@ Use this skill after feature-level discovery and design to turn repo stories int
 If you need a starting folder for a new feature, scaffold the default breakdown files with:
 
 ```bash
-python3 skills/breakdown/scripts/scaffold_breakdown.py <feature-slug>
+sirius scaffold-breakdown <feature-slug>
 ```
 
 By default this creates:
@@ -27,7 +27,7 @@ For subfeature-local breakdown work, you can also scaffold directly into an exis
 subfeature path:
 
 ```bash
-python3 skills/breakdown/scripts/scaffold_breakdown.py \
+sirius scaffold-breakdown \
   docs/features/<feature-slug>/subfeatures/<subfeature-id>
 ```
 
@@ -63,7 +63,7 @@ Preferred execution output when available:
 
 Use `assets/slice-planning-template.md` as the default starting point for `<feature_path>/slice-planning.md`.
 Use `assets/slice-traceability-template.md` as the default starting point for `<feature_path>/slice-traceability.md`.
-Use `scripts/scaffold_breakdown.py` when you want both files scaffolded together from a feature slug or an explicit subfeature path.
+Use `sirius scaffold-breakdown` when you want both files scaffolded together from a feature slug or an explicit subfeature path.
 
 ## Breakdown Rules
 
@@ -211,7 +211,7 @@ Otherwise, use an opaque slice ID and keep the repo story ID in traceability met
 4. Choose `single-agent` or `multi-agent` handling where relevant and record lane assumptions.
 5. Write `slice-planning.md` and `slice-traceability.md` with increment groupings, dependency notes, parallel-safe lanes, and integration checkpoints as needed.
 6. Create planned slices and dependency links for execution-ready work, keeping packet validation explicit.
-7. Run `python3 skills/guide-planning/scripts/manage_planning.py sync-status <feature-selector> --through breakdown_ready` so planning metadata records that breakdown artifacts are ready for review.
+7. Run `sirius manage-planning sync-status <feature-selector> --through breakdown_ready` so planning metadata records that breakdown artifacts are ready for review.
 8. Stop when each slice is ready for `review-planning` and later bootstrap by `slice` after approval and planning commit.
 
 When generating `slice-planning.md`, start from `assets/slice-planning-template.md` and replace placeholders rather than inventing a new structure each time.

@@ -40,7 +40,7 @@ The execution workflow is a centralized slice system. `guide-execution` manages 
 - Use `skills/slice/tests/test_bootstrap_slice.py` for slice bootstrap behavior.
 - Use `skills/guide-execution/tests/test_manage_execution.py` for execution lifecycle behavior.
 - Use `skills/close-slice/tests/test_close_slice.py` for closure and relation behavior.
-- Validate slices with `python3 skills/guide-execution/scripts/manage_execution.py validate-slice <slice-id>`.
+- Validate slices with `sirius manage-execution validate-slice <slice-id>`.
 
 ## PlantUML
 

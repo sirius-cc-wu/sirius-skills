@@ -7,8 +7,8 @@
   - `Makefile`
   - `README.md`
   - `AGENTS.md`
-  - `skills/guide-planning/scripts/manage_planning.py`
-  - `skills/guide-execution/scripts/manage_execution.py`
+  - `sirius manage-planning`
+  - `sirius manage-execution`
   - `skills/commit/SKILL.md`
   - `skills/create-pr/SKILL.md`
   - `skills/close-slice/SKILL.md`
@@ -38,9 +38,9 @@
 | Slice ID | Story ID | Title | Summary | Target Area | Lane | Validation | Planned Action | Depends On | Slice Ready |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
 | iac-install | IC-01 | Manage installed skill set | Keep `make install` / `make uninstall` aligned with the managed skills list. | `Makefile` | primary | Review install/uninstall targets and managed skill list | create slice |  | yes |
-| iac-planning-config | IC-02 | Resolve planning layout from config | Keep `planning.json` semantics explicit and stable. | `skills/guide-planning/scripts/manage_planning.py`, docs | primary | `pytest -q skills/guide-planning/tests/test_manage_planning.py` | create slice | iac-install | yes |
-| iac-execution-config | IC-02 | Resolve execution layout from config | Keep `execution.json` semantics explicit and stable. | `skills/guide-execution/scripts/manage_execution.py`, docs | primary | `pytest -q skills/guide-execution/tests/test_manage_execution.py` | create slice | iac-planning-config | yes |
-| iac-conventions-config | IC-03 | Apply repo naming and ID conventions | Keep `conventions.json` as the cross-cutting conventions surface. | `skills/guide-execution/scripts/manage_execution.py`, `skills/commit/SKILL.md`, `skills/create-pr/SKILL.md` | primary | Review config consumers and tests | create slice | iac-execution-config | yes |
+| iac-planning-config | IC-02 | Resolve planning layout from config | Keep `planning.json` semantics explicit and stable. | `sirius manage-planning`, docs | primary | `pytest -q skills/guide-planning/tests/test_manage_planning.py` | create slice | iac-install | yes |
+| iac-execution-config | IC-02 | Resolve execution layout from config | Keep `execution.json` semantics explicit and stable. | `sirius manage-execution`, docs | primary | `pytest -q skills/guide-execution/tests/test_manage_execution.py` | create slice | iac-planning-config | yes |
+| iac-conventions-config | IC-03 | Apply repo naming and ID conventions | Keep `conventions.json` as the cross-cutting conventions surface. | `sirius manage-execution`, `skills/commit/SKILL.md`, `skills/create-pr/SKILL.md` | primary | Review config consumers and tests | create slice | iac-execution-config | yes |
 | iac-plugin-convention | IC-04 | Document project-local plugin behavior | Keep `.skills/plugins/` explicit and opt-in rather than auto-loaded. | `README.md`, `AGENTS.md`, consumer skills | primary | Review docs for explicit plugin loading language | create slice | iac-conventions-config | yes |
 | iac-doc-alignment | IC-04 | Keep docs aligned with config behavior | Update docs and examples whenever config semantics shift. | `README.md`, `AGENTS.md`, skill docs | primary | Cross-check docs with code readers | create slice | iac-plugin-convention | yes |
 

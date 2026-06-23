@@ -1,3 +1,5 @@
+#!/usr/bin/env python3
+
 from __future__ import annotations
 
 import argparse
@@ -6,10 +8,12 @@ import sys
 from pathlib import Path
 from typing import Iterable, Sequence
 
+
 from sirius_skills.paths import package_root
-from workflow_runtime.learnings import query_learnings, update_learning_state
+from sirius_skills.lib.workflow_runtime.learnings import query_learnings, update_learning_state  # noqa: E402
 
 
+REPO_ROOT = package_root()
 DEFAULT_LEARNINGS_PATH = Path(".skills/learnings.jsonl")
 
 
@@ -76,7 +80,7 @@ def parse_args(argv: Sequence[str] | None = None) -> argparse.Namespace:
 
     parser.add_argument(
         "--repo-root",
-        default=str(package_root()),
+        default=str(REPO_ROOT),
         help="Repository root used to resolve the learnings path.",
     )
     parser.add_argument(
@@ -149,9 +153,7 @@ def main(argv: Sequence[str] | None = None) -> int:
 
     try:
         next_state = "active" if args.command == "promote" else "pruned"
-        record = update_learning_state(
-            learnings_path, args.learning_id, next_state
-        ).to_dict()
+        record = update_learning_state(learnings_path, args.learning_id, next_state).to_dict()
     except ValueError as exc:
         print(str(exc), file=sys.stderr)
         return 1
@@ -170,3 +172,7 @@ def main(argv: Sequence[str] | None = None) -> int:
     else:
         print(f"{record['id']} -> {record['state']}")
     return 0
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())

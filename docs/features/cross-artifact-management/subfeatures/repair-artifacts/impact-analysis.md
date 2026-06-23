@@ -16,19 +16,19 @@ edits, or partial automation. `repair-artifacts` provides that remediation path.
 
 ## Affected existing artifacts
 
-- `skills/audit-artifacts/scripts/artifact_inventory.py`
-- `skills/propose/scripts/manage_proposals.py`
-- `skills/guide-planning/scripts/manage_planning.py`
-- `skills/add-subfeature/scripts/manage_subfeatures.py`
-- `skills/guide-execution/scripts/manage_execution.py`
+- `sirius_skills.commands.artifact_inventory`
+- `sirius manage-proposals`
+- `sirius manage-planning`
+- `sirius manage-subfeatures`
+- `sirius manage-execution`
 - `docs/features/cross-artifact-management/discover.md`
 - `docs/features/cross-artifact-management/user-stories.md`
 
 ## New artifacts likely required
 
 - `skills/repair-artifacts/SKILL.md`
-- `skills/repair-artifacts/scripts/repair_data.py`
-- `skills/repair-artifacts/scripts/repair_artifacts.py`
+- `sirius_skills.commands.repair_data`
+- `sirius repair-artifacts`
 - `skills/repair-artifacts/tests/test_repair_artifacts.py`
 
 ## Risks and constraints

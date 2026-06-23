@@ -4,9 +4,9 @@ import sys
 from pathlib import Path
 
 
-SCRIPT_PATH = Path(__file__).resolve().parents[1] / "scripts" / "manage_planning.py"
+SCRIPT_PATH = Path(__file__).resolve().parents[3] / "src" / "sirius_skills" / "commands" / "manage_planning.py"
 PROPOSAL_SCRIPT_PATH = (
-    Path(__file__).resolve().parents[2] / "propose" / "scripts" / "manage_proposals.py"
+    Path(__file__).resolve().parents[3] / "src" / "sirius_skills" / "commands" / "manage_proposals.py"
 )
 
 

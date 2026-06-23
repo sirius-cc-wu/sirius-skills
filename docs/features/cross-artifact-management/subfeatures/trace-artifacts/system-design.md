@@ -38,7 +38,7 @@ questions without guessing links that the repo does not record durably.
 ### 1. Shared inventory plus traceability parsing
 
 The trace capability should start from
-`skills/audit-artifacts/scripts/artifact_inventory.py` for artifact discovery,
+`sirius_skills.commands.artifact_inventory` for artifact discovery,
 then extend it with one new layer that parses planning traceability docs.
 
 The key new parser should read `slice-traceability.md` tables generically enough
@@ -89,9 +89,9 @@ The first user-facing command should support two query modes:
 Recommended CLI shape:
 
 ```bash
-python3 skills/trace-artifacts/scripts/trace_artifacts.py
-python3 skills/trace-artifacts/scripts/trace_artifacts.py --artifact-type proposal --artifact-id checkout-audit
-python3 skills/trace-artifacts/scripts/trace_artifacts.py --artifact-type planned-slice --artifact-id aat-cross-artifact-audit --json
+sirius trace-artifacts
+sirius trace-artifacts --artifact-type proposal --artifact-id checkout-audit
+sirius trace-artifacts --artifact-type planned-slice --artifact-id aat-cross-artifact-audit --json
 ```
 
 ### 4. Ownership boundaries

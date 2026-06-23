@@ -30,9 +30,9 @@ workspace safety rules.
 ## Candidate Affected Implementation Areas
 
 - `.skills/execution.json`
-- `skills/ship-slice/scripts/ship_slice.py`
+- `sirius ship-slice`
 - `skills/ship-slice/tests/test_ship_slice.py`
-- `skills/close-slice/scripts/close_slice.py`
+- `sirius close-slice`
 - `skills/close-slice/tests/test_close_slice.py`
 - `skills/commit/SKILL.md`
 

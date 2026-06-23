@@ -294,19 +294,19 @@ discover -> assess -> design -> breakdown -> review-planning
 如果你想在示範裡補充底層命令，可以展示：
 
 ```bash
-python3 skills/bootstrap/scripts/bootstrap.py --mode default --wiki
+sirius bootstrap --mode default --wiki
 ```
 
 接著進入規劃加速：
 
 ```bash
-python3 skills/autoplan/scripts/autoplan.py <target> --execute-owner-chain --json
+sirius autoplan <target> --execute-owner-chain --json
 ```
 
 規劃核准並提交後，進入執行：
 
 ```bash
-python3 skills/ship/scripts/ship.py <target> --resume --json
+sirius ship <target> --resume --json
 ```
 
 如果是對代理下高階指令，我通常直接說：

@@ -4,12 +4,12 @@ import sys
 from pathlib import Path
 
 
-CLOSE_SLICE_PATH = Path(__file__).resolve().parents[1] / "scripts" / "close_slice.py"
+CLOSE_SLICE_PATH = Path(__file__).resolve().parents[3] / "src" / "sirius_skills" / "commands" / "close_slice.py"
 MANAGE_EXECUTION_PATH = (
-    Path(__file__).resolve().parents[2] / "guide-execution" / "scripts" / "manage_execution.py"
+    Path(__file__).resolve().parents[3] / "src" / "sirius_skills" / "commands" / "manage_execution.py"
 )
 MANAGE_PLANNING_PATH = (
-    Path(__file__).resolve().parents[2] / "guide-planning" / "scripts" / "manage_planning.py"
+    Path(__file__).resolve().parents[3] / "src" / "sirius_skills" / "commands" / "manage_planning.py"
 )
 
 

@@ -43,10 +43,10 @@ stack with checkpointed resume support.
 ## Tooling
 
 ```bash
-python3 skills/autoplan/scripts/autoplan.py throughput-acceleration-workflow --json
-python3 skills/autoplan/scripts/autoplan.py --resume --json
-python3 skills/autoplan/scripts/autoplan.py throughput-acceleration-workflow --execute-owner-chain --review-note "Planning reviewed" --json
-python3 skills/autoplan/scripts/autoplan.py throughput-acceleration-workflow --approve --approval-note "approved for execution" --json
+sirius autoplan throughput-acceleration-workflow --json
+sirius autoplan --resume --json
+sirius autoplan throughput-acceleration-workflow --execute-owner-chain --review-note "Planning reviewed" --json
+sirius autoplan throughput-acceleration-workflow --approve --approval-note "approved for execution" --json
 ```
 
 ## Configuration

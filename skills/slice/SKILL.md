@@ -44,19 +44,19 @@ Before bootstrapping, confirm:
 2. Bootstrap the slice with:
 
 ```bash
-python3 skills/slice/scripts/bootstrap_slice.py "<slice-id>" "<feature-name>"
+sirius bootstrap-slice "<slice-id>" "<feature-name>"
 ```
 
 3. If the repository has not configured execution yet and the default `slices/` location is not appropriate, pass an explicit directory during first bootstrap:
 
 ```bash
-python3 skills/slice/scripts/bootstrap_slice.py --slice-dir "team-slices" "<slice-id>" "<feature-name>"
+sirius bootstrap-slice --slice-dir "team-slices" "<slice-id>" "<feature-name>"
 ```
 
 4. Confirm the new slice path exists and registry state is consistent.
 5. Hand off to `guide-execution` to author `brief.md` and `blueprint.md`.
 
-`bootstrap_slice.py` keeps the ownership boundary intact by delegating registry creation, slice creation, and validation to `skills/guide-execution/scripts/manage_execution.py`.
+`bootstrap_slice.py` keeps the ownership boundary intact by delegating registry creation, slice creation, and validation to `sirius manage-execution`.
 For reviewed subfeatures, it also expects approval metadata to be present already and records the chosen ready slice ID back into `.subfeature-meta.json` so the derived planning view becomes `slice_ready`.
 
 ## Guardrails

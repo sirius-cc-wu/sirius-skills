@@ -27,7 +27,7 @@
 
 ## Execution notes
 
-- Reuse `skills/audit-artifacts/scripts/artifact_inventory.py`.
+- Reuse `sirius_skills.commands.artifact_inventory`.
 - Keep grouping logic in a dedicated reporting helper so later archive and
   repair views can reuse the same normalized records when useful.
 - Default the stale threshold conservatively and make it explicit in the CLI.

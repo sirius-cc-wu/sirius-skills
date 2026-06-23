@@ -12,20 +12,5 @@ requires-python = ">=3.11"
 [project.scripts]
 sirius = "sirius_skills.cli:main"
 
-[tool.setuptools]
-packages = [
-    "sirius_skills",
-    "sirius_skills.commands",
-    "skills",
-    "workflow_runtime",
-    "workflow_state",
-]
-
-[tool.setuptools.package-dir]
-sirius_skills = "src/sirius_skills"
-skills = "skills"
-workflow_runtime = "lib/workflow_runtime"
-workflow_state = "lib/workflow_state"
-
-[tool.setuptools.package-data]
-skills = ["**/*"]
+[tool.setuptools.packages.find]
+where = ["src"]

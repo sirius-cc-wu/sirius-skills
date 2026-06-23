@@ -4,18 +4,12 @@ import sys
 from pathlib import Path
 
 
-IMPACT_SCRIPT = Path(__file__).resolve().parents[1] / "scripts" / "analyze_impact.py"
+IMPACT_SCRIPT = Path(__file__).resolve().parents[3] / "src" / "sirius_skills" / "commands" / "analyze_impact.py"
 SUBFEATURE_SCRIPT = (
-    Path(__file__).resolve().parents[2]
-    / "add-subfeature"
-    / "scripts"
-    / "manage_subfeatures.py"
+    Path(__file__).resolve().parents[3] / "src" / "sirius_skills" / "commands" / "manage_subfeatures.py"
 )
 PLANNING_SCRIPT = (
-    Path(__file__).resolve().parents[2]
-    / "guide-planning"
-    / "scripts"
-    / "manage_planning.py"
+    Path(__file__).resolve().parents[3] / "src" / "sirius_skills" / "commands" / "manage_planning.py"
 )
 
 

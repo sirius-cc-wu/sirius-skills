@@ -345,7 +345,7 @@ putting large structured payloads there would blur registry ownership.
 - Add `breakdown` coverage ensuring superseded parent slice IDs remain in notes
   or dependencies rather than replacing the subfeature-local slice plan.
 - Validate the planning packet with
-  `python3 skills/guide-planning/scripts/manage_planning.py sync-status \
+  `sirius manage-planning sync-status \
   feature-consolidation-and-reduction --through design_ready`.
 
 ## Summary

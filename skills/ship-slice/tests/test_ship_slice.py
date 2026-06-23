@@ -8,11 +8,11 @@ from pathlib import Path
 from typing import Any, Dict, Optional
 
 
-SHIP_SLICE_SCRIPT = Path(__file__).resolve().parents[1] / "scripts" / "ship_slice.py"
+SHIP_SLICE_SCRIPT = Path(__file__).resolve().parents[3] / "src" / "sirius_skills" / "commands" / "ship_slice.py"
 EXECUTION_SCRIPT = (
-    Path(__file__).resolve().parents[2] / "guide-execution" / "scripts" / "manage_execution.py"
+    Path(__file__).resolve().parents[3] / "src" / "sirius_skills" / "commands" / "manage_execution.py"
 )
-RUNTIME_HANDOFF = Path(__file__).resolve().parents[3] / "lib" / "workflow_runtime" / "handoff.py"
+RUNTIME_HANDOFF = Path(__file__).resolve().parents[3] / "src" / "sirius_skills" / "lib" / "workflow_runtime" / "handoff.py"
 
 
 def load_module(name: str, path: Path):
@@ -99,7 +99,7 @@ def create_slice(tmp_path: Path, monkeypatch, slice_id: str, feature: str, statu
 
 def run_cli(repo_root: Path, *args: str) -> subprocess.CompletedProcess[str]:
     return subprocess.run(
-        ["python3", str(SHIP_SLICE_SCRIPT), *args],
+        [sys.executable, "-m", "sirius_skills.cli", "ship-slice", *args],
         cwd=repo_root,
         check=False,
         capture_output=True,

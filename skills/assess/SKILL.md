@@ -51,10 +51,10 @@ Read these references when relevant:
 
 ```bash
 # Analyze one subfeature and advance it to impact_ready
-python3 skills/assess/scripts/analyze_impact.py "checkout" "replace-legacy-flow"
+sirius analyze-impact "checkout" "replace-legacy-flow"
 
 # Add manual impact hints when needed
-python3 skills/assess/scripts/analyze_impact.py \
+sirius analyze-impact \
   "checkout" "replace-legacy-flow" \
   --story-id "CHK-299" \
   --slice-id "CHK-902" \

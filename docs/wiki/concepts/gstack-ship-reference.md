@@ -88,9 +88,9 @@ To match the requested two-step UX while preserving current ownership rules:
 - `gstack/ship/SKILL.md` (sibling local reference clone)
 - `gstack/autoplan/SKILL.md` (sibling local reference clone)
 - `skills/ship/SKILL.md`
-- `skills/ship/scripts/ship.py`
+- `sirius ship`
 - `skills/ship-slice/SKILL.md`
-- `skills/ship-slice/scripts/ship_slice.py`
+- `sirius ship-slice`
 - `skills/autoplan/SKILL.md`
-- `skills/autoplan/scripts/autoplan.py`
+- `sirius autoplan`
 - `docs/features/throughput-acceleration-workflow/system-design.md`

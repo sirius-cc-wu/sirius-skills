@@ -63,8 +63,8 @@ while still keeping internal owner skills and artifact invariants intact.
 - `andyosmali-agent-skills/.claude/commands/build.md`
 - `andyosmali-agent-skills/.claude/commands/ship.md`
 - `skills/autoplan/SKILL.md`
-- `skills/autoplan/scripts/autoplan.py`
+- `sirius autoplan`
 - `skills/ship/SKILL.md`
-- `skills/ship/scripts/ship.py`
+- `sirius ship`
 - `skills/ship-slice/SKILL.md`
-- `skills/ship-slice/scripts/ship_slice.py`
+- `sirius ship-slice`

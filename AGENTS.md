@@ -165,10 +165,9 @@ Use `make install` and `make uninstall` for the supported packaged workflow.
 `make install-packaged` and `make uninstall-packaged` remain explicit aliases to
 the same packaged path.
 
-Packaged installs depend on the shared-runtime sync step. When a skill imports
-shared Python support such as `workflow_state`, update
-`scripts/sync_shared_skill_runtime.py` so `make install` packages that runtime
-with the consuming skill.
+Packaged installs use the centralized `sirius` CLI and shared Python support
+under `src/sirius_skills/lib/`. When a skill needs shared runtime behavior,
+import it from the package instead of copying runtime folders into the skill.
 
 Keep repo-level guidance agent-agnostic unless a specific integration requires
 otherwise.

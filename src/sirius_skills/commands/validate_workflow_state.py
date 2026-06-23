@@ -9,6 +9,7 @@ from typing import List, Optional, Sequence
 from sirius_skills.paths import package_root
 
 
+REPO_ROOT = package_root()
 VALIDATION_TEST_PATHS = (
     "skills/audit-artifacts/tests/test_audit_artifacts.py",
     "skills/report-artifacts/tests/test_report_artifacts.py",
@@ -45,10 +46,9 @@ def build_pytest_command(pytest_args: Optional[Sequence[str]] = None) -> List[st
 
 def main(argv: Optional[Sequence[str]] = None) -> int:
     args = parse_args(argv)
-    repo_root = package_root()
     completed = subprocess.run(
         build_pytest_command(args.pytest_args),
-        cwd=repo_root,
+        cwd=REPO_ROOT,
         check=False,
     )
     return completed.returncode

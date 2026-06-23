@@ -7,7 +7,7 @@ into a durable subfeature packet.
 
 ## Affected Areas
 
-- `skills/autoplan/scripts/autoplan.py`
+- `sirius autoplan`
 - `skills/autoplan/tests/test_autoplan.py`
 - `skills/autoplan/SKILL.md`
 - `docs/wiki/concepts/two-step-autonomy-roadmap.md`

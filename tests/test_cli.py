@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import sys
+import types
 from pathlib import Path
 
 import pytest
@@ -92,7 +93,7 @@ def test_discover_commands_lists_runnable_scripts_only() -> None:
         commands["ship-worktree"].module_name
         == "sirius_skills.commands.ship_worktree"
     )
-    assert "sync-shared-runtime" in commands
+    assert "sync-shared-runtime" not in commands
     assert "validate-workflow-state" in commands
     assert "artifact-inventory" not in commands
     assert "metrics-store" not in commands
@@ -121,27 +122,21 @@ def test_cli_name_and_unknown_command_message(capsys) -> None:
     assert "Run 'sirius --help' to list commands." in captured.err
 
 
-def test_run_command_passes_arguments_and_restores_argv(tmp_path: Path) -> None:
-    script_path = tmp_path / "sample_command.py"
-    script_path.write_text(
-        "\n".join(
-            [
-                "import sys",
-                "def main(argv):",
-                "    assert argv == ['--flag', 'value']",
-                "    assert sys.argv == [__file__, '--flag', 'value']",
-                "    return 7",
-            ]
-        ),
-        encoding="utf-8",
-    )
+def test_run_command_passes_arguments_and_restores_argv(monkeypatch) -> None:
+    def sample_main(argv):
+        assert argv == ["--flag", "value"]
+        assert sys.argv == ["sample-command", "--flag", "value"]
+        return 7
+
+    module = types.SimpleNamespace(main=sample_main)
+    monkeypatch.setattr(cli, "load_command_module", lambda spec: module)
     old_argv = list(sys.argv)
 
     result = cli.run_command(
         cli.CommandSpec(
             name="sample-command",
-            script_path=script_path,
-            description=str(script_path),
+            module_name="sample.module",
+            description="sample.module",
             repo_root=REPO_ROOT,
         ),
         ["--flag", "value"],

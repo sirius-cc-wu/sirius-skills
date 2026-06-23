@@ -35,7 +35,7 @@ The repository offers a planning-layer workflow, but its value is distributed ac
 
 ## Confirmed Signals in Repo
 
-- `skills/guide-planning/scripts/manage_planning.py` manages planning registry and `.planning-meta.json`.
+- `sirius manage-planning` manages planning registry and `.planning-meta.json`.
 - `skills/discover/SKILL.md` defines `discover.md` as the starting artifact.
 - `skills/design/SKILL.md` defines `system-design.md` with PlantUML diagrams.
 - `skills/breakdown/SKILL.md` and its templates define `slice-planning.md` and `slice-traceability.md`.

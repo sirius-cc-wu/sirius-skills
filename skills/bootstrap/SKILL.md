@@ -100,19 +100,19 @@ Do not assume the wiki should be created unless the user asked for it.
 Use the bundled helper to create or update the files deterministically:
 
 ```bash
-python3 skills/bootstrap/scripts/bootstrap.py --mode default
+sirius bootstrap --mode default
 ```
 
 Add `--wiki` when the user also wants the wiki scaffold:
 
 ```bash
-python3 skills/bootstrap/scripts/bootstrap.py --mode default --wiki
+sirius bootstrap --mode default --wiki
 ```
 
 Jira mode:
 
 ```bash
-python3 skills/bootstrap/scripts/bootstrap.py \
+sirius bootstrap \
   --mode jira \
   --issue-url-template "https://jira.example.com/browse/{ID}"
 ```
@@ -120,7 +120,7 @@ python3 skills/bootstrap/scripts/bootstrap.py \
 If the user wants custom planning or execution layout, pass those values too:
 
 ```bash
-python3 skills/bootstrap/scripts/bootstrap.py \
+sirius bootstrap \
   --mode default \
   --wiki \
   --planning-dir planning/features \

@@ -108,7 +108,7 @@ Prefer:
 4. Create `user-stories.md` with stable story identifiers unless the packet is
    intentionally too small for story-level planning; when omitting it, state
    why in `discover.md`.
-5. For canonical features, run `python3 skills/guide-planning/scripts/manage_planning.py sync-status <feature-selector> --through discovery_ready` so `.planning-meta.json` records that discovery is complete.
+5. For canonical features, run `sirius manage-planning sync-status <feature-selector> --through discovery_ready` so `.planning-meta.json` records that discovery is complete.
 6. For subfeatures under `.../subfeatures/<subfeature-id>/`, do not try to force `discovery_ready` through `manage_planning.py`. Subfeature lifecycle stays in `.subfeature-meta.json`, authored discovery still leaves the raw subfeature at `draft`, and the next owner is typically `assess`.
 7. Stop when the work is concrete enough for the next planning owner:
    - canonical feature: `design`

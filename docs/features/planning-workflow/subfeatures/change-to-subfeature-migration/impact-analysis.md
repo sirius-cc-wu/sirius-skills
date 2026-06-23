@@ -19,8 +19,8 @@ workflow now needs a supported conversion path.
 - `docs/features/planning-workflow/slice-planning.md`
 - `docs/features/planning-workflow/subfeatures/subfeature-workflow/discover.md`
 - `docs/features/planning-workflow/subfeatures/subfeature-workflow/system-design.md`
-- `skills/add-subfeature/scripts/manage_subfeatures.py`
-- `skills/guide-planning/scripts/manage_planning.py`
+- `sirius manage-subfeatures`
+- `sirius manage-planning`
 - `README.md`
 - `Makefile`
 

@@ -22,18 +22,18 @@ durable repo signals into a read-only reporting surface.
 
 - `docs/features/cross-artifact-management/discover.md`
 - `docs/features/cross-artifact-management/user-stories.md`
-- `skills/audit-artifacts/scripts/artifact_inventory.py`
-- `skills/trace-artifacts/scripts/trace_data.py`
-- `skills/propose/scripts/manage_proposals.py`
-- `skills/guide-planning/scripts/manage_planning.py`
-- `skills/add-subfeature/scripts/manage_subfeatures.py`
-- `skills/guide-execution/scripts/manage_execution.py`
+- `sirius_skills.commands.artifact_inventory`
+- `sirius_skills.commands.trace_data`
+- `sirius manage-proposals`
+- `sirius manage-planning`
+- `sirius manage-subfeatures`
+- `sirius manage-execution`
 
 ## New artifacts likely required
 
 - `skills/report-artifacts/SKILL.md`
-- `skills/report-artifacts/scripts/report_data.py`
-- `skills/report-artifacts/scripts/report_artifacts.py`
+- `sirius_skills.commands.report_data`
+- `sirius report-artifacts`
 - `skills/report-artifacts/tests/test_report_artifacts.py`
 
 ## Risks and constraints

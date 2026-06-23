@@ -1,32 +1,24 @@
-from __future__ import annotations
+#!/usr/bin/env python3
 
 import argparse
 import json
 import sys
 from datetime import datetime
 from pathlib import Path
-from typing import Sequence
 
-from sirius_skills.paths import package_root
+
+SCRIPT_DIR = Path(__file__).resolve().parent
+if str(SCRIPT_DIR) not in sys.path:
+    sys.path.insert(0, str(SCRIPT_DIR))
+
+from sirius_skills.commands.metrics_engine import build_metrics_for_target, resolve_measurement_target  # noqa: E402
+from sirius_skills.commands.metrics_store import sidecar_path_for, write_metrics  # noqa: E402
 
 
 ERROR_EXIT_CODE = 2
 
 
-def _ensure_helper_paths() -> None:
-    root = package_root()
-    script_dir = root / "skills" / "measure-artifacts" / "scripts"
-    if str(script_dir) not in sys.path:
-        sys.path.insert(0, str(script_dir))
-
-
-_ensure_helper_paths()
-
-from metrics_engine import build_metrics_for_target, resolve_measurement_target  # noqa: E402
-from metrics_store import sidecar_path_for, write_metrics  # noqa: E402
-
-
-def parse_args(argv: Sequence[str] | None = None) -> argparse.Namespace:
+def parse_args(argv=None) -> argparse.Namespace:
     parser = argparse.ArgumentParser(
         description=(
             "Compute durable implementation metrics for a completed feature or subfeature."
@@ -74,7 +66,7 @@ def render_text(record: dict, sidecar_path: str | None = None, wrote: bool = Fal
     return "\n".join(lines)
 
 
-def main(argv: Sequence[str] | None = None) -> int:
+def main(argv=None) -> int:
     args = parse_args(argv)
     try:
         target = resolve_measurement_target(args.target, explicit_scope=args.scope)
@@ -95,3 +87,7 @@ def main(argv: Sequence[str] | None = None) -> int:
     except RuntimeError as exc:
         print(str(exc), file=sys.stderr)
         return ERROR_EXIT_CODE
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())

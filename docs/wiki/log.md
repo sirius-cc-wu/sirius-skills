@@ -1,6 +1,6 @@
 ## [2026-05-16] implementation-synthesis | audit stale approval-note drift
 
-- Extended `skills/audit-artifacts/scripts/audit_artifacts.py` so subfeature audits flag approval notes that still mention already-closed traced execution slices.
+- Extended `sirius audit-artifacts` so subfeature audits flag approval notes that still mention already-closed traced execution slices.
 - Added a regression test in `skills/audit-artifacts/tests/test_audit_artifacts.py` covering stale `.approval-gate.json` slice references after closure.
 - Updated `docs/wiki/features/cross-artifact-management.md` and `docs/wiki/index.md` so the synthesized maintenance-layer docs describe the new stale approval-note detection behavior.
 
@@ -36,21 +36,21 @@
 
 ## [2026-04-23] implementation-synthesis | autoplan owner-chain
 
-- Implemented optional owner-chain execution in `skills/autoplan/scripts/autoplan.py` with config/CLI controls (`execute_owner_chain`, `stop_on_owner`).
+- Implemented optional owner-chain execution in `sirius autoplan` with config/CLI controls (`execute_owner_chain`, `stop_on_owner`).
 - Added structured owner-chain boundary reporting and checkpoint/event-log context for approval, explicit owner stops, and validation/missing-input stops.
 - Added focused tests in `skills/autoplan/tests/test_autoplan.py` for owner-chain happy path and stop boundaries.
 - Updated autoplan skill docs and throughput/two-step wiki pages to reflect planning-side owner-chain implementation status.
 
 ## [2026-04-23] implementation-synthesis | ship-slice owner-chain
 
-- Implemented optional execution owner-chain routing in `skills/ship-slice/scripts/ship_slice.py` with config/CLI controls (`execute_owner_chain`, `stop_on_owner`).
+- Implemented optional execution owner-chain routing in `sirius ship-slice` with config/CLI controls (`execute_owner_chain`, `stop_on_owner`).
 - Added structured stop context for review boundaries, verification/missing-input failures, explicit owner stops, and commit checkpoints.
 - Added focused tests in `skills/ship-slice/tests/test_ship_slice.py` covering owner-chain advancement, stop boundaries, and deterministic checkpoint behavior.
 - Updated ship-slice skill docs and two-step throughput wiki pages to reflect execution-side owner-chain implementation status.
 
 ## [2026-04-23] implementation-synthesis | two-step approval gate
 
-- Implemented durable approval-gate records in `skills/ship/scripts/ship.py` using per-target `.approval-gate.json` markers.
+- Implemented durable approval-gate records in `sirius ship` using per-target `.approval-gate.json` markers.
 - Added `ship --approve [--approval-note]` to record explicit execution approval for `planning_reviewed` targets.
 - Enforced approval before delegated execution autopilot (`ship` -> `ship-slice`) and invalidated prior approvals automatically when planning artifacts change.
 - Added focused `ship` tests for approval-required delegation and post-approval invalidation behavior.
@@ -73,13 +73,13 @@
 
 - Added shared accelerator guardrail runtime in `lib/workflow_runtime/accelerator_guardrails.py` to centralize stop-reason classification, reason normalization, and readiness invariant construction.
 - Updated `autoplan`, `ship-slice`, and `ship` scripts to consume shared guardrail helpers instead of maintaining duplicated local classification/deduplication logic.
-- Synced shared `workflow_runtime` into packaged skill copies via `scripts/sync_shared_skill_runtime.py`.
+- Synced shared `workflow_runtime` into packaged skill copies via the centralized packaged runtime.
 - Added focused shared guardrail tests (`skills/autoplan/tests/test_accelerator_guardrails.py`) and revalidated accelerator suites.
 - Updated roadmap/feature synthesis and skill guardrail docs to reflect implemented cross-accelerator transition normalization.
 
 ## [2026-04-23] implementation-synthesis | ship-slice terminal automation
 
-- Implemented delegated owned-change-set tracking in `skills/ship-slice/scripts/ship_slice.py` so resumed runs can distinguish owned dirty files from unrelated baseline dirtiness and stop on same-file ownership conflicts.
+- Implemented delegated owned-change-set tracking in `sirius ship-slice` so resumed runs can distinguish owned dirty files from unrelated baseline dirtiness and stop on same-file ownership conflicts.
 - Added optional terminal automation controls under `accelerators.ship_slice`: `auto_format`, `auto_close`, `auto_commit`, plus path-scoped `format_command`; `auto_commit` now requires `auto_close`.
 - Delegated terminal automation now supports owned-file formatting, close-slice handoff, owned-only commit staging, formatter spillover detection, and explicit close-success / commit-failure partial-success reporting.
 - Added focused `ship-slice` tests for owned-change tracking, formatter spillover, full format-close-commit happy path, invalid config, and commit-failure partial success.
@@ -87,10 +87,10 @@
 
 ## [2026-04-24] implementation-synthesis | delegated execution stop policies
 
-- Implemented typed delegated continuation-policy parsing in `skills/ship-slice/scripts/ship_slice.py` with config-only controls under `accelerators.ship_slice.continuation_policy` for `review_boundary` and `commit_checkpoint`.
+- Implemented typed delegated continuation-policy parsing in `sirius ship-slice` with config-only controls under `accelerators.ship_slice.continuation_policy` for `review_boundary` and `commit_checkpoint`.
 - Updated delegated execution behavior so `auto_close`/`auto_commit` respect continuation policy defaults and config overrides instead of bypassing boundaries implicitly.
 - Extended `ship-slice` readiness output with `policy_action` and `policy_source`, while preserving boundary visibility in `blocked_by` and stop reporting.
-- Propagated delegated policy readiness metadata through `skills/ship/scripts/ship.py` so `ship --resume` surfaces the same policy context from delegated runs.
+- Propagated delegated policy readiness metadata through `sirius ship` so `ship --resume` surfaces the same policy context from delegated runs.
 - Added and updated focused tests in `skills/ship-slice/tests/test_ship_slice.py` and `skills/ship/tests/test_ship.py`, then validated with `python3 -m pytest -q skills/ship/tests/test_ship.py skills/ship-slice/tests/test_ship_slice.py`.
 - Closed slices `dsp-policy-contract` and `dsp-boundary-enforcement`, finalized subfeature `delegated-execution-stop-policies`, and updated throughput roadmap/wiki synthesis to mark continuation policy delivery as implemented.
 

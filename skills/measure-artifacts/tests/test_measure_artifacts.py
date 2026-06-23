@@ -4,17 +4,17 @@ import sys
 from pathlib import Path
 
 
-ENGINE_SCRIPT = Path(__file__).resolve().parents[1] / "scripts" / "metrics_engine.py"
-CLI_SCRIPT = Path(__file__).resolve().parents[1] / "scripts" / "measure_artifacts.py"
-STORE_SCRIPT = Path(__file__).resolve().parents[1] / "scripts" / "metrics_store.py"
+ENGINE_SCRIPT = Path(__file__).resolve().parents[3] / "src" / "sirius_skills" / "commands" / "metrics_engine.py"
+CLI_SCRIPT = Path(__file__).resolve().parents[3] / "src" / "sirius_skills" / "commands" / "measure_artifacts.py"
+STORE_SCRIPT = Path(__file__).resolve().parents[3] / "src" / "sirius_skills" / "commands" / "metrics_store.py"
 PLANNING_SCRIPT = (
-    Path(__file__).resolve().parents[2] / "guide-planning" / "scripts" / "manage_planning.py"
+    Path(__file__).resolve().parents[3] / "src" / "sirius_skills" / "commands" / "manage_planning.py"
 )
 SUBFEATURE_SCRIPT = (
-    Path(__file__).resolve().parents[2] / "add-subfeature" / "scripts" / "manage_subfeatures.py"
+    Path(__file__).resolve().parents[3] / "src" / "sirius_skills" / "commands" / "manage_subfeatures.py"
 )
 EXECUTION_SCRIPT = (
-    Path(__file__).resolve().parents[2] / "guide-execution" / "scripts" / "manage_execution.py"
+    Path(__file__).resolve().parents[3] / "src" / "sirius_skills" / "commands" / "manage_execution.py"
 )
 
 

@@ -41,7 +41,7 @@ scope resolver, `guide-planning` stays the canonical planning entrypoint, and
 older surfaces should be described as historical or migration-only unless a
 planning packet explicitly documents a temporary parallel transition.
 
-After each planning phase writes or updates its repository artifacts, persist the matching metadata transition with the owner script for that planning scope. Canonical features should use `python3 skills/guide-planning/scripts/manage_planning.py sync-status <feature-selector> --through <expected-status>`. Subfeatures should use `python3 skills/add-subfeature/scripts/manage_subfeatures.py set-status <feature-selector> <subfeature-id> <expected-status>` through `reviewed`, then `python3 skills/add-subfeature/scripts/manage_subfeatures.py approve ...` to record explicit approval and any ready slice IDs. Use adjacent advancement by default and reserve explicit overrides for deliberate repair or terminal execution states.
+After each planning phase writes or updates its repository artifacts, persist the matching metadata transition with the owner script for that planning scope. Canonical features should use `sirius manage-planning sync-status <feature-selector> --through <expected-status>`. Subfeatures should use `sirius manage-subfeatures set-status <feature-selector> <subfeature-id> <expected-status>` through `reviewed`, then `sirius manage-subfeatures approve ...` to record explicit approval and any ready slice IDs. Use adjacent advancement by default and reserve explicit overrides for deliberate repair or terminal execution states.
 
 The execution layer works one implementation-ready slice at a time, starting with `slice` bootstrap from approved committed planning artifacts. For reviewed subfeatures, that approval must be recorded in `.subfeature-meta.json` before bootstrap. `ship` can sit above that flow when an approved and committed feature or subfeature should be worked as one dependency-aware backlog; it should follow increment order first, then slice dependencies within the current increment, while still handing each concrete slice to the next existing single-slice owner such as `brief`, `blueprint`, repository implementation, `review-execution`, `close-slice`, or `commit`. When the same backlog should execute on its own git branch and checkout, `ship-worktree` can sit one layer above `ship` to create or reuse a dedicated worktree, run `ship` there, and later hand the branch off to PR creation.
 
@@ -308,7 +308,7 @@ In this workflow, an increment is a small, demonstrable system outcome made from
 Use the built-in helper when starting a new planning folder:
 
 ```bash
-python3 skills/breakdown/scripts/scaffold_breakdown.py <feature-slug>
+sirius scaffold-breakdown <feature-slug>
 ```
 
 The helper uses `.skills/planning.json` field `planning_dir` when present and
@@ -318,7 +318,7 @@ For an existing subfeature, scaffold directly into the selected change
 packet path instead:
 
 ```bash
-python3 skills/breakdown/scripts/scaffold_breakdown.py \
+sirius scaffold-breakdown \
   docs/features/<feature-slug>/subfeatures/<change-id>
 ```
 
@@ -408,13 +408,13 @@ guide-planning -> breakdown -> review-planning -> human approval -> commit -> sl
 `slice` should bootstrap a slice-scoped execution slice from the execution-ready work item, typically with:
 
 ```bash
-python3 skills/slice/scripts/bootstrap_slice.py "<slice-id>" "<slice-name>"
+sirius bootstrap-slice "<slice-id>" "<slice-name>"
 ```
 
 If execution config has not been initialized yet and the default `slices/` location is not the right fit, bootstrap the first slice with an explicit directory:
 
 ```bash
-python3 skills/slice/scripts/bootstrap_slice.py --slice-dir "team-slices" "<slice-id>" "<slice-name>"
+sirius bootstrap-slice --slice-dir "team-slices" "<slice-id>" "<slice-name>"
 ```
 
 Do not jump directly from `review-planning` to `slice`; stop for explicit human approval and commit the planning artifacts first. For subfeatures, record that approval through `manage_subfeatures.py approve ...` before slice bootstrap so the derived planning view can become `slice_ready`.

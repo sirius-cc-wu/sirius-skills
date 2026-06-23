@@ -1,28 +1,17 @@
-from __future__ import annotations
+#!/usr/bin/env python3
 
 import argparse
 import json
 import sys
 from pathlib import Path
-from typing import Dict, List, Sequence
-
-from sirius_skills.paths import package_root
+from typing import Dict, List
 
 
-def _ensure_helper_paths() -> None:
-    root = package_root()
-    helper_paths = (
-        root / "skills" / "report-artifacts" / "scripts",
-        root / "skills" / "measure-artifacts" / "scripts",
-    )
-    for path in reversed(helper_paths):
-        if str(path) not in sys.path:
-            sys.path.insert(0, str(path))
+SCRIPT_DIR = Path(__file__).resolve().parent
+if str(SCRIPT_DIR) not in sys.path:
+    sys.path.insert(0, str(SCRIPT_DIR))
 
-
-_ensure_helper_paths()
-
-from report_data import (  # noqa: E402
+from sirius_skills.commands.report_data import (  # noqa: E402
     VALID_ARTIFACT_TYPES,
     VALID_GROUP_BY,
     build_report_result,
@@ -36,7 +25,7 @@ def positive_int(value: str) -> int:
     return parsed
 
 
-def parse_args(argv: Sequence[str] | None = None) -> argparse.Namespace:
+def parse_args(argv=None) -> argparse.Namespace:
     parser = argparse.ArgumentParser(
         description=(
             "Report operational workflow state across proposals, features, "
@@ -164,7 +153,7 @@ def render_text(result: Dict[str, object]) -> str:
     return "\n".join(lines)
 
 
-def main(argv: Sequence[str] | None = None) -> int:
+def main(argv=None) -> int:
     args = parse_args(argv)
     result = run_report(
         args.artifact_type,
@@ -177,3 +166,7 @@ def main(argv: Sequence[str] | None = None) -> int:
     else:
         print(render_text(result))
     return 0
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())

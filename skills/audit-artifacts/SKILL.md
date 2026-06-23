@@ -28,15 +28,15 @@ across proposals, canonical features, durable subfeatures, and execution slices.
 
 ```bash
 # Audit all supported artifact types
-python3 skills/audit-artifacts/scripts/audit_artifacts.py
+sirius audit-artifacts
 
 # Limit the audit to selected artifact types
-python3 skills/audit-artifacts/scripts/audit_artifacts.py \
+sirius audit-artifacts \
   --artifact-type proposal \
   --artifact-type slice
 
 # Emit machine-readable output
-python3 skills/audit-artifacts/scripts/audit_artifacts.py --json
+sirius audit-artifacts --json
 ```
 
 ## Output

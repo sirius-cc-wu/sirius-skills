@@ -15,11 +15,11 @@ Trace lineage and relationships across planning and execution artifacts.
 
 - `docs/features/cross-artifact-management/discover.md`
 - `docs/features/cross-artifact-management/user-stories.md`
-- `skills/audit-artifacts/scripts/artifact_inventory.py`
-- `skills/propose/scripts/manage_proposals.py`
-- `skills/guide-planning/scripts/manage_planning.py`
-- `skills/add-subfeature/scripts/manage_subfeatures.py`
-- `skills/guide-execution/scripts/manage_execution.py`
+- `sirius_skills.commands.artifact_inventory`
+- `sirius manage-proposals`
+- `sirius manage-planning`
+- `sirius manage-subfeatures`
+- `sirius manage-execution`
 
 ## Candidate Affected Story IDs
 

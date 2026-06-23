@@ -31,7 +31,7 @@ used when a specific skill explicitly opts in.
 - `make uninstall` removes only the managed packaged skill names currently installed.
 - `make install-packaged` registers the managed packaged skill set.
 - `make uninstall-packaged` removes only the managed packaged skill names currently installed.
-- `scripts/sync_shared_skill_runtime.py` copies shared runtime modules into packaged skills that import them before packaged installation runs.
+- the centralized packaged runtime copies shared runtime modules into packaged skills that import them before packaged installation runs.
 - `manage_planning.py` reads `planning.json` for `planning_dir`.
 - `manage_execution.py` reads `execution.json` for `slice_dir`, `preferred_workflow`, and `auto_start_implementation`.
 - `manage_execution.py`, `commit`, `create-pr`, and `close-slice` read `conventions.json` for naming and issue-link behavior.

@@ -4,7 +4,7 @@ import sys
 from pathlib import Path
 
 
-SCRIPT_PATH = Path(__file__).resolve().parents[1] / "scripts" / "manage_proposals.py"
+SCRIPT_PATH = Path(__file__).resolve().parents[3] / "src" / "sirius_skills" / "commands" / "manage_proposals.py"
 
 
 def load_module():

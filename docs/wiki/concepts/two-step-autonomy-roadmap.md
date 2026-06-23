@@ -12,12 +12,12 @@ Reduce orchestration friction from many manual commands to two high-level steps:
 Use this as the default happy-path UX when accelerators are enabled:
 
 1. Run `autoplan` until planning reaches approval boundary:
-   `python3 skills/autoplan/scripts/autoplan.py <target> --execute-owner-chain --json`
+   `sirius autoplan <target> --execute-owner-chain --json`
 2. Review planning artifacts, then approve explicitly.
 3. Record approval:
-   `python3 skills/ship/scripts/ship.py <target> --approve --approval-note "<note>" --json`
+   `sirius ship <target> --approve --approval-note "<note>" --json`
 4. Start execution autopilot:
-   `python3 skills/ship/scripts/ship.py <target> --resume --json`
+   `sirius ship <target> --resume --json`
 5. Re-run `ship --resume` until `readiness.blocked_by` reports a boundary
    requiring manual action (for example `commit_checkpoint`), or until
    `readiness.preflight` reports that ship-local preflight stopped before
@@ -129,9 +129,9 @@ Use additive flags under existing typed configs:
 ## Main Sources
 
 - `skills/autoplan/SKILL.md`
-- `skills/autoplan/scripts/autoplan.py`
+- `sirius autoplan`
 - `skills/ship/SKILL.md`
-- `skills/ship/scripts/ship.py`
+- `sirius ship`
 - `skills/ship-slice/SKILL.md`
-- `skills/ship-slice/scripts/ship_slice.py`
+- `sirius ship-slice`
 - `docs/wiki/concepts/gstack-ship-reference.md`

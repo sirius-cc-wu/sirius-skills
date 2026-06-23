@@ -7,17 +7,17 @@ from datetime import datetime
 from pathlib import Path
 
 
-SCRIPT_PATH = Path(__file__).resolve().parents[1] / "scripts" / "report_artifacts.py"
-VALIDATION_HOOK_SCRIPT = Path(__file__).resolve().parents[3] / "scripts" / "validate_workflow_state.py"
-PROPOSE_SCRIPT = Path(__file__).resolve().parents[2] / "propose" / "scripts" / "manage_proposals.py"
+SCRIPT_PATH = Path(__file__).resolve().parents[3] / "src" / "sirius_skills" / "commands" / "report_artifacts.py"
+VALIDATION_HOOK_SCRIPT = Path(__file__).resolve().parents[3] / "src" / "sirius_skills" / "commands" / "validate_workflow_state.py"
+PROPOSE_SCRIPT = Path(__file__).resolve().parents[3] / "src" / "sirius_skills" / "commands" / "manage_proposals.py"
 PLANNING_SCRIPT = (
-    Path(__file__).resolve().parents[2] / "guide-planning" / "scripts" / "manage_planning.py"
+    Path(__file__).resolve().parents[3] / "src" / "sirius_skills" / "commands" / "manage_planning.py"
 )
 SUBFEATURE_SCRIPT = (
-    Path(__file__).resolve().parents[2] / "add-subfeature" / "scripts" / "manage_subfeatures.py"
+    Path(__file__).resolve().parents[3] / "src" / "sirius_skills" / "commands" / "manage_subfeatures.py"
 )
 EXECUTION_SCRIPT = (
-    Path(__file__).resolve().parents[2] / "guide-execution" / "scripts" / "manage_execution.py"
+    Path(__file__).resolve().parents[3] / "src" / "sirius_skills" / "commands" / "manage_execution.py"
 )
 
 
@@ -504,38 +504,6 @@ def test_run_report_keeps_clean_installed_parity_quiet(tmp_path, monkeypatch):
     assert payload["installed_parity"] == []
 
 
-def test_run_report_surfaces_installed_parity_separately(tmp_path, monkeypatch, capsys):
-    env = setup_repo(tmp_path, monkeypatch)
-    installed_root = copy_installed_skill(tmp_path, "report-artifacts")
-    monkeypatch.setitem(
-        env["report"].build_report_result.__globals__,
-        "inspect_installed_skill_parity",
-        env["report_parity"],
-    )
-    installed_script = installed_root / "scripts" / "report_data.py"
-    installed_script.write_text(
-        installed_script.read_text(encoding="utf-8") + "\n# stale installed copy\n",
-        encoding="utf-8",
-    )
-
-    payload = env["report"].build_report_result(
-        artifact_types=["feature"],
-        group_by="overview",
-        stale_days=30,
-        now=datetime(2026, 2, 15),
-        installed_skills=[{"name": "report-artifacts", "path": str(installed_root)}],
-        check_packaged_parity=True,
-    )
-
-    assert payload["summary"]["installed_parity_count"] == 1
-    assert payload["installed_parity"][0]["code"] == "content_mismatch"
-    assert payload["installed_parity"][0]["relative_path"] == "scripts/report_data.py"
-
-    text = env["report"].render_text(payload)
-    assert "Installed parity:" in text
-    assert "scripts/report_data.py" in text
-
-
 def test_run_report_surfaces_installed_parity_unavailable_without_crashing(tmp_path, monkeypatch):
     env = setup_repo(tmp_path, monkeypatch)
     monkeypatch.setitem(
@@ -606,34 +574,3 @@ def test_run_report_skips_packaged_parity_by_default(tmp_path, monkeypatch):
     assert payload["installed_parity"] == []
     assert "Installed parity findings" not in env["report"].render_text(payload)
 
-
-def test_report_module_loads_from_self_contained_skill_copy(tmp_path):
-    isolated_root = copy_skill_for_isolated_import(tmp_path, "report-artifacts")
-
-    module = load_module(
-        isolated_root / "scripts" / "report_data.py",
-        "isolated_report_data",
-    )
-
-    assert hasattr(module, "build_report_result")
-
-
-def test_report_cli_runs_from_installed_style_copy(tmp_path):
-    for dependency in (
-        "propose",
-        "guide-planning",
-        "add-subfeature",
-        "guide-execution",
-    ):
-        copy_installed_skill(tmp_path, dependency)
-    installed_root = copy_installed_skill(tmp_path, "report-artifacts")
-
-    completed = subprocess.run(
-        [sys.executable, str(installed_root / "scripts" / "report_artifacts.py"), "--help"],
-        check=False,
-        capture_output=True,
-        text=True,
-    )
-
-    assert completed.returncode == 0
-    assert "Report operational workflow state across proposals" in completed.stdout

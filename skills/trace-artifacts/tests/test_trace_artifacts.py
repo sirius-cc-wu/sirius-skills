@@ -5,16 +5,16 @@ import sys
 from pathlib import Path
 
 
-SCRIPT_PATH = Path(__file__).resolve().parents[1] / "scripts" / "trace_artifacts.py"
-PROPOSE_SCRIPT = Path(__file__).resolve().parents[2] / "propose" / "scripts" / "manage_proposals.py"
+SCRIPT_PATH = Path(__file__).resolve().parents[3] / "src" / "sirius_skills" / "commands" / "trace_artifacts.py"
+PROPOSE_SCRIPT = Path(__file__).resolve().parents[3] / "src" / "sirius_skills" / "commands" / "manage_proposals.py"
 PLANNING_SCRIPT = (
-    Path(__file__).resolve().parents[2] / "guide-planning" / "scripts" / "manage_planning.py"
+    Path(__file__).resolve().parents[3] / "src" / "sirius_skills" / "commands" / "manage_planning.py"
 )
 SUBFEATURE_SCRIPT = (
-    Path(__file__).resolve().parents[2] / "add-subfeature" / "scripts" / "manage_subfeatures.py"
+    Path(__file__).resolve().parents[3] / "src" / "sirius_skills" / "commands" / "manage_subfeatures.py"
 )
 EXECUTION_SCRIPT = (
-    Path(__file__).resolve().parents[2] / "guide-execution" / "scripts" / "manage_execution.py"
+    Path(__file__).resolve().parents[3] / "src" / "sirius_skills" / "commands" / "manage_execution.py"
 )
 
 
@@ -230,13 +230,3 @@ def test_cli_fails_for_missing_target(tmp_path, monkeypatch, capsys):
     )
     assert "Artifact not found: planned-slice:MISSING-1" in capsys.readouterr().err
 
-
-def test_trace_module_loads_from_self_contained_skill_copy(tmp_path):
-    isolated_root = copy_skill_for_isolated_import(tmp_path, "trace-artifacts")
-
-    module = load_module(
-        isolated_root / "scripts" / "trace_data.py",
-        "isolated_trace_data",
-    )
-
-    assert hasattr(module, "build_trace_graph")

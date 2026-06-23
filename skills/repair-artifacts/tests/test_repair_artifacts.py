@@ -5,16 +5,16 @@ import sys
 from pathlib import Path
 
 
-SCRIPT_PATH = Path(__file__).resolve().parents[1] / "scripts" / "repair_artifacts.py"
-PROPOSE_SCRIPT = Path(__file__).resolve().parents[2] / "propose" / "scripts" / "manage_proposals.py"
+SCRIPT_PATH = Path(__file__).resolve().parents[3] / "src" / "sirius_skills" / "commands" / "repair_artifacts.py"
+PROPOSE_SCRIPT = Path(__file__).resolve().parents[3] / "src" / "sirius_skills" / "commands" / "manage_proposals.py"
 PLANNING_SCRIPT = (
-    Path(__file__).resolve().parents[2] / "guide-planning" / "scripts" / "manage_planning.py"
+    Path(__file__).resolve().parents[3] / "src" / "sirius_skills" / "commands" / "manage_planning.py"
 )
 SUBFEATURE_SCRIPT = (
-    Path(__file__).resolve().parents[2] / "add-subfeature" / "scripts" / "manage_subfeatures.py"
+    Path(__file__).resolve().parents[3] / "src" / "sirius_skills" / "commands" / "manage_subfeatures.py"
 )
 EXECUTION_SCRIPT = (
-    Path(__file__).resolve().parents[2] / "guide-execution" / "scripts" / "manage_execution.py"
+    Path(__file__).resolve().parents[3] / "src" / "sirius_skills" / "commands" / "manage_execution.py"
 )
 
 
@@ -223,13 +223,3 @@ def test_cli_json_reports_selected_artifact_layer(tmp_path, monkeypatch, capsys)
     assert payload["summary"]["planned_actions"] == 1
     assert payload["actions"][0]["artifact_type"] == "slice"
 
-
-def test_repair_module_loads_from_self_contained_skill_copy(tmp_path):
-    isolated_root = copy_skill_for_isolated_import(tmp_path, "repair-artifacts")
-
-    module = load_module(
-        isolated_root / "scripts" / "repair_data.py",
-        "isolated_repair_data",
-    )
-
-    assert hasattr(module, "build_repair_result")

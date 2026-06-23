@@ -1,17 +1,29 @@
+#!/usr/bin/env python3
+
 from __future__ import annotations
 
 import argparse
+import importlib.util
 import sys
 from pathlib import Path
-from typing import Sequence
-
-from sirius_skills.legacy import load_legacy_module
 
 
+COMMAND_DIR = Path(__file__).resolve().parent
+PLANNING_SCRIPT = COMMAND_DIR / "manage_planning.py"
+SUBFEATURE_SCRIPT = COMMAND_DIR / "manage_subfeatures.py"
 SUBFEATURE_METADATA_FILE = ".subfeature-meta.json"
 
 
-def parse_args(argv: Sequence[str] | None = None) -> argparse.Namespace:
+def load_module(script_path: Path, name: str):
+    spec = importlib.util.spec_from_file_location(name, script_path)
+    if spec is None or spec.loader is None:
+        raise RuntimeError(f"Unable to load module from {script_path}")
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    return module
+
+
+def parse_args(argv=None) -> argparse.Namespace:
     parser = argparse.ArgumentParser(
         description="Record reviewed planning readiness for a feature or subfeature."
     )
@@ -30,18 +42,10 @@ def is_subfeature_target(target_dir: Path) -> bool:
     return (target_dir / SUBFEATURE_METADATA_FILE).is_file()
 
 
-def main(argv: Sequence[str] | None = None) -> int:
+def main(argv=None) -> int:
     args = parse_args(argv)
-    planning = load_legacy_module(
-        "record_review_manage_planning",
-        ("skills", "guide-planning", "scripts"),
-        "manage_planning.py",
-    )
-    subfeatures = load_legacy_module(
-        "record_review_manage_subfeatures",
-        ("skills", "add-subfeature", "scripts"),
-        "manage_subfeatures.py",
-    )
+    planning = load_module(PLANNING_SCRIPT, "record_review_manage_planning")
+    subfeatures = load_module(SUBFEATURE_SCRIPT, "record_review_manage_subfeatures")
 
     try:
         rows, feature, scope_context = planning.resolve_feature_lookup(
@@ -90,3 +94,7 @@ def main(argv: Sequence[str] | None = None) -> int:
 
     print(message)
     return 0
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())

@@ -32,10 +32,10 @@ current state with checkpointed runtime context.
 ## Tooling
 
 ```bash
-python3 skills/ship-slice/scripts/ship_slice.py taw-ship-slice-loop --json
-python3 skills/ship-slice/scripts/ship_slice.py --handoff /tmp/handoff.json --json
-python3 skills/ship-slice/scripts/ship_slice.py --resume --json
-python3 skills/ship-slice/scripts/ship_slice.py taw-ship-slice-loop --execute-owner-chain --json
+sirius ship-slice taw-ship-slice-loop --json
+sirius ship-slice --handoff /tmp/handoff.json --json
+sirius ship-slice --resume --json
+sirius ship-slice taw-ship-slice-loop --execute-owner-chain --json
 ```
 
 ## Configuration

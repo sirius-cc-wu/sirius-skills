@@ -8,12 +8,12 @@ from pathlib import Path
 from typing import Any, Dict, Optional
 
 
-AUTOPLAN_SCRIPT = Path(__file__).resolve().parents[1] / "scripts" / "autoplan.py"
+AUTOPLAN_SCRIPT = Path(__file__).resolve().parents[3] / "src" / "sirius_skills" / "commands" / "autoplan.py"
 PLANNING_SCRIPT = (
-    Path(__file__).resolve().parents[2] / "guide-planning" / "scripts" / "manage_planning.py"
+    Path(__file__).resolve().parents[3] / "src" / "sirius_skills" / "commands" / "manage_planning.py"
 )
 ADD_SUBFEATURE_SCRIPT = (
-    Path(__file__).resolve().parents[2] / "add-subfeature" / "scripts" / "manage_subfeatures.py"
+    Path(__file__).resolve().parents[3] / "src" / "sirius_skills" / "commands" / "manage_subfeatures.py"
 )
 
 
@@ -104,7 +104,7 @@ def create_feature(tmp_path: Path, monkeypatch, status: str) -> Path:
 
 def run_cli(repo_root: Path, *args: str) -> subprocess.CompletedProcess[str]:
     return subprocess.run(
-        ["python3", str(AUTOPLAN_SCRIPT), *args],
+        [sys.executable, "-m", "sirius_skills.cli", "autoplan", *args],
         cwd=repo_root,
         check=False,
         capture_output=True,
@@ -114,7 +114,7 @@ def run_cli(repo_root: Path, *args: str) -> subprocess.CompletedProcess[str]:
 
 def run_add_subfeature_cli(repo_root: Path, *args: str) -> subprocess.CompletedProcess[str]:
     return subprocess.run(
-        ["python3", str(ADD_SUBFEATURE_SCRIPT), *args],
+        [sys.executable, "-m", "sirius_skills.cli", "manage-subfeatures", *args],
         cwd=repo_root,
         check=False,
         capture_output=True,
@@ -398,7 +398,7 @@ def test_autoplan_owner_chain_suggests_design_scaffold_handoff(
     assert payload["owner_handoff"]["missing_files"] == ["system-design.md"]
     assert payload["owner_handoff"]["bootstrap_commands"] == []
     assert payload["owner_handoff"]["bootstrap_commands_executed"] == [
-        "python3 skills/design/scripts/scaffold_design.py "
+        "sirius scaffold-design "
         "docs/features/throughput-acceleration-workflow/"
     ]
     assert payload["failure_context"] is None
@@ -434,7 +434,7 @@ def test_autoplan_owner_chain_suggests_breakdown_scaffold_handoff(
     ]
     assert payload["owner_handoff"]["bootstrap_commands"] == []
     assert payload["owner_handoff"]["bootstrap_commands_executed"] == [
-        "python3 skills/breakdown/scripts/scaffold_breakdown.py "
+        "sirius scaffold-breakdown "
         "docs/features/throughput-acceleration-workflow/"
     ]
     assert payload["failure_context"] is None

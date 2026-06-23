@@ -42,9 +42,9 @@ The first version is intentionally conservative:
 The audit capability should resolve artifact roots from the same repository
 configuration already used elsewhere:
 
-- proposal root from `skills/propose/scripts/manage_proposals.py`
-- planning root from `skills/guide-planning/scripts/manage_planning.py`
-- slice root from `skills/guide-execution/scripts/manage_execution.py`
+- proposal root from `sirius manage-proposals`
+- planning root from `sirius manage-planning`
+- slice root from `sirius manage-execution`
 
 The inventory helper should collect two complementary views:
 
@@ -115,22 +115,23 @@ all of the following are true:
 
 ### 4. Read-only audit command
 
-The first user-facing surface should be a dedicated skill and script:
+The first user-facing surface should be a dedicated skill plus centralized command modules:
 
 ```text
 skills/audit-artifacts/
   SKILL.md
-  scripts/audit_artifacts.py
-  scripts/artifact_inventory.py
   tests/test_audit_artifacts.py
+src/sirius_skills/commands/
+  audit_artifacts.py
+  artifact_inventory.py
 ```
 
 Recommended CLI shape:
 
 ```bash
-python3 skills/audit-artifacts/scripts/audit_artifacts.py
-python3 skills/audit-artifacts/scripts/audit_artifacts.py --artifact-type proposal --artifact-type slice
-python3 skills/audit-artifacts/scripts/audit_artifacts.py --json
+sirius audit-artifacts
+sirius audit-artifacts --artifact-type proposal --artifact-type slice
+sirius audit-artifacts --json
 ```
 
 Default output should be a concise human-readable summary with findings grouped

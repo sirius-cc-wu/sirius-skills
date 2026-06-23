@@ -72,10 +72,10 @@ One result shape should power:
 ## 4. CLI contract
 
 ```bash
-python3 skills/archive-artifacts/scripts/archive_artifacts.py
-python3 skills/archive-artifacts/scripts/archive_artifacts.py --artifact-type proposal
-python3 skills/archive-artifacts/scripts/archive_artifacts.py --artifact-type slice --artifact-id rpt-artifact-state-report --apply
-python3 skills/archive-artifacts/scripts/archive_artifacts.py --json
+sirius archive-artifacts
+sirius archive-artifacts --artifact-type proposal
+sirius archive-artifacts --artifact-type slice --artifact-id rpt-artifact-state-report --apply
+sirius archive-artifacts --json
 ```
 
 ## 5. Validation strategy

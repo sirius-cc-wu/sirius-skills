@@ -28,7 +28,7 @@ though the local developer only needed the checked-in skills.
 - Keep the checked-in repo as the source of truth for local development.
 - Preserve a packaged install path for agents or release flows that still need
   self-contained skill copies.
-- Re-scope shared-runtime sync and installed parity checks to packaging and
+- Re-scope centralized packaged runtime and installed parity checks to packaging and
   release boundaries instead of normal local usage.
 - Document a migration path from the current `make install` behavior to the new
   split install model.
@@ -62,7 +62,7 @@ though the local developer only needed the checked-in skills.
 ## Confirmed Signals in Repo
 
 - `Makefile` currently installs all managed skills through `npx skills add`.
-- `scripts/sync_shared_skill_runtime.py` exists to copy `lib/workflow_state/`
+- the centralized packaged runtime exists to copy `lib/workflow_state/`
   into selected skill folders before packaged install.
 - `workflow-state-consistency` planning explicitly introduced installed parity to
   guard that copied-runtime packaging model.
@@ -92,7 +92,7 @@ though the local developer only needed the checked-in skills.
   - keep the local target naming generic enough for multiple agent CLIs
 
 - **Packaged-boundary hardening**
-  - keep shared-runtime sync only for packaged/export flows
+  - keep centralized packaged runtime only for packaged/export flows
   - keep installed parity checks only where copied installs still exist
 
 - **Migration guidance**

@@ -37,7 +37,7 @@ Add optional auto-close and auto-commit controls for ship-slice terminal executi
 
 - `.skills/execution.json` flags for `auto_close` and `auto_commit`
 - `.skills/execution.json` flag for `auto_format`
-- `skills/ship-slice/scripts/ship_slice.py`
+- `sirius ship-slice`
 - `skills/close-slice/`
 - `skills/commit/`
 - `skills/ship-slice/tests/test_ship_slice.py`

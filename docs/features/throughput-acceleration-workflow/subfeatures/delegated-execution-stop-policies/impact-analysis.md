@@ -31,9 +31,9 @@ stops when `ship-slice` reaches review and commit boundaries.
 ## Candidate Affected Implementation Areas
 
 - `.skills/execution.json`
-- `skills/ship/scripts/ship.py`
+- `sirius ship`
 - `skills/ship/tests/test_ship.py`
-- `skills/ship-slice/scripts/ship_slice.py`
+- `sirius ship-slice`
 - `skills/ship-slice/tests/test_ship_slice.py`
 
 ## Inherited Constraints

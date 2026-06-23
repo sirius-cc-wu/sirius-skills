@@ -33,8 +33,8 @@ Add operator policy controls for when delegated execution continues or stops at 
 ## Candidate Scope
 
 - `.skills/execution.json` policy toggles for delegated continuation behavior
-- `skills/ship/scripts/ship.py`
-- `skills/ship-slice/scripts/ship_slice.py`
+- `sirius ship`
+- `sirius ship-slice`
 - readiness payload and stop-reason handling
 - accelerator tests covering delegated continuation behavior
 

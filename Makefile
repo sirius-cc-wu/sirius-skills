@@ -1,4 +1,4 @@
-.PHONY: install uninstall install-packaged uninstall-packaged sync-shared-references sync-shared-runtime validate-workflow-state
+.PHONY: install uninstall install-packaged uninstall-packaged sync-shared-references validate-workflow-state
 
 REPO_ROOT := $(CURDIR)
 COMMON_FLAGS := --global --yes --agent github-copilot --agent codex --agent antigravity --agent gemini-cli
@@ -40,19 +40,16 @@ MANAGED_SKILLS := \
 	research
 MANAGED_SKILL_FLAGS := $(foreach skill,$(MANAGED_SKILLS),--skill $(skill))
 
-install: sync-shared-runtime sync-shared-references
+install: sync-shared-references
 	npx skills add "$(REPO_ROOT)" $(COMMON_FLAGS) $(MANAGED_SKILL_FLAGS)
 
 install-packaged: install
 
 sync-shared-references:
-	python3 scripts/sync_shared_skill_references.py
-
-sync-shared-runtime:
-	python3 scripts/sync_shared_skill_runtime.py
+	sirius sync-shared-references
 
 validate-workflow-state:
-	python3 scripts/validate_workflow_state.py
+	sirius validate-workflow-state
 
 uninstall: uninstall-packaged
 

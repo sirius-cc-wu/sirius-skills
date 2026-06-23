@@ -75,7 +75,7 @@ The shared runtime should live in a new top-level package, `lib/workflow_runtime
 instead of being folded into `lib/workflow_state/`. `workflow_state` remains the
 library for durable planning and execution truth. `workflow_runtime` is
 explicitly supplemental and can be synced into consuming skills by extending
-`scripts/sync_shared_skill_runtime.py`.
+the centralized packaged runtime.
 
 ```plantuml
 @startuml
@@ -162,21 +162,21 @@ route the next owner even when `ship-slice` is absent or disabled.
 
 ### New skill entrypoints
 
-- `python3 skills/autoplan/scripts/autoplan.py <feature-selector> [--json] [--resume]`
-- `python3 skills/ship-slice/scripts/ship_slice.py <slice-id|slice-path> [--json] [--resume]`
-- `python3 skills/ship-slice/scripts/ship_slice.py --handoff <handoff.json> [--json]`
-- `python3 skills/learn/scripts/learn.py query <scope>`
-- `python3 skills/learn/scripts/learn.py promote <learning-id>`
-- `python3 skills/learn/scripts/learn.py prune <learning-id>`
+- `sirius autoplan <feature-selector> [--json] [--resume]`
+- `sirius ship-slice <slice-id|slice-path> [--json] [--resume]`
+- `sirius ship-slice --handoff <handoff.json> [--json]`
+- `sirius learn query <scope>`
+- `sirius learn promote <learning-id>`
+- `sirius learn prune <learning-id>`
 
 ### Existing dependencies reused directly
 
-- `skills/guide-planning/scripts/manage_planning.py`
-- `skills/guide-execution/scripts/manage_execution.py`
-- `skills/ship/scripts/ship.py`
-- `skills/close-slice/scripts/close_slice.py`
+- `sirius manage-planning`
+- `sirius manage-execution`
+- `sirius ship`
+- `sirius close-slice`
 - the `commit` and `create-pr` skill workflows
-- `scripts/sync_shared_skill_runtime.py`
+- the centralized packaged runtime
 
 ### Handoff contract between `ship` and `ship-slice`
 
@@ -493,7 +493,7 @@ that naturally belong to one of those two layers.
   - delegated backlog mode consumes and emits the handoff payload correctly
   - one-active-slice semantics remain intact
 - packaging and installation checks:
-  - update `scripts/sync_shared_skill_runtime.py`
+  - update the centralized packaged runtime
   - include new skills in `Makefile`
   - extend packaged install tests for new skill names and shared runtime sync
 
@@ -547,7 +547,7 @@ authoritative workflow state.
 
 #### Detailed Design Summary
 
-`taw-runtime-foundation` establishes the shared supplemental runtime layer for future accelerator skills. The slice introduces `lib/workflow_runtime/`, extends packaged runtime syncing so consuming skills can ship that runtime, and adds the baseline tests needed to keep the new runtime explicit and self-contained.
+`taw-runtime-foundation` establishes the shared supplemental runtime layer for future accelerator skills. The slice introduces `lib/workflow_runtime/`, extends centralized packaged runtime so consuming skills can ship that runtime, and adds the baseline tests needed to keep the new runtime explicit and self-contained.
 <!-- archived-slice-summary:taw-runtime-foundation:end -->
 
 <!-- archived-slice-summary:taw-ship-backlog-integration:start -->

@@ -90,17 +90,17 @@ guide-scope -> bootstrap
 
 Use the existing repository helpers rather than inventing a new scope runtime:
 
-- planning and proposal routing: `skills/guide-planning/scripts/manage_planning.py`
-  and `skills/propose/scripts/manage_proposals.py`
+- planning and proposal routing: `sirius manage-planning`
+  and `sirius manage-proposals`
   - use `--scope <path>` when an explicit planning or proposal scope is needed
   - use `--target-scope <path>` for explicit cross-scope promotion targets
-- execution routing: `skills/guide-execution/scripts/manage_execution.py`
+- execution routing: `sirius manage-execution`
   - execution commands already follow the nearest execution scope and keep slice
     registries local to that scope
-- slice bootstrap: `skills/slice/scripts/bootstrap_slice.py`
+- slice bootstrap: `sirius bootstrap-slice`
   - bootstrap reuses scoped execution config and inherited defaults from the
     active scope chain
-- scope configuration: `skills/bootstrap/scripts/bootstrap.py`
+- scope configuration: `sirius bootstrap`
   - use `--repo-root <scope-root>` to initialize or update the selected scope's
     `.skills/` files
 

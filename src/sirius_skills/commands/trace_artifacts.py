@@ -1,27 +1,17 @@
-from __future__ import annotations
+#!/usr/bin/env python3
 
 import argparse
 import json
 import sys
 from pathlib import Path
-from typing import Dict, List, Optional, Sequence
-
-from sirius_skills.paths import package_root
+from typing import Dict, List, Optional
 
 
-ERROR_EXIT_CODE = 2
+SCRIPT_DIR = Path(__file__).resolve().parent
+if str(SCRIPT_DIR) not in sys.path:
+    sys.path.insert(0, str(SCRIPT_DIR))
 
-
-def _ensure_helper_paths() -> None:
-    root = package_root()
-    script_dir = root / "skills" / "trace-artifacts" / "scripts"
-    if str(script_dir) not in sys.path:
-        sys.path.insert(0, str(script_dir))
-
-
-_ensure_helper_paths()
-
-from trace_data import (  # noqa: E402
+from sirius_skills.commands.trace_data import (  # noqa: E402
     NODE_TYPES,
     TraceLookupError,
     build_trace_graph,
@@ -30,10 +20,11 @@ from trace_data import (  # noqa: E402
 )
 
 
+ERROR_EXIT_CODE = 2
 VALID_ARTIFACT_TYPES = tuple(sorted(set(NODE_TYPES + ("planned_slice", "execution-slice"))))
 
 
-def parse_args(argv: Sequence[str] | None = None) -> argparse.Namespace:
+def parse_args(argv=None) -> argparse.Namespace:
     parser = argparse.ArgumentParser(
         description=(
             "Trace durable lineage across proposals, features, subfeatures, "
@@ -131,7 +122,7 @@ def render_text(result: Dict[str, object]) -> str:
     return "\n".join(lines)
 
 
-def main(argv: Sequence[str] | None = None) -> int:
+def main(argv=None) -> int:
     args = parse_args(argv)
     try:
         result = run_trace(args.artifact_type, args.artifact_id)
@@ -147,3 +138,7 @@ def main(argv: Sequence[str] | None = None) -> int:
     else:
         print(render_text(result))
     return 0
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())

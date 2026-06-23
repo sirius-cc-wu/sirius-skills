@@ -49,7 +49,7 @@ Resolve `<feature_path>` as either:
 ## Tooling
 
 ```bash
-python3 skills/research/scripts/research.py \
+sirius research \
   docs/features/planning-workflow/subfeatures/reference-research-synthesis \
   --question "Which upstream pattern should own durable reference synthesis?" \
   --source "references/build-your-own-openclaw/: tutorial baseline" \
@@ -66,7 +66,7 @@ written there, record that explicitly and let the helper update the wiki page,
 index, and log:
 
 ```bash
-python3 skills/research/scripts/research.py \
+sirius research \
   planning-workflow \
   --question "Which proposal-management pattern should we reuse?" \
   --source "references/proposals/: current baseline" \

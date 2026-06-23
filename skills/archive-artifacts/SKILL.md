@@ -34,38 +34,38 @@ durable history without broad cleanup side effects.
 
 ```bash
 # Report archive candidates
-python3 skills/archive-artifacts/scripts/archive_artifacts.py
+sirius archive-artifacts
 
 # Filter to one artifact type
-python3 skills/archive-artifacts/scripts/archive_artifacts.py --artifact-type proposal
+sirius archive-artifacts --artifact-type proposal
 
 # Archive one closed slice
-python3 skills/archive-artifacts/scripts/archive_artifacts.py \
+sirius archive-artifacts \
   --artifact-type slice \
   --artifact-id rpt-artifact-state-report \
   --apply
 
 # Summarize and archive closed slices for one feature
-python3 skills/archive-artifacts/scripts/archive_artifacts.py \
+sirius archive-artifacts \
   --artifact-type feature \
   --artifact-id execution-workflow \
   --apply
 
 # Summarize and archive closed slices for one subfeature
-python3 skills/archive-artifacts/scripts/archive_artifacts.py \
+sirius archive-artifacts \
   --artifact-type subfeature \
   --artifact-id audit-artifacts \
   --apply
 
 # Optional: preserve existing structural class/component diagrams too
-python3 skills/archive-artifacts/scripts/archive_artifacts.py \
+sirius archive-artifacts \
   --artifact-type subfeature \
   --artifact-id audit-artifacts \
   --apply \
   --include-structural-diagrams
 
 # Emit machine-readable output
-python3 skills/archive-artifacts/scripts/archive_artifacts.py --json
+sirius archive-artifacts --json
 ```
 
 ## Output

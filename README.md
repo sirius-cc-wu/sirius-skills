@@ -12,15 +12,14 @@ python3 -m pip install -e .
 sirius --help
 ```
 
-The CLI discovers runnable Python helpers under `scripts/` and
-`skills/*/scripts/` and exposes them as subcommands, while leaving the original
-script paths available for compatibility. For example:
+The CLI exposes packaged command implementations under `src/sirius_skills/`.
+Use `sirius <command>` as the supported execution interface. For example:
 
 ```bash
 sirius autoplan <target> --execute-owner-chain --json
 sirius manage-planning <args>
 sirius validate-workflow-state
-sirius sync-shared-runtime
+sirius sync-shared-references
 ```
 
 ## Installing skills
@@ -34,9 +33,10 @@ make install
 ```
 
 This uses `npx skills add` to register the managed skills after refreshing the
-shared runtime and shared references that packaged installs depend on. The
-managed packaged set is sourced from `MANAGED_SKILLS` in `Makefile`, so keep
-that list in sync when adding or retiring packaged skills.
+shared references that packaged installs depend on. Shared Python runtime code
+is provided by the installed `sirius_skills` package. The managed packaged set
+is sourced from `MANAGED_SKILLS` in `Makefile`, so keep that list in sync when
+adding or retiring packaged skills.
 
 To remove the managed packaged install later:
 
@@ -125,7 +125,7 @@ then copied into the individual skill folders that need to package it.
 Current shared-reference workflow:
 
 - keep the canonical source in `docs/shared/`
-- `make install-packaged` refreshes shared runtime and reference copies before packaging managed skills
+- `make install-packaged` refreshes shared reference copies before packaging managed skills
 - `make validate-workflow-state` reruns the curated workflow consistency pytest
   bundle for parity and transition guardrail regressions
 - run `make sync-shared-references` after editing a canonical shared reference
@@ -186,18 +186,18 @@ the active planning scope's `.skills/planning.json` defines a different
 
 Default operator path (when accelerators are enabled):
 
-1. `python3 skills/autoplan/scripts/autoplan.py <target> --execute-owner-chain --json`
+1. `sirius autoplan <target> --execute-owner-chain --json`
 2. review planning artifacts, then approve explicitly
-3. `python3 skills/ship/scripts/ship.py <target> --approve --approval-note "<note>" --json`
-4. `python3 skills/ship/scripts/ship.py <target> --resume --json`
-5. or `python3 skills/ship-worktree/scripts/ship_worktree.py <target> --resume --json`
+3. `sirius ship <target> --approve --approval-note "<note>" --json`
+4. `sirius ship <target> --resume --json`
+5. or `sirius ship-worktree <target> --resume --json`
    when the implementation should live on a dedicated worktree branch
 6. repeat `ship --resume` or `ship-worktree --resume` until `readiness.blocked_by`
    or `readiness.preflight` reports a manual boundary
 7. once the target is `implemented` and all planned slices are closed, run
-   `python3 skills/ship/scripts/ship.py <target> --finalize --json`, or keep
+   `sirius ship <target> --finalize --json`, or keep
    the worktree wrapper in control with
-   `python3 skills/ship-worktree/scripts/ship_worktree.py <target> --finalize --create-pr --json`
+   `sirius ship-worktree <target> --finalize --create-pr --json`
 
 `guide-scope`, `guide-planning`, and `guide-execution` remain valid but are
 best treated as fallback/manual control paths for ambiguity resolution,
@@ -265,7 +265,7 @@ Closed slices are retained non-destructively. `sirius-skills` does not merge or 
 
 Per-slice closure is non-destructive. `sirius-skills` keeps closed slices and durable subfeature planning folders in place by default; any later cleanup or archival should happen through explicit maintenance tooling instead of an automatic feature-finalization step.
 
-To keep relation metadata healthy over time, `skills/guide-execution/scripts/manage_execution.py` also provides `audit-relations`, which checks for missing targets and missing reciprocal links.
+To keep relation metadata healthy over time, `sirius manage-execution` also provides `audit-relations`, which checks for missing targets and missing reciprocal links.
 
 ## Example prompts
 
@@ -406,16 +406,16 @@ Current configuration usage:
 - `skills/guide-scope/SKILL.md` documents the optional scope-aware entrypoint for routing multi-scope work into planning, execution, or bootstrap
 - planning-layer skills resolve `.skills/planning.json` from the nearest scope, then fall back to the repository root when inside a Git worktree; `planning_dir` still defaults to `docs/features/<feature-slug>/`
 - `skills/autoplan/SKILL.md` documents `.skills/planning.json` fields under `accelerators.autoplan`, including `execute_owner_chain` and `stop_on_owner`
-- `skills/propose/scripts/manage_proposals.py` reads the active scope's `.skills/planning.json` field `proposal_dir` when present and otherwise defaults to `docs/proposals/<proposal-slug>/`
-- `skills/guide-planning/scripts/manage_planning.py` reads the active scope's `.skills/planning.json` for `planning_dir`, maintains feature readiness metadata under `<feature_path>/.planning-meta.json`, and derives subfeature planning views from `<subfeature_path>/.subfeature-meta.json`, including explicit approval and ready-slice handoff for reviewed subfeatures
+- `sirius manage-proposals` reads the active scope's `.skills/planning.json` field `proposal_dir` when present and otherwise defaults to `docs/proposals/<proposal-slug>/`
+- `sirius manage-planning` reads the active scope's `.skills/planning.json` for `planning_dir`, maintains feature readiness metadata under `<feature_path>/.planning-meta.json`, and derives subfeature planning views from `<subfeature_path>/.subfeature-meta.json`, including explicit approval and ready-slice handoff for reviewed subfeatures
 - `skills/design/SKILL.md` reads `.skills/planning.json` field `design_diagram_mode`; `embedded` keeps fenced PlantUML in `system-design.md`, while `linked_svg` writes `.puml` and `.svg` files under `<feature_path>/figures/`, links the SVGs from `system-design.md`, and keeps those SVGs on an explicit white canvas
-- `skills/breakdown/scripts/scaffold_breakdown.py` uses `.skills/planning.json` field `planning_dir` during scaffolding when the file is present
-- `skills/slice/scripts/bootstrap_slice.py` resolves the nearest execution scope, reuses inherited scoped execution config when present, and only initializes `.skills/execution.json` locally when no execution config exists in the scope chain
-- `skills/guide-execution/scripts/manage_execution.py` resolves `.skills/execution.json`, `.skills/conventions.json`, and `slice_dir` from the active execution scope so nested scopes keep local slice registries and folders
-- when `auto_start_implementation` is `true`, `skills/guide-execution/scripts/manage_execution.py set-status <slice> blueprint_ready` auto-advances the slice into `execution_ready`
+- `sirius scaffold-breakdown` uses `.skills/planning.json` field `planning_dir` during scaffolding when the file is present
+- `sirius bootstrap-slice` resolves the nearest execution scope, reuses inherited scoped execution config when present, and only initializes `.skills/execution.json` locally when no execution config exists in the scope chain
+- `sirius manage-execution` resolves `.skills/execution.json`, `.skills/conventions.json`, and `slice_dir` from the active execution scope so nested scopes keep local slice registries and folders
+- when `auto_start_implementation` is `true`, `sirius manage-execution set-status <slice> blueprint_ready` auto-advances the slice into `execution_ready`
 - `skills/ship/SKILL.md` documents `.skills/execution.json` fields under `accelerators.ship`, including `delegate_to_ship_slice` and `preflight.mode`
 - `skills/ship-slice/SKILL.md` documents `.skills/execution.json` fields under `accelerators.ship_slice`, including `execute_owner_chain`, `stop_on_owner`, `continuation_policy`, `auto_format`, `format_command`, `auto_close`, and `auto_commit`
-- `skills/guide-execution/scripts/manage_execution.py` uses `branch_extract_pattern` during `add` when the file is present
+- `sirius manage-execution` uses `branch_extract_pattern` during `add` when the file is present
 - `skills/commit/SKILL.md` documents how `commit_format` can override the generic default
 - `skills/create-pr/SKILL.md` documents how `pr_title_format`, `branch_extract_pattern`, and `id_pattern` can define stricter PR conventions
 

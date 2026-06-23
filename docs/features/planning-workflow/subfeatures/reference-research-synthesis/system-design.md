@@ -228,7 +228,7 @@ than a readiness boundary with its own approval semantics.
   `research` versus direct `discover` or `design`.
 - Review `discover`, `design`, `review-planning`, and `SKILLS_METHODOLOGY.md`
   so they consume the local research artifact consistently.
-- Run `python3 skills/guide-planning/scripts/manage_planning.py sync-status \
+- Run `sirius manage-planning sync-status \
   docs/features/planning-workflow/subfeatures/reference-research-synthesis \
   --through design_ready` after the design artifact is written.
 

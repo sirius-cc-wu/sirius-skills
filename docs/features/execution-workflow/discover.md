@@ -36,10 +36,10 @@ The repository provides a slice-scoped execution workflow, but that workflow spa
 
 ## Confirmed Signals in Repo
 
-- `skills/guide-execution/scripts/manage_execution.py` manages registry, status updates, and relations.
+- `sirius manage-execution` manages registry, status updates, and relations.
 - `skills/brief/templates/brief-template.md` defines the slice brief structure.
 - `skills/blueprint/templates/plan-template.md` defines implementation packets and validation mapping.
-- `skills/close-slice/scripts/close_slice.py` closes slices and records durable closure metadata.
+- `sirius close-slice` closes slices and records durable closure metadata.
 - `skills/commit/` and `skills/create-pr/` enforce conventions and checklist completion around execution work.
 
 ## Success Criteria

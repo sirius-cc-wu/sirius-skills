@@ -35,14 +35,14 @@ reusable metrics that can later support:
 - `skills/report-artifacts/SKILL.md`
 - `skills/archive-artifacts/SKILL.md`
 - `skills/close-slice/SKILL.md`
-- `skills/guide-planning/scripts/manage_planning.py`
-- `skills/add-subfeature/scripts/manage_subfeatures.py`
-- `skills/guide-execution/scripts/manage_execution.py`
+- `sirius manage-planning`
+- `sirius manage-subfeatures`
+- `sirius manage-execution`
 
 ## New artifacts likely required
 
 - `skills/measure-artifacts/SKILL.md`
-- `skills/measure-artifacts/scripts/measure_artifacts.py`
+- `sirius measure-artifacts`
 - shared metric-reading helpers that can consume feature, subfeature, and slice
   metadata consistently
 - tests covering metric derivation and cross-artifact integration

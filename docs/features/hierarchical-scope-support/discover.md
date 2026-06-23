@@ -104,10 +104,10 @@ first-class way to resolve and operate within the correct planning scope.
 
 - `.skills/planning.json` currently defines one repo-root `planning_dir` and
   `proposal_dir`.
-- `skills/guide-planning/scripts/manage_planning.py` assumes one resolved
+- `sirius manage-planning` assumes one resolved
   planning area and promotes proposals into canonical feature folders within
   that area.
-- `skills/propose/scripts/manage_proposals.py` keeps proposal registries local
+- `sirius manage-proposals` keeps proposal registries local
   to the configured `proposal_dir`.
 - Repository guidance in `AGENTS.md` and top-level docs emphasizes
   configuration-first behavior, durable repository artifacts, and clear

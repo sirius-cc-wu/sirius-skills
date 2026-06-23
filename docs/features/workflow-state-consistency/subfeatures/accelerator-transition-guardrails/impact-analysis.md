@@ -8,9 +8,9 @@ durable subfeature packet.
 ## Affected Areas
 
 - `lib/workflow_runtime/accelerator_guardrails.py`
-- `skills/autoplan/scripts/autoplan.py`
-- `skills/ship/scripts/ship.py`
-- `skills/ship-slice/scripts/ship_slice.py`
+- `sirius autoplan`
+- `sirius ship`
+- `sirius ship-slice`
 
 ## Impact
 

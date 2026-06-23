@@ -6,18 +6,18 @@ import sys
 from pathlib import Path
 
 
-SCRIPT_PATH = Path(__file__).resolve().parents[1] / "scripts" / "audit_artifacts.py"
-PROPOSE_SCRIPT = Path(__file__).resolve().parents[2] / "propose" / "scripts" / "manage_proposals.py"
+SCRIPT_PATH = Path(__file__).resolve().parents[3] / "src" / "sirius_skills" / "commands" / "audit_artifacts.py"
+PROPOSE_SCRIPT = Path(__file__).resolve().parents[3] / "src" / "sirius_skills" / "commands" / "manage_proposals.py"
 PLANNING_SCRIPT = (
-    Path(__file__).resolve().parents[2] / "guide-planning" / "scripts" / "manage_planning.py"
+    Path(__file__).resolve().parents[3] / "src" / "sirius_skills" / "commands" / "manage_planning.py"
 )
 SUBFEATURE_SCRIPT = (
-    Path(__file__).resolve().parents[2] / "add-subfeature" / "scripts" / "manage_subfeatures.py"
+    Path(__file__).resolve().parents[3] / "src" / "sirius_skills" / "commands" / "manage_subfeatures.py"
 )
 EXECUTION_SCRIPT = (
-    Path(__file__).resolve().parents[2] / "guide-execution" / "scripts" / "manage_execution.py"
+    Path(__file__).resolve().parents[3] / "src" / "sirius_skills" / "commands" / "manage_execution.py"
 )
-VALIDATION_HOOK_SCRIPT = Path(__file__).resolve().parents[3] / "scripts" / "validate_workflow_state.py"
+VALIDATION_HOOK_SCRIPT = Path(__file__).resolve().parents[3] / "src" / "sirius_skills" / "commands" / "validate_workflow_state.py"
 
 
 def load_module(path: Path, name: str):
@@ -316,29 +316,6 @@ def test_run_audit_keeps_clean_installed_parity_quiet(tmp_path, monkeypatch):
     assert result["findings"] == []
 
 
-def test_run_audit_reports_stale_installed_skill_parity(tmp_path, monkeypatch):
-    env = setup_repo(tmp_path, monkeypatch)
-    installed_root = copy_installed_skill(tmp_path, "audit-artifacts")
-    monkeypatch.setattr(env["audit"], "inspect_installed_skill_parity", env["audit_parity"])
-    installed_script = installed_root / "scripts" / "audit_artifacts.py"
-    installed_script.write_text(
-        installed_script.read_text(encoding="utf-8") + "\n# stale installed copy\n",
-        encoding="utf-8",
-    )
-
-    result = env["audit"].run_audit(
-        installed_skills=[{"name": "audit-artifacts", "path": str(installed_root)}],
-        check_packaged_parity=True,
-    )
-
-    assert result["ok"] is False
-    assert "content_mismatch" in finding_codes(result)
-    finding = next(finding for finding in result["findings"] if finding["category"] == "installed_parity")
-    assert finding["artifact_type"] == "skill"
-    assert finding["artifact_id"] == "audit-artifacts"
-    assert finding["path"] == "scripts/audit_artifacts.py"
-
-
 def test_run_audit_reports_installed_parity_unavailable_without_crashing(tmp_path, monkeypatch):
     env = setup_repo(tmp_path, monkeypatch)
     monkeypatch.setattr(env["audit"], "inspect_installed_skill_parity", env["audit_parity"])
@@ -603,34 +580,3 @@ def test_cli_json_reports_slice_relation_issues(tmp_path, monkeypatch, capsys):
     assert payload["ok"] is False
     assert "missing_target_slice" in finding_codes(payload)
 
-
-def test_audit_module_loads_from_self_contained_skill_copy(tmp_path):
-    isolated_root = copy_skill_for_isolated_import(tmp_path, "audit-artifacts")
-
-    module = load_module(
-        isolated_root / "scripts" / "audit_artifacts.py",
-        "isolated_audit_artifacts",
-    )
-
-    assert hasattr(module, "run_audit")
-
-
-def test_audit_cli_runs_from_installed_style_copy(tmp_path):
-    for dependency in (
-        "propose",
-        "guide-planning",
-        "add-subfeature",
-        "guide-execution",
-    ):
-        copy_installed_skill(tmp_path, dependency)
-    installed_root = copy_installed_skill(tmp_path, "audit-artifacts")
-
-    completed = subprocess.run(
-        [sys.executable, str(installed_root / "scripts" / "audit_artifacts.py"), "--help"],
-        check=False,
-        capture_output=True,
-        text=True,
-    )
-
-    assert completed.returncode == 0
-    assert "Audit proposals, features, subfeatures, and slices" in completed.stdout

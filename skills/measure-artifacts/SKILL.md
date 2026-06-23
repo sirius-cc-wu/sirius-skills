@@ -25,10 +25,10 @@ completed feature or subfeature.
 ## Tooling
 
 ```bash
-python3 skills/measure-artifacts/scripts/measure_artifacts.py <target>
-python3 skills/measure-artifacts/scripts/measure_artifacts.py <target> --json
-python3 skills/measure-artifacts/scripts/measure_artifacts.py <target> --write
-python3 skills/measure-artifacts/scripts/measure_artifacts.py <target> --scope apps/payments
+sirius measure-artifacts <target>
+sirius measure-artifacts <target> --json
+sirius measure-artifacts <target> --write
+sirius measure-artifacts <target> --scope apps/payments
 ```
 
 ## Output

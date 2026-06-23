@@ -7,7 +7,7 @@ planning acceleration from execution acceleration.
 
 ## Affected Areas
 
-- `skills/ship/scripts/ship.py`
+- `sirius ship`
 - `skills/ship/tests/test_ship.py`
 - `docs/wiki/concepts/two-step-autonomy-roadmap.md`
 - `README.md`

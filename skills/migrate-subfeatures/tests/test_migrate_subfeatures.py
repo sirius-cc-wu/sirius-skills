@@ -4,12 +4,9 @@ import sys
 from pathlib import Path
 
 
-SCRIPT_PATH = Path(__file__).resolve().parents[1] / "scripts" / "migrate_subfeatures.py"
+SCRIPT_PATH = Path(__file__).resolve().parents[3] / "src" / "sirius_skills" / "commands" / "migrate_subfeatures.py"
 PLANNING_SCRIPT = (
-    Path(__file__).resolve().parents[2]
-    / "guide-planning"
-    / "scripts"
-    / "manage_planning.py"
+    Path(__file__).resolve().parents[3] / "src" / "sirius_skills" / "commands" / "manage_planning.py"
 )
 
 

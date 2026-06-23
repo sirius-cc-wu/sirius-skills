@@ -38,14 +38,14 @@
 
 | Slice ID | Story ID | Title | Summary | Target Area | Lane | Validation | Planned Action | Depends On | Slice Ready |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| ew-bootstrap | EW-01 | Bootstrap execution registry and slices | Manage config, slice registry, metadata, and slice creation. | `skills/guide-execution/scripts/manage_execution.py` | primary | `pytest -q skills/guide-execution/tests/test_manage_execution.py` | create slice |  | yes |
+| ew-bootstrap | EW-01 | Bootstrap execution registry and slices | Manage config, slice registry, metadata, and slice creation. | `sirius manage-execution` | primary | `pytest -q skills/guide-execution/tests/test_manage_execution.py` | create slice |  | yes |
 | ew-brief | EW-02 | Author slice brief structure | Maintain `brief.md` structure, acceptance framing, and requirement sections. | `skills/brief/SKILL.md`, `skills/brief/templates/brief-template.md` | primary | Review generated brief against skill rules | create slice | ew-bootstrap | yes |
 | ew-checklist | EW-02 | Enforce requirement checklist readiness | Keep requirements checklist aligned with brief readiness gates. | `skills/brief/SKILL.md`, `manage_execution.py` | primary | `pytest -q skills/guide-execution/tests/test_manage_execution.py` | create slice | ew-brief | yes |
 | ew-plan | EW-03 | Generate execution plan packets | Maintain `blueprint.md` structure with gates, packets, and traceability. | `skills/blueprint/SKILL.md`, `skills/blueprint/templates/plan-template.md` | primary | Review plan completeness and traceability | create slice | ew-checklist | yes |
-| ew-gates | EW-03 | Enforce plan readiness transitions | Validate plan presence and readiness state progression. | `skills/guide-execution/scripts/manage_execution.py` | primary | `pytest -q skills/guide-execution/tests/test_manage_execution.py` | create slice | ew-plan | yes |
+| ew-gates | EW-03 | Enforce plan readiness transitions | Validate plan presence and readiness state progression. | `sirius manage-execution` | primary | `pytest -q skills/guide-execution/tests/test_manage_execution.py` | create slice | ew-plan | yes |
 | ew-review | EW-04 | Review implementation against execution artifacts | Keep review guidance aligned with brief-to-implementation comparisons. | `skills/review-execution/SKILL.md` | primary | Review workflow docs for consistent review boundary | create slice | ew-gates | yes |
-| ew-relations | EW-04 | Record durable slice relations | Maintain relation types, scoping, and reciprocal integrity. | `skills/guide-execution/scripts/manage_execution.py` | primary | `pytest -q skills/guide-execution/tests/test_manage_execution.py` | create slice | ew-review | yes |
-| ew-close | EW-04 | Close slices with durable metadata | Record closure metadata and relation-safe completion output. | `skills/close-slice/scripts/close_slice.py` | primary | `pytest -q skills/close-slice/tests/test_close_slice.py` | create slice | ew-relations | yes |
+| ew-relations | EW-04 | Record durable slice relations | Maintain relation types, scoping, and reciprocal integrity. | `sirius manage-execution` | primary | `pytest -q skills/guide-execution/tests/test_manage_execution.py` | create slice | ew-review | yes |
+| ew-close | EW-04 | Close slices with durable metadata | Record closure metadata and relation-safe completion output. | `sirius close-slice` | primary | `pytest -q skills/close-slice/tests/test_close_slice.py` | create slice | ew-relations | yes |
 
 ## 5. Dependency Notes
 

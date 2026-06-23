@@ -133,8 +133,8 @@ Roadmap link:
 - `docs/features/throughput-acceleration-workflow/system-design.md`
 - `docs/features/throughput-acceleration-workflow/.planning-meta.json`
 - `skills/ship/SKILL.md`
-- `skills/ship/scripts/ship.py`
+- `sirius ship`
 - `skills/ship-slice/SKILL.md`
-- `skills/ship-slice/scripts/ship_slice.py`
+- `sirius ship-slice`
 - `gstack/ship/SKILL.md` (sibling local reference clone)
 - `andyosmali-agent-skills/README.md` (sibling local reference clone)

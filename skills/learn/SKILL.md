@@ -18,11 +18,11 @@ workflow learnings stored in the shared accelerator runtime.
 ## Tooling
 
 ```bash
-python3 skills/learn/scripts/learn.py query throughput-acceleration-workflow
-python3 skills/learn/scripts/learn.py query throughput-acceleration-workflow --state active --skill ship --json
-python3 skills/learn/scripts/learn.py promote L001
-python3 skills/learn/scripts/learn.py prune L001
-python3 skills/learn/scripts/learn.py export throughput-acceleration-workflow --state active
+sirius learn query throughput-acceleration-workflow
+sirius learn query throughput-acceleration-workflow --state active --skill ship --json
+sirius learn promote L001
+sirius learn prune L001
+sirius learn export throughput-acceleration-workflow --state active
 ```
 
 ## Guardrails

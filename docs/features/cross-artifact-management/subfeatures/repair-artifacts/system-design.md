@@ -50,9 +50,9 @@ It does not rewrite malformed metadata or freeform planning content.
 ## 4. CLI contract
 
 ```bash
-python3 skills/repair-artifacts/scripts/repair_artifacts.py
-python3 skills/repair-artifacts/scripts/repair_artifacts.py --artifact-type proposal --artifact-type slice
-python3 skills/repair-artifacts/scripts/repair_artifacts.py --apply --json
+sirius repair-artifacts
+sirius repair-artifacts --artifact-type proposal --artifact-type slice
+sirius repair-artifacts --apply --json
 ```
 
 ## 5. Validation strategy

@@ -30,7 +30,7 @@
 
 | Slice ID | Story ID | Title | Summary | Target Area | Lane | Validation | Planned Action | Depends On | Slice Ready |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| tat-trace-artifact-lineage | CAM-02 | Build the cross-artifact trace command | Add a lineage graph helper, parse planning traceability docs, expose targeted and summary trace output, and ship the `trace-artifacts` skill with tests and docs. | `skills/trace-artifacts/`, `skills/audit-artifacts/scripts/artifact_inventory.py`, planning traceability parsing | primary | `pytest -q skills/trace-artifacts/tests/test_trace_artifacts.py` and `pytest -q` | create slice |  | yes |
+| tat-trace-artifact-lineage | CAM-02 | Build the cross-artifact trace command | Add a lineage graph helper, parse planning traceability docs, expose targeted and summary trace output, and ship the `trace-artifacts` skill with tests and docs. | `skills/trace-artifacts/`, `sirius_skills.commands.artifact_inventory`, planning traceability parsing | primary | `pytest -q skills/trace-artifacts/tests/test_trace_artifacts.py` and `pytest -q` | create slice |  | yes |
 
 ## 5. Dependency Notes
 

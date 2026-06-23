@@ -57,10 +57,10 @@ Resolve `<feature_path>` as either:
 
 ```bash
 # Scaffold a starter system-design.md for a feature or subfeature
-python3 skills/design/scripts/scaffold_design.py "<feature-selector-or-path>"
+sirius scaffold-design "<feature-selector-or-path>"
 
 # Overwrite an existing scaffold deliberately
-python3 skills/design/scripts/scaffold_design.py "<feature-selector-or-path>" --force
+sirius scaffold-design "<feature-selector-or-path>" --force
 ```
 
 ## Design Rules
@@ -104,10 +104,10 @@ python3 skills/design/scripts/scaffold_design.py "<feature-selector-or-path>" --
    - planned design for work that is not yet implemented
    - current-state design for documenting existing implemented behavior
 5. Write `system-design.md` using the structure in `references/system-design-template.md`, adding the behavioral guidance from `references/behavioral-systems.md` and `references/config-surface-governance.md` when applicable.
-   When the packet has no `system-design.md` yet, you may scaffold the file first with `python3 skills/design/scripts/scaffold_design.py <feature-selector-or-path>` and then replace the placeholders with the real design.
+   When the packet has no `system-design.md` yet, you may scaffold the file first with `sirius scaffold-design <feature-selector-or-path>` and then replace the placeholders with the real design.
 6. Add at least one PlantUML system-design diagram or linked SVG figure, depending on configuration.
 7. Refine story boundaries when the design changes implementation shape.
-8. Run `python3 skills/guide-planning/scripts/manage_planning.py sync-status <feature-selector> --through design_ready`. If UI flow is required and `ui-design.md` is still missing, treat the blocked transition as a signal to hand off to `ui-flow` before claiming design readiness.
+8. Run `sirius manage-planning sync-status <feature-selector> --through design_ready`. If UI flow is required and `ui-design.md` is still missing, treat the blocked transition as a signal to hand off to `ui-flow` before claiming design readiness.
 9. Stop when the work is concrete enough for `breakdown`.
 
 ## Guardrails

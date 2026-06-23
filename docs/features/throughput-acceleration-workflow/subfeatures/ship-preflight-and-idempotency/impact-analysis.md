@@ -44,10 +44,10 @@ Add ship idempotency contracts and optional preflight freshness checks for the t
 
 - `.skills/execution.json`
 - `skills/ship/SKILL.md`
-- `skills/ship/scripts/ship.py`
+- `sirius ship`
 - `skills/ship/tests/test_ship.py`
 - `skills/ship-slice/SKILL.md`
-- `skills/ship-slice/scripts/ship_slice.py`
+- `sirius ship-slice`
 - `skills/ship-slice/tests/test_ship_slice.py`
 
 ## Inherited Constraints

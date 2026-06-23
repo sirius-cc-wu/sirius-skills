@@ -6,10 +6,7 @@ from pathlib import Path
 
 
 GUARDRAILS_MODULE = (
-    Path(__file__).resolve().parents[3]
-    / "lib"
-    / "workflow_runtime"
-    / "accelerator_guardrails.py"
+    Path(__file__).resolve().parents[3] / "src" / "sirius_skills" / "lib" / "workflow_runtime" / "accelerator_guardrails.py"
 )
 
 

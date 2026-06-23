@@ -86,7 +86,7 @@ packaged path remains opt-in.
 
 #### 3. Shared runtime sync stays only where copied artifacts still exist
 
-`scripts/sync_shared_skill_runtime.py` is still valid for packaged standalone
+the centralized packaged runtime is still valid for packaged standalone
 maintenance skills, but it should no longer be part of the source-linked local
 path. Source-linked local installs should resolve canonical repo runtime code
 without copying it into installed skill folders first.
@@ -111,7 +111,7 @@ the runtime is source-linked by symlink.
   - creates and refreshes per-skill symlinks under the selected skill home
   - removes managed symlinks on uninstall
 - **existing packaged install helper flow**
-  - retains `npx skills add/remove` and shared-runtime sync
+  - retains `npx skills add/remove` and centralized packaged runtime
 - **managed skill directories under `skills/`**
   - remain the canonical source for local use
 - **`lib/workflow_state/`**
@@ -221,7 +221,7 @@ needs a compatibility phase.
 
 - Add helper tests for local symlink creation and cleanup behavior.
 - Verify local install/uninstall leaves unrelated skills untouched.
-- Keep packaged install tests for shared-runtime sync and self-contained runtime
+- Keep packaged install tests for centralized packaged runtime and self-contained runtime
   imports.
 - Update report/audit validation so packaged parity remains testable without
   treating it as the local default path.

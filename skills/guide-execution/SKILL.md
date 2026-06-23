@@ -48,7 +48,7 @@ Do not duplicate day-to-day implementation states like `implementing` or `blocke
 ## Preflight
 
 1. Resolve `.skills/execution.json` and the configured slice registry.
-2. Resolve the active slice using `scripts/manage_execution.py get-active` or a user-provided ID/path. Do not refer to a `resolve-active` command because the execution tool exposes `get-active`.
+2. Resolve the active slice using `sirius manage-execution get-active` or a user-provided ID/path. Do not refer to a `resolve-active` command because the execution tool exposes `get-active`.
 3. Confirm the slice path represents one execution-ready work item.
 4. Check `brief.md`, `blueprint.md`, optional legacy `slices.md`, and `.slice-meta.json` as appropriate for the current state.
 5. Check whether `auto_start_implementation` is enabled so the blueprint handoff behavior matches repository config.
@@ -56,4 +56,4 @@ Do not duplicate day-to-day implementation states like `implementing` or `blocke
 
 ## Tooling
 
-Always use `scripts/manage_execution.py` in this skill directory for initialization, active-slice resolution, status updates, validation, registry synchronization, and relation management. Use `get-active` when you need the current active slice from the CLI.
+Always use `sirius manage-execution` for initialization, active-slice resolution, status updates, validation, registry synchronization, and relation management. Use `get-active` when you need the current active slice from the CLI.

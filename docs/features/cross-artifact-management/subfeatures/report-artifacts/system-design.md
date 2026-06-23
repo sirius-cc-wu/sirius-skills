@@ -68,10 +68,10 @@ JSON stay consistent.
 ## 4. CLI contract
 
 ```bash
-python3 skills/report-artifacts/scripts/report_artifacts.py
-python3 skills/report-artifacts/scripts/report_artifacts.py --group-by status
-python3 skills/report-artifacts/scripts/report_artifacts.py --group-by parent --artifact-type subfeature
-python3 skills/report-artifacts/scripts/report_artifacts.py --stale-days 21 --json
+sirius report-artifacts
+sirius report-artifacts --group-by status
+sirius report-artifacts --group-by parent --artifact-type subfeature
+sirius report-artifacts --stale-days 21 --json
 ```
 
 ## 5. Validation strategy
