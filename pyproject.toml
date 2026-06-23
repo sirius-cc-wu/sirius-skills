@@ -5,12 +5,12 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "sirius-skills"
 version = "0.1.0"
-description = "CLI helpers for the sirius-skills workflow collection."
+description = "CLI helpers for the sirius workflow collection."
 readme = "README.md"
 requires-python = ">=3.11"
 
 [project.scripts]
-sirius-skills = "sirius_skills.cli:main"
+sirius = "sirius_skills.cli:main"
 
 [tool.setuptools]
 packages = [

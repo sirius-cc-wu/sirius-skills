@@ -13,6 +13,9 @@ from typing import Iterable, Sequence
 from sirius_skills.paths import package_root
 
 
+CLI_NAME = "sirius"
+
+
 @dataclass(frozen=True)
 class CommandSpec:
     name: str
@@ -205,8 +208,8 @@ def build_parser(commands: dict[str, CommandSpec]) -> argparse.ArgumentParser:
         f"  {name:<30} {spec.description}" for name, spec in commands.items()
     )
     parser = argparse.ArgumentParser(
-        prog="sirius-skills",
-        description="Run sirius-skills workflow helper commands.",
+        prog=CLI_NAME,
+        description="Run sirius workflow helper commands.",
         epilog=f"Available commands:\n{command_list}" if command_list else None,
         formatter_class=argparse.RawDescriptionHelpFormatter,
     )
@@ -299,7 +302,7 @@ def main(argv: Sequence[str] | None = None) -> int:
     spec = commands.get(command)
     if spec is None:
         parser.error(
-            f"unknown command '{command}'. Run 'sirius-skills --help' to list commands."
+            f"unknown command '{command}'. Run '{CLI_NAME} --help' to list commands."
         )
 
     return run_command(spec, script_args)

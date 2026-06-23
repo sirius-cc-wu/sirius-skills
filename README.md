@@ -5,11 +5,11 @@
 ## Python CLI
 
 The repository can also be installed as a Python package that provides a single
-`sirius-skills` command:
+`sirius` command:
 
 ```bash
 python3 -m pip install -e .
-sirius-skills --help
+sirius --help
 ```
 
 The CLI discovers runnable Python helpers under `scripts/` and
@@ -17,10 +17,10 @@ The CLI discovers runnable Python helpers under `scripts/` and
 script paths available for compatibility. For example:
 
 ```bash
-sirius-skills autoplan <target> --execute-owner-chain --json
-sirius-skills manage-planning <args>
-sirius-skills validate-workflow-state
-sirius-skills sync-shared-runtime
+sirius autoplan <target> --execute-owner-chain --json
+sirius manage-planning <args>
+sirius validate-workflow-state
+sirius sync-shared-runtime
 ```
 
 ## Installing skills

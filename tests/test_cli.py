@@ -104,9 +104,21 @@ def test_help_lists_commands(capsys) -> None:
 
     captured = capsys.readouterr()
     assert exc_info.value.code == 0
+    assert "usage: sirius" in captured.out
     assert "Available commands:" in captured.out
     assert "autoplan" in captured.out
     assert "manage-planning" in captured.out
+
+
+def test_cli_name_and_unknown_command_message(capsys) -> None:
+    assert cli.CLI_NAME == "sirius"
+
+    with pytest.raises(SystemExit) as exc_info:
+        cli.main(["nope"])
+
+    captured = capsys.readouterr()
+    assert exc_info.value.code == 2
+    assert "Run 'sirius --help' to list commands." in captured.err
 
 
 def test_run_command_passes_arguments_and_restores_argv(tmp_path: Path) -> None:
