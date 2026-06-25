@@ -1,6 +1,12 @@
 {
   "proposals": [
     {
+      "proposal": "data-access-layer-consolidation",
+      "status": "draft",
+      "updated_at": "2026-06-25T10:49:15",
+      "path": "docs/proposals/data-access-layer-consolidation/"
+    },
+    {
       "proposal": "hierarchical-scope-support",
       "status": "promoted",
       "updated_at": "2026-04-04T02:18:05",
