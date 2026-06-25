@@ -15,6 +15,8 @@ DEFAULT_PROPOSAL_DIR = "docs/proposals"
 CONFIG_DIR = ".skills"
 CONFIG_FILE = os.path.join(CONFIG_DIR, "planning.json")
 SCOPE_RUNTIME_PATH = Path(__file__).resolve().parent / "scope_runtime.py"
+
+from sirius_skills.lib.workflow_state import proposal_repository  # noqa: E402
 REGISTRY_JSON_FILE = "registry.json"
 REGISTRY_HEADER = (
     "# Proposal Registry\n\n"
@@ -177,17 +179,9 @@ def get_registry_paths(
 
 
 def ensure_registry(proposal_dir: str) -> None:
-    normalized_proposal_dir = normalize_dir(proposal_dir, "Proposal directory")
-    index_file = os.path.join(normalized_proposal_dir, "README.md")
-    registry_json_file = os.path.join(normalized_proposal_dir, REGISTRY_JSON_FILE)
-    os.makedirs(normalized_proposal_dir, exist_ok=True)
-    if not os.path.exists(index_file):
-        with open(index_file, "w", encoding="utf-8") as f:
-            f.write(REGISTRY_HEADER)
-    if not os.path.exists(registry_json_file):
-        with open(registry_json_file, "w", encoding="utf-8") as f:
-            json.dump({"proposals": []}, f, indent=2)
-            f.write("\n")
+    proposal_repository.ensure_registry(
+        Path(normalize_dir(proposal_dir, "Proposal directory"))
+    )
 
 
 def normalize_registry_row(row: Dict[str, object]) -> Dict[str, object]:
@@ -211,23 +205,7 @@ def load_registry(scope_context: Optional[object] = None) -> List[Dict[str, obje
         required_config=False, scope_context=scope_context
     )
     ensure_registry(proposal_dir)
-    try:
-        with open(registry_json_file, "r", encoding="utf-8") as f:
-            payload = json.load(f)
-    except json.JSONDecodeError as exc:
-        raise RuntimeError("Proposal registry JSON is not valid JSON.") from exc
-
-    if isinstance(payload, list):
-        raw_rows = payload
-    elif isinstance(payload, dict):
-        raw_rows = payload.get("proposals")
-    else:
-        raise RuntimeError("Proposal registry JSON must be a JSON object or list.")
-
-    if raw_rows is None:
-        raw_rows = []
-    if not isinstance(raw_rows, list):
-        raise RuntimeError("Proposal registry field 'proposals' must be a list.")
+    raw_rows = proposal_repository.read_registry_json(Path(registry_json_file))
     return [normalize_registry_row(row) for row in raw_rows]
 
 
@@ -246,9 +224,7 @@ def write_registry(rows: List[Dict[str, object]], scope_context: Optional[object
                 f"| {row['proposal']} | {row['status']} | {updated} | {row['path']} |\n"
             )
 
-    with open(registry_json_file, "w", encoding="utf-8") as f:
-        json.dump({"proposals": sorted_rows}, f, indent=2)
-        f.write("\n")
+    proposal_repository.write_registry_json(Path(registry_json_file), sorted_rows)
 
 
 def get_proposal_root(
@@ -323,22 +299,11 @@ def normalize_metadata(payload: object) -> Dict[str, object]:
 
 
 def read_metadata(proposal_dir: str) -> Dict[str, object]:
-    path = metadata_path_for(proposal_dir)
-    if not os.path.exists(path):
-        raise RuntimeError(f"Proposal metadata not found at '{path}'.")
-    try:
-        with open(path, "r", encoding="utf-8") as f:
-            payload = json.load(f)
-    except json.JSONDecodeError as exc:
-        raise RuntimeError("Proposal metadata is not valid JSON.") from exc
-    return normalize_metadata(payload)
+    return normalize_metadata(proposal_repository.read_metadata_raw(Path(proposal_dir)))
 
 
 def write_metadata(proposal_dir: str, metadata: Dict[str, object]) -> None:
-    os.makedirs(proposal_dir, exist_ok=True)
-    with open(metadata_path_for(proposal_dir), "w", encoding="utf-8") as f:
-        json.dump(metadata, f, indent=2)
-        f.write("\n")
+    proposal_repository.write_metadata_raw(Path(proposal_dir), metadata)
 
 
 def proposal_dir_for_row(

@@ -22,7 +22,7 @@ Use this file to map repo story IDs to execution slices without moving story own
 | Story ID | Story Size | Story Summary | Increments | Planned Slice IDs | Slice Areas | Blocked By | Execution Slice IDs | Notes |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- |
 | DALC-01 | M | Markdown file repository | I3 | dalc-repo-markdown | Library | dalc-repo-metadata |  | Consolidates markdown reads/writes |
-| DALC-02 | M | Schema-validated metadata | I2 | dalc-repo-metadata | Library | dalc-foundation-guardrail |  | Enforces metadata schemas in repos |
+| DALC-02 | M | Schema-validated metadata | I2 | dalc-repo-metadata | Library | dalc-foundation-guardrail | dalc-repo-metadata | Enforces metadata schemas in repos |
 | DALC-03 | M | Relocate scope_runtime & thin commands | I1 | dalc-foundation-storage | Library |  | dalc-foundation-storage | Move scope_runtime and setup storage/models |
 | DALC-03 | M | Relocate scope_runtime & thin commands | I2 | dalc-repo-metadata | Commands, Library | dalc-foundation-guardrail |  | Thin command metadata writes |
 | DALC-03 | M | Relocate scope_runtime & thin commands | I3 | dalc-repo-markdown | Commands, Library | dalc-repo-metadata |  | Thin command markdown writes |

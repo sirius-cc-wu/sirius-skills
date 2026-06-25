@@ -1,0 +1,10 @@
+{
+  "created_at": "2026-06-25T15:49:09",
+  "updated_at": "2026-06-25T16:06:22",
+  "status": "closed",
+  "slice_id": "dalc-repo-metadata",
+  "feature": "Implement Registry and Metadata Repositories",
+  "path": "slices/dalc-repo-metadata-implement-registry-and-metadata-repositories/",
+  "relations": [],
+  "closed_at": "2026-06-25T16:06:22"
+}

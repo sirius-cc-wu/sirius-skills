@@ -15,6 +15,7 @@ from typing import Dict, List, Optional, Tuple
 SCRIPT_DIR = Path(__file__).resolve().parent
 
 from sirius_skills.lib.workflow_state import evaluate_slice_transition, format_transition_message  # noqa: E402
+from sirius_skills.lib.workflow_state import execution_repository  # noqa: E402
 
 DEFAULT_SLICES_DIR = "slices"
 DEFAULT_ARCHIVE_DIRNAME = ".archived"
@@ -504,22 +505,7 @@ def parse_registry_markdown(index_file: str) -> List[Dict[str, object]]:
 
 
 def load_registry_json(registry_json_file: str) -> List[Dict[str, object]]:
-    try:
-        with open(registry_json_file, "r", encoding="utf-8") as f:
-            payload = json.load(f)
-    except json.JSONDecodeError as exc:
-        raise RuntimeError("Slice registry JSON is not valid JSON.") from exc
-
-    if isinstance(payload, list):
-        raw_rows = payload
-    elif isinstance(payload, dict):
-        raw_rows = payload.get("slices")
-    else:
-        raise RuntimeError("Slice registry JSON must be a JSON object or list.")
-
-    if not isinstance(raw_rows, list):
-        raise RuntimeError("Specs registry JSON field 'slices' must be a list.")
-
+    raw_rows = execution_repository.read_registry_json(Path(registry_json_file))
     return [normalize_registry_row(row) for row in raw_rows]
 
 
@@ -544,17 +530,9 @@ def write_registry_markdown(index_file: str, rows: List[Dict[str, object]]) -> N
 
 
 def write_registry_json(registry_json_file: str, rows: List[Dict[str, object]]) -> None:
-    with open(registry_json_file, "w", encoding="utf-8") as f:
-        json.dump(
-            {
-                "version": 1,
-                "generated_at": now_timestamp(),
-                "slices": rows,
-            },
-            f,
-            indent=2,
-        )
-        f.write("\n")
+    execution_repository.write_registry_json(
+        Path(registry_json_file), rows, generated_at=now_timestamp()
+    )
 
 
 def ensure_registry(specs_dir: str) -> None:
@@ -599,28 +577,14 @@ def get_slice_metadata_path(slice_path: str) -> str:
 
 
 def load_slice_metadata(slice_path: str) -> Dict[str, object]:
-    metadata_path = get_slice_metadata_path(slice_path)
-    if not os.path.exists(metadata_path):
-        return {}
-
-    try:
-        with open(metadata_path, "r", encoding="utf-8") as f:
-            metadata = json.load(f)
-    except json.JSONDecodeError as exc:
-        raise RuntimeError(f"Slice metadata is not valid JSON: {metadata_path}") from exc
-
-    if not isinstance(metadata, dict):
-        raise RuntimeError(f"Slice metadata must be a JSON object: {metadata_path}")
+    metadata = execution_repository.read_slice_metadata_raw(Path(slice_path))
     if "relations" in metadata:
         metadata["relations"] = normalize_relations(metadata.get("relations"))
     return metadata
 
 
 def write_slice_metadata(slice_path: str, metadata: Dict[str, object]) -> None:
-    metadata_path = get_slice_metadata_path(slice_path)
-    with open(metadata_path, "w", encoding="utf-8") as f:
-        json.dump(metadata, f, indent=2)
-        f.write("\n")
+    execution_repository.write_slice_metadata_raw(Path(slice_path), metadata)
 
 
 def build_slice_metadata(

@@ -1,6 +1,5 @@
 {
   "version": 1,
-  "generated_at": "2026-06-25T15:48:33",
   "slices": [
     {
       "id": "hss-root-fallback",
@@ -511,6 +510,17 @@
       "closed_at": "2026-06-25T15:48:33",
       "archived_at": null,
       "relations": []
+    },
+    {
+      "id": "dalc-repo-metadata",
+      "feature": "Implement Registry and Metadata Repositories",
+      "status": "closed",
+      "path": "slices/dalc-repo-metadata-implement-registry-and-metadata-repositories/",
+      "updated_at": "2026-06-25T16:06:22",
+      "closed_at": "2026-06-25T16:06:22",
+      "archived_at": null,
+      "relations": []
     }
-  ]
+  ],
+  "generated_at": "2026-06-25T16:06:22"
 }

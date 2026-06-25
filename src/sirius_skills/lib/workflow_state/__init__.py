@@ -26,6 +26,10 @@ from sirius_skills.lib.workflow_state.models import (
 )
 from sirius_skills.lib.workflow_state.owner_completion import sync_completed_owners, sync_owner_completion
 from sirius_skills.lib.workflow_state.parity import discover_installed_skills, inspect_installed_skill_parity
+from sirius_skills.lib.workflow_state import planning_repository
+from sirius_skills.lib.workflow_state import proposal_repository
+from sirius_skills.lib.workflow_state import subfeature_repository
+from sirius_skills.lib.workflow_state import execution_repository
 from sirius_skills.lib.workflow_state.scope_runtime import (
     CONFIG_RELATIVE_PATHS,
     CONVENTIONS_CONFIG_RELATIVE_PATH,
@@ -73,6 +77,7 @@ __all__ = [
     "evaluate_feature_transition",
     "evaluate_slice_transition",
     "evaluate_subfeature_transition",
+    "execution_repository",
     "find_nearest_planning_config_root",
     "find_repo_root",
     "format_transition_message",
@@ -92,11 +97,14 @@ __all__ = [
     "normalize_dir_relpath",
     "normalize_registry_path",
     "parse_traceability_records",
+    "planning_repository",
     "planning_row_artifact_type",
+    "proposal_repository",
     "read_text",
     "resolve_context",
     "resolve_scope_context",
     "resolve_scope_path",
+    "subfeature_repository",
     "sync_completed_owners",
     "sync_owner_completion",
     "write_json_object",

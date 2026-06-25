@@ -15,6 +15,7 @@ from typing import Dict, List, Optional, Tuple
 SCRIPT_DIR = Path(__file__).resolve().parent
 
 from sirius_skills.lib.workflow_state import evaluate_feature_transition, format_transition_message  # noqa: E402
+from sirius_skills.lib.workflow_state import planning_repository  # noqa: E402
 
 DEFAULT_PLANNING_DIR = "docs/features"
 DEFAULT_PROPOSAL_DIR = "docs/proposals"
@@ -392,17 +393,7 @@ def get_registry_paths(
 
 
 def ensure_registry(planning_dir: str) -> None:
-    normalized_planning_dir = normalize_planning_dir(planning_dir)
-    index_file = os.path.join(normalized_planning_dir, "README.md")
-    registry_json_file = os.path.join(normalized_planning_dir, REGISTRY_JSON_FILE)
-    os.makedirs(normalized_planning_dir, exist_ok=True)
-    if not os.path.exists(index_file):
-        with open(index_file, "w", encoding="utf-8") as f:
-            f.write(REGISTRY_HEADER)
-    if not os.path.exists(registry_json_file):
-        with open(registry_json_file, "w", encoding="utf-8") as f:
-            json.dump({"features": []}, f, indent=2)
-            f.write("\n")
+    planning_repository.ensure_registry(Path(normalize_planning_dir(planning_dir)))
 
 
 def normalize_registry_row(row: Dict[str, object]) -> Dict[str, object]:
@@ -450,23 +441,7 @@ def parse_registry_markdown(index_file: str) -> List[Dict[str, object]]:
 
 
 def load_registry_json(registry_json_file: str) -> List[Dict[str, object]]:
-    try:
-        with open(registry_json_file, "r", encoding="utf-8") as f:
-            payload = json.load(f)
-    except json.JSONDecodeError as exc:
-        raise RuntimeError("Planning registry JSON is not valid JSON.") from exc
-
-    if isinstance(payload, list):
-        raw_rows = payload
-    elif isinstance(payload, dict):
-        raw_rows = payload.get("features")
-    else:
-        raise RuntimeError("Planning registry JSON must be a JSON object or list.")
-
-    if raw_rows is None:
-        raw_rows = []
-    if not isinstance(raw_rows, list):
-        raise RuntimeError("Planning registry field 'features' must be a list.")
+    raw_rows = planning_repository.read_registry_json(Path(registry_json_file))
     return [normalize_registry_row(row) for row in raw_rows]
 
 
@@ -485,10 +460,7 @@ def write_registry(rows: List[Dict[str, object]], scope_context: Optional[object
                 f"| {row['feature']} | {row['status']} | {updated} | {row['path']} |\n"
             )
 
-    payload = {"features": sorted_rows}
-    with open(registry_json_file, "w", encoding="utf-8") as f:
-        json.dump(payload, f, indent=2)
-        f.write("\n")
+    planning_repository.write_registry_json(Path(registry_json_file), sorted_rows)
 
 
 def parse_registry(scope_context: Optional[object] = None) -> List[Dict[str, object]]:
@@ -648,15 +620,7 @@ def read_metadata(feature_dir: str) -> Dict[str, object]:
     derived_subfeature_metadata = _derived_subfeature_metadata(feature_dir)
     if derived_subfeature_metadata is not None:
         return derived_subfeature_metadata
-    path = metadata_path_for(feature_dir)
-    if not os.path.exists(path):
-        raise RuntimeError(f"Planning metadata not found at '{path}'.")
-    try:
-        with open(path, "r", encoding="utf-8") as f:
-            payload = json.load(f)
-    except json.JSONDecodeError as exc:
-        raise RuntimeError("Planning metadata is not valid JSON.") from exc
-    return normalize_metadata(payload)
+    return normalize_metadata(planning_repository.read_metadata_raw(Path(feature_dir)))
 
 
 def write_metadata(feature_dir: str, metadata: Dict[str, object]) -> None:
@@ -665,10 +629,7 @@ def write_metadata(feature_dir: str, metadata: Dict[str, object]) -> None:
             "Subfeature planning state is derived from '.subfeature-meta.json'; "
             "use add-subfeature to update subfeatures."
         )
-    os.makedirs(feature_dir, exist_ok=True)
-    with open(metadata_path_for(feature_dir), "w", encoding="utf-8") as f:
-        json.dump(metadata, f, indent=2)
-        f.write("\n")
+    planning_repository.write_metadata_raw(Path(feature_dir), metadata)
 
 
 def feature_dir_for_row(

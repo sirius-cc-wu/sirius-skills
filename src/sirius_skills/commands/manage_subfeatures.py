@@ -14,6 +14,7 @@ from typing import Dict, List, Optional, Tuple
 COMMAND_DIR = Path(__file__).resolve().parent
 
 from sirius_skills.lib.workflow_state import evaluate_subfeature_transition, format_transition_message  # noqa: E402
+from sirius_skills.lib.workflow_state import subfeature_repository  # noqa: E402
 
 
 DEFAULT_PLANNING_DIR = "docs/features"
@@ -271,15 +272,7 @@ def subfeature_registry_paths(feature_dir: str) -> Tuple[str, str, str]:
 
 
 def ensure_subfeature_registry(feature_dir: str) -> None:
-    subfeatures_dir, readme_path, registry_json_path = subfeature_registry_paths(feature_dir)
-    os.makedirs(subfeatures_dir, exist_ok=True)
-    if not os.path.exists(readme_path):
-        with open(readme_path, "w", encoding="utf-8") as f:
-            f.write(REGISTRY_HEADER)
-    if not os.path.exists(registry_json_path):
-        with open(registry_json_path, "w", encoding="utf-8") as f:
-            json.dump({"subfeatures": []}, f, indent=2)
-            f.write("\n")
+    subfeature_repository.ensure_registry(Path(feature_dir))
 
 
 def normalize_registry_row(row: Dict[str, object]) -> Dict[str, object]:
@@ -304,23 +297,7 @@ def normalize_registry_row(row: Dict[str, object]) -> Dict[str, object]:
 def load_registry(feature_dir: str) -> List[Dict[str, object]]:
     ensure_subfeature_registry(feature_dir)
     _, _, registry_json_path = subfeature_registry_paths(feature_dir)
-    try:
-        with open(registry_json_path, "r", encoding="utf-8") as f:
-            payload = json.load(f)
-    except json.JSONDecodeError as exc:
-        raise RuntimeError("Subfeature registry JSON is not valid JSON.") from exc
-
-    if isinstance(payload, list):
-        raw_rows = payload
-    elif isinstance(payload, dict):
-        raw_rows = payload.get("subfeatures")
-    else:
-        raise RuntimeError("Subfeature registry JSON must be a JSON object or list.")
-
-    if raw_rows is None:
-        raw_rows = []
-    if not isinstance(raw_rows, list):
-        raise RuntimeError("Subfeature registry field 'subfeatures' must be a list.")
+    raw_rows = subfeature_repository.read_registry_json(Path(registry_json_path))
     return [normalize_registry_row(row) for row in raw_rows]
 
 
@@ -338,9 +315,7 @@ def write_registry(feature_dir: str, rows: List[Dict[str, object]]) -> None:
                 f"| {row['subfeature_id']} | {row['status']} | {row['subfeature_type']} | {updated} | {row['path']} |\n"
             )
 
-    with open(registry_json_path, "w", encoding="utf-8") as f:
-        json.dump({"subfeatures": sorted_rows}, f, indent=2)
-        f.write("\n")
+    subfeature_repository.write_registry_json(Path(registry_json_path), sorted_rows)
 
 
 def metadata_path_for(subfeature_dir: str) -> str:
@@ -435,22 +410,11 @@ def normalize_metadata(payload: object) -> Dict[str, object]:
 
 
 def read_metadata(subfeature_dir: str) -> Dict[str, object]:
-    path = metadata_path_for(subfeature_dir)
-    if not os.path.exists(path):
-        raise RuntimeError(f"Subfeature metadata not found at '{path}'.")
-    try:
-        with open(path, "r", encoding="utf-8") as f:
-            payload = json.load(f)
-    except json.JSONDecodeError as exc:
-        raise RuntimeError("Subfeature metadata is not valid JSON.") from exc
-    return normalize_metadata(payload)
+    return normalize_metadata(subfeature_repository.read_metadata_raw(Path(subfeature_dir)))
 
 
 def write_metadata(subfeature_dir: str, metadata: Dict[str, object]) -> None:
-    os.makedirs(subfeature_dir, exist_ok=True)
-    with open(metadata_path_for(subfeature_dir), "w", encoding="utf-8") as f:
-        json.dump(metadata, f, indent=2)
-        f.write("\n")
+    subfeature_repository.write_metadata_raw(Path(subfeature_dir), metadata)
 
 
 def subfeature_dir_for_row(row: Dict[str, object], scope_context: object) -> str:
