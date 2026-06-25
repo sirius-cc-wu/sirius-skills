@@ -29,38 +29,38 @@ Install the managed skills with the packaged workflow:
 This installs all skills listed in `skills/*/SKILL.md` that are part of the managed packaged set, including `governance-update` and `research`.
 
 ```bash
-make install
+just install
 ```
 
 This uses `npx skills add` to register the managed skills after refreshing the
 shared references that packaged installs depend on. Shared Python runtime code
 is provided by the installed `sirius_skills` package. The managed packaged set
-is sourced from `MANAGED_SKILLS` in `Makefile`, so keep that list in sync when
+is sourced from `managed_skills` in `justfile`, so keep that list in sync when
 adding or retiring packaged skills.
 
 To remove the managed packaged install later:
 
 ```bash
-make uninstall
+just uninstall
 ```
 
 The explicit packaged aliases are still available:
 
 ```bash
-make install-packaged
-make uninstall-packaged
+just install-packaged
+just uninstall-packaged
 ```
 
-`make install`, `make install-packaged`, `make uninstall`, and
-`make uninstall-packaged` all use the managed packaged flow through
+`just install`, `just install-packaged`, `just uninstall`, and
+`just uninstall-packaged` all use the managed packaged flow through
 `npx skills`.
 
 ## Migration Notes
 
 Current command map:
 
-- default packaged use: `make install` / `make uninstall`
-- explicit packaged aliases: `make install-packaged` / `make uninstall-packaged`
+- default packaged use: `just install` / `just uninstall`
+- explicit packaged aliases: `just install-packaged` / `just uninstall-packaged`
 - current managed packaged list also includes `governance-update` and `research`
 
 Current parity guidance:
@@ -72,15 +72,15 @@ Current parity guidance:
 
 Current install stance:
 
-- use `make install` for normal repo refreshes before reloading skills
-- use `make install-packaged` only when you want the explicit packaged alias
-- treat `make uninstall` / `make uninstall-packaged` as equivalent packaged removals
+- use `just install` for normal repo refreshes before reloading skills
+- use `just install-packaged` only when you want the explicit packaged alias
+- treat `just uninstall` / `just uninstall-packaged` as equivalent packaged removals
 
 To rerun the curated workflow consistency validation bundle used by CI and
 workflow-state maintenance work:
 
 ```bash
-make validate-workflow-state
+just validate-workflow-state
 ```
 
 The intended direction is:
@@ -125,10 +125,10 @@ then copied into the individual skill folders that need to package it.
 Current shared-reference workflow:
 
 - keep the canonical source in `docs/shared/`
-- `make install-packaged` refreshes shared reference copies before packaging managed skills
-- `make validate-workflow-state` reruns the curated workflow consistency pytest
+- `just install-packaged` refreshes shared reference copies before packaging managed skills
+- `just validate-workflow-state` reruns the curated workflow consistency pytest
   bundle for parity and transition guardrail regressions
-- run `make sync-shared-references` after editing a canonical shared reference
+- run `just sync-shared-references` after editing a canonical shared reference
 - have each consuming skill point only at its local `references/` copy so the
   packaged skill remains self-contained
 

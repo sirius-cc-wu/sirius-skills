@@ -161,8 +161,8 @@ When editing skills:
 
 ### Installation
 
-Use `make install` and `make uninstall` for the supported packaged workflow.
-`make install-packaged` and `make uninstall-packaged` remain explicit aliases to
+Use `just install` and `just uninstall` for the supported packaged workflow.
+`just install-packaged` and `just uninstall-packaged` remain explicit aliases to
 the same packaged path.
 
 Packaged installs use the centralized `sirius` CLI and shared Python support
