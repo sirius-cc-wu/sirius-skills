@@ -51,20 +51,14 @@ LEGACY_TO_SUBFEATURE_STATUS = {
 }
 
 
-def load_module(path: Path, name: str):
-    spec = importlib.util.spec_from_file_location(name, path)
-    module = importlib.util.module_from_spec(spec)
-    assert spec.loader is not None
-    spec.loader.exec_module(module)
-    return module
-
-
 def load_manage_planning_module():
-    return load_module(PLANNING_SCRIPT, "manage_planning")
+    from sirius_skills.commands import manage_planning
+    return manage_planning
 
 
 def load_manage_subfeatures_module():
-    return load_module(SUBFEATURE_SCRIPT, "manage_subfeatures")
+    from sirius_skills.commands import manage_subfeatures
+    return manage_subfeatures
 
 
 def normalize_optional_string(value: object) -> Optional[str]:

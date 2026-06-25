@@ -394,13 +394,22 @@ def build_bootstrap_readiness(result: BootstrapResult) -> Dict[str, object]:
 
 
 def load_module(script_path: Path, name: str):
-    spec = importlib.util.spec_from_file_location(name, script_path)
-    if spec is None or spec.loader is None:
-        raise RuntimeError(f"Unable to load module from {script_path}")
-    module = importlib.util.module_from_spec(spec)
-    sys.modules[name] = module
-    spec.loader.exec_module(module)
-    return module
+    if script_path.name == "manage_planning.py":
+        from sirius_skills.commands import manage_planning
+        return manage_planning
+    elif script_path.name == "manage_execution.py":
+        from sirius_skills.commands import manage_execution
+        return manage_execution
+    elif script_path.name == "manage_subfeatures.py":
+        from sirius_skills.commands import manage_subfeatures
+        return manage_subfeatures
+    elif script_path.name == "artifact_inventory.py":
+        from sirius_skills.commands import artifact_inventory
+        return artifact_inventory
+    elif script_path.name == "archive_data.py":
+        from sirius_skills.commands import archive_data
+        return archive_data
+    raise RuntimeError(f"Unknown script path: {script_path}")
 
 
 def record_approval_decision(

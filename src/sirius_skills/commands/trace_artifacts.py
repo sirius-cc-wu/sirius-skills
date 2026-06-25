@@ -7,11 +7,7 @@ from pathlib import Path
 from typing import Dict, List, Optional
 
 
-SCRIPT_DIR = Path(__file__).resolve().parent
-if str(SCRIPT_DIR) not in sys.path:
-    sys.path.insert(0, str(SCRIPT_DIR))
-
-from sirius_skills.commands.trace_data import (  # noqa: E402
+from sirius_skills.commands.trace_data import (
     NODE_TYPES,
     TraceLookupError,
     build_trace_graph,

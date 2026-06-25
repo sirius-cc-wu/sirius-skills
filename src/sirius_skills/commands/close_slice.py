@@ -28,17 +28,9 @@ def now_timestamp() -> str:
     return datetime.now().isoformat(timespec="seconds")
 
 
-def load_helper_module(script_path: Path, name: str):
-    spec = importlib.util.spec_from_file_location(name, script_path)
-    module = importlib.util.module_from_spec(spec)
-    if spec.loader is None:
-        raise RuntimeError(f"Unable to load guide-execution tooling from {script_path}")
-    spec.loader.exec_module(module)
-    return module
-
-
 def load_manage_specs_module():
-    return load_helper_module(GUIDE_EXECUTION_SCRIPT, "manage_execution")
+    from sirius_skills.commands import manage_execution
+    return manage_execution
 
 
 def load_publish_config(config_path: Path) -> Dict[str, str]:

@@ -19,11 +19,8 @@ TABLE_ROW_PATTERN = re.compile(r"^\|(.+)\|$")
 
 
 def load_manage_subfeatures_module():
-    spec = importlib.util.spec_from_file_location("manage_subfeatures", SUBFEATURE_SCRIPT)
-    module = importlib.util.module_from_spec(spec)
-    assert spec.loader is not None
-    spec.loader.exec_module(module)
-    return module
+    from sirius_skills.commands import manage_subfeatures
+    return manage_subfeatures
 
 
 def parse_args(argv=None) -> argparse.Namespace:

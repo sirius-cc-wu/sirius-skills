@@ -143,13 +143,10 @@ class ContinuationPolicyConfig:
 
 
 def load_module(script_path: Path, name: str):
-    spec = importlib.util.spec_from_file_location(name, script_path)
-    if spec is None or spec.loader is None:
-        raise RuntimeError(f"Unable to load module from {script_path}")
-    module = importlib.util.module_from_spec(spec)
-    sys.modules[name] = module
-    spec.loader.exec_module(module)
-    return module
+    if script_path.name == "manage_execution.py":
+        from sirius_skills.commands import manage_execution
+        return manage_execution
+    raise RuntimeError(f"Unknown script path: {script_path}")
 
 
 def parse_args(argv: Sequence[str] | None = None) -> argparse.Namespace:

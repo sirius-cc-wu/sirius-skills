@@ -53,12 +53,7 @@ SLICE_SUMMARY_BLOCK_PATTERN = re.compile(
 )
 
 
-def load_module(script_path: Path, name: str):
-    spec = importlib.util.spec_from_file_location(name, script_path)
-    module = importlib.util.module_from_spec(spec)
-    assert spec.loader is not None
-    spec.loader.exec_module(module)
-    return module
+# load_module function is no longer used, standard imports are used instead.
 
 
 def normalize_registry_path(value: str) -> str:
@@ -324,10 +319,10 @@ def iter_traceability_records(inventory: Inventory) -> List[TraceabilityRecord]:
 
 
 def resolve_context() -> InventoryContext:
-    propose = load_module(PROPOSAL_SCRIPT, "manage_proposals")
-    planning = load_module(PLANNING_SCRIPT, "manage_planning")
-    subfeatures = load_module(SUBFEATURE_SCRIPT, "manage_subfeatures")
-    execution = load_module(EXECUTION_SCRIPT, "manage_execution")
+    from sirius_skills.commands import manage_proposals as propose
+    from sirius_skills.commands import manage_planning as planning
+    from sirius_skills.commands import manage_subfeatures as subfeatures
+    from sirius_skills.commands import manage_execution as execution
 
     proposal_scope = propose.SCOPE_RUNTIME.resolve_scope_context()
     proposal_config = propose.load_config(scope_context=proposal_scope)

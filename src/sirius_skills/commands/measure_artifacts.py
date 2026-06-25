@@ -7,12 +7,8 @@ from datetime import datetime
 from pathlib import Path
 
 
-SCRIPT_DIR = Path(__file__).resolve().parent
-if str(SCRIPT_DIR) not in sys.path:
-    sys.path.insert(0, str(SCRIPT_DIR))
-
-from sirius_skills.commands.metrics_engine import build_metrics_for_target, resolve_measurement_target  # noqa: E402
-from sirius_skills.commands.metrics_store import sidecar_path_for, write_metrics  # noqa: E402
+from sirius_skills.commands.metrics_engine import build_metrics_for_target, resolve_measurement_target
+from sirius_skills.commands.metrics_store import sidecar_path_for, write_metrics
 
 
 ERROR_EXIT_CODE = 2

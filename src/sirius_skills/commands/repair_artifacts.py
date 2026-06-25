@@ -7,11 +7,7 @@ from pathlib import Path
 from typing import Dict
 
 
-SCRIPT_DIR = Path(__file__).resolve().parent
-if str(SCRIPT_DIR) not in sys.path:
-    sys.path.insert(0, str(SCRIPT_DIR))
-
-from sirius_skills.commands.repair_data import VALID_ARTIFACT_TYPES, build_repair_result  # noqa: E402
+from sirius_skills.commands.repair_data import VALID_ARTIFACT_TYPES, build_repair_result
 
 
 def parse_args(argv=None) -> argparse.Namespace:

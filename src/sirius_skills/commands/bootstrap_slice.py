@@ -14,33 +14,18 @@ SUBFEATURE_SCRIPT_PATH = COMMAND_DIR / "manage_subfeatures.py"
 
 
 def load_execution_module():
-    spec = importlib.util.spec_from_file_location(
-        "manage_execution", EXECUTION_SCRIPT_PATH
-    )
-    module = importlib.util.module_from_spec(spec)
-    assert spec.loader is not None
-    spec.loader.exec_module(module)
-    return module
+    from sirius_skills.commands import manage_execution
+    return manage_execution
 
 
 def load_planning_module():
-    spec = importlib.util.spec_from_file_location(
-        "manage_planning", PLANNING_SCRIPT_PATH
-    )
-    module = importlib.util.module_from_spec(spec)
-    assert spec.loader is not None
-    spec.loader.exec_module(module)
-    return module
+    from sirius_skills.commands import manage_planning
+    return manage_planning
 
 
 def load_subfeature_module():
-    spec = importlib.util.spec_from_file_location(
-        "manage_subfeatures", SUBFEATURE_SCRIPT_PATH
-    )
-    module = importlib.util.module_from_spec(spec)
-    assert spec.loader is not None
-    spec.loader.exec_module(module)
-    return module
+    from sirius_skills.commands import manage_subfeatures
+    return manage_subfeatures
 
 
 def git_repo_root_for(path: Path) -> Optional[Path]:

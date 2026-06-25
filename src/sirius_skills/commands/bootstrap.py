@@ -43,13 +43,8 @@ DEFAULT_SLICE_NAMING_CONVENTIONS = {
 
 
 def load_scope_runtime_module():
-    runtime_path = Path(__file__).resolve().parent / "scope_runtime.py"
-    spec = importlib.util.spec_from_file_location("scope_runtime", runtime_path)
-    if spec is None or spec.loader is None:
-        raise RuntimeError(f"Unable to load scope runtime from {runtime_path}.")
-    module = importlib.util.module_from_spec(spec)
-    spec.loader.exec_module(module)
-    return module
+    from sirius_skills.commands import scope_runtime
+    return scope_runtime
 
 
 SCOPE_RUNTIME = load_scope_runtime_module()

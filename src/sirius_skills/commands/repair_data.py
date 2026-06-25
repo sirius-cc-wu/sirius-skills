@@ -6,18 +6,7 @@ from pathlib import Path
 from typing import Dict, List, Optional, Sequence, Set, Tuple
 
 
-SCRIPT_DIR = Path(__file__).resolve().parent
-IMPORT_PATH_CANDIDATES = (
-    SCRIPT_DIR.parent / "lib",
-    SCRIPT_DIR.parents[2] / "lib",
-    SCRIPT_DIR.parents[1] / "lib",
-)
-
-for candidate in reversed(IMPORT_PATH_CANDIDATES):
-    if candidate.is_dir() and str(candidate) not in sys.path:
-        sys.path.insert(0, str(candidate))
-
-from sirius_skills.lib.workflow_state import (  # noqa: E402
+from sirius_skills.lib.workflow_state import (
     SemanticPreviewRecord,
     build_semantic_preview,
     load_inventory,

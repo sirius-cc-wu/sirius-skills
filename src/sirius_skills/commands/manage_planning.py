@@ -76,11 +76,8 @@ def now_timestamp() -> str:
 
 
 def load_scope_runtime_module():
-    spec = importlib.util.spec_from_file_location("scope_runtime", SCOPE_RUNTIME_PATH)
-    module = importlib.util.module_from_spec(spec)
-    assert spec.loader is not None
-    spec.loader.exec_module(module)
-    return module
+    from sirius_skills.commands import scope_runtime
+    return scope_runtime
 
 
 SCOPE_RUNTIME = load_scope_runtime_module()
@@ -1119,13 +1116,8 @@ def validate_feature(
 
 
 def load_manage_proposals_module():
-    script_path = Path(__file__).resolve().parent / "manage_proposals.py"
-    spec = importlib.util.spec_from_file_location("manage_proposals", script_path)
-    if spec is None or spec.loader is None:
-        raise RuntimeError("Unable to load proposal management helpers.")
-    module = importlib.util.module_from_spec(spec)
-    spec.loader.exec_module(module)
-    return module
+    from sirius_skills.commands import manage_proposals
+    return manage_proposals
 
 
 def promote_proposal_to_feature(

@@ -80,11 +80,8 @@ def now_timestamp() -> str:
 
 
 def load_manage_planning_module():
-    spec = importlib.util.spec_from_file_location("manage_planning", PLANNING_SCRIPT)
-    module = importlib.util.module_from_spec(spec)
-    assert spec.loader is not None
-    spec.loader.exec_module(module)
-    return module
+    from sirius_skills.commands import manage_planning
+    return manage_planning
 
 
 def validate_slug(value: str, field_name: str) -> str:

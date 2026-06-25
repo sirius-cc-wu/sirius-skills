@@ -126,11 +126,8 @@ def load_template(path: Path) -> str:
 
 
 def load_manage_subfeatures_module():
-    spec = importlib.util.spec_from_file_location("manage_subfeatures", SUBFEATURE_SCRIPT)
-    module = importlib.util.module_from_spec(spec)
-    assert spec.loader is not None
-    spec.loader.exec_module(module)
-    return module
+    from sirius_skills.commands import manage_subfeatures
+    return manage_subfeatures
 
 
 def format_code_list(items: list[str], empty: str) -> str:
