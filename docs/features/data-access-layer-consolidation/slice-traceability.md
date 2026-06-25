@@ -26,7 +26,7 @@ Use this file to map repo story IDs to execution slices without moving story own
 | DALC-03 | M | Relocate scope_runtime & thin commands | I1 | dalc-foundation-storage | Library |  | dalc-foundation-storage | Move scope_runtime and setup storage/models |
 | DALC-03 | M | Relocate scope_runtime & thin commands | I2 | dalc-repo-metadata | Commands, Library | dalc-foundation-guardrail |  | Thin command metadata writes |
 | DALC-03 | M | Relocate scope_runtime & thin commands | I3 | dalc-repo-markdown | Commands, Library | dalc-repo-metadata |  | Thin command markdown writes |
-| DALC-04 | S | Direct filesystem writes guardrail | I1 | dalc-foundation-guardrail | Tests | dalc-foundation-storage |  | AST analysis test checking commands |
+| DALC-04 | S | Direct filesystem writes guardrail | I1 | dalc-foundation-guardrail | Tests | dalc-foundation-storage | dalc-foundation-guardrail | AST analysis test checking commands |
 
 ## Notes
 

@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "generated_at": "2026-06-25T15:45:01",
+  "generated_at": "2026-06-25T15:48:33",
   "slices": [
     {
       "id": "hss-root-fallback",
@@ -499,6 +499,16 @@
       "path": "slices/dalc-foundation-storage-implement-storage-models-and-relocate-scope-runtime/",
       "updated_at": "2026-06-25T15:45:01",
       "closed_at": "2026-06-25T15:45:01",
+      "archived_at": null,
+      "relations": []
+    },
+    {
+      "id": "dalc-foundation-guardrail",
+      "feature": "Add AST-based Direct I/O Guardrail Test",
+      "status": "closed",
+      "path": "slices/dalc-foundation-guardrail-add-ast-based-direct-i-o-guardrail-test/",
+      "updated_at": "2026-06-25T15:48:33",
+      "closed_at": "2026-06-25T15:48:33",
       "archived_at": null,
       "relations": []
     }
