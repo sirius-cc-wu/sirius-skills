@@ -30,6 +30,7 @@ from sirius_skills.lib.workflow_state import planning_repository
 from sirius_skills.lib.workflow_state import proposal_repository
 from sirius_skills.lib.workflow_state import subfeature_repository
 from sirius_skills.lib.workflow_state import execution_repository
+from sirius_skills.lib.workflow_state import markdown_repository
 from sirius_skills.lib.workflow_state.scope_runtime import (
     CONFIG_RELATIVE_PATHS,
     CONVENTIONS_CONFIG_RELATIVE_PATH,
@@ -78,6 +79,7 @@ __all__ = [
     "evaluate_slice_transition",
     "evaluate_subfeature_transition",
     "execution_repository",
+    "markdown_repository",
     "find_nearest_planning_config_root",
     "find_repo_root",
     "format_transition_message",

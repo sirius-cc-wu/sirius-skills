@@ -11,21 +11,19 @@ from sirius_skills.commands.artifact_inventory import (  # noqa: E402
     load_inventory,
     normalize_dir_relpath,
 )
+from sirius_skills.lib.workflow_state import markdown_repository
 
 
 VALID_ARTIFACT_TYPES = ("proposal", "feature", "subfeature", "slice")
 PROPOSAL_CANDIDATE_STATUSES = {"rejected", "superseded", "promoted"}
-ARCHIVE_SUMMARIES_START = "<!-- archived-slice-summaries:start -->"
-ARCHIVE_SUMMARIES_END = "<!-- archived-slice-summaries:end -->"
-SLICE_SUMMARY_START_TEMPLATE = "<!-- archived-slice-summary:{slice_id}:start -->"
-SLICE_SUMMARY_END_TEMPLATE = "<!-- archived-slice-summary:{slice_id}:end -->"
-PLANTUML_BLOCK_PATTERN = re.compile(r"```plantuml[^\n]*\n.*?```", re.DOTALL)
-SLICE_BLOCK_PATTERN = re.compile(
-    r"<!-- archived-slice-summary:(?P<slice_id>[^:]+):start -->\n"
-    r"(?P<body>.*?)\n"
-    r"<!-- archived-slice-summary:(?P=slice_id):end -->",
-    re.DOTALL,
-)
+ARCHIVE_SUMMARIES_START = markdown_repository.ARCHIVE_SUMMARIES_START
+ARCHIVE_SUMMARIES_END = markdown_repository.ARCHIVE_SUMMARIES_END
+SLICE_SUMMARY_START_TEMPLATE = markdown_repository.SLICE_SUMMARY_START_TEMPLATE
+SLICE_SUMMARY_END_TEMPLATE = markdown_repository.SLICE_SUMMARY_END_TEMPLATE
+PLANTUML_BLOCK_PATTERN = markdown_repository.PLANTUML_BLOCK_PATTERN
+SLICE_BLOCK_PATTERN = markdown_repository.SLICE_SUMMARY_BLOCK_PATTERN
+
+PreparedSliceSummary = markdown_repository.PreparedSliceSummary
 
 
 @dataclass
@@ -61,15 +59,6 @@ class ScopeArchiveTarget:
     planning_dir: Path
     design_path: Path
     closed_slice_rows: List[Dict[str, object]]
-
-
-@dataclass
-class PreparedSliceSummary:
-    slice_id: str
-    title: str
-    brief_items: List[str]
-    design_summary: Optional[str]
-    blueprint_text: str
 
 
 class ArchiveUsageError(RuntimeError):
@@ -145,68 +134,28 @@ def _extract_consolidation_summary(metadata: Optional[Dict[str, object]]) -> Opt
 
 
 def _parse_markdown_row(line: str) -> List[str]:
-    return [cell.strip() for cell in line.strip().strip("|").split("|")]
+    return markdown_repository.split_table_row(line)
 
 
 def _dedupe_preserve_order(values: List[str]) -> List[str]:
-    seen = set()
-    ordered: List[str] = []
-    for value in values:
-        if value in seen:
-            continue
-        seen.add(value)
-        ordered.append(value)
-    return ordered
+    return markdown_repository._dedupe_preserve_order(values)
 
 
 def _dedupe_text_blocks(values: List[str]) -> List[str]:
-    seen = set()
-    ordered: List[str] = []
-    for value in values:
-        candidate = value.strip()
-        if not candidate or candidate in seen:
-            continue
-        seen.add(candidate)
-        ordered.append(candidate)
-    return ordered
+    return markdown_repository._dedupe_text_blocks(values)
 
 
 def _extract_slice_ids_from_planning_text(markdown: str) -> List[str]:
-    lines = markdown.splitlines()
-    in_slice_table = False
-    collected: List[str] = []
-
-    for line in lines:
-        stripped = line.strip()
-        if not stripped:
-            if in_slice_table:
-                break
-            continue
-        if not stripped.startswith("|"):
-            if in_slice_table and stripped.startswith("## "):
-                break
-            continue
-
-        cells = _parse_markdown_row(stripped)
-        if not cells:
-            continue
-        first = cells[0]
-        if first == "Slice ID":
-            in_slice_table = True
-            continue
-        if not in_slice_table or first.startswith("---"):
-            continue
-        if first:
-            collected.append(first)
-
-    return _dedupe_preserve_order(collected)
+    return markdown_repository.extract_slice_ids_from_planning_text(markdown)
 
 
 def _slice_planning_ids(planning_dir: Path) -> List[str]:
     planning_path = planning_dir / "slice-planning.md"
     if not planning_path.exists():
         return []
-    return _extract_slice_ids_from_planning_text(planning_path.read_text(encoding="utf-8"))
+    return markdown_repository.extract_slice_ids_from_planning_text(
+        planning_path.read_text(encoding="utf-8")
+    )
 
 
 def _load_slice_metadata(inventory, row: Dict[str, object]) -> Dict[str, object]:
@@ -404,118 +353,31 @@ def _resolve_scope_target(
 
 
 def _extract_heading_title(text: str, default: str) -> str:
-    for line in text.splitlines():
-        stripped = line.strip()
-        if not stripped.startswith("#"):
-            continue
-        title = stripped.lstrip("#").strip()
-        lowered = title.lower()
-        if lowered.startswith("slice specification:") or lowered.startswith("slice contract:"):
-            return title.split(":", 1)[1].strip() or default
-        return title or default
-    return default
+    return markdown_repository.extract_heading_title(text, default)
 
 
 def _extract_section_body(text: str, heading: str) -> Optional[str]:
-    pattern = re.compile(
-        rf"(?ms)^##\s+{re.escape(heading)}\s*$\n(?P<body>.*?)(?=^##\s+|\Z)"
-    )
-    match = pattern.search(text)
-    if not match:
-        return None
-    body = match.group("body").strip()
-    return body or None
+    return markdown_repository.extract_section_body(text, heading)
 
 
 def _extract_brief_items(brief_text: str) -> List[str]:
-    body = _extract_section_body(brief_text, "1. Work Item Summary")
-    if body is None:
-        body = _extract_section_body(brief_text, "1. Summary")
-    if body is None:
-        return []
-    items: List[str] = []
-    current_parts: List[str] = []
-    for line in body.splitlines():
-        stripped = line.strip()
-        if stripped.startswith("- "):
-            if current_parts:
-                items.append(" ".join(current_parts))
-            current_parts = [stripped[2:].strip()]
-            continue
-        if current_parts and stripped and not stripped.startswith("#"):
-            current_parts.append(stripped)
-            continue
-        if current_parts:
-            items.append(" ".join(current_parts))
-            current_parts = []
-    if current_parts:
-        items.append(" ".join(current_parts))
-    return items[:5]
+    return markdown_repository.extract_brief_items(brief_text)
 
 
 def _extract_blueprint_summary(blueprint_text: str) -> Optional[str]:
-    body = _extract_section_body(blueprint_text, "1. Summary")
-    if body is None:
-        return None
-
-    paragraph_lines: List[str] = []
-    bullet_lines: List[str] = []
-    for line in body.splitlines():
-        stripped = line.strip()
-        if not stripped:
-            if paragraph_lines:
-                break
-            continue
-        if stripped.startswith("- "):
-            bullet_lines.append(stripped[2:].strip())
-            continue
-        if stripped.startswith("#"):
-            break
-        paragraph_lines.append(stripped)
-
-    if paragraph_lines:
-        return " ".join(paragraph_lines)
-    if bullet_lines:
-        return " ".join(bullet_lines[:3])
-    return None
+    return markdown_repository.extract_blueprint_summary(blueprint_text)
 
 
 def _extract_blueprint_figures(blueprint_text: str) -> List[str]:
-    figures: List[str] = []
-    figures.extend(match.group(0).strip() for match in PLANTUML_BLOCK_PATTERN.finditer(blueprint_text))
-    return figures
+    return markdown_repository.extract_blueprint_figures(blueprint_text)
 
 
 def _is_structural_plantuml(block: str) -> bool:
-    structural_markers = (
-        r"(?m)^\s*class\s+",
-        r"(?m)^\s*component\s+",
-        r"(?m)^\s*interface\s+",
-        r"(?m)^\s*entity\s+",
-        r"(?m)^\s*package\s+",
-        r"(?m)^\s*node\s+",
-        r"(?m)^\s*artifact\s+",
-        r"(?m)^\s*rectangle\s+",
-        r"(?m)^\s*database\s+",
-        r"(?m)^\s*frame\s+",
-        r"(?m)^\s*cloud\s+",
-        r"(?m)^\s*folder\s+",
-        r"(?m)^\s*collections\s+",
-        r"(?m)^\s*queue\s+",
-        r"(?m)^\s*skinparam\s+componentStyle\b",
-        r"(?m)^\s*skinparam\s+classAttributeIconSize\b",
-    )
-    return any(re.search(pattern, block) for pattern in structural_markers)
+    return markdown_repository.is_structural_plantuml(block)
 
 
 def _extract_structural_figures(text: str) -> List[str]:
-    return _dedupe_text_blocks(
-        [
-            match.group(0).strip()
-            for match in PLANTUML_BLOCK_PATTERN.finditer(text)
-            if _is_structural_plantuml(match.group(0))
-        ]
-    )
+    return markdown_repository.extract_structural_figures(text)
 
 
 def _prepare_slice_summary(inventory, row: Dict[str, object]) -> PreparedSliceSummary:
@@ -526,52 +388,19 @@ def _prepare_slice_summary(inventory, row: Dict[str, object]) -> PreparedSliceSu
     blueprint_text = blueprint_path.read_text(encoding="utf-8") if blueprint_path.exists() else ""
     return PreparedSliceSummary(
         slice_id=str(row["id"]),
-        title=_extract_heading_title(brief_text, str(row["id"])),
-        brief_items=_extract_brief_items(brief_text),
-        design_summary=_extract_blueprint_summary(blueprint_text),
+        title=markdown_repository.extract_heading_title(brief_text, str(row["id"])),
+        brief_items=markdown_repository.extract_brief_items(brief_text),
+        design_summary=markdown_repository.extract_blueprint_summary(blueprint_text),
         blueprint_text=blueprint_text,
     )
 
 
-def _render_slice_summary_block(
-    summary: PreparedSliceSummary,
-) -> str:
-    lines = [
-        SLICE_SUMMARY_START_TEMPLATE.format(slice_id=summary.slice_id),
-        f"### `{summary.slice_id}`: {summary.title}",
-    ]
-    if summary.brief_items:
-        lines.append("")
-        lines.append("#### Work Item Summary")
-        lines.append("")
-        lines.extend(f"- {item}" for item in summary.brief_items)
-    if summary.design_summary:
-        lines.append("")
-        lines.append("#### Detailed Design Summary")
-        lines.append("")
-        lines.append(summary.design_summary)
-    figures = _extract_blueprint_figures(summary.blueprint_text)
-    if figures:
-        lines.append("")
-        lines.append("#### Blueprint Figures")
-        lines.append("")
-        lines.extend(figures)
-    lines.append(SLICE_SUMMARY_END_TEMPLATE.format(slice_id=summary.slice_id))
-    return "\n".join(lines)
+def _render_slice_summary_block(summary: PreparedSliceSummary) -> str:
+    return markdown_repository.render_slice_summary_block(summary)
 
 
 def _load_existing_summary_blocks(design_text: str) -> Dict[str, str]:
-    managed_match = re.search(
-        rf"(?s){re.escape(ARCHIVE_SUMMARIES_START)}\n(?P<body>.*?){re.escape(ARCHIVE_SUMMARIES_END)}",
-        design_text,
-    )
-    if not managed_match:
-        return {}
-    body = managed_match.group("body")
-    return {
-        match.group("slice_id"): match.group(0).strip()
-        for match in SLICE_BLOCK_PATTERN.finditer(body)
-    }
+    return markdown_repository.load_existing_summary_blocks(design_text)
 
 
 def _write_summary_appendix(
@@ -579,37 +408,7 @@ def _write_summary_appendix(
     blocks: Dict[str, str],
     structural_figures: Optional[List[str]] = None,
 ) -> None:
-    design_text = design_path.read_text(encoding="utf-8")
-    existing_blocks = _load_existing_summary_blocks(design_text)
-    existing_blocks.update(blocks)
-
-    ordered_ids = list(existing_blocks.keys())
-    managed_lines = [ARCHIVE_SUMMARIES_START, "## Archived Slice Summaries", ""]
-    preserved_structural_figures = _dedupe_text_blocks(structural_figures or [])
-    if preserved_structural_figures:
-        managed_lines.append("### Structural Context")
-        managed_lines.append("")
-        managed_lines.append(
-            "The following existing structural diagrams were preserved to anchor the behavior-focused archived slice summaries."
-        )
-        managed_lines.append("")
-        for figure in preserved_structural_figures:
-            managed_lines.append(figure)
-            managed_lines.append("")
-    for slice_id in ordered_ids:
-        managed_lines.append(existing_blocks[slice_id])
-        managed_lines.append("")
-    managed_lines.append(ARCHIVE_SUMMARIES_END)
-    managed_block = "\n".join(managed_lines).rstrip() + "\n"
-
-    managed_pattern = re.compile(
-        rf"(?s)\n*{re.escape(ARCHIVE_SUMMARIES_START)}\n.*?{re.escape(ARCHIVE_SUMMARIES_END)}\n?"
-    )
-    if managed_pattern.search(design_text):
-        updated_text = managed_pattern.sub("\n\n" + managed_block, design_text).rstrip() + "\n"
-    else:
-        updated_text = design_text.rstrip() + "\n\n" + managed_block
-    design_path.write_text(updated_text, encoding="utf-8")
+    markdown_repository.write_summary_appendix(design_path, blocks, structural_figures)
 
 
 def _apply_scope_archive(

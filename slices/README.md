@@ -54,3 +54,4 @@
 | dalc-foundation-storage | Implement Storage/Models and relocate Scope Runtime | closed | 2026-06-25T15:45:01 | 2026-06-25T15:45:01 | slices/dalc-foundation-storage-implement-storage-models-and-relocate-scope-runtime/ |
 | dalc-foundation-guardrail | Add AST-based Direct I/O Guardrail Test | closed | 2026-06-25T15:48:33 | 2026-06-25T15:48:33 | slices/dalc-foundation-guardrail-add-ast-based-direct-i-o-guardrail-test/ |
 | dalc-repo-metadata | Implement Registry and Metadata Repositories | closed | 2026-06-25T16:06:22 | 2026-06-25T16:06:22 | slices/dalc-repo-metadata-implement-registry-and-metadata-repositories/ |
+| dalc-repo-markdown | Implement Markdown and Artifact Repositories | closed | 2026-06-25T16:21:24 | 2026-06-25T16:21:24 | slices/dalc-repo-markdown-implement-markdown-and-artifact-repositories/ |

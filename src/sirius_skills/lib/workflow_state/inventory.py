@@ -12,6 +12,7 @@ from sirius_skills.lib.workflow_state.models import (
     RegistryStatus,
     TraceabilityRecord,
 )
+from sirius_skills.lib.workflow_state import markdown_repository
 
 
 def _resolve_runtime_roots() -> Tuple[Path, Path]:
@@ -36,21 +37,10 @@ PLANNING_SCRIPT = COMMANDS_ROOT / "manage_planning.py"
 SUBFEATURE_SCRIPT = COMMANDS_ROOT / "manage_subfeatures.py"
 EXECUTION_SCRIPT = COMMANDS_ROOT / "manage_execution.py"
 
-TRACEABILITY_HEADERS: Set[str] = {
-    "story id",
-    "increments",
-    "planned slice ids",
-    "execution slice ids",
-    "notes",
-}
-ARCHIVE_SUMMARIES_START = "<!-- archived-slice-summaries:start -->"
-ARCHIVE_SUMMARIES_END = "<!-- archived-slice-summaries:end -->"
-SLICE_SUMMARY_BLOCK_PATTERN = re.compile(
-    r"<!-- archived-slice-summary:(?P<slice_id>[^:]+):start -->\n"
-    r"(?P<body>.*?)\n"
-    r"<!-- archived-slice-summary:(?P=slice_id):end -->",
-    re.DOTALL,
-)
+TRACEABILITY_HEADERS: Set[str] = markdown_repository.TRACEABILITY_HEADERS
+ARCHIVE_SUMMARIES_START = markdown_repository.ARCHIVE_SUMMARIES_START
+ARCHIVE_SUMMARIES_END = markdown_repository.ARCHIVE_SUMMARIES_END
+SLICE_SUMMARY_BLOCK_PATTERN = markdown_repository.SLICE_SUMMARY_BLOCK_PATTERN
 
 
 # load_module function is no longer used, standard imports are used instead.
@@ -180,14 +170,9 @@ def load_archived_slice_summary_index(
             design_text = design_path.read_text(encoding="utf-8")
         except OSError:
             continue
-        managed_match = re.search(
-            rf"(?s){re.escape(ARCHIVE_SUMMARIES_START)}\n(?P<body>.*?){re.escape(ARCHIVE_SUMMARIES_END)}",
-            design_text,
-        )
-        if managed_match is None:
-            continue
-        for match in SLICE_SUMMARY_BLOCK_PATTERN.finditer(managed_match.group("body")):
-            slice_id = match.group("slice_id").strip()
+        managed_blocks = markdown_repository.load_existing_summary_blocks(design_text)
+        for slice_id, _block in managed_blocks.items():
+            slice_id = slice_id.strip()
             if not slice_id:
                 continue
             index.setdefault(slice_id, []).append(
@@ -216,81 +201,21 @@ def is_retained_pruned_slice_row(
 
 
 def _normalize_table_header(value: str) -> str:
-    return re.sub(r"\s+", " ", value.replace("-", " ").strip().lower())
+    return markdown_repository.normalize_table_header(value)
 
 
 def _split_table_row(line: str) -> List[str]:
-    stripped = line.strip().strip("|")
-    return [cell.strip() for cell in stripped.split("|")]
+    return markdown_repository.split_table_row(line)
 
 
 def _split_cell_values(value: str) -> List[str]:
-    raw = value.replace("<br/>", "\n").replace("<br />", "\n").replace("<br>", "\n")
-    items = [part.strip() for part in re.split(r"[\n,;]+", raw)]
-    return [item for item in items if item]
+    return markdown_repository.split_cell_values(value)
 
 
 def parse_traceability_records(
     path: Path, owner_type: str, owner_id: str, owner_path: str
 ) -> List[TraceabilityRecord]:
-    if not path.exists():
-        return []
-
-    lines = path.read_text(encoding="utf-8").splitlines()
-    records: List[TraceabilityRecord] = []
-    index = 0
-    while index < len(lines) - 1:
-        header_line = lines[index].strip()
-        divider_line = lines[index + 1].strip()
-        if "|" not in header_line or "|" not in divider_line:
-            index += 1
-            continue
-
-        headers = _split_table_row(header_line)
-        normalized_headers = [_normalize_table_header(header) for header in headers]
-        if not TRACEABILITY_HEADERS.issubset(set(normalized_headers)):
-            index += 1
-            continue
-
-        divider_cells = _split_table_row(divider_line)
-        if not divider_cells or not all(cell.startswith("---") for cell in divider_cells):
-            index += 1
-            continue
-
-        header_map = {name: position for position, name in enumerate(normalized_headers)}
-        index += 2
-        while index < len(lines):
-            row_line = lines[index].strip()
-            if not row_line.startswith("|"):
-                break
-            cells = _split_table_row(row_line)
-            if len(cells) < len(headers):
-                cells.extend([""] * (len(headers) - len(cells)))
-            records.append(
-                TraceabilityRecord(
-                    owner_type=owner_type,
-                    owner_id=owner_id,
-                    owner_path=owner_path,
-                    story_id=cells[header_map["story id"]],
-                    story_size=(
-                        cells[header_map["story size"]].strip()
-                        if "story size" in header_map
-                        else None
-                    )
-                    or None,
-                    increments=cells[header_map["increments"]],
-                    planned_slice_ids=_split_cell_values(
-                        cells[header_map["planned slice ids"]]
-                    ),
-                    execution_slice_ids=_split_cell_values(
-                        cells[header_map["execution slice ids"]]
-                    ),
-                    notes=cells[header_map["notes"]],
-                )
-            )
-            index += 1
-        continue
-    return records
+    return markdown_repository.parse_traceability_records(path, owner_type, owner_id, owner_path)
 
 
 def iter_traceability_records(inventory: Inventory) -> List[TraceabilityRecord]:

@@ -44,8 +44,8 @@
     },
     {
       "feature": "data-access-layer-consolidation",
-      "status": "planning_reviewed",
-      "updated_at": "2026-06-25T15:31:13",
+      "status": "implemented",
+      "updated_at": "2026-06-25T16:21:24",
       "path": "docs/features/data-access-layer-consolidation/"
     },
     {

@@ -41,6 +41,7 @@ from sirius_skills.lib.workflow_runtime import (  # noqa: E402
     write_planning_approval_record,
 )
 from sirius_skills.lib.workflow_state import sync_completed_owners  # noqa: E402
+from sirius_skills.lib.workflow_state import markdown_repository  # noqa: E402
 
 
 @dataclass
@@ -441,145 +442,35 @@ def record_approval_decision(
 
 
 def _split_table_row(line: str) -> List[str]:
-    stripped = line.strip().strip("|")
-    return [cell.strip() for cell in stripped.split("|")]
+    return markdown_repository.split_table_row(line)
 
 
 def _normalize_table_header(value: str) -> str:
-    return " ".join(value.replace("-", " ").strip().lower().split())
+    return markdown_repository.normalize_table_header(value)
 
 
 def _split_cell_values(value: str) -> List[str]:
-    normalized = value.replace("<br/>", "\n").replace("<br />", "\n").replace("<br>", "\n")
-    result: List[str] = []
-    for part in normalized.replace(";", ",").split(","):
-        for subpart in part.splitlines():
-            cleaned = subpart.strip()
-            if cleaned:
-                result.append(cleaned)
-    return result
+    return markdown_repository.split_cell_values(value)
 
 
 def _find_markdown_table(lines: Sequence[str], required_headers: Sequence[str]) -> Tuple[Dict[str, int], int]:
-    required = {_normalize_table_header(value) for value in required_headers}
-    for index in range(len(lines) - 1):
-        header_line = lines[index].strip()
-        divider_line = lines[index + 1].strip()
-        if "|" not in header_line or "|" not in divider_line:
-            continue
-        headers = _split_table_row(header_line)
-        normalized_headers = [_normalize_table_header(header) for header in headers]
-        if not required.issubset(set(normalized_headers)):
-            continue
-        divider_cells = _split_table_row(divider_line)
-        if not divider_cells or not all(cell.startswith("---") for cell in divider_cells):
-            continue
-        return {name: pos for pos, name in enumerate(normalized_headers)}, index + 2
-    raise RuntimeError("Could not locate the expected markdown table.")
+    return markdown_repository.find_markdown_table(lines, required_headers)
 
 
 def parse_planned_slices(slice_planning_path: Path) -> List[Dict[str, object]]:
-    lines = slice_planning_path.read_text(encoding="utf-8").splitlines()
-    header_map, start_index = _find_markdown_table(
-        lines,
-        [
-            "Slice ID",
-            "Story ID",
-            "Title",
-            "Depends On",
-        ],
-    )
-
-    results: List[Dict[str, object]] = []
-    index = start_index
-    while index < len(lines):
-        row_line = lines[index].strip()
-        if not row_line.startswith("|"):
-            break
-        cells = _split_table_row(row_line)
-        if len(cells) <= max(header_map.values()):
-            index += 1
-            continue
-        planned_slice_id = cells[header_map["slice id"]].strip()
-        if not planned_slice_id:
-            index += 1
-            continue
-        results.append(
-            {
-                "planned_slice_id": planned_slice_id,
-                "story_id": cells[header_map["story id"]].strip(),
-                "title": cells[header_map["title"]].strip(),
-                "validation_hint": cells[header_map["validation"]].strip()
-                if "validation" in header_map and len(cells) > header_map["validation"]
-                else "",
-                "depends_on": _split_cell_values(cells[header_map["depends on"]]),
-            }
-        )
-        index += 1
-    return results
+    return markdown_repository.parse_planned_slices(slice_planning_path)
 
 
 def parse_increment_plan(
     slice_planning_path: Path,
 ) -> Tuple[List[str], Dict[str, List[str]]]:
-    lines = slice_planning_path.read_text(encoding="utf-8").splitlines()
-    try:
-        header_map, start_index = _find_markdown_table(
-            lines,
-            [
-                "Increment",
-                "Planned Slice IDs",
-            ],
-        )
-    except RuntimeError:
-        return [], {}
-
-    increment_order: List[str] = []
-    increment_ids_by_planned_slice: Dict[str, List[str]] = {}
-    index = start_index
-    while index < len(lines):
-        row_line = lines[index].strip()
-        if not row_line.startswith("|"):
-            break
-        cells = _split_table_row(row_line)
-        if len(cells) <= max(header_map.values()):
-            index += 1
-            continue
-        increment_id = cells[header_map["increment"]].strip()
-        if not increment_id:
-            index += 1
-            continue
-        if increment_id not in increment_order:
-            increment_order.append(increment_id)
-        for planned_slice_id in _split_cell_values(cells[header_map["planned slice ids"]]):
-            bucket = increment_ids_by_planned_slice.setdefault(planned_slice_id, [])
-            if increment_id not in bucket:
-                bucket.append(increment_id)
-        index += 1
-    return increment_order, increment_ids_by_planned_slice
+    return markdown_repository.parse_increment_plan(slice_planning_path)
 
 
 def parse_traceability_table(
     traceability_path: Path,
 ) -> Tuple[List[str], int, Dict[str, int], List[List[str]]]:
-    lines = traceability_path.read_text(encoding="utf-8").splitlines()
-    header_map, start_index = _find_markdown_table(
-        lines,
-        [
-            "Story ID",
-            "Planned Slice IDs",
-            "Execution Slice IDs",
-        ],
-    )
-    rows: List[List[str]] = []
-    index = start_index
-    while index < len(lines):
-        row_line = lines[index].strip()
-        if not row_line.startswith("|"):
-            break
-        rows.append(_split_table_row(row_line))
-        index += 1
-    return lines, start_index, header_map, rows
+    return markdown_repository.parse_traceability_table(traceability_path)
 
 
 def collect_increment_metadata(
@@ -602,44 +493,7 @@ def collect_increment_metadata(
 def record_execution_slice_id(
     traceability_path: Path, planned_slice_id: str, execution_slice_id: str
 ) -> None:
-    lines, start_index, header_map, rows = parse_traceability_table(traceability_path)
-    planned_slice_column = header_map["planned slice ids"]
-    execution_slice_column = header_map["execution slice ids"]
-    row_index: Optional[int] = None
-
-    for index, row in enumerate(rows):
-        if planned_slice_column >= len(row):
-            continue
-        planned_slice_ids = _split_cell_values(row[planned_slice_column])
-        if planned_slice_id not in planned_slice_ids:
-            continue
-        if len(planned_slice_ids) != 1:
-            raise RuntimeError(
-                "Batch execution requires one planned slice per traceability row. "
-                f"Split the row that contains '{planned_slice_id}' before bootstrapping."
-            )
-        row_index = index
-        execution_slice_ids = (
-            _split_cell_values(row[execution_slice_column])
-            if execution_slice_column < len(row)
-            else []
-        )
-        if execution_slice_id not in execution_slice_ids:
-            execution_slice_ids.append(execution_slice_id)
-        while len(row) <= execution_slice_column:
-            row.append("")
-        row[execution_slice_column] = ", ".join(execution_slice_ids)
-        break
-
-    if row_index is None:
-        raise RuntimeError(
-            f"Could not find a traceability row for planned slice '{planned_slice_id}'."
-        )
-
-    for offset, row in enumerate(rows):
-        line_index = start_index + offset
-        lines[line_index] = "| " + " | ".join(row) + " |"
-    traceability_path.write_text("\n".join(lines) + "\n", encoding="utf-8")
+    markdown_repository.record_execution_slice_id(traceability_path, planned_slice_id, execution_slice_id)
 
 
 def resolve_target(planning_module, selector: str, explicit_scope: Optional[str]):
@@ -1313,9 +1167,6 @@ def ship_accelerator_config(scope_context, execution_module) -> Dict[str, object
     return ship_config if isinstance(ship_config, dict) else {}
 
 
-def _normalize_reconciliation_key(value: str) -> str:
-    return " ".join(value.strip().lower().split())
-
 
 def _relative_display_path(path: Path) -> str:
     try:
@@ -1325,25 +1176,11 @@ def _relative_display_path(path: Path) -> str:
 
 
 def _extract_execution_reconciliation_block(markdown: str) -> Optional[str]:
-    start = markdown.find(EXECUTION_RECONCILIATION_START)
-    if start < 0:
-        return None
-    end = markdown.find(EXECUTION_RECONCILIATION_END, start)
-    if end < 0:
-        return None
-    body_start = start + len(EXECUTION_RECONCILIATION_START)
-    return markdown[body_start:end].strip()
+    return markdown_repository.extract_execution_reconciliation_block(markdown)
 
 
 def _parse_execution_reconciliation_fields(block_text: str) -> Dict[str, str]:
-    fields: Dict[str, str] = {}
-    for line in block_text.splitlines():
-        stripped = line.strip()
-        if not stripped or stripped.startswith("-") or ":" not in stripped:
-            continue
-        key, value = stripped.split(":", 1)
-        fields[_normalize_reconciliation_key(key)] = value.strip()
-    return fields
+    return markdown_repository.parse_execution_reconciliation_fields(block_text)
 
 
 def inspect_execution_reconciliation(

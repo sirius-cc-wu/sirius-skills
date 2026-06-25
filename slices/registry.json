@@ -520,7 +520,17 @@
       "closed_at": "2026-06-25T16:06:22",
       "archived_at": null,
       "relations": []
+    },
+    {
+      "id": "dalc-repo-markdown",
+      "feature": "Implement Markdown and Artifact Repositories",
+      "status": "closed",
+      "path": "slices/dalc-repo-markdown-implement-markdown-and-artifact-repositories/",
+      "updated_at": "2026-06-25T16:21:24",
+      "closed_at": "2026-06-25T16:21:24",
+      "archived_at": null,
+      "relations": []
     }
   ],
-  "generated_at": "2026-06-25T16:06:22"
+  "generated_at": "2026-06-25T16:21:24"
 }
