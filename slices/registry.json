@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "generated_at": "2026-05-01T19:39:57",
+  "generated_at": "2026-06-25T15:45:01",
   "slices": [
     {
       "id": "hss-root-fallback",
@@ -489,6 +489,16 @@
       "path": "slices/spi-operator-contracts-document-rerun-semantics-and-preflight-behavior/",
       "updated_at": "2026-04-24T19:59:33",
       "closed_at": "2026-04-24T19:59:33",
+      "archived_at": null,
+      "relations": []
+    },
+    {
+      "id": "dalc-foundation-storage",
+      "feature": "Implement Storage/Models and relocate Scope Runtime",
+      "status": "closed",
+      "path": "slices/dalc-foundation-storage-implement-storage-models-and-relocate-scope-runtime/",
+      "updated_at": "2026-06-25T15:45:01",
+      "closed_at": "2026-06-25T15:45:01",
       "archived_at": null,
       "relations": []
     }

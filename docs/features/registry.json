@@ -43,6 +43,12 @@
       "path": "docs/features/cross-artifact-management/subfeatures/trace-artifacts/"
     },
     {
+      "feature": "data-access-layer-consolidation",
+      "status": "planning_reviewed",
+      "updated_at": "2026-06-25T15:31:13",
+      "path": "docs/features/data-access-layer-consolidation/"
+    },
+    {
       "feature": "execution-workflow",
       "status": "implemented",
       "updated_at": "2026-04-23T13:39:42",

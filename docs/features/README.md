@@ -9,6 +9,7 @@
 | repair-artifacts | implemented | 2026-04-18T13:36:19 | docs/features/cross-artifact-management/subfeatures/repair-artifacts/ |
 | report-artifacts | implemented | 2026-04-18T13:36:19 | docs/features/cross-artifact-management/subfeatures/report-artifacts/ |
 | trace-artifacts | implemented | 2026-04-18T13:36:18 | docs/features/cross-artifact-management/subfeatures/trace-artifacts/ |
+| data-access-layer-consolidation | planning_reviewed | 2026-06-25T15:31:13 | docs/features/data-access-layer-consolidation/ |
 | execution-workflow | implemented | 2026-04-23T13:39:42 | docs/features/execution-workflow/ |
 | multi-slice-execution | implemented | 2026-04-14T16:33:28 | docs/features/execution-workflow/subfeatures/multi-slice-execution/ |
 | hierarchical-scope-support | implemented | 2026-04-23T13:39:42 | docs/features/hierarchical-scope-support/ |

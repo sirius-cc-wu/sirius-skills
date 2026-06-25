@@ -1,0 +1,11 @@
+{
+  "version": 1,
+  "approved": true,
+  "approved_at": "2026-06-25T07:45:13+00:00",
+  "target_id": "data-access-layer-consolidation",
+  "target_path": "docs/features/data-access-layer-consolidation/",
+  "planning_status": "planning_reviewed",
+  "planning_updated_at": "2026-06-25T15:31:13",
+  "planning_fingerprint": "876392fe890804f269c20aff257bbeddea099b11c7dcca417bbfe7737fd44d05",
+  "approval_note": "continue after foundation-storage closure"
+}

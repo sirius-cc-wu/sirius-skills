@@ -2,8 +2,8 @@
   "proposals": [
     {
       "proposal": "data-access-layer-consolidation",
-      "status": "draft",
-      "updated_at": "2026-06-25T10:49:15",
+      "status": "promoted",
+      "updated_at": "2026-06-25T15:11:51",
       "path": "docs/proposals/data-access-layer-consolidation/"
     },
     {

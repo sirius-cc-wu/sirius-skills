@@ -51,3 +51,4 @@
 | spi-preflight-contract | Add typed ship preflight contract and readiness metadata | closed | 2026-04-24T19:40:59 | 2026-04-24T19:40:59 | slices/spi-preflight-contract-add-typed-ship-preflight-contract-and-readiness-metadata/ |
 | spi-mutation-gating | Gate bootstrap and delegated resume with local-only preflight | closed | 2026-04-24T19:53:24 | 2026-04-24T19:53:24 | slices/spi-mutation-gating-gate-bootstrap-and-delegated-resume-with-local-only-preflight/ |
 | spi-operator-contracts | Document rerun semantics and preflight behavior | closed | 2026-04-24T19:59:33 | 2026-04-24T19:59:33 | slices/spi-operator-contracts-document-rerun-semantics-and-preflight-behavior/ |
+| dalc-foundation-storage | Implement Storage/Models and relocate Scope Runtime | closed | 2026-06-25T15:45:01 | 2026-06-25T15:45:01 | slices/dalc-foundation-storage-implement-storage-models-and-relocate-scope-runtime/ |

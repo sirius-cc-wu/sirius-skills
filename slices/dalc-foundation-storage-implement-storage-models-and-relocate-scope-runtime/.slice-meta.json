@@ -1,0 +1,10 @@
+{
+  "created_at": "2026-06-25T15:37:40",
+  "updated_at": "2026-06-25T15:45:01",
+  "status": "closed",
+  "slice_id": "dalc-foundation-storage",
+  "feature": "Implement Storage/Models and relocate Scope Runtime",
+  "path": "slices/dalc-foundation-storage-implement-storage-models-and-relocate-scope-runtime/",
+  "relations": [],
+  "closed_at": "2026-06-25T15:45:01"
+}

@@ -3,6 +3,15 @@ from pathlib import Path
 from typing import Dict, List, Optional
 
 
+@dataclass(frozen=True)
+class ScopeContext:
+    start_dir: Path
+    repo_root: Path
+    scope_root: Path
+    scope_chain: tuple[Path, ...]
+    planning_config_path: Path
+
+
 @dataclass
 class RegistryStatus:
     artifact_type: str
