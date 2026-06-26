@@ -1,0 +1,12 @@
+@startuml
+actor User as U
+participant CLI
+participant analyze_module as Analyze
+participant storage as Storage
+
+U -> CLI: sirius analyze-impact --feature my-feature
+CLI -> Analyze: load module & call main()
+Analyze -> Storage: read artifact registry
+Analyze --> CLI: outputs impact report
+CLI --> U: return status and report
+@enduml

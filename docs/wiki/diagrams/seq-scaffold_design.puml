@@ -1,0 +1,17 @@
+@startuml
+actor User as U
+participant CLI
+participant discover_commands
+participant scaffold_module as Scaffold
+participant planning_repo as PlanningRepo
+participant markdown_repo as MarkdownRepo
+
+U -> CLI: sirius scaffold-design
+CLI -> discover_commands: discover_commands()
+discover_commands --> CLI: CommandSpec list
+CLI -> Scaffold: load module & call main()
+Scaffold -> PlanningRepo: ensure_registry() 
+Scaffold -> MarkdownRepo: write README.md / scaffold files
+Scaffold --> CLI: exit code
+CLI --> U: return status
+@enduml

@@ -1,0 +1,15 @@
+@startuml
+actor User as U
+participant CLI
+participant discover_commands
+participant bootstrap_module as Bootstrap
+participant planning_repo as PlanningRepo
+
+U -> CLI: sirius bootstrap
+CLI -> discover_commands: discover_commands()
+discover_commands --> CLI: CommandSpec list
+CLI -> Bootstrap: load module & call main()
+Bootstrap -> PlanningRepo: ensure_registry() / write_metadata
+Bootstrap --> CLI: exit code
+CLI --> U: return status
+@enduml
