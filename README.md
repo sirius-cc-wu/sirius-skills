@@ -70,6 +70,15 @@ Current parity guidance:
 - use `--check-packaged-parity` when you explicitly want packaged install
   validation
 
+Targeted skill evals are regular pytest cases. For the current routing packs, run:
+
+```bash
+pytest tests/test_guide_scope_evals.py
+pytest tests/test_guide_scope_followup_evals.py
+pytest tests/test_guide_planning_evals.py
+pytest tests/test_guide_execution_evals.py
+```
+
 Current install stance:
 
 - use `just install` for normal repo refreshes before reloading skills
