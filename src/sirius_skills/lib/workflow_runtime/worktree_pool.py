@@ -60,22 +60,6 @@ def git_repo_root(start_dir: Path | None = None) -> Path:
     return Path(result.stdout.strip()).resolve()
 
 
-def resolve_main_repo_root(repo_root: Path) -> Path:
-    """Resolve the owning repository root for the current checkout."""
-    result = _run_git(["git", "rev-parse", "--git-dir"], cwd=repo_root)
-    if result.returncode != 0:
-        raise RuntimeError(
-            (result.stderr or result.stdout or "Unable to resolve git dir.").strip()
-        )
-
-    git_dir = _resolve_git_output_path(repo_root, result.stdout)
-    if git_dir.name == ".git":
-        return git_dir.parent
-    if git_dir.parent.name == "worktrees" and git_dir.parent.parent.name == ".git":
-        return git_dir.parent.parent.parent
-    raise RuntimeError("Unable to determine the owning repository root.")
-
-
 def git_has_remote(repo_root: Path, name: str = "origin") -> bool:
     """Return True when the repository has the named remote."""
     result = _run_git(["git", "remote"], cwd=repo_root)
@@ -192,8 +176,10 @@ def build_pool_key(value: str) -> str:
 
 def worktree_pool_root(repo_root: Path) -> Path:
     """Return the sibling directory that stores the reusable worktree pool."""
-    main_root = resolve_main_repo_root(repo_root)
-    return main_root.parent / f"{main_root.name}.worktrees"
+    for parent in (repo_root, *repo_root.parents):
+        if parent.name.endswith(".worktrees"):
+            return parent.parent / f"{parent.stem}.worktrees"
+    return repo_root.parent / f"{repo_root.name}.worktrees"
 
 
 def worktree_pool_state_path(repo_root: Path, pool_key: str) -> Path:

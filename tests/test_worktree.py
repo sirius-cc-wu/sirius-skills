@@ -12,6 +12,7 @@ if str(SRC_DIR) not in sys.path:
     sys.path.insert(0, str(SRC_DIR))
 
 from sirius_skills.commands import worktree
+from sirius_skills.lib.workflow_runtime import worktree_pool_root
 
 
 def init_git_repo(root: Path) -> None:
@@ -57,7 +58,7 @@ def test_worktree_get_return_and_reuse(tmp_path, monkeypatch, capsys):
     assert second_path == first_path
 
 
-def test_worktree_pool_anchors_to_main_repo_root(tmp_path, monkeypatch) -> None:
+def test_worktree_pool_anchors_to_the_current_checkout_sibling(tmp_path, monkeypatch) -> None:
     monkeypatch.chdir(tmp_path)
     init_git_repo(tmp_path)
 
@@ -68,7 +69,13 @@ def test_worktree_pool_anchors_to_main_repo_root(tmp_path, monkeypatch) -> None:
     subprocess.run(["git", "worktree", "add", "--detach", str(linked), "HEAD"], cwd=tmp_path, check=True)
 
     config = worktree.load_worktree_config(linked)
-    assert config.worktree_root == tmp_path.parent / f"{tmp_path.name}.worktrees"
+    assert config.worktree_root == tmp_path.parent / f"{linked.name}.worktrees"
+
+
+def test_worktree_pool_does_not_nest_inside_existing_pool() -> None:
+    assert worktree_pool_root(Path("/base/main.worktrees/1/main")) == Path(
+        "/base/main.worktrees"
+    )
 
 
 def test_worktree_json_output(tmp_path, monkeypatch, capsys):
