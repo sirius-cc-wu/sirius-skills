@@ -94,6 +94,7 @@ def test_discover_commands_lists_runnable_scripts_only() -> None:
         commands["ship-worktree"].module_name
         == "sirius_skills.commands.ship_worktree"
     )
+    assert commands["worktree"].module_name == "sirius_skills.commands.worktree"
     assert "sync-shared-runtime" not in commands
     assert "validate-workflow-state" in commands
     assert "artifact-inventory" not in commands

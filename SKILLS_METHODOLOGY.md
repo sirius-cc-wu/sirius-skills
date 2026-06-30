@@ -47,7 +47,7 @@ planning packet explicitly documents a temporary parallel transition.
 
 After each planning phase writes or updates its repository artifacts, persist the matching metadata transition with the owner script for that planning scope. Canonical features should use `sirius manage-planning sync-status <feature-selector> --through <expected-status>`. Subfeatures should use `sirius manage-subfeatures set-status <feature-selector> <subfeature-id> <expected-status>` through `reviewed`, then `sirius manage-subfeatures approve ...` to record explicit approval and any ready slice IDs. Use adjacent advancement by default and reserve explicit overrides for deliberate repair or terminal execution states.
 
-The execution layer works one implementation-ready slice at a time, starting with `slice` bootstrap from approved committed planning artifacts. For reviewed subfeatures, that approval must be recorded in `.subfeature-meta.json` before bootstrap. `ship` can sit above that flow when an approved and committed feature or subfeature should be worked as one dependency-aware backlog; it should follow increment order first, then slice dependencies within the current increment, while still handing each concrete slice to the next existing single-slice owner such as `brief`, `blueprint`, repository implementation, `review-execution`, `close-slice`, or `commit`. When the same backlog should execute on its own git branch and checkout, `ship-worktree` can sit one layer above `ship` to create or reuse a dedicated worktree, run `ship` there, and later hand the branch off to PR creation.
+The execution layer works one implementation-ready slice at a time, starting with `slice` bootstrap from approved committed planning artifacts. For reviewed subfeatures, that approval must be recorded in `.subfeature-meta.json` before bootstrap. `ship` can sit above that flow when an approved and committed feature or subfeature should be worked as one dependency-aware backlog; it should follow increment order first, then slice dependencies within the current increment, while still handing each concrete slice to the next existing single-slice owner such as `brief`, `blueprint`, repository implementation, `review-execution`, `close-slice`, or `commit`. When the same backlog should execute on its own git branch and checkout, `ship-worktree` can sit one layer above `ship` to create or reuse a dedicated worktree, run `ship` there, and later hand the branch off to PR creation. For faster manual local work, use the shared `sirius worktree get` / `return` / `status` pool rooted at the owning repo's sibling `<repo>.worktrees` directory instead of the target-specific wrapper.
 
 When accelerators are enabled, the default operator path compresses to one
 planning accelerator surface and one execution accelerator surface, with an
@@ -61,6 +61,10 @@ explicit approval-and-commit checkpoint between them:
 4. When the target should execute on its own branch and checkout,
    `ship-worktree --resume` can wrap that same execution path inside a
    dedicated worktree and later hand the branch off to PR creation.
+5. For ad hoc manual work, use `sirius worktree get` to lease a reusable
+   checkout in the owning repo's sibling `<repo>.worktrees`, `sirius worktree
+   status` to inspect the pool, and `sirius worktree return <path>` to hand it
+   back.
 
 `guide-scope`, `guide-planning`, and `guide-execution` remain the canonical
 manual fallback surfaces for ambiguous scope, recovery, and fine-grained

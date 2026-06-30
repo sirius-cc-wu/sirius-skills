@@ -20,6 +20,8 @@ sirius autoplan <target> --execute-owner-chain --json
 sirius manage-planning <args>
 sirius validate-workflow-state
 sirius sync-shared-references
+sirius worktree get --json
+sirius worktree status
 ```
 
 ## Installing skills
@@ -118,7 +120,10 @@ to drive planning to review-ready state, rerun `autoplan --approve` after
 explicit human approval so it can hand off the planning commit checkpoint, then
 use `ship --resume` once the approved planning artifacts are committed, or use
 `ship-worktree` when execution should move into a treehouse-managed leased
-worktree tied to that feature or subfeature.
+worktree tied to that feature or subfeature. Use `worktree get` /
+`worktree return` when you want
+a reusable manual checkout pool rooted at the owning repo's sibling
+`<repo>.worktrees` directory without target-specific execution routing.
 
 Shared runtime state under `.skills/runtime/` is the cross-agent transient
 handoff surface. Keep durable feature/subfeature truth in repo planning docs,
@@ -255,6 +260,9 @@ should execute in a dedicated treehouse-managed leased worktree. It keeps the
 original branch as the PR base, asks treehouse for a reusable worktree lease,
 runs `ship` inside that checkout, and can hand the finished branch off to PR
 creation without moving backlog ownership out of `ship`.
+
+`worktree` provides the reusable manual pool for fast local checkout reuse
+without target-specific execution routing.
 
 By default, new execution slices are created under `slices/` unless `.skills/execution.json` overrides the location.
 

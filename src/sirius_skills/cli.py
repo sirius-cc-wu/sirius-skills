@@ -127,6 +127,10 @@ PACKAGE_COMMANDS = {
         "sirius_skills.commands.trace_artifacts",
         "sirius_skills.commands.trace_artifacts",
     ),
+    "worktree": (
+        "sirius_skills.commands.worktree",
+        "sirius_skills.commands.worktree",
+    ),
     "validate-workflow-state": (
         "sirius_skills.commands.validate_workflow_state",
         "sirius_skills.commands.validate_workflow_state",
