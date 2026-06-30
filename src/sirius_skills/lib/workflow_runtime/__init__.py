@@ -23,12 +23,14 @@ from sirius_skills.lib.workflow_runtime.learnings import (
 )
 from sirius_skills.lib.workflow_runtime.locking import locked_file
 from sirius_skills.lib.workflow_runtime.worktree_pool import (
+    ProcessInfo,
     WorktreeAcquireResult,
     WorktreePoolEntry,
     WorktreePoolState,
     WorktreePoolStatus,
     acquire_worktree,
     git_repo_root,
+    find_processes_in_worktree,
     list_worktrees,
     return_worktree,
     worktree_pool_root,
@@ -66,6 +68,7 @@ __all__ = [
     "LearningRecord",
     "RequestHandoffRecord",
     "WorktreeSessionRecord",
+    "ProcessInfo",
     "WorktreeAcquireResult",
     "WorktreePoolEntry",
     "WorktreePoolState",
@@ -73,6 +76,7 @@ __all__ = [
     "append_event",
     "append_learning",
     "acquire_worktree",
+    "find_processes_in_worktree",
     "build_worktree_target_key",
     "build_failure_context",
     "build_accelerator_readiness",

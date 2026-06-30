@@ -3,7 +3,10 @@ from __future__ import annotations
 import json
 import subprocess
 import sys
+import time
 from pathlib import Path
+
+import psutil
 
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
@@ -76,6 +79,47 @@ def test_worktree_pool_does_not_nest_inside_existing_pool() -> None:
     assert worktree_pool_root(Path("/base/main.worktrees/1/main")) == Path(
         "/base/main.worktrees"
     )
+
+
+def test_worktree_status_marks_in_use_and_blocks_reuse(tmp_path, monkeypatch, capsys):
+    monkeypatch.chdir(tmp_path)
+    init_git_repo(tmp_path)
+
+    (tmp_path / "baseline.txt").write_text("baseline\n", encoding="utf-8")
+    git_commit_all(tmp_path, "baseline")
+
+    assert worktree.main(["get"]) == 0
+    first_path = Path(capsys.readouterr().out.strip())
+    assert first_path.is_dir()
+
+    assert worktree.main(["return", str(first_path)]) == 0
+    capsys.readouterr()
+
+    sleeper = subprocess.Popen(
+        [sys.executable, "-c", "import time; time.sleep(10)"],
+        cwd=first_path,
+    )
+    try:
+        for _ in range(50):
+            if psutil.pid_exists(sleeper.pid):
+                break
+            time.sleep(0.05)
+
+        assert worktree.main(["status"]) == 0
+        status_output = capsys.readouterr().out
+        assert "in-use" in status_output or "you're here" in status_output
+        assert str(sleeper.pid) in status_output or "python" in status_output.lower()
+
+        assert worktree.main(["get"]) == 0
+        second_path = Path(capsys.readouterr().out.strip())
+        assert second_path != first_path
+    finally:
+        sleeper.terminate()
+        try:
+            sleeper.wait(timeout=5)
+        except subprocess.TimeoutExpired:
+            sleeper.kill()
+            sleeper.wait(timeout=5)
 
 
 def test_worktree_json_output(tmp_path, monkeypatch, capsys):

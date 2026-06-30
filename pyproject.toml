@@ -8,6 +8,7 @@ version = "0.1.0"
 description = "CLI helpers for the sirius workflow collection."
 readme = "README.md"
 requires-python = ">=3.11"
+dependencies = ["psutil>=5.9"]
 
 [project.scripts]
 sirius = "sirius_skills.cli:main"

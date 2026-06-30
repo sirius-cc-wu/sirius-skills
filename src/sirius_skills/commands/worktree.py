@@ -41,7 +41,7 @@ def _human_path(path: str) -> str:
 
 def _status_payload(statuses) -> Dict[str, Any]:
     return {
-        "pool": [status.__dict__ for status in statuses],
+        "pool": [status.to_dict() for status in statuses],
         "count": len(statuses),
     }
 
@@ -62,6 +62,11 @@ def _render_status_lines(statuses) -> list[str]:
             line += f"  (held by {status.lease_holder})"
         line += f"  [{status.branch}]"
         lines.append(line)
+        if status.processes:
+            proc_indent = " " * (4 + 2 + 11 + 2)
+            lines.append(
+                f"{proc_indent}{', '.join(str(proc) for proc in status.processes)}"
+            )
     return lines
 
 

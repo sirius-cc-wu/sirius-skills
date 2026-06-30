@@ -9,6 +9,8 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Callable, Dict, Optional, Sequence, TypeVar
 
+import psutil
+
 from sirius_skills.lib.workflow_runtime.locking import locked_file
 from sirius_skills.lib.workflow_runtime.worktree_scope import git_dirty_paths
 
@@ -120,6 +122,62 @@ def git_worktree_paths(repo_root: Path) -> set[Path]:
         if line.startswith("worktree "):
             paths.add(Path(line.removeprefix("worktree ")).resolve())
     return paths
+
+
+@dataclass
+class ProcessInfo:
+    """One running process discovered inside a pooled worktree."""
+
+    pid: int
+    name: str
+
+    def __str__(self) -> str:
+        return f"{self.name} ({self.pid})"
+
+
+def _resolve_path(path: str) -> Path:
+    return Path(path).expanduser().resolve()
+
+
+def _path_is_within(path: Path, root: Path) -> bool:
+    try:
+        path.relative_to(root)
+        return True
+    except ValueError:
+        return False
+
+
+def find_processes_in_worktree(worktree_path: Path) -> list[ProcessInfo]:
+    """Return processes whose cwd lives within the given worktree."""
+    if not worktree_path.exists():
+        return []
+
+    abs_worktree = _resolve_path(str(worktree_path))
+    result: list[ProcessInfo] = []
+    for proc in psutil.process_iter(attrs=["pid", "name"]):
+        try:
+            cwd = proc.cwd()
+        except (psutil.NoSuchProcess, psutil.AccessDenied, psutil.ZombieProcess):
+            continue
+        if not cwd:
+            continue
+
+        abs_cwd = _resolve_path(cwd)
+        if not _path_is_within(abs_cwd, abs_worktree):
+            continue
+
+        result.append(
+            ProcessInfo(
+                pid=int(proc.info["pid"]),
+                name=str(proc.info.get("name") or ""),
+            )
+        )
+    return result
+
+
+def is_worktree_in_use(worktree_path: Path) -> bool:
+    """Return True when a pooled worktree has running processes inside it."""
+    return len(find_processes_in_worktree(worktree_path)) > 0
 
 
 def is_worktree_dirty(worktree_path: Path) -> bool:
@@ -261,6 +319,17 @@ class WorktreePoolStatus:
     branch: str
     status: str
     lease_holder: Optional[str] = None
+    processes: list[ProcessInfo] = field(default_factory=list)
+
+    def to_dict(self) -> Dict[str, Any]:
+        return {
+            "name": self.name,
+            "path": self.path,
+            "branch": self.branch,
+            "status": self.status,
+            "lease_holder": self.lease_holder,
+            "processes": [asdict(proc) for proc in self.processes],
+        }
 
 
 @dataclass
@@ -316,14 +385,6 @@ def _branch_name(branch_prefix: str, name: str) -> str:
     return f"{prefix}/{name}" if prefix else name
 
 
-def _cwd_is_within(path: Path, cwd: Path) -> bool:
-    try:
-        cwd.relative_to(path.resolve())
-        return True
-    except ValueError:
-        return False
-
-
 def _heal_state(state: WorktreePoolState, repo_root: Path) -> bool:
     active_paths = git_worktree_paths(repo_root)
     before = len(state.entries)
@@ -357,6 +418,8 @@ def acquire_worktree(
         for index, entry in enumerate(state.entries):
             entry_path = Path(entry.path)
             if entry.leased:
+                continue
+            if find_processes_in_worktree(entry_path):
                 continue
             if is_worktree_dirty(entry_path):
                 continue
@@ -408,17 +471,18 @@ def list_worktrees(
     def _list(state: WorktreePoolState) -> list[WorktreePoolStatus]:
         _heal_state(state, repo_root)
         statuses: list[WorktreePoolStatus] = []
+        cwd = Path.cwd().resolve()
         for entry in state.entries:
             path = Path(entry.path)
-            dirty = is_worktree_dirty(path)
+            processes = find_processes_in_worktree(path)
             if entry.leased:
                 status = "leased"
-            elif dirty:
+            elif processes:
+                status = "you're here" if _path_is_within(cwd, path.resolve()) else "in-use"
+            elif is_worktree_dirty(path):
                 status = "dirty"
             else:
                 status = "available"
-            if status != "dirty" and _cwd_is_within(path, cwd):
-                status = "you're here"
             statuses.append(
                 WorktreePoolStatus(
                     name=entry.name,
@@ -426,6 +490,7 @@ def list_worktrees(
                     branch=entry.branch,
                     status=status,
                     lease_holder=entry.lease_holder if entry.leased else None,
+                    processes=processes,
                 )
             )
         return statuses
