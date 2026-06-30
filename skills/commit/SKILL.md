@@ -26,7 +26,26 @@ Follow these standards for all commit messages:
 - **Default Summary Line:** Use the format `scope: summary`.
     - **Scope:** Mandatory. Use the crate name or module name (e.g., `api`, `core`).
     - **Summary:** A concise, imperative summary of the change (e.g., "Refactor service handlers").
-- **Body (Optional but Recommended):** A bulleted list of specific changes or a brief explanation of *why* the changes were made.
+- **Body (Optional but Recommended):** Start with a brief explanation of *why* the changes were made, then add a bulleted list of specific changes.
+- **Prefer rationale over inventory:** Lead with the intent, tradeoffs, or reason the change exists, not just a second copy of the diff.
+- **Good body content:** motivation, behavior change, constraints, compatibility notes, or why a refactor was necessary.
+- **Avoid weak bodies:** bare file lists, vague "updated code" text, or a restatement of the summary line.
+
+Examples:
+
+```text
+core: simplify retry handling
+
+Reduces duplicate retry logic so backoff behavior stays consistent across API
+and worker flows.
+```
+
+```text
+ui: tighten empty-state copy
+
+Clarifies the no-data state so users understand the page is waiting for input,
+not broken.
+```
 
 ### 3a. Optional Project-Specific Conventions
 If the project defines `.skills/conventions.json`, follow that configuration instead of assuming the default format.
