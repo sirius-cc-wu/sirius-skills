@@ -46,8 +46,8 @@ def test_worktree_get_return_and_reuse(tmp_path, monkeypatch, capsys):
     assert worktree.main(["get"]) == 0
     first_path = Path(capsys.readouterr().out.strip())
     assert first_path.is_dir()
-    assert first_path.parent == config.worktree_root / "1"
-    assert first_path.name == tmp_path.name
+    assert first_path.parent == config.worktree_root
+    assert first_path.name == "1"
 
     assert worktree.main(["status"]) == 0
     status_output = capsys.readouterr().out
@@ -144,7 +144,7 @@ def test_worktree_json_output(tmp_path, monkeypatch, capsys):
     assert status_payload["pool"][0]["source"] == "manual"
 
 
-def test_worktree_status_includes_ship_worktree_entries(tmp_path, monkeypatch, capsys):
+def test_worktree_status_includes_recorded_entries(tmp_path, monkeypatch, capsys):
     monkeypatch.chdir(tmp_path)
     init_git_repo(tmp_path)
 
@@ -161,12 +161,12 @@ def test_worktree_status_includes_ship_worktree_entries(tmp_path, monkeypatch, c
         name="ship-target",
         path=ship_path,
         branch="HEAD",
-        source="ship-worktree",
+        source="external",
         lease_holder="target-123",
         leased=True,
     )
 
     assert worktree.main(["status"]) == 0
     status_output = capsys.readouterr().out
-    assert "ship-worktree" in status_output
+    assert "external" in status_output
     assert "target-123" in status_output

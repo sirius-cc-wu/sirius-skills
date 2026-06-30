@@ -381,7 +381,7 @@ def _next_entry_name(state: WorktreePoolState) -> str:
 
 
 def _entry_path(worktree_root: Path, _pool_key: str, name: str, repo_root: Path) -> Path:
-    return worktree_root / name / repo_root.name
+    return worktree_root / name
 
 
 def _find_entry_index(state: WorktreePoolState, *, name: str | None = None, path: Path | None = None) -> int:
