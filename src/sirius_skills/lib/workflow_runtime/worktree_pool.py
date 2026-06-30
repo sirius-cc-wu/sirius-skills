@@ -254,6 +254,7 @@ class WorktreePoolEntry:
     branch: str
     created_at: str
     updated_at: str
+    source: str = "manual"
     leased: bool = False
     lease_holder: Optional[str] = None
     leased_at: Optional[str] = None
@@ -269,6 +270,7 @@ class WorktreePoolEntry:
             branch=str(payload["branch"]),
             created_at=str(payload["created_at"]),
             updated_at=str(payload["updated_at"]),
+            source=str(payload.get("source", "manual")),
             leased=bool(payload.get("leased", False)),
             lease_holder=(
                 str(payload["lease_holder"]) if payload.get("lease_holder") is not None else None
@@ -318,6 +320,7 @@ class WorktreePoolStatus:
     path: str
     branch: str
     status: str
+    source: str = "manual"
     lease_holder: Optional[str] = None
     processes: list[ProcessInfo] = field(default_factory=list)
 
@@ -327,6 +330,7 @@ class WorktreePoolStatus:
             "path": self.path,
             "branch": self.branch,
             "status": self.status,
+            "source": self.source,
             "lease_holder": self.lease_holder,
             "processes": [asdict(proc) for proc in self.processes],
         }
@@ -376,8 +380,17 @@ def _next_entry_name(state: WorktreePoolState) -> str:
     return "1"
 
 
-def _entry_path(worktree_root: Path, pool_key: str, name: str, repo_root: Path) -> Path:
-    return worktree_root / build_pool_key(pool_key) / name / repo_root.name
+def _entry_path(worktree_root: Path, _pool_key: str, name: str, repo_root: Path) -> Path:
+    return worktree_root / name / repo_root.name
+
+
+def _find_entry_index(state: WorktreePoolState, *, name: str | None = None, path: Path | None = None) -> int:
+    for index, entry in enumerate(state.entries):
+        if name is not None and entry.name == name:
+            return index
+        if path is not None and Path(entry.path).resolve() == path.resolve():
+            return index
+    return -1
 
 
 def _branch_name(branch_prefix: str, name: str) -> str:
@@ -429,6 +442,7 @@ def acquire_worktree(
             state.entries[index].lease_holder = lease_holder
             state.entries[index].leased_at = _utc_now()
             state.entries[index].updated_at = _utc_now()
+            state.entries[index].source = "manual"
             return WorktreeAcquireResult(entry=state.entries[index], created=False, state_path=state_path)
 
         if len(state.entries) >= max_trees:
@@ -447,6 +461,7 @@ def acquire_worktree(
             branch=branch,
             created_at=_utc_now(),
             updated_at=_utc_now(),
+            source="manual",
             leased=True,
             lease_holder=lease_holder,
             leased_at=_utc_now(),
@@ -466,7 +481,6 @@ def list_worktrees(
     """List the current status of all pooled worktrees."""
     state_path = worktree_pool_state_path(repo_root, pool_key)
     default_state = _default_state(repo_root, pool_key, worktree_root, get_default_branch(repo_root))
-    cwd = Path.cwd().resolve()
 
     def _list(state: WorktreePoolState) -> list[WorktreePoolStatus]:
         _heal_state(state, repo_root)
@@ -489,6 +503,7 @@ def list_worktrees(
                     path=entry.path,
                     branch=entry.branch,
                     status=status,
+                    source=entry.source,
                     lease_holder=entry.lease_holder if entry.leased else None,
                     processes=processes,
                 )
@@ -496,6 +511,55 @@ def list_worktrees(
         return statuses
 
     return _with_state_lock(state_path, default_state, _list)
+
+
+def record_worktree(
+    repo_root: Path,
+    *,
+    worktree_root: Path,
+    pool_key: str,
+    name: str,
+    path: Path,
+    branch: str,
+    source: str,
+    lease_holder: Optional[str] = None,
+    leased: bool = True,
+) -> WorktreePoolEntry:
+    """Create or update a pooled worktree entry at an explicit path."""
+    state_path = worktree_pool_state_path(repo_root, pool_key)
+    default_state = _default_state(repo_root, pool_key, worktree_root, get_default_branch(repo_root))
+    normalized_path = path.resolve()
+
+    def _record(state: WorktreePoolState) -> WorktreePoolEntry:
+        _heal_state(state, repo_root)
+        now = _utc_now()
+        index = _find_entry_index(state, name=name, path=normalized_path)
+        if index >= 0:
+            entry = state.entries[index]
+            entry.path = str(normalized_path)
+            entry.branch = branch
+            entry.source = source
+            entry.leased = leased
+            entry.lease_holder = lease_holder if leased else None
+            entry.leased_at = now if leased else None
+            entry.updated_at = now
+            return entry
+
+        entry = WorktreePoolEntry(
+            name=name,
+            path=str(normalized_path),
+            branch=branch,
+            created_at=now,
+            updated_at=now,
+            source=source,
+            leased=leased,
+            lease_holder=lease_holder if leased else None,
+            leased_at=now if leased else None,
+        )
+        state.entries.append(entry)
+        return entry
+
+    return _with_state_lock(state_path, default_state, _record)
 
 
 def return_worktree(

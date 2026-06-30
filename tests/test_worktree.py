@@ -15,7 +15,7 @@ if str(SRC_DIR) not in sys.path:
     sys.path.insert(0, str(SRC_DIR))
 
 from sirius_skills.commands import worktree
-from sirius_skills.lib.workflow_runtime import worktree_pool_root
+from sirius_skills.lib.workflow_runtime import record_worktree, worktree_pool_root
 
 
 def init_git_repo(root: Path) -> None:
@@ -46,6 +46,8 @@ def test_worktree_get_return_and_reuse(tmp_path, monkeypatch, capsys):
     assert worktree.main(["get"]) == 0
     first_path = Path(capsys.readouterr().out.strip())
     assert first_path.is_dir()
+    assert first_path.parent == config.worktree_root / "1"
+    assert first_path.name == tmp_path.name
 
     assert worktree.main(["status"]) == 0
     status_output = capsys.readouterr().out
@@ -139,3 +141,32 @@ def test_worktree_json_output(tmp_path, monkeypatch, capsys):
     status_payload = json.loads(capsys.readouterr().out)
     assert status_payload["count"] == 1
     assert status_payload["pool"][0]["status"] == "leased"
+    assert status_payload["pool"][0]["source"] == "manual"
+
+
+def test_worktree_status_includes_ship_worktree_entries(tmp_path, monkeypatch, capsys):
+    monkeypatch.chdir(tmp_path)
+    init_git_repo(tmp_path)
+
+    (tmp_path / "baseline.txt").write_text("baseline\n", encoding="utf-8")
+    git_commit_all(tmp_path, "baseline")
+
+    ship_path = worktree_pool_root(tmp_path) / "feature" / "ship-target" / tmp_path.name
+    ship_path.parent.mkdir(parents=True, exist_ok=True)
+    subprocess.run(["git", "worktree", "add", str(ship_path), "HEAD"], cwd=tmp_path, check=True)
+    record_worktree(
+        tmp_path,
+        worktree_root=worktree_pool_root(tmp_path),
+        pool_key="shared",
+        name="ship-target",
+        path=ship_path,
+        branch="HEAD",
+        source="ship-worktree",
+        lease_holder="target-123",
+        leased=True,
+    )
+
+    assert worktree.main(["status"]) == 0
+    status_output = capsys.readouterr().out
+    assert "ship-worktree" in status_output
+    assert "target-123" in status_output

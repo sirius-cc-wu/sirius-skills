@@ -17,17 +17,19 @@ from sirius_skills.lib.workflow_runtime import (
     worktree_pool_root,
 )
 
+WORKTREE_POOL_KEY = "shared"
+
 
 @dataclass
 class WorktreeCommandConfig:
-    """Typed config for the repo-derived manual worktree pool."""
+    """Typed config for the repo-derived shared worktree pool."""
 
     worktree_root: Path
     branch_prefix: str = "wt"
 
 
 def load_worktree_config(repo_root: Path) -> WorktreeCommandConfig:
-    """Load the manual worktree config from the repository path alone."""
+    """Load the shared worktree config from the repository path alone."""
     return WorktreeCommandConfig(worktree_root=worktree_pool_root(repo_root))
 
 
@@ -57,7 +59,7 @@ def _render_status_lines(statuses) -> list[str]:
         return ["🌳 No worktrees in pool."]
     lines = []
     for status in statuses:
-        line = f"{status.name:<4}  {status.status:<11}  {_human_path(status.path)}"
+        line = f"{status.name:<4}  {status.status:<11}  {status.source:<12}  {_human_path(status.path)}"
         if status.lease_holder:
             line += f"  (held by {status.lease_holder})"
         line += f"  [{status.branch}]"
@@ -71,7 +73,7 @@ def _render_status_lines(statuses) -> list[str]:
 
 
 def parse_args(argv: Sequence[str] | None = None) -> argparse.Namespace:
-    """Parse the manual worktree subcommand arguments."""
+    """Parse the shared worktree subcommand arguments."""
     parser = argparse.ArgumentParser(description="Manage a reusable pool of git worktrees.")
     subparsers = parser.add_subparsers(dest="subcommand", required=True)
 
@@ -99,7 +101,7 @@ def run_get(repo_root: Path, config: WorktreeCommandConfig, args: argparse.Names
     result: WorktreeAcquireResult = acquire_worktree(
         repo_root,
         worktree_root=config.worktree_root,
-        pool_key="manual",
+        pool_key=WORKTREE_POOL_KEY,
         branch_prefix=config.branch_prefix,
         lease_holder=args.lease_holder,
     )
@@ -128,7 +130,7 @@ def run_return(repo_root: Path, config: WorktreeCommandConfig, args: argparse.Na
     entry = return_worktree(
         repo_root,
         worktree_root=config.worktree_root,
-        pool_key="manual",
+        pool_key=WORKTREE_POOL_KEY,
         worktree_path=path,
         force=args.force,
     )
@@ -147,11 +149,11 @@ def run_return(repo_root: Path, config: WorktreeCommandConfig, args: argparse.Na
 
 
 def run_status(repo_root: Path, config: WorktreeCommandConfig, args: argparse.Namespace) -> int:
-    """Render the current manual worktree pool status."""
+    """Render the current shared worktree pool status."""
     statuses = list_worktrees(
         repo_root,
         worktree_root=config.worktree_root,
-        pool_key="manual",
+        pool_key=WORKTREE_POOL_KEY,
     )
     payload = _status_payload(statuses)
     if args.json:
@@ -163,7 +165,7 @@ def run_status(repo_root: Path, config: WorktreeCommandConfig, args: argparse.Na
 
 
 def main(argv: Sequence[str] | None = None) -> int:
-    """Run the manual worktree command entrypoint."""
+    """Run the shared worktree command entrypoint."""
     args = parse_args(argv)
     repo_root = git_repo_root()
     config = load_worktree_config(repo_root)
