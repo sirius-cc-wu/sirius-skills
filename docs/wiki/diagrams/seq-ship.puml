@@ -1,0 +1,17 @@
+@startuml
+actor User as U
+participant CLI
+participant discover_commands
+participant ship_module as Ship
+participant worktree as Worktree
+participant runtime as Runtime
+
+U -> CLI: sirius ship
+CLI -> discover_commands: discover_commands()
+discover_commands --> CLI: CommandSpec list
+CLI -> Ship: load module & call main()
+Ship -> Worktree: build_worktree_target_key / apply changes
+Ship -> Runtime: write_checkpoint / record events
+Ship --> CLI: exit code
+CLI --> U: return status
+@enduml

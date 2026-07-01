@@ -1,0 +1,17 @@
+@startuml
+actor Automation as A
+participant CLI
+participant discover_commands
+participant validate_module as Validate
+participant storage as Storage
+participant transitions as Transitions
+
+A -> CLI: sirius validate-workflow-state
+CLI -> discover_commands: discover_commands()
+discover_commands --> CLI: CommandSpec list
+CLI -> Validate: load module & call main()
+Validate -> Storage: read state files
+Validate -> Transitions: run transition checks
+Validate --> CLI: exit code / report
+CLI --> A: return status and report
+@enduml
