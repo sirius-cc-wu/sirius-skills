@@ -105,7 +105,7 @@ The managed repo-first skill set is grouped into:
 - repo utilities: `skills/bootstrap/`, `skills/commit/`, `skills/create-pr/`, `skills/governance-update/`, `skills/simplify/`
 - accelerator utilities: `skills/autoplan/`, `skills/learn/`, `skills/ship-slice/`, `skills/ship-worktree/`
 - artifact maintenance: `skills/audit-artifacts/`, `skills/measure-artifacts/`, `skills/trace-artifacts/`, `skills/report-artifacts/`, `skills/repair-artifacts/`, `skills/archive-artifacts/`
-- planning layer: `skills/guide-scope/`, `skills/guide-planning/`, `skills/propose/`, `skills/add-subfeature/`, `skills/migrate-subfeatures/`, `skills/assess/`, `skills/research/`, `skills/discover/`, `skills/design/`, `skills/ui-flow/`, `skills/breakdown/`, `skills/review-planning/`
+- planning layer: `skills/guide-scope/`, `skills/guide-planning/`, `skills/propose/`, `skills/add-subfeature/`, `skills/migrate-subfeatures/`, `skills/migrate-slices/`, `skills/assess/`, `skills/research/`, `skills/discover/`, `skills/design/`, `skills/ui-flow/`, `skills/breakdown/`, `skills/review-planning/`
 - execution layer: `skills/slice/`, `skills/guide-execution/`, `skills/ship/`, `skills/ship-worktree/`, `skills/brief/`, `skills/blueprint/`, `skills/review-execution/`, `skills/reconcile-execution/`, `skills/close-slice/`
 
 If a project has no extra configuration, these skills should still work with generic conventions.
@@ -150,6 +150,7 @@ For repositories that use repo-first planning, the recommended short-name planni
 - `skills/propose/`
 - `skills/add-subfeature/`
 - `skills/migrate-subfeatures/`
+- `skills/migrate-slices/`
 - `skills/assess/`
 - `skills/research/`
 - `skills/discover/`
@@ -160,7 +161,7 @@ For repositories that use repo-first planning, the recommended short-name planni
 
 These skills sit **before** the execution-slice skills:
 
-- planning layer: `guide-scope`, `guide-planning`, `propose`, `add-subfeature`, `migrate-subfeatures`, `assess`, `research`, `discover`, `design`, `ui-flow`, `breakdown`, `review-planning`
+- planning layer: `guide-scope`, `guide-planning`, `propose`, `add-subfeature`, `migrate-subfeatures`, `migrate-slices`, `assess`, `research`, `discover`, `design`, `ui-flow`, `breakdown`, `review-planning`
 - execution layer: `slice`, `guide-execution`, `ship`, `ship-worktree`, `brief`, `blueprint`, `review-execution`, `reconcile-execution`, `close-slice`
 
 Canonical planning surface:
@@ -238,6 +239,10 @@ For repositories that still contain legacy `changes/` packets from the old
 workflow, `migrate-subfeatures` can scan and convert those legacy planning
 folders into the current durable `subfeatures/` layout before normal planning
 work continues.
+
+For repositories that still keep execution slices in a root-level `slices/`
+tree, `migrate-slices` can scan, version, and move those slices into feature-local
+scope roots while preserving archived history.
 
 In the repo-native flow, `guide-planning` owns feature-planning readiness and routing, `breakdown` owns repo-story decomposition, `review-planning` owns planning readiness review, `slice` owns execution bootstrap from approved committed planning artifacts, `brief` owns the slice-scoped `brief.md` as a lean contract for intent, acceptance, and assumptions, `blueprint` owns the final slice-scoped technical execution plan and validation checklist, and `review-execution` owns the final implementation-versus-brief review before closure.
 

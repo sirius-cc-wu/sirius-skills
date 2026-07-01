@@ -361,8 +361,10 @@ def write_config(
     proposal_dir: str,
     design_diagram_mode: str,
     existing: Optional[Dict[str, object]] = None,
+    scope_context: Optional[object] = None,
 ) -> None:
-    config_file = SCOPE_RUNTIME.resolve_scope_context().planning_config_path
+    resolved_scope = scope_context or SCOPE_RUNTIME.resolve_scope_context()
+    config_file = resolved_scope.planning_config_path
     os.makedirs(config_file.parent, exist_ok=True)
     updated: Dict[str, object] = dict(existing or {})
     updated["planning_dir"] = normalize_planning_dir(planning_dir)

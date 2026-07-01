@@ -14,6 +14,7 @@ Use a **two-layer workflow**:
    - `guide-planning`
    - `propose`
    - `add-subfeature`
+   - `migrate-slices` (for co-locating execution slices)
    - `assess`
    - `research` (when upstream comparison materially affects planning shape)
    - `discover`
@@ -34,6 +35,9 @@ Use a **two-layer workflow**:
 The planning layer keeps scope, design, decomposition, increment planning, and
 optional durable reference comparison in repo documents, and `guide-planning`
 owns readiness and routing across those artifacts.
+
+`migrate-slices` is the migration helper for execution artifacts that still live
+in a root-level `slices/` tree.
 
 When planning work consolidates, narrows, or supersedes older workflow
 surface, keep the user-facing route singular: `guide-scope` stays the optional

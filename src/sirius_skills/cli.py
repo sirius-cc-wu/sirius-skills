@@ -79,6 +79,10 @@ PACKAGE_COMMANDS = {
         "sirius_skills.commands.migrate_subfeatures",
         "sirius_skills.commands.migrate_subfeatures",
     ),
+    "migrate-slices": (
+        "sirius_skills.commands.migrate_slices",
+        "sirius_skills.commands.migrate_slices",
+    ),
     "record-review": (
         "sirius_skills.commands.record_review",
         "sirius_skills.commands.record_review",
