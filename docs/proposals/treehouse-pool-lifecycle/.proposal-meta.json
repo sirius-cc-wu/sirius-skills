@@ -1,0 +1,11 @@
+{
+  "proposal_slug": "treehouse-pool-lifecycle",
+  "status": "draft",
+  "created_at": "2026-07-01T16:38:59",
+  "updated_at": "2026-07-01T16:38:59",
+  "summary": "Manage reusable per-repository worktree pools with acquisition, status, and return.",
+  "review_note": null,
+  "target_feature": null,
+  "promoted_feature": null,
+  "promoted_at": null
+}
