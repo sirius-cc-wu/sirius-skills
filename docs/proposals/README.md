@@ -6,10 +6,5 @@
 | hierarchical-scope-support | promoted | 2026-04-04T02:18:05 | docs/proposals/hierarchical-scope-support/ |
 | skill-state-engine-rewrite | draft | 2026-04-17T19:21:32 | docs/proposals/skill-state-engine-rewrite/ |
 | throughput-acceleration-workflow | promoted | 2026-04-22T09:18:53 | docs/proposals/throughput-acceleration-workflow/ |
-| treehouse-config-and-hooks | draft | 2026-07-01T16:39:01 | docs/proposals/treehouse-config-and-hooks/ |
-| treehouse-distribution-and-update | draft | 2026-07-01T16:39:01 | docs/proposals/treehouse-distribution-and-update/ |
-| treehouse-durable-leasing | draft | 2026-07-01T16:39:00 | docs/proposals/treehouse-durable-leasing/ |
-| treehouse-pool-lifecycle | draft | 2026-07-01T16:38:59 | docs/proposals/treehouse-pool-lifecycle/ |
-| treehouse-safe-reclamation | draft | 2026-07-01T16:39:00 | docs/proposals/treehouse-safe-reclamation/ |
 | workflow-capability-upgrades | draft | 2026-03-28T22:29:44 | docs/proposals/workflow-capability-upgrades/ |
 | workflow-state-consistency | promoted | 2026-04-17T19:35:53 | docs/proposals/workflow-state-consistency/ |

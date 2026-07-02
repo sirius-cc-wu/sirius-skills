@@ -117,8 +117,8 @@ When accelerator config is enabled, the intended happy path is: use `autoplan`
 to drive planning to review-ready state, rerun `autoplan --approve` after
 explicit human approval so it can hand off the planning commit checkpoint, then
 use `ship --resume` once the approved planning artifacts are committed, or use
-`ship-worktree` when execution should move into a dedicated git worktree tied to
-that feature or subfeature.
+`ship-worktree` when execution should move into a treehouse-managed leased
+worktree tied to that feature or subfeature.
 
 Shared runtime state under `.skills/runtime/` is the cross-agent transient
 handoff surface. Keep durable feature/subfeature truth in repo planning docs,
@@ -251,10 +251,10 @@ Execution follows the same pattern: `guide-execution` owns routing, readiness, a
 `ship` sits above that single-slice flow as an optional orchestrator. It resolves one reviewed and committed feature or subfeature backlog, resumes or bootstraps one mapped execution slice at a time, and hands that slice to the next concrete owner such as `brief`, `blueprint`, repository implementation, `guide-execution`, `review-execution`, `reconcile-execution`, `close-slice`, or `commit`. It does not replace those owners. When the target is completed and `implemented`, `ship --finalize` can require reconciliation and then route the terminal archive step through `archive-artifacts`.
 
 `ship-worktree` sits one layer above that orchestrator when the same target
-should execute in a dedicated git worktree. It keeps the original branch as the
-PR base, reuses a target-named worktree branch and path, runs `ship` inside that
-checkout, and can hand the finished worktree branch off to PR creation without
-moving backlog ownership out of `ship`.
+should execute in a dedicated treehouse-managed leased worktree. It keeps the
+original branch as the PR base, asks treehouse for a reusable worktree lease,
+runs `ship` inside that checkout, and can hand the finished branch off to PR
+creation without moving backlog ownership out of `ship`.
 
 By default, new execution slices are created under `slices/` unless `.skills/execution.json` overrides the location.
 
