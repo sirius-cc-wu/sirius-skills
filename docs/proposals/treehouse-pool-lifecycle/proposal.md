@@ -4,14 +4,14 @@
 
 Treehouse needs a core pool model that can hand out reusable per-repository
 worktrees, reset them to a clean detached HEAD, and give them back safely when
-the caller exits. That core loop also needs to keep local state in sync so the
-same pool can be reused by later sessions without cloning a new repository each
+the caller exits. That core loop also needs to keep state in sync so the same
+pool can be reused by later sessions without cloning a new repository each
 time.
 
 ## Goals
 
-- Manage one pool per repository under a configurable treehouse root.
-- Resolve the pool root from repo-level or user-level configuration.
+- Manage one pool per repository under the configured shared treehouse root.
+- Resolve the pool root from user-level configuration.
 - Acquire a clean worktree from the pool or create a new one when capacity
   allows.
 - Reset reused worktrees to the current default branch before handing them out.
@@ -20,8 +20,6 @@ time.
   states.
 - Auto-heal stale state entries when managed worktrees disappear or reservations
   expire.
-- Keep repo-local housekeeping in place, including the generated `.gitignore`
-  entry for the treehouse root.
 
 ## Non-Goals
 

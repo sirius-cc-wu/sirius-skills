@@ -3,7 +3,7 @@
   "status": "draft",
   "created_at": "2026-07-01T16:39:01",
   "updated_at": "2026-07-01T16:39:01",
-  "summary": "Load repo and user config, resolve pool roots, and run lifecycle hooks.",
+  "summary": "Load repo and user config, resolve the treehouse root, and run lifecycle hooks.",
   "review_note": null,
   "target_feature": null,
   "promoted_feature": null,

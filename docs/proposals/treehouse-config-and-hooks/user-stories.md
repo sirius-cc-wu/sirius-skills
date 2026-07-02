@@ -6,8 +6,8 @@
 - **TCH-02 (M)**: As a team lead, I want user-level hooks for create and destroy
   lifecycles so setup and teardown actions can be automated.
 
-- **TCH-03 (S)**: As a repository user, I want relative roots to resolve from
-  the repo root so local pool layouts stay portable.
+- **TCH-03 (S)**: As a repository user, I want the shared treehouse root to
+  resolve predictably from config so layouts stay portable.
 
 - **TCH-04 (S)**: As a maintainer, I want treehouse to keep `.gitignore`
   synchronized with its managed root so generated worktree paths stay out of the
