@@ -1,0 +1,11 @@
+{
+  "proposal_slug": "treehouse-safe-reclamation",
+  "status": "draft",
+  "created_at": "2026-07-01T16:39:00",
+  "updated_at": "2026-07-01T16:39:00",
+  "summary": "Safely prune or destroy stale worktrees with explicit opt-ins.",
+  "review_note": null,
+  "target_feature": null,
+  "promoted_feature": null,
+  "promoted_at": null
+}
