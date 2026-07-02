@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 import argparse
-import importlib.util
 import json
 import re
 import subprocess
@@ -14,12 +13,6 @@ from pathlib import Path
 from typing import Any, Dict, Optional, Sequence
 
 
-COMMAND_DIR = Path(__file__).resolve().parent
-
-SHIP_SCRIPT = COMMAND_DIR / "ship.py"
-GUIDE_EXECUTION_SCRIPT = COMMAND_DIR / "manage_execution.py"
-
-
 from sirius_skills.lib.workflow_runtime import (  # noqa: E402
     WorktreeSessionRecord,
     read_worktree_session,
@@ -27,12 +20,7 @@ from sirius_skills.lib.workflow_runtime import (  # noqa: E402
     write_worktree_session,
 )
 
-
-@dataclass
-class ShipWorktreeConfig:
-    worktree_root: Path
-    branch_prefix: str = "wt"
-    draft_pr: bool = True
+from sirius_skills.commands import manage_execution
 
 
 @dataclass
@@ -89,8 +77,8 @@ class ShipWorktreeResult:
 def parse_args(argv: Sequence[str] | None = None) -> argparse.Namespace:
     parser = argparse.ArgumentParser(
         description=(
-            "Create or resume a dedicated git worktree for one feature or subfeature "
-            "and optionally run ship or open a pull request from that worktree."
+            "Create or resume a treehouse-managed leased worktree for one feature or "
+            "subfeature and optionally run ship or open a pull request from that worktree."
         )
     )
     parser.add_argument("target", help="Feature slug, subfeature slug, or planning packet path.")
@@ -143,13 +131,6 @@ def parse_args(argv: Sequence[str] | None = None) -> argparse.Namespace:
 
 def utc_now() -> str:
     return datetime.now(timezone.utc).replace(microsecond=0).isoformat()
-
-
-def load_module(script_path: Path, name: str):
-    if script_path.name == "manage_execution.py":
-        from sirius_skills.commands import manage_execution
-        return manage_execution
-    raise RuntimeError(f"Unknown script path: {script_path}")
 
 
 def run_command(command: Sequence[str], *, cwd: Path) -> subprocess.CompletedProcess[str]:
@@ -205,87 +186,15 @@ def git_status_paths(cwd: Path) -> list[str]:
     return [line.rstrip() for line in result.stdout.splitlines() if line.strip()]
 
 
-def git_branch_exists(repo_root: Path, branch: str) -> bool:
-    result = run_command(
-        ["git", "show-ref", "--verify", "--quiet", f"refs/heads/{branch}"],
-        cwd=repo_root,
-    )
-    return result.returncode == 0
-
-
 def sanitize_segment(value: str) -> str:
     cleaned = "".join(char.lower() if char.isalnum() else "-" for char in value.strip())
     collapsed = "-".join(part for part in cleaned.split("-") if part)
     return collapsed or "target"
 
 
-def sanitize_branch_prefix(value: str) -> str:
-    parts = [sanitize_segment(part) for part in value.split("/") if part.strip()]
-    return "/".join(parts)
-
-
-def load_ship_worktree_config(
-    repo_root: Path,
-    *,
-    explicit_scope: Optional[str],
-) -> tuple[ShipWorktreeConfig, Dict[str, str]]:
-    execution_module = load_module(GUIDE_EXECUTION_SCRIPT, "ship_worktree_manage_execution")
-    scope_context = execution_module.SCOPE_RUNTIME.resolve_scope_context(
-        start_path=repo_root,
-        explicit_scope=explicit_scope,
-    )
-    raw_execution = execution_module.load_raw_config(required=False, scope_context=scope_context)
-    conventions = execution_module.load_conventions_config(
-        required=False, scope_context=scope_context
-    )
-
-    accelerators = raw_execution.get("accelerators", {})
-    if accelerators is None:
-        accelerators = {}
-    if not isinstance(accelerators, dict):
-        raise RuntimeError("Execution config field 'accelerators' must be a JSON object.")
-
-    raw_config = accelerators.get("ship_worktree", {})
-    if raw_config is None:
-        raw_config = {}
-    if not isinstance(raw_config, dict):
-        raise RuntimeError(
-            "Execution config field 'accelerators.ship_worktree' must be a JSON object."
-        )
-
-    raw_root = raw_config.get("worktree_root")
-    if raw_root is None:
-        worktree_root = repo_root.parent / f".{repo_root.name}-worktrees"
-    else:
-        if not isinstance(raw_root, str) or not raw_root.strip():
-            raise RuntimeError(
-                "Execution config field 'accelerators.ship_worktree.worktree_root' "
-                "must be a non-empty string."
-            )
-        worktree_root = Path(raw_root).expanduser()
-        if not worktree_root.is_absolute():
-            worktree_root = (repo_root / worktree_root).resolve()
-
-    raw_prefix = raw_config.get("branch_prefix", "wt")
-    if not isinstance(raw_prefix, str) or not raw_prefix.strip():
-        raise RuntimeError(
-            "Execution config field 'accelerators.ship_worktree.branch_prefix' "
-            "must be a non-empty string."
-        )
-    raw_draft = raw_config.get("draft_pr", True)
-    if not isinstance(raw_draft, bool):
-        raise RuntimeError(
-            "Execution config field 'accelerators.ship_worktree.draft_pr' must be a boolean."
-        )
-
-    return (
-        ShipWorktreeConfig(
-            worktree_root=worktree_root,
-            branch_prefix=sanitize_branch_prefix(raw_prefix),
-            draft_pr=raw_draft,
-        ),
-        conventions,
-    )
+def load_conventions_config(repo_root: Path) -> Dict[str, str]:
+    scope_context = manage_execution.SCOPE_RUNTIME.resolve_scope_context(start_path=repo_root)
+    return manage_execution.load_conventions_config(required=False, scope_context=scope_context)
 
 
 def resolve_target(repo_root: Path, selector: str, *, explicit_scope: Optional[str]) -> Dict[str, Any]:
@@ -309,37 +218,30 @@ def target_segments(target_type: str, target_path: str) -> list[str]:
     return [sanitize_segment(path.parent.name), sanitize_segment(path.name)]
 
 
-def list_worktrees(repo_root: Path) -> list[dict[str, str]]:
-    result = run_command(["git", "worktree", "list", "--porcelain"], cwd=repo_root)
+def build_review_branch_name(target_type: str, target_path: str) -> str:
+    return "/".join(["wt", *target_segments(target_type, target_path)])
+
+
+def acquire_treehouse_worktree(repo_root: Path, *, lease_holder: str) -> Path:
+    command = ["treehouse", "get", "--lease"]
+    if lease_holder.strip():
+        command.extend(["--lease-holder", lease_holder.strip()])
+    result = run_command(command, cwd=repo_root)
     if result.returncode != 0:
-        raise RuntimeError("Unable to inspect git worktree list.")
-
-    entries: list[dict[str, str]] = []
-    current: dict[str, str] = {}
-    for raw_line in result.stdout.splitlines():
-        line = raw_line.strip()
-        if not line:
-            if current:
-                entries.append(current)
-                current = {}
-            continue
-        key, _, value = line.partition(" ")
-        current[key] = value.strip()
-    if current:
-        entries.append(current)
-    return entries
+        raise RuntimeError(_command_error(result))
+    worktree_path = (result.stdout or "").strip()
+    if not worktree_path:
+        raise RuntimeError("treehouse get --lease did not return a worktree path.")
+    path = Path(worktree_path).expanduser().resolve()
+    if not path.exists():
+        raise RuntimeError(f"treehouse returned missing worktree path: {path}")
+    return path
 
 
-def find_worktree_path_for_branch(repo_root: Path, branch: str) -> Optional[Path]:
-    expected_ref = f"refs/heads/{branch}"
-    for entry in list_worktrees(repo_root):
-        raw_branch = entry.get("branch")
-        raw_worktree = entry.get("worktree")
-        if not raw_branch or not raw_worktree:
-            continue
-        if raw_branch == expected_ref or raw_branch == branch:
-            return Path(raw_worktree).resolve()
-    return None
+def return_treehouse_worktree(repo_root: Path, worktree_path: Path) -> None:
+    result = run_command(["treehouse", "return", str(worktree_path), "--force"], cwd=repo_root)
+    if result.returncode != 0:
+        raise RuntimeError(_command_error(result))
 
 
 def load_or_create_session(
@@ -347,7 +249,6 @@ def load_or_create_session(
     *,
     selector: str,
     target_payload: Dict[str, Any],
-    config: ShipWorktreeConfig,
 ) -> tuple[WorktreeSessionRecord, Path]:
     target_type = str(target_payload["target_type"])
     target_id = str(target_payload["target_id"])
@@ -367,12 +268,6 @@ def load_or_create_session(
         return record, record_path
 
     base_branch = current_branch(repo_root)
-    segments = target_segments(target_type, target_path)
-    branch_suffix = "/".join(segments)
-    worktree_branch = (
-        f"{config.branch_prefix}/{branch_suffix}" if config.branch_prefix else branch_suffix
-    )
-    worktree_path = config.worktree_root / target_type / Path(*segments)
 
     record = WorktreeSessionRecord(
         target_key=record_path.stem,
@@ -381,8 +276,8 @@ def load_or_create_session(
         target_id=target_id,
         target_path=target_path,
         base_branch=base_branch,
-        worktree_branch=worktree_branch,
-        worktree_path=str(worktree_path),
+        worktree_branch=build_review_branch_name(target_type, target_path),
+        worktree_path="",
         created_at=now,
         updated_at=now,
     )
@@ -390,41 +285,17 @@ def load_or_create_session(
 
 
 def ensure_worktree(repo_root: Path, record: WorktreeSessionRecord) -> bool:
-    existing_path = find_worktree_path_for_branch(repo_root, record.worktree_branch)
-    if existing_path is not None:
-        record.worktree_path = str(existing_path)
-        record.updated_at = utc_now()
-        return False
+    current_path = record.worktree_path.strip()
+    if current_path:
+        target_path = Path(current_path).expanduser().resolve()
+        if target_path.exists():
+            record.worktree_path = str(target_path)
+            record.updated_at = utc_now()
+            return False
 
-    target_path = Path(record.worktree_path).resolve()
-    if target_path.exists():
-        branch = current_branch(target_path)
-        if branch != record.worktree_branch:
-            raise RuntimeError(
-                f"Worktree path already exists at '{target_path}' but is checked out on "
-                f"'{branch}', not '{record.worktree_branch}'."
-            )
-        record.worktree_path = str(target_path)
-        record.updated_at = utc_now()
-        return False
-
-    target_path.parent.mkdir(parents=True, exist_ok=True)
-    if git_branch_exists(repo_root, record.worktree_branch):
-        command = ["git", "worktree", "add", str(target_path), record.worktree_branch]
-    else:
-        command = [
-            "git",
-            "worktree",
-            "add",
-            "-b",
-            record.worktree_branch,
-            str(target_path),
-            record.base_branch,
-        ]
-    result = run_command(command, cwd=repo_root)
-    if result.returncode != 0:
-        raise RuntimeError(_command_error(result))
-    record.worktree_path = str(target_path)
+    record.worktree_path = str(
+        acquire_treehouse_worktree(repo_root, lease_holder=record.target_id or record.selector)
+    )
     record.updated_at = utc_now()
     return True
 
@@ -608,7 +479,7 @@ def create_or_reuse_pull_request(
         return None, "no_commits_to_review", "ship", [], False
 
     push_result = run_command(
-        ["git", "push", "-u", "origin", record.worktree_branch],
+        ["git", "push", "origin", f"HEAD:{record.worktree_branch}"],
         cwd=worktree_path,
     )
     if push_result.returncode != 0:
@@ -688,13 +559,12 @@ def main(argv: Sequence[str] | None = None) -> int:
         raise SystemExit("Choose at most one of --resume or --finalize.")
 
     repo_root = git_repo_root()
-    config, conventions = load_ship_worktree_config(repo_root, explicit_scope=args.scope)
+    conventions = load_conventions_config(repo_root)
     target_payload = resolve_target(repo_root, args.target, explicit_scope=args.scope)
     record, record_path = load_or_create_session(
         repo_root,
         selector=args.target,
         target_payload=target_payload,
-        config=config,
     )
     worktree_created = ensure_worktree(repo_root, record)
 
@@ -731,7 +601,7 @@ def main(argv: Sequence[str] | None = None) -> int:
 
     pull_request: Optional[PullRequestInfo] = None
     if args.create_pr:
-        draft_pr = config.draft_pr if args.draft_pr is None else bool(args.draft_pr)
+        draft_pr = True if args.draft_pr is None else bool(args.draft_pr)
         (
             pull_request,
             pr_block_reason,
@@ -764,6 +634,9 @@ def main(argv: Sequence[str] | None = None) -> int:
 
     record.updated_at = utc_now()
     write_worktree_session(record_path, record)
+    if args.create_pr and pull_request is not None:
+        return_treehouse_worktree(repo_root, Path(record.worktree_path))
+        record_path.unlink(missing_ok=True)
 
     result = ShipWorktreeResult(
         target_type=record.target_type,

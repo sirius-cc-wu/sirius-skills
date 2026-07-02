@@ -57,6 +57,72 @@ def git_commit_all(root: Path, message: str):
     subprocess.run(["git", "commit", "--quiet", "-m", message], cwd=root, check=True)
 
 
+def install_treehouse_stub(module, monkeypatch, repo_root: Path, worktree_path: Path):
+    original_run_command = module.run_command
+    gh_state = {"created": False}
+
+    def fake_run_command(command, *, cwd):
+        if command[:3] == ["treehouse", "get", "--lease"]:
+            worktree_path.parent.mkdir(parents=True, exist_ok=True)
+            if not worktree_path.exists():
+                subprocess.run(
+                    ["git", "worktree", "add", "--detach", str(worktree_path), "HEAD"],
+                    cwd=repo_root,
+                    check=True,
+                    capture_output=True,
+                    text=True,
+                )
+            return subprocess.CompletedProcess(command, 0, f"{worktree_path}\n", "")
+        if command[:2] == ["treehouse", "return"]:
+            if worktree_path.exists():
+                subprocess.run(
+                    ["git", "worktree", "remove", "--force", str(worktree_path)],
+                    cwd=repo_root,
+                    check=True,
+                    capture_output=True,
+                    text=True,
+                )
+            return subprocess.CompletedProcess(command, 0, "", "")
+        if command[:2] == ["git", "push"]:
+            return subprocess.CompletedProcess(command, 0, "", "")
+        if command[:4] == ["gh", "pr", "list", "--state"]:
+            if not gh_state["created"]:
+                return subprocess.CompletedProcess(command, 0, "[]\n", "")
+            return subprocess.CompletedProcess(
+                command,
+                0,
+                json.dumps(
+                    [
+                        {
+                            "number": 42,
+                            "url": "https://example.test/pr/42",
+                            "state": "OPEN",
+                            "title": "feature: Implement execution-workflow",
+                            "isDraft": True,
+                        }
+                    ]
+                )
+                + "\n",
+                "",
+            )
+        if command[:3] == ["gh", "pr", "create"]:
+            gh_state["created"] = True
+            return subprocess.CompletedProcess(
+                command,
+                0,
+                "https://example.test/pr/42\n",
+                "",
+            )
+        return original_run_command(command, cwd=cwd)
+
+    monkeypatch.setattr(module, "run_command", fake_run_command)
+    return gh_state
+
+
+def treehouse_worktree_path(repo_root: Path) -> Path:
+    return repo_root.parent / f"treehouse-worktrees-{repo_root.name}" / "execution-workflow"
+
+
 def setup_repo(tmp_path: Path, monkeypatch):
     monkeypatch.chdir(tmp_path)
     init_git_repo(tmp_path)
@@ -205,6 +271,8 @@ def test_ship_worktree_creates_target_named_worktree(tmp_path, monkeypatch, caps
     env = setup_repo(tmp_path, monkeypatch)
     mark_feature_reviewed(env)
     module = env["module"]
+    worktree_path = treehouse_worktree_path(tmp_path)
+    install_treehouse_stub(module, monkeypatch, tmp_path, worktree_path)
 
     assert run_cli(module, monkeypatch, "execution-workflow", "--json") == 0
     payload = json.loads(capsys.readouterr().out)
@@ -213,6 +281,7 @@ def test_ship_worktree_creates_target_named_worktree(tmp_path, monkeypatch, caps
     assert payload["next_owner"] == "ship"
     assert payload["worktree_branch"] == "wt/execution-workflow"
     assert payload["worktree_created"] is True
+    assert Path(payload["worktree_path"]) == worktree_path
     assert Path(payload["worktree_path"]).is_dir()
     assert Path(payload["record_path"]).is_file()
 
@@ -221,6 +290,8 @@ def test_ship_worktree_resume_runs_ship_inside_worktree(tmp_path, monkeypatch, c
     env = setup_repo(tmp_path, monkeypatch)
     mark_feature_reviewed(env)
     module = env["module"]
+    worktree_path = treehouse_worktree_path(tmp_path)
+    install_treehouse_stub(module, monkeypatch, tmp_path, worktree_path)
 
     assert run_cli(module, monkeypatch, "execution-workflow", "--resume", "--json") == 0
     payload = json.loads(capsys.readouterr().out)
@@ -229,6 +300,7 @@ def test_ship_worktree_resume_runs_ship_inside_worktree(tmp_path, monkeypatch, c
     assert payload["ship_result"]["action"] == "bootstrap_next_slice"
     assert payload["ship_result"]["bootstrapped_slice_id"] == "mse-scope-and-backlog-resolution"
     assert payload["next_owner"] == "brief"
+    assert Path(payload["worktree_path"]) == worktree_path
 
 
 def test_ship_worktree_create_pr_blocks_when_worktree_is_dirty(
@@ -237,6 +309,8 @@ def test_ship_worktree_create_pr_blocks_when_worktree_is_dirty(
     env = setup_repo(tmp_path, monkeypatch)
     mark_feature_implemented(env)
     module = env["module"]
+    worktree_path = treehouse_worktree_path(tmp_path)
+    install_treehouse_stub(module, monkeypatch, tmp_path, worktree_path)
 
     assert run_cli(module, monkeypatch, "execution-workflow", "--json") == 0
     payload = json.loads(capsys.readouterr().out)
@@ -259,6 +333,8 @@ def test_ship_worktree_create_pr_reuses_or_creates_review_branch(
     env = setup_repo(tmp_path, monkeypatch)
     mark_feature_implemented(env)
     module = env["module"]
+    worktree_path = treehouse_worktree_path(tmp_path)
+    install_treehouse_stub(module, monkeypatch, tmp_path, worktree_path)
 
     assert run_cli(module, monkeypatch, "execution-workflow", "--json") == 0
     payload = json.loads(capsys.readouterr().out)
@@ -312,3 +388,5 @@ def test_ship_worktree_create_pr_reuses_or_creates_review_branch(
     assert created["next_owner"] == "none"
     assert created["pull_request"]["number"] == 42
     assert created["pull_request"]["url"] == "https://example.test/pr/42"
+    assert not Path(created["record_path"]).exists()
+    assert not worktree_path.exists()
