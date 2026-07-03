@@ -27,31 +27,31 @@
     {
       "proposal": "treehouse-config-and-hooks",
       "status": "draft",
-      "updated_at": "2026-07-01T16:39:01",
+      "updated_at": "2026-07-04T01:31:15",
       "path": "docs/proposals/treehouse-config-and-hooks/"
     },
     {
       "proposal": "treehouse-distribution-and-update",
       "status": "draft",
-      "updated_at": "2026-07-01T16:39:01",
+      "updated_at": "2026-07-04T01:31:15",
       "path": "docs/proposals/treehouse-distribution-and-update/"
     },
     {
       "proposal": "treehouse-durable-leasing",
       "status": "draft",
-      "updated_at": "2026-07-01T16:39:00",
+      "updated_at": "2026-07-04T01:31:15",
       "path": "docs/proposals/treehouse-durable-leasing/"
     },
     {
       "proposal": "treehouse-pool-lifecycle",
       "status": "draft",
-      "updated_at": "2026-07-01T16:38:59",
+      "updated_at": "2026-07-04T01:31:15",
       "path": "docs/proposals/treehouse-pool-lifecycle/"
     },
     {
       "proposal": "treehouse-safe-reclamation",
       "status": "draft",
-      "updated_at": "2026-07-01T16:39:00",
+      "updated_at": "2026-07-04T01:31:15",
       "path": "docs/proposals/treehouse-safe-reclamation/"
     },
     {

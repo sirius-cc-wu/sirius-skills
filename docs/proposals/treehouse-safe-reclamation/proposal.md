@@ -1,11 +1,11 @@
-# Proposal: Treehouse Safe Reclamation
+# Proposal: Treehouse-Inspired Sirius Worktree Safe Reclamation
 
 ## Problem
 
-Treehouse needs a way to reclaim disk space without making destructive behavior
-the default. That means stale worktrees should be pruned only when they are
-clean, idle, and already merged, while more dangerous removals require explicit
-opt-in flags and clear previews.
+`sirius worktree` needs a treehouse-like way to reclaim disk space without
+making destructive behavior the default. Stale worktrees should be pruned only
+when they are clean, idle, and already merged, while more dangerous removals
+require explicit opt-in flags and clear previews.
 
 ## Goals
 
@@ -23,6 +23,7 @@ opt-in flags and clear previews.
 
 ## Non-Goals
 
+- Requiring the standalone treehouse CLI.
 - Global destructive deletion without an explicit pool target.
 - A single `--force` flag that overrides every protection at once.
 - Removing leased worktrees in bulk.
@@ -35,10 +36,11 @@ while still making every risky override obvious to the operator.
 
 ## Success Criteria
 
-- `treehouse prune` is a dry run unless `--yes` is passed.
-- `treehouse prune --all` can sweep every managed pool from the user-level root.
-- `treehouse destroy` previews risk, labels what is being removed, and requires
-  explicit opt-in for dangerous classes.
+- `sirius worktree prune` is a dry run unless `--yes` is passed.
+- `sirius worktree prune --all` can sweep every managed pool from the configured
+  or derived root.
+- `sirius worktree destroy` previews risk, labels what is being removed, and
+  requires explicit opt-in for dangerous classes.
 - Orphaned or unverified worktrees are never removed accidentally.
 - Bulk skips are non-fatal, while a single-target skip is surfaced loudly.
 

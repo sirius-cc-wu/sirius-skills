@@ -1,13 +1,15 @@
-# User Stories: Treehouse Distribution And Update
+# User Stories: Treehouse Distribution Lessons For Sirius Worktree
 
-- **TDU-01 (M)**: As a user, I want treehouse to be installable from source or
-  supported bootstrap scripts so I can choose the path that fits my environment.
+- **TDU-01 (M)**: As a user, I want `sirius worktree` to arrive through the
+  normal packaged `sirius` install path so worktree management does not add a
+  second CLI distribution channel.
 
-- **TDU-02 (M)**: As a user, I want update checks to be cached so the CLI stays
-  fast and does not hit the network on every invocation.
+- **TDU-02 (M)**: As a user, I want `sirius worktree` to avoid release checks
+  during routine worktree operations so the command stays fast and offline-safe.
 
-- **TDU-03 (M)**: As a maintainer, I want `treehouse update` to verify the
-  release archive before replacing the binary so updates remain trustworthy.
+- **TDU-03 (M)**: As a maintainer, I want any future packaged `sirius` updater
+  to verify release artifacts before replacement so update safety stays outside
+  the worktree command itself.
 
-- **TDU-04 (S)**: As a cross-platform user, I want the updater to work on
-  Windows, macOS, and Linux so the same release flow applies everywhere.
+- **TDU-04 (S)**: As a cross-platform user, I want `sirius worktree` behavior to
+  stay portable without embedding platform-specific binary replacement logic.
