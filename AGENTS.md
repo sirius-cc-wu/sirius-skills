@@ -25,9 +25,17 @@ Local tooling note:
   - local sibling clone (when present): `../gstack/`
 - `agent-skills` (Addy Osmani)
   - upstream: `git@github.com:addyosmani/agent-skills.git`
+- `treehouse`
+  - upstream: `git@github.com:kunchenguid/treehouse.git`
+  - local submodule: `references/treehouse/`
 
 Treat them as references, not source-of-truth replacements for this repo's
 artifact ownership and workflow boundaries.
+
+The `references/` tree is for checked-in upstream reference inputs only. Do not
+write implementation changes, planning artifacts, generated docs, or workflow
+state inside `references/`; copy or synthesize relevant lessons into this
+repo's owned surfaces instead.
 
 ## Core Rules
 
