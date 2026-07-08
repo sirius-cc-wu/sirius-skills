@@ -64,7 +64,6 @@ generic slice-ID defaults unless the repo already overrides them:
 
 For `jira` mode, use these preset conventions unless the user supplies project-specific values:
 
-- `issue_sliceer`: `jira`
 - `id_pattern`: `^[A-Z][A-Z0-9]*-[0-9]+$`
 - `branch_extract_pattern`: `^([A-Z][A-Z0-9]*-[0-9]+)-(.+)$`
 - `commit_format`: `{ID}: {summary}`

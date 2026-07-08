@@ -41,7 +41,6 @@ Example project config:
 
 ```json
 {
-  "issue_sliceer": "jira",
   "id_pattern": "^[A-Z][A-Z0-9]*-[0-9]+$",
   "branch_extract_pattern": "^([A-Z][A-Z0-9]*-[0-9]+)-(.+)$",
   "pr_title_format": "{ID}: {summary}"

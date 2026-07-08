@@ -418,7 +418,6 @@ def load_conventions_config(
         raise RuntimeError("Conventions config must be a JSON object.")
 
     string_fields = (
-        "issue_sliceer",
         "id_pattern",
         "branch_extract_pattern",
         "commit_format",

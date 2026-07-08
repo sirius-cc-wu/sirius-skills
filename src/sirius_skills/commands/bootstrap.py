@@ -23,7 +23,6 @@ BOOTSTRAP_AGENTS_END = "<!-- sirius-skills bootstrap wiki architecture end -->"
 VALID_DESIGN_DIAGRAM_MODES = ("embedded", "linked_svg")
 
 DEFAULT_JIRA_CONVENTIONS = {
-    "issue_sliceer": "jira",
     "id_pattern": r"^[A-Z][A-Z0-9]*-[0-9]+$",
     "branch_extract_pattern": r"^([A-Z][A-Z0-9]*-[0-9]+)-(.+)$",
     "commit_format": "{ID}: {summary}",
