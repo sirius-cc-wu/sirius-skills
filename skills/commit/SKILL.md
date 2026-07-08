@@ -10,18 +10,20 @@ This skill guides the process of committing code changes to the repository, ensu
 ## Workflow
 
 ### 1. Verify Staged Changes
-Before committing, always verify exactly what is staged.
-- Use `git status` and `git diff --staged` (or `get_changed_files`) to review the changes.
+Before committing, always verify exactly what is staged and what remains outside the commit.
+- Use `git status`, `git diff --staged`, and `git diff --name-only --staged` to review the staged changes.
+- Use `git diff` and `git status` to notice unstaged or untracked work without modifying it.
+- Use `git log --oneline -10` to align the commit message with recent repository style.
 - Ensure only relevant changes are staged.
 
 ### 2. Quality Assurance
 Adhere to the project mandates (e.g. `AGENTS.md`):
-- **No Compilation Warnings:** Run build checks (e.g. `cargo check`, `npm run lint`) to ensure the code compiles without warnings.
-- **Tests Pass:** Ensure all relevant tests pass.
+- **Build and lint checks:** Run the repository's documented build, lint, type-check, or equivalent validation commands when available.
+- **Tests pass:** Run the tests relevant to the staged changes. If no applicable validation command exists, state that explicitly before committing.
 - **Formatter safety:** If you need to run a formatter or fixer before commit, scope it to the intended file set when the tool supports path arguments. If the formatter rewrites files outside that intended set, stop and treat that as spillover instead of silently committing unrelated cleanup.
 
 ### 3. Crafting the Commit Message
-Follow these standards for all commit messages:
+Follow these standards by default:
 
 - **Default Summary Line:** Use the format `scope: summary`.
     - **Scope:** Mandatory. Use the crate name or module name (e.g., `api`, `core`).
@@ -55,29 +57,34 @@ If the project defines `.skills/conventions.json`, follow that configuration ins
 - If the configured format requires an ID, resolve it from:
   1. the current branch using `branch_extract_pattern`,
   2. direct user input.
+- If `id_pattern` is present, validate any extracted or user-provided ID against it.
 - Do **not** assume Jira, Azure DevOps, or any issue tracker unless the project config explicitly opts in.
 
 Example project config:
 
 ```json
 {
-  "issue_sliceer": "jira",
+  "id_pattern": "^[A-Z][A-Z0-9]*-[0-9]+$",
   "branch_extract_pattern": "^([A-Z][A-Z0-9]*-[0-9]+)-(.+)$",
   "commit_format": "{ID}: {summary}"
 }
 ```
 
 ### 4. Executing the Commit
-Use a message file and `git commit -F` when preparing a multi-line message.
+Use a message file and `git commit -F` when preparing a multi-line message. In agent workflows, create the message file with the available file-editing mechanism instead of shell heredocs when repository guidance forbids shell file writes.
 
-```bash
-cat > /tmp/commit-msg.txt <<'EOF'
+Message file content for `/tmp/commit-msg.txt`:
+
+```text
 module: Summary line
 
-- Detailed bullet point 1
-- Detailed bullet point 2 with `code_snippet`
-EOF
+- Explain why the change exists.
+- Mention important behavior, compatibility, or validation notes.
+```
 
+Commit command:
+
+```bash
 git commit -F /tmp/commit-msg.txt
 rm -f /tmp/commit-msg.txt
 ```
@@ -93,12 +100,12 @@ git commit -m 'module: Summary line' -m '- Detail bullet point'
 ### Example 1: Refactoring a Service
 **Request:** "Commit the changes where I refactored the module."
 **Action:**
-1. Check staged changes.
-2. Run build verification.
-3. Commit with crate or module scope.
+1. Inspect `git status`, `git diff --staged`, `git diff`, and recent commit style.
+2. Run the repository's relevant documented verification commands.
+3. Commit only the intended staged changes with crate or module scope.
 
 ### Example 2: Configured Ticket-Based Workflow
-If `.skills/conventions.json` defines `commit_format` as `{ID}: {summary}` and the branch is `BSP-3313-buffer-fix`, use a title like:
+If `.skills/conventions.json` defines `commit_format` as `{ID}: {summary}` and the branch is `BSP-3313-buffer-fix`, use a summary line like:
 
 ```text
 BSP-3313: Fix uds buffer bounds handling
