@@ -41,22 +41,36 @@ def write_file(path: Path, content: str):
     path.write_text(content, encoding="utf-8")
 
 
-def create_closed_slice(execution, slice_id: str, feature_name: str, brief: str, blueprint: str):
-    execution.create_slice(slice_id, feature_name)
-    _, _, slice_registry = execution.get_registry_paths(required_config=False)
+def create_closed_slice(
+    execution,
+    slice_id: str,
+    feature_name: str,
+    brief: str,
+    blueprint: str,
+    scope_context=None,
+):
+    execution.create_slice(slice_id, feature_name, scope_context=scope_context)
+    _, _, slice_registry = execution.get_registry_paths(
+        required_config=False,
+        scope_context=scope_context,
+    )
     slice_rows = execution.load_registry_json(slice_registry)
     slice_row = next(row for row in slice_rows if row["id"] == slice_id)
     slice_row["status"] = "closed"
-    execution.write_registry(slice_rows)
+    execution.write_registry(slice_rows, scope_context=scope_context)
 
-    slice_dir = Path(execution.slice_path_for_row(slice_row))
+    slice_dir = Path(execution.slice_path_for_row(slice_row, scope_context=scope_context))
     write_file(slice_dir / "brief.md", brief)
     write_file(slice_dir / "blueprint.md", blueprint)
 
-    metadata = execution.load_slice_metadata(execution.slice_path_for_row(slice_row))
+    metadata = execution.load_slice_metadata(
+        execution.slice_path_for_row(slice_row, scope_context=scope_context)
+    )
     metadata["status"] = "closed"
     metadata["closed_at"] = "2026-02-13T00:00:00"
-    execution.write_slice_metadata(execution.slice_path_for_row(slice_row), metadata)
+    execution.write_slice_metadata(
+        execution.slice_path_for_row(slice_row, scope_context=scope_context), metadata
+    )
     return slice_dir
 
 
@@ -136,6 +150,18 @@ def setup_repo(tmp_path: Path, monkeypatch):
         "justification": "The old flow should become historical context.",
     }
     subfeatures.write_metadata(subfeature_dir, subfeature_metadata)
+    write_scope_config(
+        subfeature_path,
+        "execution.json",
+        {
+            "slice_dir": "slices",
+            "preferred_workflow": "TDD",
+            "auto_start_implementation": True,
+        },
+    )
+    subfeature_scope_context = execution.resolve_execution_scope_context(
+        explicit_scope=subfeature_path
+    )
     write_file(subfeature_path / "system-design.md", "# System Design\n\nBaseline subfeature design.\n")
     write_file(
         subfeature_path / "slice-planning.md",
@@ -187,6 +213,7 @@ def setup_repo(tmp_path: Path, monkeypatch):
         "# Implementation Plan: Replace legacy flow\n\n"
         "## 1. Summary\n\n"
         "Document the replacement flow design before archival.\n",
+        scope_context=subfeature_scope_context,
     )
 
     return {
@@ -194,6 +221,7 @@ def setup_repo(tmp_path: Path, monkeypatch):
         "execution": execution,
         "feature_dir": feature_path,
         "subfeature_dir": subfeature_path,
+        "subfeature_scope_context": subfeature_scope_context,
     }
 
 
@@ -241,6 +269,29 @@ def test_build_archive_result_applies_closed_slice_archive(tmp_path, monkeypatch
     assert archived_row["path"].startswith("slices/.archived/")
 
 
+def test_build_archive_result_applies_subfeature_local_slice_archive(tmp_path, monkeypatch):
+    env = setup_repo(tmp_path, monkeypatch)
+
+    payload = env["archive"].build_archive_result(
+        artifact_type="slice",
+        artifact_id="SUB-201",
+        apply=True,
+    )
+
+    _, _, slice_registry = env["execution"].get_registry_paths(
+        required_config=False,
+        scope_context=env["subfeature_scope_context"],
+    )
+    slice_rows = env["execution"].load_registry_json(slice_registry)
+    archived_row = next(row for row in slice_rows if row["id"] == "SUB-201")
+
+    assert payload["applied"]["artifact_id"] == "SUB-201"
+    assert payload["applied"]["path"].startswith(
+        "docs/features/checkout/subfeatures/replace-legacy-flow/slices/.archived/"
+    )
+    assert archived_row["path"].startswith("slices/.archived/")
+
+
 def test_build_archive_result_applies_feature_archive_and_updates_system_design(
     tmp_path, monkeypatch
 ):
@@ -256,7 +307,12 @@ def test_build_archive_result_applies_feature_archive_and_updates_system_design(
     _, _, slice_registry = env["execution"].get_registry_paths(required_config=False)
     slice_rows = env["execution"].load_registry_json(slice_registry)
     archived_row = next(row for row in slice_rows if row["id"] == "CHK-101")
-    subfeature_row = next(row for row in slice_rows if row["id"] == "SUB-201")
+    _, _, subfeature_slice_registry = env["execution"].get_registry_paths(
+        required_config=False,
+        scope_context=env["subfeature_scope_context"],
+    )
+    subfeature_slice_rows = env["execution"].load_registry_json(subfeature_slice_registry)
+    subfeature_row = next(row for row in subfeature_slice_rows if row["id"] == "SUB-201")
 
     assert payload["applied"]["artifact_id"] == "checkout"
     assert payload["applied"]["archived_slice_ids"] == ["CHK-101"]
@@ -288,7 +344,10 @@ def test_build_archive_result_applies_subfeature_archive_and_updates_system_desi
     )
 
     design_text = (env["subfeature_dir"] / "system-design.md").read_text(encoding="utf-8")
-    _, _, slice_registry = env["execution"].get_registry_paths(required_config=False)
+    _, _, slice_registry = env["execution"].get_registry_paths(
+        required_config=False,
+        scope_context=env["subfeature_scope_context"],
+    )
     slice_rows = env["execution"].load_registry_json(slice_registry)
     archived_row = next(row for row in slice_rows if row["id"] == "SUB-201")
 

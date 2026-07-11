@@ -13,6 +13,12 @@ existing owners, not replacements.
   - Planning authoring skills own planning artifacts.
 - Execution ownership:
   - `guide-execution` owns slice readiness and execution registry state.
+  - new subfeature execution slices live under the owning subfeature's local
+    `slices/` root.
+  - `blueprint` owns the new-slice contract, implementation plan, validation
+    mapping, and detailed design.
+  - `brief` and `brief_ready` are legacy or explicit-clarification surfaces, not
+    mandatory new-slice owners.
   - `review-execution` and `close-slice` own closure quality and closure writes.
 - Maintenance ownership:
   - cross-artifact skills inspect, report, and repair derived drift, but avoid

@@ -145,7 +145,7 @@ def _derive_next_owner(backlog: BacklogResolution) -> Optional[str]:
         if isinstance(raw_owner, str) and raw_owner.strip():
             return raw_owner
     if backlog.ready_next:
-        return "brief"
+        return "blueprint"
     if all(entry.state == "completed" for entry in backlog.entries):
         return "none"
     return "guide-execution"
@@ -514,6 +514,58 @@ def resolve_target(planning_module, selector: str, explicit_scope: Optional[str]
     return feature, feature_dir, metadata, scope_context, target_type
 
 
+def ensure_target_execution_scope(
+    planning_module,
+    execution_module,
+    target_dir: Path,
+    root_scope_context,
+) -> object:
+    """Create a subfeature-local execution scope and return its scope context."""
+    skills_dir = target_dir / ".skills"
+    skills_dir.mkdir(parents=True, exist_ok=True)
+    execution_path = skills_dir / "execution.json"
+
+    root_execution = execution_module.load_config(
+        required=False, scope_context=root_scope_context
+    )
+    if not execution_path.exists():
+        execution_module.write_config(
+            "slices",
+            preferred_workflow=str(root_execution["preferred_workflow"]),
+            auto_start_implementation=bool(root_execution["auto_start_implementation"]),
+            scope_context=type("ScopeContextLike", (), {"scope_root": target_dir})(),
+        )
+
+    target_scope_context = execution_module.resolve_execution_scope_context(
+        explicit_scope=target_dir
+    )
+    specs_dir, _, _ = execution_module.get_registry_paths(
+        required_config=True, scope_context=target_scope_context
+    )
+    execution_module.ensure_registry(specs_dir)
+    return target_scope_context
+
+
+def execution_scope_for_target(
+    planning_module,
+    execution_module,
+    target_type: str,
+    target_dir: Path,
+    root_scope_context,
+    *,
+    create: bool = False,
+) -> object:
+    if target_type != "subfeature":
+        return root_scope_context
+    if create:
+        return ensure_target_execution_scope(
+            planning_module, execution_module, target_dir, root_scope_context
+        )
+    if (target_dir / ".skills" / "execution.json").exists():
+        return execution_module.resolve_execution_scope_context(explicit_scope=target_dir)
+    return root_scope_context
+
+
 def parse_dependency_selector(dependency: str) -> Optional[Tuple[str, str]]:
     parts = dependency.rsplit(" ", 1)
     if len(parts) != 2:
@@ -615,7 +667,15 @@ def resolve_backlog(selector: str, explicit_scope: Optional[str] = None) -> Back
     increment_order, increment_ids_by_planned_slice = collect_increment_metadata(
         slice_planning_path, traceability_records
     )
-    execution_rows = execution_module.parse_registry(scope_context=scope_context)
+    execution_scope_context = execution_scope_for_target(
+        planning_module,
+        execution_module,
+        target_type,
+        target_dir_path,
+        scope_context,
+        create=False,
+    )
+    execution_rows = execution_module.parse_registry(scope_context=execution_scope_context)
     execution_status_by_id = {str(row["id"]): str(row["status"]) for row in execution_rows}
     planning_rows = planning_module.lookup_rows(scope_context=scope_context)
     ship_config = ship_accelerator_config(scope_context, execution_module)
@@ -766,7 +826,7 @@ def resolve_backlog(selector: str, explicit_scope: Optional[str] = None) -> Back
                 active_slice,
                 active_entry,
                 execution_module=execution_module,
-                scope_context=scope_context,
+                scope_context=execution_scope_context,
             )
 
     approval_gate = evaluate_planning_approval_gate(
@@ -800,6 +860,7 @@ def inspect_slice_artifacts(slice_row: Dict[str, object], execution_module, scop
         "brief_exists": (slice_path / "brief.md").is_file(),
         "requirements_exists": (slice_path / "checklists" / "requirements.md").is_file(),
         "blueprint_exists": (slice_path / "blueprint.md").is_file(),
+        "blueprint_contract_exists": execution_module.blueprint_has_slice_contract(str(slice_path)),
         "metadata_exists": (slice_path / ".slice-meta.json").is_file(),
     }
 
@@ -817,21 +878,27 @@ def build_active_slice_handoff(
     checks = inspect_slice_artifacts(slice_row, execution_module, scope_context)
     config = execution_module.load_config(required=True, scope_context=scope_context)
     validation_hint = backlog_entry.validation_hint if backlog_entry is not None else ""
+    absolute_slice_path = Path(
+        execution_module.slice_path_for_row(slice_row, scope_context=scope_context)
+    )
+    try:
+        handoff_slice_path = str(absolute_slice_path.relative_to(scope_context.repo_root))
+    except ValueError:
+        handoff_slice_path = str(absolute_slice_path)
     missing_artifacts: List[str] = []
     downstream_owners: List[str]
 
-    if not checks["brief_exists"]:
+    if status == "brief_ready" and not checks["brief_exists"]:
         missing_artifacts.append("brief.md")
-    if not checks["requirements_exists"]:
+    if status == "brief_ready" and not checks["requirements_exists"]:
         missing_artifacts.append("checklists/requirements.md")
     if status in {"blueprint_ready", "execution_ready", "closed"} and not checks["blueprint_exists"]:
         missing_artifacts.append("blueprint.md")
 
     if status == "draft":
-        next_owner = "brief"
-        next_action = "create_or_update_brief"
+        next_owner = "blueprint"
+        next_action = "create_or_update_blueprint"
         downstream_owners = [
-            "blueprint",
             "implementation",
             "review-execution",
             "close-slice",
@@ -875,7 +942,7 @@ def build_active_slice_handoff(
             backlog_entry.planned_slice_id if backlog_entry is not None else str(slice_row["id"])
         ),
         execution_slice_id=str(slice_row["id"]),
-        execution_slice_path=str(slice_row["path"]),
+        execution_slice_path=execution_module.normalize_slice_path(handoff_slice_path),
         slice_status=status,
         next_owner=next_owner,
         action="resume_active_slice",
@@ -923,8 +990,16 @@ def bootstrap_next_slice(
 
     planning_module = load_module(GUIDE_PLANNING_SCRIPT, "manage_planning")
     execution_module = load_module(GUIDE_EXECUTION_SCRIPT, "manage_execution")
-    _, target_dir, _, scope_context, _ = resolve_target(
+    _, target_dir, _, scope_context, target_type = resolve_target(
         planning_module, selector, explicit_scope
+    )
+    execution_scope_context = execution_scope_for_target(
+        planning_module,
+        execution_module,
+        target_type,
+        Path(target_dir),
+        scope_context,
+        create=True,
     )
     checkpoint_required = require_commit_checkpoint(
         backlog, str(scope_context.repo_root), requested_command="bootstrap_next"
@@ -939,9 +1014,9 @@ def bootstrap_next_slice(
     _, created = execution_module.create_slice(
         next_planned_slice_id,
         entry.title,
-        scope_context=scope_context,
+        scope_context=execution_scope_context,
     )
-    execution_rows = execution_module.parse_registry(scope_context=scope_context)
+    execution_rows = execution_module.parse_registry(scope_context=execution_scope_context)
     slice_row = execution_module.resolve_slice(execution_rows, next_planned_slice_id)
     if slice_row is None:
         raise RuntimeError(
@@ -961,7 +1036,7 @@ def bootstrap_next_slice(
     refreshed_backlog = resolve_backlog(selector, explicit_scope=explicit_scope)
     approval_required = require_approval_checkpoint(
         refreshed_backlog,
-        scope_context=scope_context,
+        scope_context=execution_scope_context,
         execution_module=execution_module,
         requested_command="bootstrap_next",
     )
@@ -969,7 +1044,7 @@ def bootstrap_next_slice(
         return approval_required
     delegate_result = maybe_delegate_to_ship_slice(
         refreshed_backlog,
-        scope_context=scope_context,
+        scope_context=execution_scope_context,
         execution_module=execution_module,
     )
     return BootstrapResult(
@@ -1007,13 +1082,21 @@ def resume_execution(
 
     planning_module = load_module(GUIDE_PLANNING_SCRIPT, "manage_planning")
     execution_module = load_module(GUIDE_EXECUTION_SCRIPT, "manage_execution")
-    _, _, _, scope_context, _ = resolve_target(
+    _, target_dir, _, scope_context, target_type = resolve_target(
         planning_module, selector, explicit_scope
+    )
+    execution_scope_context = execution_scope_for_target(
+        planning_module,
+        execution_module,
+        target_type,
+        Path(target_dir),
+        scope_context,
+        create=False,
     )
 
     if backlog.active_execution_slices:
         active_slice_id = backlog.active_execution_slices[0]
-        execution_rows = execution_module.parse_registry(scope_context=scope_context)
+        execution_rows = execution_module.parse_registry(scope_context=execution_scope_context)
         slice_row = execution_module.resolve_slice(execution_rows, active_slice_id)
         if slice_row is None:
             raise RuntimeError(
@@ -1021,7 +1104,7 @@ def resume_execution(
             )
         approval_required = require_approval_checkpoint(
             backlog,
-            scope_context=scope_context,
+            scope_context=execution_scope_context,
             execution_module=execution_module,
             requested_command="resume",
         )
@@ -1029,7 +1112,7 @@ def resume_execution(
             return approval_required
         delegate_result = maybe_delegate_to_ship_slice(
             backlog,
-            scope_context=scope_context,
+            scope_context=execution_scope_context,
             execution_module=execution_module,
         )
         return BootstrapResult(

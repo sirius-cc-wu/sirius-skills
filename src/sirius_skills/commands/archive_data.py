@@ -4,12 +4,13 @@ import json
 import re
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Dict, List, Optional
+from typing import Dict, List, Optional, Tuple
 
 from sirius_skills.commands.artifact_inventory import (  # noqa: E402
     iter_subfeature_dirs,
     load_inventory,
     normalize_dir_relpath,
+    normalize_registry_path,
 )
 from sirius_skills.lib.workflow_state import markdown_repository
 
@@ -186,6 +187,53 @@ def _closed_slice_rows_for_ids(inventory, slice_ids: List[str]) -> List[Dict[str
         if _is_closed_unarchived_slice(inventory, row):
             closed_rows.append(row)
     return closed_rows
+
+
+def _slice_scope_root_for_row(inventory, row: Dict[str, object]) -> Path:
+    row_path = normalize_registry_path(str(row.get("path", "")))
+    matching_roots = [
+        normalize_registry_path(status.root_path)
+        for status in inventory.registry_statuses
+        if status.artifact_type == "slice"
+        and row_path.startswith(normalize_registry_path(status.root_path))
+    ]
+    if matching_roots:
+        root_path = max(matching_roots, key=len)
+        return (Path.cwd() / root_path.rstrip("/")).parent.resolve()
+
+    path = Path(row_path.rstrip("/"))
+    if not path.is_absolute():
+        path = Path.cwd() / path
+    parts = path.parts
+    slice_indexes = [index for index, part in enumerate(parts) if part == "slices"]
+    if not slice_indexes:
+        return Path.cwd().resolve()
+    return Path(*parts[: slice_indexes[-1]]).resolve()
+
+
+def _registry_row_for_inventory_row(
+    inventory,
+    row: Dict[str, object],
+) -> Tuple[object, List[Dict[str, object]], Dict[str, object]]:
+    scope_root = _slice_scope_root_for_row(inventory, row)
+    scope_context = inventory.context.execution.resolve_execution_scope_context(
+        explicit_scope=scope_root
+    )
+    rows = inventory.context.execution.parse_registry(scope_context=scope_context)
+    registry_row = inventory.context.execution.resolve_slice(rows, str(row["id"]))
+    if registry_row is None:
+        raise ArchiveUsageError(f"Slice not found: {row['id']}")
+    return scope_context, rows, registry_row
+
+
+def _inventory_row_for_candidate(inventory, candidate: ArchiveCandidate) -> Dict[str, object]:
+    candidate_path = normalize_registry_path(candidate.path)
+    for row in inventory.slice_rows:
+        if str(row["id"]) != candidate.artifact_id:
+            continue
+        if normalize_registry_path(str(row["path"])) == candidate_path:
+            return row
+    raise ArchiveUsageError(f"Slice not found: {candidate.artifact_id}")
 
 
 def _feature_candidate(inventory, feature_dir: Path) -> Optional[ArchiveCandidate]:
@@ -433,17 +481,17 @@ def _apply_scope_archive(
         )
         preserved_structural_figures = _dedupe_text_blocks(preserved_structural_figures)
 
-    rows = inventory.context.execution.load_registry_json(inventory.context.slice_registry)
     archived_slice_ids: List[str] = []
     for row in sorted(target.closed_slice_rows, key=lambda item: str(item["id"])):
-        current_row = inventory.context.execution.resolve_slice(rows, str(row["id"]))
-        if current_row is None:
-            raise ArchiveUsageError(f"Slice not found: {row['id']}")
-        ok, message, updated_slice = inventory.context.execution.archive_slice(rows, current_row)
+        scope_context, rows, current_row = _registry_row_for_inventory_row(inventory, row)
+        ok, message, updated_slice = inventory.context.execution.archive_slice(
+            rows,
+            current_row,
+            scope_context=scope_context,
+        )
         if not ok:
             raise ArchiveUsageError(message)
         archived_slice_ids.append(str(updated_slice["id"]))
-        rows = inventory.context.execution.load_registry_json(inventory.context.slice_registry)
 
     rendered_blocks = {
         summary.slice_id: _render_slice_summary_block(summary)
@@ -498,18 +546,22 @@ def build_archive_result(
         inventory = load_inventory()
         if artifact_type == "slice":
             target = _select_candidate(discover_candidates("slice"), "slice", artifact_id)
-            _, _, slice_registry = inventory.context.execution.get_registry_paths(required_config=False)
-            rows = inventory.context.execution.load_registry_json(slice_registry)
-            slice_row = inventory.context.execution.resolve_slice(rows, target.artifact_id)
-            if slice_row is None:
-                raise ArchiveUsageError(f"Slice not found: {artifact_id}")
-            ok, message, updated_slice = inventory.context.execution.archive_slice(rows, slice_row)
+            row = _inventory_row_for_candidate(inventory, target)
+            scope_context, rows, slice_row = _registry_row_for_inventory_row(inventory, row)
+            ok, message, updated_slice = inventory.context.execution.archive_slice(
+                rows,
+                slice_row,
+                scope_context=scope_context,
+            )
             if not ok:
                 raise ArchiveUsageError(message)
+            updated_path = normalize_dir_relpath(
+                scope_context.scope_root / str(updated_slice["path"]).rstrip("/")
+            )
             applied = {
                 "artifact_type": "slice",
                 "artifact_id": str(updated_slice["id"]),
-                "path": str(updated_slice["path"]),
+                "path": updated_path,
                 "message": message,
             }
         else:

@@ -26,6 +26,12 @@ CONVENTIONS_CONFIG_FILE = os.path.join(CONVENTIONS_CONFIG_DIR, "conventions.json
 DEFAULT_PREFERRED_WORKFLOW = "TDD"
 DEFAULT_AUTO_START_IMPLEMENTATION = True
 REGISTRY_JSON_FILE = "registry.json"
+BLUEPRINT_FILE = "blueprint.md"
+BRIEF_FILE = "brief.md"
+REQUIREMENTS_CHECKLIST_FILE = os.path.join("checklists", "requirements.md")
+SLICE_CONTRACT_HEADING_PATTERN = re.compile(
+    r"^##\s+(?:\d+\.\s*)?Slice Contract\s*$", re.IGNORECASE | re.MULTILINE
+)
 DEFAULT_GENERATED_SLICE_PREFIX = "SPC"
 REGISTRY_HEADER = (
     "# Slice Registry\n\n"
@@ -262,8 +268,62 @@ def normalize_slice_path(path: str) -> str:
     return normalized + "/"
 
 
-def resolve_execution_scope_context(scope_context: Optional[object] = None) -> object:
-    return scope_context or SCOPE_RUNTIME.resolve_scope_context()
+def _nearest_execution_config_root(start_path: Optional[object] = None) -> Optional[Path]:
+    path = Path(start_path).expanduser() if start_path is not None else Path.cwd()
+    if not path.is_absolute():
+        path = Path.cwd() / path
+    path = path.resolve()
+    if path.is_file():
+        path = path.parent
+    current = path
+    while True:
+        if (current / CONFIG_FILE).exists():
+            return current
+        if current.parent == current:
+            return None
+        current = current.parent
+
+
+def _execution_scope_from_root(scope_root: Path, start_dir: Optional[Path] = None) -> object:
+    start_dir = (start_dir or Path.cwd()).resolve()
+    repo_root = SCOPE_RUNTIME.find_repo_root(start_dir) or start_dir
+    return SCOPE_RUNTIME.ScopeContext(
+        start_dir=start_dir,
+        repo_root=repo_root,
+        scope_root=scope_root.resolve(),
+        scope_chain=SCOPE_RUNTIME.build_scope_chain(repo_root, scope_root.resolve()),
+        planning_config_path=scope_root.resolve() / SCOPE_RUNTIME.PLANNING_CONFIG_RELATIVE_PATH,
+    )
+
+
+def resolve_execution_scope_context(
+    scope_context: Optional[object] = None,
+    *,
+    explicit_scope: Optional[object] = None,
+    start_path: Optional[object] = None,
+) -> object:
+    if scope_context is not None:
+        return scope_context
+    if explicit_scope is not None:
+        scope_path = Path(explicit_scope).expanduser()
+        if not scope_path.is_absolute():
+            scope_path = Path.cwd() / scope_path
+        scope_path = scope_path.resolve()
+        if (scope_path / CONFIG_FILE).exists():
+            return _execution_scope_from_root(scope_path)
+    planning_scope = SCOPE_RUNTIME.resolve_scope_context(
+        start_path=start_path, explicit_scope=explicit_scope
+    )
+    execution_root = _nearest_execution_config_root(start_path)
+    if execution_root is not None:
+        try:
+            execution_root.relative_to(planning_scope.scope_root)
+            execution_is_inside_planning_scope = execution_root != planning_scope.scope_root
+        except ValueError:
+            execution_is_inside_planning_scope = False
+        if execution_is_inside_planning_scope:
+            return _execution_scope_from_root(execution_root)
+    return planning_scope
 
 
 def execution_config_path(scope_context: Optional[object] = None) -> str:
@@ -586,6 +646,17 @@ def write_slice_metadata(slice_path: str, metadata: Dict[str, object]) -> None:
     execution_repository.write_slice_metadata_raw(Path(slice_path), metadata)
 
 
+def blueprint_has_slice_contract(path: str) -> bool:
+    blueprint_path = Path(path) / BLUEPRINT_FILE
+    if not blueprint_path.is_file():
+        return False
+    try:
+        content = blueprint_path.read_text(encoding="utf-8")
+    except OSError:
+        return False
+    return bool(SLICE_CONTRACT_HEADING_PATTERN.search(content))
+
+
 def build_slice_metadata(
     row: Dict[str, object],
     status: str,
@@ -633,11 +704,13 @@ def apply_metadata_to_row(
     return normalize_registry_row(updated)
 
 
-def sync_slice_metadata(row: Dict[str, object], metadata: Dict[str, object]) -> None:
+def sync_slice_metadata(
+    row: Dict[str, object], metadata: Dict[str, object], scope_context: Optional[object] = None
+) -> None:
     updated_row = apply_metadata_to_row(row, metadata)
     row.clear()
     row.update(updated_row)
-    write_slice_metadata(slice_path_for_row(row), metadata)
+    write_slice_metadata(slice_path_for_row(row, scope_context=scope_context), metadata)
 
 
 def archive_slice(
@@ -679,7 +752,7 @@ def archive_slice(
         if not isinstance(metadata.get("archived_from"), str):
             metadata["archived_from"] = current_normalized
         updated_metadata = build_slice_metadata(slice, current_status, existing=metadata)
-        sync_slice_metadata(slice, updated_metadata)
+        sync_slice_metadata(slice, updated_metadata, scope_context=resolved_scope)
         write_registry(rows, scope_context=resolved_scope)
         return True, f"Slice {slice['id']} is already archived at {target_normalized}", slice
 
@@ -703,7 +776,7 @@ def archive_slice(
 
     slice["path"] = target_normalized
     updated_metadata = build_slice_metadata(slice, current_status, existing=moved_metadata)
-    sync_slice_metadata(slice, updated_metadata)
+    sync_slice_metadata(slice, updated_metadata, scope_context=resolved_scope)
     write_registry(rows, scope_context=resolved_scope)
     return True, f"Archived {slice['id']} to {target_normalized}", slice
 
@@ -1047,32 +1120,40 @@ def find_active_slice(rows: List[Dict[str, object]]) -> Optional[Dict[str, objec
 
 
 def expected_status_for_files(
-    brief_exists: bool, requirements_exists: bool, plan_exists: bool, slices_exists: bool
+    brief_exists: bool,
+    requirements_exists: bool,
+    plan_exists: bool,
+    slices_exists: bool,
+    blueprint_contract_exists: bool = False,
 ) -> str:
     del slices_exists
-    if not brief_exists or not requirements_exists:
-        return "draft"
-    if not plan_exists:
+    if plan_exists:
+        return "blueprint_ready"
+    if brief_exists and requirements_exists:
         return "brief_ready"
-    return "blueprint_ready"
+    return "draft"
 
 
 def validate_slice(
-    row: Dict[str, object], skip_metadata_status_check: bool = False
+    row: Dict[str, object],
+    skip_metadata_status_check: bool = False,
+    scope_context: Optional[object] = None,
 ) -> Tuple[bool, List[str], Dict[str, bool]]:
     issues: List[str] = []
-    path = slice_path_for_row(row)
-    brief = os.path.join(path, "brief.md")
-    requirements = os.path.join(path, "checklists", "requirements.md")
-    plan = os.path.join(path, "blueprint.md")
+    path = slice_path_for_row(row, scope_context=scope_context)
+    brief = os.path.join(path, BRIEF_FILE)
+    requirements = os.path.join(path, REQUIREMENTS_CHECKLIST_FILE)
+    plan = os.path.join(path, BLUEPRINT_FILE)
     slices = os.path.join(path, "slices.md")
     metadata = load_slice_metadata(path)
+    contract_exists = blueprint_has_slice_contract(path)
     checks = {
         "slice_dir_exists": os.path.isdir(path),
         "metadata_exists": bool(metadata),
         "brief_exists": os.path.isfile(brief),
         "requirements_exists": os.path.isfile(requirements),
         "plan_exists": os.path.isfile(plan),
+        "blueprint_contract_exists": contract_exists,
         "slices_exists": os.path.isfile(slices),
         "closed_at_recorded": isinstance(metadata.get("closed_at"), str),
         "archived_at_recorded": isinstance(metadata.get("archived_at"), str),
@@ -1095,23 +1176,24 @@ def validate_slice(
         checks["requirements_exists"],
         checks["plan_exists"],
         checks["slices_exists"],
+        checks["blueprint_contract_exists"],
     )
     if normalized_status in {"draft", "brief_ready", "blueprint_ready"}:
         if normalized_status != expected:
             issues.append(
                 f"status_mismatch:status={normalized_status} expected={expected} based_on_files"
             )
-    if normalized_status in {"brief_ready", "blueprint_ready", "execution_ready"} and not checks[
-        "requirements_exists"
-    ]:
+    if normalized_status == "brief_ready" and not checks["requirements_exists"]:
         issues.append("missing_requirements_checklist")
+    if normalized_status == "brief_ready" and not checks["brief_exists"]:
+        issues.append("brief_ready_without_brief")
     if normalized_status == "execution_ready" and not checks["plan_exists"]:
         issues.append("execution_ready_without_plan")
-    if normalized_status == "execution_ready" and not checks["brief_exists"]:
-        issues.append("execution_ready_without_brief")
-    if normalized_status == "closed" and not (
-        checks["brief_exists"] and checks["requirements_exists"] and checks["plan_exists"]
-    ):
+    if normalized_status in {"blueprint_ready", "execution_ready", "closed"} and checks[
+        "plan_exists"
+    ] and not (checks["brief_exists"] or checks["blueprint_contract_exists"]):
+        issues.append("blueprint_without_slice_contract")
+    if normalized_status == "closed" and not checks["plan_exists"]:
         issues.append("closed_without_core_artifacts")
     if normalized_status == "closed" and not checks["metadata_exists"]:
         issues.append("closed_without_metadata")
@@ -1192,11 +1274,15 @@ def is_allowed_transition(current_status: str, target_status: str) -> bool:
 
 
 def validate_slice_for_status(
-    row: Dict[str, object], target_status: str
+    row: Dict[str, object],
+    target_status: str,
+    scope_context: Optional[object] = None,
 ) -> Tuple[bool, List[str], Dict[str, bool]]:
     candidate = dict(row)
     candidate["status"] = target_status
-    ok, issues, checks = validate_slice(candidate, skip_metadata_status_check=True)
+    ok, issues, checks = validate_slice(
+        candidate, skip_metadata_status_check=True, scope_context=scope_context
+    )
     if target_status == "closed":
         issues = [
             issue
@@ -1212,6 +1298,7 @@ def update_slice_status(
     slice: Dict[str, object],
     status: str,
     force: bool = False,
+    scope_context: Optional[object] = None,
 ) -> Tuple[bool, str]:
     current_status = normalize_status(str(slice["status"]))
     if not force and not is_allowed_transition(current_status, status):
@@ -1221,7 +1308,7 @@ def update_slice_status(
             f"{current_status} -> {status}. Use --force to override.",
         )
 
-    ok, issues, _ = validate_slice_for_status(slice, status)
+    ok, issues, _ = validate_slice_for_status(slice, status, scope_context=scope_context)
     if not ok and not force:
         return (
             False,
@@ -1242,9 +1329,11 @@ def update_slice_status(
     final_status = status
     auto_started = False
     if status == "blueprint_ready" and not force:
-        config = load_config(required=True)
+        config = load_config(required=True, scope_context=scope_context)
         if bool(config["auto_start_implementation"]):
-            auto_ok, auto_issues, _ = validate_slice_for_status(slice, "execution_ready")
+            auto_ok, auto_issues, _ = validate_slice_for_status(
+                slice, "execution_ready", scope_context=scope_context
+            )
             if not auto_ok:
                 return (
                     False,
@@ -1254,7 +1343,7 @@ def update_slice_status(
             final_status = "execution_ready"
             auto_started = True
 
-    slice_path = slice_path_for_row(slice)
+    slice_path = slice_path_for_row(slice, scope_context=scope_context)
     metadata = load_slice_metadata(slice_path)
     updated_metadata = build_slice_metadata(slice, final_status, existing=metadata)
     write_slice_metadata(slice_path, updated_metadata)
@@ -1262,7 +1351,7 @@ def update_slice_status(
     slice["status"] = final_status
     slice["updated_at"] = normalize_optional_timestamp(updated_metadata.get("updated_at"))
     slice["closed_at"] = normalize_optional_timestamp(updated_metadata.get("closed_at"))
-    write_registry(rows)
+    write_registry(rows, scope_context=scope_context)
     post_transition_result = None
     if final_status == "closed":
         post_transition_result = evaluate_slice_transition(str(slice["id"]), final_status)

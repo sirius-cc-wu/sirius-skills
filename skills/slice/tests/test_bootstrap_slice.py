@@ -267,6 +267,14 @@ def test_bootstrap_syncs_approved_subfeature_to_slice_ready(tmp_path, monkeypatc
     assert planning_metadata["status"] == "slice_ready"
     assert planning_metadata["ready_slice_ids"] == ["ENV-01"]
     assert subfeature_metadata["ready_slice_ids"] == ["ENV-01"]
+    assert (subfeature_dir / ".skills" / "execution.json").exists()
+    assert (
+        subfeature_dir
+        / "slices"
+        / "ENV-01-environment-injection"
+        / ".slice-meta.json"
+    ).exists()
+    assert not (tmp_path / "slices" / "ENV-01-environment-injection").exists()
 
 
 def test_bootstrap_blocks_dirty_approved_subfeature_until_planning_is_committed(
@@ -312,6 +320,13 @@ def test_bootstrap_allows_committed_approved_subfeature_in_git_repo(tmp_path, mo
     assert planning_metadata["status"] == "slice_ready"
     assert planning_metadata["ready_slice_ids"] == ["ENV-01"]
     assert subfeature_metadata["ready_slice_ids"] == ["ENV-01"]
+    assert (subfeature_dir / ".skills" / "execution.json").exists()
+    assert (
+        subfeature_dir
+        / "slices"
+        / "ENV-01-environment-injection"
+        / ".slice-meta.json"
+    ).exists()
 
 
 def test_bootstrap_uses_explicit_slice_dir_when_config_missing(tmp_path, monkeypatch):

@@ -1,11 +1,11 @@
-# Slice Contract: [WORK ITEM NAME]
+# Optional Slice Clarification: [WORK ITEM NAME]
 
 **Slice**: `[ID-work-item-name]`
 **Created**: [DATE]  
-**Status**: Draft  
+**Status**: Draft / Legacy
 **Input**: "$ARGUMENTS"
 
-## 1. Summary
+## 1. Clarification Summary
 
 - **Work Item**: [Short slice-scoped summary]
 - **Source Story / Increment / Slice**: [Originating story ID, increment ID, planned slice ID, or "standalone"]

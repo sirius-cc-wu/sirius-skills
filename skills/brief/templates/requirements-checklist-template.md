@@ -1,6 +1,6 @@
-# Brief Checklist: [WORK ITEM NAME]
+# Legacy Brief Checklist: [WORK ITEM NAME]
 
-**Purpose**: Validate that the slice-scoped `brief.md` is ready as a lean slice contract for `blueprint`
+**Purpose**: Legacy validation for slice-scoped `brief.md`. New slices should put these checks in `blueprint.md` instead of creating this file.
 **Created**: [DATE]  
 **Brief**: [link to brief.md]
 

@@ -233,8 +233,8 @@ Manual repo workflow (explicit control path):
 10. `breakdown` turns feature-owned repo stories into directly executable work items under the selected subfeature and groups those slices into small demonstrable increments. Direct feature-level breakdown remains a compatibility path for existing packets.
 11. `review-planning` reviews planning artifacts and slice definitions, then stops for explicit human approval.
 12. After approval, commit the planning artifacts so the reviewed plan is durable before execution begins. For reviewed subfeatures, also record that approval in `.subfeature-meta.json` so the approval boundary stays durable in the single source of truth.
-13. `slice` validates approved, committed execution-ready input, bootstraps a slice-scoped execution slice, and hands off to `guide-execution`.
-14. `guide-execution` routes slice-scoped execution through `brief` to capture a lean slice contract covering intent, expected behavior, acceptance, and assumptions, then through `blueprint` to produce the final technical execution artifact. When `.skills/execution.json` enables `auto_start_implementation`, that handoff continues directly into implementation after the blueprint is marked ready.
+13. `slice` validates approved, committed execution-ready input, bootstraps a slice-scoped execution slice, and hands off to `guide-execution`. New subfeature work creates that execution slice under the owning subfeature's local `slices/` root.
+14. `guide-execution` routes new slice-scoped execution to `blueprint`, where the slice contract and technical execution plan live together. `brief` and `brief_ready` remain legacy or explicit-clarification paths. When `.skills/execution.json` enables `auto_start_implementation`, that handoff continues directly into implementation after the blueprint is marked ready.
 15. `ship` is the optional batch entrypoint when a reviewed and committed feature or subfeature backlog should be worked one planned slice at a time. It respects increment order first, then slice dependencies within the current increment, resumes or bootstraps one mapped slice, reports the next concrete execution owner for that slice, and stops at blockers or commit checkpoints. Its JSON output also includes a machine-readable `handoff_payload` for the active slice so future accelerators can consume the same routing contract without changing `ship` ownership.
 16. `ship-worktree` is the optional wrapper entrypoint when that same reviewed and committed backlog should execute in a dedicated git worktree branch. It owns worktree lifecycle and PR handoff, but still delegates slice backlog execution to `ship`.
 17. `review-execution` checks implementation and validation outcomes against the slice-scoped execution artifacts before closure.
@@ -247,14 +247,16 @@ folders into the current durable `subfeatures/` layout before normal planning
 work continues.
 
 For repositories that still keep execution slices in a root-level `slices/`
-tree, `migrate-slices` can scan, version, and move those slices into feature-local
-scope roots while preserving archived history.
+tree, `migrate-slices` can scan, version, and move those slices into
+subfeature-local scope roots when traceability identifies the owner, while
+preserving archived history. Feature-level slice roots are migration-only once
+subfeatures are universal.
 
-In the repo-native flow, `guide-planning` owns feature-planning readiness and routing, `breakdown` owns repo-story decomposition, `review-planning` owns planning readiness review, `slice` owns execution bootstrap from approved committed planning artifacts, `brief` owns the slice-scoped `brief.md` as a lean contract for intent, acceptance, and assumptions, `blueprint` owns the final slice-scoped technical execution plan and validation checklist, and `review-execution` owns the final implementation-versus-brief review before closure.
+In the repo-native flow, `guide-planning` owns feature-planning readiness and routing, `breakdown` owns repo-story decomposition, `review-planning` owns planning readiness review, `slice` owns execution bootstrap from approved committed planning artifacts, `blueprint` owns the slice-scoped contract, technical execution plan, and validation mapping, optional legacy `brief` owns standalone clarification when needed, and `review-execution` owns the final implementation-versus-blueprint review before closure.
 
-Execution follows the same pattern: `guide-execution` owns routing, readiness, and registry state, while `brief`, `blueprint`, `review-execution`, `reconcile-execution`, and `close-slice` own execution-side artifacts and closure/reconciliation metadata. With `auto_start_implementation`, `guide-execution` can promote a slice from `blueprint_ready` to `execution_ready` as the signal to begin coding immediately.
+Execution follows the same pattern: `guide-execution` owns routing, readiness, and registry state, while `blueprint`, optional legacy `brief`, `review-execution`, `reconcile-execution`, and `close-slice` own execution-side artifacts and closure/reconciliation metadata. With `auto_start_implementation`, `guide-execution` can promote a slice from `blueprint_ready` to `execution_ready` as the signal to begin coding immediately.
 
-`ship` sits above that single-slice flow as an optional orchestrator. It resolves one reviewed and committed feature or subfeature backlog, resumes or bootstraps one mapped execution slice at a time, and hands that slice to the next concrete owner such as `brief`, `blueprint`, repository implementation, `guide-execution`, `review-execution`, `reconcile-execution`, `close-slice`, or `commit`. It does not replace those owners. When the target is completed and `implemented`, `ship --finalize` can require reconciliation and then route the terminal archive step through `archive-artifacts`.
+`ship` sits above that single-slice flow as an optional orchestrator. It resolves one reviewed and committed feature or subfeature backlog, resumes or bootstraps one mapped execution slice at a time, and hands that slice to the next concrete owner such as `blueprint`, optional legacy `brief`, repository implementation, `guide-execution`, `review-execution`, `reconcile-execution`, `close-slice`, or `commit`. It does not replace those owners. When the target is completed and `implemented`, `ship --finalize` can require reconciliation and then route the terminal archive step through `archive-artifacts`.
 
 `ship-worktree` sits one layer above that orchestrator when the same target
 should execute in a dedicated treehouse-managed leased worktree. It keeps the
@@ -265,7 +267,7 @@ creation without moving backlog ownership out of `ship`.
 `worktree` provides the reusable manual pool for fast local checkout reuse
 without target-specific execution routing.
 
-By default, new execution slices are created under `slices/` unless `.skills/execution.json` overrides the location.
+For new subfeature work, execution slices are created under the owning subfeature's local `slices/` root. Root-level `slices/` remains a compatibility location for legacy and direct feature work unless `.skills/execution.json` overrides the location.
 
 Use **PlantUML** for required UML diagrams:
 
@@ -284,7 +286,7 @@ The `guide-execution` workflow now keeps three complementary artifacts in sync:
 
 The machine-readable metadata can also store explicit cross-slice relations such as `supersedes`, `invalidates`, `narrows`, and `replaces_partially`, with reciprocal backlinks and optional soft selectors for story titles, requirement IDs, or freeform selectors.
 
-Closed slices are retained non-destructively. `sirius-skills` does not merge or delete the original `brief.md`/`blueprint.md` artifacts when a slice closes; instead it records closure durably in the slice registry and metadata.
+Closed slices are retained non-destructively. `sirius-skills` does not merge or delete the original `blueprint.md` or legacy `brief.md` artifacts when a slice closes; instead it records closure durably in the slice registry and metadata.
 
 Per-slice closure is non-destructive. `sirius-skills` keeps closed slices and durable subfeature planning folders in place by default; any later cleanup or archival should happen through explicit maintenance tooling instead of an automatic feature-finalization step.
 

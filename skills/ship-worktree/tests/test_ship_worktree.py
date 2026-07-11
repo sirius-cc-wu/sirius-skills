@@ -299,7 +299,7 @@ def test_ship_worktree_resume_runs_ship_inside_worktree(tmp_path, monkeypatch, c
     assert payload["action"] == "bootstrap_next_slice"
     assert payload["ship_result"]["action"] == "bootstrap_next_slice"
     assert payload["ship_result"]["bootstrapped_slice_id"] == "mse-scope-and-backlog-resolution"
-    assert payload["next_owner"] == "brief"
+    assert payload["next_owner"] == "blueprint"
     assert Path(payload["worktree_path"]) == worktree_path
 
 

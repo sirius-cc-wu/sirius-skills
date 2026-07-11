@@ -274,7 +274,7 @@ def test_resolve_feature_scope_returns_first_ready_planned_slice(tmp_path, monke
     assert payload["target_type"] == "feature"
     assert payload["ready_next"] == ["mse-scope-and-backlog-resolution"]
     assert payload["readiness"]["can_proceed"] is True
-    assert payload["readiness"]["next_owner"] == "brief"
+    assert payload["readiness"]["next_owner"] == "blueprint"
     assert payload["readiness"]["blocked_by"] == []
     states = {entry["planned_slice_id"]: entry["state"] for entry in payload["entries"]}
     assert states["mse-scope-and-backlog-resolution"] == "ready"
@@ -1043,9 +1043,9 @@ def test_bootstrap_next_creates_first_ready_slice_and_updates_traceability(
     slice_row = execution.resolve_slice(registry_rows, "mse-scope-and-backlog-resolution")
 
     assert payload["bootstrapped_slice_id"] == "mse-scope-and-backlog-resolution"
-    assert payload["next_owner"] == "brief"
-    assert payload["active_slice_handoff"]["next_owner"] == "brief"
-    assert payload["active_slice_handoff"]["next_action"] == "create_or_update_brief"
+    assert payload["next_owner"] == "blueprint"
+    assert payload["active_slice_handoff"]["next_owner"] == "blueprint"
+    assert payload["active_slice_handoff"]["next_action"] == "create_or_update_blueprint"
     assert payload["active_slice_handoff"]["validation_hint"] == "test"
     assert slice_row is not None
     assert slice_row["status"] == "draft"
@@ -1174,12 +1174,11 @@ def test_resume_returns_active_mapped_slice_and_next_owner(tmp_path, monkeypatch
 
     assert payload["action"] == "resume_active_slice"
     assert payload["bootstrapped_slice_id"] == "mse-scope-and-backlog-resolution"
-    assert payload["next_owner"] == "brief"
+    assert payload["next_owner"] == "blueprint"
     assert payload["readiness"]["can_proceed"] is True
     assert payload["readiness"]["blocked_by"] == []
-    assert payload["active_slice_handoff"]["next_owner"] == "brief"
+    assert payload["active_slice_handoff"]["next_owner"] == "blueprint"
     assert payload["active_slice_handoff"]["downstream_owners"] == [
-        "blueprint",
         "implementation",
         "review-execution",
         "close-slice",
@@ -1259,7 +1258,19 @@ def test_resume_bootstraps_next_ready_slice_after_completed_predecessor(
 
     assert payload["action"] == "bootstrap_next_slice"
     assert payload["bootstrapped_slice_id"] == "mse-sequential-slice-orchestration"
-    assert payload["next_owner"] == "brief"
+    assert payload["next_owner"] == "blueprint"
+    assert (
+        subfeature_path
+        / "slices"
+        / "mse-sequential-slice-orchestration-orchestrate-slices"
+        / ".slice-meta.json"
+    ).exists()
+    subfeature_registry = json.loads(
+        (subfeature_path / "slices" / "registry.json").read_text(encoding="utf-8")
+    )
+    assert {row["id"] for row in subfeature_registry["slices"]} == {
+        "mse-sequential-slice-orchestration"
+    }
 
 
 def test_resume_routes_brief_ready_slice_to_blueprint_and_emits_handoff_payload(
@@ -1689,10 +1700,10 @@ def test_resume_delegation_routes_active_slice_through_ship_slice(
     payload = json.loads(capsys.readouterr().out)
 
     assert payload["action"] == "delegated_to_ship_slice"
-    assert payload["next_owner"] == "brief"
+    assert payload["next_owner"] == "blueprint"
     assert payload["readiness"]["can_proceed"] is True
     assert payload["readiness"]["blocked_by"] == []
-    assert payload["delegate_result"]["next_owner"] == "brief"
+    assert payload["delegate_result"]["next_owner"] == "blueprint"
     assert payload["delegate_result"]["handoff_payload"]["execution_slice_id"] == (
         "mse-scope-and-backlog-resolution"
     )

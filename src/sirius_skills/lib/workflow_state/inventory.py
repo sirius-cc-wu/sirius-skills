@@ -109,6 +109,52 @@ def _discover_subfeature_dirs(feature_dir: Path) -> List[Path]:
     return _discover_child_dirs(feature_dir / "subfeatures")
 
 
+def _slice_registry_paths_for_scope(scope_dir: Path) -> Tuple[Path, Path, Path]:
+    slice_root = scope_dir / "slices"
+    return slice_root, slice_root / "README.md", slice_root / "registry.json"
+
+
+def _repo_relative_slice_rows(scope_dir: Path, rows: List[Dict[str, object]]) -> List[Dict[str, object]]:
+    normalized: List[Dict[str, object]] = []
+    for row in rows:
+        updated = dict(row)
+        row_path = Path(str(updated.get("path") or "").rstrip("/"))
+        if not row_path.is_absolute():
+            row_path = scope_dir / row_path
+        updated["path"] = normalize_dir_relpath(row_path)
+        normalized.append(updated)
+    return normalized
+
+
+def _load_nested_slice_scope(
+    context: InventoryContext, scope_dir: Path
+) -> Tuple[List[Dict[str, object]], List[Path], RegistryStatus]:
+    slice_root, slice_readme, slice_registry = _slice_registry_paths_for_scope(scope_dir)
+    rows, error = _load_registry_rows(
+        slice_registry,
+        slice_readme,
+        "slices",
+        context.execution.normalize_registry_row,
+        markdown_parser=context.execution.parse_registry_markdown,
+    )
+    rows = _repo_relative_slice_rows(scope_dir, rows)
+    return (
+        rows,
+        _discover_child_dirs(slice_root),
+        RegistryStatus(
+            artifact_type="slice",
+            owner_id=scope_dir.name,
+            root_path=normalize_dir_relpath(slice_root),
+            readme_path=normalize_dir_relpath(slice_readme),
+            registry_path=normalize_dir_relpath(slice_registry),
+            root_exists=slice_root.exists(),
+            readme_exists=slice_readme.exists(),
+            registry_exists=slice_registry.exists(),
+            error=error,
+        ),
+    )
+
+
 def planning_row_artifact_type(row: Dict[str, object]) -> str:
     path = str(row.get("path", ""))
     return "subfeature" if "/subfeatures/" in path else "feature"
@@ -315,6 +361,34 @@ def load_inventory() -> Inventory:
     }
     slice_dirs = _discover_child_dirs(context.slice_root)
 
+    nested_registry_statuses: List[RegistryStatus] = []
+    nested_slice_rows: List[Dict[str, object]] = []
+    nested_slice_dirs: List[Path] = []
+    nested_scope_dirs = list(feature_dirs)
+    for subfeature_dirs in subfeature_dirs_by_feature.values():
+        nested_scope_dirs.extend(subfeature_dirs)
+    root_slice_registry = context.slice_registry.resolve()
+    for scope_dir in nested_scope_dirs:
+        _, _, nested_registry = _slice_registry_paths_for_scope(scope_dir)
+        if nested_registry.resolve() == root_slice_registry:
+            continue
+        rows, dirs, status = _load_nested_slice_scope(context, scope_dir)
+        if rows or status.root_exists or status.registry_exists or status.readme_exists:
+            nested_slice_rows.extend(rows)
+            nested_slice_dirs.extend(dirs)
+            nested_registry_statuses.append(status)
+
+    if nested_slice_rows:
+        rows_by_path = {normalize_registry_path(str(row["path"])): dict(row) for row in slice_rows}
+        for row in nested_slice_rows:
+            rows_by_path[normalize_registry_path(str(row["path"]))] = dict(row)
+        slice_rows = list(rows_by_path.values())
+    if nested_slice_dirs:
+        dirs_by_path = {normalize_dir_relpath(path): path for path in slice_dirs}
+        for path in nested_slice_dirs:
+            dirs_by_path[normalize_dir_relpath(path)] = path
+        slice_dirs = list(dirs_by_path.values())
+
     registry_statuses: List[RegistryStatus] = [
         RegistryStatus(
             artifact_type="proposal",
@@ -349,6 +423,7 @@ def load_inventory() -> Inventory:
             registry_exists=context.slice_registry.exists(),
             error=slice_error,
         ),
+        *nested_registry_statuses,
     ]
 
     subfeature_registry_rows: Dict[str, List[Dict[str, object]]] = {}

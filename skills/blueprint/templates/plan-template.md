@@ -5,11 +5,21 @@
 **Status**: Draft
 **Spec**: [link to brief.md]
 
-## 1. Summary
+## 1. Slice Contract
+
+- Requested outcome:
+- Source story / increment / planned slice:
+- Acceptance scenarios:
+- Functional requirements:
+- Edge cases:
+- Assumptions and dependencies:
+- Independent validation:
+
+## 2. Summary
 
 [Short summary of the implementation approach for this slice. Do not restate the full brief; build on it.]
 
-## 2. Technical Context
+## 3. Technical Context
 
 - Current system context:
 - Target modules / files:
@@ -17,7 +27,7 @@
 - Assumptions:
 - Out of scope:
 
-## 3. Planning Gates
+## 4. Planning Gates
 
 ### Architecture / Constraints
 
@@ -37,7 +47,7 @@
 - Result: PASS / WAIVED / FAIL
 - Notes:
 
-## 4. Requirement Traceability
+## 5. Requirement Traceability
 
 Map each brief requirement once into concrete implementation and validation.
 
@@ -46,7 +56,7 @@ Map each brief requirement once into concrete implementation and validation.
 | FR-001 | [step IDs] | [check IDs] |
 | FR-002 | [step IDs] | [check IDs] |
 
-## 5. Execution Plan
+## 6. Execution Plan
 
 ### Packet P01: [Name]
 
@@ -73,7 +83,7 @@ Map each brief requirement once into concrete implementation and validation.
 - Definition of Done:
 - Rollback / Mitigation:
 
-## 6. Supporting Notes
+## 7. Supporting Notes
 
 ### Detailed Design Diagrams (PlantUML)
 
@@ -115,7 +125,7 @@ Map each brief requirement once into concrete implementation and validation.
 - Edge case:
 - Regression checks:
 
-## 7. Delivery Notes
+## 8. Delivery Notes
 
 - Sequencing rationale:
 - Risks to monitor:

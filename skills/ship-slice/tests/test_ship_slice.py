@@ -149,7 +149,7 @@ def test_finish_or_resume_from_handoff_routes_draft_slice_and_writes_runtime_fil
             execution_slice_id="taw-ship-slice-loop",
             execution_slice_path="slices/taw-ship-slice-loop-add-one-slice-finishing-and-resume-orchestration/",
             slice_status="draft",
-            next_owner="brief",
+            next_owner="blueprint",
             action="resume_active_slice",
         ),
     )
@@ -158,8 +158,8 @@ def test_finish_or_resume_from_handoff_routes_draft_slice_and_writes_runtime_fil
 
     assert result.returncode == 0
     payload = json.loads(result.stdout)
-    assert payload["next_owner"] == "brief"
-    assert payload["action"] == "create_or_update_brief"
+    assert payload["next_owner"] == "blueprint"
+    assert payload["action"] == "create_or_update_blueprint"
     assert Path(payload["checkpoint_path"]).is_file()
     assert Path(payload["event_log_path"]).is_file()
     assert payload["readiness"]["can_proceed"] is True

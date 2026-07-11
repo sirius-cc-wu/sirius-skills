@@ -29,7 +29,7 @@ Use a **two-layer workflow**:
    - `guide-execution`
    - `ship` (optional backlog orchestrator)
    - `ship-worktree` (optional dedicated-worktree wrapper around `ship`)
-   - `brief`
+   - `brief` (legacy/optional clarification)
    - `blueprint`
    - `review-execution`
    - `close-slice`
@@ -49,7 +49,7 @@ planning packet explicitly documents a temporary parallel transition.
 
 After each planning phase writes or updates its repository artifacts, persist the matching metadata transition with the owner script for that planning scope. Canonical features should use `sirius manage-planning sync-status <feature-selector> --through <expected-status>`. Subfeatures should use `sirius manage-subfeatures set-status <feature-selector> <subfeature-id> <expected-status>` through `reviewed`, then `sirius manage-subfeatures approve ...` to record explicit approval and any ready slice IDs. Use adjacent advancement by default and reserve explicit overrides for deliberate repair or terminal execution states.
 
-The execution layer works one implementation-ready slice at a time, starting with `slice` bootstrap from approved committed planning artifacts. For reviewed subfeatures, that approval must be recorded in `.subfeature-meta.json` before bootstrap. `ship` can sit above that flow when an approved and committed subfeature should be worked as one dependency-aware backlog; direct feature targets remain compatibility for existing packets. It should follow increment order first, then slice dependencies within the current increment, while still handing each concrete slice to the next existing single-slice owner such as `brief`, `blueprint`, repository implementation, `review-execution`, `close-slice`, or `commit`. When the same backlog should execute on its own git branch and checkout, `ship-worktree` can sit one layer above `ship` to create or reuse a dedicated worktree, run `ship` there, and later hand the branch off to PR creation. For faster manual local work, use the shared `sirius worktree get` / `return` / `status` pool rooted at the owning repo's sibling `<repo>.worktrees` directory.
+The execution layer works one implementation-ready slice at a time, starting with `slice` bootstrap from approved committed planning artifacts. For reviewed subfeatures, that approval must be recorded in `.subfeature-meta.json` before bootstrap, and new execution slices are created under the owning subfeature's local `slices/` root. `ship` can sit above that flow when an approved and committed subfeature should be worked as one dependency-aware backlog; direct feature targets remain compatibility for existing packets. It should follow increment order first, then slice dependencies within the current increment, while still handing each concrete slice to the next existing single-slice owner such as `blueprint`, optional legacy `brief`, repository implementation, `review-execution`, `close-slice`, or `commit`. When the same backlog should execute on its own git branch and checkout, `ship-worktree` can sit one layer above `ship` to create or reuse a dedicated worktree, run `ship` there, and later hand the branch off to PR creation. For faster manual local work, use the shared `sirius worktree get` / `return` / `status` pool rooted at the owning repo's sibling `<repo>.worktrees` directory.
 
 When accelerators are enabled, the default operator path compresses to one
 planning accelerator surface and one execution accelerator surface, with an
@@ -439,7 +439,7 @@ When a reviewed and committed feature or subfeature has multiple planned slices
 and the goal is to keep progressing through the backlog, `ship`
 can resolve the remaining planned slices, resume an active mapped slice, or
 bootstrap the next ready one. It stays orchestration-only: `guide-execution`,
-`brief`, `blueprint`, `review-execution`, `close-slice`, and `commit` still own
+`blueprint`, optional legacy `brief`, `review-execution`, `close-slice`, and `commit` still own
 their existing steps.
 
 When `.skills/execution.json` enables delegated owner-chain execution,
@@ -453,37 +453,37 @@ continuation policy.
 After a slice exists, use the manual execution layer:
 
 1. `guide-execution`
-2. `brief`
-3. `blueprint`
+2. `blueprint`
+3. optional legacy `brief` only when standalone clarification is needed
 
 This is where slice-scoped execution artifacts are created:
 
-- `brief.md`
 - `blueprint.md`
+- optional legacy `brief.md`
 
 Within that execution layer:
 
 - `guide-execution` owns routing, readiness checks, and registry state
 - `ship` owns backlog traversal across multiple planned slices for one reviewed and committed feature or subfeature
-- `brief` creates the slice-scoped `brief.md` as a lean contract for one execution-ready work item: value, expected behavior, acceptance criteria, assumptions, and traceability
-- `blueprint` converts that slice-scoped brief into the final implementation packets, technical decisions, traceability, validation steps, and PlantUML detailed design needed for execution
+- `blueprint` creates the slice-scoped contract and final implementation packets, technical decisions, traceability, validation steps, and PlantUML detailed design needed for execution
+- `brief` remains available only for legacy slices or explicit standalone clarification before blueprint authoring
 - when `.skills/execution.json` sets `auto_start_implementation` to `true`, marking the blueprint ready should immediately advance the slice into `execution_ready` and continue into repository implementation work
-- `review-execution` owns the explicit implementation-versus-brief review outcome
+- `review-execution` owns the explicit implementation-versus-blueprint review outcome
 - `close-slice` owns slice closure metadata
 Keep the boundary explicit:
 
 - `breakdown` owns repo-story decomposition and execution-ready slices
 - `breakdown` also owns increment grouping at the repo-planning level
-- `brief` owns `brief.md` and `checklists/requirements.md`
-- `blueprint` owns the final slice-scoped execution checklist for new slices
+- `blueprint` owns the slice contract, requirement mapping, validation gates, and final slice-scoped execution checklist for new slices
+- `brief_ready`, `brief.md`, and `checklists/requirements.md` are legacy-only unless a slice explicitly needs standalone clarification
 - `guide-execution` should validate handoffs and route work, not take over artifact authoring from the other execution skills
 - `ship` should stop at blockers or per-slice commit checkpoints instead of silently rolling work into the next slice
 
 Execution review loop:
 
-- review the slice-scoped `brief.md` and `blueprint.md` before implementation starts if the slice carries meaningful risk or ambiguity
-- review brief-to-implementation alignment during execution, not only at final handoff
-- when validation or review finds a gap, update the slice-scoped execution artifacts or surrounding guidance so the fix persists at the brief level
+- review the slice-scoped `blueprint.md` before implementation starts if the slice carries meaningful risk or ambiguity
+- review blueprint-to-implementation alignment during execution, not only at final handoff
+- when validation or review finds a gap, update the slice-scoped execution artifacts or surrounding guidance so the fix persists at the blueprint level
 
 ### 8. Manage slice execution
 
@@ -492,11 +492,11 @@ Use the repository and `guide-execution` for the actual slice lifecycle:
 - track slice readiness and state transitions
 - record blockers or pauses in slice metadata
 - request or record implementation review as required by your team
-- capture review findings that affect execution or acceptance in `brief.md` or `blueprint.md`
+- capture review findings that affect execution or acceptance in `blueprint.md`, or in legacy `brief.md` when that artifact exists
 - verify the implementation against the slice-scoped artifacts
 - mark work complete using `close-slice`
 
-If review uncovers an intent gap or brief gap, feed that back into the relevant brief or planning artifact before considering the slice fully done.
+If review uncovers an intent gap or blueprint gap, feed that back into the relevant blueprint or planning artifact before considering the slice fully done.
 
 Keep the responsibility boundary clear:
 
@@ -597,15 +597,19 @@ Use proposal folders for speculative or not-yet-accepted work. By default, `prop
 ### Slice-level execution
 
 ```text
-<slice_dir>/<slice-id>-<slice-slug>/
-  brief.md
+<feature_dir>/subfeatures/<subfeature-id>/slices/<slice-id>-<slice-slug>/
   blueprint.md
+  brief.md                 # optional legacy/clarification artifact
 ```
 
-The exact execution-slice path depends on `guide-execution` configuration. The important rule is that execution slices are **slice-scoped**, not feature-scoped, and remain centrally managed separately from the feature-local planning docs.
+For new subfeature work, execution slices live under the owning subfeature's
+local `slices/` root. Root-level or feature-level slice roots are compatibility
+or migration-only locations. The important rule is that execution slices are
+**slice-scoped** and stay tied to the subfeature delivery unit that owns the
+planned slice backlog.
 
-By default, `guide-execution` uses `slices/`; projects can override that by setting
-`slice_dir` in `.skills/execution.json`.
+Direct feature or legacy work can still use a configured `slice_dir` in
+`.skills/execution.json`.
 
 ## Diagram Conventions
 
@@ -634,24 +638,22 @@ my-app/
             system-design.md
             slice-planning.md
             slice-traceability.md
+            slices/
+              HAB-101-create-schema/
+                blueprint.md
           habit-interactions/
             discover.md
             system-design.md
             slice-planning.md
             slice-traceability.md
-  slices/
-    HAB-101-create-schema/
-      brief.md
-      blueprint.md
-    HAB-102-add-habit-form/
-      brief.md
-      blueprint.md
-    HAB-103-mark-habit-done/
-      brief.md
-      blueprint.md
+            slices/
+              HAB-102-add-habit-form/
+                blueprint.md
+              HAB-103-mark-habit-done/
+                blueprint.md
 ```
 
-In this example, the default planning layout `docs/features/habit-tracker/` holds the feature-level discovery and story catalog, subfeatures hold executable planning, and each executable slice gets its own centralized execution slice under `slices/`.
+In this example, the default planning layout `docs/features/habit-tracker/` holds the feature-level discovery and story catalog, subfeatures hold executable planning, and each executable slice lives under the owning subfeature's local `slices/` root.
 
 ## Operating Rules
 

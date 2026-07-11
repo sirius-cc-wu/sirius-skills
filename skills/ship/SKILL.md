@@ -23,7 +23,8 @@ resolution:
 The second slice adds conservative sequential orchestration:
 
 5. Bootstrap exactly one next-ready execution slice from the current unfinished
-   increment when no mapped slice is already active.
+   increment when no mapped slice is already active; for subfeatures, the slice
+   is created under the owning subfeature's local `slices/` root.
 6. Record the bootstrapped execution slice ID back into `slice-traceability.md`.
 7. Hand the active slice to the concrete next owner inside the execution layer.
 
@@ -32,8 +33,8 @@ The third slice adds stop/resume semantics:
 8. Resume an already-active mapped slice instead of creating a second one.
 9. Recompute progress from closed slices, active slices, increments, and
    dependencies without a batch-only progress file.
-10. Report whether the active slice next belongs to `brief`, `blueprint`,
-    repository implementation, `guide-execution`, `review-execution`,
+10. Report whether the active slice next belongs to `blueprint`, legacy `brief`,
+     repository implementation, `guide-execution`, `review-execution`,
     `close-slice`, or `commit`.
 11. Expose a stable machine-readable handoff payload for the active slice in
     JSON output without changing backlog ownership semantics.
@@ -159,9 +160,9 @@ Behavior:
   commit still represents one completed execution slice.
 - Require a durable `execution-reconciliation` block in `system-design.md`
   before terminal archive mutation.
-- Keep one-slice execution ownership in the existing `slice`, `brief`,
-  `blueprint`, `guide-execution`, `review-execution`, `close-slice`, and
-  `commit` skills.
+- Keep one-slice execution ownership in the existing `slice`, `blueprint`,
+  optional legacy `brief`, `guide-execution`, `review-execution`,
+  `close-slice`, and `commit` skills.
 - Keep terminal reconciliation owned by `reconcile-execution` and archive
   mutation owned by `archive-artifacts`, even when `ship` orchestrates both.
 - Keep explicit human approval as a durable gate before delegated execution

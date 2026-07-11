@@ -44,7 +44,7 @@ DEFAULT_RUNTIME_DIR = Path(".skills/runtime")
 DEFAULT_LEARNINGS_PATH = Path(".skills/learnings.jsonl")
 
 CHAIN_TARGET_STATUS_BY_STATE = {
-    "draft": "brief_ready",
+    "draft": "blueprint_ready",
     "brief_ready": "blueprint_ready",
     "blueprint_ready": "execution_ready",
 }
@@ -758,8 +758,10 @@ def runtime_paths(repo_root: Path) -> tuple[Path, Path, Path]:
 
 
 def inspect_slice_artifacts(slice_row: Dict[str, Any], execution_module, scope_context) -> Dict[str, bool]:
-    slice_path = execution_module.slice_path_for_row(slice_row, scope_context=scope_context)
-    return execution_module.validate_slice(slice_row, skip_metadata_status_check=True)[2] | {
+    slice_path = Path(execution_module.slice_path_for_row(slice_row, scope_context=scope_context))
+    return execution_module.validate_slice(
+        slice_row, skip_metadata_status_check=True, scope_context=scope_context
+    )[2] | {
         "slice_path_exists": slice_path.is_dir()
     }
 
@@ -788,8 +790,8 @@ def build_route(
         next_owner = "guide-execution"
         action = "resolve_owned_file_conflict"
     elif status == "draft":
-        next_owner = "brief"
-        action = "create_or_update_brief"
+        next_owner = "blueprint"
+        action = "create_or_update_blueprint"
     elif status == "brief_ready":
         next_owner = "blueprint"
         action = "create_or_update_blueprint"
@@ -874,6 +876,20 @@ def resolve_slice(
 
     if selector:
         row = execution_module.resolve_slice(rows, selector)
+        if row is None and handoff is not None:
+            handoff_path = Path(handoff.execution_slice_path)
+            if not handoff_path.is_absolute():
+                handoff_path = scope_context.repo_root / handoff_path
+            for candidate in [handoff_path, *handoff_path.parents]:
+                if not (candidate / ".skills" / "execution.json").exists():
+                    continue
+                scope_context = execution_module.SCOPE_RUNTIME.resolve_scope_context(
+                    explicit_scope=candidate
+                )
+                rows = execution_module.parse_registry(scope_context=scope_context)
+                row = execution_module.resolve_slice(rows, selector)
+                if row is not None:
+                    break
     else:
         row = execution_module.find_active_slice(rows)
         if row is not None:
@@ -1009,6 +1025,7 @@ def execute_owner_chain(
             rows,
             slice_row,
             target_status,
+            scope_context=scope_context,
         )
         next_status = str(slice_row["status"])
         advanced = next_status != current_status

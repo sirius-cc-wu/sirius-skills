@@ -1,22 +1,24 @@
 ---
 name: migrate-slices
-description: Migrates execution slices into co-located feature-scoped slice roots with versioned reports.
+description: Migrates execution slices into co-located subfeature-scoped slice roots with versioned reports.
 ---
 
 # Migrate Slices
 
 Use this skill when a repository still keeps execution slices in a root-level
-slice tree and those slices should be moved into the owning feature scope
-without losing archived history.
+slice tree and those slices should be moved into the owning subfeature scope
+without losing archived history. Feature-level slice roots remain a fallback for
+legacy direct-feature packets and become migration-only once subfeatures are
+universal.
 
 ## Responsibilities
 
 1. Resolve one feature or the full execution tree.
 2. Detect active and archived slice rows in the current slice registry.
-3. Create or reuse feature-local scope files so the feature can own a local
-   `slices/` tree.
-4. Move slice directories and rewrite registry paths into the feature-local
-   slice root.
+3. Create or reuse subfeature-local execution scope files so the subfeature can
+   own a local `slices/` tree.
+4. Move slice directories and rewrite registry paths into the subfeature-local
+   slice root when traceability identifies one owner.
 5. Emit a versioned JSON migration report with planned, migrated, and blocked
    entries.
 
@@ -28,8 +30,8 @@ without losing archived history.
 
 ## Required Output
 
-- co-located slices under the owning feature scope
-- preserved archived slices under that feature scope's archive subtree
+- co-located slices under the owning subfeature scope when traceability identifies one owner
+- preserved archived slices under that subfeature scope's archive subtree
 - a versioned JSON report suitable for future migration runs
 
 ## Workflow
@@ -37,7 +39,8 @@ without losing archived history.
 1. Run `scan` to inspect current slice rows and feature targets.
 2. Run `migrate --dry-run` to preview target paths and feature-scope setup.
 3. Run `migrate` for one feature or `--all` for the whole execution tree.
-4. Review the JSON report for migrated items and any conflicts left behind.
+4. Review the JSON report for migrated items and any conflicts left behind;
+   ambiguous or unmapped slices are blocked instead of guessed.
 
 ## Guardrails
 

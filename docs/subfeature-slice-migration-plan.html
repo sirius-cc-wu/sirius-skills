@@ -1,0 +1,513 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Subfeature-Local Slice Migration Plan</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --bg: #f7f4ee;
+      --paper: #fffdf8;
+      --ink: #1d2430;
+      --muted: #5f6b7a;
+      --line: #d9d0c2;
+      --accent: #7c3f2c;
+      --accent-soft: #f2ddd3;
+      --code: #f3efe7;
+      --ok: #246b45;
+      --warn: #8a5b00;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--ink);
+      font: 16px/1.55 system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+
+    main {
+      max-width: 1040px;
+      margin: 0 auto;
+      padding: 40px 20px 64px;
+    }
+
+    article {
+      background: var(--paper);
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      box-shadow: 0 18px 48px rgba(44, 34, 20, 0.12);
+      overflow: hidden;
+    }
+
+    header {
+      padding: 40px;
+      background: linear-gradient(135deg, #fff7eb 0%, #f3d9ca 100%);
+      border-bottom: 1px solid var(--line);
+    }
+
+    section {
+      padding: 28px 40px;
+      border-bottom: 1px solid var(--line);
+    }
+
+    section:last-child {
+      border-bottom: 0;
+    }
+
+    h1,
+    h2,
+    h3 {
+      line-height: 1.15;
+      margin: 0 0 14px;
+    }
+
+    h1 {
+      max-width: 820px;
+      font-size: clamp(2rem, 5vw, 4.1rem);
+      letter-spacing: -0.05em;
+    }
+
+    h2 {
+      color: var(--accent);
+      font-size: 1.55rem;
+      letter-spacing: -0.02em;
+    }
+
+    h3 {
+      font-size: 1.08rem;
+      margin-top: 22px;
+    }
+
+    p {
+      margin: 0 0 14px;
+    }
+
+    ul,
+    ol {
+      margin: 0 0 16px 1.35rem;
+      padding: 0;
+    }
+
+    li {
+      margin: 6px 0;
+    }
+
+    code,
+    pre {
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace;
+    }
+
+    code {
+      background: var(--code);
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      padding: 0.1rem 0.3rem;
+      font-size: 0.92em;
+    }
+
+    pre {
+      overflow-x: auto;
+      background: #201b18;
+      color: #fff8ec;
+      border-radius: 14px;
+      padding: 18px;
+      font-size: 0.9rem;
+      line-height: 1.45;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 16px 0;
+      overflow: hidden;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+    }
+
+    th,
+    td {
+      border-bottom: 1px solid var(--line);
+      padding: 12px 14px;
+      text-align: left;
+      vertical-align: top;
+    }
+
+    th {
+      background: var(--accent-soft);
+      color: #442116;
+      font-weight: 700;
+    }
+
+    tr:last-child td {
+      border-bottom: 0;
+    }
+
+    .lede {
+      max-width: 820px;
+      color: #3f2f28;
+      font-size: 1.2rem;
+      margin-top: 18px;
+    }
+
+    .meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 24px;
+    }
+
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      border: 1px solid rgba(124, 63, 44, 0.28);
+      border-radius: 999px;
+      background: rgba(255, 253, 248, 0.72);
+      color: #513124;
+      padding: 6px 12px;
+      font-size: 0.9rem;
+      font-weight: 650;
+    }
+
+    .callout {
+      border-left: 5px solid var(--accent);
+      background: #fff7ed;
+      border-radius: 12px;
+      padding: 16px 18px;
+      margin: 18px 0;
+    }
+
+    .status-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 14px;
+      margin-top: 18px;
+    }
+
+    .card {
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      background: #fffaf1;
+      padding: 16px;
+    }
+
+    .card strong {
+      display: block;
+      margin-bottom: 6px;
+    }
+
+    .muted {
+      color: var(--muted);
+    }
+
+    .decision {
+      color: var(--ok);
+      font-weight: 750;
+    }
+
+    .risk {
+      color: var(--warn);
+      font-weight: 750;
+    }
+
+    @media print {
+      body {
+        background: white;
+      }
+
+      main {
+        max-width: none;
+        padding: 0;
+      }
+
+      article {
+        border: 0;
+        box-shadow: none;
+        border-radius: 0;
+      }
+
+      header,
+      section {
+        padding: 22px 0;
+      }
+
+      pre {
+        white-space: pre-wrap;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main>
+    <article>
+      <header>
+        <h1>Subfeature-Local Slice Migration Plan</h1>
+        <p class="lede">Proposal to align execution slices with the subfeatures they implement, while reducing duplicate slice-contract paperwork by folding most <code>brief.md</code> content into <code>blueprint.md</code> and removing the separate requirements checklist for new slices.</p>
+        <div class="meta">
+          <span class="pill">Discussion Draft</span>
+          <span class="pill">Scope: sirius-skills workflow</span>
+          <span class="pill">Decision: mandatory for new subfeatures</span>
+          <span class="pill">Decision: remove new checklists</span>
+          <span class="pill">Date: 2026-07-12</span>
+        </div>
+      </header>
+
+      <section>
+        <h2>Executive Summary</h2>
+        <p>The current workflow treats subfeatures as the default delivery unit, but execution slices still live in a central root-level <code>slices/</code> tree or, after the existing migration helper, in a feature-level <code>slices/</code> tree. That creates an ownership mismatch: the detailed implementation plan is physically separated from the subfeature planning packet that owns the work.</p>
+        <p class="decision">Decision: all new subfeature work must create execution slices under the owning subfeature. Existing root or feature-level slices should be migrated there when traceability can identify a single subfeature owner.</p>
+        <p>At the same time, make <code>blueprint.md</code> the primary per-slice execution artifact by adding a short slice-contract section at the top. Keep <code>brief.md</code> only as an optional clarification artifact or a minimal compatibility stub, and stop creating <code>checklists/requirements.md</code> for new slices.</p>
+      </section>
+
+      <section>
+        <h2>Current State</h2>
+        <div class="status-grid">
+          <div class="card">
+            <strong>Subfeature planning</strong>
+            <span class="muted">Lives under <code>docs/features/&lt;feature&gt;/subfeatures/&lt;subfeature&gt;/</code> and owns subfeature intent, impact analysis, design, planned slices, and traceability.</span>
+          </div>
+          <div class="card">
+            <strong>Execution slices</strong>
+            <span class="muted">Currently live under the configured <code>slice_dir</code>, usually root <code>slices/</code>.</span>
+          </div>
+          <div class="card">
+            <strong>Existing migration target</strong>
+            <span class="muted"><code>migrate-slices</code> currently targets feature-local <code>docs/features/&lt;feature&gt;/slices/</code>, not subfeature-local slices.</span>
+          </div>
+          <div class="card">
+            <strong>Brief and blueprint split</strong>
+            <span class="muted"><code>brief.md</code> captures the contract; <code>checklists/requirements.md</code> validates that contract; <code>blueprint.md</code> captures implementation details. For small slices, this duplicates planning and validation content.</span>
+          </div>
+        </div>
+      </section>
+
+      <section>
+        <h2>Proposed Target Layout</h2>
+        <pre><code>docs/features/&lt;feature&gt;/
+  subfeatures/&lt;subfeature&gt;/
+    discover.md
+    impact-analysis.md
+    system-design.md
+    slice-planning.md
+    slice-traceability.md
+    .subfeature-meta.json
+    .skills/
+      execution.json
+    slices/
+      README.md
+      registry.json
+      &lt;slice-id&gt;-&lt;slice-slug&gt;/
+        blueprint.md
+        brief.md              # optional or compatibility stub
+        .slice-meta.json
+        checklists/           # legacy only; not created for new slices</code></pre>
+        <p>This keeps the planning backlog, planned-to-execution traceability, execution plan, and execution lifecycle metadata inside the same durable delivery scope.</p>
+      </section>
+
+      <section>
+        <h2>Ownership Model</h2>
+        <table>
+          <thead>
+            <tr>
+              <th>Artifact</th>
+              <th>Owner</th>
+              <th>Purpose</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><code>.subfeature-meta.json</code></td>
+              <td>Subfeature lifecycle</td>
+              <td>Records child capability status, approval, affected artifacts, and ready slice IDs.</td>
+            </tr>
+            <tr>
+              <td><code>slice-planning.md</code></td>
+              <td><code>breakdown</code></td>
+              <td>Defines planned slices, increments, dependency order, and validation hints.</td>
+            </tr>
+            <tr>
+              <td><code>slice-traceability.md</code></td>
+              <td><code>breakdown</code> and execution bootstrap</td>
+              <td>Maps parent story IDs to planned slice IDs and execution slice IDs or paths.</td>
+            </tr>
+            <tr>
+              <td><code>slices/registry.json</code></td>
+              <td><code>guide-execution</code> tooling</td>
+              <td>Tracks execution-slice lifecycle state inside the subfeature scope.</td>
+            </tr>
+            <tr>
+              <td><code>blueprint.md</code></td>
+              <td><code>blueprint</code></td>
+              <td>Primary execution artifact: slice contract, technical plan, traceability, validation, and detailed design.</td>
+            </tr>
+            <tr>
+              <td><code>brief.md</code></td>
+              <td><code>brief</code>, optional</td>
+              <td>Only needed when the slice contract needs clarification before technical planning, or retained as a legacy stub.</td>
+            </tr>
+            <tr>
+              <td><code>checklists/requirements.md</code></td>
+              <td>Legacy validation artifact</td>
+              <td>Do not create for new slices. Preserve and read for legacy slices only; move useful checks into <code>blueprint.md</code> validation gates.</td>
+            </tr>
+            <tr>
+              <td><code>.slice-meta.json</code></td>
+              <td>Execution slice lifecycle</td>
+              <td>Records execution-slice status, path, timestamps, and relation metadata.</td>
+            </tr>
+          </tbody>
+        </table>
+      </section>
+
+      <section>
+        <h2>Brief Minimization</h2>
+        <p>The concept of a slice contract is still useful. The redundant part is requiring a standalone full <code>brief.md</code> for every slice when <code>blueprint.md</code> already needs to map requirements to implementation and validation.</p>
+        <h3>New default</h3>
+        <p>Add this section to the top of every <code>blueprint.md</code>:</p>
+        <pre><code>## 1. Slice Contract
+
+- Requested outcome:
+- Source story / increment / planned slice:
+- Acceptance scenarios:
+- Functional requirements:
+- Edge cases:
+- Assumptions and dependencies:
+- Independent validation:</code></pre>
+        <h3>Compatibility stub</h3>
+        <p>For tools that still expect <code>brief.md</code>, generate a minimal file instead of duplicating the full contract:</p>
+        <pre><code># Slice Contract
+
+Canonical execution plan: `blueprint.md`
+
+This slice contract is captured in the "Slice Contract" section of `blueprint.md`.</code></pre>
+        <p>Long-form <code>brief.md</code> remains valid when intent is ambiguous and the team wants an explicit contract review before implementation planning.</p>
+        <div class="callout">
+          <p><strong>Readiness decision:</strong> <code>brief_ready</code> becomes a legacy state. New normal slice flow should move from <code>draft</code> to <code>blueprint_ready</code> or <code>execution_ready</code> once <code>blueprint.md</code> contains the slice contract and implementation plan.</p>
+        </div>
+        <div class="callout">
+          <p><strong>Checklist decision:</strong> stop creating <code>checklists/requirements.md</code> for new slices. Legacy checklists remain readable, but validation should move into <code>blueprint.md</code> through requirement traceability and validation gates.</p>
+        </div>
+      </section>
+
+      <section>
+        <h2>Migration Plan</h2>
+        <ol>
+          <li><strong>Codify the rule.</strong> Document that all new subfeature work must create execution slices under the owning subfeature, while root and feature-level slice roots are compatibility locations only.</li>
+          <li><strong>Update execution scope resolution.</strong> Teach <code>slice</code>, <code>ship</code>, <code>ship-slice</code>, <code>guide-execution</code>, <code>review-execution</code>, and <code>close-slice</code> to prefer the selected subfeature path as the execution scope.</li>
+          <li><strong>Create subfeature execution config.</strong> When bootstrapping from a subfeature, create <code>&lt;subfeature&gt;/.skills/execution.json</code> with <code>slice_dir: "slices"</code> if missing.</li>
+          <li><strong>Enhance <code>migrate-slices</code>.</strong> Use subfeature <code>slice-traceability.md</code> files to map existing execution slice IDs to a single owning subfeature.</li>
+          <li><strong>Move matched slices.</strong> Move root or feature-level execution slice folders into <code>&lt;subfeature&gt;/slices/</code>, preserving active and archived slices.</li>
+          <li><strong>Rewrite registries.</strong> Remove migrated rows from old registries and add them to the subfeature-local <code>slices/registry.json</code> with paths relative to the subfeature scope.</li>
+          <li><strong>Preserve traceability.</strong> Ensure <code>slice-traceability.md</code> still maps each planned slice to the migrated execution slice ID and, if useful, the relative execution slice path.</li>
+          <li><strong>Minimize <code>brief.md</code>.</strong> Update blueprint templates and validators so a blueprint-owned slice contract satisfies normal execution readiness.</li>
+          <li><strong>Remove new requirements checklists.</strong> Stop generating <code>checklists/requirements.md</code> for new slices and move its useful validation checks into the <code>blueprint.md</code> template and readiness validation.</li>
+          <li><strong>Keep compatibility reads.</strong> Reporting, tracing, audit, repair, archive, and close flows should continue reading root and feature-level slice roots during the migration period.</li>
+          <li><strong>Deprecate root slices.</strong> After migration, mark root <code>slices/</code> as legacy and avoid using it for new subfeature delivery work.</li>
+        </ol>
+      </section>
+
+      <section>
+        <h2>Phased Rollout</h2>
+        <table>
+          <thead>
+            <tr>
+              <th>Phase</th>
+              <th>Change</th>
+              <th>Expected Outcome</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>1</td>
+              <td>Docs and templates</td>
+              <td>Workflow guidance says subfeature-local execution slices are mandatory for new subfeature work, <code>blueprint.md</code> owns the default slice contract, and new slices do not create <code>checklists/requirements.md</code>.</td>
+            </tr>
+            <tr>
+              <td>2</td>
+              <td>Validation compatibility</td>
+              <td>Execution validation accepts either legacy <code>brief.md</code> plus <code>blueprint.md</code>, or <code>blueprint.md</code> with a valid slice-contract section. <code>brief_ready</code> and <code>checklists/requirements.md</code> are treated as legacy.</td>
+            </tr>
+            <tr>
+              <td>3</td>
+              <td>New-slice bootstrap</td>
+              <td>New slices created from subfeature planning land in <code>&lt;subfeature&gt;/slices/</code>.</td>
+            </tr>
+            <tr>
+              <td>4</td>
+              <td>Migration dry run</td>
+              <td><code>migrate-slices --dry-run</code> reports target subfeatures, blocked ambiguities, and planned registry rewrites.</td>
+            </tr>
+            <tr>
+              <td>5</td>
+              <td>Migration execution</td>
+              <td>Matched slices move into subfeature-local slice roots without losing archived history or lifecycle metadata.</td>
+            </tr>
+            <tr>
+              <td>6</td>
+              <td>Legacy cleanup</td>
+              <td>Root <code>slices/</code> remains readable for compatibility but is no longer a preferred write target.</td>
+            </tr>
+          </tbody>
+        </table>
+      </section>
+
+      <section>
+        <h2>Validation Criteria</h2>
+        <ul>
+          <li>New subfeature slices are always created under the owning subfeature.</li>
+          <li><code>ship &lt;subfeature&gt;</code> can resume or bootstrap work without relying on root <code>slices/</code>.</li>
+          <li><code>trace-artifacts</code>, <code>report-artifacts</code>, <code>audit-artifacts</code>, <code>repair-artifacts</code>, and <code>archive-artifacts</code> can find subfeature-local execution slices.</li>
+          <li><code>close-slice</code> still invokes owner-completion reconciliation for the linked subfeature.</li>
+          <li><code>blueprint.md</code> contains the complete contract plus implementation plan for normal slices.</li>
+          <li><code>brief.md</code> is optional or minimal and no longer duplicates the same contract in full.</li>
+          <li><code>checklists/requirements.md</code> is not created for new slices; equivalent checks are enforced through <code>blueprint.md</code>.</li>
+        </ul>
+      </section>
+
+      <section>
+        <h2>Risks and Mitigations</h2>
+        <table>
+          <thead>
+            <tr>
+              <th>Risk</th>
+              <th>Mitigation</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><span class="risk">Ambiguous ownership</span>: a legacy slice maps to multiple subfeatures or none.</td>
+              <td>Block migration for that slice and emit a report entry requiring manual traceability repair.</td>
+            </tr>
+            <tr>
+              <td><span class="risk">Tooling misses nested registries</span>: reporting or close flows only read root <code>slices/</code>.</td>
+              <td>Update inventory discovery before moving slices, and keep root reads as compatibility fallback.</td>
+            </tr>
+            <tr>
+              <td><span class="risk">Brief or checklist removal breaks validators</span>.</td>
+              <td>Support legacy <code>brief.md</code> and <code>checklists/requirements.md</code> during transition, but make <code>blueprint.md</code> sufficient for new-slice readiness.</td>
+            </tr>
+            <tr>
+              <td><span class="risk">Migration rewrites too much state</span>.</td>
+              <td>Require dry-run reports, preserve archived slices, and avoid destructive cleanup in the migration command.</td>
+            </tr>
+          </tbody>
+        </table>
+      </section>
+
+      <section>
+        <h2>Open Decisions</h2>
+        <ol>
+          <li><strong>Resolved:</strong> subfeature-local slices are mandatory for all new subfeature work immediately. Compatibility support remains only for legacy root slices, legacy feature-level slices, direct feature work during transition, and migration-only feature-level slice roots.</li>
+          <li><strong>Resolved:</strong> <code>brief_ready</code> becomes a legacy state used only for existing slices or explicit standalone-brief flows.</li>
+          <li><strong>Resolved:</strong> remove <code>checklists/requirements.md</code> for new slices. Preserve legacy files, but move required checks into <code>blueprint.md</code>.</li>
+          <li><strong>Resolved:</strong> feature-level <code>docs/features/&lt;feature&gt;/slices/</code> roots are migration-only once subfeatures are universal.</li>
+        </ol>
+      </section>
+    </article>
+  </main>
+</body>
+</html>

@@ -9,6 +9,8 @@ from types import SimpleNamespace
 from pathlib import Path
 from typing import Dict, List, Optional, Tuple
 
+from sirius_skills.lib.workflow_state import markdown_repository
+
 
 MIGRATION_VERSION = 1
 
@@ -94,6 +96,58 @@ def ensure_feature_scope(
     return created
 
 
+def ensure_subfeature_execution_scope(
+    manage_execution,
+    subfeature_dir: Path,
+    root_scope_context: object,
+) -> bool:
+    skills_dir = subfeature_dir / ".skills"
+    skills_dir.mkdir(parents=True, exist_ok=True)
+    execution_path = skills_dir / "execution.json"
+    created = False
+    root_execution_config = manage_execution.load_config(
+        required=False, scope_context=root_scope_context
+    )
+    if not execution_path.exists():
+        manage_execution.write_config(
+            "slices",
+            preferred_workflow=root_execution_config["preferred_workflow"],
+            auto_start_implementation=root_execution_config["auto_start_implementation"],
+            scope_context=SimpleNamespace(scope_root=subfeature_dir),
+        )
+        created = True
+    return created
+
+
+def discover_subfeature_targets(feature_path: Path) -> List[Path]:
+    subfeatures_root = feature_path / "subfeatures"
+    if not subfeatures_root.exists():
+        return []
+    return sorted(
+        path
+        for path in subfeatures_root.iterdir()
+        if path.is_dir() and (path / ".subfeature-meta.json").exists()
+    )
+
+
+def build_subfeature_owner_map(feature_path: Path) -> Dict[str, List[Path]]:
+    owners_by_slice_id: Dict[str, List[Path]] = {}
+    for subfeature_dir in discover_subfeature_targets(feature_path):
+        traceability_path = subfeature_dir / "slice-traceability.md"
+        if not traceability_path.exists():
+            continue
+        records = markdown_repository.parse_traceability_records(
+            traceability_path,
+            "subfeature",
+            subfeature_dir.name,
+            str(subfeature_dir),
+        )
+        for record in records:
+            for execution_slice_id in record.execution_slice_ids:
+                owners_by_slice_id.setdefault(execution_slice_id, []).append(subfeature_dir)
+    return owners_by_slice_id
+
+
 def discover_feature_targets(
     manage_planning, manage_execution, root_scope_context: object
 ) -> List[Tuple[str, str]]:
@@ -141,6 +195,25 @@ def target_slice_root(
     return Path(specs_dir), archive_dir
 
 
+def target_scope_for_row(
+    row: Dict[str, object],
+    feature_path: Path,
+    owner_map: Dict[str, List[Path]],
+) -> Tuple[Optional[Path], Optional[str]]:
+    owners = owner_map.get(str(row.get("id") or ""), [])
+    unique_owners = []
+    for owner in owners:
+        if owner not in unique_owners:
+            unique_owners.append(owner)
+    if len(unique_owners) == 1:
+        return unique_owners[0], None
+    if len(unique_owners) > 1:
+        return None, "Execution slice maps to multiple subfeatures."
+    if discover_subfeature_targets(feature_path):
+        return None, "Execution slice is not mapped by any subfeature traceability file."
+    return feature_path, None
+
+
 def migrate_feature_rows(
     manage_planning,
     manage_execution,
@@ -152,24 +225,10 @@ def migrate_feature_rows(
     dry_run: bool,
 ) -> Dict[str, object]:
     feature_path = Path(feature_dir)
-    feature_scope_created = False
-    feature_scope_context: Optional[object] = None
-    existing_feature_rows: List[Dict[str, object]] = []
-    if not dry_run:
-        feature_scope_created = ensure_feature_scope(
-            manage_planning,
-            manage_execution,
-            manage_proposals,
-            feature_path,
-            root_scope_context,
-        )
-        feature_scope_context = manage_planning.SCOPE_RUNTIME.resolve_scope_context(
-            explicit_scope=feature_path
-        )
-        existing_feature_rows = manage_execution.parse_registry(scope_context=feature_scope_context)
-    specs_dir, archive_dir = target_slice_root(
-        manage_execution, feature_path, feature_scope_context
-    )
+    owner_map = build_subfeature_owner_map(feature_path)
+    scope_created_by_target: Dict[str, bool] = {}
+    existing_rows_by_target: Dict[str, List[Dict[str, object]]] = {}
+    migrated_rows_by_target: Dict[str, List[Dict[str, object]]] = {}
 
     planned: List[Dict[str, object]] = []
     migrated: List[Dict[str, object]] = []
@@ -182,6 +241,54 @@ def migrate_feature_rows(
             remaining_rows.append(row)
             continue
 
+        target_scope, target_error = target_scope_for_row(row, feature_path, owner_map)
+        if target_error is not None or target_scope is None:
+            source_abs = Path(manage_execution.slice_path_for_row(row, scope_context=root_scope_context))
+            entry = {
+                "id": row["id"],
+                "status": row["status"],
+                "archived": is_archived_row(row),
+                "source_path": str(source_abs.resolve().relative_to(root_scope_context.scope_root)),
+                "target_path": None,
+            }
+            planned.append(entry)
+            blocked.append({**entry, "reason": target_error or "Unable to resolve target scope."})
+            remaining_rows.append(row)
+            continue
+
+        target_scope_context = None
+        target_key = str(target_scope.resolve())
+        if not dry_run:
+            if target_scope == feature_path:
+                created = ensure_feature_scope(
+                    manage_planning,
+                    manage_execution,
+                    manage_proposals,
+                    target_scope,
+                    root_scope_context,
+                )
+                target_scope_context = manage_planning.SCOPE_RUNTIME.resolve_scope_context(
+                    explicit_scope=target_scope
+                )
+            else:
+                created = ensure_subfeature_execution_scope(
+                    manage_execution,
+                    target_scope,
+                    root_scope_context,
+                )
+                target_scope_context = manage_execution.resolve_execution_scope_context(
+                    explicit_scope=target_scope
+                )
+            scope_created_by_target[target_key] = scope_created_by_target.get(target_key, False) or created
+            existing_rows_by_target.setdefault(
+                target_key,
+                manage_execution.parse_registry(scope_context=target_scope_context),
+            )
+
+        specs_dir, archive_dir = target_slice_root(
+            manage_execution, target_scope, target_scope_context
+        )
+
         archived = is_archived_row(row)
         source_abs = Path(manage_execution.slice_path_for_row(row, scope_context=root_scope_context))
         if archived:
@@ -192,7 +299,7 @@ def migrate_feature_rows(
         folder_name = source_abs.name
         target_abs = target_root / folder_name
         target_rel = manage_execution.normalize_slice_path(
-            os.path.relpath(str(target_abs.resolve()), str(feature_path.resolve()))
+            os.path.relpath(str(target_abs.resolve()), str(target_scope.resolve()))
         )
         source_rel = str(source_abs.resolve().relative_to(root_scope_context.scope_root))
 
@@ -202,6 +309,7 @@ def migrate_feature_rows(
             "archived": archived,
             "source_path": source_rel,
             "target_path": target_rel,
+            "target_scope": str(target_scope),
         }
         planned.append(entry)
 
@@ -236,38 +344,36 @@ def migrate_feature_rows(
                 "target_path": target_rel,
             }
         )
+        migrated_rows_by_target.setdefault(target_key, []).append(
+            manage_execution.apply_metadata_to_row(normalized_row, updated_metadata)
+        )
 
     if not dry_run:
         manage_execution.write_registry(remaining_rows, scope_context=root_scope_context)
-
-        feature_rows = [row for row in root_rows if str(row.get("feature", "")).strip() == feature_slug]
-        migrated_rows: List[Dict[str, object]] = []
-        for row in feature_rows:
-            if any(item["id"] == row["id"] for item in blocked):
-                continue
-            archived = is_archived_row(row)
-            source_abs = Path(manage_execution.slice_path_for_row(row, scope_context=root_scope_context))
-            target_root = archive_dir if archived else specs_dir
-            target_abs = target_root / source_abs.name
-            if not target_abs.exists():
-                continue
-            metadata = manage_execution.load_slice_metadata(str(target_abs))
-            row = dict(row)
-            row["path"] = manage_execution.normalize_slice_path(
-                os.path.relpath(str(target_abs.resolve()), str(feature_path.resolve()))
+        for target_key, migrated_rows in migrated_rows_by_target.items():
+            target_scope = Path(target_key)
+            if target_scope == feature_path:
+                target_scope_context = manage_planning.SCOPE_RUNTIME.resolve_scope_context(
+                    explicit_scope=target_scope
+                )
+            else:
+                target_scope_context = manage_execution.resolve_execution_scope_context(
+                    explicit_scope=target_scope
+                )
+            combined_rows = {
+                row["id"]: dict(row) for row in existing_rows_by_target.get(target_key, [])
+            }
+            for migrated_row in migrated_rows:
+                combined_rows[migrated_row["id"]] = dict(migrated_row)
+            manage_execution.write_registry(
+                list(combined_rows.values()), scope_context=target_scope_context
             )
-            row = manage_execution.normalize_registry_row(row)
-            migrated_rows.append(manage_execution.apply_metadata_to_row(row, metadata))
-
-        combined_rows = {row["id"]: dict(row) for row in existing_feature_rows}
-        for row in migrated_rows:
-            combined_rows[row["id"]] = dict(row)
-        manage_execution.write_registry(list(combined_rows.values()), scope_context=feature_scope_context)
 
     return {
         "feature": feature_slug,
         "feature_path": str(feature_path),
-        "feature_scope_created": feature_scope_created,
+        "feature_scope_created": scope_created_by_target.get(str(feature_path.resolve()), False),
+        "target_scopes_created": scope_created_by_target,
         "planned": planned,
         "migrated": migrated,
         "blocked": blocked,

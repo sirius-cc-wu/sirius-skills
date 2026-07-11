@@ -7,7 +7,7 @@ The repository provides a slice-scoped execution workflow, but that workflow spa
 ## Goals
 
 - Bootstrap one slice per execution-ready work item.
-- Capture slice intent in `brief.md` and make execution sequencing explicit in `blueprint.md`.
+- Capture slice intent and execution sequencing in `blueprint.md`; use `brief.md` only for legacy or explicit clarification flows.
 - Keep slice readiness separate from day-to-day implementation progress.
 - Preserve non-destructive closure and relation metadata for later feature-level finalization and historical publishing.
 
@@ -22,29 +22,29 @@ The repository provides a slice-scoped execution workflow, but that workflow spa
 - Slice definer capturing acceptance and requirements.
 - Slice planner producing implementation packets and validation.
 - Implementation agent executing a ready slice.
-- Reviewer checking brief-to-implementation alignment.
+- Reviewer checking blueprint-to-implementation alignment.
 - Closure owner recording slice closure.
 
 ## Constraints
 
 - Slice layout defaults to `slices/` unless `.skills/execution.json` overrides `slice_dir`.
-- Execution state machine is `draft -> brief_ready -> blueprint_ready -> execution_ready -> closed`.
+- Execution state machine is `draft -> blueprint_ready -> execution_ready -> closed` for new slices; `brief_ready` remains a legacy standalone-brief state.
 - When `.skills/execution.json` sets `auto_start_implementation` to `true`, reaching `blueprint_ready` should immediately hand off into implementation and advance the slice to `execution_ready`.
 - `guide-execution` owns readiness and registry state; teams should not invent extra registry states for day-to-day progress.
-- Closed slices retain `brief.md`, `blueprint.md`, and any legacy `slices.md`.
+- Closed slices retain `blueprint.md`, optional legacy `brief.md`, and any legacy `slices.md`.
 - Relations such as `supersedes` and `replaces_partially` are durable metadata, not transient notes.
 
 ## Confirmed Signals in Repo
 
 - `sirius manage-execution` manages registry, status updates, and relations.
-- `skills/brief/templates/brief-template.md` defines the slice brief structure.
+- `skills/blueprint/templates/plan-template.md` defines the primary slice contract and implementation plan structure.
 - `skills/blueprint/templates/plan-template.md` defines implementation packets and validation mapping.
 - `sirius close-slice` closes slices and records durable closure metadata.
 - `skills/commit/` and `skills/create-pr/` enforce conventions and checklist completion around execution work.
 
 ## Success Criteria
 
-- A maintainer can bootstrap, brief, blueprint, review, and close a execution slice with durable metadata.
+- A maintainer can bootstrap, blueprint, review, and close an execution slice with durable metadata.
 - Slice artifacts remain sufficient for later audit without requiring a separate subfeature-finalization step.
 - Execution workflow stays generic-first while allowing project-level conventions via config.
 

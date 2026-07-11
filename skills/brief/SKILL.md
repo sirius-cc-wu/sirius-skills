@@ -1,25 +1,27 @@
 ---
 name: brief
-description: Creates and validates lean slice-scoped briefs.
+description: Creates optional slice-scoped clarification briefs for legacy or ambiguous execution slices.
 ---
 
 # Brief
 
-Use this skill to turn one execution-ready work item into a concise `brief.md`.
-`brief` defines the slice contract: what outcome the slice must deliver, how success will be recognized, and what assumptions or dependencies shape the work.
-It should stay intentionally lighter than `blueprint`.
+Use this skill only when a slice needs a standalone clarification artifact before
+technical planning, or when maintaining legacy slices that already use
+`brief.md` and `brief_ready`.
+
+For new normal slices, put the slice contract directly in `blueprint.md` and
+route draft slices to `blueprint` instead of requiring `brief.md` first.
 
 ## Responsibilities
 
 1. Create or update `<slice_path>/brief.md`.
-2. Create or update `<slice_path>/checklists/requirements.md`.
-3. Clarify only what is necessary.
-4. Validate the brief before handoff.
+2. Clarify only what is necessary.
+3. Validate the brief before handoff.
 
 ## Required Outputs
 
 - `<slice_path>/brief.md`
-- `<slice_path>/checklists/requirements.md`
+- legacy only: `<slice_path>/checklists/requirements.md`
 
 Resolve `<slice_path>` through `guide-execution`.
 
@@ -28,7 +30,9 @@ Resolve `<slice_path>` through `guide-execution`.
 `brief` owns the content of:
 
 - `<slice_path>/brief.md`
-- `<slice_path>/checklists/requirements.md`
+
+`checklists/requirements.md` is legacy-only. Do not create it for new slices;
+required checks belong in `blueprint.md`.
 
 `guide-execution` should resolve the active slice and enforce readiness gates, but it should not take over brief authoring that belongs to `brief`.
 
@@ -86,7 +90,7 @@ Before handoff, confirm:
 ## Workflow
 
 1. Resolve the active slice with `guide-execution`.
-2. Fill `brief-template.md` with a lean slice contract.
-3. Create or update the requirements checklist.
+2. Fill `brief-template.md` with only the clarification needed before planning.
+3. For legacy slices only, update the requirements checklist if it already exists.
 4. Run validation and revise if needed.
-5. Stop when the brief is ready for `blueprint`.
+5. Stop when the clarification is ready for `blueprint`.

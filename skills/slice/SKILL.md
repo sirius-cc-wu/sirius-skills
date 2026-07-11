@@ -13,7 +13,7 @@ Use this skill when a work item is small enough to execute, has passed planning 
 2. Ensure execution bootstrap prerequisites exist, including `.skills/execution.json`, the slice registry, and a durable approved planning checkpoint.
 3. Bootstrap one execution slice for that work item.
 4. Confirm the slice exists and is aligned with the repository's execution layout.
-5. Hand off to `guide-execution` for `brief.md` and `blueprint.md`.
+5. Hand off to `guide-execution` for `blueprint.md` and optional legacy `brief.md`.
 
 ## Preferred Input
 
@@ -25,6 +25,8 @@ Use this skill when a work item is small enough to execute, has passed planning 
 
 - One executable work item should map to one slice.
 - Prefer preserving the planned ID as the slice ID when available.
+- For new subfeature work, create the execution slice under the owning
+  subfeature's local `slices/` root.
 - Do not create a slice for work that still needs major decomposition.
 - If execution config does not exist yet, initialize it with a repository-specific slice directory when known, otherwise use the generic default `slices/`.
 - Keep slice readiness and registry state in `guide-execution`.
@@ -58,10 +60,11 @@ sirius bootstrap-slice --slice-dir "team-slices" "<slice-id>" "<feature-name>"
 ```
 
 4. Confirm the new slice path exists and registry state is consistent.
-5. Hand off to `guide-execution` to author `brief.md` and `blueprint.md`.
+5. Hand off to `guide-execution` to author `blueprint.md`; use `brief.md` only for legacy or explicit clarification flows.
 
 `bootstrap_slice.py` keeps the ownership boundary intact by delegating registry creation, slice creation, and validation to `sirius manage-execution`.
 For reviewed subfeatures, it also expects approval metadata to be present already and records the chosen ready slice ID back into `.subfeature-meta.json` so the derived planning view becomes `slice_ready`.
+For new reviewed subfeatures, it creates or reuses `<subfeature>/.skills/execution.json` and stores execution slices under `<subfeature>/slices/`.
 
 ## Guardrails
 

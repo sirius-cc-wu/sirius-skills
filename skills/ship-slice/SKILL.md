@@ -14,8 +14,9 @@ current state with checkpointed runtime context.
    `handoff_payload`, or a previously written checkpoint.
 2. Read active and candidate learnings for the target scope.
 3. Reconcile the current slice status against execution artifacts.
-4. Optionally run owner-chain orchestration for one slice (`brief`, `blueprint`,
-   implementation routing) until review/checkpoint boundaries.
+4. Optionally run owner-chain orchestration for one slice (`blueprint`,
+   optional legacy `brief`, implementation routing) until review/checkpoint
+   boundaries.
 5. Optionally continue through owned-file formatting, delegated closure, and
    owned-file commit when execution config enables the terminal automation tail.
 6. Report the next owner for the slice and write a resumable checkpoint plus
