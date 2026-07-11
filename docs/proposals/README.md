@@ -2,6 +2,7 @@
 
 | Proposal | Status | Updated | Path |
 |---|---|---|---|
+| batch-planning-orchestration | draft | 2026-07-12T04:50:03 | docs/proposals/batch-planning-orchestration/ |
 | data-access-layer-consolidation | promoted | 2026-06-25T15:11:51 | docs/proposals/data-access-layer-consolidation/ |
 | hierarchical-scope-support | promoted | 2026-04-04T02:18:05 | docs/proposals/hierarchical-scope-support/ |
 | skill-state-engine-rewrite | draft | 2026-04-17T19:21:32 | docs/proposals/skill-state-engine-rewrite/ |

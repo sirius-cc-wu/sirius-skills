@@ -1,6 +1,12 @@
 {
   "proposals": [
     {
+      "proposal": "batch-planning-orchestration",
+      "status": "draft",
+      "updated_at": "2026-07-12T04:50:03",
+      "path": "docs/proposals/batch-planning-orchestration/"
+    },
+    {
       "proposal": "data-access-layer-consolidation",
       "status": "promoted",
       "updated_at": "2026-06-25T15:11:51",
