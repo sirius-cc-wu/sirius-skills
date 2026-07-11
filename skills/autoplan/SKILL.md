@@ -101,6 +101,9 @@ Optional CLI overrides:
 5. Invoke the returned owner skill (`discover`, `assess`, `design`,
    `breakdown`, or `review-planning`) and let that skill author or repair the
    planning artifacts it owns.
+   If the target has only `draft.md`, lacks `discover.md`, or has a
+   scaffold-marked `discover.md`, treat `discover` as the next owner rather
+   than advancing to `design` or `assess`.
 6. After the owner skill completes, rerun `autoplan.py <target> --json` and
    continue looping until one of these explicit stop boundaries is reached:
    - `approval_required`
@@ -177,6 +180,7 @@ skills.
 - Keep approval as an explicit human gate and planning commit as the durable
   checkpoint before execution.
 - Keep planning transitions owned by planning-layer validation and metadata.
+- Treat `draft.md` as rough planning input, not completed discovery.
 - Stop with structured context when owner-chain boundaries are hit (explicit
    stop owner, missing required input, validation failure, or approval).
 - Keep raw failure incidents in runtime logs; use durable learnings only for

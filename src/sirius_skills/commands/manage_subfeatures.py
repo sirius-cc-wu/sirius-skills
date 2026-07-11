@@ -29,6 +29,7 @@ REGISTRY_HEADER = (
     "|---|---|---|---|---|\n"
 )
 METADATA_FILE = ".subfeature-meta.json"
+DISCOVERY_DRAFT_FILE = "draft.md"
 DISCOVER_FILE = "discover.md"
 IMPACT_FILE = "impact-analysis.md"
 DESIGN_FILE = "system-design.md"
@@ -452,7 +453,7 @@ def find_subfeature(rows: List[Dict[str, object]], selector: str) -> Optional[Di
     return None
 
 
-def write_discover_stub(
+def write_discovery_draft(
     subfeature_dir: str,
     parent_feature_slug: str,
     subfeature_id: str,
@@ -460,8 +461,8 @@ def write_discover_stub(
     summary: Optional[str],
     story_ids: Optional[List[str]] = None,
 ) -> None:
-    discover_path = os.path.join(subfeature_dir, DISCOVER_FILE)
-    if os.path.exists(discover_path):
+    draft_path = os.path.join(subfeature_dir, DISCOVERY_DRAFT_FILE)
+    if os.path.exists(draft_path) or os.path.exists(os.path.join(subfeature_dir, DISCOVER_FILE)):
         return
 
     title = subfeature_id.replace("-", " ").strip().title()
@@ -470,10 +471,9 @@ def write_discover_stub(
     if not story_lines:
         story_lines = "- Parent story: `TBD`"
     content = (
-        f"{DISCOVER_STUB_MARKER}\n"
-        f"# Discover: {title}\n\n"
-        "> Bootstrap stub created by `add-subfeature`.\n"
-        "> Replace this scaffold with the real discovery packet via the `discover` skill.\n\n"
+        f"# Draft: {title}\n\n"
+        "> Bootstrap draft created by `add-subfeature`.\n"
+        "> Use this as input to the `discover` skill; do not treat it as completed discovery.\n\n"
         "## Parent Feature\n\n"
         f"- Feature: `{parent_feature_slug}`\n"
         f"- Subfeature ID: `{subfeature_id}`\n"
@@ -500,7 +500,7 @@ def write_discover_stub(
         "## Risks and Open Questions\n\n"
         "- What existing stories, slices, or validation paths might this subfeature affect?\n"
     )
-    with open(discover_path, "w", encoding="utf-8") as f:
+    with open(draft_path, "w", encoding="utf-8") as f:
         f.write(content)
 
 
@@ -513,6 +513,32 @@ def validate_required_file(subfeature_dir: str, filename: str) -> Tuple[bool, st
     if not content:
         return False, f"Required file '{filename}' is empty."
     return True, f"Found '{filename}'."
+
+
+def validate_discovery_draft_or_packet(subfeature_dir: str) -> Tuple[bool, str]:
+    discover_path = os.path.join(subfeature_dir, DISCOVER_FILE)
+    if os.path.exists(discover_path):
+        return validate_authored_discover(subfeature_dir)
+    draft_path = os.path.join(subfeature_dir, DISCOVERY_DRAFT_FILE)
+    if not os.path.exists(draft_path):
+        return False, f"Missing required file '{DISCOVERY_DRAFT_FILE}' or '{DISCOVER_FILE}'."
+    with open(draft_path, "r", encoding="utf-8") as f:
+        content = f.read().strip()
+    if not content:
+        return False, f"Required file '{DISCOVERY_DRAFT_FILE}' is empty."
+    return True, f"Found '{DISCOVERY_DRAFT_FILE}'."
+
+
+def validate_authored_discover(subfeature_dir: str) -> Tuple[bool, str]:
+    ok, detail = validate_required_file(subfeature_dir, DISCOVER_FILE)
+    if not ok:
+        return ok, detail
+    discover_path = os.path.join(subfeature_dir, DISCOVER_FILE)
+    with open(discover_path, "r", encoding="utf-8") as f:
+        content = f.read()
+    if DISCOVER_STUB_MARKER in content:
+        return False, f"Required file '{DISCOVER_FILE}' is still a bootstrap stub."
+    return True, detail
 
 
 def validate_subfeature_state(
@@ -537,8 +563,12 @@ def validate_subfeature_state(
     if not exists:
         return False, issues, checks
 
-    ok, detail = validate_required_file(subfeature_dir, DISCOVER_FILE)
-    record_check("discover", ok, detail)
+    if status_index >= STATUS_SEQUENCE.index("impact_ready"):
+        ok, detail = validate_authored_discover(subfeature_dir)
+        record_check("discover", ok, detail)
+    else:
+        ok, detail = validate_discovery_draft_or_packet(subfeature_dir)
+        record_check("discovery_input", ok, detail)
 
     if status_index >= STATUS_SEQUENCE.index("impact_ready"):
         ok, detail = validate_required_file(subfeature_dir, IMPACT_FILE)
@@ -654,7 +684,7 @@ def create_subfeature(
         story_ids=story_ids,
     )
     write_metadata(subfeature_dir, metadata)
-    write_discover_stub(
+    write_discovery_draft(
         subfeature_dir,
         parent_feature_slug,
         subfeature_id,

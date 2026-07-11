@@ -1,6 +1,6 @@
 ---
 name: add-subfeature
-description: Canonical workflow for creating and managing durable subfeatures under an existing feature. Use this whenever the user asks to add, create, start, open, or bootstrap a subfeature so downstream planning skills keep the expected metadata and discover-stub lifecycle.
+description: Canonical workflow for creating and managing durable subfeatures under an existing feature. Use this whenever the user asks to add, create, start, open, or bootstrap a subfeature so downstream planning skills keep the expected metadata and discovery-draft lifecycle.
 ---
 
 # Add Subfeature
@@ -23,7 +23,7 @@ missing capability on top of that shipped work.
 3. Create one durable subfeature under `docs/features/<feature>/subfeatures/<subfeature-id>/`.
 4. Maintain machine-readable subfeature metadata for parent-child and impact context.
 5. Seed the subfeature as a real planning folder with `.subfeature-meta.json` as its lifecycle source of truth.
-6. Make the bootstrap `discover.md` unmistakably a scaffold until `discover` authors the real packet.
+6. Seed bootstrap context in `draft.md` so `discover.md` remains reserved for the real discovery packet authored by `discover`.
 
 ## Preferred Input
 
@@ -37,7 +37,7 @@ missing capability on top of that shipped work.
 
 - `<feature_path>/subfeatures/README.md`
 - `<feature_path>/subfeatures/registry.json`
-- `<feature_path>/subfeatures/<subfeature-id>/discover.md`
+- `<feature_path>/subfeatures/<subfeature-id>/draft.md`
 - `<feature_path>/subfeatures/<subfeature-id>/.subfeature-meta.json`
 
 ## Workflow
@@ -45,10 +45,12 @@ missing capability on top of that shipped work.
 1. Resolve the parent feature.
 2. Initialize the feature-local subfeature registry with `manage_subfeatures.py init-feature <feature>` when needed.
 3. Create the durable child planning folder with `manage_subfeatures.py add <feature> <subfeature-id>`.
-4. Treat the generated `discover.md` as a bootstrap stub, not finished discovery. Replace it with the real discovery packet via `discover`.
-5. Write the requested child capability in the subfeature-local `discover.md`,
-   linking back to parent feature story IDs rather than creating a
-   subfeature-local `user-stories.md`.
+4. Treat the generated `draft.md` as bootstrap input, not finished discovery.
+   The next `discover` pass should consume or replace it with the real
+   subfeature-local `discover.md`.
+5. Capture the requested child capability in `draft.md` initially, then in
+   `discover.md` once `discover` runs, linking back to parent feature story IDs
+   rather than creating a subfeature-local `user-stories.md`.
    For `narrowing`, `superseding`, or `replacement` work, declare what existing
    capability, artifact, command path, or validation path is affected and what
    simplification or retirement the child capability is expected to produce.

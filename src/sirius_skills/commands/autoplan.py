@@ -597,8 +597,8 @@ def execute_subfeature_owner_chain(
                     "status": raw_status,
                     "target_status": raw_status,
                     "message": (
-                        "Subfeature discovery is still the add-subfeature bootstrap stub; "
-                        "run discover to author the real discovery packet."
+                        "Subfeature discovery is still draft or scaffold input; run "
+                        "discover to author the real discovery packet."
                     ),
                 },
             )
@@ -1247,6 +1247,12 @@ def main(argv: Sequence[str] | None = None) -> int:
                 if subfeature_state is not None
                 else owner_for_status(planning_status)
             )
+            if (
+                subfeature_state is None
+                and planning_status == "discovery_ready"
+                and discover_is_stub(feature_dir)
+            ):
+                next_owner, action = "discover", "repair_discovery"
 
         owner_handoff = build_owner_handoff(
             target_id=target_id,

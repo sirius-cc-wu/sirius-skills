@@ -706,6 +706,40 @@ def test_discovery_ready_requires_discover_file(tmp_path, monkeypatch, capsys):
     assert "Missing required file 'discover.md'." in captured.err
 
 
+def test_add_creates_draft_not_discover_packet(tmp_path, monkeypatch):
+    module = load_manage_planning_module()
+    monkeypatch.chdir(tmp_path)
+
+    assert run_cli(module, monkeypatch, "init") == 0
+    assert run_cli(module, monkeypatch, "add", "habit-tracker") == 0
+
+    feature_dir = tmp_path / "docs" / "features" / "habit-tracker"
+    draft = (feature_dir / "draft.md").read_text(encoding="utf-8")
+
+    assert not (feature_dir / "discover.md").exists()
+    assert "Bootstrap draft created by `manage-planning add`." in draft
+    assert "Use this as input to the `discover` skill" in draft
+
+
+def test_discovery_ready_rejects_bootstrap_stub_discover(tmp_path, monkeypatch, capsys):
+    module = load_manage_planning_module()
+    monkeypatch.chdir(tmp_path)
+
+    assert run_cli(module, monkeypatch, "init") == 0
+    assert run_cli(module, monkeypatch, "add", "habit-tracker") == 0
+
+    feature_dir = tmp_path / "docs" / "features" / "habit-tracker"
+    write_file(
+        feature_dir / "discover.md",
+        "<!-- add-subfeature:discover-stub -->\n# Discover\n",
+    )
+    exit_code = run_cli(module, monkeypatch, "set-status", "habit-tracker", "discovery_ready")
+    captured = capsys.readouterr()
+
+    assert exit_code == 2
+    assert "still a bootstrap stub" in captured.err
+
+
 def test_ui_required_blocks_design_ready_without_ui_design(tmp_path, monkeypatch, capsys):
     module = load_manage_planning_module()
     monkeypatch.chdir(tmp_path)

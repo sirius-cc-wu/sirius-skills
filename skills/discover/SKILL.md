@@ -26,8 +26,12 @@ Subfeatures do not own a separate story catalog. For subfeatures created by
 `add-subfeature`, reference parent feature story IDs in `discover.md` and
 `.subfeature-meta.json` instead of creating `<subfeature_path>/user-stories.md`.
 
-For subfeatures created by `add-subfeature`, the initial `discover.md` may
-already exist as a bootstrap scaffold marked by
+For features or subfeatures created by bootstrap tooling, rough context may
+exist in `draft.md`. Treat `draft.md` as input only: consume, replace, or
+supersede it by authoring the real `discover.md`. Do not mark discovery ready
+while only `draft.md` exists.
+
+Older subfeatures may still contain a bootstrap `discover.md` marked by
 `<!-- add-subfeature:discover-stub -->`. Replace that stub with the real
 discovery packet instead of treating the placeholder as completed discovery.
 
@@ -107,8 +111,9 @@ Prefer:
 1. Resolve `<feature_path>` from `.skills/planning.json` when `planning_dir` is present; otherwise use `docs/features/<feature-slug>/`, then identify or create the feature planning folder.
 2. Inspect the repository, existing docs, optional `reference-research.md`, and
    other relevant context.
-3. Write `discover.md` with explicit problem framing, actors, goals,
-   constraints, risks, and next-step guidance.
+3. Read any existing `draft.md` as rough input, then write `discover.md` with
+   explicit problem framing, actors, goals, constraints, risks, and next-step
+   guidance.
 4. For canonical features, create `user-stories.md` with stable story
    identifiers unless the packet is intentionally too small for story-level
    planning; when omitting it, state why in `discover.md`. For subfeatures,

@@ -39,6 +39,9 @@ REGISTRY_HEADER = (
 )
 METADATA_FILE = ".planning-meta.json"
 SUBFEATURE_METADATA_FILE = ".subfeature-meta.json"
+DISCOVERY_DRAFT_FILE = "draft.md"
+DISCOVER_FILE = "discover.md"
+DISCOVER_STUB_MARKER = "<!-- add-subfeature:discover-stub -->"
 FEATURE_SLUG_PATTERN = re.compile(r"^[A-Za-z0-9][A-Za-z0-9._-]*$")
 STATUS_SEQUENCE = [
     "discovery_pending",
@@ -813,6 +816,39 @@ def validate_required_file(feature_dir: str, filename: str) -> Tuple[bool, str]:
     return True, f"Found '{filename}'."
 
 
+def validate_authored_discover(feature_dir: str) -> Tuple[bool, str]:
+    ok, detail = validate_required_file(feature_dir, DISCOVER_FILE)
+    if not ok:
+        return ok, detail
+    path = os.path.join(feature_dir, DISCOVER_FILE)
+    with open(path, "r", encoding="utf-8") as f:
+        content = f.read()
+    if DISCOVER_STUB_MARKER in content:
+        return False, f"Required file '{DISCOVER_FILE}' is still a bootstrap stub."
+    return True, detail
+
+
+def write_discovery_draft(feature_dir: str, feature_slug: str) -> None:
+    draft_path = os.path.join(feature_dir, DISCOVERY_DRAFT_FILE)
+    discover_path = os.path.join(feature_dir, DISCOVER_FILE)
+    if os.path.exists(draft_path) or os.path.exists(discover_path):
+        return
+    title = feature_slug.replace("-", " ").strip().title()
+    content = (
+        f"# Draft: {title}\n\n"
+        "> Bootstrap draft created by `manage-planning add`.\n"
+        "> Use this as input to the `discover` skill; do not treat it as completed discovery.\n\n"
+        "## Problem\n\n"
+        "- Describe the problem or capability request.\n\n"
+        "## Desired Outcome\n\n"
+        "- Describe what should be true after discovery is complete.\n\n"
+        "## Notes\n\n"
+        "- Add rough context here before `discover` authors `discover.md`.\n"
+    )
+    with open(draft_path, "w", encoding="utf-8") as f:
+        f.write(content)
+
+
 def validate_feature_state(feature_dir: str, metadata: Dict[str, object]) -> Tuple[bool, List[str], List[Dict[str, object]]]:
     checks: List[Dict[str, object]] = []
     issues: List[str] = []
@@ -830,7 +866,7 @@ def validate_feature_state(feature_dir: str, metadata: Dict[str, object]) -> Tup
         return False, issues, checks
 
     if status_index >= STATUS_SEQUENCE.index("discovery_ready"):
-        ok, detail = validate_required_file(feature_dir, "discover.md")
+        ok, detail = validate_authored_discover(feature_dir)
         record_check("discover", ok, detail)
 
     if status_index >= STATUS_SEQUENCE.index("design_ready"):
@@ -911,6 +947,7 @@ def create_feature_at_path(
     ensure_registry(planning_dir)
     metadata = build_metadata(feature_slug, requires_ui_flow=requires_ui_flow)
     write_metadata(normalized_feature_dir, metadata)
+    write_discovery_draft(normalized_feature_dir, feature_slug)
     subfeature_repository.ensure_registry(Path(normalized_feature_dir))
     sync_registry(rows, scope_context=scope_context)
     return normalized_feature_dir, True

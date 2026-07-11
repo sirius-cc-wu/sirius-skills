@@ -226,6 +226,39 @@ def test_autoplan_routes_discovery_pending_to_discover(tmp_path: Path, monkeypat
     assert payload["readiness"]["approval_gate"]["required"] is False
 
 
+def test_autoplan_repairs_scaffolded_discovery_ready_feature(
+    tmp_path: Path, monkeypatch
+) -> None:
+    init_git_repo(tmp_path)
+    write_planning_config(tmp_path)
+    monkeypatch.chdir(tmp_path)
+    planning = load_module("manage_planning_for_autoplan_scaffold_test", PLANNING_SCRIPT)
+    feature_dir, _ = planning.create_feature("throughput-acceleration-workflow")
+    feature_path = Path(feature_dir)
+    (feature_path / "discover.md").write_text(
+        "<!-- add-subfeature:discover-stub -->\n# Discover\n",
+        encoding="utf-8",
+    )
+    rows = planning.parse_registry()
+    feature = planning.find_feature(rows, "throughput-acceleration-workflow")
+    assert feature is not None
+    ok, message = planning.update_feature_status(
+        rows,
+        feature,
+        "discovery_ready",
+        force=True,
+    )
+    assert ok, message
+
+    result = run_cli(tmp_path, "throughput-acceleration-workflow", "--json")
+
+    assert result.returncode == 0
+    payload = json.loads(result.stdout)
+    assert payload["planning_status"] == "discovery_ready"
+    assert payload["next_owner"] == "discover"
+    assert payload["action"] == "repair_discovery"
+
+
 def test_autoplan_resume_uses_checkpoint(tmp_path: Path, monkeypatch) -> None:
     init_git_repo(tmp_path)
     write_planning_config(tmp_path)

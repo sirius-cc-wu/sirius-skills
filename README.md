@@ -180,6 +180,8 @@ Canonical planning surface:
 Recommended boundary:
 
 - keep goals, design, stories, decomposition, and increment plans in repo documents
+- treat `draft.md` as rough bootstrap input and reserve `discover.md` for the
+  real discovery packet authored by the `discover` skill
 - keep executable slices and dependency tracking in the repository planning artifacts
 - stop planning at `review-planning` until a human explicitly approves the planning artifacts
 - commit approved planning artifacts before bootstrapping execution with `slice`

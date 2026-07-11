@@ -33,7 +33,9 @@ Use `guide-planning` when you need to decide the next planning step before slice
 - If the user explicitly asks for reference-project research or wiki synthesis, if the target overlaps checked-in `references/` patterns and has no durable `reference-research.md` yet, or if discovery/design depends on choosing between multiple upstream patterns, route to `research`.
 - If the work is a small repo-local change whose shape does not depend on upstream comparison, skip `research` and continue directly into the normal planning path.
 - If the user supplied a concrete error message, failing command, or missing runtime path, verify the current code/runtime seam first before deciding the request is only a planning-doc update.
-- If the problem, outcomes, or constraints are still being framed, route to `discover`.
+- If the problem, outcomes, or constraints are still being framed, if only
+  `draft.md` exists, or if `discover.md` is a bootstrap scaffold, route to
+  `discover`.
 - If the architecture, interfaces, or validation strategy are still unresolved, route to `design`.
 - If UI or interaction flow remains material, route to `ui-flow`.
 - If the work is still too large for execution or slices are not explicit, route to `breakdown`.
@@ -89,6 +91,11 @@ guide-planning -> propose/add-subfeature/assess/research/discover -> design -> u
 
 Use adjacent transitions by default and repair skipped states only deliberately.
 
+- `discovery_pending` means discovery has not been authored yet. A planning
+  folder may have `draft.md` rough input in this state, but `draft.md` is not a
+  readiness artifact.
+- `discovery_ready` means `discover` has authored a real `discover.md`; draft
+  notes or scaffold-marked `discover.md` files do not qualify.
 - `planning_reviewed` means the planning packet has passed readiness review and is waiting for explicit human approval.
 - `slice_ready` means the approved planning artifacts are committed and at least one execution-ready work item is selected for execution bootstrap. For subfeatures, derive this from reviewed status plus approval metadata and recorded ready slice IDs in `.subfeature-meta.json`.
 
@@ -99,7 +106,7 @@ Use adjacent transitions by default and repair skipped states only deliberately.
 3. Ensure the planning registry exists.
 4. Resolve the active feature using tooling or a user-provided slug/path.
 5. Confirm the folder represents one coherent feature or capability.
-6. Check optional `reference-research.md`, `discover.md`, `system-design.md`, optional `ui-design.md`, `slice-planning.md`, `slice-traceability.md`, and `.planning-meta.json` as appropriate for the current state. For subfeatures, rely on the derived planning view rather than editing a nested `.planning-meta.json` file directly.
+6. Check optional `reference-research.md`, `draft.md`, `discover.md`, `system-design.md`, optional `ui-design.md`, `slice-planning.md`, `slice-traceability.md`, and `.planning-meta.json` as appropriate for the current state. For subfeatures, rely on the derived planning view rather than editing a nested `.planning-meta.json` file directly.
 7. If the target feature is already `implemented`, has archived slices, or the request is framed as a new bugfix/follow-on issue, decide first whether the right durable target is a new or existing subfeature rather than in-place edits to the parent packet.
 8. When the user provided a concrete runtime failure or missing-path report, inspect the current implementation seam before choosing between subfeature planning, execution handoff, or archival.
 9. When the packet materially reshapes existing workflow surface, confirm any
