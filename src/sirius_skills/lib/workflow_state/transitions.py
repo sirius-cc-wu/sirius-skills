@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from pathlib import Path
 from typing import Dict, List, Optional, Sequence, Set, Tuple
 
 from sirius_skills.lib.workflow_state.inventory import iter_traceability_records, load_inventory
@@ -44,8 +45,8 @@ def _dedupe(records: Sequence[SemanticPreviewRecord]) -> List[SemanticPreviewRec
     return result
 
 
-def _subfeature_dirs_by_id(inventory: Inventory) -> Dict[str, object]:
-    result: Dict[str, object] = {}
+def _subfeature_dirs_by_id(inventory: Inventory) -> Dict[str, Path]:
+    result: Dict[str, Path] = {}
     for paths in inventory.subfeature_dirs_by_feature.values():
         for subfeature_dir in paths:
             result[subfeature_dir.name] = subfeature_dir
@@ -114,11 +115,7 @@ def _subfeature_blockers_for_slice_close(
 def _open_slice_warnings_for_subfeature(
     inventory: Inventory, subfeature_id: str
 ) -> List[SemanticPreviewRecord]:
-    slice_rows_by_id = {
-        str(row.get("id") or "").strip(): dict(row)
-        for row in inventory.slice_rows
-        if str(row.get("id") or "").strip()
-    }
+    slice_rows_by_id = {row.id: row for row in inventory.slice_registry if row.id}
     findings: List[SemanticPreviewRecord] = []
     for record in iter_traceability_records(inventory):
         if record.owner_type != "subfeature" or record.owner_id != subfeature_id:
@@ -128,11 +125,7 @@ def _open_slice_warnings_for_subfeature(
             for slice_id in record.planned_slice_ids
             if slice_id in slice_rows_by_id
         ]
-        open_slice_ids = sorted(
-            str(row.get("id") or "")
-            for row in linked_rows
-            if str(row.get("status") or "") != "closed"
-        )
+        open_slice_ids = sorted(row.id for row in linked_rows if row.status != "closed")
         if not open_slice_ids:
             continue
         findings.append(

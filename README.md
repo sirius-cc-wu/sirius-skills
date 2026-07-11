@@ -94,6 +94,11 @@ workflow-state maintenance work:
 just validate-workflow-state
 ```
 
+This runs the scoped strict Pyright check for hardened workflow-state Python
+modules before the curated pytest bundle. Use
+`sirius validate-workflow-state --skip-pyright` only when debugging tests in an
+environment without Node/npm available.
+
 The intended direction is:
 
 - keep core workflow skills reusable across personal and company projects
@@ -140,8 +145,9 @@ Current shared-reference workflow:
 
 - keep the canonical source in `docs/shared/`
 - `just install-packaged` refreshes shared reference copies before packaging managed skills
-- `just validate-workflow-state` reruns the curated workflow consistency pytest
-  bundle for parity and transition guardrail regressions
+- `just validate-workflow-state` reruns the scoped strict Pyright check and the
+  curated workflow consistency pytest bundle for parity and transition guardrail
+  regressions
 - run `just sync-shared-references` after editing a canonical shared reference
 - have each consuming skill point only at its local `references/` copy so the
   packaged skill remains self-contained

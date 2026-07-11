@@ -466,12 +466,13 @@ def test_workflow_state_validation_hook_runs_from_repo_root_and_returns_exit_cod
 
     monkeypatch.setattr(module.subprocess, "run", fake_run)
 
-    assert module.main(["--", "-k", "parity"]) == 7
+    assert module.main(["--skip-pyright", "--", "-k", "parity"]) == 7
     assert calls["command"] == [
         sys.executable,
         "-m",
         "pytest",
         "-q",
+        "tests/test_workflow_state_transitions.py",
         "skills/audit-artifacts/tests/test_audit_artifacts.py",
         "skills/report-artifacts/tests/test_report_artifacts.py",
         "skills/guide-planning/tests/test_manage_planning.py",
@@ -573,4 +574,3 @@ def test_run_report_skips_packaged_parity_by_default(tmp_path, monkeypatch):
     assert payload["summary"]["installed_parity_count"] == 0
     assert payload["installed_parity"] == []
     assert "Installed parity findings" not in env["report"].render_text(payload)
-

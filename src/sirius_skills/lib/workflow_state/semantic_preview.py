@@ -1,10 +1,10 @@
 from __future__ import annotations
 
 from pathlib import Path
-from typing import Dict, List, Optional, Sequence, Set, Tuple
+from typing import Callable, List, Mapping, Optional, Sequence, Set, Tuple
 
 from sirius_skills.lib.workflow_state.inventory import normalize_dir_relpath, parse_traceability_records
-from sirius_skills.lib.workflow_state.models import Inventory, SemanticPreviewRecord
+from sirius_skills.lib.workflow_state.models import Inventory, SemanticPreviewRecord, SliceRegistryRow
 
 
 VALID_ARTIFACT_TYPES = {"proposal", "feature", "subfeature", "slice"}
@@ -15,7 +15,13 @@ def _selected_types(raw_types: Sequence[str]) -> Set[str]:
     return selected or set(VALID_ARTIFACT_TYPES)
 
 
-def _safe_read_metadata(reader, artifact_type: str, artifact_id: str, path: Path):
+MetadataReader = Callable[[str], Mapping[str, object]]
+MetadataReadResult = Tuple[Optional[Mapping[str, object]], Optional[SemanticPreviewRecord]]
+
+
+def _safe_read_metadata(
+    reader: MetadataReader, artifact_type: str, artifact_id: str, path: Path
+) -> MetadataReadResult:
     try:
         return reader(str(path)), None
     except (RuntimeError, ValueError):
@@ -31,7 +37,7 @@ def _safe_read_metadata(reader, artifact_type: str, artifact_id: str, path: Path
 def _dedupe_preview_records(
     preview_records: Sequence[SemanticPreviewRecord],
 ) -> List[SemanticPreviewRecord]:
-    seen = set()
+    seen: Set[Tuple[str, str, str, str, str]] = set()
     result: List[SemanticPreviewRecord] = []
     for item in preview_records:
         key = (item.artifact_type, item.artifact_id, item.path, item.code, item.message)
@@ -44,10 +50,10 @@ def _dedupe_preview_records(
 
 def _canonical_feature_slugs(
     inventory: Inventory,
-) -> Tuple[Set[str], Dict[str, Dict[str, object]], Dict[str, str]]:
+) -> Tuple[Set[str], dict[str, Mapping[str, object]], dict[str, str]]:
     slugs: Set[str] = set()
-    metadata_by_slug: Dict[str, Dict[str, object]] = {}
-    path_by_slug: Dict[str, str] = {}
+    metadata_by_slug: dict[str, Mapping[str, object]] = {}
+    path_by_slug: dict[str, str] = {}
     for feature_dir in inventory.feature_dirs:
         metadata, preview_record = _safe_read_metadata(
             inventory.context.planning.read_metadata,
@@ -115,17 +121,16 @@ def _proposal_link_preview(
 def _planning_status_preview(
     inventory: Inventory,
     selected: Set[str],
-    feature_metadata_by_slug: Dict[str, Dict[str, object]],
-    feature_paths_by_slug: Dict[str, str],
+    feature_metadata_by_slug: dict[str, Mapping[str, object]],
+    feature_paths_by_slug: dict[str, str],
 ) -> List[SemanticPreviewRecord]:
     if "feature" not in selected:
         return []
     preview_records: List[SemanticPreviewRecord] = []
-    slice_rows_by_feature: Dict[str, List[Dict[str, object]]] = {}
-    for row in inventory.slice_rows:
-        feature_slug = str(row.get("feature") or "").strip()
-        if feature_slug:
-            slice_rows_by_feature.setdefault(feature_slug, []).append(dict(row))
+    slice_rows_by_feature: dict[str, list[SliceRegistryRow]] = {}
+    for row in inventory.slice_registry:
+        if row.feature:
+            slice_rows_by_feature.setdefault(row.feature, []).append(row)
 
     for feature_slug, rows in slice_rows_by_feature.items():
         metadata = feature_metadata_by_slug.get(feature_slug)
@@ -136,10 +141,10 @@ def _planning_status_preview(
             continue
         suggested_status = (
             "implemented"
-            if rows and all(str(row.get("status")) == "closed" for row in rows)
+            if rows and all(row.status == "closed" for row in rows)
             else "slice_ready"
         )
-        slice_ids = ", ".join(sorted(str(row["id"]) for row in rows))
+        slice_ids = ", ".join(sorted(row.id for row in rows))
         preview_records.append(
             SemanticPreviewRecord(
                 artifact_type="feature",
@@ -163,11 +168,7 @@ def _subfeature_planning_status_preview(
     if "subfeature" not in selected:
         return []
     preview_records: List[SemanticPreviewRecord] = []
-    slice_rows_by_id = {
-        str(row.get("id") or "").strip(): dict(row)
-        for row in inventory.slice_rows
-        if str(row.get("id") or "").strip()
-    }
+    slice_rows_by_id = {row.id: row for row in inventory.slice_registry if row.id}
     for feature_dir in inventory.feature_dirs:
         for subfeature_dir in inventory.subfeature_dirs_by_feature.get(feature_dir.name, []):
             metadata, preview_record = _safe_read_metadata(
@@ -195,7 +196,7 @@ def _subfeature_planning_status_preview(
             if not execution_slice_ids:
                 continue
             all_closed = all(
-                str(slice_rows_by_id[slice_id].get("status") or "") == "closed"
+                slice_rows_by_id[slice_id].status == "closed"
                 for slice_id in execution_slice_ids
             )
             current_status = str(metadata.get("status") or "")
@@ -228,12 +229,10 @@ def _traceability_preview(
     selected: Set[str],
 ) -> List[SemanticPreviewRecord]:
     preview_records: List[SemanticPreviewRecord] = []
-    slice_ids_by_feature: Dict[str, Set[str]] = {}
-    for row in inventory.slice_rows:
-        feature_slug = str(row.get("feature") or "").strip()
-        slice_id = str(row.get("id") or "").strip()
-        if feature_slug and slice_id:
-            slice_ids_by_feature.setdefault(feature_slug, set()).add(slice_id)
+    slice_ids_by_feature: dict[str, Set[str]] = {}
+    for row in inventory.slice_registry:
+        if row.feature and row.id:
+            slice_ids_by_feature.setdefault(row.feature, set()).add(row.id)
 
     owner_specs: List[Tuple[str, str, Path, str]] = []
     if "feature" in selected:

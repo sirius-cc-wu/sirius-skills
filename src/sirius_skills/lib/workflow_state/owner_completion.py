@@ -4,10 +4,11 @@ from pathlib import Path
 from typing import Dict, List, Optional, Sequence, Tuple
 
 from sirius_skills.lib.workflow_state.inventory import iter_traceability_records, load_inventory
-from sirius_skills.lib.workflow_state.models import Inventory, TraceabilityRecord
+from sirius_skills.lib.workflow_state.models import Inventory, RegistryRow, TraceabilityRecord
 
 
 OwnerKey = Tuple[str, str, str]
+CompletionResult = Dict[str, object]
 
 
 def _safe_load_inventory() -> Optional[Inventory]:
@@ -102,7 +103,7 @@ def _completed_owner_execution_slices(
 
 def _sync_feature_completion(
     inventory: Inventory, owner_id: str, owner_path: str
-) -> Optional[Dict[str, object]]:
+) -> Optional[CompletionResult]:
     planning = inventory.context.planning
     scope_context = planning.SCOPE_RUNTIME.resolve_scope_context()
     planning.sync_registry(scope_context=scope_context)
@@ -144,7 +145,7 @@ def _ensure_subfeature_registry_row(
     subfeature_dir: str,
     subfeature_id: str,
     scope_context: object,
-):
+) -> RegistryRow:
     planning = inventory.context.planning
     subfeatures = inventory.context.subfeatures
     subfeatures.ensure_subfeature_registry(feature_dir)
@@ -154,13 +155,16 @@ def _ensure_subfeature_registry_row(
         return selected
 
     metadata = subfeatures.read_metadata(subfeature_dir)
+    status = metadata.get("status")
+    subfeature_type = metadata.get("subfeature_type")
+    updated_at = metadata.get("updated_at")
     rows.append(
         subfeatures.normalize_registry_row(
             {
                 "subfeature_id": subfeature_id,
-                "status": metadata.get("status", "draft"),
-                "subfeature_type": metadata.get("subfeature_type", "additive"),
-                "updated_at": metadata.get("updated_at"),
+                "status": status if isinstance(status, str) else "draft",
+                "subfeature_type": subfeature_type if isinstance(subfeature_type, str) else "additive",
+                "updated_at": updated_at if isinstance(updated_at, str) else None,
                 "path": planning.relative_path_from_scope_root(
                     subfeature_dir, scope_context
                 ),
@@ -182,14 +186,14 @@ def _sync_subfeature_completion(
     owner_id: str,
     owner_path: str,
     closed_execution_slice_ids: List[str],
-) -> Optional[Dict[str, object]]:
+) -> Optional[CompletionResult]:
     planning = inventory.context.planning
     subfeatures = inventory.context.subfeatures
     scope_context = planning.SCOPE_RUNTIME.resolve_scope_context()
     planning.sync_registry(scope_context=scope_context)
-    rows, subfeature_feature, scope_context = planning.resolve_feature_lookup(owner_path)
+    _rows, subfeature_feature, scope_context = planning.resolve_feature_lookup(owner_path)
     if subfeature_feature is None:
-        rows, subfeature_feature, scope_context = planning.resolve_feature_lookup(owner_id)
+        _rows, subfeature_feature, scope_context = planning.resolve_feature_lookup(owner_id)
     if subfeature_feature is None:
         raise RuntimeError(
             f"Unable to resolve planning subfeature '{owner_id}' for completion handoff."
@@ -235,7 +239,7 @@ def sync_completed_owners(
     slice_id: Optional[str] = None,
     owner_type: Optional[str] = None,
     owner_id: Optional[str] = None,
-) -> List[Dict[str, object]]:
+) -> List[CompletionResult]:
     """Promote completed planning owners from traced closed execution slices.
 
     This is the shared terminal reconciliation hook. It intentionally derives
@@ -246,18 +250,14 @@ def sync_completed_owners(
     if inventory is None:
         return []
 
-    execution_status_by_id = {
-        str(row.get("id") or "").strip(): str(row.get("status") or "").strip()
-        for row in inventory.slice_rows
-        if str(row.get("id") or "").strip()
-    }
+    execution_status_by_id = {row.id: row.status for row in inventory.slice_registry if row.id}
     owner_records = _owner_records_for_scope(
         inventory,
         slice_id=slice_id,
         owner_type=owner_type,
         owner_id=owner_id,
     )
-    sync_results: List[Dict[str, object]] = []
+    sync_results: List[CompletionResult] = []
     for (record_owner_type, record_owner_id, owner_path), records in owner_records.items():
         closed_execution_slice_ids = _completed_owner_execution_slices(
             records, execution_status_by_id
@@ -277,5 +277,5 @@ def sync_completed_owners(
     return sync_results
 
 
-def sync_owner_completion(slice_id: str) -> List[Dict[str, object]]:
+def sync_owner_completion(slice_id: str) -> List[CompletionResult]:
     return sync_completed_owners(slice_id=slice_id)

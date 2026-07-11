@@ -283,6 +283,7 @@ def test_workflow_state_validation_hook_targets_reviewed_suite():
         "-m",
         "pytest",
         "-q",
+        "tests/test_workflow_state_transitions.py",
         "skills/audit-artifacts/tests/test_audit_artifacts.py",
         "skills/report-artifacts/tests/test_report_artifacts.py",
         "skills/guide-planning/tests/test_manage_planning.py",
@@ -293,12 +294,20 @@ def test_workflow_state_validation_hook_targets_reviewed_suite():
         "-m",
         "pytest",
         "-q",
+        "tests/test_workflow_state_transitions.py",
         "skills/audit-artifacts/tests/test_audit_artifacts.py",
         "skills/report-artifacts/tests/test_report_artifacts.py",
         "skills/guide-planning/tests/test_manage_planning.py",
         "skills/close-slice/tests/test_close_slice.py",
         "-k",
         "installed_parity",
+    ]
+    assert module.build_pyright_command() == [
+        "npx",
+        "--yes",
+        "pyright",
+        "--project",
+        str(module.REPO_ROOT / "pyproject.toml"),
     ]
 
 

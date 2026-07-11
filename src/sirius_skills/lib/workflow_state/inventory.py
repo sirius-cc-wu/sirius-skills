@@ -1,14 +1,13 @@
 #!/usr/bin/env python3
 
-import importlib.util
 import json
-import re
 from pathlib import Path
-from typing import Callable, Dict, List, Optional, Set, Tuple
+from typing import Callable, Dict, List, Mapping, Optional, Set, Tuple, cast
 
 from sirius_skills.lib.workflow_state.models import (
     Inventory,
     InventoryContext,
+    RegistryRow,
     RegistryStatus,
     TraceabilityRecord,
 )
@@ -67,26 +66,32 @@ def _load_registry_rows(
     registry_path: Path,
     readme_path: Path,
     key: str,
-    normalizer: Callable[[Dict[str, object]], Dict[str, object]],
-    markdown_parser: Optional[Callable[[str], List[Dict[str, object]]]] = None,
-) -> Tuple[List[Dict[str, object]], Optional[str]]:
+    normalizer: Callable[[RegistryRow], RegistryRow],
+    markdown_parser: Optional[Callable[[str], List[RegistryRow]]] = None,
+) -> Tuple[List[RegistryRow], Optional[str]]:
     if registry_path.exists():
         try:
-            payload = json.loads(registry_path.read_text(encoding="utf-8"))
+            payload: object = json.loads(registry_path.read_text(encoding="utf-8"))
         except json.JSONDecodeError:
             return [], f"{registry_path.name} is not valid JSON."
         if isinstance(payload, list):
-            raw_rows = payload
+            raw_rows_obj: object = cast(List[object], payload)
         elif isinstance(payload, dict):
-            raw_rows = payload.get(key, [])
+            raw_rows_obj = cast(Mapping[str, object], payload).get(key, [])
         else:
             return [], f"{registry_path.name} must be a JSON object or list."
-        if raw_rows is None:
-            raw_rows = []
-        if not isinstance(raw_rows, list):
+        if raw_rows_obj is None:
+            raw_rows_obj = []
+        if not isinstance(raw_rows_obj, list):
             return [], f"Registry field '{key}' must be a list."
+        raw_rows = cast(List[object], raw_rows_obj)
         try:
-            return [normalizer(row) for row in raw_rows], None
+            normalized: List[RegistryRow] = []
+            for row in raw_rows:
+                if not isinstance(row, dict):
+                    return [], f"Registry field '{key}' must contain object rows."
+                normalized.append(normalizer(cast(RegistryRow, row)))
+            return normalized, None
         except (RuntimeError, ValueError) as exc:
             return [], str(exc)
     if markdown_parser is not None and readme_path.exists():
@@ -114,8 +119,8 @@ def _slice_registry_paths_for_scope(scope_dir: Path) -> Tuple[Path, Path, Path]:
     return slice_root, slice_root / "README.md", slice_root / "registry.json"
 
 
-def _repo_relative_slice_rows(scope_dir: Path, rows: List[Dict[str, object]]) -> List[Dict[str, object]]:
-    normalized: List[Dict[str, object]] = []
+def _repo_relative_slice_rows(scope_dir: Path, rows: List[RegistryRow]) -> List[RegistryRow]:
+    normalized: List[RegistryRow] = []
     for row in rows:
         updated = dict(row)
         row_path = Path(str(updated.get("path") or "").rstrip("/"))
@@ -128,7 +133,7 @@ def _repo_relative_slice_rows(scope_dir: Path, rows: List[Dict[str, object]]) ->
 
 def _load_nested_slice_scope(
     context: InventoryContext, scope_dir: Path
-) -> Tuple[List[Dict[str, object]], List[Path], RegistryStatus]:
+) -> Tuple[List[RegistryRow], List[Path], RegistryStatus]:
     slice_root, slice_readme, slice_registry = _slice_registry_paths_for_scope(scope_dir)
     rows, error = _load_registry_rows(
         slice_registry,
@@ -244,18 +249,6 @@ def is_retained_pruned_slice_row(
         return False
     summaries = summary_index if summary_index is not None else load_archived_slice_summary_index(inventory)
     return str(row.get("id", "")).strip() in summaries
-
-
-def _normalize_table_header(value: str) -> str:
-    return markdown_repository.normalize_table_header(value)
-
-
-def _split_table_row(line: str) -> List[str]:
-    return markdown_repository.split_table_row(line)
-
-
-def _split_cell_values(value: str) -> List[str]:
-    return markdown_repository.split_cell_values(value)
 
 
 def parse_traceability_records(
