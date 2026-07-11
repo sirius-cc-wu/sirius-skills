@@ -176,7 +176,7 @@ Add a migration or repair mode before removing compatibility.
 Possible command:
 
 ```bash
-sirius migrate-planning-model --dry-run
+sirius migrate-planning-model
 sirius migrate-planning-model --apply
 ```
 

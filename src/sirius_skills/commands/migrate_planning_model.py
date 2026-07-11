@@ -36,21 +36,23 @@ def normalize_story_ids(items: List[str]) -> List[str]:
     return normalized
 
 
-def read_json_object(path: Path) -> Dict[str, object]:
+def read_json_payload(path: Path) -> object:
     if not path.exists():
         return {}
     try:
-        payload = json.loads(path.read_text(encoding="utf-8"))
+        return json.loads(path.read_text(encoding="utf-8"))
     except json.JSONDecodeError as exc:
         raise RuntimeError(f"Registry JSON is not valid JSON: {path}") from exc
-    if not isinstance(payload, dict):
-        return {}
-    return payload
 
 
 def read_registry_rows(path: Path, key: str) -> List[Dict[str, object]]:
-    payload = read_json_object(path)
-    raw_rows = payload.get(key, [])
+    payload = read_json_payload(path)
+    if isinstance(payload, list):
+        raw_rows = payload
+    elif isinstance(payload, dict):
+        raw_rows = payload.get(key, [])
+    else:
+        raw_rows = []
     if not isinstance(raw_rows, list):
         return []
     return [row for row in raw_rows if isinstance(row, dict)]
@@ -164,11 +166,9 @@ def build_migration_result(apply: bool = False, explicit_scope: Optional[str] = 
                 )
             )
 
-    raw_registry = read_json_object(registry)
-    raw_rows = raw_registry.get("features", [])
+    raw_rows = read_registry_rows(registry, "features")
     has_subfeature_rows = any(
-        isinstance(row, dict) and "/subfeatures/" in str(row.get("path", ""))
-        for row in raw_rows if isinstance(raw_rows, list)
+        "/subfeatures/" in str(row.get("path", "")) for row in raw_rows
     )
     if has_subfeature_rows:
         rebuilt_rows = rebuild_feature_registry_rows(scope_context, planning_dir)

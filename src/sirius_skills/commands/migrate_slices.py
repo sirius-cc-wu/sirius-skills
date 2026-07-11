@@ -61,7 +61,6 @@ def ensure_feature_scope(
     skills_dir.mkdir(parents=True, exist_ok=True)
 
     planning_path = skills_dir / "planning.json"
-    execution_path = skills_dir / "execution.json"
     created = False
 
     root_planning_dir, _, _ = manage_planning.get_registry_paths(
@@ -69,9 +68,6 @@ def ensure_feature_scope(
     )
     root_proposal_dir, _, _ = manage_proposals.get_registry_paths(
         required_config=False, scope_context=root_scope_context
-    )
-    root_execution_config = manage_execution.load_config(
-        required=False, scope_context=root_scope_context
     )
     if not planning_path.exists():
         manage_planning.write_config(
@@ -84,39 +80,10 @@ def ensure_feature_scope(
         )
         created = True
 
-    if not execution_path.exists():
-        manage_execution.write_config(
-            "slices",
-            preferred_workflow=root_execution_config["preferred_workflow"],
-            auto_start_implementation=root_execution_config["auto_start_implementation"],
-            scope_context=SimpleNamespace(scope_root=feature_dir),
-        )
-        created = True
-
-    return created
-
-
-def ensure_subfeature_execution_scope(
-    manage_execution,
-    subfeature_dir: Path,
-    root_scope_context: object,
-) -> bool:
-    skills_dir = subfeature_dir / ".skills"
-    skills_dir.mkdir(parents=True, exist_ok=True)
-    execution_path = skills_dir / "execution.json"
-    created = False
-    root_execution_config = manage_execution.load_config(
-        required=False, scope_context=root_scope_context
+    _, execution_created = manage_execution.ensure_local_execution_scope(
+        feature_dir, root_scope_context
     )
-    if not execution_path.exists():
-        manage_execution.write_config(
-            "slices",
-            preferred_workflow=root_execution_config["preferred_workflow"],
-            auto_start_implementation=root_execution_config["auto_start_implementation"],
-            scope_context=SimpleNamespace(scope_root=subfeature_dir),
-        )
-        created = True
-    return created
+    return created or execution_created
 
 
 def discover_subfeature_targets(feature_path: Path) -> List[Path]:
@@ -130,9 +97,9 @@ def discover_subfeature_targets(feature_path: Path) -> List[Path]:
     )
 
 
-def build_subfeature_owner_map(feature_path: Path) -> Dict[str, List[Path]]:
+def build_subfeature_owner_map(subfeature_targets: List[Path]) -> Dict[str, List[Path]]:
     owners_by_slice_id: Dict[str, List[Path]] = {}
-    for subfeature_dir in discover_subfeature_targets(feature_path):
+    for subfeature_dir in subfeature_targets:
         traceability_path = subfeature_dir / "slice-traceability.md"
         if not traceability_path.exists():
             continue
@@ -199,17 +166,15 @@ def target_scope_for_row(
     row: Dict[str, object],
     feature_path: Path,
     owner_map: Dict[str, List[Path]],
+    subfeature_targets: List[Path],
 ) -> Tuple[Optional[Path], Optional[str]]:
     owners = owner_map.get(str(row.get("id") or ""), [])
-    unique_owners = []
-    for owner in owners:
-        if owner not in unique_owners:
-            unique_owners.append(owner)
+    unique_owners = list(dict.fromkeys(owners))
     if len(unique_owners) == 1:
         return unique_owners[0], None
     if len(unique_owners) > 1:
         return None, "Execution slice maps to multiple subfeatures."
-    if discover_subfeature_targets(feature_path):
+    if subfeature_targets:
         return None, "Execution slice is not mapped by any subfeature traceability file."
     return feature_path, None
 
@@ -225,7 +190,8 @@ def migrate_feature_rows(
     dry_run: bool,
 ) -> Dict[str, object]:
     feature_path = Path(feature_dir)
-    owner_map = build_subfeature_owner_map(feature_path)
+    subfeature_targets = discover_subfeature_targets(feature_path)
+    owner_map = build_subfeature_owner_map(subfeature_targets)
     scope_created_by_target: Dict[str, bool] = {}
     existing_rows_by_target: Dict[str, List[Dict[str, object]]] = {}
     migrated_rows_by_target: Dict[str, List[Dict[str, object]]] = {}
@@ -241,7 +207,9 @@ def migrate_feature_rows(
             remaining_rows.append(row)
             continue
 
-        target_scope, target_error = target_scope_for_row(row, feature_path, owner_map)
+        target_scope, target_error = target_scope_for_row(
+            row, feature_path, owner_map, subfeature_targets
+        )
         if target_error is not None or target_scope is None:
             source_abs = Path(manage_execution.slice_path_for_row(row, scope_context=root_scope_context))
             entry = {
@@ -267,17 +235,13 @@ def migrate_feature_rows(
                     target_scope,
                     root_scope_context,
                 )
-                target_scope_context = manage_planning.SCOPE_RUNTIME.resolve_scope_context(
+                target_scope_context = manage_execution.resolve_execution_scope_context(
                     explicit_scope=target_scope
                 )
             else:
-                created = ensure_subfeature_execution_scope(
-                    manage_execution,
+                target_scope_context, created = manage_execution.ensure_local_execution_scope(
                     target_scope,
                     root_scope_context,
-                )
-                target_scope_context = manage_execution.resolve_execution_scope_context(
-                    explicit_scope=target_scope
                 )
             scope_created_by_target[target_key] = scope_created_by_target.get(target_key, False) or created
             existing_rows_by_target.setdefault(
@@ -352,14 +316,9 @@ def migrate_feature_rows(
         manage_execution.write_registry(remaining_rows, scope_context=root_scope_context)
         for target_key, migrated_rows in migrated_rows_by_target.items():
             target_scope = Path(target_key)
-            if target_scope == feature_path:
-                target_scope_context = manage_planning.SCOPE_RUNTIME.resolve_scope_context(
-                    explicit_scope=target_scope
-                )
-            else:
-                target_scope_context = manage_execution.resolve_execution_scope_context(
-                    explicit_scope=target_scope
-                )
+            target_scope_context = manage_execution.resolve_execution_scope_context(
+                explicit_scope=target_scope
+            )
             combined_rows = {
                 row["id"]: dict(row) for row in existing_rows_by_target.get(target_key, [])
             }
@@ -434,6 +393,8 @@ def run_migrate(args: argparse.Namespace) -> Tuple[Dict[str, object], int]:
     features: List[Dict[str, object]] = []
     overall_ok = True
     for feature_dir, feature_slug in targets:
+        if not bool(args.dry_run):
+            root_rows = manage_execution.parse_registry(scope_context=root_scope_context)
         report = migrate_feature_rows(
             manage_planning,
             manage_execution,

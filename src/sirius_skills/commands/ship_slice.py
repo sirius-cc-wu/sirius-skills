@@ -852,6 +852,23 @@ def resolve_input_payload(
     return handoff, checkpoint
 
 
+def iter_handoff_scope_contexts(handoff: HandoffPayload, execution_module, fallback_scope):
+    handoff_path = Path(handoff.execution_slice_path)
+    if not handoff_path.is_absolute():
+        handoff_path = fallback_scope.repo_root / handoff_path
+    seen = set()
+    for candidate in [handoff_path, *handoff_path.parents]:
+        if (candidate / ".skills" / "execution.json").exists():
+            scope_context = execution_module.resolve_execution_scope_context(
+                explicit_scope=candidate
+            )
+            scope_root = scope_context.scope_root.resolve()
+            if scope_root in seen:
+                continue
+            seen.add(scope_root)
+            yield scope_context
+
+
 def resolve_slice(
     args: argparse.Namespace,
     execution_module,
@@ -877,15 +894,10 @@ def resolve_slice(
     if selector:
         row = execution_module.resolve_slice(rows, selector)
         if row is None and handoff is not None:
-            handoff_path = Path(handoff.execution_slice_path)
-            if not handoff_path.is_absolute():
-                handoff_path = scope_context.repo_root / handoff_path
-            for candidate in [handoff_path, *handoff_path.parents]:
-                if not (candidate / ".skills" / "execution.json").exists():
-                    continue
-                scope_context = execution_module.SCOPE_RUNTIME.resolve_scope_context(
-                    explicit_scope=candidate
-                )
+            for handoff_scope_context in iter_handoff_scope_contexts(
+                handoff, execution_module, scope_context
+            ):
+                scope_context = handoff_scope_context
                 rows = execution_module.parse_registry(scope_context=scope_context)
                 row = execution_module.resolve_slice(rows, selector)
                 if row is not None:

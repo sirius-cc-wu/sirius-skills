@@ -326,6 +326,41 @@ def resolve_execution_scope_context(
     return planning_scope
 
 
+def ensure_local_execution_scope(
+    scope_root: Path,
+    inherited_scope_context: object,
+    *,
+    initialize_registry: bool = False,
+) -> Tuple[object, bool]:
+    local_root = Path(scope_root).expanduser()
+    if not local_root.is_absolute():
+        local_root = Path.cwd() / local_root
+    local_root = local_root.resolve()
+    local_scope_context = _execution_scope_from_root(local_root, start_dir=local_root)
+    config_path = local_root / CONFIG_FILE
+    created = False
+
+    if not config_path.exists():
+        inherited_config = load_config(
+            required=False, scope_context=inherited_scope_context
+        )
+        write_config(
+            DEFAULT_SLICES_DIR,
+            preferred_workflow=str(inherited_config["preferred_workflow"]),
+            auto_start_implementation=bool(inherited_config["auto_start_implementation"]),
+            scope_context=local_scope_context,
+        )
+        created = True
+
+    resolved_scope = resolve_execution_scope_context(explicit_scope=local_root)
+    if initialize_registry:
+        specs_dir, _, _ = get_registry_paths(
+            required_config=True, scope_context=resolved_scope
+        )
+        ensure_registry(specs_dir)
+    return resolved_scope, created
+
+
 def execution_config_path(scope_context: Optional[object] = None) -> str:
     resolved_scope = resolve_execution_scope_context(scope_context)
     return str(
@@ -1123,10 +1158,7 @@ def expected_status_for_files(
     brief_exists: bool,
     requirements_exists: bool,
     plan_exists: bool,
-    slices_exists: bool,
-    blueprint_contract_exists: bool = False,
 ) -> str:
-    del slices_exists
     if plan_exists:
         return "blueprint_ready"
     if brief_exists and requirements_exists:
@@ -1175,8 +1207,6 @@ def validate_slice(
         checks["brief_exists"],
         checks["requirements_exists"],
         checks["plan_exists"],
-        checks["slices_exists"],
-        checks["blueprint_contract_exists"],
     )
     if normalized_status in {"draft", "brief_ready", "blueprint_ready"}:
         if normalized_status != expected:

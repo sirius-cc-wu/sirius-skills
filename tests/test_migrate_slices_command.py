@@ -1,18 +1,7 @@
 from __future__ import annotations
 
 import json
-import sys
 from pathlib import Path
-
-import pytest
-
-
-REPO_ROOT = Path(__file__).resolve().parents[1]
-SRC_DIR = REPO_ROOT / "src"
-LIB_DIR = REPO_ROOT / "lib"
-for path in (SRC_DIR, LIB_DIR):
-    if str(path) not in sys.path:
-        sys.path.insert(0, str(path))
 
 from sirius_skills.commands import bootstrap, migrate_slices
 
@@ -123,6 +112,33 @@ def test_package_migrate_slices_moves_mapped_slices_into_subfeature_scope(
     assert subfeature_registry["slices"][0]["id"] == "CHK-001"
     assert subfeature_registry["slices"][0]["path"].startswith("slices/")
 
+    root_registry = json.loads((tmp_path / "slices" / "registry.json").read_text(encoding="utf-8"))
+    assert root_registry["slices"] == []
+
+
+def test_package_migrate_slices_all_refreshes_root_registry_between_features(
+    tmp_path: Path, monkeypatch
+) -> None:
+    monkeypatch.chdir(tmp_path)
+
+    assert bootstrap.main(["--mode", "default"]) == 0
+
+    from sirius_skills.commands import manage_execution, manage_planning
+
+    for feature_slug, slice_id in (("checkout", "CHK-001"), ("billing", "BIL-001")):
+        _, created = manage_planning.create_feature(feature_slug)
+        assert created is True
+        _, created = manage_execution.create_slice(slice_id, feature_slug)
+        assert created is True
+
+    assert migrate_slices.main(["migrate", "--all"]) == 0
+
+    assert (
+        tmp_path / "docs" / "features" / "checkout" / "slices" / "CHK-001-checkout"
+    ).exists()
+    assert (
+        tmp_path / "docs" / "features" / "billing" / "slices" / "BIL-001-billing"
+    ).exists()
     root_registry = json.loads((tmp_path / "slices" / "registry.json").read_text(encoding="utf-8"))
     assert root_registry["slices"] == []
 

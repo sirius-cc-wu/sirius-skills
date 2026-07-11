@@ -514,40 +514,7 @@ def resolve_target(planning_module, selector: str, explicit_scope: Optional[str]
     return feature, feature_dir, metadata, scope_context, target_type
 
 
-def ensure_target_execution_scope(
-    planning_module,
-    execution_module,
-    target_dir: Path,
-    root_scope_context,
-) -> object:
-    """Create a subfeature-local execution scope and return its scope context."""
-    skills_dir = target_dir / ".skills"
-    skills_dir.mkdir(parents=True, exist_ok=True)
-    execution_path = skills_dir / "execution.json"
-
-    root_execution = execution_module.load_config(
-        required=False, scope_context=root_scope_context
-    )
-    if not execution_path.exists():
-        execution_module.write_config(
-            "slices",
-            preferred_workflow=str(root_execution["preferred_workflow"]),
-            auto_start_implementation=bool(root_execution["auto_start_implementation"]),
-            scope_context=type("ScopeContextLike", (), {"scope_root": target_dir})(),
-        )
-
-    target_scope_context = execution_module.resolve_execution_scope_context(
-        explicit_scope=target_dir
-    )
-    specs_dir, _, _ = execution_module.get_registry_paths(
-        required_config=True, scope_context=target_scope_context
-    )
-    execution_module.ensure_registry(specs_dir)
-    return target_scope_context
-
-
 def execution_scope_for_target(
-    planning_module,
     execution_module,
     target_type: str,
     target_dir: Path,
@@ -558,9 +525,12 @@ def execution_scope_for_target(
     if target_type != "subfeature":
         return root_scope_context
     if create:
-        return ensure_target_execution_scope(
-            planning_module, execution_module, target_dir, root_scope_context
+        target_scope_context, _ = execution_module.ensure_local_execution_scope(
+            target_dir,
+            root_scope_context,
+            initialize_registry=True,
         )
+        return target_scope_context
     if (target_dir / ".skills" / "execution.json").exists():
         return execution_module.resolve_execution_scope_context(explicit_scope=target_dir)
     return root_scope_context
@@ -668,7 +638,6 @@ def resolve_backlog(selector: str, explicit_scope: Optional[str] = None) -> Back
         slice_planning_path, traceability_records
     )
     execution_scope_context = execution_scope_for_target(
-        planning_module,
         execution_module,
         target_type,
         target_dir_path,
@@ -860,8 +829,6 @@ def inspect_slice_artifacts(slice_row: Dict[str, object], execution_module, scop
         "brief_exists": (slice_path / "brief.md").is_file(),
         "requirements_exists": (slice_path / "checklists" / "requirements.md").is_file(),
         "blueprint_exists": (slice_path / "blueprint.md").is_file(),
-        "blueprint_contract_exists": execution_module.blueprint_has_slice_contract(str(slice_path)),
-        "metadata_exists": (slice_path / ".slice-meta.json").is_file(),
     }
 
 
@@ -994,7 +961,6 @@ def bootstrap_next_slice(
         planning_module, selector, explicit_scope
     )
     execution_scope_context = execution_scope_for_target(
-        planning_module,
         execution_module,
         target_type,
         Path(target_dir),
@@ -1086,7 +1052,6 @@ def resume_execution(
         planning_module, selector, explicit_scope
     )
     execution_scope_context = execution_scope_for_target(
-        planning_module,
         execution_module,
         target_type,
         Path(target_dir),

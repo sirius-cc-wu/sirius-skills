@@ -111,26 +111,34 @@ def ensure_execution_registry(
     return slice_dir
 
 
-def resolve_slice_id(module, requested_id: Optional[str], name: str) -> str:
+def resolve_slice_id(
+    module,
+    requested_id: Optional[str],
+    name: str,
+    scope_context: Optional[object] = None,
+) -> str:
     if requested_id:
         return requested_id
 
-    conventions_config = module.load_conventions_config(required=False)
-    rows = module.parse_registry()
+    conventions_config = module.load_conventions_config(
+        required=False, scope_context=scope_context
+    )
+    rows = module.parse_registry(scope_context=scope_context)
     return module.infer_id_from_branch(conventions_config) or module.generate_hash_slice_id(
         rows, name
     )
 
 
-def sync_planning_handoff(
+def resolve_planning_handoff(
     feature_name: str,
-    slice_id: str,
     *,
     validate_dirty: bool = True,
     explicit_scope: Optional[str] = None,
 ) -> Optional[Dict[str, object]]:
     planning = load_planning_module()
-    scope_context = planning.SCOPE_RUNTIME.resolve_scope_context()
+    scope_context = planning.SCOPE_RUNTIME.resolve_scope_context(
+        explicit_scope=explicit_scope
+    )
     merged_config = planning.SCOPE_RUNTIME.load_merged_config(scope_context, "planning")
     if not merged_config:
         return None
@@ -158,6 +166,40 @@ def sync_planning_handoff(
                 "Planning artifacts must be committed before slice bootstrap. "
                 f"Dirty target paths: {', '.join(dirty_worktree_paths)}"
             )
+    return {
+        "planning": planning,
+        "rows": rows,
+        "feature": feature,
+        "feature_dir": feature_dir,
+        "metadata": metadata,
+        "scope_context": scope_context,
+        "is_subfeature": is_subfeature,
+    }
+
+
+def sync_planning_handoff(
+    feature_name: str,
+    slice_id: str,
+    *,
+    planning_handoff: Optional[Dict[str, object]] = None,
+    validate_dirty: bool = True,
+    explicit_scope: Optional[str] = None,
+) -> Optional[Dict[str, object]]:
+    handoff = planning_handoff or resolve_planning_handoff(
+        feature_name,
+        validate_dirty=validate_dirty,
+        explicit_scope=explicit_scope,
+    )
+    if handoff is None:
+        return None
+
+    planning = handoff["planning"]
+    rows = handoff["rows"]
+    feature = handoff["feature"]
+    feature_dir = str(handoff["feature_dir"])
+    metadata = handoff["metadata"]
+    scope_context = handoff["scope_context"]
+    is_subfeature = bool(handoff["is_subfeature"])
 
     if is_subfeature:
         subfeatures = load_subfeature_module()
@@ -213,81 +255,21 @@ def sync_planning_handoff(
     }
 
 
-def resolve_planning_handoff(feature_name: str) -> Optional[Dict[str, object]]:
-    planning = load_planning_module()
-    scope_context = planning.SCOPE_RUNTIME.resolve_scope_context()
-    merged_config = planning.SCOPE_RUNTIME.load_merged_config(scope_context, "planning")
-    if not merged_config:
-        return None
-
-    rows, feature, scope_context = planning.resolve_feature_lookup(feature_name)
-    if feature is None:
-        return None
-
-    feature_dir = planning.feature_dir_for_row(feature, scope_context=scope_context)
-    metadata = planning.read_metadata(feature_dir)
-    current_status = str(metadata["status"])
-    is_subfeature = Path(planning.subfeature_metadata_path_for(feature_dir)).exists()
-    if current_status not in {"planning_reviewed", "slice_ready"}:
-        raise RuntimeError(
-            f"{'Subfeature' if is_subfeature else 'Planning feature'} '{feature['feature']}' "
-            "must be in 'planning_reviewed' or 'slice_ready' before slice bootstrap. "
-            f"Current status: '{current_status}'."
-        )
-    dirty_worktree_paths = target_dirty_worktree_paths(Path(feature_dir))
-    if dirty_worktree_paths:
-        raise RuntimeError(
-            "Planning artifacts must be committed before slice bootstrap. "
-            f"Dirty target paths: {', '.join(dirty_worktree_paths)}"
-        )
-    return {
-        "planning": planning,
-        "feature": feature,
-        "feature_dir": feature_dir,
-        "scope_context": scope_context,
-        "is_subfeature": is_subfeature,
-    }
-
-
-def ensure_subfeature_execution_scope(
-    execution_module,
-    planning,
-    subfeature_dir: Path,
-    root_scope_context: object,
-) -> object:
-    skills_dir = subfeature_dir / ".skills"
-    skills_dir.mkdir(parents=True, exist_ok=True)
-    execution_path = skills_dir / "execution.json"
-
-    root_execution = execution_module.load_config(
-        required=False, scope_context=root_scope_context
-    )
-    if not execution_path.exists():
-        execution_module.write_config(
-            "slices",
-            preferred_workflow=str(root_execution["preferred_workflow"]),
-            auto_start_implementation=bool(root_execution["auto_start_implementation"]),
-            scope_context=type("ScopeContextLike", (), {"scope_root": subfeature_dir})(),
-        )
-
-    return execution_module.resolve_execution_scope_context(explicit_scope=subfeature_dir)
-
-
 def bootstrap_slice(module, raw_args: List[str], requested_slice_dir: Optional[str]) -> Dict[str, object]:
     requested_id, name = parse_bootstrap_args(module, raw_args)
     planning_handoff = resolve_planning_handoff(name)
     execution_scope_context = module.resolve_execution_scope_context()
     if planning_handoff is not None and bool(planning_handoff["is_subfeature"]):
-        execution_scope_context = ensure_subfeature_execution_scope(
-            module,
-            planning_handoff["planning"],
+        execution_scope_context, _ = module.ensure_local_execution_scope(
             Path(str(planning_handoff["feature_dir"])),
             planning_handoff["scope_context"],
         )
     initialized_slice_dir = ensure_execution_registry(
         module, requested_slice_dir, scope_context=execution_scope_context
     )
-    slice_id = resolve_slice_id(module, requested_id, name)
+    slice_id = resolve_slice_id(
+        module, requested_id, name, scope_context=execution_scope_context
+    )
 
     folder, created = module.create_slice(slice_id, name, scope_context=execution_scope_context)
     rows = module.parse_registry(scope_context=execution_scope_context)
@@ -305,10 +287,7 @@ def bootstrap_slice(module, raw_args: List[str], requested_slice_dir: Optional[s
     planning_sync = sync_planning_handoff(
         name,
         str(row["id"]),
-        validate_dirty=False,
-        explicit_scope=str(planning_handoff["scope_context"].scope_root)
-        if planning_handoff is not None
-        else None,
+        planning_handoff=planning_handoff,
     )
     return {
         "slice_id": row["id"],
