@@ -12,9 +12,11 @@ Use a **two-layer workflow**:
 1. **Planning layer**
    - `guide-scope` (optional scope-aware entrypoint)
    - `guide-planning`
-   - `propose`
-   - `add-subfeature`
-   - `migrate-slices` (for co-locating execution slices)
+    - `propose`
+    - `add-subfeature`
+    - `migrate-subfeatures` (for legacy change packets)
+    - `migrate-planning-model` (for simplified feature/subfeature layout repair)
+    - `migrate-slices` (for co-locating execution slices)
    - `assess`
    - `research` (when upstream comparison materially affects planning shape)
    - `discover`
@@ -47,7 +49,7 @@ planning packet explicitly documents a temporary parallel transition.
 
 After each planning phase writes or updates its repository artifacts, persist the matching metadata transition with the owner script for that planning scope. Canonical features should use `sirius manage-planning sync-status <feature-selector> --through <expected-status>`. Subfeatures should use `sirius manage-subfeatures set-status <feature-selector> <subfeature-id> <expected-status>` through `reviewed`, then `sirius manage-subfeatures approve ...` to record explicit approval and any ready slice IDs. Use adjacent advancement by default and reserve explicit overrides for deliberate repair or terminal execution states.
 
-The execution layer works one implementation-ready slice at a time, starting with `slice` bootstrap from approved committed planning artifacts. For reviewed subfeatures, that approval must be recorded in `.subfeature-meta.json` before bootstrap. `ship` can sit above that flow when an approved and committed feature or subfeature should be worked as one dependency-aware backlog; it should follow increment order first, then slice dependencies within the current increment, while still handing each concrete slice to the next existing single-slice owner such as `brief`, `blueprint`, repository implementation, `review-execution`, `close-slice`, or `commit`. When the same backlog should execute on its own git branch and checkout, `ship-worktree` can sit one layer above `ship` to create or reuse a dedicated worktree, run `ship` there, and later hand the branch off to PR creation. For faster manual local work, use the shared `sirius worktree get` / `return` / `status` pool rooted at the owning repo's sibling `<repo>.worktrees` directory.
+The execution layer works one implementation-ready slice at a time, starting with `slice` bootstrap from approved committed planning artifacts. For reviewed subfeatures, that approval must be recorded in `.subfeature-meta.json` before bootstrap. `ship` can sit above that flow when an approved and committed subfeature should be worked as one dependency-aware backlog; direct feature targets remain compatibility for existing packets. It should follow increment order first, then slice dependencies within the current increment, while still handing each concrete slice to the next existing single-slice owner such as `brief`, `blueprint`, repository implementation, `review-execution`, `close-slice`, or `commit`. When the same backlog should execute on its own git branch and checkout, `ship-worktree` can sit one layer above `ship` to create or reuse a dedicated worktree, run `ship` there, and later hand the branch off to PR creation. For faster manual local work, use the shared `sirius worktree get` / `return` / `status` pool rooted at the owning repo's sibling `<repo>.worktrees` directory.
 
 When accelerators are enabled, the default operator path compresses to one
 planning accelerator surface and one execution accelerator surface, with an
@@ -247,10 +249,14 @@ Use `discover` to define:
 - the constraints
 - the first set of user stories or capabilities
 
+In the simplified planning model, canonical features own the stable story
+catalog and subfeatures reference those parent story IDs. Do not create a
+subfeature-local `user-stories.md` for new work.
+
 Expected outputs:
 
 - `discover.md`
-- optional early `user-stories.md`
+- feature-level `user-stories.md` when stable story IDs are needed
 
 If `reference-research.md` exists, use it to inform discovery framing,
 constraints, and upstream-influenced goals. If it does not exist, discovery can
@@ -322,8 +328,8 @@ sirius scaffold-breakdown <feature-slug>
 The helper uses `.skills/planning.json` field `planning_dir` when present and
 otherwise defaults to `docs/features`.
 
-For an existing subfeature, scaffold directly into the selected change
-packet path instead:
+For an existing subfeature, scaffold directly into the selected delivery-unit
+path instead:
 
 ```bash
 sirius scaffold-breakdown \
@@ -335,7 +341,9 @@ When the target is a real subfeature, the scaffold seeds subfeature context from
 stay tied to the affected canonical stories, slices, and baseline docs.
 Those breakdown artifacts remain subfeature-local; they are not default
 finalization targets for the canonical feature's `slice-planning.md` or
-`slice-traceability.md`.
+`slice-traceability.md`. New executable planning should prefer this subfeature
+path; direct feature-level breakdown remains a compatibility path for existing
+packets.
 
 Review checkpoint:
 
@@ -546,14 +554,35 @@ explicit maintenance tooling rather than bundling deletion into slice closure.
 ```text
 <planning_dir>/<feature-slug>/
   discover.md
+  user-stories.md
+  .planning-meta.json
+  subfeatures/
+    README.md
+    registry.json
+```
+
+Keep discovery and stable story context in a feature-local planning folder so
+the product context stays together. Every feature should have a `subfeatures/`
+registry. The parent feature folder is still a repository document area; it is
+not a slice-execution slice. By default, `planning_dir` is `docs/features`;
+projects can override it in `.skills/planning.json`.
+
+### Subfeature delivery planning
+
+```text
+<planning_dir>/<feature-slug>/subfeatures/<subfeature-id>/
+  discover.md
+  .subfeature-meta.json
+  impact-analysis.md        # when existing baseline impact matters
   system-design.md
   ui-design.md              # optional
-  user-stories.md
   slice-planning.md
   slice-traceability.md
 ```
 
-Keep discovery, design, and breakdown artifacts in a feature-local planning folder so the project context stays together. The planning folder is still a repository document area; it is not a slice-execution slice. By default, `planning_dir` is `docs/features`; projects can override it in `.skills/planning.json`.
+Use subfeatures as the normal executable planning and delivery unit. Subfeature
+metadata should carry parent feature `story_ids`; subfeatures should not create
+their own `user-stories.md` catalogs.
 
 ### Proposal staging
 
@@ -597,11 +626,19 @@ my-app/
     features/
       habit-tracker/
         discover.md
-        system-design.md
-        ui-design.md
         user-stories.md
-        slice-planning.md
-        slice-traceability.md
+        subfeatures/
+          registry.json
+          habit-storage/
+            discover.md
+            system-design.md
+            slice-planning.md
+            slice-traceability.md
+          habit-interactions/
+            discover.md
+            system-design.md
+            slice-planning.md
+            slice-traceability.md
   slices/
     HAB-101-create-schema/
       brief.md
@@ -614,7 +651,7 @@ my-app/
       blueprint.md
 ```
 
-In this example, the default planning layout `docs/features/habit-tracker/` holds the feature-level planning artifacts, while each executable slice gets its own centralized execution slice under `slices/`.
+In this example, the default planning layout `docs/features/habit-tracker/` holds the feature-level discovery and story catalog, subfeatures hold executable planning, and each executable slice gets its own centralized execution slice under `slices/`.
 
 ## Operating Rules
 

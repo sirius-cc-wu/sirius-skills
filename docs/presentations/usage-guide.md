@@ -56,7 +56,7 @@ Stored in `docs/features/<feature-slug>/`
 
 Default planned slice IDs should use a scope-prefixed format such as
 `atf-read-file` or `shp-store` rather than bare `slice-*` placeholders.
-- `subfeatures/<change-id>/`: A planning-scoped delta for evolving an existing feature.
+- `subfeatures/<change-id>/`: The default delivery planning unit under a feature-owned story catalog.
 - `subfeatures/<change-id>/impact-analysis.md`: Change-scoped impact record for feature evolution.
 
 ---
@@ -100,7 +100,7 @@ Stored in `slices/<slice-id>-<slug>/`
 
 1.  **Propose**: `propose` captures speculative or not-yet-accepted work.
 2.  **Hand Off to Planning**: `guide-planning` promotes accepted proposal artifacts into canonical feature planning and then continues the planning workflow.
-3.  **Plan a Net-New Feature**: `guide-planning` -> `discover` -> `design` -> `breakdown`.
+3.  **Plan a Net-New Feature**: `guide-planning` -> `discover` creates feature context and stories, then `add-subfeature` creates delivery units for `design` and `breakdown`.
 4.  **Evolve an Existing Feature**: `guide-planning` -> `add-subfeature` -> `assess` -> `design` -> `breakdown`.
 5.  **Review**: `review-planning` confirms the plan or subfeature is ready.
 6.  **Approve**: A human explicitly approves the reviewed planning artifacts.

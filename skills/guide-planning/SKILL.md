@@ -22,7 +22,9 @@ Use this skill as the planning-layer canonical entrypoint when you need to decid
 
 Use `guide-planning` when you need to decide the next planning step before slice-scoped execution begins.
 
-- If no feature planning folder exists yet, initialize one and route to `discover`.
+- If no feature planning folder exists yet, initialize one with its default
+  `subfeatures/` registry and route to `discover`.
+  In short: initialize one and route to `discover`.
 - If the work is still speculative, exploratory, or not yet accepted as a canonical feature, route to `propose`.
 - If the user wants an accepted proposal promoted into canonical planning, perform that promotion here and then route to `discover`.
 - If the request adds or reshapes a durable child capability under an existing feature, route to `add-subfeature`.
@@ -39,7 +41,11 @@ Use `guide-planning` when you need to decide the next planning step before slice
   For workflow-shaping changes, expect the review pass to verify any declared
   consolidation story before the packet can become `planning_reviewed`.
 - If planning has been reviewed but not yet explicitly approved, stop for human approval instead of advancing into execution.
-- If planning has been approved and committed and the feature already has execution-ready work items with explicit slice IDs, hand off to the execution layer through `slice`.
+- If implementation planning is needed for a canonical feature, create or select
+  a subfeature first; subfeatures are the default execution-planning unit.
+- If planning has been approved and committed and the selected subfeature or
+  compatibility feature packet already has execution-ready work items with
+  explicit slice IDs, hand off to the execution layer through `slice`.
 - If a slice-scoped execution slice already exists, hand off to `guide-execution`.
 
 ## Workflow Boundary
@@ -49,6 +55,8 @@ Use `guide-planning` when you need to decide the next planning step before slice
 - Own the transition from accepted proposal to canonical feature planning.
 - Keep feature-planning readiness in planning metadata.
 - For subfeatures, treat `.subfeature-meta.json` as the writable lifecycle source and only use `guide-planning`'s metadata view as a derived projection. That derived view should stay `planning_reviewed` until explicit approval is recorded in subfeature metadata, and only become `slice_ready` once approved reviewed work also has ready slice IDs recorded.
+- Treat the top-level planning registry as feature-only. Subfeature lookup is
+  derived from feature-local `subfeatures/registry.json` and `.subfeature-meta.json`.
 - Keep `research` advisory within the existing planning lifecycle instead of introducing a new readiness state.
 - Do not duplicate execution-slice lifecycle state here.
 - Stop at reviewed planning until the user approves the planning artifacts.

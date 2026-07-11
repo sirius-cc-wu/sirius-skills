@@ -262,6 +262,8 @@ def convert_legacy_metadata(
             "finalized_at": finalized_at,
         }
     )
+    if not metadata.get("story_ids"):
+        metadata["story_ids"] = list(metadata.get("affected_story_ids") or [])
     return metadata, legacy_status
 
 

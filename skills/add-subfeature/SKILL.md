@@ -31,6 +31,7 @@ missing capability on top of that shipped work.
 - a subfeature ID or short slug
 - an optional subfeature type such as `additive`, `narrowing`, `superseding`, or `replacement`
 - an optional summary of why the feature needs the child capability
+- optional parent feature story IDs that this subfeature delivers or changes
 
 ## Required Output
 
@@ -45,7 +46,9 @@ missing capability on top of that shipped work.
 2. Initialize the feature-local subfeature registry with `manage_subfeatures.py init-feature <feature>` when needed.
 3. Create the durable child planning folder with `manage_subfeatures.py add <feature> <subfeature-id>`.
 4. Treat the generated `discover.md` as a bootstrap stub, not finished discovery. Replace it with the real discovery packet via `discover`.
-5. Write the requested child capability in the subfeature-local `discover.md`.
+5. Write the requested child capability in the subfeature-local `discover.md`,
+   linking back to parent feature story IDs rather than creating a
+   subfeature-local `user-stories.md`.
    For `narrowing`, `superseding`, or `replacement` work, declare what existing
    capability, artifact, command path, or validation path is affected and what
    simplification or retirement the child capability is expected to produce.
@@ -58,6 +61,7 @@ missing capability on top of that shipped work.
 ## Source of Truth Rules
 
 - Keep `docs/features/<feature-slug>/` as the parent feature planning folder.
+- Keep stable story definitions in `docs/features/<feature-slug>/user-stories.md`.
 - Treat `docs/features/<feature-slug>/subfeatures/<subfeature-id>/` as a durable planning folder, not a temporary delta and not an execution slice.
 - Do not silently fold subfeature docs back into the parent feature docs.
 - Let the subfeature folder keep its own lifecycle through `.subfeature-meta.json`.
@@ -72,6 +76,11 @@ sirius manage-subfeatures init-feature "<feature-slug>"
 
 # Create a new additive subfeature
 sirius manage-subfeatures add "<feature-slug>" "<subfeature-id>"
+
+# Create a subfeature linked to parent feature stories
+sirius manage-subfeatures add \
+  "<feature-slug>" "<subfeature-id>" \
+  --story-id "CHK-001"
 
 # Create a superseding subfeature with a short summary
 sirius manage-subfeatures add \

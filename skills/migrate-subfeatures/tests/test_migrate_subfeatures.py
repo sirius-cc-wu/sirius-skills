@@ -175,9 +175,8 @@ def test_migrate_converts_legacy_change_packet_and_resyncs_registries(
 
     subfeature_dir = feature_dir / "subfeatures" / "replace-legacy-flow"
     metadata = json.loads((subfeature_dir / ".subfeature-meta.json").read_text(encoding="utf-8"))
-    planning_meta = load_module(PLANNING_SCRIPT, "manage_planning_for_migrate").read_metadata(
-        str(subfeature_dir)
-    )
+    planning_module = load_module(PLANNING_SCRIPT, "manage_planning_for_migrate")
+    planning_meta = planning_module.read_metadata(str(subfeature_dir))
     subfeature_registry = json.loads((feature_dir / "subfeatures" / "registry.json").read_text(encoding="utf-8"))
     planning_registry = json.loads((tmp_path / "docs" / "features" / "registry.json").read_text(encoding="utf-8"))
 
@@ -192,9 +191,10 @@ def test_migrate_converts_legacy_change_packet_and_resyncs_registries(
     assert (subfeature_dir / "discover.md").exists()
     assert not (feature_dir / "changes").exists()
     assert subfeature_registry["subfeatures"][0]["subfeature_id"] == "replace-legacy-flow"
+    assert [row["feature"] for row in planning_registry["features"]] == ["checkout"]
     assert any(
         row["path"] == "docs/features/checkout/subfeatures/replace-legacy-flow/"
-        for row in planning_registry["features"]
+        for row in planning_module.lookup_rows()
     )
 
 

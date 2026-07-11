@@ -617,7 +617,7 @@ def resolve_backlog(selector: str, explicit_scope: Optional[str] = None) -> Back
     )
     execution_rows = execution_module.parse_registry(scope_context=scope_context)
     execution_status_by_id = {str(row["id"]): str(row["status"]) for row in execution_rows}
-    planning_rows = planning_module.parse_registry(scope_context=scope_context)
+    planning_rows = planning_module.lookup_rows(scope_context=scope_context)
     ship_config = ship_accelerator_config(scope_context, execution_module)
     preflight_mode = normalize_preflight_mode(ship_config)
     sibling_subfeature_rows: Optional[List[Dict[str, object]]] = None

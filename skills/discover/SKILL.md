@@ -18,9 +18,13 @@ Use this skill at the start of a project, capability, or larger feature before s
 
 - `<feature_path>/discover.md`
 
-Expected companion output for most canonical features:
+Required companion output for canonical features that will continue into planning:
 
 - `<feature_path>/user-stories.md`
+
+Subfeatures do not own a separate story catalog. For subfeatures created by
+`add-subfeature`, reference parent feature story IDs in `discover.md` and
+`.subfeature-meta.json` instead of creating `<subfeature_path>/user-stories.md`.
 
 For subfeatures created by `add-subfeature`, the initial `discover.md` may
 already exist as a bootstrap scaffold marked by
@@ -33,10 +37,10 @@ Treat `user-stories.md` as the default, not the exception, when:
 - later `design`, `breakdown`, or `slice-traceability` work is likely
 - stable story IDs will help preserve traceability across subfeatures or slices
 
-You may omit `user-stories.md` only when the discovery target is genuinely too
-small or too corrective to benefit from stable story IDs. If you omit it,
-record that choice explicitly in `discover.md` so downstream planning does not
-have to guess whether the omission was intentional.
+You may omit feature-level `user-stories.md` only when the discovery target is
+genuinely too small or too corrective to benefit from stable story IDs. If you
+omit it, record that choice explicitly in `discover.md` so downstream planning
+does not have to guess whether the omission was intentional.
 
 Resolve `<feature_path>` from the repository planning layout:
 
@@ -105,9 +109,10 @@ Prefer:
    other relevant context.
 3. Write `discover.md` with explicit problem framing, actors, goals,
    constraints, risks, and next-step guidance.
-4. Create `user-stories.md` with stable story identifiers unless the packet is
-   intentionally too small for story-level planning; when omitting it, state
-   why in `discover.md`.
+4. For canonical features, create `user-stories.md` with stable story
+   identifiers unless the packet is intentionally too small for story-level
+   planning; when omitting it, state why in `discover.md`. For subfeatures,
+   reference parent story IDs instead of creating a subfeature-local story file.
 5. For canonical features, run `sirius manage-planning sync-status <feature-selector> --through discovery_ready` so `.planning-meta.json` records that discovery is complete.
 6. For subfeatures under `.../subfeatures/<subfeature-id>/`, do not try to force `discovery_ready` through `manage_planning.py`. Subfeature lifecycle stays in `.subfeature-meta.json`, authored discovery still leaves the raw subfeature at `draft`, and the next owner is typically `assess`.
 7. Stop when the work is concrete enough for the next planning owner:

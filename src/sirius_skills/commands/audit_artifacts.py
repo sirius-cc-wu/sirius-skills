@@ -18,7 +18,6 @@ from sirius_skills.lib.workflow_state.inventory import (
     load_archived_slice_summary_index,
     normalize_dir_relpath,
     normalize_registry_path,
-    planning_row_artifact_type,
 )
 from sirius_skills.lib.workflow_state.models import (
     Inventory,
@@ -371,6 +370,18 @@ def _audit_subfeatures(
             continue
         assert metadata is not None
         metadata_by_path[relpath] = metadata
+        if (subfeature_dir / "user-stories.md").exists():
+            add_finding(
+                findings,
+                selected,
+                "subfeature",
+                subfeature_id,
+                relpath,
+                "structure",
+                "subfeature_local_user_stories_deprecated",
+                "warning",
+                "Subfeature-local user-stories.md is deprecated; keep story definitions in the parent feature and reference parent story IDs from subfeature metadata.",
+            )
         ok, issues, _ = inventory.context.subfeatures.validate_subfeature_state(
             str(subfeature_dir), metadata
         )
@@ -818,7 +829,7 @@ def run_audit(
     all_slice_dirs = iter_all_slice_dirs(inventory)
 
     _registry_findings(findings, selected, proposal_status, inventory.proposal_dirs)
-    _registry_findings(findings, selected, planning_status, inventory.feature_dirs + iter_subfeature_dirs(inventory))
+    _registry_findings(findings, selected, planning_status, inventory.feature_dirs)
     _registry_findings(findings, selected, slice_status, all_slice_dirs)
 
     for status in inventory.registry_statuses:
@@ -846,22 +857,8 @@ def run_audit(
         {
             normalize_registry_path(str(row["path"]))
             for row in inventory.planning_rows
-            if planning_row_artifact_type(row) == "feature"
         },
         {normalize_dir_relpath(path) for path in inventory.feature_dirs},
-        "planning_registry_path_missing",
-        "planning_registry_entry_missing",
-    )
-    _compare_paths(
-        findings,
-        selected,
-        "subfeature",
-        {
-            normalize_registry_path(str(row["path"]))
-            for row in inventory.planning_rows
-            if planning_row_artifact_type(row) == "subfeature"
-        },
-        {normalize_dir_relpath(path) for path in iter_subfeature_dirs(inventory)},
         "planning_registry_path_missing",
         "planning_registry_entry_missing",
     )

@@ -139,14 +139,16 @@ def test_build_repair_result_applies_registry_repairs(tmp_path, monkeypatch):
 
     proposal_rows = env["propose"].load_registry()
     planning_rows = env["planning"].parse_registry()
+    subfeature_rows = env["subfeatures"].load_registry(str(env["feature_dir"]))
     _, _, slice_registry = env["execution"].get_registry_paths(required_config=False)
     slice_rows = env["execution"].load_registry_json(slice_registry)
 
     assert payload["summary"]["applied_actions"] == 4
     assert len(proposal_rows) == 1
     assert proposal_rows[0]["proposal"] == "checkout-audit"
-    assert {row["feature"] for row in planning_rows} == {"checkout", "replace-legacy-flow"}
-    assert any("/subfeatures/replace-legacy-flow/" in row["path"] for row in planning_rows)
+    assert {row["feature"] for row in planning_rows} == {"checkout"}
+    assert {row["subfeature_id"] for row in subfeature_rows} == {"replace-legacy-flow"}
+    assert any("/subfeatures/replace-legacy-flow/" in row["path"] for row in subfeature_rows)
     assert len(slice_rows) == 1
     assert slice_rows[0]["id"] == "CHK-101"
     assert payload["summary"]["suggested_repairs"] == 0
@@ -222,4 +224,3 @@ def test_cli_json_reports_selected_artifact_layer(tmp_path, monkeypatch, capsys)
 
     assert payload["summary"]["planned_actions"] == 1
     assert payload["actions"][0]["artifact_type"] == "slice"
-

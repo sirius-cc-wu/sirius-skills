@@ -125,8 +125,7 @@ def sync_planning_handoff(feature_name: str, slice_id: str) -> Optional[Dict[str
     if not merged_config:
         return None
 
-    rows = planning.parse_registry(scope_context=scope_context)
-    feature = planning.find_feature(rows, feature_name, scope_context=scope_context)
+    rows, feature, scope_context = planning.resolve_feature_lookup(feature_name)
     if feature is None:
         return None
 

@@ -106,10 +106,9 @@ def _sync_feature_completion(
     planning = inventory.context.planning
     scope_context = planning.SCOPE_RUNTIME.resolve_scope_context()
     planning.sync_registry(scope_context=scope_context)
-    rows = planning.parse_registry(scope_context=scope_context)
-    feature = planning.find_feature(rows, owner_path, scope_context=scope_context)
+    rows, feature, scope_context = planning.resolve_feature_lookup(owner_path)
     if feature is None:
-        feature = planning.find_feature(rows, owner_id, scope_context=scope_context)
+        rows, feature, scope_context = planning.resolve_feature_lookup(owner_id)
     if feature is None:
         raise RuntimeError(
             f"Unable to resolve planning feature '{owner_id}' for completion handoff."
@@ -188,12 +187,9 @@ def _sync_subfeature_completion(
     subfeatures = inventory.context.subfeatures
     scope_context = planning.SCOPE_RUNTIME.resolve_scope_context()
     planning.sync_registry(scope_context=scope_context)
-    rows = planning.parse_registry(scope_context=scope_context)
-    subfeature_feature = planning.find_feature(rows, owner_path, scope_context=scope_context)
+    rows, subfeature_feature, scope_context = planning.resolve_feature_lookup(owner_path)
     if subfeature_feature is None:
-        subfeature_feature = planning.find_feature(
-            rows, owner_id, scope_context=scope_context
-        )
+        rows, subfeature_feature, scope_context = planning.resolve_feature_lookup(owner_id)
     if subfeature_feature is None:
         raise RuntimeError(
             f"Unable to resolve planning subfeature '{owner_id}' for completion handoff."

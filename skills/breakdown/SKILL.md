@@ -5,7 +5,10 @@ description: Converts repo stories and planning docs into directly executable, d
 
 # Breakdown
 
-Use this skill after feature-level discovery and design to turn repo stories into directly executable work.
+Use this skill after discovery and design to turn repo stories into directly
+executable work. Prefer running breakdown against a subfeature delivery unit;
+direct feature-level breakdown is retained as compatibility for existing
+planning packets.
 
 If you need a starting folder for a new feature, scaffold the default breakdown files with:
 
@@ -23,7 +26,7 @@ docs/features/<feature-slug>/slice-traceability.md
 If `.skills/planning.json` defines `planning_dir`, the scaffold uses
 `<planning_dir>/<feature-slug>/` instead unless `--base-dir` is passed.
 
-For subfeature-local breakdown work, you can also scaffold directly into an existing
+For subfeature-local breakdown work, scaffold directly into an existing
 subfeature path:
 
 ```bash
@@ -51,8 +54,8 @@ stories, slices, and baseline docs.
 
 Resolve `<feature_path>` as either:
 
-- `<planning_dir>/<feature-slug>/` for canonical feature planning
-- `<planning_dir>/<feature-slug>/subfeatures/<subfeature-id>/` for a selected subfeature
+- `<planning_dir>/<feature-slug>/subfeatures/<subfeature-id>/` for the preferred delivery-unit path
+- `<planning_dir>/<feature-slug>/` only for legacy direct-feature planning packets
 
 - If `.skills/planning.json` defines `planning_dir`, use that as `<planning_dir>`.
 - Otherwise default to `docs/features`.
@@ -203,9 +206,10 @@ Otherwise, use an opaque slice ID and keep the repo story ID in traceability met
 
 ## Workflow
 
-1. Read `discover.md`, `system-design.md`, optional `ui-design.md`, and `user-stories.md`.
-   For subfeatures, also read `impact-analysis.md` and the canonical feature's
-   `user-stories.md`, `slice-planning.md`, and `slice-traceability.md`.
+1. Read the target `discover.md`, `system-design.md`, and optional
+   `ui-design.md`. For subfeatures, read parent feature `user-stories.md` as the
+   story catalog and use subfeature `story_ids`/impact metadata to select the
+   affected parent stories.
 2. Validate that each story has scope, acceptance notes, an explicit size, and an explicit risk rating.
 3. Split oversized work into smaller execution packets and group them into increments with clear demo outcomes.
 4. Choose `single-agent` or `multi-agent` handling where relevant and record lane assumptions.
@@ -232,3 +236,5 @@ When generating `slice-traceability.md`, start from `assets/slice-traceability-t
 - For subfeatures, only plan the new or amended slices needed by the change;
   keep references to superseded canonical slices in notes or dependencies rather
   than reusing them as subfeature-local slice IDs.
+- Do not create subfeature-local `user-stories.md`; preserve stories in the
+  parent feature and map planned slices back to those IDs.

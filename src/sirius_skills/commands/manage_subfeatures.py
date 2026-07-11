@@ -259,6 +259,8 @@ def resolve_parent_feature(
     if not feature:
         raise RuntimeError(f"Canonical feature not found: {selector}")
     feature_dir = manage_planning.feature_dir_for_row(feature, scope_context=scope_context)
+    if os.path.exists(manage_planning.subfeature_metadata_path_for(feature_dir)):
+        raise RuntimeError(f"Canonical feature not found: {selector}")
     return feature_dir, str(feature["feature"]), scope_context
 
 
@@ -327,8 +329,10 @@ def build_metadata(
     subfeature_id: str,
     subfeature_type: str = "additive",
     summary: Optional[str] = None,
+    story_ids: Optional[List[str]] = None,
 ) -> Dict[str, object]:
     timestamp = now_timestamp()
+    normalized_story_ids = normalize_string_list(story_ids or [], "Story IDs")
     return {
         "subfeature_id": validate_slug(subfeature_id, "Subfeature ID"),
         "parent_feature_slug": validate_slug(parent_feature_slug, "Parent feature slug"),
@@ -338,8 +342,9 @@ def build_metadata(
         "updated_at": timestamp,
         "subfeature_type": normalize_subfeature_type(subfeature_type),
         "summary": normalize_optional_string(summary, "Summary"),
+        "story_ids": normalized_story_ids,
         "affected_artifacts": [],
-        "affected_story_ids": [],
+        "affected_story_ids": normalized_story_ids,
         "affected_slice_ids": [],
         "ready_slice_ids": [],
         "consolidation": None,
@@ -372,6 +377,15 @@ def normalize_metadata(payload: object) -> Dict[str, object]:
     if approval_status == "approved" and approved_at is None:
         approved_at = finalized_at or updated_at
 
+    affected_story_ids = normalize_string_list(
+        payload.get("affected_story_ids"), "Affected story IDs"
+    )
+    story_ids = normalize_string_list(
+        payload.get("story_ids", affected_story_ids), "Story IDs"
+    )
+    if not story_ids:
+        story_ids = affected_story_ids
+
     return {
         "subfeature_id": validate_slug(subfeature_id, "Subfeature ID"),
         "parent_feature_slug": validate_slug(
@@ -386,12 +400,11 @@ def normalize_metadata(payload: object) -> Dict[str, object]:
             str(payload.get("subfeature_type", "additive"))
         ),
         "summary": normalize_optional_string(payload.get("summary"), "Summary"),
+        "story_ids": story_ids,
         "affected_artifacts": normalize_string_list(
             payload.get("affected_artifacts"), "Affected artifacts"
         ),
-        "affected_story_ids": normalize_string_list(
-            payload.get("affected_story_ids"), "Affected story IDs"
-        ),
+        "affected_story_ids": affected_story_ids,
         "affected_slice_ids": normalize_string_list(
             payload.get("affected_slice_ids"), "Affected slice IDs"
         ),
@@ -445,6 +458,7 @@ def write_discover_stub(
     subfeature_id: str,
     subfeature_type: str,
     summary: Optional[str],
+    story_ids: Optional[List[str]] = None,
 ) -> None:
     discover_path = os.path.join(subfeature_dir, DISCOVER_FILE)
     if os.path.exists(discover_path):
@@ -452,6 +466,9 @@ def write_discover_stub(
 
     title = subfeature_id.replace("-", " ").strip().title()
     summary_line = summary or "Describe why this existing feature needs a durable subfeature."
+    story_lines = "\n".join(f"- Parent story: `{story_id}`" for story_id in story_ids or [])
+    if not story_lines:
+        story_lines = "- Parent story: `TBD`"
     content = (
         f"{DISCOVER_STUB_MARKER}\n"
         f"# Discover: {title}\n\n"
@@ -474,6 +491,9 @@ def write_discover_stub(
         "- `discover.md`\n"
         "- `system-design.md`\n"
         "- `user-stories.md`\n\n"
+        "## Parent Story Links\n\n"
+        f"{story_lines}\n\n"
+        "Keep story definitions in the parent feature's `user-stories.md`; do not create a subfeature-local story catalog.\n\n"
         "## Subfeature Execution Planning\n\n"
         "- Add or update `slice-planning.md` and `slice-traceability.md` inside this subfeature folder for any new execution work.\n"
         "- Treat the parent feature docs as baseline context unless impact analysis explicitly narrows or supersedes them.\n\n"
@@ -617,6 +637,7 @@ def create_subfeature(
     subfeature_type: str,
     summary: Optional[str],
     scope_context: object,
+    story_ids: Optional[List[str]] = None,
 ) -> Tuple[str, bool]:
     rows = load_registry(feature_dir)
     existing = find_subfeature(rows, subfeature_id)
@@ -630,6 +651,7 @@ def create_subfeature(
         subfeature_id,
         subfeature_type=subfeature_type,
         summary=summary,
+        story_ids=story_ids,
     )
     write_metadata(subfeature_dir, metadata)
     write_discover_stub(
@@ -638,6 +660,7 @@ def create_subfeature(
         subfeature_id,
         metadata["subfeature_type"],
         summary,
+        list(metadata.get("story_ids") or []),
     )
 
     rows.append(
@@ -668,6 +691,7 @@ def update_subfeature_status(
     review_note: Optional[str] = None,
     affected_artifacts: Optional[List[str]] = None,
     affected_story_ids: Optional[List[str]] = None,
+    story_ids: Optional[List[str]] = None,
     affected_slice_ids: Optional[List[str]] = None,
     consolidation: Optional[Dict[str, object]] = None,
 ) -> Tuple[bool, str]:
@@ -694,6 +718,8 @@ def update_subfeature_status(
         updated_metadata["subfeature_type"] = normalize_subfeature_type(subfeature_type)
     if summary is not None:
         updated_metadata["summary"] = normalize_optional_string(summary, "Summary")
+    if story_ids is not None:
+        updated_metadata["story_ids"] = normalize_string_list(story_ids, "Story IDs")
     if review_note is not None:
         updated_metadata["review_note"] = normalize_optional_string(review_note, "Review note")
     if affected_artifacts is not None:
@@ -701,9 +727,12 @@ def update_subfeature_status(
             affected_artifacts, "Affected artifacts"
         )
     if affected_story_ids is not None:
-        updated_metadata["affected_story_ids"] = normalize_string_list(
+        normalized_affected_story_ids = normalize_string_list(
             affected_story_ids, "Affected story IDs"
         )
+        updated_metadata["affected_story_ids"] = normalized_affected_story_ids
+        if story_ids is None and not updated_metadata.get("story_ids"):
+            updated_metadata["story_ids"] = normalized_affected_story_ids
     if affected_slice_ids is not None:
         updated_metadata["affected_slice_ids"] = normalize_string_list(
             affected_slice_ids, "Affected slice IDs"
@@ -840,6 +869,7 @@ def cmd_add(args: argparse.Namespace) -> int:
             normalize_subfeature_type(args.type),
             args.summary,
             scope_context,
+            story_ids=args.story_id if args.story_id else None,
         )
     except (RuntimeError, ValueError) as exc:
         print(str(exc), file=sys.stderr)
@@ -875,6 +905,7 @@ def cmd_set_status(args: argparse.Namespace) -> int:
             review_note=args.review_note,
             affected_artifacts=args.affected_artifact if args.affected_artifact else None,
             affected_story_ids=args.story_id if args.story_id else None,
+            story_ids=args.story_id if args.story_id else None,
             affected_slice_ids=args.slice_id if args.slice_id else None,
             consolidation=parse_consolidation_json_arg(args.consolidation_json),
         )
@@ -964,6 +995,12 @@ def build_parser() -> argparse.ArgumentParser:
     add_p.add_argument(
         "--summary", default=None, help="Optional summary of the requested subfeature."
     )
+    add_p.add_argument(
+        "--story-id",
+        action="append",
+        default=[],
+        help="Parent feature story ID linked to this subfeature. Repeatable.",
+    )
 
     status_p = subparsers.add_parser(
         "set-status", help="Advance a subfeature status once required artifacts exist"
@@ -981,7 +1018,10 @@ def build_parser() -> argparse.ArgumentParser:
         help="Affected artifact path. Repeatable.",
     )
     status_p.add_argument(
-        "--story-id", action="append", default=[], help="Affected story ID. Repeatable."
+        "--story-id",
+        action="append",
+        default=[],
+        help="Parent feature story ID affected by this subfeature. Repeatable.",
     )
     status_p.add_argument(
         "--slice-id", action="append", default=[], help="Affected slice ID. Repeatable."

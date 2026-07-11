@@ -16,6 +16,7 @@ SCRIPT_DIR = Path(__file__).resolve().parent
 
 from sirius_skills.lib.workflow_state import evaluate_feature_transition, format_transition_message  # noqa: E402
 from sirius_skills.lib.workflow_state import planning_repository  # noqa: E402
+from sirius_skills.lib.workflow_state import subfeature_repository  # noqa: E402
 
 DEFAULT_PLANNING_DIR = "docs/features"
 DEFAULT_PROPOSAL_DIR = "docs/proposals"
@@ -495,13 +496,20 @@ def discover_feature_dirs(planning_dir: str) -> List[str]:
     discovered_paths = {
         str(metadata_path.parent)
         for metadata_path in root.rglob(METADATA_FILE)
-        if metadata_path.is_file()
+        if metadata_path.is_file() and "subfeatures" not in metadata_path.parts
     }
-    discovered_paths.update(
+    return sorted(discovered_paths)
+
+
+def discover_subfeature_dirs(planning_dir: str) -> List[str]:
+    root = Path(planning_dir)
+    if not root.exists():
+        return []
+    discovered_paths = {
         str(metadata_path.parent)
         for metadata_path in root.rglob(SUBFEATURE_METADATA_FILE)
         if metadata_path.is_file()
-    )
+    }
     return sorted(discovered_paths)
 
 
@@ -527,6 +535,19 @@ def sync_registry(
     rows = [row for path, row in by_path.items() if path in discovered_paths]
     write_registry(rows, scope_context=scope_context)
     return rows
+
+
+def lookup_rows(scope_context: Optional[object] = None) -> List[Dict[str, object]]:
+    if scope_context is None:
+        scope_context = SCOPE_RUNTIME.resolve_scope_context()
+    rows = parse_registry(scope_context=scope_context)
+    by_path: Dict[str, Dict[str, object]] = {str(row["path"]): dict(row) for row in rows}
+    planning_dir, _, _ = get_registry_paths(required_config=False, scope_context=scope_context)
+    for subfeature_dir in discover_subfeature_dirs(planning_dir):
+        metadata = read_metadata(subfeature_dir)
+        row = build_registry_row(subfeature_dir, metadata, scope_context)
+        by_path[str(row["path"])] = row
+    return sorted(by_path.values(), key=lambda row: (str(row["path"]), row.get("updated_at") or ""))
 
 
 def metadata_path_for(feature_dir: str) -> str:
@@ -558,6 +579,9 @@ def _derived_subfeature_metadata(feature_dir: str) -> Optional[Dict[str, object]
         payload.get("approval_status"), raw_status.strip().lower()
     )
     ready_slice_ids = normalize_slice_ids(payload.get("ready_slice_ids"))
+    story_ids = normalize_story_ids(payload.get("story_ids"))
+    if not story_ids:
+        story_ids = normalize_story_ids(payload.get("affected_story_ids"))
     planning_status = derive_subfeature_planning_status(
         raw_status, approval_status, ready_slice_ids
     )
@@ -571,7 +595,7 @@ def _derived_subfeature_metadata(feature_dir: str) -> Optional[Dict[str, object]
         "requires_ui_flow": False,
         "review_note": normalize_review_note(payload.get("review_note")),
         "ready_slice_ids": ready_slice_ids if planning_status == "slice_ready" else [],
-        "related_story_ids": [],
+        "related_story_ids": story_ids,
         "consolidation": normalize_consolidation_summary(payload.get("consolidation")),
     }
 
@@ -702,20 +726,41 @@ def list_plausible_scope_contexts(scope_context: object) -> List[object]:
     return contexts
 
 
+def find_planning_target(
+    rows: List[Dict[str, object]],
+    target_rows: List[Dict[str, object]],
+    selector: str,
+    scope_context: object,
+) -> Optional[Dict[str, object]]:
+    feature = find_feature(rows, selector, scope_context=scope_context)
+    if feature is not None:
+        return feature
+    return find_feature(target_rows, selector, scope_context=scope_context)
+
+
 def resolve_feature_lookup(
     selector: str, explicit_scope: Optional[str] = None
 ) -> Tuple[List[Dict[str, object]], Optional[Dict[str, object]], object]:
     scope_context = SCOPE_RUNTIME.resolve_scope_context(explicit_scope=explicit_scope)
     rows = parse_registry(scope_context=scope_context)
+    target_rows = lookup_rows(scope_context=scope_context)
 
     if explicit_scope is not None or not is_slug_selector(selector):
-        return rows, find_feature(rows, selector, scope_context=scope_context), scope_context
+        return (
+            rows,
+            find_planning_target(rows, target_rows, selector, scope_context),
+            scope_context,
+        )
 
     matches: List[Tuple[object, List[Dict[str, object]], Dict[str, object]]] = []
     for candidate_scope_context in list_plausible_scope_contexts(scope_context):
         candidate_rows = parse_registry(scope_context=candidate_scope_context)
-        feature = find_feature(
-            candidate_rows, selector, scope_context=candidate_scope_context
+        candidate_target_rows = lookup_rows(scope_context=candidate_scope_context)
+        feature = find_planning_target(
+            candidate_rows,
+            candidate_target_rows,
+            selector,
+            candidate_scope_context,
         )
         if feature:
             matches.append((candidate_scope_context, candidate_rows, feature))
@@ -866,6 +911,7 @@ def create_feature_at_path(
     ensure_registry(planning_dir)
     metadata = build_metadata(feature_slug, requires_ui_flow=requires_ui_flow)
     write_metadata(normalized_feature_dir, metadata)
+    subfeature_repository.ensure_registry(Path(normalized_feature_dir))
     sync_registry(rows, scope_context=scope_context)
     return normalized_feature_dir, True
 

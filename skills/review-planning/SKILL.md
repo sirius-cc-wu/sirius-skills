@@ -7,7 +7,7 @@ description: Reviews discovery, design, and breakdown artifacts for readiness be
 
 Use this skill after `discover`, `design`, or `breakdown` when the planning artifacts need an explicit readiness review before human approval, planning commit, and slice-scoped execution bootstrap.
 
-It applies to both:
+It applies to both, with subfeatures as the preferred delivery-unit target:
 
 - canonical feature planning under `<planning_dir>/<feature-slug>/`
 - a selected subfeature under `<planning_dir>/<feature-slug>/subfeatures/<subfeature-id>/`
@@ -83,6 +83,9 @@ sirius record-review \
 - Distinguish blocking findings from follow-up improvements so handoff decisions stay clear.
 - For subfeatures, review the subfeature-local planning docs against `impact-analysis.md` and the intended child capability rather than treating the parent feature breakdown as the execution backlog.
 - For subfeatures, confirm the planned slices represent only the new or amended work required by the subfeature and keep superseded parent slice IDs in notes or dependency references.
+- For parent features, confirm new executable planning is being routed into a
+  subfeature unless the packet is intentionally preserving legacy direct-feature
+  planning.
 - When the planning packet records a metadata-carried `consolidation` summary,
   confirm it matches the narrative intent in the docs instead of becoming a
   second conflicting source of truth.

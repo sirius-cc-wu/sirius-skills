@@ -21,6 +21,7 @@ def test_remaining_package_wrappers_show_help(capsys) -> None:
         "manage-planning",
         "manage-proposals",
         "manage-subfeatures",
+        "migrate-planning-model",
         "ship",
         "ship-slice",
         "ship-worktree",

@@ -6,7 +6,9 @@ description: Resolves one reviewed feature or subfeature backlog into remaining 
 # Ship
 
 Use this skill when a maintainer wants to work through all planned slices for
-one reviewed and committed feature or subfeature.
+one reviewed and committed subfeature. Direct feature targets remain supported
+for existing planning packets, but new delivery work should normally ship from a
+subfeature.
 
 ## Responsibilities
 

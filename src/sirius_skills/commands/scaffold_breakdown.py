@@ -158,7 +158,10 @@ def resolve_subfeature_context(target_dir: Path) -> dict[str, object] | None:
     subfeature_id = str(metadata["subfeature_id"])
     subfeature_type = str(metadata["subfeature_type"])
     status = str(metadata["status"])
-    affected_story_ids = [str(item) for item in metadata.get("affected_story_ids", [])]
+    story_ids = [
+        str(item)
+        for item in metadata.get("story_ids", metadata.get("affected_story_ids", []))
+    ]
     affected_slice_ids = [str(item) for item in metadata.get("affected_slice_ids", [])]
     affected_artifacts = [str(item) for item in metadata.get("affected_artifacts", [])]
 
@@ -169,7 +172,7 @@ def resolve_subfeature_context(target_dir: Path) -> dict[str, object] | None:
         "status": status,
         "canonical_feature_path": canonical_feature_path,
         "has_impact_analysis": (target_dir / IMPACT_FILE).exists(),
-        "affected_story_ids": affected_story_ids,
+        "affected_story_ids": story_ids,
         "affected_slice_ids": affected_slice_ids,
         "affected_artifacts": affected_artifacts,
     }
@@ -178,7 +181,7 @@ def resolve_subfeature_context(target_dir: Path) -> dict[str, object] | None:
 def render_subfeature_context_section(subfeature_context: dict[str, object]) -> str:
     story_lines = format_code_list(
         list(subfeature_context["affected_story_ids"]),
-        "No affected story IDs were recorded yet. Refine `impact-analysis.md` before final review.",
+        "No parent story IDs were recorded yet. Link this subfeature to parent `user-stories.md` before final review.",
     )
     slice_lines = format_code_list(
         list(subfeature_context["affected_slice_ids"]),
@@ -202,7 +205,7 @@ def render_subfeature_context_section(subfeature_context: dict[str, object]) -> 
         f"- Subfeature type: `{subfeature_context['subfeature_type']}`\n"
         f"- Current subfeature status: `{subfeature_context['status']}`\n"
         f"- Impact input: {impact_status}\n\n"
-        "### Affected Story IDs\n\n"
+        "### Parent Story IDs\n\n"
         f"{story_lines}\n\n"
         "### Affected Canonical Slice IDs\n\n"
         f"{slice_lines}\n\n"

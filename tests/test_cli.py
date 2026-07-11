@@ -62,6 +62,10 @@ def test_discover_commands_lists_runnable_scripts_only() -> None:
         commands["migrate-subfeatures"].module_name
         == "sirius_skills.commands.migrate_subfeatures"
     )
+    assert (
+        commands["migrate-planning-model"].module_name
+        == "sirius_skills.commands.migrate_planning_model"
+    )
     assert commands["migrate-slices"].module_name == "sirius_skills.commands.migrate_slices"
     assert (
         commands["record-review"].module_name

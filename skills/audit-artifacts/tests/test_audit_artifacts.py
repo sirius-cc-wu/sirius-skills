@@ -400,7 +400,7 @@ def test_run_audit_reports_missing_promoted_feature_and_subfeature_registry_drif
 
     assert result["ok"] is False
     assert "missing_promoted_feature" in finding_codes(result)
-    assert "planning_registry_path_missing" in finding_codes(result)
+    assert "subfeature_registry_path_missing" in finding_codes(result)
     assert "subfeature_registry_path_missing" in finding_codes(result)
 
 
@@ -579,4 +579,3 @@ def test_cli_json_reports_slice_relation_issues(tmp_path, monkeypatch, capsys):
 
     assert payload["ok"] is False
     assert "missing_target_slice" in finding_codes(payload)
-

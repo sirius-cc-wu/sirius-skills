@@ -62,7 +62,9 @@ def collect_story_ids(target_dir: Path, subfeature_metadata: dict[str, object] |
     if subfeature_metadata is not None:
         story_ids = [
             str(item).strip()
-            for item in subfeature_metadata.get("affected_story_ids", [])
+            for item in subfeature_metadata.get(
+                "story_ids", subfeature_metadata.get("affected_story_ids", [])
+            )
             if isinstance(item, str) and item.strip()
         ]
         if story_ids:

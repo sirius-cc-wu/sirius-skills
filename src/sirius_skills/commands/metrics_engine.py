@@ -78,7 +78,9 @@ def resolve_measurement_target(
         parent_feature = str(subfeature_metadata.get("parent_feature_slug") or "").strip() or None
         affected_story_ids = [
             story_id
-            for story_id in subfeature_metadata.get("affected_story_ids", [])
+            for story_id in subfeature_metadata.get(
+                "story_ids", subfeature_metadata.get("affected_story_ids", [])
+            )
             if isinstance(story_id, str) and story_id.strip()
         ]
         if str(subfeature_metadata.get("status")) != "finalized":

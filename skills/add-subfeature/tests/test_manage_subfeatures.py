@@ -125,9 +125,11 @@ def test_add_creates_durable_subfeature_and_updates_planning_registry(tmp_path, 
     assert planning_meta["feature_slug"] == "replace-legacy-flow"
     assert planning_meta["status"] == "discovery_pending"
     assert registry["subfeatures"][0]["subfeature_id"] == "replace-legacy-flow"
+    assert [row["feature"] for row in planning_registry["features"]] == ["checkout"]
+    lookup_rows = planning_module.lookup_rows()
     assert any(
         row["path"] == "docs/features/checkout/subfeatures/replace-legacy-flow/"
-        for row in planning_registry["features"]
+        for row in lookup_rows
     )
     assert discover.startswith("<!-- add-subfeature:discover-stub -->")
     assert "Bootstrap stub created by `add-subfeature`." in discover

@@ -79,6 +79,10 @@ PACKAGE_COMMANDS = {
         "sirius_skills.commands.migrate_subfeatures",
         "sirius_skills.commands.migrate_subfeatures",
     ),
+    "migrate-planning-model": (
+        "sirius_skills.commands.migrate_planning_model",
+        "sirius_skills.commands.migrate_planning_model",
+    ),
     "migrate-slices": (
         "sirius_skills.commands.migrate_slices",
         "sirius_skills.commands.migrate_slices",

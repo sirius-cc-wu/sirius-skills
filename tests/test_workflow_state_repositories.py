@@ -306,6 +306,44 @@ class TestCommandCompatibility:
         assert loaded["feature_slug"] == "my-feat"
         assert loaded["status"] == "discovery_pending"
 
+    def test_manage_planning_create_feature_initializes_subfeature_registry(self, tmp_path: Path, monkeypatch) -> None:
+        monkeypatch.chdir(tmp_path)
+        from sirius_skills.commands import manage_planning
+
+        feature_dir, created = manage_planning.create_feature("checkout")
+
+        assert created is True
+        assert Path(feature_dir, "subfeatures", "registry.json").exists()
+        rows = manage_planning.parse_registry()
+        assert [row["feature"] for row in rows] == ["checkout"]
+
+    def test_manage_planning_registry_is_feature_only_but_lookup_resolves_subfeatures(self, tmp_path: Path, monkeypatch) -> None:
+        monkeypatch.chdir(tmp_path)
+        from sirius_skills.commands import manage_planning, manage_subfeatures
+
+        feature_dir, _ = manage_planning.create_feature("checkout")
+        scope_context = manage_planning.SCOPE_RUNTIME.resolve_scope_context()
+        subfeature_dir, created = manage_subfeatures.create_subfeature(
+            manage_planning,
+            feature_dir,
+            "checkout",
+            "render-doc",
+            "additive",
+            "Render documents.",
+            scope_context,
+            story_ids=["CHK-01"],
+        )
+
+        assert created is True
+        assert Path(subfeature_dir, ".subfeature-meta.json").exists()
+        rows = manage_planning.parse_registry()
+        assert [row["feature"] for row in rows] == ["checkout"]
+        lookup_rows = manage_planning.lookup_rows()
+        assert {row["feature"] for row in lookup_rows} == {"checkout", "render-doc"}
+        _, target, _ = manage_planning.resolve_feature_lookup("render-doc")
+        assert target is not None
+        assert target["path"].endswith("/subfeatures/render-doc/")
+
     def test_manage_proposals_ensure_and_read_write_metadata(self, tmp_path: Path, monkeypatch) -> None:
         monkeypatch.chdir(tmp_path)
         from sirius_skills.commands import manage_proposals
@@ -335,6 +373,21 @@ class TestCommandCompatibility:
         loaded = manage_subfeatures.read_metadata(sf_dir)
         assert loaded["subfeature_id"] == "replace-flow"
         assert loaded["status"] == "draft"
+        assert loaded["story_ids"] == []
+
+    def test_manage_subfeatures_metadata_records_parent_story_ids(self, tmp_path: Path, monkeypatch) -> None:
+        monkeypatch.chdir(tmp_path)
+        from sirius_skills.commands import manage_subfeatures
+
+        sf_dir = str(tmp_path / "docs" / "features" / "checkout" / "subfeatures" / "replace-flow")
+        metadata = manage_subfeatures.build_metadata(
+            "checkout", "replace-flow", story_ids=["CHK-01", "CHK-01"]
+        )
+        manage_subfeatures.write_metadata(sf_dir, metadata)
+
+        loaded = manage_subfeatures.read_metadata(sf_dir)
+        assert loaded["story_ids"] == ["CHK-01"]
+        assert loaded["affected_story_ids"] == ["CHK-01"]
 
     def test_manage_execution_load_and_write_slice_metadata(self, tmp_path: Path, monkeypatch) -> None:
         monkeypatch.chdir(tmp_path)

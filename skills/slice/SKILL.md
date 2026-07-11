@@ -18,6 +18,8 @@ Use this skill when a work item is small enough to execute, has passed planning 
 ## Preferred Input
 
 - a work item ID from repository planning (for example, one created by `breakdown`)
+- the owning subfeature slug or path when bootstrapping from the simplified
+  planning model
 
 ## Bootstrap Rules
 
@@ -37,6 +39,8 @@ Before bootstrapping, confirm:
 4. The chosen slice ID, if provided, should be preserved exactly.
 5. The planning artifacts were explicitly approved and committed before bootstrap.
 6. For subfeatures, explicit approval must already be recorded in `.subfeature-meta.json`; `reviewed` alone is not enough.
+7. Prefer subfeature-owned planned work. Direct feature-owned slice bootstrap is
+   a compatibility path for existing planning packets.
 
 ## Workflow
 

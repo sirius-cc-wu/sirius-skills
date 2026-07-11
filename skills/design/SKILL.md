@@ -46,8 +46,8 @@ Optional companion output:
 
 Resolve `<feature_path>` as either:
 
-- `<planning_dir>/<feature-slug>/` for canonical feature planning
-- `<planning_dir>/<feature-slug>/subfeatures/<subfeature-id>/` for a selected durable subfeature
+- `<planning_dir>/<feature-slug>/subfeatures/<subfeature-id>/` for the preferred implementation design target
+- `<planning_dir>/<feature-slug>/` for feature container context or legacy direct-feature planning
 
 - If `.skills/planning.json` defines `planning_dir`, use that as `<planning_dir>`.
 - Otherwise default to `docs/features`.
@@ -66,6 +66,8 @@ sirius scaffold-design "<feature-selector-or-path>" --force
 ## Design Rules
 
 - Keep this skill feature-scoped, not slice-scoped.
+- Prefer subfeature-scoped implementation designs; parent features normally own
+  discovery and story context rather than executable delivery planning.
 - Focus on decisions that unblock later decomposition and execution.
 - Document interfaces, dependencies, and operational constraints clearly.
 - Call out risks that should affect slice ordering or stop-and-ask gates.
