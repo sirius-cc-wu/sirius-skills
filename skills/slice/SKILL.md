@@ -10,7 +10,7 @@ Use this skill when a work item is small enough to execute, has passed planning 
 ## Responsibilities
 
 1. Validate that the selected work item is ready for execution.
-2. Ensure execution bootstrap prerequisites exist, including `.skills/execution.json`, the slice registry, and a durable approved planning checkpoint.
+2. Ensure execution bootstrap prerequisites exist, including `.skills/execution.json`, a registry-owning execution scope, and a durable approved planning checkpoint.
 3. Bootstrap one execution slice for that work item.
 4. Confirm the slice exists and is aligned with the repository's execution layout.
 5. Hand off to `guide-execution` for `blueprint.md` and optional legacy `brief.md`.
@@ -29,6 +29,7 @@ Use this skill when a work item is small enough to execute, has passed planning 
   subfeature's local `slices/` root.
 - Do not create a slice for work that still needs major decomposition.
 - If execution config does not exist yet, initialize it with a repository-specific slice directory when known, otherwise use the generic default `slices/`.
+- If execution config exists but omits `slice_dir`, treat it as defaults-only; do not implicitly create root-level `slices/` unless an explicit `--slice-dir` was provided.
 - Keep slice readiness and registry state in `guide-execution`.
 
 ## Preflight
@@ -53,7 +54,7 @@ Before bootstrapping, confirm:
 sirius bootstrap-slice "<slice-id>" "<feature-name>"
 ```
 
-3. If the repository has not configured execution yet and the default `slices/` location is not appropriate, pass an explicit directory during first bootstrap:
+3. If the active execution scope has no `slice_dir` and the default `slices/` location is not appropriate, pass an explicit directory during first bootstrap:
 
 ```bash
 sirius bootstrap-slice --slice-dir "team-slices" "<slice-id>" "<feature-name>"

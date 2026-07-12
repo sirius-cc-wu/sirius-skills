@@ -427,7 +427,7 @@ guide-planning -> breakdown -> review-planning -> human approval -> commit -> sl
 sirius bootstrap-slice "<slice-id>" "<slice-name>"
 ```
 
-If execution config has not been initialized yet and the default `slices/` location is not the right fit, bootstrap the first slice with an explicit directory:
+If the active execution scope has no registry-owning `slice_dir` and the default `slices/` location is not the right fit, bootstrap the first slice with an explicit directory:
 
 ```bash
 sirius bootstrap-slice --slice-dir "team-slices" "<slice-id>" "<slice-name>"
@@ -609,7 +609,9 @@ or migration-only locations. The important rule is that execution slices are
 planned slice backlog.
 
 Direct feature or legacy work can still use a configured `slice_dir` in
-`.skills/execution.json`.
+`.skills/execution.json`. A root execution config without `slice_dir` is
+defaults-only and does not own or implicitly recreate a root-level `slices/`
+registry.
 
 ## Diagram Conventions
 

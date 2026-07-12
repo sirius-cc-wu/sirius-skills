@@ -3,6 +3,8 @@ import json
 import sys
 from pathlib import Path
 
+import pytest
+
 
 SCRIPT_PATH = Path(__file__).resolve().parents[3] / "src" / "sirius_skills" / "commands" / "manage_execution.py"
 
@@ -127,6 +129,59 @@ def test_init_defaults_to_slices_directory(tmp_path, monkeypatch):
     assert config["slice_dir"] == "slices"
     assert config["auto_start_implementation"] is True
     assert not (tmp_path / ".specs").exists()
+
+
+def test_defaults_only_execution_config_does_not_own_slice_registry(
+    tmp_path, monkeypatch, capsys
+):
+    module = load_manage_specs_module()
+    monkeypatch.chdir(tmp_path)
+    write_scope_config(
+        tmp_path,
+        "execution.json",
+        {"preferred_workflow": "Kanban", "auto_start_implementation": False},
+    )
+
+    config = module.load_config(required=False)
+
+    assert config == {
+        "preferred_workflow": "Kanban",
+        "auto_start_implementation": False,
+    }
+    with pytest.raises(RuntimeError, match="does not define 'slice_dir'"):
+        module.load_config(required=True)
+    specs_dir, _, _ = module.get_registry_paths(required_config=False)
+    assert specs_dir == str(tmp_path / "slices")
+    assert not (tmp_path / "slices").exists()
+
+    exit_code = run_cli(module, monkeypatch, "add", "DEMO", "Demo Feature")
+    captured = capsys.readouterr()
+
+    assert exit_code == 2
+    assert "does not define 'slice_dir'" in captured.err
+    assert not (tmp_path / "slices").exists()
+
+
+def test_init_adds_slice_dir_to_defaults_only_execution_config(tmp_path, monkeypatch):
+    module = load_manage_specs_module()
+    monkeypatch.chdir(tmp_path)
+    write_scope_config(
+        tmp_path,
+        "execution.json",
+        {"preferred_workflow": "Kanban", "auto_start_implementation": False},
+    )
+
+    assert run_cli(module, monkeypatch, "init") == 0
+
+    config = json.loads(
+        (tmp_path / ".skills" / "execution.json").read_text(encoding="utf-8")
+    )
+    assert config == {
+        "slice_dir": "slices",
+        "preferred_workflow": "Kanban",
+        "auto_start_implementation": False,
+    }
+    assert (tmp_path / "slices" / "registry.json").exists()
 
 
 def test_add_creates_slice_metadata_and_registry_entries(tmp_path, monkeypatch):

@@ -47,7 +47,7 @@ Do not duplicate day-to-day implementation states like `implementing` or `blocke
 
 ## Preflight
 
-1. Resolve `.skills/execution.json` and the configured slice registry.
+1. Resolve `.skills/execution.json` and the configured slice registry; if the active execution config omits `slice_dir`, this is a defaults-only scope and not a registry-owning execution scope.
 2. Resolve the active slice using `sirius manage-execution get-active` or a user-provided ID/path. Do not refer to a `resolve-active` command because the execution tool exposes `get-active`.
 3. Confirm the slice path represents one execution-ready work item.
 4. Check `blueprint.md`, optional legacy `brief.md`, optional legacy `slices.md`, and `.slice-meta.json` as appropriate for the current state.

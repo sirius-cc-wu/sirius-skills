@@ -352,6 +352,59 @@ def test_bootstrap_uses_explicit_slice_dir_when_config_missing(tmp_path, monkeyp
     assert (tmp_path / "work" / "slices" / "DEMO-demo-feature").exists()
 
 
+def test_bootstrap_rejects_defaults_only_execution_config_without_slice_dir(
+    tmp_path, monkeypatch, capsys
+):
+    module = load_module()
+    monkeypatch.chdir(tmp_path)
+    write_scope_config(
+        tmp_path,
+        "execution.json",
+        {"preferred_workflow": "Kanban", "auto_start_implementation": False},
+    )
+
+    exit_code = run_cli(module, monkeypatch, "DEMO", "Demo Feature")
+    captured = capsys.readouterr()
+
+    assert exit_code == 2
+    assert "does not define 'slice_dir'" in captured.err
+    assert not (tmp_path / "slices").exists()
+
+
+def test_bootstrap_can_initialize_defaults_only_execution_config_with_explicit_slice_dir(
+    tmp_path, monkeypatch
+):
+    module = load_module()
+    monkeypatch.chdir(tmp_path)
+    write_scope_config(
+        tmp_path,
+        "execution.json",
+        {"preferred_workflow": "Kanban", "auto_start_implementation": False},
+    )
+
+    assert (
+        run_cli(
+            module,
+            monkeypatch,
+            "--slice-dir",
+            "work/slices",
+            "DEMO",
+            "Demo Feature",
+        )
+        == 0
+    )
+
+    execution = json.loads(
+        (tmp_path / ".skills" / "execution.json").read_text(encoding="utf-8")
+    )
+    assert execution == {
+        "slice_dir": "work/slices",
+        "preferred_workflow": "Kanban",
+        "auto_start_implementation": False,
+    }
+    assert (tmp_path / "work" / "slices" / "DEMO-demo-feature").exists()
+
+
 def test_bootstrap_reuses_existing_execution_config_and_deduplicates(tmp_path, monkeypatch):
     module = load_module()
     monkeypatch.chdir(tmp_path)

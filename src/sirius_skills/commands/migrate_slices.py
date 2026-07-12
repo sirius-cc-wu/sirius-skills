@@ -133,7 +133,7 @@ def row_matches_target(
 def discover_feature_targets(
     manage_planning, manage_execution, root_scope_context: object
 ) -> List[Tuple[str, str]]:
-    rows = manage_execution.parse_registry(scope_context=root_scope_context)
+    rows = load_root_slice_rows(manage_execution, root_scope_context)
     planning_dir, _, _ = manage_planning.get_registry_paths(
         required_config=False, scope_context=root_scope_context
     )
@@ -154,6 +154,25 @@ def discover_feature_targets(
         targets.append((feature_dir, feature_slug))
         seen.add(feature_slug)
     return targets
+
+
+def load_root_slice_rows(manage_execution, root_scope_context: object) -> List[Dict[str, object]]:
+    try:
+        return manage_execution.parse_registry(scope_context=root_scope_context)
+    except RuntimeError as exc:
+        if "does not define 'slice_dir'" not in str(exc):
+            raise
+
+    _, index_file, registry_json_file = manage_execution.get_registry_paths(
+        required_config=False, scope_context=root_scope_context
+    )
+    registry_path = Path(registry_json_file)
+    if registry_path.exists():
+        return manage_execution.load_registry_json(str(registry_path))
+    index_path = Path(index_file)
+    if index_path.exists():
+        return manage_execution.parse_registry_markdown(str(index_path))
+    return []
 
 
 def resolve_feature_target(
@@ -342,7 +361,8 @@ def migrate_feature_rows(
         )
 
     if not dry_run:
-        manage_execution.write_registry(remaining_rows, scope_context=root_scope_context)
+        if migrated_rows_by_target or len(remaining_rows) != len(root_rows):
+            manage_execution.write_registry(remaining_rows, scope_context=root_scope_context)
         for target_key, migrated_rows in migrated_rows_by_target.items():
             target_scope = Path(target_key)
             target_scope_context = manage_execution.resolve_execution_scope_context(
@@ -384,7 +404,7 @@ def run_scan(args: argparse.Namespace) -> Tuple[Dict[str, object], int]:
     manage_execution = load_manage_execution_module()
     manage_proposals = load_manage_proposals_module()
     root_scope_context = manage_planning.SCOPE_RUNTIME.resolve_scope_context()
-    root_rows = manage_execution.parse_registry(scope_context=root_scope_context)
+    root_rows = load_root_slice_rows(manage_execution, root_scope_context)
     targets = resolve_targets(manage_planning, manage_execution, args, root_scope_context)
 
     features: List[Dict[str, object]] = []
@@ -416,14 +436,14 @@ def run_migrate(args: argparse.Namespace) -> Tuple[Dict[str, object], int]:
     manage_execution = load_manage_execution_module()
     manage_proposals = load_manage_proposals_module()
     root_scope_context = manage_planning.SCOPE_RUNTIME.resolve_scope_context()
-    root_rows = manage_execution.parse_registry(scope_context=root_scope_context)
+    root_rows = load_root_slice_rows(manage_execution, root_scope_context)
     targets = resolve_targets(manage_planning, manage_execution, args, root_scope_context)
 
     features: List[Dict[str, object]] = []
     overall_ok = True
     for feature_dir, feature_slug in targets:
         if not bool(args.dry_run):
-            root_rows = manage_execution.parse_registry(scope_context=root_scope_context)
+            root_rows = load_root_slice_rows(manage_execution, root_scope_context)
         report = migrate_feature_rows(
             manage_planning,
             manage_execution,

@@ -296,6 +296,12 @@ def _execution_scope_from_root(scope_root: Path, start_dir: Optional[Path] = Non
     )
 
 
+def execution_config_exists(scope_context: Optional[object] = None) -> bool:
+    resolved_scope = resolve_execution_scope_context(scope_context)
+    relative_path = SCOPE_RUNTIME.config_relative_path("execution")
+    return any((Path(scope_root) / relative_path).exists() for scope_root in resolved_scope.scope_chain)
+
+
 def resolve_execution_scope_context(
     scope_context: Optional[object] = None,
     *,
@@ -429,7 +435,8 @@ def load_raw_config(
 ) -> Dict[str, object]:
     resolved_scope = resolve_execution_scope_context(scope_context)
     config = SCOPE_RUNTIME.load_merged_config(resolved_scope, "execution")
-    if config:
+    config_exists = execution_config_exists(resolved_scope)
+    if config or config_exists:
         return config
     config_file = execution_config_path(resolved_scope)
 
@@ -462,7 +469,8 @@ def load_config(
 ) -> Dict[str, object]:
     config = load_raw_config(required=required, scope_context=scope_context)
 
-    slice_dir = config.get("slice_dir", DEFAULT_SLICES_DIR)
+    has_slice_dir = "slice_dir" in config
+    slice_dir = config.get("slice_dir")
     preferred_workflow = config.get(
         "preferred_workflow", DEFAULT_PREFERRED_WORKFLOW
     )
@@ -470,7 +478,13 @@ def load_config(
         "auto_start_implementation", False
     )
 
-    if not isinstance(slice_dir, str):
+    if required and not has_slice_dir:
+        raise RuntimeError(
+            "Execution config does not define 'slice_dir'. This scope provides "
+            "execution defaults only; run from a local execution scope or run "
+            "`sirius manage-execution init <slice-dir>`."
+        )
+    if has_slice_dir and not isinstance(slice_dir, str):
         raise RuntimeError("Execution config field 'slice_dir' must be a string.")
     if not isinstance(preferred_workflow, str):
         raise RuntimeError(
@@ -481,11 +495,13 @@ def load_config(
             "Execution config field 'auto_start_implementation' must be a boolean."
         )
 
-    return {
-        "slice_dir": normalize_slice_dir(slice_dir),
+    normalized = {
         "preferred_workflow": preferred_workflow,
         "auto_start_implementation": auto_start_implementation,
     }
+    if has_slice_dir:
+        normalized["slice_dir"] = normalize_slice_dir(str(slice_dir))
+    return normalized
 
 
 def load_conventions_config(
@@ -557,10 +573,19 @@ def get_registry_paths(
 ) -> Tuple[str, str, str]:
     resolved_scope = resolve_execution_scope_context(scope_context)
     config = load_config(required=required_config, scope_context=resolved_scope)
+    if "slice_dir" not in config:
+        if required_config:
+            raise RuntimeError(
+                "Execution config does not define 'slice_dir'. This scope provides "
+                "execution defaults only and does not own a local slice registry."
+            )
+        slice_dir = DEFAULT_SLICES_DIR
+    else:
+        slice_dir = str(config["slice_dir"])
     specs_dir = str(
         SCOPE_RUNTIME.resolve_scope_path(
             resolved_scope.scope_root,
-            normalize_slice_dir(str(config["slice_dir"])),
+            normalize_slice_dir(slice_dir),
         )
     )
     return (
@@ -1403,7 +1428,9 @@ def cmd_init(args: argparse.Namespace) -> int:
     scope_context = resolve_execution_scope_context()
     config = load_config(required=False, scope_context=scope_context)
     slice_dir = (
-        normalize_slice_dir(args.slice_dir) if args.slice_dir else config["slice_dir"]
+        normalize_slice_dir(args.slice_dir)
+        if args.slice_dir
+        else config.get("slice_dir", DEFAULT_SLICES_DIR)
     )
     write_config(
         str(slice_dir),

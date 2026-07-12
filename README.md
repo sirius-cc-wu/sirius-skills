@@ -275,7 +275,7 @@ creation without moving backlog ownership out of `ship`.
 `worktree` provides the reusable manual pool for fast local checkout reuse
 without target-specific execution routing.
 
-For new subfeature work, execution slices are created under the owning subfeature's local `slices/` root. Root-level `slices/` remains a compatibility location for legacy and direct feature work unless `.skills/execution.json` overrides the location.
+For new subfeature work, execution slices are created under the owning subfeature's local `slices/` root. Root-level `slices/` remains a compatibility location for legacy and direct feature work only when the active `.skills/execution.json` defines a `slice_dir`.
 
 Use **PlantUML** for required UML diagrams:
 
@@ -291,6 +291,8 @@ The `guide-execution` workflow now keeps three complementary artifacts in sync:
 - `<slice_dir>/README.md` for a human-readable registry
 - `<slice_dir>/registry.json` for machine-readable registry/state
 - `<slice_path>/.slice-meta.json` for per-slice lifecycle metadata such as `created_at`, `updated_at`, `closed_at`, and explicit relation metadata
+
+An execution scope owns a local slice registry only when its merged `.skills/execution.json` defines `slice_dir`. A config without `slice_dir` is defaults-only: it can provide inherited execution settings such as `preferred_workflow` or `auto_start_implementation`, but registry-owning commands must run from a local execution scope or be initialized explicitly.
 
 The machine-readable metadata can also store explicit cross-slice relations such as `supersedes`, `invalidates`, `narrows`, and `replaces_partially`, with reciprocal backlinks and optional soft selectors for story titles, requirement IDs, or freeform selectors.
 
@@ -380,9 +382,18 @@ Generic default slice naming now assumes scope-prefixed planned slice IDs:
 - subfeature-scoped planning uses a short lowercase alias derived from the subfeature ID
 - avoid bare `slice-*` IDs unless the project explicitly overrides that convention
 
-Projects can add `.skills/execution.json` in the repository root to configure execution-slice layout for `guide-execution` and `slice` bootstrap.
+Projects can add `.skills/execution.json` in the repository root to configure execution defaults for `guide-execution` and `slice` bootstrap.
 
-Example:
+Defaults-only example:
+
+```json
+{
+  "preferred_workflow": "TDD",
+  "auto_start_implementation": true
+}
+```
+
+Registry-owning example:
 
 ```json
 {
@@ -443,8 +454,8 @@ Current configuration usage:
 - `sirius migrate-planning-model` previews or applies safe compatibility repairs for the simplified planning model, including missing `subfeatures/` registries, top-level registries that still contain subfeature rows, and inferable subfeature `story_ids`
 - `skills/design/SKILL.md` reads `.skills/planning.json` field `design_diagram_mode`; `embedded` keeps fenced PlantUML in `system-design.md`, while `linked_svg` writes `.puml` and `.svg` files under `<feature_path>/figures/`, links the SVGs from `system-design.md`, and keeps those SVGs on an explicit white canvas
 - `sirius scaffold-breakdown` uses `.skills/planning.json` field `planning_dir` during scaffolding when the file is present
-- `sirius bootstrap-slice` resolves the nearest execution scope, reuses inherited scoped execution config when present, and only initializes `.skills/execution.json` locally when no execution config exists in the scope chain
-- `sirius manage-execution` resolves `.skills/execution.json`, `.skills/conventions.json`, and `slice_dir` from the active execution scope so nested scopes keep local slice registries and folders
+- `sirius bootstrap-slice` resolves the nearest execution scope, reuses inherited scoped execution config when present, and only initializes `.skills/execution.json` locally when no execution config exists in the scope chain or `--slice-dir` is explicitly provided for a defaults-only scope
+- `sirius manage-execution` resolves `.skills/execution.json`, `.skills/conventions.json`, and `slice_dir` from the active execution scope so nested scopes keep local slice registries and folders; if `slice_dir` is absent, the scope provides defaults only and does not own a local registry
 - when `auto_start_implementation` is `true`, `sirius manage-execution set-status <slice> blueprint_ready` auto-advances the slice into `execution_ready`
 - `skills/ship/SKILL.md` documents `.skills/execution.json` fields under `accelerators.ship`, including `delegate_to_ship_slice` and `preflight.mode`
 - `skills/ship-slice/SKILL.md` documents `.skills/execution.json` fields under `accelerators.ship_slice`, including `execute_owner_chain`, `stop_on_owner`, `continuation_policy`, `auto_format`, `format_command`, `auto_close`, and `auto_commit`
@@ -452,7 +463,7 @@ Current configuration usage:
 - `skills/commit/SKILL.md` documents how `commit_format` can override the generic default
 - `skills/create-pr/SKILL.md` documents how `pr_title_format`, `branch_extract_pattern`, and `id_pattern` can define stricter PR conventions
 
-If the file is absent, the generic defaults remain in effect.
+If the file is absent, the generic defaults remain in effect. If the file is present without `slice_dir`, it is treated as defaults-only and will not create a local `slices/` registry implicitly.
 
 ## Project-local extensions
 

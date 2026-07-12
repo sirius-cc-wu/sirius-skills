@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+import shutil
 from pathlib import Path
 
 from sirius_skills.commands import bootstrap, migrate_slices
@@ -211,3 +212,25 @@ def test_package_migrate_slices_scan_does_not_create_feature_scope(tmp_path: Pat
     capsys.readouterr()
 
     assert not (tmp_path / "docs" / "features" / "checkout" / ".skills").exists()
+
+
+def test_package_migrate_slices_scan_all_allows_defaults_only_execution_config(
+    tmp_path: Path, monkeypatch, capsys
+) -> None:
+    monkeypatch.chdir(tmp_path)
+
+    assert bootstrap.main(["--mode", "default"]) == 0
+    capsys.readouterr()
+    execution_path = tmp_path / ".skills" / "execution.json"
+    execution_config = json.loads(execution_path.read_text(encoding="utf-8"))
+    execution_config.pop("slice_dir")
+    execution_path.write_text(json.dumps(execution_config, indent=2) + "\n", encoding="utf-8")
+    if (tmp_path / "slices").exists():
+        shutil.rmtree(tmp_path / "slices")
+
+    assert migrate_slices.main(["scan", "--all"]) == 0
+    captured = capsys.readouterr()
+    payload = json.loads(captured.out)
+
+    assert payload["features"] == []
+    assert not (tmp_path / "slices").exists()
