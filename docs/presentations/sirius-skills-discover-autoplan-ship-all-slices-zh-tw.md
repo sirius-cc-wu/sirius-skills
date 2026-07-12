@@ -180,13 +180,13 @@ discover -> design -> breakdown -> review-planning
 對 **`subfeature`**，常見流程是：
 
 ```text
-discover -> assess -> design -> breakdown -> review-planning
+discover -> design -> breakdown -> review-planning
 ```
 
 這裡有一個重點：
 
 - `feature` 通常直接往 `design` 前進
-- `subfeature` 常常先進 `assess`，先分析它對既有 `feature` 的影響，再繼續設計與切片
+- `subfeature` 也先完成自己的 `discover.md`，再直接進入 `design` 與切片
 
 ### `autoplan` 的真正價值
 

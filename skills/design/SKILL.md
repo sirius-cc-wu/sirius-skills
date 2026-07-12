@@ -37,7 +37,6 @@ Optional companion output:
 
 - `<feature_path>/discover.md` when present
 - optional `<feature_path>/reference-research.md` when present
-- `impact-analysis.md` when present
 - direct user prompt or backlog context when `discover.md` does not exist
 - relevant existing docs, ADRs, or feature notes
 - relevant code paths when documenting current implemented behavior
@@ -98,7 +97,7 @@ sirius scaffold-design "<feature-selector-or-path>" --force
 ## Workflow
 
 1. Gather the best available inputs:
-   - read `discover.md`, optional `reference-research.md`, `impact-analysis.md`, and existing feature planning docs when present
+   - read `discover.md`, optional `reference-research.md`, and existing feature planning docs when present
    - otherwise derive the design from the user prompt, backlog context, and repository context
 2. Inspect the relevant codebase or adjacent systems as needed, especially existing interfaces, ownership boundaries, operational constraints, and already-owned configuration/state surfaces.
 3. Read `.skills/planning.json` when present to determine whether diagrams stay embedded or are emitted under `<feature_path>/figures/`.

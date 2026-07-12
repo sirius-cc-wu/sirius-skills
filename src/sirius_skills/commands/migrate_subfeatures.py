@@ -28,8 +28,8 @@ LEGACY_REGISTRY_HEADER = (
 )
 LEGACY_STATUS_ALIASES = {
     "draft": "draft",
-    "impact_ready": "impact_ready",
-    "impact-ready": "impact_ready",
+    "discovery_ready": "discovery_ready",
+    "discovery-ready": "discovery_ready",
     "design_ready": "design_ready",
     "design-ready": "design_ready",
     "breakdown_ready": "breakdown_ready",
@@ -42,7 +42,7 @@ LEGACY_STATUS_ALIASES = {
 }
 LEGACY_TO_SUBFEATURE_STATUS = {
     "draft": "draft",
-    "impact_ready": "impact_ready",
+    "discovery_ready": "discovery_ready",
     "design_ready": "design_ready",
     "breakdown_ready": "breakdown_ready",
     "reviewed": "reviewed",

@@ -12,7 +12,7 @@ Use this skill as the planning-layer canonical entrypoint when you need to decid
 1. Resolve or initialize the active feature planning folder.
 2. Promote accepted proposals into canonical feature planning folders when the user explicitly asks for planning to begin.
 3. Verify required planning files, registry state, and feature metadata.
-4. Route feature-scoped work to `propose`, `add-subfeature`, `assess`, `research`, `discover`, `design`, `ui-flow`, `breakdown`, or `review-planning`, then stop for approval/commit before execution begins.
+4. Route feature-scoped work to `propose`, `add-subfeature`, `research`, `discover`, `design`, `ui-flow`, `breakdown`, or `review-planning`, then stop for approval/commit before execution begins.
 5. Persist planning readiness state when a phase is complete.
 6. Keep planning handoff decisions durable in the repository instead of transient chat state.
 7. When planning surface is consolidated, keep one canonical planning route and treat superseded surfaces as historical context instead of parallel entrypoints.
@@ -29,7 +29,6 @@ Use `guide-planning` when you need to decide the next planning step before slice
 - If the user wants an accepted proposal promoted into canonical planning, perform that promotion here and then route to `discover`.
 - If the request adds or reshapes a durable child capability under an existing feature, route to `add-subfeature`.
 - If the user reports a bug, regression, missing behavior, or concrete runtime failure against an existing canonical feature, especially one already marked `implemented` or already archived, treat that as follow-on delta work and route to `add-subfeature` before editing the old packet further.
-- If an active subfeature exists and the parent-feature impact is not yet explicit, route to `assess`.
 - If the user explicitly asks for reference-project research or wiki synthesis, if the target overlaps checked-in `references/` patterns and has no durable `reference-research.md` yet, or if discovery/design depends on choosing between multiple upstream patterns, route to `research`.
 - If the work is a small repo-local change whose shape does not depend on upstream comparison, skip `research` and continue directly into the normal planning path.
 - If the user supplied a concrete error message, failing command, or missing runtime path, verify the current code/runtime seam first before deciding the request is only a planning-doc update.
@@ -76,7 +75,7 @@ Use `guide-planning` when you need to decide the next planning step before slice
 Typical handoff:
 
 ```text
-guide-planning -> propose/add-subfeature/assess/research/discover -> design -> ui-flow -> breakdown -> review-planning -> human approval -> commit -> slice -> guide-execution
+guide-planning -> propose/add-subfeature/research/discover -> design -> ui-flow -> breakdown -> review-planning -> human approval -> commit -> slice -> guide-execution
 ```
 
 ## Lifecycle States

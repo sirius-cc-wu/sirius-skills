@@ -36,7 +36,7 @@ ownership outside repository planning artifacts.
 
 | Story ID | Story Size | Story Summary | Increments | Planned Slice IDs | Slice Areas | Blocked By | Execution Slice IDs | Notes |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| FCR-01 | M | Require consolidation declarations in planning authoring | I1 | fcr-declaration-contract | discover, add-subfeature, assess guidance |  |  | Seeds the durable declaration contract before review enforcement or maintenance consumption. |
+| FCR-01 | M | Require consolidation declarations in planning authoring | I1 | fcr-declaration-contract | discover and add-subfeature guidance |  |  | Seeds the durable declaration contract before review enforcement or maintenance consumption. |
 | FCR-03 | M | Record active versus historical outcomes durably | I1 | fcr-metadata-summary | planning and subfeature metadata carriers | fcr-declaration-contract |  | Introduces one compact consolidation summary in existing metadata files rather than a new sidecar artifact. |
 | FCR-02 | M | Flag additive-only expansion during planning review | I2 | fcr-review-gate | review-planning guidance, planning validation | fcr-metadata-summary |  | Makes missing or contradictory reduction stories blocking when overlap exists. |
 | FCR-04 | S | Keep the user-facing planning surface canonical and simpler | I2 | fcr-canonical-surface | guide-planning, README, methodology docs | fcr-review-gate |  | Explains which planning path remains canonical after consolidation and which surfaces become historical. |

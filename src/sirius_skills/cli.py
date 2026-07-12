@@ -23,10 +23,6 @@ class CommandSpec:
 
 
 PACKAGE_COMMANDS = {
-    "analyze-impact": (
-        "sirius_skills.commands.analyze_impact",
-        "sirius_skills.commands.analyze_impact",
-    ),
     "archive-artifacts": (
         "sirius_skills.commands.archive_artifacts",
         "sirius_skills.commands.archive_artifacts",

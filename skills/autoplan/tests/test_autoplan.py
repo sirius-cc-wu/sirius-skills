@@ -165,13 +165,21 @@ def create_subfeature(
             "## Problem\n\n"
             "Ctrl-S forces users through an awkward toggle.\n\n"
             "## Next Step\n\n"
-            "Assess the impact of retiring the toggle.\n",
+            "Design the simplified copy flow.\n",
             encoding="utf-8",
         )
         (subfeature_path / "user-stories.md").write_text(
             "# User Stories\n\n- TUI-001 Simplify transcript copy.\n",
             encoding="utf-8",
         )
+        result = run_add_subfeature_cli(
+            tmp_path,
+            "set-status",
+            "throughput-acceleration-workflow",
+            subfeature_id,
+            "discovery_ready",
+        )
+        assert result.returncode == 0, result.stderr
     return subfeature_path
 
 
@@ -182,7 +190,6 @@ def prepare_approved_subfeature(
     ready_slice_ids: Optional[list[str]] = None,
 ) -> Path:
     subfeature_path = create_subfeature(tmp_path, monkeypatch, authored_discover=True)
-    (subfeature_path / "impact-analysis.md").write_text("# Impact Analysis\n", encoding="utf-8")
     (subfeature_path / "system-design.md").write_text("# Design\n", encoding="utf-8")
     (subfeature_path / "slice-planning.md").write_text("# Slice Planning\n", encoding="utf-8")
     (subfeature_path / "slice-traceability.md").write_text(
@@ -679,7 +686,7 @@ def test_autoplan_routes_subfeature_stub_back_to_discover(
     assert payload["action"] == "run_discover"
 
 
-def test_autoplan_routes_authored_subfeature_discovery_to_assess(
+def test_autoplan_routes_authored_subfeature_discovery_to_design(
     tmp_path: Path, monkeypatch
 ) -> None:
     init_git_repo(tmp_path)
@@ -691,14 +698,14 @@ def test_autoplan_routes_authored_subfeature_discovery_to_assess(
     assert result.returncode == 0
     payload = json.loads(result.stdout)
     assert payload["target_kind"] == "subfeature"
-    assert payload["planning_status"] == "discovery_pending"
-    assert payload["subfeature_status"] == "draft"
+    assert payload["planning_status"] == "discovery_ready"
+    assert payload["subfeature_status"] == "discovery_ready"
     assert payload["subfeature_discover_stub"] is False
-    assert payload["next_owner"] == "assess"
-    assert payload["action"] == "run_assess"
+    assert payload["next_owner"] == "design"
+    assert payload["action"] == "run_design"
 
 
-def test_autoplan_owner_chain_hands_off_authored_subfeature_to_assess(
+def test_autoplan_owner_chain_hands_off_authored_subfeature_to_design(
     tmp_path: Path, monkeypatch
 ) -> None:
     init_git_repo(tmp_path)
@@ -714,12 +721,16 @@ def test_autoplan_owner_chain_hands_off_authored_subfeature_to_assess(
 
     assert result.returncode == 0
     payload = json.loads(result.stdout)
-    assert payload["next_owner"] == "assess"
-    assert payload["action"] == "run_assess"
-    assert payload["owner_chain"]["stop_reason"]["kind"] == "missing_required_input"
+    assert (subfeature_path / "system-design.md").is_file()
+    assert payload["next_owner"] == "design"
+    assert payload["action"] == "run_design"
+    assert payload["owner_chain"]["stop_reason"]["kind"] == "bootstrap_applied"
     assert payload["owner_handoff"]["should_invoke_skill"] is True
-    assert payload["owner_handoff"]["owner"] == "assess"
-    assert payload["owner_handoff"]["missing_files"] == ["impact-analysis.md"]
+    assert payload["owner_handoff"]["owner"] == "design"
+    assert payload["owner_handoff"]["missing_files"] == ["system-design.md"]
+    assert payload["owner_handoff"]["bootstrap_commands_executed"] == [
+        "sirius scaffold-design " f"{subfeature_path.relative_to(tmp_path)}/"
+    ]
 
 
 def test_autoplan_requires_commit_for_approved_subfeature_before_slice(

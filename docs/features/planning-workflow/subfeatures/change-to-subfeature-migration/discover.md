@@ -79,7 +79,7 @@ metadata by hand, which is risky and inconsistent across repositories.
   explicit repair path.
 - Keep the migration auditable and deterministic.
 - Prefer a repo-managed helper or skill over ad hoc shell instructions.
-- Keep the migrated output compatible with `guide-planning`, `assess`, and
+- Keep the migrated output compatible with `guide-planning`, `design`, and
   `breakdown`.
 
 ## Success Criteria
@@ -93,8 +93,9 @@ metadata by hand, which is risky and inconsistent across repositories.
 
 ## Risks and Open Questions
 
-- Which legacy change statuses should map directly to `draft`, `impact_ready`,
-  `design_ready`, `breakdown_ready`, `reviewed`, or `finalized`?
+- Which legacy change statuses should map directly to `draft`,
+  `discovery_ready`, `design_ready`, `breakdown_ready`, `reviewed`, or
+  `finalized`?
 - Should the first version migrate one selected feature at a time, or support
   whole-repo bulk migration immediately?
 - Should migration write backlink notes into the migrated docs, or keep the

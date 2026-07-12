@@ -7,7 +7,6 @@ from pathlib import Path
 REPO_ROOT = Path(__file__).resolve().parents[1]
 COMMANDS_DIR = REPO_ROOT / "src" / "sirius_skills" / "commands"
 WRITE_OWNER_ALLOWLIST = {
-    "analyze_impact",
     "archive_data",
     "bootstrap",
     "close_slice",
@@ -99,4 +98,3 @@ def test_commands_do_not_add_new_direct_workspace_writes() -> None:
         "New direct workspace writes in src/sirius_skills/commands/ must be "
         f"moved behind an owned helper:\n" + "\n".join(violations)
     )
-

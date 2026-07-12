@@ -166,7 +166,6 @@ def setup_repo(tmp_path: Path, monkeypatch):
     )
     subfeature_path = Path(subfeature_dir)
     write_file(subfeature_path / "discover.md", "# Discover\n")
-    write_file(subfeature_path / "impact-analysis.md", "# Impact\n")
     write_file(subfeature_path / "system-design.md", "# Design\n")
 
     git_commit_all(tmp_path, "fixture: initialize repo")

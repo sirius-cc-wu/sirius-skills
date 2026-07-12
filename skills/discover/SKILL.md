@@ -113,16 +113,17 @@ Prefer:
    other relevant context.
 3. Read any existing `draft.md` as rough input, then write `discover.md` with
    explicit problem framing, actors, goals, constraints, risks, and next-step
-   guidance.
+   guidance. After `discover.md` is authored, remove `draft.md` so the draft
+   cannot become a stale second source of truth.
 4. For canonical features, create `user-stories.md` with stable story
    identifiers unless the packet is intentionally too small for story-level
    planning; when omitting it, state why in `discover.md`. For subfeatures,
    reference parent story IDs instead of creating a subfeature-local story file.
 5. For canonical features, run `sirius manage-planning sync-status <feature-selector> --through discovery_ready` so `.planning-meta.json` records that discovery is complete.
-6. For subfeatures under `.../subfeatures/<subfeature-id>/`, do not try to force `discovery_ready` through `manage_planning.py`. Subfeature lifecycle stays in `.subfeature-meta.json`, authored discovery still leaves the raw subfeature at `draft`, and the next owner is typically `assess`.
+6. For subfeatures under `.../subfeatures/<subfeature-id>/`, advance with `sirius manage-subfeatures set-status <feature> <subfeature-id> discovery_ready` after authoring `discover.md`; do not try to force `discovery_ready` through `manage_planning.py`.
 7. Stop when the work is concrete enough for the next planning owner:
    - canonical feature: `design`
-   - subfeature: usually `assess`
+   - subfeature: usually `design`
 
 ## Guardrails
 

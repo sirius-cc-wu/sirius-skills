@@ -57,7 +57,7 @@ missing capability on top of that shipped work.
    For bugfix or missing-behavior follow-on work, make the current failure and
    the expected repaired behavior explicit so later planning does not collapse
    back into the archived parent narrative.
-6. Hand off to `assess`, `design`, `breakdown`, and `review-planning` using the selected subfeature folder.
+6. Hand off to `discover`, `design`, `breakdown`, and `review-planning` using the selected subfeature folder.
 7. After review passes, keep the subfeature at `reviewed` until a human explicitly approves it, then record that approval in `.subfeature-meta.json` before `slice` bootstrap.
 
 ## Source of Truth Rules
@@ -92,7 +92,7 @@ sirius manage-subfeatures add \
 
 # Advance subfeature state once required artifacts exist
 sirius manage-subfeatures set-status \
-  "<feature-slug>" "<subfeature-id>" impact_ready
+  "<feature-slug>" "<subfeature-id>" discovery_ready
 
 # After review passes, record explicit human approval and any ready slice IDs
 sirius manage-subfeatures approve \

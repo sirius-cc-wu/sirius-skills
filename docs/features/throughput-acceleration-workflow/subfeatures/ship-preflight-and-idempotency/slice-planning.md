@@ -19,8 +19,8 @@ bootstrapping execution slices.
 - Parent feature path: `docs/features/throughput-acceleration-workflow`
 - Subfeature ID: `ship-preflight-and-idempotency`
 - Subfeature type: `additive`
-- Current subfeature status: `impact_ready`
-- Impact input: `impact-analysis.md` is present and should drive the
+- Current subfeature status: `discovery_ready`
+- Discovery input: `discover.md` is present and should drive the
   subfeature-local slice plan.
 
 ### Affected Story IDs

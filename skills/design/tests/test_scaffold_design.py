@@ -68,7 +68,6 @@ def setup_subfeature(tmp_path: Path, monkeypatch):
     ) == 0
     subfeature_path = feature_path / "subfeatures" / "replace-legacy-flow"
     write_file(subfeature_path / "discover.md", "# Discover\n")
-    write_file(subfeature_path / "impact-analysis.md", "# Impact\n")
     return subfeature_path
 
 
@@ -103,4 +102,4 @@ def test_scaffold_design_creates_subfeature_scaffold(tmp_path, monkeypatch):
     content = (subfeature_path / "system-design.md").read_text(encoding="utf-8")
     assert "# System design: Replace Legacy Flow" in content
     assert "- Parent feature: `checkout`" in content
-    assert "- Impact analysis: `present`" in content
+    assert "Impact analysis" not in content

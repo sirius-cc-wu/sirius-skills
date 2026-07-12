@@ -194,7 +194,6 @@ def test_scaffold_subfeature_seeds_subfeature_context(tmp_path, monkeypatch):
     metadata["affected_story_ids"] = ["CHK-01", "CHK-02"]
     metadata["affected_slice_ids"] = ["CHK-101", "CHK-102"]
     metadata_path.write_text(json.dumps(metadata, indent=2) + "\n", encoding="utf-8")
-    write_file(subfeature_dir / "impact-analysis.md", "# Impact Analysis\n")
     write_file(subfeature_dir / "system-design.md", "# Design\n")
 
     target = "docs/features/checkout/subfeatures/replace-legacy-flow"
@@ -207,7 +206,7 @@ def test_scaffold_subfeature_seeds_subfeature_context(tmp_path, monkeypatch):
     assert "- Parent feature: `checkout`" in slice_planning
     assert "- Subfeature ID: `replace-legacy-flow`" in slice_planning
     assert "- Subfeature type: `superseding`" in slice_planning
-    assert "- `impact-analysis.md`" in slice_planning
+    assert "impact-analysis.md" not in slice_planning
     assert "- `CHK-01`" in slice_planning
     assert "- `CHK-101`" in slice_planning
     assert "- `docs/features/checkout/discover.md`" in slice_planning

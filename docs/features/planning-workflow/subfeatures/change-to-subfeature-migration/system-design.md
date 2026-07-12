@@ -79,7 +79,7 @@ Recommended state mapping:
 | Legacy change status | New subfeature status |
 | --- | --- |
 | `draft` | `draft` |
-| `impact_ready` | `impact_ready` |
+| `discovery_ready` | `discovery_ready` |
 | `design_ready` | `design_ready` |
 | `breakdown_ready` | `breakdown_ready` |
 | `reviewed` | `reviewed` |

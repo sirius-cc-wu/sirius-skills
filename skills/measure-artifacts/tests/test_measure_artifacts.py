@@ -155,7 +155,6 @@ def create_finalized_subfeature_target(env):
     )
     subfeature_path = Path(subfeature_dir)
     subfeature_path.joinpath("discover.md").write_text("# Discover\n", encoding="utf-8")
-    subfeature_path.joinpath("impact-analysis.md").write_text("# Impact Analysis\n", encoding="utf-8")
     subfeature_path.joinpath("system-design.md").write_text("# System Design\n", encoding="utf-8")
     subfeature_path.joinpath("slice-planning.md").write_text("# Slice Planning\n", encoding="utf-8")
     subfeature_path.joinpath("slice-traceability.md").write_text(

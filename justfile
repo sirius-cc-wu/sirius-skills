@@ -5,7 +5,7 @@ set shell := ["bash", "-c"]
 repo_root := justfile_directory()
 common_flags := "--global --yes --agent github-copilot --agent codex --agent antigravity --agent antigravity-cli"
 
-managed_skills := "autoplan audit-artifacts measure-artifacts trace-artifacts report-artifacts repair-artifacts archive-artifacts brief breakdown create-pr close-slice commit bootstrap design discover add-subfeature migrate-subfeatures migrate-slices assess guide-scope guide-planning propose blueprint reconcile-execution review-execution review-planning simplify guide-execution learn ship ship-worktree ship-slice slice ui-flow governance-update research"
+managed_skills := "autoplan audit-artifacts measure-artifacts trace-artifacts report-artifacts repair-artifacts archive-artifacts brief breakdown create-pr close-slice commit bootstrap design discover add-subfeature migrate-subfeatures migrate-slices guide-scope guide-planning propose blueprint reconcile-execution review-execution review-planning simplify guide-execution learn ship ship-worktree ship-slice slice ui-flow governance-update research"
 
 # Install the python package, sync references, and add skills
 install: install-python-package sync-shared-references

@@ -119,7 +119,7 @@ Use `add-subfeature` to create `replace-legacy-flow` under `checkout`.
 ```
 
 ```text
-Use `assess` for subfeature `replace-legacy-flow` under `checkout`.
+Use `discover` for `docs/features/checkout/subfeatures/replace-legacy-flow/` and replace the bootstrap draft with the real subfeature discovery packet.
 ```
 
 If the feature is already shipped and the user is reporting a new bug,

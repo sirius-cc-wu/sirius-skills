@@ -133,7 +133,7 @@ Rules:
 
 Examples:
 
-- good: `propose`, `discover`, `design`, `assess`
+- good: `propose`, `discover`, `design`, `breakdown`
 - acceptable when needed: `add-subfeature`, `guide-planning`, `review-planning`
 - avoid for skill names: `proposal`, `impact-analysis`
 
@@ -144,7 +144,7 @@ Examples:
 
 - `docs/proposals/`
 - `proposal_dir`
-- `impact-analysis.md`
+- `system-design.md`
 - `.proposal-meta.json`
 
 ### Keep workflow naming boundaries clear

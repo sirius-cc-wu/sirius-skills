@@ -17,7 +17,6 @@ Use a **two-layer workflow**:
     - `migrate-subfeatures` (for legacy change packets)
     - `migrate-planning-model` (for simplified feature/subfeature layout repair)
     - `migrate-slices` (for co-locating execution slices)
-   - `assess`
    - `research` (when upstream comparison materially affects planning shape)
    - `discover`
    - `design`
@@ -108,7 +107,7 @@ Its job is to:
 
 - resolve or initialize the feature planning folder
 - verify the current planning artifacts and metadata
-- decide whether the next step is `propose`, `add-subfeature`, `assess`, `research`, `discover`, `design`, `ui-flow`, `breakdown`, `review-planning`, or an approval/commit stop before execution begins
+- decide whether the next step is `propose`, `add-subfeature`, `research`, `discover`, `design`, `ui-flow`, `breakdown`, `review-planning`, or an approval/commit stop before execution begins
 - keep planning handoff decisions durable through explicit readiness states
 - keep the canonical planning surface explicit when reviewed work narrows or supersedes older workflow paths
 
@@ -125,7 +124,7 @@ Expected planning states:
 Recommended handoff:
 
 ```text
-guide-scope -> guide-planning -> propose/add-subfeature/assess/research/discover/design/ui-flow/breakdown/review-planning -> human approval -> commit -> slice/ship -> guide-execution
+guide-scope -> guide-planning -> propose/add-subfeature/research/discover/design/ui-flow/breakdown/review-planning -> human approval -> commit -> slice/ship -> guide-execution
 ```
 
 When the repository prefers one feature or subfeature per worktree branch,
@@ -158,7 +157,7 @@ in feature/subfeature artifacts, but use runtime files such as checkpoints,
 event logs, and `request-handoff.json` when another agent or later run needs to
 pick up the latest request-level route decision.
 
-After a subfeature exists, use `assess` before subfeature-local design when you need an explicit record of affected baseline artifacts, stories, increments, and slices.
+After a subfeature exists, author the real subfeature-local `discover.md` before design. Bootstrap `draft.md` is rough input only and should disappear once discovery is complete.
 
 Use `research` only when upstream comparison can materially change the planning
 shape: explicit user requests for reference-project research or wiki synthesis,
@@ -167,26 +166,9 @@ missing durable research for a feature or subfeature that overlaps checked-in
 between multiple upstream patterns. Skip `research` for small repo-local edits
 whose shape does not depend on external comparison.
 
-### 0b. Assess existing-feature impact
+### 0b. Capture reference-project comparison only when it matters
 
-Use `assess` after `add-subfeature` and before subfeature-local design or breakdown.
-
-Its job is to:
-
-- inspect the canonical feature baseline
-- write `impact-analysis.md` inside the selected subfeature
-- record affected artifacts, story IDs, and slice IDs in `.subfeature-meta.json`
-- make the changed scope explicit before design starts
-
-Recommended handoff:
-
-```text
-guide-planning -> add-subfeature -> assess -> design -> breakdown
-```
-
-### 0c. Capture reference-project comparison only when it matters
-
-Use `research` after `guide-planning` or `assess` when durable upstream
+Use `research` after `guide-planning` or `discover` when durable upstream
 comparison is needed before discovery or design should continue.
 
 Its job is to:
@@ -204,7 +186,7 @@ Recommended handoff:
 
 ```text
 guide-planning -> research -> discover/design
-guide-planning -> add-subfeature -> assess -> research -> design/breakdown
+guide-planning -> add-subfeature -> discover -> research -> design/breakdown
 ```
 
 Skip `research` when the work is repo-local and does not depend on external
@@ -337,8 +319,8 @@ sirius scaffold-breakdown \
 ```
 
 When the target is a real subfeature, the scaffold seeds subfeature context from
-`.subfeature-meta.json` and `impact-analysis.md` so the breakdown artifacts
-stay tied to the affected canonical stories, slices, and baseline docs.
+`.subfeature-meta.json` so the breakdown artifacts stay tied to the affected
+canonical stories, slices, and baseline docs.
 Those breakdown artifacts remain subfeature-local; they are not default
 finalization targets for the canonical feature's `slice-planning.md` or
 `slice-traceability.md`. New executable planning should prefer this subfeature
@@ -397,9 +379,8 @@ relevant borrowing-path decisions still line up with `discover.md`,
 
 It can review either canonical feature planning or a selected feature subfeature.
 For subfeatures, the review should center on the subfeature-local `discover.md`,
-optional `impact-analysis.md`, `system-design.md`, `slice-planning.md`, and
-`slice-traceability.md`, while using the canonical feature docs only as baseline
-context for the delta.
+`system-design.md`, `slice-planning.md`, and `slice-traceability.md`, while using
+the canonical feature docs only as baseline context for the delta.
 
 When the review target is a subfeature, write findings back into the
 subfeature-local docs and confirm the planned slices represent only the new or
@@ -573,7 +554,6 @@ projects can override it in `.skills/planning.json`.
 <planning_dir>/<feature-slug>/subfeatures/<subfeature-id>/
   discover.md
   .subfeature-meta.json
-  impact-analysis.md        # when existing baseline impact matters
   system-design.md
   ui-design.md              # optional
   slice-planning.md

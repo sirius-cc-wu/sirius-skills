@@ -146,15 +146,14 @@ def test_add_creates_durable_subfeature_and_updates_planning_registry(tmp_path, 
     assert "user-facing simplification" in draft
 
 
-def test_impact_ready_requires_impact_analysis_and_syncs_planning_status(tmp_path, monkeypatch, capsys):
+def test_discovery_ready_requires_authored_discover_and_removes_draft(tmp_path, monkeypatch, capsys):
     module = load_module(SCRIPT_PATH, "manage_subfeatures")
-    planning_module = load_module(PLANNING_SCRIPT_PATH, "manage_planning_for_impact")
+    planning_module = load_module(PLANNING_SCRIPT_PATH, "manage_planning_for_discovery")
     monkeypatch.chdir(tmp_path)
     feature_dir = setup_feature(tmp_path)
 
     assert run_cli(module, "manage_subfeatures.py", monkeypatch, "add", "checkout", "replace-legacy-flow") == 0
     subfeature_dir = feature_dir / "subfeatures" / "replace-legacy-flow"
-    write_authored_discover(subfeature_dir)
     exit_code = run_cli(
         module,
         "manage_subfeatures.py",
@@ -162,13 +161,13 @@ def test_impact_ready_requires_impact_analysis_and_syncs_planning_status(tmp_pat
         "set-status",
         "checkout",
         "replace-legacy-flow",
-        "impact_ready",
+        "discovery_ready",
     )
     captured = capsys.readouterr()
     assert exit_code == 2
-    assert "Missing required file 'impact-analysis.md'." in captured.err
+    assert "Missing required file 'discover.md'." in captured.err
 
-    write_file(subfeature_dir / "impact-analysis.md")
+    write_authored_discover(subfeature_dir)
     assert run_cli(
         module,
         "manage_subfeatures.py",
@@ -176,7 +175,7 @@ def test_impact_ready_requires_impact_analysis_and_syncs_planning_status(tmp_pat
         "set-status",
         "checkout",
         "replace-legacy-flow",
-        "impact_ready",
+        "discovery_ready",
         "--affected-artifact",
         "docs/features/checkout/discover.md",
         "--story-id",
@@ -187,6 +186,7 @@ def test_impact_ready_requires_impact_analysis_and_syncs_planning_status(tmp_pat
         str(feature_dir / "subfeatures" / "replace-legacy-flow")
     )
     assert planning_meta["status"] == "discovery_ready"
+    assert not (subfeature_dir / "draft.md").exists()
 
 
 def test_guide_planning_rejects_mutating_subfeature_status(tmp_path, monkeypatch, capsys):
@@ -197,7 +197,6 @@ def test_guide_planning_rejects_mutating_subfeature_status(tmp_path, monkeypatch
 
     assert run_cli(module, "manage_subfeatures.py", monkeypatch, "add", "checkout", "replace-legacy-flow") == 0
     write_authored_discover(feature_dir / "subfeatures" / "replace-legacy-flow")
-    write_file(feature_dir / "subfeatures" / "replace-legacy-flow" / "impact-analysis.md")
 
     exit_code = run_cli(
         planning_module,
@@ -221,7 +220,6 @@ def test_reviewed_requires_review_note_and_validate_reports_success(tmp_path, mo
     assert run_cli(module, "manage_subfeatures.py", monkeypatch, "add", "checkout", "replace-legacy-flow") == 0
     subfeature_dir = feature_dir / "subfeatures" / "replace-legacy-flow"
     write_authored_discover(subfeature_dir)
-    write_file(subfeature_dir / "impact-analysis.md")
     write_file(subfeature_dir / "system-design.md")
     write_file(subfeature_dir / "slice-planning.md")
     write_file(subfeature_dir / "slice-traceability.md")
@@ -233,7 +231,7 @@ def test_reviewed_requires_review_note_and_validate_reports_success(tmp_path, mo
         "set-status",
         "checkout",
         "replace-legacy-flow",
-        "impact_ready",
+        "discovery_ready",
     ) == 0
     assert run_cli(
         module,
@@ -296,7 +294,6 @@ def test_approve_records_human_approval_and_slice_ready_handoff(tmp_path, monkey
     assert run_cli(module, "manage_subfeatures.py", monkeypatch, "add", "checkout", "replace-legacy-flow") == 0
     subfeature_dir = feature_dir / "subfeatures" / "replace-legacy-flow"
     write_authored_discover(subfeature_dir)
-    write_file(subfeature_dir / "impact-analysis.md")
     write_file(subfeature_dir / "system-design.md")
     write_file(subfeature_dir / "slice-planning.md")
     write_file(subfeature_dir / "slice-traceability.md")
@@ -308,7 +305,7 @@ def test_approve_records_human_approval_and_slice_ready_handoff(tmp_path, monkey
         "set-status",
         "checkout",
         "replace-legacy-flow",
-        "impact_ready",
+        "discovery_ready",
     ) == 0
     assert run_cli(
         module,
@@ -375,7 +372,6 @@ def test_set_status_persists_normalized_consolidation_summary(tmp_path, monkeypa
     assert run_cli(module, "manage_subfeatures.py", monkeypatch, "add", "checkout", "replace-legacy-flow") == 0
     subfeature_dir = feature_dir / "subfeatures" / "replace-legacy-flow"
     write_authored_discover(subfeature_dir)
-    write_file(subfeature_dir / "impact-analysis.md")
 
     assert run_cli(
         module,
@@ -384,7 +380,7 @@ def test_set_status_persists_normalized_consolidation_summary(tmp_path, monkeypa
         "set-status",
         "checkout",
         "replace-legacy-flow",
-        "impact_ready",
+        "discovery_ready",
         "--consolidation-json",
         json.dumps(
             {
@@ -434,7 +430,6 @@ def test_finalized_warns_when_linked_execution_slices_remain_open(
     assert run_cli(module, "manage_subfeatures.py", monkeypatch, "add", "checkout", "replace-legacy-flow") == 0
     subfeature_dir = feature_dir / "subfeatures" / "replace-legacy-flow"
     write_authored_discover(subfeature_dir)
-    write_file(subfeature_dir / "impact-analysis.md")
     write_file(subfeature_dir / "system-design.md")
     write_file(subfeature_dir / "slice-planning.md")
     write_file(
@@ -452,7 +447,7 @@ def test_finalized_warns_when_linked_execution_slices_remain_open(
         "set-status",
         "checkout",
         "replace-legacy-flow",
-        "impact_ready",
+        "discovery_ready",
     ) == 0
     assert run_cli(
         module,

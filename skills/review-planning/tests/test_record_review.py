@@ -68,7 +68,7 @@ def setup_subfeature(tmp_path: Path, monkeypatch):
         "replace-legacy-flow",
     ) == 0
     subfeature_path = feature_path / "subfeatures" / "replace-legacy-flow"
-    write_file(subfeature_path / "impact-analysis.md", "# Impact\n")
+    write_file(subfeature_path / "discover.md", "# Discover\n")
     write_file(subfeature_path / "system-design.md", "# Design\n")
     write_file(subfeature_path / "slice-planning.md", "# Slice Planning\n")
     write_file(subfeature_path / "slice-traceability.md", "# Slice Traceability\n")
@@ -79,7 +79,7 @@ def setup_subfeature(tmp_path: Path, monkeypatch):
         "set-status",
         "checkout",
         "replace-legacy-flow",
-        "impact_ready",
+        "discovery_ready",
     ) == 0
     assert run_cli(
         subfeature_module,

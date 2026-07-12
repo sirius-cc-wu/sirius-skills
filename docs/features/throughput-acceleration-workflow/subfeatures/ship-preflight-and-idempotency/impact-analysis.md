@@ -5,7 +5,7 @@
 - Parent Feature: `throughput-acceleration-workflow`
 - Subfeature ID: `ship-preflight-and-idempotency`
 - Subfeature Type: `additive`
-- Current Subfeature Status: `impact_ready`
+- Current Subfeature Status: `discovery_ready`
 
 ## Subfeature Summary
 

@@ -31,7 +31,6 @@ REGISTRY_HEADER = (
 METADATA_FILE = ".subfeature-meta.json"
 DISCOVERY_DRAFT_FILE = "draft.md"
 DISCOVER_FILE = "discover.md"
-IMPACT_FILE = "impact-analysis.md"
 DESIGN_FILE = "system-design.md"
 SLICE_PLANNING_FILE = "slice-planning.md"
 SLICE_TRACEABILITY_FILE = "slice-traceability.md"
@@ -39,7 +38,7 @@ DISCOVER_STUB_MARKER = "<!-- add-subfeature:discover-stub -->"
 SLUG_PATTERN = re.compile(r"^[A-Za-z0-9][A-Za-z0-9._-]*$")
 STATUS_SEQUENCE = [
     "draft",
-    "impact_ready",
+    "discovery_ready",
     "design_ready",
     "breakdown_ready",
     "reviewed",
@@ -48,8 +47,10 @@ STATUS_SEQUENCE = [
 VALID_STATUSES = set(STATUS_SEQUENCE)
 STATUS_ALIASES = {
     "draft": "draft",
-    "impact_ready": "impact_ready",
-    "impact-ready": "impact_ready",
+    "discovery_ready": "discovery_ready",
+    "discovery-ready": "discovery_ready",
+    "discover_ready": "discovery_ready",
+    "discover-ready": "discovery_ready",
     "design_ready": "design_ready",
     "design-ready": "design_ready",
     "breakdown_ready": "breakdown_ready",
@@ -563,16 +564,12 @@ def validate_subfeature_state(
     if not exists:
         return False, issues, checks
 
-    if status_index >= STATUS_SEQUENCE.index("impact_ready"):
+    if status_index >= STATUS_SEQUENCE.index("discovery_ready"):
         ok, detail = validate_authored_discover(subfeature_dir)
         record_check("discover", ok, detail)
     else:
         ok, detail = validate_discovery_draft_or_packet(subfeature_dir)
         record_check("discovery_input", ok, detail)
-
-    if status_index >= STATUS_SEQUENCE.index("impact_ready"):
-        ok, detail = validate_required_file(subfeature_dir, IMPACT_FILE)
-        record_check("impact_analysis", ok, detail)
 
     if status_index >= STATUS_SEQUENCE.index("design_ready"):
         ok, detail = validate_required_file(subfeature_dir, DESIGN_FILE)
@@ -653,7 +650,16 @@ def validate_subfeature_state(
     return not issues, issues, checks
 
 
+def remove_discovery_draft_if_authored(subfeature_dir: str) -> None:
+    draft_path = Path(subfeature_dir) / DISCOVERY_DRAFT_FILE
+    discover_path = Path(subfeature_dir) / DISCOVER_FILE
+    if draft_path.exists() and discover_path.exists():
+        draft_path.unlink()
+
+
 def can_transition(current: str, target: str) -> bool:
+    current = normalize_status(current)
+    target = normalize_status(target)
     if current == target:
         return True
     return STATUS_SEQUENCE.index(target) - STATUS_SEQUENCE.index(current) == 1
@@ -732,7 +738,8 @@ def update_subfeature_status(
 
     subfeature_dir = subfeature_dir_for_row(selected, scope_context)
     metadata = read_metadata(subfeature_dir)
-    current_status = str(metadata["status"])
+    current_status = normalize_status(str(metadata["status"]))
+    status = normalize_status(status)
 
     if not force and not can_transition(current_status, status):
         return (
@@ -786,6 +793,8 @@ def update_subfeature_status(
         return False, "Cannot set status: " + "; ".join(issues)
 
     write_metadata(subfeature_dir, updated_metadata)
+    if STATUS_SEQUENCE.index(status) >= STATUS_SEQUENCE.index("discovery_ready"):
+        remove_discovery_draft_if_authored(subfeature_dir)
     legacy_planning_meta_path = Path(subfeature_dir) / ".planning-meta.json"
     if legacy_planning_meta_path.exists():
         legacy_planning_meta_path.unlink()

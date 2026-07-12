@@ -80,7 +80,6 @@ def write_transition_guardrail_feature(
     if not include_subfeature:
         return
     (subfeature_dir / "discover.md").write_text("# Discover\n", encoding="utf-8")
-    (subfeature_dir / "impact-analysis.md").write_text("# Impact\n", encoding="utf-8")
     (subfeature_dir / "system-design.md").write_text("# Design\n", encoding="utf-8")
     (subfeature_dir / "slice-planning.md").write_text("# Slice Planning\n", encoding="utf-8")
     (subfeature_dir / ".subfeature-meta.json").write_text(

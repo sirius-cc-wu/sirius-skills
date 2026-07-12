@@ -14,9 +14,8 @@ stack with checkpointed resume support.
 2. Read active and candidate learnings for the target scope.
 3. Surface the next planning owner based on the current planning status.
 4. Optionally execute the planning owner chain in sequence until a hard
-   boundary is hit. For canonical features that chain is `discover -> design
-   -> breakdown -> review-planning`; for subfeatures it is normally
-   `discover -> assess -> design -> breakdown -> review-planning`.
+   boundary is hit. For canonical features and subfeatures that chain is
+   normally `discover -> design -> breakdown -> review-planning`.
 5. Evaluate the durable human-approval gate for `planning_reviewed` targets.
 6. After approval is recorded, hand approved-but-uncommitted planning back to the
    `commit` owner before execution begins.
@@ -98,12 +97,12 @@ Optional CLI overrides:
    scaffold pair:
    - `slice-planning.md`
    - `slice-traceability.md`
-5. Invoke the returned owner skill (`discover`, `assess`, `design`,
-   `breakdown`, or `review-planning`) and let that skill author or repair the
+5. Invoke the returned owner skill (`discover`, `design`,
+    `breakdown`, or `review-planning`) and let that skill author or repair the
    planning artifacts it owns.
    If the target has only `draft.md`, lacks `discover.md`, or has a
-   scaffold-marked `discover.md`, treat `discover` as the next owner rather
-   than advancing to `design` or `assess`.
+    scaffold-marked `discover.md`, treat `discover` as the next owner rather
+    than advancing to `design`.
 6. After the owner skill completes, rerun `autoplan.py <target> --json` and
    continue looping until one of these explicit stop boundaries is reached:
    - `approval_required`
@@ -143,8 +142,8 @@ same request when the next owner becomes `commit`.
 That means:
 
 - invoke `autoplan.py`
-- if it hands off to an automatable owner such as `discover`, `assess`,
-  `design`, `breakdown`, or `review-planning`, run that owner in the same turn
+- if it hands off to an automatable owner such as `discover`, `design`,
+  `breakdown`, or `review-planning`, run that owner in the same turn
 - rerun `autoplan.py` after each owner completes
 - continue until one of these real stop boundaries is reached:
   - `approval_required`

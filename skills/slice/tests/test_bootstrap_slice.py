@@ -143,7 +143,6 @@ def setup_reviewed_subfeature(
     subfeature_dir = subfeatures_dir / subfeature_id
     subfeature_dir.mkdir(parents=True, exist_ok=True)
     write_planning_file(subfeature_dir, "discover.md", "# Discover\n\nReady.\n")
-    write_planning_file(subfeature_dir, "impact-analysis.md", "# Impact Analysis\n\nReady.\n")
     write_planning_file(subfeature_dir, "system-design.md", "# System Design\n\nReady.\n")
     write_planning_file(subfeature_dir, "slice-planning.md", "# Slice Planning\n\nReady.\n")
     write_planning_file(

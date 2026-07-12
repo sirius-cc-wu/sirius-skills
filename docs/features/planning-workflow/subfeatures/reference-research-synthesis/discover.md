@@ -100,9 +100,9 @@ feature.
   an ongoing research/synthesis workflow after bootstrap.
 - `skills/discover/SKILL.md` frames problem discovery, but it does not currently
   require a durable wiki update or a separate research handoff.
-- `skills/design/SKILL.md`, `skills/assess/SKILL.md`, and
-  `skills/review-planning/SKILL.md` already tell maintainers to read references
-  when relevant, which shows the need exists but is still distributed.
+- `skills/design/SKILL.md` and `skills/review-planning/SKILL.md` already tell
+  maintainers to read references when relevant, which shows the need exists but
+  is still distributed.
 - `AGENTS.md` already treats docs and skills as durable repo artifacts, so a
   reusable wiki-synthesis capability fits the repository's current workflow
   philosophy.

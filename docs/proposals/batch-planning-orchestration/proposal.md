@@ -64,7 +64,7 @@ The orchestrator should:
 4. For canonical features, advance metadata to `discovery_ready` through the
    normal planning status tooling.
 5. For subfeatures, preserve subfeature lifecycle ownership in
-   `.subfeature-meta.json` and leave downstream routing to `assess`.
+   `.subfeature-meta.json` and leave downstream routing to `design`.
 6. Stop after discovery artifacts are ready for human review.
 
 ### Phase 2: Human Discovery Review
@@ -89,7 +89,7 @@ The orchestrator should:
 1. Select all targets ready for planning beyond discovery.
 2. Run the existing one-target `autoplan` flow with owner-chain execution where
    appropriate.
-3. Delegate artifact authoring to `assess`, `design`, `breakdown`, and
+3. Delegate artifact authoring to `design`, `breakdown`, and
    `review-planning` as directed by the single-target autoplan handoff.
 4. Continue each target until a real stop boundary is reached:
    `planning_reviewed`, `approval_required`, `commit_checkpoint`,

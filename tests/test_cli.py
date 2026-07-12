@@ -19,10 +19,6 @@ def test_discover_commands_lists_runnable_scripts_only() -> None:
     commands = cli.discover_commands()
 
     assert (
-        commands["analyze-impact"].module_name
-        == "sirius_skills.commands.analyze_impact"
-    )
-    assert (
         commands["archive-artifacts"].module_name
         == "sirius_skills.commands.archive_artifacts"
     )

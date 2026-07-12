@@ -112,7 +112,7 @@ The managed repo-first skill set is grouped into:
 - repo utilities: `skills/bootstrap/`, `skills/commit/`, `skills/create-pr/`, `skills/governance-update/`, `skills/simplify/`
 - accelerator utilities: `skills/autoplan/`, `skills/learn/`, `skills/ship-slice/`, `skills/ship-worktree/`
 - artifact maintenance: `skills/audit-artifacts/`, `skills/measure-artifacts/`, `skills/trace-artifacts/`, `skills/report-artifacts/`, `skills/repair-artifacts/`, `skills/archive-artifacts/`
-- planning layer: `skills/guide-scope/`, `skills/guide-planning/`, `skills/propose/`, `skills/add-subfeature/`, `skills/migrate-subfeatures/`, `migrate-planning-model`, `skills/migrate-slices/`, `skills/assess/`, `skills/research/`, `skills/discover/`, `skills/design/`, `skills/ui-flow/`, `skills/breakdown/`, `skills/review-planning/`
+- planning layer: `skills/guide-scope/`, `skills/guide-planning/`, `skills/propose/`, `skills/add-subfeature/`, `skills/migrate-subfeatures/`, `migrate-planning-model`, `skills/migrate-slices/`, `skills/research/`, `skills/discover/`, `skills/design/`, `skills/ui-flow/`, `skills/breakdown/`, `skills/review-planning/`
 - execution layer: `skills/slice/`, `skills/guide-execution/`, `skills/ship/`, `skills/ship-worktree/`, `skills/brief/`, `skills/blueprint/`, `skills/review-execution/`, `skills/reconcile-execution/`, `skills/close-slice/`
 
 If a project has no extra configuration, these skills should still work with generic conventions.
@@ -163,7 +163,6 @@ For repositories that use repo-first planning, the recommended short-name planni
 - `skills/migrate-subfeatures/`
 - `sirius migrate-planning-model`
 - `skills/migrate-slices/`
-- `skills/assess/`
 - `skills/research/`
 - `skills/discover/`
 - `skills/design/`
@@ -173,7 +172,7 @@ For repositories that use repo-first planning, the recommended short-name planni
 
 These skills sit **before** the execution-slice skills:
 
-- planning layer: `guide-scope`, `guide-planning`, `propose`, `add-subfeature`, `migrate-subfeatures`, `migrate-planning-model`, `migrate-slices`, `assess`, `research`, `discover`, `design`, `ui-flow`, `breakdown`, `review-planning`
+- planning layer: `guide-scope`, `guide-planning`, `propose`, `add-subfeature`, `migrate-subfeatures`, `migrate-planning-model`, `migrate-slices`, `research`, `discover`, `design`, `ui-flow`, `breakdown`, `review-planning`
 - execution layer: `slice`, `guide-execution`, `ship`, `ship-worktree`, `brief`, `blueprint`, `review-execution`, `reconcile-execution`, `close-slice`
 
 Canonical planning surface:
@@ -233,21 +232,20 @@ Manual repo workflow (explicit control path):
 2. `guide-planning` resolves the feature planning folder, validates planning readiness, and routes to the right planning skill.
 3. If the request is still speculative and should not become a canonical feature yet, `propose` creates a proposal folder under `docs/proposals/<proposal-slug>/`.
 4. New feature folders include a feature-local `subfeatures/` registry by default. If the request adds or reshapes executable delivery work, `add-subfeature` creates a subfeature folder under `docs/features/<feature>/subfeatures/<subfeature-id>/`.
-5. `assess` inspects the parent feature and writes subfeature-scoped `impact-analysis.md` before subfeature-local design starts.
-6. When checked-in reference comparison materially affects planning shape, `research` writes `reference-research.md` and, when a derived wiki root already exists, can also update one focused wiki page plus wiki `index.md` and `log.md`.
-7. `discover` creates problem framing and initial story candidates.
-8. `design` turns that into architecture, interfaces, and risks.
-9. `ui-flow` adds optional UX or screen-flow artifacts.
-10. `breakdown` turns feature-owned repo stories into directly executable work items under the selected subfeature and groups those slices into small demonstrable increments. Direct feature-level breakdown remains a compatibility path for existing packets.
-11. `review-planning` reviews planning artifacts and slice definitions, then stops for explicit human approval.
-12. After approval, commit the planning artifacts so the reviewed plan is durable before execution begins. For reviewed subfeatures, also record that approval in `.subfeature-meta.json` so the approval boundary stays durable in the single source of truth.
-13. `slice` validates approved, committed execution-ready input, bootstraps a slice-scoped execution slice, and hands off to `guide-execution`. New subfeature work creates that execution slice under the owning subfeature's local `slices/` root.
-14. `guide-execution` routes new slice-scoped execution to `blueprint`, where the slice contract and technical execution plan live together. `brief` and `brief_ready` remain legacy or explicit-clarification paths. When `.skills/execution.json` enables `auto_start_implementation`, that handoff continues directly into implementation after the blueprint is marked ready.
-15. `ship` is the optional batch entrypoint when a reviewed and committed feature or subfeature backlog should be worked one planned slice at a time. It respects increment order first, then slice dependencies within the current increment, resumes or bootstraps one mapped slice, reports the next concrete execution owner for that slice, and stops at blockers or commit checkpoints. Its JSON output also includes a machine-readable `handoff_payload` for the active slice so future accelerators can consume the same routing contract without changing `ship` ownership.
-16. `ship-worktree` is the optional wrapper entrypoint when that same reviewed and committed backlog should execute in a dedicated git worktree branch. It owns worktree lifecycle and PR handoff, but still delegates slice backlog execution to `ship`.
-17. `review-execution` checks implementation and validation outcomes against the slice-scoped execution artifacts before closure.
-18. `close-slice` closes completed execution slices, records durable closure metadata, and invokes shared owner-completion reconciliation for linked planning owners.
-19. `reconcile-execution` records durable design-versus-execution alignment in `system-design.md`, and `ship --finalize` can first run the same shared owner-completion reconciliation before routing `archive-artifacts` to summarize and archive the closed slices.
+5. When checked-in reference comparison materially affects planning shape, `research` writes `reference-research.md` and, when a derived wiki root already exists, can also update one focused wiki page plus wiki `index.md` and `log.md`.
+6. `discover` creates problem framing and initial story candidates. For subfeatures, authored `discover.md` replaces bootstrap `draft.md` before design starts.
+7. `design` turns that into architecture, interfaces, and risks.
+8. `ui-flow` adds optional UX or screen-flow artifacts.
+9. `breakdown` turns feature-owned repo stories into directly executable work items under the selected subfeature and groups those slices into small demonstrable increments. Direct feature-level breakdown remains a compatibility path for existing packets.
+10. `review-planning` reviews planning artifacts and slice definitions, then stops for explicit human approval.
+11. After approval, commit the planning artifacts so the reviewed plan is durable before execution begins. For reviewed subfeatures, also record that approval in `.subfeature-meta.json` so the approval boundary stays durable in the single source of truth.
+12. `slice` validates approved, committed execution-ready input, bootstraps a slice-scoped execution slice, and hands off to `guide-execution`. New subfeature work creates that execution slice under the owning subfeature's local `slices/` root.
+13. `guide-execution` routes new slice-scoped execution to `blueprint`, where the slice contract and technical execution plan live together. `brief` and `brief_ready` remain legacy or explicit-clarification paths. When `.skills/execution.json` enables `auto_start_implementation`, that handoff continues directly into implementation after the blueprint is marked ready.
+14. `ship` is the optional batch entrypoint when a reviewed and committed feature or subfeature backlog should be worked one planned slice at a time. It respects increment order first, then slice dependencies within the current increment, resumes or bootstraps one mapped slice, reports the next concrete execution owner for that slice, and stops at blockers or commit checkpoints. Its JSON output also includes a machine-readable `handoff_payload` for the active slice so future accelerators can consume the same routing contract without changing `ship` ownership.
+15. `ship-worktree` is the optional wrapper entrypoint when that same reviewed and committed backlog should execute in a dedicated git worktree branch. It owns worktree lifecycle and PR handoff, but still delegates slice backlog execution to `ship`.
+16. `review-execution` checks implementation and validation outcomes against the slice-scoped execution artifacts before closure.
+17. `close-slice` closes completed execution slices, records durable closure metadata, and invokes shared owner-completion reconciliation for linked planning owners.
+18. `reconcile-execution` records durable design-versus-execution alignment in `system-design.md`, and `ship --finalize` can first run the same shared owner-completion reconciliation before routing `archive-artifacts` to summarize and archive the closed slices.
 
 For repositories that still contain legacy `changes/` packets from the old
 workflow, `migrate-subfeatures` can scan and convert those legacy planning

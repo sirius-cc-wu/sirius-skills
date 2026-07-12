@@ -61,7 +61,7 @@ OWNER_TRANSITIONS = {
 }
 
 SUBFEATURE_STATUS_TO_OWNER = {
-    "impact_ready": ("design", "run_design"),
+    "discovery_ready": ("design", "run_design"),
     "design_ready": ("breakdown", "run_breakdown"),
     "breakdown_ready": ("review-planning", "run_review_planning"),
     "reviewed": ("approval", "approval_required"),
@@ -71,9 +71,8 @@ SUBFEATURE_STATUS_TO_OWNER = {
 VALID_OWNER_NAMES = (
     {owner for owner, _ in STATUS_TO_OWNER.values()}
     | {owner for owner, _ in SUBFEATURE_STATUS_TO_OWNER.values()}
-    | {"assess"}
 )
-AUTOMATABLE_OWNERS = {"discover", "assess", "design", "breakdown", "review-planning"}
+AUTOMATABLE_OWNERS = {"discover", "design", "breakdown", "review-planning"}
 
 
 def load_module(script_path: Path, name: str):
@@ -273,7 +272,7 @@ def owner_for_subfeature_state(subfeature_state: dict[str, Any]) -> tuple[str, s
     if raw_status == "draft":
         if subfeature_state["discover_is_stub"]:
             return "discover", "run_discover"
-        return "assess", "run_assess"
+        return "design", "run_design"
     if raw_status == "reviewed":
         if (
             str(subfeature_state["approval_status"]) == "approved"
@@ -604,8 +603,8 @@ def execute_subfeature_owner_chain(
             )
 
         if raw_status == "draft":
-            owner, target_status = "assess", "impact_ready"
-        elif raw_status == "impact_ready":
+            owner, target_status = "discover", "discovery_ready"
+        elif raw_status == "discovery_ready":
             owner, target_status = "design", "design_ready"
         elif raw_status == "design_ready":
             owner, target_status = "breakdown", "breakdown_ready"

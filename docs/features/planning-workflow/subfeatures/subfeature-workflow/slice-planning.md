@@ -38,9 +38,9 @@
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
 | sfw-registry | FEW-01 | Initialize subfeature registry | Add per-feature `subfeatures/README.md`, `registry.json`, and registry lifecycle management for subfeatures. | `sirius manage-subfeatures` | primary | `pytest -q skills/add-subfeature/tests/test_manage_subfeatures.py` | create slice |  | yes |
 | sfw-initiate-change | FEW-01 | Bootstrap one durable subfeature | Resolve the parent feature, create `subfeatures/<subfeature-id>/`, and seed child planning artifacts. | `skills/add-subfeature/SKILL.md`, `sirius manage-subfeatures` | primary | `pytest -q skills/add-subfeature/tests/test_manage_subfeatures.py` | create slice | sfw-registry | yes |
-| sfw-impact-analysis | FEW-02 | Produce impact analysis for a subfeature | Inspect parent planning docs and write `impact-analysis.md` with affected stories, artifacts, and slice implications. | `skills/assess/SKILL.md`, `skills/assess/`, subfeature docs | primary | Review generated `impact-analysis.md` plus `pytest -q skills/assess/tests/test_analyze_impact.py` | create slice | sfw-initiate-change | yes |
+| sfw-discovery-context | FEW-02 | Produce discovery context for a subfeature | Inspect parent planning docs and write subfeature `discover.md` with affected stories, artifacts, and slice implications. | `skills/discover/SKILL.md`, subfeature docs | primary | Review generated `discover.md` plus `pytest -q skills/add-subfeature/tests/test_manage_subfeatures.py` | create slice | sfw-initiate-change | yes |
 | sfw-change-metadata | FEW-03 | Enforce subfeature state model | Add `.subfeature-meta.json` shape, state transitions, and artifact-gated validation for durable subfeatures. | `sirius manage-subfeatures` | primary | `pytest -q skills/add-subfeature/tests/test_manage_subfeatures.py` | create slice | sfw-initiate-change | yes |
-| sfw-change-artifacts | FEW-03 | Support subfeature-local planning artifacts | Extend path resolution so `design` and `breakdown` can operate on a selected subfeature cleanly. | `skills/design/`, `skills/breakdown/`, path-resolution helpers | primary | Validate one subfeature reaches `design_ready` / `breakdown_ready` using tooling or fixture tests | create slice | sfw-impact-analysis, sfw-change-metadata | yes |
+| sfw-change-artifacts | FEW-03 | Support subfeature-local planning artifacts | Extend path resolution so `design` and `breakdown` can operate on a selected subfeature cleanly. | `skills/design/`, `skills/breakdown/`, path-resolution helpers | primary | Validate one subfeature reaches `design_ready` / `breakdown_ready` using tooling or fixture tests | create slice | sfw-discovery-context, sfw-change-metadata | yes |
 | sfw-change-breakdown | FEW-04 | Break subfeatures into execution-ready slices | Generate subfeature-local `slice-planning.md` and `slice-traceability.md` that produce execution-ready slices from reviewed child planning. | `skills/breakdown/SKILL.md`, templates, subfeature examples | primary | Review generated planning docs and add fixture coverage for subfeature-local breakdown | create slice | sfw-change-artifacts | yes |
 | sfw-finalization-workflow | FEW-04 | Represent implemented subfeatures without a dedicated finalization skill | Keep reviewed subfeatures non-destructive after execution by relying on closed slice state plus planning metadata instead of a separate cleanup skill. | `sirius manage-subfeatures`, `skills/close-slice/`, methodology docs | primary | Validate subfeature metadata and closure behavior in fixture tests | create slice | sfw-change-breakdown | yes |
 | sfw-history-closure | FEW-05 | Keep implemented subfeatures as durable history | Preserve the subfeature folder and closed execution slices as durable history unless explicit archive maintenance is requested later. | `skills/add-subfeature/`, `skills/close-slice/`, archive docs | primary | Review docs and fixture behavior for retained history | create slice | sfw-finalization-workflow | yes |
@@ -48,7 +48,7 @@
 
 ## 5. Dependency Notes
 
-- Critical path: subfeature registry -> subfeature bootstrap -> impact analysis
+- Critical path: subfeature registry -> subfeature bootstrap -> discovery context
   -> artifact support -> breakdown -> retained-history semantics -> routing/docs.
 - Explicit blockers: retained-history semantics depend on reviewed
   subfeature-local planning outputs and closed execution slices.
@@ -56,7 +56,7 @@
   path resolution, state transitions, and cleanup semantics are tightly coupled.
 - Increment ordering: I1 -> I2 -> I3 -> I4.
 - Lane owners and handoffs: `guide-planning` routes into `add-subfeature`;
-  `assess`, `design`, and `breakdown` operate on the selected subfeature;
+  `discover`, `design`, and `breakdown` operate on the selected subfeature;
   `review-planning` confirms readiness before slice bootstrap;
   retained-history semantics close the feature-level execution loop without a
   dedicated finalization skill.

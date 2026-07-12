@@ -169,9 +169,8 @@ immediately into durable repository artifacts.
 
 Research is therefore a **supporting planning pass**, not a new readiness state.
 
-For subfeatures, `assess` still runs first so `impact-analysis.md` records the
-affected parent baseline before `research` or subfeature-local design adds new
-direction.
+For subfeatures, authored `discover.md` records the affected parent baseline
+before `research` or subfeature-local design adds new direction.
 
 ## Failure handling and operational constraints
 

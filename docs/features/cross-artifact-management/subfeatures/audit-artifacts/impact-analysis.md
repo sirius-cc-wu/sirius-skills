@@ -5,7 +5,7 @@
 - Parent Feature: `cross-artifact-management`
 - Subfeature ID: `audit-artifacts`
 - Subfeature Type: `additive`
-- Current Subfeature Status: `impact_ready`
+- Current Subfeature Status: `discovery_ready`
 
 ## Subfeature Summary
 

@@ -2,7 +2,7 @@
 
 ## Problem
 
-`sirius-skills` commands (such as `analyze_impact.py`, `autoplan.py`, `scaffold_breakdown.py`, `ship.py`, etc.) are implicitly coupled through the files they access. Currently, these commands perform direct file I/O (using `Path.read_text`, `Path.write_text`, `json.loads`) and direct regex parsing/string manipulation on shared workspace files:
+`sirius-skills` commands (such as `autoplan.py`, `scaffold_breakdown.py`, `ship.py`, etc.) are implicitly coupled through the files they access. Currently, these commands perform direct file I/O (using `Path.read_text`, `Path.write_text`, `json.loads`) and direct regex parsing/string manipulation on shared workspace files:
 
 - `slice-traceability.md`
 - `slice-planning.md`

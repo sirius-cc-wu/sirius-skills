@@ -20,7 +20,6 @@ docs/features/<feature-slug>/
       .planning-meta.json
       .subfeature-meta.json
       discover.md
-      impact-analysis.md
       system-design.md
       slice-planning.md
       slice-traceability.md
@@ -59,13 +58,12 @@ slices.
 ### 4. Parent and child state stay distinct
 
 Parent feature readiness remains in `.planning-meta.json`. Each child subfeature
-also has its own `.planning-meta.json`, plus `.subfeature-meta.json` for
-parent-child and impact metadata.
+uses `.subfeature-meta.json` for parent-child metadata and lifecycle state.
 
 Implemented lifecycle in code:
 
 - `draft`
-- `impact_ready`
+- `discovery_ready`
 - `design_ready`
 - `breakdown_ready`
 - `reviewed`
@@ -98,12 +96,8 @@ Reviewed subfeatures stay durable after execution:
 
 - **Subfeature metadata**
   - `.subfeature-meta.json`
-  - stores parent slug, status, impact summary, and affected artifact context
-
-- **Impact analysis**
-  - `impact-analysis.md`
-  - captures affected parent artifacts, stories, and slices before design or
-    breakdown continues
+  - stores parent slug, status, summary, parent story IDs, and affected artifact
+    context
 
 - **Finalization cleanup**
   - removes completed execution slices
@@ -121,12 +115,8 @@ Reviewed subfeatures stay durable after execution:
   - initializes the local subfeature registry
   - creates a durable child planning folder and metadata
 
-- **`assess`**
-  - inspects the parent feature baseline
-  - writes `impact-analysis.md` into the child subfeature folder
-
 - **`design`**
-  - authors subfeature-local design artifacts after impact review
+  - authors subfeature-local design artifacts after discovery
 
 - **`breakdown`**
   - authors subfeature-local `slice-planning.md` and
@@ -167,7 +157,6 @@ Recommended fields:
 ## Validation Strategy
 
 - `pytest -q skills/add-subfeature/tests/test_manage_subfeatures.py`
-- `pytest -q skills/assess/tests/test_analyze_impact.py`
 - `pytest -q skills/breakdown/tests/test_scaffold_breakdown.py`
 - `pytest -q skills/guide-planning/tests/test_manage_planning.py`
 
@@ -180,9 +169,8 @@ folder "Parent Feature" {
   folder "subfeatures/" {
     file "registry.json" as Registry
     folder "<subfeature-id>/" {
-      file ".planning-meta.json" as ChildPlan
       file ".subfeature-meta.json" as ChildMeta
-      file "impact-analysis.md" as Impact
+      file "discover.md" as Discover
       file "slice-planning.md" as Breakdown
     }
   }
@@ -190,9 +178,8 @@ folder "Parent Feature" {
 
 [guide-planning] --> ParentMeta
 [guide-planning] --> Registry
-[add-subfeature] --> ChildPlan
 [add-subfeature] --> ChildMeta
-[assess] --> Impact
+[discover] --> Discover
 [breakdown] --> Breakdown
 @enduml
 ```

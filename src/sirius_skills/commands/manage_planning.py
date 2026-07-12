@@ -69,7 +69,7 @@ STATUS_ALIASES = {
 }
 SUBFEATURE_STATUS_TO_PLANNING_STATUS = {
     "draft": "discovery_pending",
-    "impact_ready": "discovery_ready",
+    "discovery_ready": "discovery_ready",
     "design_ready": "design_ready",
     "breakdown_ready": "breakdown_ready",
     "finalized": "implemented",

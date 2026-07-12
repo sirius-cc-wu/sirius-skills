@@ -52,16 +52,6 @@ GUIDE_PLANNING_EVALS: tuple[GuidePlanningEvalCase, ...] = (
         ),
     ),
     GuidePlanningEvalCase(
-        name="assess",
-        prompt="Check parent-feature impact before subfeature design.",
-        expected_route="route to assess",
-        required_phrases=(
-            "If an active subfeature exists and the parent-feature impact is not yet explicit",
-            "route to `assess`",
-            "parent-feature impact",
-        ),
-    ),
-    GuidePlanningEvalCase(
         name="research",
         prompt="Choose between upstream patterns before planning.",
         expected_route="route to research",
@@ -113,5 +103,5 @@ def test_guide_planning_core_routing_evals(case: GuidePlanningEvalCase) -> None:
 def test_guide_planning_documented_handoff_lists_core_targets() -> None:
     skill_text = normalize_whitespace(read_guide_planning_skill())
 
-    assert "guide-planning -> propose/add-subfeature/assess/research/discover" in skill_text
+    assert "guide-planning -> propose/add-subfeature/research/discover" in skill_text
     assert "-> design -> ui-flow -> breakdown -> review-planning -> human approval -> commit -> slice -> guide-execution" in skill_text

@@ -99,7 +99,6 @@ def build_scaffold(
     title = title_from_slug(target_slug)
     story_ids = collect_story_ids(target_dir, subfeature_metadata)
     discover_exists = (target_dir / "discover.md").is_file()
-    impact_exists = (target_dir / "impact-analysis.md").is_file()
     research_exists = (target_dir / "reference-research.md").is_file()
 
     context_lines = [
@@ -113,9 +112,6 @@ def build_scaffold(
         )
         context_lines.append(
             f"- Subfeature type: `{subfeature_metadata['subfeature_type']}`"
-        )
-        context_lines.append(
-            f"- Impact analysis: `{'present' if impact_exists else 'missing'}`"
         )
     if research_exists:
         context_lines.append("- Reference research: `present`")

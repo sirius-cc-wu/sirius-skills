@@ -17,7 +17,6 @@ PLANNING_CONFIG_FILE = Path(".skills") / "planning.json"
 PLANNING_DIR_FIELD = "planning_dir"
 FEATURE_SLUG_PATTERN = re.compile(r"^[A-Za-z0-9][A-Za-z0-9._-]*$")
 SUBFEATURE_METADATA_FILE = ".subfeature-meta.json"
-IMPACT_FILE = "impact-analysis.md"
 SUBFEATURE_SCRIPT = (
     COMMAND_DIR / "manage_subfeatures.py"
 )
@@ -171,7 +170,6 @@ def resolve_subfeature_context(target_dir: Path) -> dict[str, object] | None:
         "subfeature_type": subfeature_type,
         "status": status,
         "canonical_feature_path": canonical_feature_path,
-        "has_impact_analysis": (target_dir / IMPACT_FILE).exists(),
         "affected_story_ids": story_ids,
         "affected_slice_ids": affected_slice_ids,
         "affected_artifacts": affected_artifacts,
@@ -191,20 +189,13 @@ def render_subfeature_context_section(subfeature_context: dict[str, object]) -> 
         list(subfeature_context["affected_artifacts"]),
         "No affected baseline artifacts were recorded yet.",
     )
-    impact_status = (
-        f"`{IMPACT_FILE}` is present and should drive the subfeature-local slice plan."
-        if subfeature_context["has_impact_analysis"]
-        else f"`{IMPACT_FILE}` is missing; add or regenerate it before planning review."
-    )
-
     return (
         "## 0. Subfeature Context\n\n"
         f"- Parent feature: `{subfeature_context['feature_slug']}`\n"
         f"- Parent feature path: `{subfeature_context['canonical_feature_path']}`\n"
         f"- Subfeature ID: `{subfeature_context['subfeature_id']}`\n"
         f"- Subfeature type: `{subfeature_context['subfeature_type']}`\n"
-        f"- Current subfeature status: `{subfeature_context['status']}`\n"
-        f"- Impact input: {impact_status}\n\n"
+        f"- Current subfeature status: `{subfeature_context['status']}`\n\n"
         "### Parent Story IDs\n\n"
         f"{story_lines}\n\n"
         "### Affected Canonical Slice IDs\n\n"
@@ -222,11 +213,6 @@ def render_slice_planning(
     if not subfeature_context:
         return template
 
-    template = template.replace(
-        "  - `discover.md`\n",
-        "  - `discover.md`\n  - `impact-analysis.md`\n",
-        1,
-    )
     template = template.replace(
         "  - `user-stories.md`\n",
         f"  - parent `{subfeature_context['canonical_feature_path']}/user-stories.md`\n",

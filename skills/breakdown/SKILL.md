@@ -35,9 +35,9 @@ sirius scaffold-breakdown \
 ```
 
 When the target path is a real subfeature with `.subfeature-meta.json`,
-the scaffold seeds subfeature context from the metadata and `impact-analysis.md`
-so the resulting breakdown artifacts stay anchored to the affected parent
-stories, slices, and baseline docs.
+the scaffold seeds subfeature context from metadata and `discover.md` so the
+resulting breakdown artifacts stay anchored to the affected parent stories,
+slices, and baseline docs.
 
 ## Responsibilities
 

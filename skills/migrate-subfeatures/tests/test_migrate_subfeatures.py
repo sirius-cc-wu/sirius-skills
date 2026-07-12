@@ -65,7 +65,6 @@ def setup_legacy_change(feature_dir: Path, status: str = "reviewed"):
     change_dir = changes_dir / "replace-legacy-flow"
     change_dir.mkdir(parents=True, exist_ok=True)
     write_file(change_dir / "discover.md", "# Discover\n\nLegacy change.\n")
-    write_file(change_dir / "impact-analysis.md", "# Impact\n")
     write_file(change_dir / "system-design.md", "# Design\n")
     write_file(change_dir / "slice-planning.md", "# Slice Planning\n")
     write_file(change_dir / "slice-traceability.md", "# Traceability\n")

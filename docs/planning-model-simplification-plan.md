@@ -92,7 +92,7 @@ Prefer explicit subfeature metadata for parent story linkage:
 | File | Change |
 |---|---|
 | `manage_subfeatures.py` | Add `story_ids` or replace `affected_story_ids` with clearer parent story linkage. |
-| `analyze_impact.py` | Populate subfeature story refs from parent stories. |
+| `manage_subfeatures.py` | Keep parent story refs in subfeature metadata. |
 | `discover/SKILL.md` | Do not create `user-stories.md` for subfeatures. |
 | `breakdown/SKILL.md` | Read parent feature stories for subfeature breakdown. |
 | Tests | Cover story refs without subfeature-local story files. |

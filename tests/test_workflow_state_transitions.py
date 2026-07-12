@@ -120,7 +120,7 @@ def test_registry_row_models_preserve_serialized_field_names() -> None:
     assert SubfeatureRegistryRow.from_mapping(
         {
             "subfeature_id": "sub-a",
-            "status": "impact_ready",
+            "status": "discovery_ready",
             "path": "docs/features/feature-a/subfeatures/sub-a/",
             "subfeature_type": "additive",
             "updated_at": "2026-01-01T00:00:00",

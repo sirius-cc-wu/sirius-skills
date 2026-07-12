@@ -38,7 +38,6 @@ Stored in `docs/proposals/<proposal-slug>/`
 **Key Skills:**
 - `guide-planning`: The planning entry point once work is ready for canonical feature handling.
 - `add-subfeature`: Creates a subfeature when an existing canonical feature needs to evolve.
-- `assess`: Records change-scoped impact analysis before subfeature-local design continues.
 - `discover`: Defines the problem, outcomes, and constraints.
 - `design`: Architecture, interfaces, and PlantUML system diagrams.
 - `breakdown`: Splits stories into executable **Slices** and **Increments**.
@@ -57,7 +56,7 @@ Stored in `docs/features/<feature-slug>/`
 Default planned slice IDs should use a scope-prefixed format such as
 `atf-read-file` or `shp-store` rather than bare `slice-*` placeholders.
 - `subfeatures/<change-id>/`: The default delivery planning unit under a feature-owned story catalog.
-- `subfeatures/<change-id>/impact-analysis.md`: Change-scoped impact record for feature evolution.
+- `subfeatures/<change-id>/discover.md`: Subfeature-scoped discovery that replaces bootstrap draft context before design.
 
 ---
 
@@ -101,7 +100,7 @@ Stored in `slices/<slice-id>-<slug>/`
 1.  **Propose**: `propose` captures speculative or not-yet-accepted work.
 2.  **Hand Off to Planning**: `guide-planning` promotes accepted proposal artifacts into canonical feature planning and then continues the planning workflow.
 3.  **Plan a Net-New Feature**: `guide-planning` -> `discover` creates feature context and stories, then `add-subfeature` creates delivery units for `design` and `breakdown`.
-4.  **Evolve an Existing Feature**: `guide-planning` -> `add-subfeature` -> `assess` -> `design` -> `breakdown`.
+4.  **Evolve an Existing Feature**: `guide-planning` -> `add-subfeature` -> `discover` -> `design` -> `breakdown`.
 5.  **Review**: `review-planning` confirms the plan or subfeature is ready.
 6.  **Approve**: A human explicitly approves the reviewed planning artifacts.
 7.  **Commit Planning**: Commit the approved planning artifacts before execution starts.

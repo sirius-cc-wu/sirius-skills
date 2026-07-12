@@ -68,8 +68,7 @@ For this subfeature family, the declaration should answer:
 
 The declaration should appear in:
 
-- `discover.md` for initial intent
-- `impact-analysis.md` when the work is a durable subfeature
+- `discover.md` for initial intent and affected parent baseline
 - `system-design.md` for the chosen technical contract
 - `slice-planning.md` and `slice-traceability.md` only as downstream execution
   consequences, not as the primary policy record
@@ -149,25 +148,22 @@ they should be able to consume the durable result.
 ```plantuml
 @startuml
 actor Planner
-rectangle "discover / assess / design" as Authoring
+rectangle "discover / design" as Authoring
 rectangle "breakdown" as Breakdown
 rectangle "review-planning" as Review
 rectangle "maintenance skills\n(trace/report/archive)" as Maintenance
 
 file "discover.md" as DiscoverDoc
-file "impact-analysis.md" as ImpactDoc
 file "system-design.md" as DesignDoc
 file ".subfeature-meta.json /\n.planning-meta.json" as Metadata
 file "slice-planning.md /\nslice-traceability.md" as BreakdownDocs
 
 Planner --> Authoring : author consolidation intent
 Authoring --> DiscoverDoc
-Authoring --> ImpactDoc
 Authoring --> DesignDoc
 Authoring --> Metadata : write compact consolidation summary
 Breakdown --> BreakdownDocs : capture execution consequences
 Review --> DiscoverDoc : validate intent
-Review --> ImpactDoc : validate affected baseline
 Review --> DesignDoc : validate contract
 Review --> Metadata : validate durable summary
 Review --> BreakdownDocs : validate execution consequences
@@ -195,17 +191,6 @@ For planning-workflow capabilities, discovery should record:
 - expected user-facing simplification
 
 This is the first durable declaration, not the final enforcement point.
-
-### `assess`
-
-When a subfeature exists, `impact-analysis.md` should be the place that narrows
-the parent baseline into:
-
-- affected parent stories
-- affected planned slices
-- affected planning artifacts
-- confirmation of whether existing work is kept, narrowed, superseded, or
-  replaced
 
 ### `design`
 
@@ -253,7 +238,7 @@ multiple control planes for the same decision.
 
 1. A planner creates or updates a planning-workflow capability.
 2. `discover` records the initial consolidation declaration.
-3. If the work is subfeature-scoped, `assess` narrows that declaration against
+3. If the work is subfeature-scoped, discovery narrows that declaration against
    the parent baseline and affected stories/slices.
 4. `design` records the durable ownership model and enforcement rules.
 5. The metadata file stores the compact consolidation summary.

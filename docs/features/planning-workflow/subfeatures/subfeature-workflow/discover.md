@@ -62,14 +62,12 @@ become first-class planning artifacts.
   - Start a durable child planning folder under an existing feature.
   - Record parent-child metadata and the reason for the new capability.
 
-- **Impact analysis**
-  - Inspect affected parent artifacts, user stories, and planned slices.
-  - Distinguish additive, narrowing, superseding, or replacement changes.
-
 - **Subfeature-local planning artifacts**
-  - Author `discover.md`, `impact-analysis.md`, `system-design.md`,
-    `slice-planning.md`, and `slice-traceability.md` inside the selected
-    subfeature folder.
+  - Author `discover.md`, `system-design.md`, `slice-planning.md`, and
+    `slice-traceability.md` inside the selected subfeature folder.
+  - Use `discover.md` and `.subfeature-meta.json` to record affected parent
+    artifacts, user stories, planned slices, and whether the change is additive,
+    narrowing, superseding, or replacement.
   - Keep those artifacts linked to the parent feature without overwriting the
     parent baseline.
 
@@ -83,8 +81,7 @@ become first-class planning artifacts.
 - `guide-planning` already manages planning readiness and registry state.
 - `add-subfeature` creates durable child planning folders and subfeature
   metadata.
-- `assess` writes subfeature-local `impact-analysis.md` from parent feature
-  context.
+- `discover` writes subfeature-local context from parent feature context.
 - `design` and `breakdown` can target a selected subfeature path.
 - Subfeature execution remains non-destructive after closure; any later cleanup
   or archival should be handled by explicit maintenance tooling.

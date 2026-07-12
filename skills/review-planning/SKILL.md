@@ -27,7 +27,6 @@ Read these references when relevant:
 
 - `<feature_path>/discover.md`
 - optional `<feature_path>/reference-research.md` when present
-- optional `<feature_path>/impact-analysis.md` when reviewing a subfeature
 - `<feature_path>/system-design.md`
 - optional `<feature_path>/ui-design.md`
 - `<feature_path>/slice-planning.md`
@@ -64,13 +63,13 @@ sirius record-review \
 - Check that the technical approach matches the stated architecture, repository boundaries, and non-functional constraints.
 - Confirm that configuration and state ownership are coherent, especially when subfeatures inherit a parent feature that already defines typed control surfaces.
 - When the packet materially reshapes an existing planning or workflow surface,
-  confirm discovery, impact/design, and metadata agree on whether the change is
+  confirm discovery, design, and metadata agree on whether the change is
   additive, narrowing, superseding, or replacement work.
 - Treat missing consolidation declarations as blocking when the packet claims to
   simplify or replace existing workflow surface but never names the affected
   capability, artifact, command path, or validation path.
 - Treat contradictory active-versus-historical artifact movement as blocking
-  when discovery, impact analysis, design, and metadata do not tell the same
+  when discovery, design, and metadata do not tell the same
   reduction story.
 - When `reference-research.md` exists, confirm that the relevant borrowing-path
   conclusions and tradeoffs remain coherent across discovery, design, and
@@ -81,7 +80,7 @@ sirius record-review \
   story fans out, so later execution bootstrap can record execution slice IDs
   deterministically.
 - Distinguish blocking findings from follow-up improvements so handoff decisions stay clear.
-- For subfeatures, review the subfeature-local planning docs against `impact-analysis.md` and the intended child capability rather than treating the parent feature breakdown as the execution backlog.
+- For subfeatures, review the subfeature-local planning docs against `discover.md`, `system-design.md`, and the intended child capability rather than treating the parent feature breakdown as the execution backlog.
 - For subfeatures, confirm the planned slices represent only the new or amended work required by the subfeature and keep superseded parent slice IDs in notes or dependency references.
 - For parent features, confirm new executable planning is being routed into a
   subfeature unless the packet is intentionally preserving legacy direct-feature
@@ -95,8 +94,8 @@ sirius record-review \
 
 1. Resolve whether the review target is canonical feature planning or a selected subfeature.
 2. Read the current planning artifacts, optional `reference-research.md`, and
-   any linked backlog context. For subfeatures, also read `impact-analysis.md`
-   and the parent feature context needed to evaluate the child capability.
+   any linked backlog context. For subfeatures, also read the parent feature
+   context needed to evaluate the child capability.
 3. Compare discovery intent, design direction, and breakdown outputs for contradictions or missing handoff details, including duplicate configuration surfaces, consolidation drift, or parent/subfeature ownership drift.
 4. Record findings directly in the planning docs already used by the team. For subfeatures, write those findings back into the subfeature-local docs.
 5. Update the affected planning artifacts so the reviewed state is durable, including any `consolidation` metadata summary when the packet already relies on one.
