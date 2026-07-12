@@ -90,40 +90,34 @@ def ensure_execution_registry(
     scope_context: Optional[object] = None,
 ) -> Optional[str]:
     scope_context = scope_context or module.resolve_execution_scope_context()
+    initialized_slice_dir = None
     if module.execution_config_exists(scope_context):
         config = module.load_config(required=False, scope_context=scope_context)
         if "slice_dir" not in config:
             if requested_slice_dir is None:
                 module.get_registry_paths(required_config=True, scope_context=scope_context)
-                raise RuntimeError("Execution config does not define 'slice_dir'.")
-            slice_dir = module.normalize_slice_dir(requested_slice_dir)
+                return None
+            initialized_slice_dir = module.normalize_slice_dir(requested_slice_dir)
             module.write_config(
-                slice_dir,
+                initialized_slice_dir,
                 preferred_workflow=str(config["preferred_workflow"]),
                 auto_start_implementation=bool(config["auto_start_implementation"]),
                 scope_context=scope_context,
             )
-            module.ensure_registry(
-                module.get_registry_paths(required_config=True, scope_context=scope_context)[0]
-            )
-            return slice_dir
-        module.ensure_registry(
-            module.get_registry_paths(required_config=True, scope_context=scope_context)[0]
+    else:
+        initialized_slice_dir = module.normalize_slice_dir(
+            requested_slice_dir or module.DEFAULT_SLICES_DIR
         )
-        return None
+        module.write_config(
+            initialized_slice_dir,
+            preferred_workflow=module.DEFAULT_PREFERRED_WORKFLOW,
+            scope_context=scope_context,
+        )
 
-    slice_dir = module.normalize_slice_dir(
-        requested_slice_dir or module.DEFAULT_SLICES_DIR
-    )
-    module.write_config(
-        slice_dir,
-        preferred_workflow=module.DEFAULT_PREFERRED_WORKFLOW,
-        scope_context=scope_context,
-    )
     module.ensure_registry(
         module.get_registry_paths(required_config=True, scope_context=scope_context)[0]
     )
-    return slice_dir
+    return initialized_slice_dir
 
 
 def resolve_slice_id(

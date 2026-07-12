@@ -121,19 +121,11 @@ def build_subfeature_owner_map(subfeature_targets: List[Path]) -> Dict[str, List
     return owners_by_slice_id
 
 
-def row_matches_target(
-    row: Dict[str, object], target_slug: str, owner_map: Dict[str, List[Path]]
-) -> bool:
-    row_id = str(row.get("id") or "").strip()
-    if row_id in owner_map:
-        return True
-    return str(row.get("feature", "")).strip() == target_slug
-
-
 def discover_feature_targets(
-    manage_planning, manage_execution, root_scope_context: object
+    manage_planning,
+    root_rows: List[Dict[str, object]],
+    root_scope_context: object,
 ) -> List[Tuple[str, str]]:
-    rows = load_root_slice_rows(manage_execution, root_scope_context)
     planning_dir, _, _ = manage_planning.get_registry_paths(
         required_config=False, scope_context=root_scope_context
     )
@@ -148,7 +140,11 @@ def discover_feature_targets(
         owner_map = build_subfeature_owner_map(
             target_subfeature_scopes(Path(feature_dir))
         )
-        if not any(row_matches_target(row, feature_slug, owner_map) for row in rows):
+        if not any(
+            str(row.get("id") or "").strip() in owner_map
+            or str(row.get("feature", "")).strip() == feature_slug
+            for row in root_rows
+        ):
             continue
 
         targets.append((feature_dir, feature_slug))
@@ -157,11 +153,12 @@ def discover_feature_targets(
 
 
 def load_root_slice_rows(manage_execution, root_scope_context: object) -> List[Dict[str, object]]:
-    try:
+    if not manage_execution.execution_config_exists(root_scope_context):
         return manage_execution.parse_registry(scope_context=root_scope_context)
-    except RuntimeError as exc:
-        if "does not define 'slice_dir'" not in str(exc):
-            raise
+
+    config = manage_execution.load_config(required=False, scope_context=root_scope_context)
+    if "slice_dir" in config:
+        return manage_execution.parse_registry(scope_context=root_scope_context)
 
     _, index_file, registry_json_file = manage_execution.get_registry_paths(
         required_config=False, scope_context=root_scope_context
@@ -205,7 +202,6 @@ def target_scope_for_row(
     row: Dict[str, object],
     feature_path: Path,
     owner_map: Dict[str, List[Path]],
-    subfeature_targets: List[Path],
     allow_direct_fallback: bool,
 ) -> Tuple[Optional[Path], Optional[str]]:
     owners = owner_map.get(str(row.get("id") or ""), [])
@@ -216,9 +212,7 @@ def target_scope_for_row(
         return None, "Execution slice maps to multiple subfeatures."
     if allow_direct_fallback:
         return feature_path, None
-    if subfeature_targets:
-        return None, "Execution slice is not mapped by any subfeature traceability file."
-    return feature_path, None
+    return None, "Execution slice is not mapped by any subfeature traceability file."
 
 
 def migrate_feature_rows(
@@ -255,7 +249,6 @@ def migrate_feature_rows(
             row,
             feature_path,
             owner_map,
-            subfeature_targets,
             allow_direct_fallback=direct_fallback,
         )
         if target_error is not None or target_scope is None:
@@ -350,12 +343,7 @@ def migrate_feature_rows(
             normalized_row, str(normalized_row["status"]), existing=moved_metadata
         )
         manage_execution.write_slice_metadata(str(target_abs), updated_metadata)
-        migrated.append(
-            {
-                **entry,
-                "target_path": target_rel,
-            }
-        )
+        migrated.append(entry)
         migrated_rows_by_target.setdefault(target_key, []).append(
             manage_execution.apply_metadata_to_row(normalized_row, updated_metadata)
         )
@@ -389,10 +377,13 @@ def migrate_feature_rows(
 
 
 def resolve_targets(
-    manage_planning, manage_execution, args: argparse.Namespace, root_scope_context: object
+    manage_planning,
+    args: argparse.Namespace,
+    root_scope_context: object,
+    root_rows: List[Dict[str, object]],
 ) -> List[Tuple[str, str]]:
     if args.all:
-        return discover_feature_targets(manage_planning, manage_execution, root_scope_context)
+        return discover_feature_targets(manage_planning, root_rows, root_scope_context)
     feature_dir, feature_slug, _ = resolve_feature_target(
         manage_planning, args.feature, root_scope_context
     )
@@ -405,7 +396,7 @@ def run_scan(args: argparse.Namespace) -> Tuple[Dict[str, object], int]:
     manage_proposals = load_manage_proposals_module()
     root_scope_context = manage_planning.SCOPE_RUNTIME.resolve_scope_context()
     root_rows = load_root_slice_rows(manage_execution, root_scope_context)
-    targets = resolve_targets(manage_planning, manage_execution, args, root_scope_context)
+    targets = resolve_targets(manage_planning, args, root_scope_context, root_rows)
 
     features: List[Dict[str, object]] = []
     for feature_dir, feature_slug in targets:
@@ -437,7 +428,7 @@ def run_migrate(args: argparse.Namespace) -> Tuple[Dict[str, object], int]:
     manage_proposals = load_manage_proposals_module()
     root_scope_context = manage_planning.SCOPE_RUNTIME.resolve_scope_context()
     root_rows = load_root_slice_rows(manage_execution, root_scope_context)
-    targets = resolve_targets(manage_planning, manage_execution, args, root_scope_context)
+    targets = resolve_targets(manage_planning, args, root_scope_context, root_rows)
 
     features: List[Dict[str, object]] = []
     overall_ok = True

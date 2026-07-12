@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 import json
-import shutil
 from pathlib import Path
 
 from sirius_skills.commands import bootstrap, migrate_slices
@@ -219,14 +218,19 @@ def test_package_migrate_slices_scan_all_allows_defaults_only_execution_config(
 ) -> None:
     monkeypatch.chdir(tmp_path)
 
-    assert bootstrap.main(["--mode", "default"]) == 0
-    capsys.readouterr()
-    execution_path = tmp_path / ".skills" / "execution.json"
-    execution_config = json.loads(execution_path.read_text(encoding="utf-8"))
-    execution_config.pop("slice_dir")
-    execution_path.write_text(json.dumps(execution_config, indent=2) + "\n", encoding="utf-8")
-    if (tmp_path / "slices").exists():
-        shutil.rmtree(tmp_path / "slices")
+    skills_dir = tmp_path / ".skills"
+    skills_dir.mkdir()
+    (skills_dir / "planning.json").write_text(
+        json.dumps(
+            {"planning_dir": "docs/features", "proposal_dir": "docs/proposals"}
+        )
+        + "\n",
+        encoding="utf-8",
+    )
+    (skills_dir / "execution.json").write_text(
+        json.dumps({"preferred_workflow": "TDD", "auto_start_implementation": True}) + "\n",
+        encoding="utf-8",
+    )
 
     assert migrate_slices.main(["scan", "--all"]) == 0
     captured = capsys.readouterr()

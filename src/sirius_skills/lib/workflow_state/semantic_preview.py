@@ -291,9 +291,17 @@ def build_semantic_preview(
     artifact_types: Optional[Sequence[str]] = None,
 ) -> List[SemanticPreviewRecord]:
     selected = _selected_types(artifact_types or [])
-    canonical_feature_slugs, feature_metadata_by_slug, feature_paths_by_slug = _canonical_feature_slugs(
-        inventory
-    )
+    canonical_feature_slugs: Set[str]
+    feature_metadata_by_slug: dict[str, Mapping[str, object]]
+    feature_paths_by_slug: dict[str, str]
+    if selected & {"proposal", "feature"}:
+        canonical_feature_slugs, feature_metadata_by_slug, feature_paths_by_slug = (
+            _canonical_feature_slugs(inventory)
+        )
+    else:
+        canonical_feature_slugs = set()
+        feature_metadata_by_slug = {}
+        feature_paths_by_slug = {}
     preview_records = _proposal_link_preview(
         inventory,
         selected,

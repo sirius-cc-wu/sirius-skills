@@ -438,30 +438,18 @@ def load_raw_config(
     config_exists = execution_config_exists(resolved_scope)
     if config or config_exists:
         return config
-    config_file = execution_config_path(resolved_scope)
 
-    if not os.path.exists(config_file):
-        if required:
-            raise RuntimeError(
-                "Slice config not found at '.skills/execution.json'. "
-                "Ask the user where slices should be created, then run "
-                "`manage_execution.py init <slice-dir>`."
-            )
-        return {
-            "slice_dir": DEFAULT_SLICES_DIR,
-            "preferred_workflow": DEFAULT_PREFERRED_WORKFLOW,
-            "auto_start_implementation": DEFAULT_AUTO_START_IMPLEMENTATION,
-        }
-
-    try:
-        with open(config_file, "r", encoding="utf-8") as f:
-            config = json.load(f)
-    except json.JSONDecodeError as exc:
-        raise RuntimeError("Execution config is not valid JSON.") from exc
-
-    if not isinstance(config, dict):
-        raise RuntimeError("Execution config must be a JSON object.")
-    return config
+    if required:
+        raise RuntimeError(
+            "Slice config not found at '.skills/execution.json'. "
+            "Ask the user where slices should be created, then run "
+            "`manage_execution.py init <slice-dir>`."
+        )
+    return {
+        "slice_dir": DEFAULT_SLICES_DIR,
+        "preferred_workflow": DEFAULT_PREFERRED_WORKFLOW,
+        "auto_start_implementation": DEFAULT_AUTO_START_IMPLEMENTATION,
+    }
 
 
 def load_config(
@@ -573,15 +561,7 @@ def get_registry_paths(
 ) -> Tuple[str, str, str]:
     resolved_scope = resolve_execution_scope_context(scope_context)
     config = load_config(required=required_config, scope_context=resolved_scope)
-    if "slice_dir" not in config:
-        if required_config:
-            raise RuntimeError(
-                "Execution config does not define 'slice_dir'. This scope provides "
-                "execution defaults only and does not own a local slice registry."
-            )
-        slice_dir = DEFAULT_SLICES_DIR
-    else:
-        slice_dir = str(config["slice_dir"])
+    slice_dir = str(config.get("slice_dir", DEFAULT_SLICES_DIR))
     specs_dir = str(
         SCOPE_RUNTIME.resolve_scope_path(
             resolved_scope.scope_root,

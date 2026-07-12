@@ -145,6 +145,14 @@ def _optional_str(row: Mapping[str, object], field_name: str) -> Optional[str]:
     return stripped or None
 
 
+def _registry_row(required: Mapping[str, object], **fields: Optional[str]) -> RegistryRow:
+    payload: RegistryRow = dict(required)
+    for field_name, value in fields.items():
+        if value is not None:
+            payload[field_name] = value
+    return payload
+
+
 @dataclass(frozen=True)
 class ScopeContext:
     start_dir: Path
@@ -171,14 +179,14 @@ class ProposalRegistryRow:
         )
 
     def to_dict(self) -> RegistryRow:
-        payload: RegistryRow = {
-            "proposal": self.proposal,
-            "status": self.status,
-            "path": self.path,
-        }
-        if self.updated_at is not None:
-            payload["updated_at"] = self.updated_at
-        return payload
+        return _registry_row(
+            {
+                "proposal": self.proposal,
+                "status": self.status,
+                "path": self.path,
+            },
+            updated_at=self.updated_at,
+        )
 
 
 @dataclass(frozen=True)
@@ -198,14 +206,14 @@ class PlanningRegistryRow:
         )
 
     def to_dict(self) -> RegistryRow:
-        payload: RegistryRow = {
-            "feature": self.feature,
-            "status": self.status,
-            "path": self.path,
-        }
-        if self.updated_at is not None:
-            payload["updated_at"] = self.updated_at
-        return payload
+        return _registry_row(
+            {
+                "feature": self.feature,
+                "status": self.status,
+                "path": self.path,
+            },
+            updated_at=self.updated_at,
+        )
 
 
 @dataclass(frozen=True)
@@ -229,18 +237,16 @@ class SubfeatureRegistryRow:
         )
 
     def to_dict(self) -> RegistryRow:
-        payload: RegistryRow = {
-            "subfeature_id": self.subfeature_id,
-            "status": self.status,
-            "path": self.path,
-        }
-        if self.feature is not None:
-            payload["feature"] = self.feature
-        if self.subfeature_type is not None:
-            payload["subfeature_type"] = self.subfeature_type
-        if self.updated_at is not None:
-            payload["updated_at"] = self.updated_at
-        return payload
+        return _registry_row(
+            {
+                "subfeature_id": self.subfeature_id,
+                "status": self.status,
+                "path": self.path,
+            },
+            feature=self.feature,
+            subfeature_type=self.subfeature_type,
+            updated_at=self.updated_at,
+        )
 
 
 @dataclass(frozen=True)
@@ -264,17 +270,16 @@ class SliceRegistryRow:
         )
 
     def to_dict(self) -> RegistryRow:
-        payload: RegistryRow = {
-            "id": self.id,
-            "feature": self.feature,
-            "status": self.status,
-            "path": self.path,
-        }
-        if self.updated_at is not None:
-            payload["updated_at"] = self.updated_at
-        if self.archived_at is not None:
-            payload["archived_at"] = self.archived_at
-        return payload
+        return _registry_row(
+            {
+                "id": self.id,
+                "feature": self.feature,
+                "status": self.status,
+                "path": self.path,
+            },
+            updated_at=self.updated_at,
+            archived_at=self.archived_at,
+        )
 
 
 @dataclass
