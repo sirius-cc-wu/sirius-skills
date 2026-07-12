@@ -97,6 +97,12 @@ def discover_subfeature_targets(feature_path: Path) -> List[Path]:
     )
 
 
+def target_subfeature_scopes(target_path: Path) -> List[Path]:
+    if (target_path / ".subfeature-meta.json").exists():
+        return [target_path]
+    return discover_subfeature_targets(target_path)
+
+
 def build_subfeature_owner_map(subfeature_targets: List[Path]) -> Dict[str, List[Path]]:
     owners_by_slice_id: Dict[str, List[Path]] = {}
     for subfeature_dir in subfeature_targets:
@@ -115,23 +121,37 @@ def build_subfeature_owner_map(subfeature_targets: List[Path]) -> Dict[str, List
     return owners_by_slice_id
 
 
+def row_matches_target(
+    row: Dict[str, object], target_slug: str, owner_map: Dict[str, List[Path]]
+) -> bool:
+    row_id = str(row.get("id") or "").strip()
+    if row_id in owner_map:
+        return True
+    return str(row.get("feature", "")).strip() == target_slug
+
+
 def discover_feature_targets(
     manage_planning, manage_execution, root_scope_context: object
 ) -> List[Tuple[str, str]]:
     rows = manage_execution.parse_registry(scope_context=root_scope_context)
+    planning_dir, _, _ = manage_planning.get_registry_paths(
+        required_config=False, scope_context=root_scope_context
+    )
     targets: List[Tuple[str, str]] = []
     seen: set[str] = set()
-    for row in rows:
-        feature_slug = str(row.get("feature", "")).strip()
+    for feature_dir in manage_planning.discover_feature_dirs(planning_dir):
+        metadata = manage_planning.read_metadata(feature_dir)
+        feature_slug = str(metadata["feature_slug"])
         if not feature_slug or feature_slug in seen:
             continue
-        _, feature, _ = manage_planning.resolve_feature_lookup(
-            feature_slug, explicit_scope=str(root_scope_context.scope_root)
+
+        owner_map = build_subfeature_owner_map(
+            target_subfeature_scopes(Path(feature_dir))
         )
-        if feature is None:
+        if not any(row_matches_target(row, feature_slug, owner_map) for row in rows):
             continue
-        feature_dir = manage_planning.feature_dir_for_row(feature, scope_context=root_scope_context)
-        targets.append((feature_dir, str(feature["feature"])))
+
+        targets.append((feature_dir, feature_slug))
         seen.add(feature_slug)
     return targets
 
@@ -167,6 +187,7 @@ def target_scope_for_row(
     feature_path: Path,
     owner_map: Dict[str, List[Path]],
     subfeature_targets: List[Path],
+    allow_direct_fallback: bool,
 ) -> Tuple[Optional[Path], Optional[str]]:
     owners = owner_map.get(str(row.get("id") or ""), [])
     unique_owners = list(dict.fromkeys(owners))
@@ -174,6 +195,8 @@ def target_scope_for_row(
         return unique_owners[0], None
     if len(unique_owners) > 1:
         return None, "Execution slice maps to multiple subfeatures."
+    if allow_direct_fallback:
+        return feature_path, None
     if subfeature_targets:
         return None, "Execution slice is not mapped by any subfeature traceability file."
     return feature_path, None
@@ -190,7 +213,7 @@ def migrate_feature_rows(
     dry_run: bool,
 ) -> Dict[str, object]:
     feature_path = Path(feature_dir)
-    subfeature_targets = discover_subfeature_targets(feature_path)
+    subfeature_targets = target_subfeature_scopes(feature_path)
     owner_map = build_subfeature_owner_map(subfeature_targets)
     scope_created_by_target: Dict[str, bool] = {}
     existing_rows_by_target: Dict[str, List[Dict[str, object]]] = {}
@@ -203,12 +226,18 @@ def migrate_feature_rows(
 
     for row in root_rows:
         row_feature = str(row.get("feature", "")).strip()
-        if row_feature != feature_slug:
+        owned_by_target = str(row.get("id") or "").strip() in owner_map
+        direct_fallback = row_feature == feature_slug
+        if not owned_by_target and not direct_fallback:
             remaining_rows.append(row)
             continue
 
         target_scope, target_error = target_scope_for_row(
-            row, feature_path, owner_map, subfeature_targets
+            row,
+            feature_path,
+            owner_map,
+            subfeature_targets,
+            allow_direct_fallback=direct_fallback,
         )
         if target_error is not None or target_scope is None:
             source_abs = Path(manage_execution.slice_path_for_row(row, scope_context=root_scope_context))

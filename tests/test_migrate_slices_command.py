@@ -116,6 +116,57 @@ def test_package_migrate_slices_moves_mapped_slices_into_subfeature_scope(
     assert root_registry["slices"] == []
 
 
+def test_package_migrate_slices_all_uses_traceability_when_feature_field_is_title(
+    tmp_path: Path, monkeypatch
+) -> None:
+    monkeypatch.chdir(tmp_path)
+
+    assert bootstrap.main(["--mode", "default"]) == 0
+
+    from sirius_skills.commands import manage_execution, manage_planning, manage_subfeatures
+
+    feature_dir, created = manage_planning.create_feature("checkout")
+    assert created is True
+    manage_subfeatures.ensure_subfeature_registry(feature_dir)
+    scope_context = manage_planning.SCOPE_RUNTIME.resolve_scope_context()
+    subfeature_dir, created = manage_subfeatures.create_subfeature(
+        manage_planning,
+        feature_dir,
+        "checkout",
+        "replace-legacy-flow",
+        "replacement",
+        "Replace the old checkout flow.",
+        scope_context,
+    )
+    assert created is True
+    subfeature_path = Path(subfeature_dir)
+    (subfeature_path / "slice-traceability.md").write_text(
+        "# Slice Traceability\n\n"
+        "| Story ID | Story Size | Story Summary | Increments | Planned Slice IDs | Slice Areas | Blocked By | Execution Slice IDs | Notes |\n"
+        "| --- | --- | --- | --- | --- | --- | --- | --- | --- |\n"
+        "| CHK-01 | M | Replace flow | I1 | CHK-001 | checkout |  | CHK-001 | mapped |\n"
+        "| CHK-02 | S | Confirm redirect | I1 | CHK-002 | checkout |  | CHK-002 | mapped |\n",
+        encoding="utf-8",
+    )
+
+    first_folder, created = manage_execution.create_slice("CHK-001", "Replace checkout flow")
+    assert created is True
+    second_folder, created = manage_execution.create_slice("CHK-002", "Confirm redirect")
+    assert created is True
+
+    assert migrate_slices.main(["migrate", "--all"]) == 0
+
+    assert (subfeature_path / "slices" / first_folder).exists()
+    assert (subfeature_path / "slices" / second_folder).exists()
+    subfeature_registry = json.loads(
+        (subfeature_path / "slices" / "registry.json").read_text(encoding="utf-8")
+    )
+    assert {row["id"] for row in subfeature_registry["slices"]} == {"CHK-001", "CHK-002"}
+
+    root_registry = json.loads((tmp_path / "slices" / "registry.json").read_text(encoding="utf-8"))
+    assert root_registry["slices"] == []
+
+
 def test_package_migrate_slices_all_refreshes_root_registry_between_features(
     tmp_path: Path, monkeypatch
 ) -> None:
