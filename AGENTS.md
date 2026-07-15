@@ -104,6 +104,14 @@ When you change a skill or helper:
 - update any top-level docs that describe the behavior
 - remove stale examples in the same change when practical
 
+### Keep technical documentation approachable
+
+Introduce project-specific concepts in plain language on first use, followed by
+the canonical term in parentheses. Name test scenarios after the behavior being
+verified rather than jargon such as "happy path," "gating," or "soak." Prefer
+the actual resource or operation over generic phrases such as "resource
+acquisition," while retaining exact identifiers needed to match code and logs.
+
 ### Reconcile before archive
 
 When a feature or subfeature has completed all planned slices and is about to be
