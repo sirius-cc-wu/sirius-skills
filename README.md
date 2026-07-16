@@ -38,9 +38,37 @@ just validate
 8. `uml-class-diagram-design` - summarize the design model as software classes.
 9. `design-pattern-application` - apply GoF patterns only where variation, creation, notification, or composition pressure warrants them.
 
+## Artifact Durability and Layouts
+
+The iterative UP coordinator distinguishes durable design knowledge from
+iteration history:
+
+- Use cases, domain models, SSDs, contracts, realizations, and design class
+  diagrams are canonical artifacts refined across iterations.
+- Iteration records retain goals, risks, selected scope, exit criteria, and
+  results without copying the canonical artifacts.
+- Decision records preserve cross-cutting choices and explicitly supersede
+  earlier decisions when needed.
+
+The coordinator preserves an established repository layout. When no convention
+exists, it selects the smallest suitable structure rather than imposing one
+taxonomy:
+
+| Layout | Best fit |
+|---|---|
+| Flat hybrid | Small repositories and one-page features |
+| Feature packages | Cohesive features with independently changing artifacts |
+| Artifact-oriented | Shared models spanning many features |
+| Product-area oriented | Stable subsystems with area ownership |
+| Iteration-first | Audit-focused repositories with snapshots plus a canonical `current/` index |
+
+See [Artifact Durability and Repository Layouts](skills/iterative-up-analysis-design/references/artifact-layouts.md)
+for selection criteria, tradeoffs, linking rules, and migration guidance.
+
 ## Files
 
 - `skill-inventory.md` maps source concepts to skill boundaries.
 - `skills/*/SKILL.md` contains the agent-facing workflows.
+- `skills/iterative-up-analysis-design/references/artifact-layouts.md` describes supported persistence layouts.
 - `scripts/validate_skills.sh` performs lightweight structure validation.
 - `justfile` installs, removes, and validates the managed skills.
