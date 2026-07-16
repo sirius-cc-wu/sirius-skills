@@ -28,7 +28,7 @@ Use an iterative, risk-driven flow: produce just enough artifacts for the curren
 3. **Inspect repository conventions.** Read governance, indexes, and neighboring artifacts before selecting paths or creating directories.
 4. **Classify artifact lifecycles.** Refine design artifacts at canonical paths, create one historical record per iteration, and record durable cross-cutting decisions separately when needed.
 5. **Choose only necessary artifacts.** Do not create every artifact by default; create what reduces uncertainty for the current iteration.
-6. **Choose artifact placement.** Preserve an established layout. When none exists, use the smallest suitable option from [Artifact Durability and Repository Layouts](references/artifact-layouts.md); default to flat hybrid for a small repository.
+6. **Choose artifact placement.** Preserve an established layout. When none exists, use the smallest suitable option from [Artifact Durability and Repository Layouts](references/artifact-layouts.md); default to the feature-iteration hybrid with flat feature files, promoting a feature to a package only when its artifacts change independently.
 7. **Sequence analysis before design.** Use cases lead to SSDs, domain model, contracts, GRASP decisions, realizations, and design class diagrams.
 8. **Keep durable artifacts evolving.** Mark canonical artifacts as started or refined; expect corrections as contracts, design, implementation, and feedback reveal gaps.
 9. **Tie artifacts together.** Each design decision should trace back to use cases, system events, contracts, risks, or verification evidence.

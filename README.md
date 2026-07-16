@@ -56,8 +56,8 @@ taxonomy:
 
 | Layout | Best fit |
 |---|---|
-| Flat hybrid | Small repositories and one-page features |
-| Feature packages | Cohesive features with independently changing artifacts |
+| Feature-iteration hybrid, flat variant | Small repositories and one-page features |
+| Feature-iteration hybrid, package variant | Cohesive features with independently changing artifacts |
 | Artifact-oriented | Shared models spanning many features |
 | Product-area oriented | Stable subsystems with area ownership |
 | Iteration-first | Audit-focused repositories with snapshots plus a canonical `current/` index |

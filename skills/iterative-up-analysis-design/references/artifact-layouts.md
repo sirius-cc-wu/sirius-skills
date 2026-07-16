@@ -37,30 +37,7 @@ iteration-specific copies of those artifacts.
 
 ## Layout Options
 
-### Flat Hybrid
-
-```text
-docs/
-  features/
-    view-markdown-with-plantuml.md
-  iterations/
-    e1-view-markdown-with-plantuml.md
-  decisions/
-  index.md
-```
-
-Use when:
-
-- The repository is small or early in development.
-- Most features fit in one durable document.
-- Readers navigate primarily by feature.
-
-Tradeoffs:
-
-- It has low ceremony and short paths.
-- Large feature files may eventually need decomposition.
-
-### Feature Packages
+### Feature-Iteration Hybrid
 
 ```text
 docs/
@@ -73,18 +50,32 @@ docs/
   iterations/
     e1-view-markdown-with-plantuml.md
   decisions/
+  index.md
 ```
+
+This is the recommended general-purpose layout. It separates durable feature
+knowledge from historical iteration records while keeping both easy to
+navigate.
+
+Feature storage has two variants:
+
+- Use a single file such as `features/view-markdown-with-plantuml.md` while the
+  feature remains cohesive and changes as one unit.
+- Use the feature package shown above when its use case, analysis, and design
+  artifacts change independently.
 
 Use when:
 
-- A feature has several durable artifacts that change independently.
-- Feature cohesion matters more than browsing by artifact type.
-- One feature document has become difficult to review or navigate.
+- Readers navigate primarily by feature.
+- Iteration history must remain separate from current design knowledge.
+- The repository needs a structure that can grow from one-page features to
+  feature packages without changing its top-level organization.
 
 Tradeoffs:
 
-- It keeps related knowledge together.
-- It can create empty or tiny files when introduced too early.
+- Its flat variant has low ceremony and short paths.
+- Its package variant keeps related artifacts together but can create tiny
+  files when introduced before they change independently.
 
 ### Artifact-Oriented
 
@@ -179,15 +170,15 @@ copies and never become the current-artifact locator.
 
 | Repository condition | Preferred starting layout |
 |---|---|
-| Small repository with one-page features | Flat hybrid |
-| Large cohesive features with independently changing artifacts | Feature packages |
+| Small repository with one-page features | Feature-iteration hybrid, flat feature variant |
+| Large cohesive features with independently changing artifacts | Feature-iteration hybrid, feature package variant |
 | Shared models spanning many features | Artifact-oriented |
 | Stable subsystems with area ownership | Product-area oriented |
 | Regulated chronological snapshots | Iteration-first, with canonical artifacts and an explicit index under `current/` |
 
 These are starting points, not mandatory taxonomies. A repository may combine
-them, such as feature packages for user-facing work, product-area architecture,
-and a shared top-level iteration ledger.
+them, such as the feature-iteration hybrid for user-facing work,
+product-area-oriented architecture, and artifact-oriented shared models.
 
 ## Linking Rules
 
@@ -207,8 +198,9 @@ and a shared top-level iteration ledger.
 
 ## Migration Guidance
 
-- Move from flat hybrid to a feature package when a feature has multiple
-  independently maintained sections, not merely because the file is long.
+- Move from the flat to the package variant of the feature-iteration hybrid
+  when a feature has multiple independently maintained sections, not merely
+  because the file is long.
 - Introduce artifact-oriented directories when models become genuinely shared
   across features.
 - Introduce product areas only after their boundaries and ownership are stable.
