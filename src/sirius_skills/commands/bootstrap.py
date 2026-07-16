@@ -14,7 +14,6 @@ from typing import Any
 DEFAULT_PLANNING_DIR = "docs/features"
 DEFAULT_PROPOSAL_DIR = "docs/proposals"
 DEFAULT_DESIGN_DIAGRAM_MODE = "embedded"
-DEFAULT_SLICE_DIR = "slices"
 DEFAULT_WORKFLOW = "TDD"
 DEFAULT_AUTO_START_IMPLEMENTATION = True
 DEFAULT_WIKI_DIR_NAME = "wiki"
@@ -92,7 +91,10 @@ def parse_args(argv=None) -> argparse.Namespace:
     parser.add_argument(
         "--slice-dir",
         default=None,
-        help=f"Slice directory for .skills/execution.json (default: {DEFAULT_SLICE_DIR}).",
+        help=(
+            "Registry-owning slice directory for .skills/execution.json. "
+            "Omit for a defaults-only execution config."
+        ),
     )
     parser.add_argument(
         "--workflow",
@@ -227,9 +229,8 @@ def build_execution_config(
     auto_start_implementation: bool | None,
 ) -> dict[str, Any]:
     updated = dict(existing)
-    updated["slice_dir"] = inherited_or_default(
-        existing, "slice_dir", slice_dir, DEFAULT_SLICE_DIR
-    )
+    if slice_dir is not None:
+        updated["slice_dir"] = slice_dir
     updated["preferred_workflow"] = inherited_or_default(
         existing, "preferred_workflow", workflow, DEFAULT_WORKFLOW
     )
@@ -257,21 +258,36 @@ def build_conventions_config(
 
 
 def scaffold_wiki(
-    repo_root: Path, planning_dir: str, proposal_dir: str, slice_dir: str
+    repo_root: Path,
+    planning_dir: str,
+    proposal_dir: str,
+    slice_dir: str | None,
 ) -> None:
     wiki_dir = repo_root / Path(derive_wiki_dir(planning_dir))
     (wiki_dir / "features").mkdir(parents=True, exist_ok=True)
     (wiki_dir / "concepts").mkdir(parents=True, exist_ok=True)
     (wiki_dir / "concepts" / "architecture").mkdir(parents=True, exist_ok=True)
 
+    canonical_sources = f"`{planning_dir}/` and `{proposal_dir}/`"
+    source_kinds = "planning"
+    execution_note = (
+        "\n\nThis scope's execution config is defaults-only and does not own an "
+        "execution slice registry."
+    )
+    if slice_dir is not None:
+        canonical_sources = (
+            f"`{planning_dir}/`, `{proposal_dir}/`, and `{slice_dir}/`"
+        )
+        source_kinds = "planning and execution"
+        execution_note = ""
+
     index_content = f"""# Wiki Index
 
 This wiki is the repository's synthesized knowledge layer. Read it before
 re-deriving answers from raw planning artifacts or upstream references.
 
-It is intentionally separate from `{planning_dir}/`, `{proposal_dir}/`, and
-`{slice_dir}/`, which remain the canonical planning and execution sources of
-truth.
+It is intentionally separate from {canonical_sources}, which remain the
+canonical {source_kinds} sources of truth.{execution_note}
 
 ## Architecture
 
@@ -393,7 +409,7 @@ def main(argv=None) -> int:
             repo_root,
             planning_config["planning_dir"],
             planning_config["proposal_dir"],
-            execution_config["slice_dir"],
+            execution_config.get("slice_dir"),
         )
         agents_updated = patch_agents_for_wiki(repo_root, planning_config["planning_dir"])
 

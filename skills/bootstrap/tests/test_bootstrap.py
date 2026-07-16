@@ -52,7 +52,6 @@ def test_default_mode_writes_generic_config_files(tmp_path, monkeypatch):
         "design_diagram_mode": "embedded",
     }
     assert execution == {
-        "slice_dir": "slices",
         "preferred_workflow": "TDD",
         "auto_start_implementation": True,
     }
@@ -191,7 +190,8 @@ def test_bootstrap_with_wiki_scaffolds_docs_wiki(tmp_path, monkeypatch):
     assert "## Features" in index_text
     assert "docs/features/" in index_text
     assert "docs/proposals/" in index_text
-    assert "slices/" in index_text
+    assert "slices/" not in index_text
+    assert "execution config is defaults-only" in index_text
     assert "## Concepts" in index_text
     assert "## [YYYY-MM-DD] operation | subject" in log_text
 

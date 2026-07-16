@@ -382,6 +382,8 @@ Generic default slice naming now assumes scope-prefixed planned slice IDs:
 
 Projects can add `.skills/execution.json` in the repository root to configure execution defaults for `guide-execution` and `slice` bootstrap.
 
+`sirius bootstrap` writes the defaults-only form unless the target scope already inherits a `slice_dir` or the user explicitly supplies `--slice-dir`. This prevents first-time repository setup from implicitly owning a root-level `slices/` registry.
+
 Defaults-only example:
 
 ```json

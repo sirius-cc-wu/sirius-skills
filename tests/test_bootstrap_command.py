@@ -34,4 +34,5 @@ def test_package_bootstrap_writes_default_config(tmp_path: Path, monkeypatch) ->
         (tmp_path / ".skills" / "execution.json").read_text(encoding="utf-8")
     )
     assert planning["planning_dir"] == "docs/features"
-    assert execution["slice_dir"] == "slices"
+    assert "slice_dir" not in execution
+    assert execution["preferred_workflow"] == "TDD"

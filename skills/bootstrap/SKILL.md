@@ -49,9 +49,13 @@ Use these defaults unless the user asked for different values:
 - `planning_dir`: `docs/features`
 - `proposal_dir`: `docs/proposals`
 - `design_diagram_mode`: `embedded`
-- `slice_dir`: `slices`
 - `preferred_workflow`: `TDD`
 - `auto_start_implementation`: `true`
+
+By default, omit `slice_dir` so the generated execution config provides shared
+defaults without owning a root-level execution registry. Preserve an existing
+or inherited `slice_dir`, and only add one to a new defaults-only scope when the
+user explicitly chooses a registry location with `--slice-dir`.
 
 In both `default` and `jira` mode, seed `.skills/conventions.json` with these
 generic slice-ID defaults unless the repo already overrides them:
