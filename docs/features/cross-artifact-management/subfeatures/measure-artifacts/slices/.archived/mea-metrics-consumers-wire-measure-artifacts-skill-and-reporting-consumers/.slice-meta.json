@@ -1,0 +1,12 @@
+{
+  "created_at": "2026-04-18T01:56:57",
+  "updated_at": "2026-07-16T15:33:12",
+  "status": "closed",
+  "slice_id": "mea-metrics-consumers",
+  "feature": "Wire measure-artifacts skill and reporting consumers",
+  "path": "slices/.archived/mea-metrics-consumers-wire-measure-artifacts-skill-and-reporting-consumers/",
+  "relations": [],
+  "closed_at": "2026-04-18T02:04:05",
+  "archived_at": "2026-05-01T19:38:20",
+  "archived_from": "slices/mea-metrics-consumers-wire-measure-artifacts-skill-and-reporting-consumers/"
+}

@@ -82,96 +82,6 @@
       "relations": []
     },
     {
-      "id": "aat-cross-artifact-audit",
-      "feature": "audit-artifacts",
-      "status": "closed",
-      "path": "slices/.archived/aat-cross-artifact-audit-audit-artifacts/",
-      "updated_at": "2026-05-01T19:34:33",
-      "closed_at": "2026-04-11T23:30:02",
-      "archived_at": "2026-05-01T19:34:33",
-      "relations": []
-    },
-    {
-      "id": "tat-trace-artifact-lineage",
-      "feature": "trace-artifacts",
-      "status": "closed",
-      "path": "slices/tat-trace-artifact-lineage-trace-artifacts/",
-      "updated_at": "2026-04-11T23:40:32",
-      "closed_at": "2026-04-11T23:40:32",
-      "archived_at": null,
-      "relations": []
-    },
-    {
-      "id": "rpt-artifact-state-report",
-      "feature": "report-artifacts",
-      "status": "closed",
-      "path": "slices/rpt-artifact-state-report-report-artifacts/",
-      "updated_at": "2026-04-11T23:48:13",
-      "closed_at": "2026-04-11T23:48:13",
-      "archived_at": null,
-      "relations": []
-    },
-    {
-      "id": "rpr-registry-drift-repair",
-      "feature": "repair-artifacts",
-      "status": "closed",
-      "path": "slices/rpr-registry-drift-repair-repair-artifacts/",
-      "updated_at": "2026-04-11T23:53:30",
-      "closed_at": "2026-04-11T23:53:30",
-      "archived_at": null,
-      "relations": []
-    },
-    {
-      "id": "arc-safe-slice-archival",
-      "feature": "archive-artifacts",
-      "status": "closed",
-      "path": "slices/arc-safe-slice-archival-archive-artifacts/",
-      "updated_at": "2026-04-11T23:58:00",
-      "closed_at": "2026-04-11T23:58:00",
-      "archived_at": null,
-      "relations": []
-    },
-    {
-      "id": "mse-scope-and-backlog-resolution",
-      "feature": "Resolve planning scope and remaining planned slices",
-      "status": "closed",
-      "path": "slices/.archived/mse-scope-and-backlog-resolution-resolve-planning-scope-and-remaining-planned-slices/",
-      "updated_at": "2026-05-01T19:39:57",
-      "closed_at": "2026-04-14T16:33:27",
-      "archived_at": "2026-05-01T19:39:57",
-      "relations": []
-    },
-    {
-      "id": "mse-sequential-slice-orchestration",
-      "feature": "Orchestrate sequential slice execution",
-      "status": "closed",
-      "path": "slices/.archived/mse-sequential-slice-orchestration-orchestrate-sequential-slice-execution/",
-      "updated_at": "2026-05-01T19:39:57",
-      "closed_at": "2026-04-14T16:33:28",
-      "archived_at": "2026-05-01T19:39:57",
-      "relations": []
-    },
-    {
-      "id": "mse-stop-and-resume-semantics",
-      "feature": "Stop on blockers and resume from durable state",
-      "status": "closed",
-      "path": "slices/.archived/mse-stop-and-resume-semantics-stop-on-blockers-and-resume-from-durable-state/",
-      "updated_at": "2026-05-01T19:39:57",
-      "closed_at": "2026-04-14T16:33:28",
-      "archived_at": "2026-05-01T19:39:57",
-      "relations": []
-    },
-    {
-      "id": "mse-per-slice-commit-checkpoints",
-      "feature": "Enforce one commit per completed slice",
-      "status": "closed",
-      "path": "slices/.archived/mse-per-slice-commit-checkpoints-enforce-one-commit-per-completed-slice/",
-      "updated_at": "2026-05-01T19:39:57",
-      "closed_at": "2026-04-14T16:33:28",
-      "archived_at": "2026-05-01T19:39:57",
-      "relations": []
-    },
-    {
       "id": "wsc-shared-library",
       "feature": "Create shared workflow-state library",
       "status": "closed",
@@ -179,26 +89,6 @@
       "updated_at": "2026-05-01T19:33:12",
       "closed_at": "2026-04-17T21:29:37",
       "archived_at": "2026-05-01T19:33:12",
-      "relations": []
-    },
-    {
-      "id": "mea-metrics-foundation",
-      "feature": "Build metrics record and sidecar engine",
-      "status": "closed",
-      "path": "slices/.archived/mea-metrics-foundation-build-metrics-record-and-sidecar-engine/",
-      "updated_at": "2026-05-01T19:38:20",
-      "closed_at": "2026-04-18T01:55:58",
-      "archived_at": "2026-05-01T19:38:20",
-      "relations": []
-    },
-    {
-      "id": "mea-metrics-consumers",
-      "feature": "Wire measure-artifacts skill and reporting consumers",
-      "status": "closed",
-      "path": "slices/.archived/mea-metrics-consumers-wire-measure-artifacts-skill-and-reporting-consumers/",
-      "updated_at": "2026-05-01T19:38:20",
-      "closed_at": "2026-04-18T02:04:05",
-      "archived_at": "2026-05-01T19:38:20",
       "relations": []
     },
     {
@@ -249,116 +139,6 @@
       "updated_at": "2026-05-01T19:33:12",
       "closed_at": "2026-04-19T01:24:17",
       "archived_at": "2026-05-01T19:33:12",
-      "relations": []
-    },
-    {
-      "id": "sim-local-helper",
-      "feature": "Add source-linked local install helper",
-      "status": "closed",
-      "path": "slices/sim-local-helper-add-source-linked-local-install-helper/",
-      "updated_at": "2026-04-19T10:56:05",
-      "closed_at": "2026-04-19T10:56:05",
-      "archived_at": null,
-      "relations": []
-    },
-    {
-      "id": "sim-local-docs",
-      "feature": "Document the source-linked local install path",
-      "status": "closed",
-      "path": "slices/sim-local-docs-document-the-source-linked-local-install-path/",
-      "updated_at": "2026-04-19T10:58:51",
-      "closed_at": "2026-04-19T10:58:51",
-      "archived_at": null,
-      "relations": []
-    },
-    {
-      "id": "sim-packaged-targets",
-      "feature": "Split local and packaged install targets",
-      "status": "closed",
-      "path": "slices/sim-packaged-targets-split-local-and-packaged-install-targets/",
-      "updated_at": "2026-04-19T11:07:03",
-      "closed_at": "2026-04-19T11:07:03",
-      "archived_at": null,
-      "relations": []
-    },
-    {
-      "id": "sim-packaged-compat",
-      "feature": "Preserve packaged install compatibility during migration",
-      "status": "closed",
-      "path": "slices/sim-packaged-compat-preserve-packaged-install-compatibility-during-migration/",
-      "updated_at": "2026-04-19T11:09:09",
-      "closed_at": "2026-04-19T11:09:09",
-      "archived_at": null,
-      "relations": []
-    },
-    {
-      "id": "sim-runtime-scope",
-      "feature": "Scope shared-runtime sync to packaged installs",
-      "status": "closed",
-      "path": "slices/sim-runtime-scope-scope-shared-runtime-sync-to-packaged-installs/",
-      "updated_at": "2026-04-19T11:10:55",
-      "closed_at": "2026-04-19T11:10:55",
-      "archived_at": null,
-      "relations": []
-    },
-    {
-      "id": "sim-parity-scope",
-      "feature": "Re-scope installed parity to packaged validation",
-      "status": "closed",
-      "path": "slices/sim-parity-scope-re-scope-installed-parity-to-packaged-validation/",
-      "updated_at": "2026-04-19T11:13:49",
-      "closed_at": "2026-04-19T11:13:49",
-      "archived_at": null,
-      "relations": []
-    },
-    {
-      "id": "sim-migration-guidance",
-      "feature": "Publish the migration path and operator guidance",
-      "status": "closed",
-      "path": "slices/sim-migration-guidance-publish-the-migration-path-and-operator-guidance/",
-      "updated_at": "2026-04-19T11:15:37",
-      "closed_at": "2026-04-19T11:15:37",
-      "archived_at": null,
-      "relations": []
-    },
-    {
-      "id": "rrs-research-skill",
-      "feature": "Create explicit research skill",
-      "status": "closed",
-      "path": "slices/rrs-research-skill-create-explicit-research-skill/",
-      "updated_at": "2026-04-21T00:54:26",
-      "closed_at": "2026-04-21T00:54:26",
-      "archived_at": null,
-      "relations": []
-    },
-    {
-      "id": "rrs-relevance-routing",
-      "feature": "Route research only when relevant",
-      "status": "closed",
-      "path": "slices/rrs-relevance-routing-route-research-only-when-relevant/",
-      "updated_at": "2026-04-21T01:00:53",
-      "closed_at": "2026-04-21T01:00:53",
-      "archived_at": null,
-      "relations": []
-    },
-    {
-      "id": "rrs-research-consumers",
-      "feature": "Teach planning docs to cite research output",
-      "status": "closed",
-      "path": "slices/rrs-research-consumers-teach-planning-docs-to-cite-research-output/",
-      "updated_at": "2026-04-21T01:05:08",
-      "closed_at": "2026-04-21T01:05:08",
-      "archived_at": null,
-      "relations": []
-    },
-    {
-      "id": "rrs-wiki-synthesis",
-      "feature": "Add reusable wiki synthesis flow",
-      "status": "closed",
-      "path": "slices/rrs-wiki-synthesis-add-reusable-wiki-synthesis-flow/",
-      "updated_at": "2026-04-21T01:10:07",
-      "closed_at": "2026-04-21T01:10:07",
-      "archived_at": null,
       "relations": []
     },
     {
@@ -422,76 +202,6 @@
       "relations": []
     },
     {
-      "id": "scc-owned-change-set",
-      "feature": "ship-slice-close-commit-controls",
-      "status": "closed",
-      "path": "slices/scc-owned-change-set-ship-slice-close-commit-controls/",
-      "updated_at": "2026-04-23T15:59:13",
-      "closed_at": "2026-04-23T15:59:13",
-      "archived_at": null,
-      "relations": []
-    },
-    {
-      "id": "scc-terminal-automation",
-      "feature": "ship-slice-close-commit-controls",
-      "status": "closed",
-      "path": "slices/scc-terminal-automation-ship-slice-close-commit-controls/",
-      "updated_at": "2026-04-23T16:57:50",
-      "closed_at": "2026-04-23T16:57:50",
-      "archived_at": null,
-      "relations": []
-    },
-    {
-      "id": "dsp-policy-contract",
-      "feature": "delegated-execution-stop-policies",
-      "status": "closed",
-      "path": "slices/dsp-policy-contract-delegated-execution-stop-policies/",
-      "updated_at": "2026-04-24T00:14:14",
-      "closed_at": "2026-04-24T00:14:14",
-      "archived_at": null,
-      "relations": []
-    },
-    {
-      "id": "dsp-boundary-enforcement",
-      "feature": "delegated-execution-stop-policies",
-      "status": "closed",
-      "path": "slices/dsp-boundary-enforcement-delegated-execution-stop-policies/",
-      "updated_at": "2026-04-24T00:14:14",
-      "closed_at": "2026-04-24T00:14:14",
-      "archived_at": null,
-      "relations": []
-    },
-    {
-      "id": "spi-preflight-contract",
-      "feature": "Add typed ship preflight contract and readiness metadata",
-      "status": "closed",
-      "path": "slices/spi-preflight-contract-add-typed-ship-preflight-contract-and-readiness-metadata/",
-      "updated_at": "2026-04-24T19:40:59",
-      "closed_at": "2026-04-24T19:40:59",
-      "archived_at": null,
-      "relations": []
-    },
-    {
-      "id": "spi-mutation-gating",
-      "feature": "Gate bootstrap and delegated resume with local-only preflight",
-      "status": "closed",
-      "path": "slices/spi-mutation-gating-gate-bootstrap-and-delegated-resume-with-local-only-preflight/",
-      "updated_at": "2026-04-24T19:53:24",
-      "closed_at": "2026-04-24T19:53:24",
-      "archived_at": null,
-      "relations": []
-    },
-    {
-      "id": "spi-operator-contracts",
-      "feature": "Document rerun semantics and preflight behavior",
-      "status": "closed",
-      "path": "slices/spi-operator-contracts-document-rerun-semantics-and-preflight-behavior/",
-      "updated_at": "2026-04-24T19:59:33",
-      "closed_at": "2026-04-24T19:59:33",
-      "archived_at": null,
-      "relations": []
-    },
-    {
       "id": "dalc-foundation-storage",
       "feature": "Implement Storage/Models and relocate Scope Runtime",
       "status": "closed",
@@ -532,5 +242,5 @@
       "relations": []
     }
   ],
-  "generated_at": "2026-06-25T16:21:24"
+  "generated_at": "2026-07-16T15:33:12"
 }

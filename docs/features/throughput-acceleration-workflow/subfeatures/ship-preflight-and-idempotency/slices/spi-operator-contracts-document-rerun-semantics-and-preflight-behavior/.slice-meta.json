@@ -1,0 +1,10 @@
+{
+  "created_at": "2026-04-24T19:55:00",
+  "updated_at": "2026-07-16T15:33:12",
+  "status": "closed",
+  "slice_id": "spi-operator-contracts",
+  "feature": "Document rerun semantics and preflight behavior",
+  "path": "slices/spi-operator-contracts-document-rerun-semantics-and-preflight-behavior/",
+  "relations": [],
+  "closed_at": "2026-04-24T19:59:33"
+}

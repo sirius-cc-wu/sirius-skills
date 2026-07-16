@@ -1,0 +1,46 @@
+{
+  "version": 1,
+  "slices": [
+    {
+      "id": "rrs-research-skill",
+      "feature": "Create explicit research skill",
+      "status": "closed",
+      "path": "slices/rrs-research-skill-create-explicit-research-skill/",
+      "updated_at": "2026-07-16T15:33:12",
+      "closed_at": "2026-04-21T00:54:26",
+      "archived_at": null,
+      "relations": []
+    },
+    {
+      "id": "rrs-relevance-routing",
+      "feature": "Route research only when relevant",
+      "status": "closed",
+      "path": "slices/rrs-relevance-routing-route-research-only-when-relevant/",
+      "updated_at": "2026-07-16T15:33:12",
+      "closed_at": "2026-04-21T01:00:53",
+      "archived_at": null,
+      "relations": []
+    },
+    {
+      "id": "rrs-research-consumers",
+      "feature": "Teach planning docs to cite research output",
+      "status": "closed",
+      "path": "slices/rrs-research-consumers-teach-planning-docs-to-cite-research-output/",
+      "updated_at": "2026-07-16T15:33:12",
+      "closed_at": "2026-04-21T01:05:08",
+      "archived_at": null,
+      "relations": []
+    },
+    {
+      "id": "rrs-wiki-synthesis",
+      "feature": "Add reusable wiki synthesis flow",
+      "status": "closed",
+      "path": "slices/rrs-wiki-synthesis-add-reusable-wiki-synthesis-flow/",
+      "updated_at": "2026-07-16T15:33:12",
+      "closed_at": "2026-04-21T01:10:07",
+      "archived_at": null,
+      "relations": []
+    }
+  ],
+  "generated_at": "2026-07-16T15:33:12"
+}

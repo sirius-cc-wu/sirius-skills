@@ -1,0 +1,36 @@
+{
+  "version": 1,
+  "slices": [
+    {
+      "id": "spi-preflight-contract",
+      "feature": "Add typed ship preflight contract and readiness metadata",
+      "status": "closed",
+      "path": "slices/spi-preflight-contract-add-typed-ship-preflight-contract-and-readiness-metadata/",
+      "updated_at": "2026-07-16T15:33:12",
+      "closed_at": "2026-04-24T19:40:59",
+      "archived_at": null,
+      "relations": []
+    },
+    {
+      "id": "spi-mutation-gating",
+      "feature": "Gate bootstrap and delegated resume with local-only preflight",
+      "status": "closed",
+      "path": "slices/spi-mutation-gating-gate-bootstrap-and-delegated-resume-with-local-only-preflight/",
+      "updated_at": "2026-07-16T15:33:12",
+      "closed_at": "2026-04-24T19:53:24",
+      "archived_at": null,
+      "relations": []
+    },
+    {
+      "id": "spi-operator-contracts",
+      "feature": "Document rerun semantics and preflight behavior",
+      "status": "closed",
+      "path": "slices/spi-operator-contracts-document-rerun-semantics-and-preflight-behavior/",
+      "updated_at": "2026-07-16T15:33:12",
+      "closed_at": "2026-04-24T19:59:33",
+      "archived_at": null,
+      "relations": []
+    }
+  ],
+  "generated_at": "2026-07-16T15:33:12"
+}

@@ -1,0 +1,16 @@
+{
+  "version": 1,
+  "slices": [
+    {
+      "id": "rpt-artifact-state-report",
+      "feature": "report-artifacts",
+      "status": "closed",
+      "path": "slices/rpt-artifact-state-report-report-artifacts/",
+      "updated_at": "2026-07-16T15:33:12",
+      "closed_at": "2026-04-11T23:48:13",
+      "archived_at": null,
+      "relations": []
+    }
+  ],
+  "generated_at": "2026-07-16T15:33:12"
+}

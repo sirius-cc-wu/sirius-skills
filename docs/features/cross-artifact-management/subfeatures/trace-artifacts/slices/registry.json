@@ -1,0 +1,16 @@
+{
+  "version": 1,
+  "slices": [
+    {
+      "id": "tat-trace-artifact-lineage",
+      "feature": "trace-artifacts",
+      "status": "closed",
+      "path": "slices/tat-trace-artifact-lineage-trace-artifacts/",
+      "updated_at": "2026-07-16T15:33:12",
+      "closed_at": "2026-04-11T23:40:32",
+      "archived_at": null,
+      "relations": []
+    }
+  ],
+  "generated_at": "2026-07-16T15:33:12"
+}

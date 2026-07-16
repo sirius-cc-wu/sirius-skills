@@ -1,0 +1,76 @@
+{
+  "version": 1,
+  "slices": [
+    {
+      "id": "sim-local-helper",
+      "feature": "Add source-linked local install helper",
+      "status": "closed",
+      "path": "slices/sim-local-helper-add-source-linked-local-install-helper/",
+      "updated_at": "2026-07-16T15:33:12",
+      "closed_at": "2026-04-19T10:56:05",
+      "archived_at": null,
+      "relations": []
+    },
+    {
+      "id": "sim-local-docs",
+      "feature": "Document the source-linked local install path",
+      "status": "closed",
+      "path": "slices/sim-local-docs-document-the-source-linked-local-install-path/",
+      "updated_at": "2026-07-16T15:33:12",
+      "closed_at": "2026-04-19T10:58:51",
+      "archived_at": null,
+      "relations": []
+    },
+    {
+      "id": "sim-packaged-targets",
+      "feature": "Split local and packaged install targets",
+      "status": "closed",
+      "path": "slices/sim-packaged-targets-split-local-and-packaged-install-targets/",
+      "updated_at": "2026-07-16T15:33:12",
+      "closed_at": "2026-04-19T11:07:03",
+      "archived_at": null,
+      "relations": []
+    },
+    {
+      "id": "sim-packaged-compat",
+      "feature": "Preserve packaged install compatibility during migration",
+      "status": "closed",
+      "path": "slices/sim-packaged-compat-preserve-packaged-install-compatibility-during-migration/",
+      "updated_at": "2026-07-16T15:33:12",
+      "closed_at": "2026-04-19T11:09:09",
+      "archived_at": null,
+      "relations": []
+    },
+    {
+      "id": "sim-runtime-scope",
+      "feature": "Scope shared-runtime sync to packaged installs",
+      "status": "closed",
+      "path": "slices/sim-runtime-scope-scope-shared-runtime-sync-to-packaged-installs/",
+      "updated_at": "2026-07-16T15:33:12",
+      "closed_at": "2026-04-19T11:10:55",
+      "archived_at": null,
+      "relations": []
+    },
+    {
+      "id": "sim-parity-scope",
+      "feature": "Re-scope installed parity to packaged validation",
+      "status": "closed",
+      "path": "slices/sim-parity-scope-re-scope-installed-parity-to-packaged-validation/",
+      "updated_at": "2026-07-16T15:33:12",
+      "closed_at": "2026-04-19T11:13:49",
+      "archived_at": null,
+      "relations": []
+    },
+    {
+      "id": "sim-migration-guidance",
+      "feature": "Publish the migration path and operator guidance",
+      "status": "closed",
+      "path": "slices/sim-migration-guidance-publish-the-migration-path-and-operator-guidance/",
+      "updated_at": "2026-07-16T15:33:12",
+      "closed_at": "2026-04-19T11:15:37",
+      "archived_at": null,
+      "relations": []
+    }
+  ],
+  "generated_at": "2026-07-16T15:33:12"
+}
