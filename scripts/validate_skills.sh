@@ -30,6 +30,7 @@ expected=(
   use-case-realization
   uml-class-diagram-design
   design-pattern-application
+  software-design-language-adaptation
   iterative-up-analysis-design
 )
 

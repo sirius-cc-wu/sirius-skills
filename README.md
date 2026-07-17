@@ -38,6 +38,8 @@ just validate
 8. `uml-class-diagram-design` - summarize the design model as software classes.
 9. `design-pattern-application` - apply GoF patterns only where variation, creation, notification, or composition pressure warrants them.
 
+Use `software-design-language-adaptation` alongside steps 6-9 when the implementation language is known. Load only the reference for the selected language.
+
 ## Artifact Durability and Layouts
 
 The iterative UP coordinator distinguishes durable design knowledge from

@@ -16,6 +16,10 @@ GRASP patterns are decision tools for assigning responsibilities. Use them to ke
 - Creation, coordination, variation, or dependency pressure is unclear.
 - Do not use as a naming exercise after responsibilities have already been chosen.
 
+## Language Adaptation
+
+When the implementation language is known, also use [Software Design Language Adaptation](../software-design-language-adaptation/SKILL.md) and read only its matching language reference. Preserve the GRASP rationale while allowing a responsibility owner to become a native type, function, module, callable, or other appropriate construct rather than forcing a class.
+
 ## Workflow
 
 1. **Start from a responsibility.** Phrase it as "Who should know..." or "Who should do..."
@@ -57,4 +61,3 @@ Variation Point: [none or protected by interface/polymorphism]
 - [ ] Controllers coordinate but do not absorb domain logic.
 - [ ] Coupling and cohesion were checked for each major assignment.
 - [ ] Variation points are protected by polymorphism, interfaces, adapters, or indirection.
-

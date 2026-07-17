@@ -16,6 +16,10 @@ A design class diagram summarizes software classes discovered during object desi
 - Package boundaries, visibility, navigability, or interfaces must be clarified.
 - Do not use as the first requirements artifact or as a database ERD substitute.
 
+## Language Adaptation
+
+When the implementation language is known, also use [Software Design Language Adaptation](../software-design-language-adaptation/SKILL.md) and read only its matching language reference. Represent the target language's actual types, functions, modules, variation mechanisms, visibility, and ownership semantics instead of mapping every design element to a class or interface.
+
 ## Workflow
 
 1. **Start from realized collaborations.** Add classes and operations that appeared in interaction diagrams.
@@ -64,4 +68,3 @@ Package Notes:
 - [ ] Associations show required knowledge/navigation.
 - [ ] Interfaces or abstract types protect real variation points.
 - [ ] The diagram distinguishes conceptual domain classes from software design classes.
-

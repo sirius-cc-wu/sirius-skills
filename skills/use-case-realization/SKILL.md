@@ -16,6 +16,10 @@ Use-case realization shows how software objects collaborate to satisfy a use-cas
 - A system operation requires coordinated domain behavior.
 - Do not use before black-box requirements and system events are understood.
 
+## Language Adaptation
+
+When the implementation language is known, also use [Software Design Language Adaptation](../software-design-language-adaptation/SKILL.md) and read only its matching language reference. Model actual runtime participants such as functions, modules, callables, values, or channels when they own meaningful behavior; do not invent object lifelines for diagram symmetry.
+
 ## Workflow
 
 1. **Select one scenario and operation sequence.** Use the SSD as the external event source.
@@ -64,4 +68,3 @@ Design Classes Discovered:
 - [ ] Message receivers have GRASP-based responsibility rationale.
 - [ ] New design classes and methods are recorded for the class diagram.
 - [ ] Important alternate flows are realized or intentionally deferred.
-

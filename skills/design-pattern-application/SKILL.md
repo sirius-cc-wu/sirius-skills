@@ -16,6 +16,10 @@ Design patterns are named solutions to recurring design forces. Apply them after
 - You need a concise rationale for a pattern choice.
 - Do not use to make a simple design look sophisticated.
 
+## Language Adaptation
+
+When the implementation language is known, also use [Software Design Language Adaptation](../software-design-language-adaptation/SKILL.md) and read only its matching language reference. Preserve the design force and consequences, but prefer a native language mechanism over reproducing a canonical class structure from another language.
+
 ## Workflow
 
 1. **State the force.** Identify the concrete design problem: variation, creation, notification, adaptation, composition, or dependency direction.
@@ -66,4 +70,3 @@ Consequences:
 - [ ] Simpler alternatives were considered.
 - [ ] UML interactions/classes reflect the pattern accurately.
 - [ ] Added indirection has a justified benefit.
-

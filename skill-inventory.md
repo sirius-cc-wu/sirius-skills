@@ -11,6 +11,7 @@
 | `use-case-realization` | Interaction diagrams, object messages, controller entry points, design classes discovered while realizing use cases | Sequence/communication diagrams | Shows software object collaboration for one scenario |
 | `uml-class-diagram-design` | Design model classes, attributes, operations, associations, navigability, visibility, packages, domain vs design model | Design class diagram | Summarizes discovered software classes after responsibility design |
 | `design-pattern-application` | Adapter, Factory, Strategy, Composite, Observer, Abstract Factory and pattern-to-GRASP connections | Pattern decision record and implementation sketch | Applies patterns when forces justify them; avoids pattern catalog dumping |
+| `software-design-language-adaptation` | Language-native mappings for responsibilities, variation, lifecycle, errors, concurrency, and UML notation | Implementation-facing design adaptation | Adapts design intent to Rust, Python, TypeScript, C#, or C++; does not alter language-neutral requirements or domain models |
 
 ## Distillation Rules
 
