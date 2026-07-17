@@ -5,7 +5,7 @@ set shell := ["bash", "-c"]
 repo_root := justfile_directory()
 common_flags := "--global --yes --agent github-copilot --agent codex --agent antigravity --agent antigravity-cli"
 
-managed_skills := "iterative-up-analysis-design use-case-modeling domain-modeling system-sequence-diagrams operation-contracts grasp-responsibility-design use-case-realization uml-class-diagram-design design-pattern-application software-design-language-adaptation"
+managed_skills := "iterative-up-analysis-design inception use-case-modeling domain-modeling system-sequence-diagrams operation-contracts grasp-responsibility-design use-case-realization uml-class-diagram-design design-pattern-application software-design-language-adaptation"
 
 # Add all managed skills
 install:

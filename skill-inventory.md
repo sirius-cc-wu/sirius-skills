@@ -2,7 +2,8 @@
 
 | Skill | Source Concepts Preserved | Primary Artifact | Boundary |
 |---|---|---|---|
-| `iterative-up-analysis-design` | Unified Process phases, inception/elaboration/construction/transition, risk-driven iterations, durable design artifacts, historical iteration records, repository layout selection | Iteration plan, artifact map, and lifecycle-aware placement | Coordinates the sequence and artifact durability; does not replace detailed artifact skills or impose one repository taxonomy |
+| `iterative-up-analysis-design` | Unified Process phases (elaboration/construction/transition coordination), risk-driven iterations, durable design artifacts, historical iteration records, repository layout selection | Iteration plan, artifact map, and lifecycle-aware placement | Coordinates the sequence and artifact durability; does not replace detailed artifact skills or impose one repository taxonomy |
+| `inception` | Envision product scope, vision, business case, feasibility, sample inception artifacts (Vision, Use-Case Model name list, Supplementary Specification, Glossary, Risk List, Development Case), inception red flags | Vision and Business Case, Risk List, Development Case | Defines the boundaries, objectives, and minimal artifact set for the project kickoff phase; transitions to Elaboration |
 | `use-case-modeling` | Actors, goals, elementary business processes, black-box use cases, main success and extensions, use-case diagrams as summaries | Use-case model | Captures requirements, not internal object design |
 | `domain-modeling` | Conceptual classes, associations, attributes, category lists, domain model vs design model | Domain model | Models real-world concepts, not software classes or database tables |
 | `system-sequence-diagrams` | System boundary, actors, system events, system operations, scenarios from use cases | SSDs | Shows actor-system interaction, not object collaboration |

@@ -32,6 +32,7 @@ expected=(
   design-pattern-application
   software-design-language-adaptation
   iterative-up-analysis-design
+  inception
 )
 
 for name in "${expected[@]}"; do
