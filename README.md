@@ -1,6 +1,6 @@
 # Applying UML and Patterns Skills
 
-This collection distills `applying-uml-and-patterns.md` into agent skills for moving from requirements to object design with UML, Unified Process practices, GRASP, and common design patterns.
+This collection distills `applying-uml-and-patterns.md` into agent skills for moving from requirements through object design to tested implementation and refactoring with UML, Unified Process practices, GRASP, and common design patterns.
 
 ## Installing Skills
 
@@ -38,8 +38,10 @@ just validate
 8. `use-case-realization` - realize use cases with interaction diagrams and collaborating objects.
 9. `uml-class-diagram-design` - summarize the design model as software classes.
 10. `design-pattern-application` - apply GoF patterns only where variation, creation, notification, or composition pressure warrants them.
+11. `test-driven-implementation` - implement one observable behavior at a time with a failing test, the smallest passing change, and design feedback.
+12. `behavior-preserving-refactoring` - improve code and design through small transformations verified by the passing test suite.
 
-Use `software-design-language-adaptation` alongside steps 7-10 when the implementation language is known. Load only the reference for the selected language.
+Use `software-design-language-adaptation` alongside steps 7-12 when the implementation language is known. Load only the reference for the selected language.
 
 ## Artifact Durability and Layouts
 

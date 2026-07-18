@@ -34,7 +34,7 @@ Use an iterative, risk-driven flow: produce just enough artifacts for the curren
 9. **Tie artifacts together.** Each design decision should trace back to use cases, system events, contracts, risks, or verification evidence.
 10. **Timebox detail.** Fully detail architecturally significant use cases; keep low-risk artifacts lightweight.
 11. **Close the iteration.** Record results against exit criteria without copying canonical artifact bodies into the iteration record.
-12. **End with executable next steps.** Convert design outcomes into implementation tasks and verification checks.
+12. **End with executable next steps.** Convert design outcomes into implementation tasks and verification checks. Use [Test-Driven Implementation](../test-driven-implementation/SKILL.md) and [Behavior-Preserving Refactoring](../behavior-preserving-refactoring/SKILL.md) during construction, and feed design-relevant discoveries back into canonical artifacts.
 
 ## Artifact Durability
 

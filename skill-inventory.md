@@ -13,6 +13,8 @@
 | `uml-class-diagram-design` | Design model classes, attributes, operations, associations, navigability, visibility, packages, domain vs design model | Design class diagram | Summarizes discovered software classes after responsibility design |
 | `design-pattern-application` | Adapter, Factory, Strategy, Composite, Observer, Abstract Factory and pattern-to-GRASP connections | Pattern decision record and implementation sketch | Applies patterns when forces justify them; avoids pattern catalog dumping |
 | `software-design-language-adaptation` | Language-native mappings for responsibilities, variation, lifecycle, errors, concurrency, and UML notation | Implementation-facing design adaptation | Adapts design intent to Rust, Python, TypeScript, C#, or C++; does not alter language-neutral requirements or domain models |
+| `test-driven-implementation` | Test-first development, one behavior per red-green-refactor increment, executable interface clarification, fixtures and observable assertions, repeatable regression verification | Tested production increment and behavior-slice evidence | Implements scoped behavior from requirements or design inputs; does not prescribe one test per class or replace broader quality strategy |
+| `behavior-preserving-refactoring` | Small behavior-preserving transformations, test execution after each step, code smells, Extract Method, Extract Constant, Introduce Explaining Variable, structural design feedback | Verified structural improvement and refactoring record | Improves structure behind passing tests; separates behavior changes and delegates pattern selection to explicit design forces |
 
 ## Distillation Rules
 

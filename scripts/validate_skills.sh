@@ -31,6 +31,8 @@ expected=(
   uml-class-diagram-design
   design-pattern-application
   software-design-language-adaptation
+  test-driven-implementation
+  behavior-preserving-refactoring
   iterative-up-analysis-design
   inception
 )
