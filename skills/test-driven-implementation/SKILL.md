@@ -1,61 +1,70 @@
 ---
 name: test-driven-implementation
-description: Implements scoped behavior through a test-first red-green-refactor loop. Use when adding or changing production behavior from use cases, operation contracts, use-case realizations, design classes, acceptance examples, or bug reports and executable verification can drive the implementation.
+description: Implements scoped behavior through risk-calibrated, test-first verification. Use when adding or changing production behavior from use cases, operation contracts, use-case realizations, design classes, acceptance examples, or bug reports and executable examples, properties, invariants, or other mechanical checks can anchor the implementation.
 ---
 
 # Test-Driven Implementation
 
 ## Overview
 
-Implement one observable behavior at a time: demonstrate its absence with a focused test, make that test pass with the smallest production change, then improve the structure while the tests stay green. Use discoveries from executable examples to clarify interfaces and refine implementation-facing design.
+Implement a risk-sized slice of observable behavior: establish an implementation-independent oracle, demonstrate that its checks discriminate missing or incorrect behavior, make the smallest coherent production change, then improve the structure while verification stays green. Prefer short feedback loops without forcing every related test through its own isolated red-green cycle.
 
 ## When to Use
 
-- Add or change behavior whose expected result can be expressed as an executable example.
+- Add or change behavior whose expected result can be expressed as an executable example, property, invariant, or other mechanical constraint.
 - Translate an operation contract, realized collaboration, design operation, acceptance example, or bug report into production code.
 - Clarify a detailed interface by exercising it from a caller's perspective before implementing it.
+- For a trivial mechanical change already protected by adequate checks, use the existing verification instead of manufacturing a new failing test.
 - Do not use test-first mechanics to guess at missing business rules; resolve material requirement ambiguity first.
 
 ## Design Inputs and Feedback
 
-- Start from the smallest available source of expected behavior. Do not require every upstream artifact for a small change.
+- Start from the smallest available source of expected behavior. Derive expected outcomes from requirements, contracts, approved examples, or independent reference behavior rather than from the production logic under test.
+- Treat a prose specification as design input, not executable evidence, until a tool can mechanically check it.
 - Use [Operation Contracts](../operation-contracts/SKILL.md) when domain state changes need precise postconditions.
 - Use [GRASP Responsibility Design](../grasp-responsibility-design/SKILL.md), [Use-Case Realization](../use-case-realization/SKILL.md), and [UML Class Diagram Design](../uml-class-diagram-design/SKILL.md) when responsibility, collaboration, or interface ownership is unclear.
 - Use [Software Design Language Adaptation](../software-design-language-adaptation/SKILL.md) to express the design and tests with native language constructs.
 - Feed discoveries back into durable contracts, realizations, or design class diagrams when implementation changes their externally relevant postconditions, responsibilities, collaborations, or interfaces.
 
+## Calibrate the Slice
+
+- Use a narrow behavior slice for ambiguous requirements, novel algorithms, defect reproduction, security or financial rules, concurrency, irreversible effects, and other high-risk work.
+- Use a small coherent group of examples or properties for a well-specified vertical behavior whose checks share one stable boundary and implementation change.
+- Use existing regression and static checks for a low-risk mechanical change when a new failing test would add no discriminatory evidence.
+- Shrink the slice when failures would be hard to localize or the implementation would span unrelated responsibilities. Do not default to a comprehensive test suite followed by a whole-module implementation.
+
 ## Workflow
 
-1. **Inspect the repository.** Read governance and neighboring tests; identify the established test framework, commands, naming, fixtures, and test level.
-2. **Select one behavior.** State one concrete input, action, and observable result traceable to the requirement, contract, design artifact, or defect.
-3. **Choose a stable test boundary.** Prefer the narrowest boundary that proves the behavior without coupling the test to private structure. Use a broader test when the behavior crosses a meaningful integration boundary.
-4. **Write one focused test.** Arrange the relevant context, invoke the intended public surface, and assert the observable result. Include only the setup needed for this behavior.
-5. **Observe a meaningful failure.** Run the focused test and confirm that it fails because the behavior is absent or incorrect. Fix test setup errors until the failure demonstrates the intended gap; reconsider a test that already passes.
-6. **Make the smallest production change.** Implement enough behavior to pass the test. Defer speculative generalization and unrelated cleanup.
-7. **Return to green.** Run the focused test, then the smallest relevant regression set. Diagnose failures rather than weakening valid expectations.
-8. **Improve structure safely.** Remove immediate duplication or clarify names and expressions while green. For non-trivial cleanup, use [Behavior-Preserving Refactoring](../behavior-preserving-refactoring/SKILL.md).
-9. **Repeat incrementally.** Add the next behavior, boundary case, or failure mode one test at a time; do not write the entire test suite before implementing any behavior.
-10. **Reconcile design knowledge.** Update affected durable design artifacts only when the executable design changes information those artifacts are meant to preserve.
-11. **Report verification.** Record the behavior covered, focused and regression commands run, results, and any design feedback or remaining gap.
+1. **Inspect the repository.** Read governance and neighboring tests; identify the established framework, commands, naming, fixtures, test levels, and non-test verification tools.
+2. **Define the oracle.** State the inputs, action, expected results, postconditions, properties, or invariants and trace them to a source independent of the production implementation.
+3. **Size the behavior slice.** Use risk, uncertainty, reversibility, and failure locality to choose one example, a small coherent group, or existing verification.
+4. **Choose a stable verification boundary.** Prefer the narrowest public boundary that proves the behavior without coupling checks to private structure. Use a broader boundary when the behavior crosses a meaningful integration.
+5. **Write focused checks.** Express the oracle with the most suitable combination of example tests, properties, invariants, differential comparisons, type constraints, or static analysis.
+6. **Demonstrate discrimination.** Before adding behavior, obtain evidence that the checks can detect its absence or an incorrect result. Prefer an intended behavioral failure; use a negative control, mutation, or reference comparison when an ordinary red run is not informative. Do not count incidental setup or compilation failure as behavioral evidence.
+7. **Make the smallest coherent production change.** Implement enough behavior to satisfy the slice. Defer speculative generalization and unrelated cleanup.
+8. **Return to green.** Run the focused checks, then the smallest relevant regression set. Run the broader repository suite at an appropriate checkpoint. Diagnose failures rather than weakening valid expectations.
+9. **Improve structure safely.** Remove immediate duplication or clarify names and expressions while green. For non-trivial cleanup, use [Behavior-Preserving Refactoring](../behavior-preserving-refactoring/SKILL.md).
+10. **Repeat incrementally.** Add the next behavior slice, boundary case, or failure mode. Split work further whenever feedback becomes ambiguous or slow.
+11. **Reconcile design knowledge.** Update affected durable design artifacts only when the executable design changes information those artifacts are meant to preserve.
+12. **Report verification.** Record the oracle source, slice-size rationale, discrimination evidence, focused and regression commands, results, and any design feedback or remaining gap.
 
 ## Behavior Slice Template
 
 ```markdown
 ## Behavior: [Concise outcome]
 
-Source:
-- [Use case step, contract postcondition, design operation, acceptance example, or defect]
+Risk and Slice Size:
+- [risk/uncertainty and why this increment is appropriately sized]
 
-Example:
-- Given: [initial context]
-- When: [action]
-- Then: [observable result]
+Oracle:
+- Source: [use case, contract, design operation, approved example, invariant, reference, or defect]
+- Expected: [observable result, property, or mechanical constraint]
 
-Test Boundary:
-- [Public surface and test level]
+Checks:
+- [stable boundary and example/property/static mechanism]
 
-Red Evidence:
-- [Command and expected failure reason]
+Discrimination Evidence:
+- [command, negative control, mutation, or comparison and detected gap]
 
 Green Evidence:
 - [Focused and regression commands with results]
@@ -66,20 +75,24 @@ Design Feedback:
 
 ## Red Flags
 
-- Production code is written before any test demonstrates the behavioral gap.
-- A test fails because of broken setup, compilation, or infrastructure rather than the intended missing behavior.
+- Expected results are copied from or calculated with the production logic under test.
+- A prose specification is treated as verification without an executable or mechanical check.
+- A setup, compilation, or infrastructure failure is accepted as proof of semantic behavior.
+- A comprehensive suite and whole-module implementation obscure which check detects which behavioral gap.
+- Every related test is forced through an isolated red cycle without adding discriminatory evidence.
 - Tests assert private calls, internal fields, or exact collaboration structure without a contractual reason.
 - Every production class or public method receives a test mechanically, regardless of meaningful behavior.
 - Mocks replace simple collaborators or duplicate implementation logic in expectations.
-- A large batch of tests is written before any one behavior is made to pass.
 - A passing test is weakened to accommodate an unintended production result.
 
 ## Verification
 
-- [ ] Each increment traces to a requirement, contract, design decision, example, or defect.
-- [ ] Each new test was observed failing for the intended reason before production behavior was added.
-- [ ] Tests exercise observable behavior through a stable boundary.
-- [ ] The smallest relevant regression set passes after each increment.
+- [ ] Each behavior slice traces to a requirement, contract, approved example, invariant, reference, or defect.
+- [ ] The oracle is derived independently from the production implementation.
+- [ ] Slice size is justified by risk, uncertainty, reversibility, and failure locality.
+- [ ] Each new behavior has evidence that its checks discriminate an absent or incorrect implementation; individual tests need not each receive an isolated red run.
+- [ ] Checks exercise observable behavior through a stable boundary and use non-test verification where it adds confidence.
+- [ ] Focused checks and the smallest relevant regression set pass after each slice; broader verification passes at the chosen checkpoint.
 - [ ] Structural cleanup occurred only while protected by passing tests.
 - [ ] Design artifacts were refined when durable responsibilities, collaborations, interfaces, or postconditions changed.
 - [ ] Final verification commands and results are reported.

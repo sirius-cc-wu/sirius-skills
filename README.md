@@ -38,8 +38,8 @@ just validate
 8. `use-case-realization` - realize use cases with interaction diagrams and collaborating objects.
 9. `uml-class-diagram-design` - summarize the design model as software classes.
 10. `design-pattern-application` - apply GoF patterns only where variation, creation, notification, or composition pressure warrants them.
-11. `test-driven-implementation` - implement one observable behavior at a time with a failing test, the smallest passing change, and design feedback.
-12. `behavior-preserving-refactoring` - improve code and design through small transformations verified by the passing test suite.
+11. `test-driven-implementation` - implement risk-sized behavior slices from independent executable or mechanically checked oracles.
+12. `behavior-preserving-refactoring` - improve code and design through independently reviewable transformations or bounded mechanical batches protected by verification.
 
 Use `software-design-language-adaptation` alongside steps 7-12 when the implementation language is known. Load only the reference for the selected language.
 

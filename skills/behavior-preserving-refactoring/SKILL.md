@@ -1,13 +1,13 @@
 ---
 name: behavior-preserving-refactoring
-description: Improves internal code and design through small, verified transformations without intentionally changing observable behavior. Use when removing duplication, shortening or clarifying code, improving names, cohesion, coupling, responsibilities, or dependency structure behind an adequate passing test suite.
+description: Improves internal code and design through risk-calibrated, verified transformations without intentionally changing observable behavior. Use when removing duplication, shortening or clarifying code, improving names, cohesion, coupling, responsibilities, or dependency structure behind adequate tests and other mechanical checks.
 ---
 
 # Behavior-Preserving Refactoring
 
 ## Overview
 
-Improve internal structure through one small transformation at a time and rerun relevant tests after every step. Preserve public contracts, observable results, state transitions, side effects, and error behavior unless a separate behavior change is explicitly requested.
+Improve internal structure through one independently reviewable transformation at a time, or through an explicitly bounded batch of homogeneous mechanical edits. Rerun relevant checks after each verified step while preserving public contracts, observable results, state transitions, side effects, and error behavior.
 
 ## When to Use
 
@@ -28,11 +28,11 @@ Improve internal structure through one small transformation at a time and rerun 
 
 1. **Define the invariant.** State the observable behavior and public contracts that must remain unchanged. Separate any desired behavior change into another task or test-driven increment.
 2. **Inspect the repository and worktree.** Read governance, find established verification commands, and distinguish existing user changes from the intended refactoring.
-3. **Establish a green baseline.** Run the focused tests that cover the behavior. If protection is inadequate, add characterization tests for current required behavior before restructuring it.
+3. **Establish a green baseline.** Run the focused tests and other required checks that protect the behavior. If protection is inadequate, add characterization tests for current required behavior before restructuring it.
 4. **Name one structural problem.** Identify concrete evidence such as duplication, a long routine, an unclear expression, a large responsibility cluster, high coupling, or an unstable dependency.
-5. **Choose one small transformation.** Prefer a local move such as Rename, Extract Function/Method, Extract Constant, Introduce Explaining Variable, simplify a conditional, move one responsibility, or encapsulate one dependency.
-6. **Apply only that transformation.** Keep the diff small enough to explain and reverse independently. Preserve behavior instead of redesigning multiple boundaries at once.
-7. **Re-execute focused tests.** Run them immediately. If they fail, repair or undo only the current transformation before continuing; do not edit valid expectations to conceal a regression.
+5. **Calibrate the step.** Default to one semantic transformation. Batch only homogeneous mechanical edits that follow one rule, share the same protection, remain easy to review and reverse, and do not alter public interfaces, responsibility placement, ownership, errors, ordering, or concurrency semantics.
+6. **Apply the transformation or bounded batch.** Prefer a local move such as Rename, Extract Function/Method, Extract Constant, Introduce Explaining Variable, simplify a conditional, move one responsibility, or encapsulate one dependency. Preserve behavior instead of redesigning multiple boundaries at once.
+7. **Re-execute focused checks.** Run them immediately after the independently reviewable step. If they fail, repair or undo only that step before continuing; do not edit valid expectations to conceal a regression.
 8. **Inspect the result.** Confirm that the named problem improved and that the change did not introduce unnecessary indirection, duplication, or semantic drift.
 9. **Repeat in small steps.** Chain transformations only while each has a clear purpose and independently verified green state.
 10. **Run broader verification.** Execute the relevant regression suite and repository-required static, formatting, lint, or type checks.
@@ -54,7 +54,10 @@ Problem:
 - [Concrete smell or design pressure]
 
 Transformations:
-1. [Small transformation] -> [focused test result]
+1. [Small transformation or justified mechanical batch] -> [focused check result]
+
+Batch Rationale:
+- [not batched, or shared rule, protection, reviewability, and reversibility]
 
 Broader Verification:
 - [Command and result]
@@ -67,6 +70,7 @@ Design Feedback:
 
 - Refactoring begins without a passing baseline or adequate characterization of required behavior.
 - A broad rewrite prevents individual transformations from being verified.
+- Semantic or independently changing edits are hidden inside a mechanical batch.
 - Tests are changed to accept an accidental behavioral difference.
 - A design pattern is introduced before its force and cost are stated.
 - Generated indirection makes the code longer or harder to understand without improving a named pressure.
@@ -76,9 +80,10 @@ Design Feedback:
 ## Verification
 
 - [ ] The observable behavior to preserve is explicit.
-- [ ] Relevant tests passed before the first transformation.
-- [ ] Each transformation addressed one named structural problem.
-- [ ] Focused tests ran after every transformation and broader checks passed at the end.
+- [ ] Relevant tests and required checks passed before the first transformation.
+- [ ] Each transformation or bounded batch addressed one named structural problem.
+- [ ] Every batch contains only homogeneous, mechanical, independently reviewable edits and has an explicit batching rationale.
+- [ ] Focused checks ran after every transformation or justified batch and broader checks passed at the end.
 - [ ] No valid expectation was weakened to hide a regression.
 - [ ] Language-specific behavior such as ownership, errors, ordering, and concurrency remains intact.
 - [ ] Durable design artifacts were updated only when their represented design knowledge changed.
