@@ -18,7 +18,8 @@ uninstall:
 	#!/usr/bin/env bash
 	installed=$(npx skills ls -g --json | python3 -c 'import json, sys; managed = set("{{managed_skills}}".split()); installed = [item["name"] for item in json.load(sys.stdin) if item.get("name") in managed]; print("\n".join(installed))')
 	if [ -n "$installed" ]; then
-		printf '%s\n' "$installed" | xargs npx skills remove {{common_flags}}
+		# Do not restrict agents: universal agent aliases share ~/.agents/skills.
+		printf '%s\n' "$installed" | xargs npx skills remove --global --yes
 	else
 		echo "No managed skills installed."
 	fi
