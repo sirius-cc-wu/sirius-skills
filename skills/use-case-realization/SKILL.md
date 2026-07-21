@@ -34,23 +34,44 @@ When the implementation language is known, also use [Software Design Language Ad
 
 ## Output Template
 
-```markdown
-## Use-Case Realization: [Use Case] - [Scenario]
+For a standalone Markdown file, follow
+[Markdown Artifact Frontmatter](../iterative-up-analysis-design/references/markdown-artifact-frontmatter.md)
+and use this shape. When embedding the realization in an aggregate file, omit
+the frontmatter and adjust heading levels.
 
-System Operations:
+```markdown
+---
+type: "Use-Case Realization"
+title: "[Use Case] - [Scenario] Realization"
+description: "[One sentence summarizing the collaboration and outcome]"
+id: "[Stable realization ID when cross-referenced]"
+use_case: "[Use-case ID or title]"
+scenario: "[Scenario name]"
+status: "[draft | active | retired]"
+tags: [design, use-case-realization]
+---
+
+# Use-Case Realization: [Use Case] - [Scenario]
+
+## System Operations
+
 - [operation(parameters)]
 
-Collaborators:
+## Collaborators
+
 - [Object/Class]: [role]
 
-Interaction Summary:
+## Interaction Summary
+
 1. [Controller] receives [system event].
 2. [Sender] -> [Receiver]: [message]
 
-Responsibility Notes:
+## Responsibility Notes
+
 - [Message]: [GRASP rationale]
 
-Design Classes Discovered:
+## Design Classes Discovered
+
 - [Class.operation()]
 ```
 
@@ -68,3 +89,4 @@ Design Classes Discovered:
 - [ ] Message receivers have GRASP-based responsibility rationale.
 - [ ] New design classes and methods are recorded for the class diagram.
 - [ ] Important alternate flows are realized or intentionally deferred.
+- [ ] A standalone Markdown realization exposes identity, use-case trace, scenario, summary, and lifecycle metadata in one frontmatter block.

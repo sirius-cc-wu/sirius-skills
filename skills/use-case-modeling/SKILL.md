@@ -30,24 +30,41 @@ Use cases capture how actors achieve goals with the system as a black box. They 
 
 ## Output Template
 
+For a standalone Markdown file, follow
+[Markdown Artifact Frontmatter](../iterative-up-analysis-design/references/markdown-artifact-frontmatter.md)
+and use this shape. When embedding the use case in an aggregate file, omit the
+frontmatter and adjust heading levels.
+
 ```markdown
-## Use Case: [Goal Name]
+---
+type: "Use Case"
+title: "[Goal Name]"
+description: "[One sentence describing the actor's goal and outcome]"
+id: "[Stable use-case ID when cross-referenced]"
+status: "[draft | active | retired]"
+primary_actor: "[Actor]"
+scope: "[System under discussion]"
+level: "[user goal | summary | subfunction]"
+tags: [requirements, use-case]
+---
 
-Primary Actor: [Actor]
-Scope: [System under discussion]
-Level: [user goal / summary / subfunction]
+# Use Case: [Goal Name]
 
-Main Success Scenario:
+## Main Success Scenario
+
 1. [Actor intent]
 2. [System responsibility]
 
-Extensions:
+## Extensions
+
 1a. [Condition]: [alternate behavior]
 
-Special Requirements:
+## Special Requirements
+
 - [Quality attribute, rule, constraint]
 
-Open Questions:
+## Open Questions
+
 - [Unresolved issue]
 ```
 
@@ -65,4 +82,4 @@ Open Questions:
 - [ ] Main success scenarios are black-box and actor-goal oriented.
 - [ ] Important extensions and failure paths are captured.
 - [ ] Non-functional requirements and business rules are linked to affected use cases.
-
+- [ ] A standalone Markdown use case exposes identity, summary, actor, scope, level, and lifecycle metadata in one frontmatter block.

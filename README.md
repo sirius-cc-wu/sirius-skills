@@ -70,10 +70,18 @@ taxonomy:
 See [Artifact Durability and Repository Layouts](skills/iterative-up-analysis-design/references/artifact-layouts.md)
 for selection criteria, tradeoffs, linking rules, and migration guidance.
 
+When a skill persists a standalone Markdown artifact, it uses OKF-aligned YAML
+frontmatter for discovery metadata such as artifact type, title, description,
+stable ID, and lifecycle state. Narrative content, diagrams, rationale, and
+evidence remain in the Markdown body. See [Markdown Artifact Frontmatter](skills/iterative-up-analysis-design/references/markdown-artifact-frontmatter.md)
+for the shared rules, artifact types, aggregate-file handling, and reserved
+`index.md`/`log.md` behavior.
+
 ## Files
 
 - `skill-inventory.md` maps source concepts to skill boundaries.
 - `skills/*/SKILL.md` contains the agent-facing workflows.
 - `skills/iterative-up-analysis-design/references/artifact-layouts.md` describes supported persistence layouts.
+- `skills/iterative-up-analysis-design/references/markdown-artifact-frontmatter.md` defines metadata for generated Markdown artifacts.
 - `scripts/validate_skills.sh` performs lightweight structure validation.
 - `justfile` installs, removes, and validates the managed skills.

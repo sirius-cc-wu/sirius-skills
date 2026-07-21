@@ -38,19 +38,38 @@ When the implementation language is known, also use [Software Design Language Ad
 
 ## Decision Template
 
-```markdown
-## Pattern Decision: [Pattern]
+For a standalone Markdown file, follow
+[Markdown Artifact Frontmatter](../iterative-up-analysis-design/references/markdown-artifact-frontmatter.md)
+and use this shape. When embedding the decision in an aggregate file, omit the
+frontmatter and adjust heading levels.
 
-Force:
+```markdown
+---
+type: "Pattern Decision"
+title: "[Pattern] for [Design force or context]"
+description: "[One sentence summarizing the force and chosen resolution]"
+id: "[Stable decision ID when cross-referenced]"
+pattern: "[Pattern]"
+status: "[proposed | accepted | superseded]"
+tags: [design, pattern]
+---
+
+# Pattern Decision: [Pattern]
+
+## Force
+
 - [Problem creating design pressure]
 
-Participants:
+## Participants
+
 - [Project type] as [pattern role]
 
-Alternatives Considered:
+## Alternatives Considered
+
 - [Simpler option]: [why insufficient or acceptable]
 
-Consequences:
+## Consequences
+
 - Benefits: [coupling/cohesion/variation impact]
 - Costs: [indirection/complexity impact]
 ```
@@ -70,3 +89,4 @@ Consequences:
 - [ ] Simpler alternatives were considered.
 - [ ] UML interactions/classes reflect the pattern accurately.
 - [ ] Added indirection has a justified benefit.
+- [ ] A standalone Markdown pattern decision exposes identity, pattern, summary, and lifecycle metadata in one frontmatter block.

@@ -30,6 +30,17 @@ Preserve responsibility, collaboration, and variation decisions while expressing
 5. **Adapt diagrams.** Represent actual language constructs and runtime participants rather than relabeling everything as a class or object.
 6. **Reconcile physical boundaries.** Treat logical packages as evidence, then apply repository governance before creating files, modules, projects, crates, or libraries.
 
+## File Output
+
+When persisting a standalone Markdown adaptation note, follow
+[Markdown Artifact Frontmatter](../iterative-up-analysis-design/references/markdown-artifact-frontmatter.md).
+Use `type: "Implementation Design Adaptation"`, a `language` field with the
+selected target, and identity, summary, lifecycle, and tags as appropriate.
+When modifying another design artifact, merge the language metadata into that
+file's existing frontmatter only if the file as a whole is language-specific;
+otherwise keep the adaptation details in the body. Do not add a second
+frontmatter block.
+
 ## Boundaries
 
 - Requirements and operation contracts remain language-neutral.
@@ -45,3 +56,4 @@ Preserve responsibility, collaboration, and variation decisions while expressing
 - [ ] Polymorphism matches whether variation is open or closed and static or runtime-selected.
 - [ ] Diagrams distinguish compile-time declarations from runtime collaborators.
 - [ ] No class, interface, factory, or module exists only to preserve language-neutral diagram symmetry.
+- [ ] A standalone Markdown adaptation exposes its artifact type, target language, summary, and lifecycle metadata in one frontmatter block.

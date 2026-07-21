@@ -50,26 +50,47 @@ Implement a risk-sized slice of observable behavior: establish an implementation
 
 ## Behavior Slice Template
 
-```markdown
-## Behavior: [Concise outcome]
+Use this template when persisting behavior-slice evidence as a standalone
+Markdown file. Follow
+[Markdown Artifact Frontmatter](../iterative-up-analysis-design/references/markdown-artifact-frontmatter.md).
+For a conversational report or a section embedded in an aggregate file, omit
+the frontmatter and adjust heading levels.
 
-Risk and Slice Size:
+```markdown
+---
+type: "Behavior Slice Evidence"
+title: "Behavior: [Concise outcome]"
+description: "[One sentence naming the observable behavior proved]"
+id: "[Stable behavior or work-item ID when cross-referenced]"
+status: "[planned | verified | blocked]"
+tags: [implementation, verification]
+---
+
+# Behavior: [Concise Outcome]
+
+## Risk and Slice Size
+
 - [risk/uncertainty and why this increment is appropriately sized]
 
-Oracle:
+## Oracle
+
 - Source: [use case, contract, design operation, approved example, invariant, reference, or defect]
 - Expected: [observable result, property, or mechanical constraint]
 
-Checks:
+## Checks
+
 - [stable boundary and example/property/static mechanism]
 
-Discrimination Evidence:
+## Discrimination Evidence
+
 - [command, negative control, mutation, or comparison and detected gap]
 
-Green Evidence:
+## Green Evidence
+
 - [Focused and regression commands with results]
 
-Design Feedback:
+## Design Feedback
+
 - [none, or artifact/decision to refine]
 ```
 
@@ -96,3 +117,4 @@ Design Feedback:
 - [ ] Structural cleanup occurred only while protected by passing tests.
 - [ ] Design artifacts were refined when durable responsibilities, collaborations, interfaces, or postconditions changed.
 - [ ] Final verification commands and results are reported.
+- [ ] Persisted standalone Markdown evidence exposes identity, behavior summary, and lifecycle metadata in one frontmatter block.

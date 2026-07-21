@@ -29,17 +29,36 @@ A system sequence diagram shows external actors sending events to the system tre
 
 ## Output Template
 
-```markdown
-## SSD: [Use Case] - [Scenario]
+For a standalone Markdown file, follow
+[Markdown Artifact Frontmatter](../iterative-up-analysis-design/references/markdown-artifact-frontmatter.md)
+and use this shape. When embedding the SSD in an aggregate file, omit the
+frontmatter and adjust heading levels.
 
-Actors:
+```markdown
+---
+type: "System Sequence Diagram"
+title: "[Use Case] - [Scenario]"
+description: "[One sentence summarizing the actor-system interaction]"
+id: "[Stable SSD ID when cross-referenced]"
+use_case: "[Use-case ID or title]"
+scenario: "[Scenario name]"
+status: "[draft | active | retired]"
+tags: [analysis, ssd]
+---
+
+# SSD: [Use Case] - [Scenario]
+
+## Actors
+
 - [Actor]
 
-System Events:
+## System Events
+
 1. [actor] -> System: [operation(parameters)]
 2. System -> [actor]: [response, if relevant]
 
-Discovered System Operations:
+## Discovered System Operations
+
 - [operation(parameters)]: [intent]
 ```
 
@@ -57,4 +76,4 @@ Discovered System Operations:
 - [ ] System operation names are stable enough for contracts and controllers.
 - [ ] Parameters are actor-provided or external-system-provided data.
 - [ ] Significant alternate flows have SSD coverage when their events differ.
-
+- [ ] A standalone Markdown SSD exposes identity, use-case trace, scenario, summary, and lifecycle metadata in one frontmatter block.

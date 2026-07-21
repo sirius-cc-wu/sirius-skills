@@ -35,22 +35,40 @@ When the implementation language is known, also use [Software Design Language Ad
 
 ## Output Template
 
-```markdown
-## Design Class Diagram Notes
+For a standalone Markdown file, follow
+[Markdown Artifact Frontmatter](../iterative-up-analysis-design/references/markdown-artifact-frontmatter.md)
+and use this shape. When embedding the design model in an aggregate file, omit
+the frontmatter and adjust heading levels.
 
-Classes:
+```markdown
+---
+type: "Design Class Diagram"
+title: "[System, area, or feature] Design Class Diagram"
+description: "[One sentence summarizing the software design scope]"
+id: "[Stable design-model ID when cross-referenced]"
+status: "[draft | active | retired]"
+tags: [design, class-diagram]
+---
+
+# Design Class Diagram: [System, Area, or Feature]
+
+## Classes
+
 - [Class]
   - Responsibilities: [summary]
   - Operations: [operation(params): return]
   - Attributes: [attribute: type]
 
-Relationships:
+## Relationships
+
 - [Class A] -> [Class B]: [reason/navigability/multiplicity]
 
-Interfaces or Abstract Types:
+## Interfaces or Abstract Types
+
 - [Type]: [variation protected]
 
-Package Notes:
+## Package Notes
+
 - [Package]: [cohesive purpose]
 ```
 
@@ -68,3 +86,4 @@ Package Notes:
 - [ ] Associations show required knowledge/navigation.
 - [ ] Interfaces or abstract types protect real variation points.
 - [ ] The diagram distinguishes conceptual domain classes from software design classes.
+- [ ] A standalone Markdown design class diagram exposes identity, scope summary, and lifecycle metadata in one frontmatter block.

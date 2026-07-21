@@ -35,16 +35,34 @@ When the implementation language is known, also use [Software Design Language Ad
 
 ## Decision Record Template
 
-```markdown
-## Responsibility Decision: [responsibility]
+For a standalone Markdown file, follow
+[Markdown Artifact Frontmatter](../iterative-up-analysis-design/references/markdown-artifact-frontmatter.md)
+and use this shape. When embedding the decision in an aggregate file, omit the
+frontmatter and adjust heading levels.
 
-Candidates:
+```markdown
+---
+type: "Responsibility Decision"
+title: "Responsibility: [Concise responsibility]"
+description: "[One sentence naming the chosen owner and design reason]"
+id: "[Stable decision ID when cross-referenced]"
+responsibility: "[Who should know or do what]"
+chosen_owner: "[Class or language-native construct]"
+grasp_basis: ["[Expert | Creator | Controller | other GRASP principle]"]
+status: "[proposed | accepted | superseded]"
+tags: [design, grasp]
+---
+
+# Responsibility Decision: [Responsibility]
+
+## Candidates
+
 - [Class]: [reason for/against]
 
-Chosen Owner: [Class]
-GRASP Basis: [Expert / Creator / Controller / etc.]
-Coupling/Cohesion Check: [impact]
-Variation Point: [none or protected by interface/polymorphism]
+## Rationale
+
+- Coupling/cohesion impact: [impact]
+- Variation point: [none or protected by interface/polymorphism]
 ```
 
 ## Red Flags
@@ -61,3 +79,4 @@ Variation Point: [none or protected by interface/polymorphism]
 - [ ] Controllers coordinate but do not absorb domain logic.
 - [ ] Coupling and cohesion were checked for each major assignment.
 - [ ] Variation points are protected by polymorphism, interfaces, adapters, or indirection.
+- [ ] A standalone Markdown decision exposes identity, responsibility, chosen owner, GRASP basis, and lifecycle metadata in one frontmatter block.

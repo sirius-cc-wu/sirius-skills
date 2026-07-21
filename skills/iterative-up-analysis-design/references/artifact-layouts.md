@@ -196,6 +196,19 @@ product-area-oriented architecture, and artifact-oriented shared models.
   iteration snapshots are the explicit audit-oriented exception and must link
   back to the canonical artifact under `current/`.
 
+## Markdown Metadata and Reserved Files
+
+- Apply [Markdown Artifact Frontmatter](markdown-artifact-frontmatter.md) to
+  every standalone Markdown concept artifact created by these layouts.
+- In a flat feature file, describe the feature's aggregate requirements and
+  design content once in file-level frontmatter. Do not insert frontmatter
+  between body sections.
+- In a feature package or artifact-oriented layout, give independently
+  maintained artifact files their specific types, titles, descriptions, and
+  stable IDs in frontmatter.
+- Treat `index.md` and `log.md` as reserved structural files rather than
+  concept artifacts, and follow their special frontmatter rules.
+
 ## Migration Guidance
 
 - Move from the flat to the package variant of the feature-iteration hybrid

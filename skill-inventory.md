@@ -22,3 +22,6 @@
 - Prefer checklists, decision points, and artifact templates over explanation.
 - Keep each skill small enough to load independently.
 - Avoid copying long source passages; preserve concepts as practical procedures.
+- Put discovery and lifecycle metadata for standalone Markdown artifacts in one
+  OKF-aligned YAML frontmatter block; keep narrative analysis, design,
+  rationale, and evidence in the body.

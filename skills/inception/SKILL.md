@@ -31,6 +31,17 @@ Inception is the initial short step to establish a common vision, basic scope, a
 8. **Plan the Next Step.** Define the iteration plan for the first elaboration iteration. Estimate a low-precision guess for elaboration phase duration/effort (Phase Plan).
 9. **Define the Development Case.** Customize the UP steps and artifacts to fit the specific project's scale and constraints.
 
+## File Output
+
+When persisting an inception artifact as a standalone Markdown file, follow
+[Markdown Artifact Frontmatter](../iterative-up-analysis-design/references/markdown-artifact-frontmatter.md).
+Use the artifact-specific type (`Vision`, `Business Case`, `Risk List`,
+`Development Case`, `Phase Plan`, and so on), not a generic `Inception`
+type. Put identity, summary, and lifecycle metadata in frontmatter while
+keeping scope, assumptions, analysis, and evidence in the body. For a single
+aggregate inception file, describe the aggregate once in file-level
+frontmatter and do not add nested frontmatter between sections.
+
 ## Red Flags
 
 - Inception lasts more than a few weeks.
@@ -52,3 +63,4 @@ Inception is the initial short step to establish a common vision, basic scope, a
 - [ ] A low-precision phase plan/effort guess for Elaboration is defined.
 - [ ] An Iteration Plan for the first elaboration iteration is created.
 - [ ] The UP Development Case has been customized for the project's scale and constraints.
+- [ ] Every standalone Markdown artifact has frontmatter appropriate to its artifact type.

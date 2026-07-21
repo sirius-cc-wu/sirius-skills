@@ -29,22 +29,38 @@ Operation contracts define what a system operation guarantees, especially change
 
 ## Output Template
 
+For a standalone Markdown file, follow
+[Markdown Artifact Frontmatter](../iterative-up-analysis-design/references/markdown-artifact-frontmatter.md)
+and use this shape. When embedding the contract in an aggregate file, omit the
+frontmatter and adjust heading levels.
+
 ```markdown
-## Contract: [operation(parameters)]
+---
+type: "Operation Contract"
+title: "Contract: [operation(parameters)]"
+description: "[One sentence summarizing the guaranteed state change]"
+id: "[Stable contract ID when cross-referenced]"
+operation: "[operation(parameters)]"
+traces: ["[Use-case ID]", "[SSD ID or step]"]
+status: "[draft | active | retired]"
+tags: [analysis, operation-contract]
+---
 
-Operation: [name(parameters)]
-Cross References: [Use case, SSD step]
+# Contract: [operation(parameters)]
 
-Preconditions:
+## Preconditions
+
 - [Condition that must already be true]
 
-Postconditions:
+## Postconditions
+
 - [Instance] was created/deleted.
 - [Association] was formed/broken.
 - [Attribute] became [value or relationship].
 - [Event or transaction] was recorded.
 
-Open Issues:
+## Open Issues
+
 - [Question affecting design]
 ```
 
@@ -62,4 +78,4 @@ Open Issues:
 - [ ] Created/deleted instances, associations, and attribute changes are explicit.
 - [ ] Domain model gaps discovered by the contract are recorded.
 - [ ] The contract provides enough detail to assign object responsibilities.
-
+- [ ] A standalone Markdown contract exposes identity, operation, trace, summary, and lifecycle metadata in one frontmatter block.

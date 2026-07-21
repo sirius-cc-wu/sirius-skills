@@ -41,28 +41,50 @@ Improve internal structure through one independently reviewable transformation a
 
 ## Refactoring Record Template
 
-```markdown
-## Refactoring: [Structural outcome]
+Use this template when persisting refactoring evidence as a standalone Markdown
+file. Follow
+[Markdown Artifact Frontmatter](../iterative-up-analysis-design/references/markdown-artifact-frontmatter.md).
+For a conversational report or a section embedded in an aggregate file, omit
+the frontmatter and adjust heading levels.
 
-Behavior Preserved:
+```markdown
+---
+type: "Refactoring Record"
+title: "Refactoring: [Structural outcome]"
+description: "[One sentence summarizing the verified structural improvement]"
+id: "[Stable work-item ID when cross-referenced]"
+status: "[planned | verified | blocked]"
+tags: [refactoring, verification]
+---
+
+# Refactoring: [Structural Outcome]
+
+## Behavior Preserved
+
 - [Public contract or observable result]
 
-Baseline:
+## Baseline
+
 - [Focused test command and passing result]
 
-Problem:
+## Problem
+
 - [Concrete smell or design pressure]
 
-Transformations:
+## Transformations
+
 1. [Small transformation or justified mechanical batch] -> [focused check result]
 
-Batch Rationale:
+## Batch Rationale
+
 - [not batched, or shared rule, protection, reviewability, and reversibility]
 
-Broader Verification:
+## Broader Verification
+
 - [Command and result]
 
-Design Feedback:
+## Design Feedback
+
 - [none, or artifact/decision refined]
 ```
 
@@ -87,3 +109,4 @@ Design Feedback:
 - [ ] No valid expectation was weakened to hide a regression.
 - [ ] Language-specific behavior such as ownership, errors, ordering, and concurrency remains intact.
 - [ ] Durable design artifacts were updated only when their represented design knowledge changed.
+- [ ] Persisted standalone Markdown evidence exposes identity, structural summary, and lifecycle metadata in one frontmatter block.

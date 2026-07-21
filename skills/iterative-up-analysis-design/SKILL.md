@@ -36,6 +36,15 @@ Use an iterative, risk-driven flow: produce just enough artifacts for the curren
 11. **Close the iteration.** Record results against exit criteria without copying canonical artifact bodies into the iteration record.
 12. **End with executable next steps.** Convert design outcomes into implementation tasks and verification checks. Use [Test-Driven Implementation](../test-driven-implementation/SKILL.md) and [Behavior-Preserving Refactoring](../behavior-preserving-refactoring/SKILL.md) during construction, and feed design-relevant discoveries back into canonical artifacts.
 
+## File Output
+
+When persisting any standalone Markdown artifact, follow
+[Markdown Artifact Frontmatter](references/markdown-artifact-frontmatter.md).
+Put discovery metadata in frontmatter and substantive analysis or design in
+the body. When several artifacts share a flat feature file, describe the
+aggregate once in file-level frontmatter; never insert nested frontmatter.
+Treat `index.md` and `log.md` as reserved structural files.
+
 ## Artifact Durability
 
 - Treat use cases, domain models, SSDs, contracts, realizations, and design class diagrams as durable, evolving sources of truth.
@@ -48,9 +57,17 @@ Use an iterative, risk-driven flow: produce just enough artifacts for the curren
 ## Iteration Plan Template
 
 ```markdown
-## Iteration: [Name]
+---
+type: "Iteration Record"
+title: "Iteration: [Name]"
+description: "[One-sentence learning, risk-reduction, or stakeholder goal]"
+id: "[Stable iteration ID]"
+phase: "[inception | elaboration | construction | transition]"
+status: "[planned | active | completed]"
+tags: [iteration]
+---
 
-Status: [planned / active / completed]
+# Iteration: [Name]
 
 Goal:
 - [Learning, risk reduction, or stakeholder outcome]
@@ -109,3 +126,4 @@ deferred or changed after the plan was written.
 - [ ] Design decisions trace to requirements or contracts.
 - [ ] The iteration has concrete exit criteria and implementation handoff points.
 - [ ] A closed iteration records results and links to canonical artifacts without duplicating them.
+- [ ] Every standalone Markdown artifact has one OKF-aligned frontmatter block; aggregate and reserved files follow their special rules.
