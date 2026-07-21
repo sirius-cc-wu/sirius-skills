@@ -1,5 +1,10 @@
 # Wiki Index
 
+> Historical status: this wiki describes the retired spec-driven development
+> implementation. It is retained as development history, not as the current
+> skill catalog or operating guide. See the repository `README.md` for the four
+> supported skills.
+
 This wiki is the repository's synthesized knowledge layer. Read it before
 re-deriving answers from raw planning artifacts or upstream references.
 

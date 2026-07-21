@@ -5,10 +5,10 @@ set shell := ["bash", "-c"]
 repo_root := justfile_directory()
 common_flags := "--global --yes --agent github-copilot --agent codex --agent antigravity --agent antigravity-cli"
 
-managed_skills := "autoplan audit-artifacts measure-artifacts trace-artifacts report-artifacts repair-artifacts archive-artifacts brief breakdown create-pr close-slice commit bootstrap design discover add-subfeature migrate-subfeatures migrate-slices guide-scope guide-planning propose blueprint reconcile-execution review-execution review-planning simplify guide-execution learn ship ship-worktree ship-slice slice ui-flow governance-update research"
+managed_skills := "simplify create-pr commit governance-update"
 
-# Install the python package, sync references, and add skills
-install: install-python-package sync-shared-references
+# Sync references and add the managed skills
+install: sync-shared-references
 	#!/usr/bin/env bash
 	skill_flags=$(python3 -c 'print(" ".join(f"--skill {s}" for s in "{{managed_skills}}".split()))')
 	npx skills add "{{repo_root}}" {{common_flags}} $skill_flags
@@ -16,23 +16,15 @@ install: install-python-package sync-shared-references
 # Alias for install
 install-packaged: install
 
-# Install the python package in editable mode
-install-python-package:
-	python3 -m pip install -e .
-
 # Sync shared references
 sync-shared-references:
-	sirius sync-shared-references
+	env PYTHONPATH="{{repo_root}}/src" python3 -c 'from sirius_skills.commands.sync_shared_references import main; raise SystemExit(main([]))'
 
-# Validate workflow state
-validate-workflow-state:
-	sirius validate-workflow-state
-
-# Uninstall all skills and the python package
+# Uninstall all managed skills
 uninstall: uninstall-packaged
 
-# Uninstall the python package and remove registered skills
-uninstall-packaged: uninstall-python-package
+# Remove registered managed skills
+uninstall-packaged:
 	#!/usr/bin/env bash
 	installed=$(npx skills ls -g --json | python3 -c 'import json, sys; managed = set("{{managed_skills}}".split()); installed = [item["name"] for item in json.load(sys.stdin) if item.get("name") in managed]; print("\n".join(installed))')
 	if [ -n "$installed" ]; then
@@ -40,7 +32,3 @@ uninstall-packaged: uninstall-python-package
 	else
 		echo "No managed skills installed."
 	fi
-
-# Uninstall the python package
-uninstall-python-package:
-	python3 -m pip uninstall -y sirius-skills

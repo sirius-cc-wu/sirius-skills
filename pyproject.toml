@@ -19,6 +19,9 @@ sirius = "sirius_skills.cli:main"
 [tool.setuptools.packages.find]
 where = ["src"]
 
+[tool.setuptools.package-data]
+sirius_skills = ["assets/*.md"]
+
 [tool.pyright]
 include = [
     "src/sirius_skills/lib/workflow_state/inventory.py",

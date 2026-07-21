@@ -108,3 +108,9 @@
 - Updated `docs/features/installation-and-configuration/subfeatures/split-install-modes/.subfeature-meta.json` so `affected_slice_ids` matches the actual closed `sim-*` execution slices.
 - Restored a minimal `README.md` for the closed `sim-parity-scope` slice so closed-slice validation has the expected core artifact surface.
 - Updated synthesized wiki feature pages to reflect the repaired planning/doc state.
+
+## [2026-07-21] catalog-retirement | spec-driven development skills
+
+- Retired the spec-driven planning, execution, slice, accelerator, and artifact-maintenance skills from the managed catalog.
+- Kept `simplify`, `create-pr`, `commit`, and `governance-update` as the supported generic repository workflow skills.
+- Marked the existing planning wiki and feature artifacts as historical context and redirected current usage guidance to the top-level documentation.

@@ -9,7 +9,7 @@ from pathlib import Path
 
 
 COMMAND_DIR = Path(__file__).resolve().parent
-ASSETS_DIR = Path(__file__).resolve().parents[3] / "skills" / "breakdown" / "assets"
+ASSETS_DIR = COMMAND_DIR.parent / "assets"
 SLICE_PLANNING_TEMPLATE = ASSETS_DIR / "slice-planning-template.md"
 SLICE_TRACEABILITY_TEMPLATE = ASSETS_DIR / "slice-traceability-template.md"
 DEFAULT_BASE_DIR = Path("docs/features")

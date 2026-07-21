@@ -18,7 +18,7 @@ Read these references when relevant:
 - Start with `git diff HEAD` (or PR diff/comments).
 - Focus on changed files and critical paths.
 - Lock invariants/contracts and follow `AGENTS.md`.
-- When the diff touches startup, configuration, compatibility, or tests, inspect the governing planning docs first so the cleanup pass preserves the intended ownership of configuration and state.
+- When the diff touches startup, configuration, compatibility, or tests, inspect the governing design and configuration docs first so the cleanup pass preserves the intended ownership of configuration and state.
 
 2. Phase 2: Review
 
