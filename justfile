@@ -1,4 +1,4 @@
-# justfile for uml-skills
+# justfile for iterative-software-design-skills
 
 set shell := ["bash", "-c"]
 

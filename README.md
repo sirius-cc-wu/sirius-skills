@@ -1,6 +1,6 @@
-# Applying UML and Patterns Skills
+# Iterative Software Design Skills
 
-This collection distills `applying-uml-and-patterns.md` into agent skills for moving from requirements through object design to tested implementation and refactoring with UML, Unified Process practices, GRASP, and common design patterns.
+This collection provides agent skills for moving iteratively from product scope and behavioral requirements through design, tested implementation, and refactoring. It uses techniques such as use cases, domain modeling, UML, responsibility-driven design, and patterns where they help.
 
 ## Installing Skills
 
