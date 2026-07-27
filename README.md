@@ -10,7 +10,9 @@ Install all managed skills globally for GitHub Copilot, Codex, Antigravity, and 
 just install
 ```
 
-The managed set is defined by `managed_skills` in `justfile`. Keep that list in sync when adding or retiring skills.
+The managed set is defined by [`skill-sets/all.txt`](skill-sets/all.txt). The
+installer and validator both consume that file, so adding or retiring a skill
+requires one membership update.
 
 Remove the managed skills later with:
 
@@ -26,22 +28,31 @@ Validate the collection structure and skill metadata:
 just validate
 ```
 
-## Recommended Sequence
+## Workflow Tracks
 
-1. `iterative-up-analysis-design` - frame the work as an iterative, risk-driven analysis/design slice.
-2. `inception` - envision product scope, feasibility, business case, and key risks to decide if the project is worth serious investigation.
-3. `use-case-modeling` - identify actors, goals, and black-box system behavior.
-4. `domain-modeling` - model conceptual classes, associations, and attributes.
-5. `system-sequence-diagrams` - convert use-case scenarios into system events.
-6. `operation-contracts` - specify non-trivial system operation effects.
-7. `grasp-responsibility-design` - assign responsibilities using GRASP.
-8. `use-case-realization` - realize use cases with interaction diagrams and collaborating objects.
-9. `uml-class-diagram-design` - summarize the design model as software classes.
-10. `design-pattern-application` - apply GoF patterns only where variation, creation, notification, or composition pressure warrants them.
-11. `test-driven-implementation` - implement risk-sized behavior slices from independent executable or mechanically checked oracles.
-12. `behavior-preserving-refactoring` - improve code and design through independently reviewable transformations or bounded mechanical batches protected by verification.
+Skills remain independently deployable and can be composed through different
+tracks:
 
-Use `software-design-language-adaptation` alongside steps 7-12 when the implementation language is known. Load only the reference for the selected language.
+- [Client to Code](catalog/tracks/client-to-code.md) describes the proposed
+  path from stakeholder evidence to a bounded coding-agent brief.
+- [Iterative Analysis and Design](catalog/tracks/iterative-analysis-design.md)
+  sequences the current requirements, analysis, responsibility, and object
+  design skills.
+- [Implementation and Evolution](catalog/tracks/implementation-evolution.md)
+  covers verified behavior changes and behavior-preserving structural
+  improvement.
+
+The tracks express dependencies and common handoffs, not a requirement to
+create every artifact. Select skills according to the current risk, learning
+goal, and behavior slice.
+
+## Sources
+
+The currently implemented collection distills agent workflows from Craig
+Larman's *Applying UML and Patterns*. New sources and their candidate skill
+boundaries are tracked separately so that deployable skill directories remain
+organized by capability rather than by book. See the
+[Source Catalog](catalog/sources.md) and [Skill Catalog](catalog/skills.md).
 
 ## Artifact Durability and Layouts
 
@@ -79,8 +90,14 @@ for the shared rules, artifact types, aggregate-file handling, and reserved
 
 ## Files
 
-- `skill-inventory.md` maps source concepts to skill boundaries.
 - `skills/*/SKILL.md` contains the agent-facing workflows.
+- `catalog/skills.md` maps concepts, artifacts, and skill boundaries.
+- `catalog/sources.md` records intellectual provenance without making source
+  books filesystem owners.
+- `catalog/tracks/*.md` describes ways to compose skills.
+- `skill-sets/*.txt` defines curated installation groups; `all.txt` is the
+  canonical managed set.
+- `docs/proposals/` contains design proposals that are not deployable skills.
 - `skills/iterative-up-analysis-design/references/artifact-layouts.md` describes supported persistence layouts.
 - `skills/iterative-up-analysis-design/references/markdown-artifact-frontmatter.md` defines metadata for generated Markdown artifacts.
 - `scripts/validate_skills.sh` performs lightweight structure validation.

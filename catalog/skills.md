@@ -1,4 +1,8 @@
-# Skill Inventory
+# Skill Catalog
+
+This catalog describes each deployable skill's responsibility and boundary.
+See [Source Catalog](sources.md) for intellectual provenance and
+[Workflow Tracks](tracks/) for ways to compose the skills.
 
 | Skill | Source Concepts Preserved | Primary Artifact | Boundary |
 |---|---|---|---|
