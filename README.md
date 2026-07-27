@@ -1,6 +1,10 @@
 # Iterative Software Design Skills
 
-This collection provides agent skills for moving iteratively from product scope and behavioral requirements through design, tested implementation, and refactoring. It uses techniques such as use cases, domain modeling, UML, responsibility-driven design, and patterns where they help.
+This collection provides agent skills for recovering existing software
+knowledge and moving iteratively from product scope and behavioral requirements
+through design, tested implementation, and refactoring. It uses evidence-driven
+reverse engineering, use cases, domain modeling, UML, responsibility-driven
+design, and patterns where they help.
 
 ## Installing Skills
 
@@ -35,6 +39,9 @@ tracks:
 
 - [Client to Code](catalog/tracks/client-to-code.md) describes the proposed
   path from stakeholder evidence to a bounded coding-agent brief.
+- [Reverse Engineering](catalog/tracks/reverse-engineering.md) recovers
+  evidence-backed behavior and as-built architecture from existing systems,
+  then reconciles them with documents, decisions, tests, and history.
 - [Iterative Analysis and Design](catalog/tracks/iterative-analysis-design.md)
   sequences the current requirements, analysis, responsibility, and object
   design skills.
@@ -48,9 +55,11 @@ goal, and behavior slice.
 
 ## Sources
 
-The currently implemented collection distills agent workflows from Craig
-Larman's *Applying UML and Patterns*. New sources and their candidate skill
-boundaries are tracked separately so that deployable skill directories remain
+The original analysis and design skills distill agent workflows from Craig
+Larman's *Applying UML and Patterns*. Reverse-engineering skills also draw from
+software reengineering, architecture reconstruction, architecture
+documentation, and code-reading sources. New sources and candidate skill
+boundaries remain tracked separately so deployable skill directories are
 organized by capability rather than by book. See the
 [Source Catalog](catalog/sources.md) and [Skill Catalog](catalog/skills.md).
 
@@ -91,6 +100,7 @@ for the shared rules, artifact types, aggregate-file handling, and reserved
 ## Files
 
 - `skills/*/SKILL.md` contains the agent-facing workflows.
+- `skills/*/agents/openai.yaml` optionally provides user-facing skill metadata.
 - `catalog/skills.md` maps concepts, artifacts, and skill boundaries.
 - `catalog/sources.md` records intellectual provenance without making source
   books filesystem owners.

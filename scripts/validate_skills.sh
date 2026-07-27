@@ -18,6 +18,7 @@ grep -q "^# Source Catalog$" "$source_catalog" || { echo "source catalog missing
 
 required_tracks=(
   client-to-code
+  reverse-engineering
   iterative-analysis-design
   implementation-evolution
 )
@@ -98,6 +99,11 @@ for name in "${expected[@]}"; do
 done
 
 template_types=(
+  "reverse-engineer-software-system|Reverse Engineering Record"
+  "survey-existing-system|System Survey"
+  "recover-system-behavior|Recovered Behavior Model"
+  "reconstruct-software-architecture|Recovered Architecture"
+  "reconcile-recovered-design|Design Reconciliation"
   "iterative-up-analysis-design|Iteration Record"
   "use-case-modeling|Use Case"
   "domain-modeling|Domain Model"
@@ -110,6 +116,25 @@ template_types=(
   "test-driven-implementation|Behavior Slice Evidence"
   "behavior-preserving-refactoring|Refactoring Record"
 )
+
+recovery_evidence_reference="$root/skills/reverse-engineer-software-system/references/recovery-evidence.md"
+test -f "$recovery_evidence_reference" || { echo "missing $recovery_evidence_reference" >&2; exit 1; }
+
+reverse_engineering_skills=(
+  reverse-engineer-software-system
+  survey-existing-system
+  recover-system-behavior
+  reconstruct-software-architecture
+  reconcile-recovered-design
+)
+
+for name in "${reverse_engineering_skills[@]}"; do
+  file="$root/skills/$name/SKILL.md"
+  metadata="$root/skills/$name/agents/openai.yaml"
+  test -f "$metadata" || { echo "missing $metadata" >&2; exit 1; }
+  grep -q "recovery-evidence.md" "$file" || { echo "$name missing recovery evidence guidance" >&2; exit 1; }
+  grep -Fq "\$$name" "$metadata" || { echo "$name metadata default prompt missing skill invocation" >&2; exit 1; }
+done
 
 for entry in "${template_types[@]}"; do
   name="${entry%%|*}"
