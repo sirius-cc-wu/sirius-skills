@@ -14,9 +14,17 @@ Install all managed skills globally for GitHub Copilot, Codex, Antigravity, and 
 just install
 ```
 
-The managed set is defined by [`skill-sets/all.txt`](skill-sets/all.txt). The
-installer and validator both consume that file, so adding or retiring a skill
-requires one membership update.
+Install only one curated skill set by passing its filename without the `.txt`
+extension:
+
+```bash
+just install applying-uml-and-patterns
+```
+
+Available sets are defined in [`skill-sets/`](skill-sets/). The default managed
+set is defined by [`skill-sets/all.txt`](skill-sets/all.txt). The installer and
+validator consume these files, so adding or retiring a skill requires one
+membership update.
 
 Remove the managed skills later with:
 

@@ -7,10 +7,21 @@ common_flags := "--global --yes --agent github-copilot --agent codex --agent ant
 
 managed_skills_file := repo_root + "/skill-sets/all.txt"
 
-# Add all managed skills
-install:
+# Add the selected skill set, or all managed skills by default
+install skill_set="all":
 	#!/usr/bin/env bash
-	mapfile -t skills < <(sed -e '/^[[:space:]]*#/d' -e '/^[[:space:]]*$/d' "{{managed_skills_file}}")
+	skill_set={{quote(skill_set)}}
+	skill_set_file="{{repo_root}}/skill-sets/${skill_set}.txt"
+	if [[ ! "$skill_set" =~ ^[a-z0-9][a-z0-9-]*$ || ! -f "$skill_set_file" ]]; then
+		echo "Unknown skill set: $skill_set" >&2
+		echo "Available skill sets:" >&2
+		find "{{repo_root}}/skill-sets" -maxdepth 1 -type f -name '*.txt' -printf '  %f\n' \
+			| sed 's/\.txt$//' \
+			| sort >&2
+		exit 1
+	fi
+
+	mapfile -t skills < <(sed -e '/^[[:space:]]*#/d' -e '/^[[:space:]]*$/d' "$skill_set_file")
 	skill_flags=()
 	for skill in "${skills[@]}"; do
 		skill_flags+=(--skill "$skill")
