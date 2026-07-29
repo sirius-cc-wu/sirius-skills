@@ -62,7 +62,8 @@ intent hypotheses.
 ## Survey Template
 
 When persisting a standalone Markdown survey, follow
-[Markdown Artifact Frontmatter](../iterative-up-analysis-design/references/markdown-artifact-frontmatter.md).
+[Markdown Artifact Frontmatter](../iterative-up-analysis-design/references/markdown-artifact-frontmatter.md)
+and [Readable Technical Artifacts](../iterative-up-analysis-design/references/readable-technical-artifacts.md).
 
 ```markdown
 ---
@@ -76,6 +77,11 @@ tags: [reverse-engineering, survey]
 ---
 
 # System Survey: [System or Subsystem]
+
+## Survey Purpose
+
+- Decision: [why this orientation is needed]
+- Reader: [who will use it and what they need to find]
 
 ## Scope and Governance
 
@@ -128,5 +134,6 @@ tags: [reverse-engineering, survey]
 - [ ] Generated, vendor, fixture, and historical material are not mistaken for
       current production ownership.
 - [ ] The survey ends with bounded, decision-relevant follow-up slices.
+- [ ] The survey purpose explains why the inventory matters before listing system surfaces.
 - [ ] A standalone survey exposes identity, revision, summary, and lifecycle
       metadata in one frontmatter block.

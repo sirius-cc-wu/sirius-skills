@@ -71,7 +71,10 @@ convenient source.
 ## Recovery Record Template
 
 When persisting a standalone Markdown record, follow
-[Markdown Artifact Frontmatter](../iterative-up-analysis-design/references/markdown-artifact-frontmatter.md).
+[Markdown Artifact Frontmatter](../iterative-up-analysis-design/references/markdown-artifact-frontmatter.md)
+and [Readable Technical Artifacts](../iterative-up-analysis-design/references/readable-technical-artifacts.md).
+The decision and scope normally provide the reader-oriented opening; retain
+evidence status and uncertainty when simplifying later sections.
 
 ```markdown
 ---
@@ -131,5 +134,6 @@ tags: [reverse-engineering]
 - [ ] Contradictions and residual unknowns remain visible.
 - [ ] The outcome answers the original question or identifies the precise
       evidence still required.
+- [ ] The decision and scope orient readers before the evidence plan and findings.
 - [ ] A standalone record exposes identity, revision, summary, and lifecycle
       metadata in one frontmatter block.

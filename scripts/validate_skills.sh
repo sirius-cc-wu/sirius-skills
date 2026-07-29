@@ -97,24 +97,12 @@ for name in "${expected[@]}"; do
   test -f "$file" || { echo "missing $file" >&2; exit 1; }
   grep -q "^name: $name$" "$file" || { echo "bad or missing name in $file" >&2; exit 1; }
   grep -q "^description: .*Use when" "$file" || { echo "description must include Use when in $file" >&2; exit 1; }
+  grep -Fq "| \`$name\` |" "$skill_catalog" || { echo "skill catalog missing $name" >&2; exit 1; }
   grep -q "^## When to Use" "$file" || { echo "missing When to Use in $file" >&2; exit 1; }
   grep -q "^## Workflow" "$file" || { echo "missing Workflow in $file" >&2; exit 1; }
   grep -q "markdown-artifact-frontmatter.md" "$file" || { echo "missing Markdown artifact frontmatter guidance in $file" >&2; exit 1; }
+  grep -q "readable-technical-artifacts.md" "$file" || { echo "missing readable technical artifact guidance in $file" >&2; exit 1; }
   grep -q "^## Verification" "$file" || { echo "missing Verification in $file" >&2; exit 1; }
-done
-
-readability_pilot_skills=(
-  iterative-up-analysis-design
-  use-case-modeling
-  operation-contracts
-)
-
-for name in "${readability_pilot_skills[@]}"; do
-  file="$root/skills/$name/SKILL.md"
-  grep -q "readable-technical-artifacts.md" "$file" || {
-    echo "$name missing readable technical artifact guidance" >&2
-    exit 1
-  }
 done
 
 template_types=(
@@ -154,6 +142,13 @@ for name in "${reverse_engineering_skills[@]}"; do
   grep -q "recovery-evidence.md" "$file" || { echo "$name missing recovery evidence guidance" >&2; exit 1; }
   grep -Fq "\$$name" "$metadata" || { echo "$name metadata default prompt missing skill invocation" >&2; exit 1; }
 done
+
+rewrite_metadata="$root/skills/rewrite-technical-artifacts/agents/openai.yaml"
+test -f "$rewrite_metadata" || { echo "rewrite-technical-artifacts missing agents/openai.yaml" >&2; exit 1; }
+grep -Fq '$rewrite-technical-artifacts' "$rewrite_metadata" || {
+  echo "rewrite-technical-artifacts metadata default prompt missing skill invocation" >&2
+  exit 1
+}
 
 for entry in "${template_types[@]}"; do
   name="${entry%%|*}"

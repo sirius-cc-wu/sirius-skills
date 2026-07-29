@@ -43,7 +43,10 @@ Improve internal structure through one independently reviewable transformation a
 
 Use this template when persisting refactoring evidence as a standalone Markdown
 file. Follow
-[Markdown Artifact Frontmatter](../iterative-up-analysis-design/references/markdown-artifact-frontmatter.md).
+[Markdown Artifact Frontmatter](../iterative-up-analysis-design/references/markdown-artifact-frontmatter.md)
+and [Readable Technical Artifacts](../iterative-up-analysis-design/references/readable-technical-artifacts.md).
+The preserved behavior and named structural problem should orient the reader
+without adding a summary that repeats the verification record.
 For a conversational report or a section embedded in an aggregate file, omit
 the frontmatter and adjust heading levels.
 
@@ -109,4 +112,5 @@ tags: [refactoring, verification]
 - [ ] No valid expectation was weakened to hide a regression.
 - [ ] Language-specific behavior such as ownership, errors, ordering, and concurrency remains intact.
 - [ ] Durable design artifacts were updated only when their represented design knowledge changed.
+- [ ] The record explains the preserved behavior and structural problem before transformation detail.
 - [ ] Persisted standalone Markdown evidence exposes identity, structural summary, and lifecycle metadata in one frontmatter block.

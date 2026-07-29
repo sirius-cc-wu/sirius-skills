@@ -36,8 +36,11 @@ When the implementation language is known, also use [Software Design Language Ad
 
 For a standalone Markdown file, follow
 [Markdown Artifact Frontmatter](../iterative-up-analysis-design/references/markdown-artifact-frontmatter.md)
-and use this shape. When embedding the realization in an aggregate file, omit
-the frontmatter and adjust heading levels.
+and [Readable Technical Artifacts](../iterative-up-analysis-design/references/readable-technical-artifacts.md),
+then use this shape. The realized use-case scenario supplies the representative
+scenario; summarize its outcome instead of repeating the black-box steps. When
+embedding the realization in an aggregate file, omit the frontmatter and adjust
+heading levels.
 
 ```markdown
 ---
@@ -52,6 +55,11 @@ tags: [design, use-case-realization]
 ---
 
 # Use-Case Realization: [Use Case] - [Scenario]
+
+## Scenario and Outcome
+
+[Explain the initiating event, meaningful result, and design pressure in plain
+language.]
 
 ## System Operations
 
@@ -89,4 +97,5 @@ tags: [design, use-case-realization]
 - [ ] Message receivers have GRASP-based responsibility rationale.
 - [ ] New design classes and methods are recorded for the class diagram.
 - [ ] Important alternate flows are realized or intentionally deferred.
+- [ ] The scenario outcome orients readers before the internal collaboration.
 - [ ] A standalone Markdown realization exposes identity, use-case trace, scenario, summary, and lifecycle metadata in one frontmatter block.

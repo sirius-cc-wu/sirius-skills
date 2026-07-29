@@ -1,4 +1,5 @@
 iterative-up-analysis-design
+rewrite-technical-artifacts
 inception
 use-case-modeling
 domain-modeling

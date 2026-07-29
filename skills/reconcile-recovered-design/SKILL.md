@@ -65,7 +65,10 @@ stakeholder confirmation for intent.
 ## Reconciliation Template
 
 When persisting a standalone Markdown reconciliation, follow
-[Markdown Artifact Frontmatter](../iterative-up-analysis-design/references/markdown-artifact-frontmatter.md).
+[Markdown Artifact Frontmatter](../iterative-up-analysis-design/references/markdown-artifact-frontmatter.md)
+and [Readable Technical Artifacts](../iterative-up-analysis-design/references/readable-technical-artifacts.md).
+State the consequential agreement, drift, gap, or uncertainty before the full
+perspective matrix.
 
 ```markdown
 ---
@@ -79,6 +82,11 @@ tags: [reverse-engineering, reconciliation]
 ---
 
 # Design Reconciliation: [Scope]
+
+## At a Glance
+
+[Explain what agrees or differs, why the difference matters, and who or what
+must resolve any remaining uncertainty.]
 
 ## Baseline
 
@@ -125,5 +133,6 @@ tags: [reverse-engineering, reconciliation]
 - [ ] Retired and superseded behavior remains distinguishable from drift.
 - [ ] Recommendations identify the smallest authoritative next action without
       silently mutating code or documents.
+- [ ] The opening states the consequential result before the evidence matrix.
 - [ ] A standalone reconciliation exposes identity, revision, summary, and
       lifecycle metadata in one frontmatter block.

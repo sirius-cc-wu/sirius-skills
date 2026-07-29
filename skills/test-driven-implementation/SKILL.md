@@ -52,7 +52,10 @@ Implement a risk-sized slice of observable behavior: establish an implementation
 
 Use this template when persisting behavior-slice evidence as a standalone
 Markdown file. Follow
-[Markdown Artifact Frontmatter](../iterative-up-analysis-design/references/markdown-artifact-frontmatter.md).
+[Markdown Artifact Frontmatter](../iterative-up-analysis-design/references/markdown-artifact-frontmatter.md)
+and [Readable Technical Artifacts](../iterative-up-analysis-design/references/readable-technical-artifacts.md).
+The behavior title, risk, and oracle should orient the reader without adding a
+second narrative that repeats the evidence.
 For a conversational report or a section embedded in an aggregate file, omit
 the frontmatter and adjust heading levels.
 
@@ -117,4 +120,5 @@ tags: [implementation, verification]
 - [ ] Structural cleanup occurred only while protected by passing tests.
 - [ ] Design artifacts were refined when durable responsibilities, collaborations, interfaces, or postconditions changed.
 - [ ] Final verification commands and results are reported.
+- [ ] The record makes the behavior, risk, and expected result clear before detailed commands and evidence.
 - [ ] Persisted standalone Markdown evidence exposes identity, behavior summary, and lifecycle metadata in one frontmatter block.

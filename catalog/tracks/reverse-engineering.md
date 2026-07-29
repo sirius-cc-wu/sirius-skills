@@ -37,6 +37,11 @@ vocabulary.
 Recovered artifacts describe a fixed revision. They do not become intended
 requirements merely because they match current code or tests.
 
+Use
+[`rewrite-technical-artifacts`](../../skills/rewrite-technical-artifacts/SKILL.md)
+to improve a recovered artifact's reading order only after its evidence,
+confidence, temporal status, and residual uncertainty have been inventoried.
+
 ## Selection Rule
 
 Do not execute every skill at full depth. A first-contact onboarding question

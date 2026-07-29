@@ -70,7 +70,10 @@ participant into a class.
 ## Architecture Template
 
 When persisting a standalone Markdown reconstruction, follow
-[Markdown Artifact Frontmatter](../iterative-up-analysis-design/references/markdown-artifact-frontmatter.md).
+[Markdown Artifact Frontmatter](../iterative-up-analysis-design/references/markdown-artifact-frontmatter.md)
+and [Readable Technical Artifacts](../iterative-up-analysis-design/references/readable-technical-artifacts.md).
+Use the representative runtime scenario before exhaustive element inventories
+when runtime behavior is the architectural question.
 
 ```markdown
 ---
@@ -85,6 +88,11 @@ tags: [reverse-engineering, architecture]
 ---
 
 # Recovered Architecture: [System, Area, or Scenario]
+
+## At a Glance
+
+[Explain the architectural question, the answer supported by current evidence,
+and the important consequence or uncertainty.]
 
 ## Question and View Selection
 
@@ -140,5 +148,6 @@ tags: [reverse-engineering, architecture]
       external interface.
 - [ ] Every material abstraction has evidence and calibrated confidence.
 - [ ] Intent, rationale, and history are not inferred from structure alone.
+- [ ] The opening and representative runtime scenario orient readers before exhaustive architecture detail.
 - [ ] A standalone reconstruction exposes identity, revision, summary,
       language, and lifecycle metadata in one frontmatter block.

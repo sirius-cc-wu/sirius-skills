@@ -34,7 +34,8 @@ Inception is the initial short step to establish a common vision, basic scope, a
 ## File Output
 
 When persisting an inception artifact as a standalone Markdown file, follow
-[Markdown Artifact Frontmatter](../iterative-up-analysis-design/references/markdown-artifact-frontmatter.md).
+[Markdown Artifact Frontmatter](../iterative-up-analysis-design/references/markdown-artifact-frontmatter.md)
+and [Readable Technical Artifacts](../iterative-up-analysis-design/references/readable-technical-artifacts.md).
 Use the artifact-specific type (`Vision`, `Business Case`, `Risk List`,
 `Development Case`, `Phase Plan`, and so on), not a generic `Inception`
 type. Put identity, summary, and lifecycle metadata in frontmatter while
@@ -63,4 +64,5 @@ frontmatter and do not add nested frontmatter between sections.
 - [ ] A low-precision phase plan/effort guess for Elaboration is defined.
 - [ ] An Iteration Plan for the first elaboration iteration is created.
 - [ ] The UP Development Case has been customized for the project's scale and constraints.
+- [ ] Reader-facing inception artifacts explain the opportunity, decision, and important consequence before detailed scope or evidence.
 - [ ] Every standalone Markdown artifact has frontmatter appropriate to its artifact type.

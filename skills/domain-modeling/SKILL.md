@@ -31,7 +31,8 @@ A domain model visualizes real-world conceptual classes in the problem domain. I
 
 For a standalone Markdown file, follow
 [Markdown Artifact Frontmatter](../iterative-up-analysis-design/references/markdown-artifact-frontmatter.md)
-and use this shape. When embedding the model in an aggregate file, omit the
+and [Readable Technical Artifacts](../iterative-up-analysis-design/references/readable-technical-artifacts.md),
+then use this shape. When embedding the model in an aggregate file, omit the
 frontmatter and adjust heading levels.
 
 ```markdown
@@ -45,6 +46,11 @@ tags: [analysis, domain-model]
 ---
 
 # Domain Model: [Domain or Feature]
+
+## Model Purpose
+
+[Explain the real-world scope, the questions this vocabulary resolves, and
+what the model intentionally does not represent.]
 
 ## Conceptual Classes
 
@@ -77,4 +83,5 @@ tags: [analysis, domain-model]
 - [ ] Attributes are simple facts and not disguised concepts.
 - [ ] Names match stakeholder vocabulary.
 - [ ] The model covers the nouns and rules in the important use cases.
+- [ ] The model purpose orients readers before the concept inventory.
 - [ ] A standalone Markdown domain model exposes identity, summary, and lifecycle metadata in one frontmatter block.

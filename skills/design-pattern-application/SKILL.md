@@ -40,8 +40,11 @@ When the implementation language is known, also use [Software Design Language Ad
 
 For a standalone Markdown file, follow
 [Markdown Artifact Frontmatter](../iterative-up-analysis-design/references/markdown-artifact-frontmatter.md)
-and use this shape. When embedding the decision in an aggregate file, omit the
-frontmatter and adjust heading levels.
+and [Readable Technical Artifacts](../iterative-up-analysis-design/references/readable-technical-artifacts.md),
+then use this shape. The force and its consequence normally provide the
+reader-oriented opening; do not add a generic summary that repeats them. When
+embedding the decision in an aggregate file, omit the frontmatter and adjust
+heading levels.
 
 ```markdown
 ---
@@ -89,4 +92,5 @@ tags: [design, pattern]
 - [ ] Simpler alternatives were considered.
 - [ ] UML interactions/classes reflect the pattern accurately.
 - [ ] Added indirection has a justified benefit.
+- [ ] The force and consequence are understandable before pattern terminology or participant detail.
 - [ ] A standalone Markdown pattern decision exposes identity, pattern, summary, and lifecycle metadata in one frontmatter block.

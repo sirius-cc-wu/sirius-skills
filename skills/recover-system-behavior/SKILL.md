@@ -60,7 +60,10 @@ requirement that should persist.
 ## Behavior Model Template
 
 When persisting a standalone Markdown model, follow
-[Markdown Artifact Frontmatter](../iterative-up-analysis-design/references/markdown-artifact-frontmatter.md).
+[Markdown Artifact Frontmatter](../iterative-up-analysis-design/references/markdown-artifact-frontmatter.md)
+and [Readable Technical Artifacts](../iterative-up-analysis-design/references/readable-technical-artifacts.md).
+The main observed scenario provides the representative scenario; keep its
+evidence status distinct from intended behavior.
 
 ```markdown
 ---
@@ -74,6 +77,11 @@ tags: [reverse-engineering, behavior]
 ---
 
 # Recovered Behavior: [Goal or Interface]
+
+## At a Glance
+
+[Explain the external goal, observed outcome, and why this behavior matters,
+with its evidence status.]
 
 ## Boundary and Actors
 
@@ -125,5 +133,6 @@ tags: [reverse-engineering, behavior]
       temporal status, and evidence.
 - [ ] Existing behavior and intended behavior remain distinguishable.
 - [ ] Anomalies, contradictions, and unobserved paths are explicit.
+- [ ] The opening explains the observed behavior and evidence status before detailed interfaces or failures.
 - [ ] A standalone model exposes identity, revision, summary, and lifecycle
       metadata in one frontmatter block.

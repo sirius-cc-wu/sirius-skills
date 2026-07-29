@@ -37,7 +37,8 @@ When the implementation language is known, also use [Software Design Language Ad
 
 For a standalone Markdown file, follow
 [Markdown Artifact Frontmatter](../iterative-up-analysis-design/references/markdown-artifact-frontmatter.md)
-and use this shape. When embedding the design model in an aggregate file, omit
+and [Readable Technical Artifacts](../iterative-up-analysis-design/references/readable-technical-artifacts.md),
+then use this shape. When embedding the design model in an aggregate file, omit
 the frontmatter and adjust heading levels.
 
 ```markdown
@@ -51,6 +52,11 @@ tags: [design, class-diagram]
 ---
 
 # Design Class Diagram: [System, Area, or Feature]
+
+## Design Scope
+
+[Explain the behavior or decisions summarized, the implementation boundary,
+and what the diagram intentionally omits.]
 
 ## Classes
 
@@ -86,4 +92,5 @@ tags: [design, class-diagram]
 - [ ] Associations show required knowledge/navigation.
 - [ ] Interfaces or abstract types protect real variation points.
 - [ ] The diagram distinguishes conceptual domain classes from software design classes.
+- [ ] The design scope explains the diagram's purpose before the type inventory.
 - [ ] A standalone Markdown design class diagram exposes identity, scope summary, and lifecycle metadata in one frontmatter block.

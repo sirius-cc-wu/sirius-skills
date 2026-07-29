@@ -37,7 +37,8 @@ When the implementation language is known, also use [Software Design Language Ad
 
 For a standalone Markdown file, follow
 [Markdown Artifact Frontmatter](../iterative-up-analysis-design/references/markdown-artifact-frontmatter.md)
-and use this shape. When embedding the decision in an aggregate file, omit the
+and [Readable Technical Artifacts](../iterative-up-analysis-design/references/readable-technical-artifacts.md),
+then use this shape. When embedding the decision in an aggregate file, omit the
 frontmatter and adjust heading levels.
 
 ```markdown
@@ -54,6 +55,11 @@ tags: [design, grasp]
 ---
 
 # Responsibility Decision: [Responsibility]
+
+## Context and Consequence
+
+- Problem: [why an owner must be chosen]
+- Consequence: [what this assignment makes possible or protects]
 
 ## Candidates
 
@@ -79,4 +85,5 @@ tags: [design, grasp]
 - [ ] Controllers coordinate but do not absorb domain logic.
 - [ ] Coupling and cohesion were checked for each major assignment.
 - [ ] Variation points are protected by polymorphism, interfaces, adapters, or indirection.
+- [ ] The decision explains its problem and consequence before comparing candidates.
 - [ ] A standalone Markdown decision exposes identity, responsibility, chosen owner, GRASP basis, and lifecycle metadata in one frontmatter block.
