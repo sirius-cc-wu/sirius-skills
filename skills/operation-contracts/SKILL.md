@@ -20,19 +20,22 @@ Operation contracts define what a system operation guarantees, especially change
 
 1. **Select the operation.** Use an operation from a system sequence diagram.
 2. **Name the operation and scope.** Include parameters and the owning system boundary.
-3. **State preconditions sparingly.** Only include conditions assumed true before the operation starts.
-4. **Write postconditions as state changes.** Capture created/deleted instances, changed attributes, formed/broken associations, and recorded events.
-5. **Use domain model vocabulary.** Contracts should reference conceptual objects, not implementation classes.
-6. **Avoid algorithm steps.** State what must be true after the operation, not how to implement it.
-7. **Update the domain model.** If a postcondition needs a missing concept or association, revise the domain model.
-8. **Use contracts to drive design.** Feed postconditions into GRASP responsibility assignment.
+3. **Explain the effect.** Summarize in plain language what changes on acceptance and what important state remains unchanged.
+4. **State preconditions sparingly.** Only include conditions assumed true before the operation starts.
+5. **Write postconditions as state changes.** Capture created/deleted instances, changed attributes, formed/broken associations, and recorded events.
+6. **Use domain model vocabulary.** Contracts should reference conceptual objects, not implementation classes.
+7. **Avoid algorithm steps.** State what must be true after the operation, not how to implement it.
+8. **Update the domain model.** If a postcondition needs a missing concept or association, revise the domain model.
+9. **Use contracts to drive design.** Feed postconditions into GRASP responsibility assignment.
 
 ## Output Template
 
 For a standalone Markdown file, follow
 [Markdown Artifact Frontmatter](../iterative-up-analysis-design/references/markdown-artifact-frontmatter.md)
-and use this shape. When embedding the contract in an aggregate file, omit the
-frontmatter and adjust heading levels.
+and [Readable Technical Artifacts](../iterative-up-analysis-design/references/readable-technical-artifacts.md),
+then use this shape. Link to the discovering scenario rather than restating it
+when the cross-reference provides sufficient context. When embedding the
+contract in an aggregate file, omit the frontmatter and adjust heading levels.
 
 ```markdown
 ---
@@ -47,6 +50,10 @@ tags: [analysis, operation-contract]
 ---
 
 # Contract: [operation(parameters)]
+
+## Effect in Plain Language
+
+[State what changes on acceptance and what important state remains unchanged.]
 
 ## Preconditions
 
@@ -74,6 +81,7 @@ tags: [analysis, operation-contract]
 ## Verification
 
 - [ ] Each contract corresponds to a system operation from an SSD.
+- [ ] The plain-language effect orients the reader without weakening or adding to the postconditions.
 - [ ] Postconditions are declarative and testable.
 - [ ] Created/deleted instances, associations, and attribute changes are explicit.
 - [ ] Domain model gaps discovered by the contract are recorded.

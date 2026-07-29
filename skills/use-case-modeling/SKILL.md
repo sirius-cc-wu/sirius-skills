@@ -22,18 +22,21 @@ Use cases capture how actors achieve goals with the system as a black box. They 
 2. **Find primary actors.** List who or what has goals served by the system.
 3. **Find actor goals.** Prefer elementary business processes over tiny UI actions.
 4. **Name use cases by goals.** Use verb-object names such as `Process Sale`, not button labels.
-5. **Write black-box scenarios.** Describe actor intent and system responsibilities without UI widgets or internal classes.
-6. **Separate main success from extensions.** Keep the happy path readable, then add alternate and failure flows.
-7. **Attach related requirements.** Link non-functional requirements, business rules, data requirements, and constraints to the relevant use cases.
-8. **Use diagrams only as an index.** Create a use-case diagram when it helps show actors and use-case names.
-9. **Mark detail level by risk.** Fully dress architecturally significant or risky use cases; keep low-risk cases brief or casual.
+5. **Orient the reader.** State the actor's problem, intended outcome, and the most important behavioral boundary in plain language.
+6. **Write black-box scenarios.** Describe actor intent and system responsibilities without UI widgets or internal classes.
+7. **Separate main success from extensions.** Keep the successful representative scenario readable, then add alternate and failure flows.
+8. **Attach related requirements.** Link non-functional requirements, business rules, data requirements, and constraints to the relevant use cases.
+9. **Use diagrams only as an index.** Create a use-case diagram when it helps show actors and use-case names.
+10. **Mark detail level by risk.** Fully dress architecturally significant or risky use cases; keep low-risk cases brief or casual.
 
 ## Output Template
 
 For a standalone Markdown file, follow
 [Markdown Artifact Frontmatter](../iterative-up-analysis-design/references/markdown-artifact-frontmatter.md)
-and use this shape. When embedding the use case in an aggregate file, omit the
-frontmatter and adjust heading levels.
+and [Readable Technical Artifacts](../iterative-up-analysis-design/references/readable-technical-artifacts.md),
+then use this shape. The main success scenario normally serves as the
+representative scenario. When embedding the use case in an aggregate file,
+omit the frontmatter and adjust heading levels.
 
 ```markdown
 ---
@@ -49,6 +52,11 @@ tags: [requirements, use-case]
 ---
 
 # Use Case: [Goal Name]
+
+## Goal
+
+[Explain the actor's problem, intended outcome, and important behavioral
+boundary in plain language.]
 
 ## Main Success Scenario
 
@@ -79,6 +87,7 @@ tags: [requirements, use-case]
 
 - [ ] The system boundary is explicit.
 - [ ] Every primary actor has at least one user-goal use case.
+- [ ] The goal orients the reader before detailed scenarios and requirements.
 - [ ] Main success scenarios are black-box and actor-goal oriented.
 - [ ] Important extensions and failure paths are captured.
 - [ ] Non-functional requirements and business rules are linked to affected use cases.

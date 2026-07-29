@@ -30,10 +30,13 @@ done
 up_skill="$root/skills/iterative-up-analysis-design/SKILL.md"
 layout_reference="$root/skills/iterative-up-analysis-design/references/artifact-layouts.md"
 frontmatter_reference="$root/skills/iterative-up-analysis-design/references/markdown-artifact-frontmatter.md"
+readability_reference="$root/skills/iterative-up-analysis-design/references/readable-technical-artifacts.md"
 test -f "$layout_reference" || { echo "missing $layout_reference" >&2; exit 1; }
 test -f "$frontmatter_reference" || { echo "missing $frontmatter_reference" >&2; exit 1; }
+test -f "$readability_reference" || { echo "missing $readability_reference" >&2; exit 1; }
 grep -q "references/artifact-layouts.md" "$up_skill" || { echo "iterative UP skill missing artifact layout reference" >&2; exit 1; }
 grep -q "references/markdown-artifact-frontmatter.md" "$up_skill" || { echo "iterative UP skill missing Markdown frontmatter reference" >&2; exit 1; }
+grep -q "references/readable-technical-artifacts.md" "$up_skill" || { echo "iterative UP skill missing readable artifact reference" >&2; exit 1; }
 grep -q "^## Artifact Durability$" "$up_skill" || { echo "iterative UP skill missing artifact durability guidance" >&2; exit 1; }
 grep -q "^Artifact Outcomes:$" "$up_skill" || { echo "iteration template missing artifact outcomes" >&2; exit 1; }
 grep -q "^## Artifact Lifecycles$" "$layout_reference" || { echo "artifact layout reference missing lifecycle guidance" >&2; exit 1; }
@@ -42,6 +45,8 @@ grep -q "^## Linking Rules$" "$layout_reference" || { echo "artifact layout refe
 grep -q "markdown-artifact-frontmatter.md" "$layout_reference" || { echo "artifact layout reference missing Markdown metadata guidance" >&2; exit 1; }
 grep -q '^type: "\[Descriptive artifact type\]"$' "$frontmatter_reference" || { echo "frontmatter reference missing base type field" >&2; exit 1; }
 grep -q '^## Reserved Files$' "$frontmatter_reference" || { echo "frontmatter reference missing reserved-file guidance" >&2; exit 1; }
+grep -q '^## Writing Flow$' "$readability_reference" || { echo "readability reference missing writing flow" >&2; exit 1; }
+grep -q '^## Preserve Meaning$' "$readability_reference" || { echo "readability reference missing meaning-preservation guidance" >&2; exit 1; }
 grep -q "^## Artifact Durability and Layouts$" "$root/README.md" || { echo "README missing artifact durability section" >&2; exit 1; }
 grep -q "artifact-layouts.md" "$root/README.md" || { echo "README missing artifact layout reference" >&2; exit 1; }
 grep -q "durable design artifacts" "$skill_catalog" || { echo "skill catalog missing artifact durability boundary" >&2; exit 1; }
@@ -96,6 +101,20 @@ for name in "${expected[@]}"; do
   grep -q "^## Workflow" "$file" || { echo "missing Workflow in $file" >&2; exit 1; }
   grep -q "markdown-artifact-frontmatter.md" "$file" || { echo "missing Markdown artifact frontmatter guidance in $file" >&2; exit 1; }
   grep -q "^## Verification" "$file" || { echo "missing Verification in $file" >&2; exit 1; }
+done
+
+readability_pilot_skills=(
+  iterative-up-analysis-design
+  use-case-modeling
+  operation-contracts
+)
+
+for name in "${readability_pilot_skills[@]}"; do
+  file="$root/skills/$name/SKILL.md"
+  grep -q "readable-technical-artifacts.md" "$file" || {
+    echo "$name missing readable technical artifact guidance" >&2
+    exit 1
+  }
 done
 
 template_types=(

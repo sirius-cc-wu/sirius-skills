@@ -118,5 +118,6 @@ for the shared rules, artifact types, aggregate-file handling, and reserved
 - `docs/proposals/` contains design proposals that are not deployable skills.
 - `skills/iterative-up-analysis-design/references/artifact-layouts.md` describes supported persistence layouts.
 - `skills/iterative-up-analysis-design/references/markdown-artifact-frontmatter.md` defines metadata for generated Markdown artifacts.
+- `skills/iterative-up-analysis-design/references/readable-technical-artifacts.md` defines explanation-first writing and semantic-preservation guidance.
 - `scripts/validate_skills.sh` performs lightweight structure validation.
 - `justfile` installs, removes, and validates the managed skills.

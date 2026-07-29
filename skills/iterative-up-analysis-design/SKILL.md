@@ -40,6 +40,11 @@ Use an iterative, risk-driven flow: produce just enough artifacts for the curren
 
 When persisting any standalone Markdown artifact, follow
 [Markdown Artifact Frontmatter](references/markdown-artifact-frontmatter.md).
+For reader-facing artifacts, follow
+[Readable Technical Artifacts](references/readable-technical-artifacts.md):
+orient the reader before exhaustive specification, use a representative
+scenario when the behavior is unfamiliar or stateful, and preserve exact rules
+after that explanation.
 Put discovery metadata in frontmatter and substantive analysis or design in
 the body. When several artifacts share a flat feature file, describe the
 aggregate once in file-level frontmatter; never insert nested frontmatter.
@@ -126,4 +131,6 @@ deferred or changed after the plan was written.
 - [ ] Design decisions trace to requirements or contracts.
 - [ ] The iteration has concrete exit criteria and implementation handoff points.
 - [ ] A closed iteration records results and links to canonical artifacts without duplicating them.
+- [ ] Reader-facing artifacts explain their problem, behavior or decision, and consequence before exhaustive terminology or specification.
+- [ ] A representative scenario precedes detailed contracts or state rules when it materially improves understanding.
 - [ ] Every standalone Markdown artifact has one OKF-aligned frontmatter block; aggregate and reserved files follow their special rules.
