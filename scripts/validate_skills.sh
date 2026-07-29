@@ -144,9 +144,22 @@ for name in "${reverse_engineering_skills[@]}"; do
 done
 
 rewrite_metadata="$root/skills/rewrite-technical-artifacts/agents/openai.yaml"
+rewrite_skill="$root/skills/rewrite-technical-artifacts/SKILL.md"
 test -f "$rewrite_metadata" || { echo "rewrite-technical-artifacts missing agents/openai.yaml" >&2; exit 1; }
 grep -Fq '$rewrite-technical-artifacts' "$rewrite_metadata" || {
   echo "rewrite-technical-artifacts metadata default prompt missing skill invocation" >&2
+  exit 1
+}
+grep -q '^## Diff-Focused Review Mode$' "$rewrite_skill" || {
+  echo "rewrite-technical-artifacts missing diff-focused review mode" >&2
+  exit 1
+}
+grep -q '^## Final Editorial Pass$' "$readability_reference" || {
+  echo "readability reference missing final editorial handoff" >&2
+  exit 1
+}
+grep -q '../../rewrite-technical-artifacts/SKILL.md' "$readability_reference" || {
+  echo "readability reference missing rewrite skill link" >&2
   exit 1
 }
 

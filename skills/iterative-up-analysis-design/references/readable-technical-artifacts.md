@@ -53,3 +53,17 @@ Do not try to make one artifact serve every audience. Prefer one canonical
 technical artifact with a layered opening. Create a separate operator guide or
 companion explanation only when a genuinely different task or audience cannot
 be served safely by the canonical artifact.
+
+## Final Editorial Pass
+
+The owning skill should produce a readable artifact directly. After producing
+or materially revising a substantial artifact, use
+[Rewrite Technical Artifacts](../../rewrite-technical-artifacts/SKILL.md) as a
+focused final pass when the reading path, proportion, canonical ownership, or
+cross-artifact consistency remains difficult. The same pass can review the
+reader-facing artifacts in a branch or pull-request diff before commit or
+review.
+
+This handoff is risk-calibrated, not mandatory. Skip it for a narrow structural
+artifact that is already proportionate, and accept a review that finds no
+high-confidence improvement.

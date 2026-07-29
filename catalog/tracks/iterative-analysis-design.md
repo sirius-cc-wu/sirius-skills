@@ -42,5 +42,7 @@ arrives.
 Use
 [`rewrite-technical-artifacts`](../../skills/rewrite-technical-artifacts/SKILL.md)
 when an existing artifact contains the required knowledge but needs
-progressive disclosure or a clearer reading path. Rewriting must preserve its
-normative meaning, identifiers, lifecycle, and traceability.
+progressive disclosure or a clearer reading path, or as a focused final review
+of substantial changed artifacts before commit or review. The pass is optional
+for narrow structural artifacts and must preserve normative meaning,
+identifiers, lifecycle, and traceability.

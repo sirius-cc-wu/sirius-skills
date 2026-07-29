@@ -39,8 +39,10 @@ requirements merely because they match current code or tests.
 
 Use
 [`rewrite-technical-artifacts`](../../skills/rewrite-technical-artifacts/SKILL.md)
-to improve a recovered artifact's reading order only after its evidence,
-confidence, temporal status, and residual uncertainty have been inventoried.
+to improve a recovered artifact's reading order, or to review substantial
+changed recovery artifacts as a final diff-focused pass, only after their
+evidence, confidence, temporal status, and residual uncertainty have been
+inventoried.
 
 ## Selection Rule
 
