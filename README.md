@@ -56,6 +56,8 @@ tracks:
 - [Implementation and Evolution](catalog/tracks/implementation-evolution.md)
   covers verified behavior changes and behavior-preserving structural
   improvement.
+- [Skill Relationships](catalog/skill-relationships.md) visualizes the common
+  handoffs and optional feedback paths across these tracks.
 
 The tracks express dependencies and common handoffs, not a requirement to
 create every artifact. Select skills according to the current risk, learning
