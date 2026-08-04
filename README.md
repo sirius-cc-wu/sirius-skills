@@ -58,6 +58,11 @@ The [Skill Relationships](catalog/skill-relationships.md) diagram summarizes
 normal handoffs and optional feedback paths. Select the smallest set of skills
 that addresses the current risk or outcome.
 
+The [repository structure and skill-relationship comparison](catalog/agent-skill-repository-structures.md)
+uses PlantUML views to show how two related projects organize skill authoring,
+orchestration, distribution, runtime support, verification, and workflow
+handoffs.
+
 ## Repository conventions
 
 `commit` and `create-pr` can read `.skills/conventions.json` when a consuming
@@ -100,6 +105,8 @@ pytest -q
 - `skills/*/SKILL.md`: deployable agent workflows
 - `skill-sets/*.txt`: canonical installation profiles
 - `catalog/skills.md`: skill responsibilities and boundaries
+- `catalog/agent-skill-repository-structures.md`: comparative PlantUML views of
+  related skill repositories and their documented workflow handoffs
 - `catalog/tracks/*.md`: optional workflow compositions
 - `catalog/sources.md`: intellectual and repository provenance
 - `docs/shared/`: canonical references copied into self-contained skills
