@@ -11,10 +11,11 @@ tags: [evaluation, skills, quality]
 Implementation is proceeding in risk-sized stages. The deterministic routing
 case format, runner, and eight-skill pilot are owned by
 [`evals/`](../../evals/README.md). Opt-in Codex execution now captures traces,
-workspace mutations, and verification results in a disposable fixture;
-initial visual composition fixtures also distinguish no-diagram, focused
-architecture-view, and focused class-view outcomes. Semantic grading and
-broader feedback composition remain planned.
+workspace mutations, and verification results in a disposable fixture. The
+invoice pilot mechanically checks red–mutation–green ordering, and initial
+visual composition fixtures distinguish no-diagram, focused architecture-view,
+and focused class-view outcomes. Semantic grading and broader feedback
+composition remain planned.
 
 ## At a Glance
 

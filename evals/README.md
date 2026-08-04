@@ -108,6 +108,14 @@ ordinary prose such as “no class diagram” from satisfying or violating a
 diagram-notation assertion. A missing or unterminated PlantUML fence fails the
 assertion.
 
+`trace_assertions` can mechanically check selected JSONL event ordering. The
+supported `red_green` assertion requires every `command_contains` fragment to
+appear in a command. A matching nonzero command must complete before the first
+file change matching `mutation_patterns`, and a matching zero-exit command
+must complete after the last matching change. This establishes red–mutation–
+green ordering; it does not prove that the failing command discriminated the
+intended behavior.
+
 ## Run a Behavioral Case
 
 Inspect the plan before spending model tokens:
@@ -134,9 +142,10 @@ Behavioral execution is never part of `just validate`. The runner:
 4. captures created, modified, and deleted files while ignoring tool caches;
 5. rejects changes outside `allowed_mutations` and missing
    `required_mutations`;
-6. checks required and forbidden output-file fragments;
-7. runs declared verification commands without a shell; and
-8. writes the trace and mechanical result under the ignored `evals/results/`
+6. evaluates declared JSONL trace-order assertions;
+7. checks required and forbidden output-file fragments;
+8. runs declared verification commands without a shell; and
+9. writes the trace and mechanical result under the ignored `evals/results/`
    directory before deleting the temporary workspace.
 
 Use the lower-level command when a model override, timeout, or retained

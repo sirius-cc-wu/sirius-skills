@@ -100,6 +100,19 @@ def main(argv: Sequence[str] | None = None) -> int:
                 "Failed file assertions: "
                 + ", ".join(assertion.path for assertion in failed_assertions)
             )
+        failed_trace_assertions = [
+            assertion
+            for assertion in result.trace_assertions
+            if not assertion.passed
+        ]
+        if failed_trace_assertions:
+            print(
+                "Failed trace assertions: "
+                + ", ".join(
+                    f"{assertion.assertion_type}: {assertion.error}"
+                    for assertion in failed_trace_assertions
+                )
+            )
         print(f"Trace: {result.trace_path}")
         print(f"Result: {result.result_path}")
         print("Semantic expectations: UNGRADED")

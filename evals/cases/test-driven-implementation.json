@@ -55,6 +55,17 @@
           "-q"
         ]
       ],
+      "trace_assertions": [
+        {
+          "type": "red_green",
+          "command_contains": [
+            "pytest"
+          ],
+          "mutation_patterns": [
+            "src/**"
+          ]
+        }
+      ],
       "trust_level": "fixture-backed"
     }
   ]

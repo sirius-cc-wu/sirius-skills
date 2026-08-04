@@ -154,7 +154,12 @@ def test_pilot_routing_cases_pass() -> None:
     assert report.routing_checks >= 40
 
 
-def write_behavior_fixture(root: Path, *, allowed_mutations: list[str]) -> None:
+def write_behavior_fixture(
+    root: Path,
+    *,
+    allowed_mutations: list[str],
+    trace_assertions: list[dict[str, object]] | None = None,
+) -> None:
     write_skill(root, "implementation", "Implement behavior with executable tests.")
     fixture = root / "evals" / "fixtures" / "example"
     (fixture / "src").mkdir(parents=True)
@@ -165,25 +170,26 @@ def write_behavior_fixture(root: Path, *, allowed_mutations: list[str]) -> None:
         "raise SystemExit(Path('src/value.txt').read_text() != 'fixed\\n')\n",
         encoding="utf-8",
     )
+    behavioral_case: dict[str, object] = {
+        "id": "fix-value",
+        "prompt": "Fix the value.",
+        "expected_output": "The verifier passes.",
+        "expectations": ["The broken value is corrected."],
+        "prohibitions": ["Do not change unrelated files."],
+        "fixture": "example",
+        "allowed_mutations": allowed_mutations,
+        "required_mutations": ["src/**"],
+        "checks": [[sys.executable, "tests/verify.py"]],
+    }
+    if trace_assertions is not None:
+        behavioral_case["trace_assertions"] = trace_assertions
     write_case(
         root,
         "implementation",
         {
             "skill_name": "implementation",
             "trigger": {"positive": [], "negative": []},
-            "evals": [
-                {
-                    "id": "fix-value",
-                    "prompt": "Fix the value.",
-                    "expected_output": "The verifier passes.",
-                    "expectations": ["The broken value is corrected."],
-                    "prohibitions": ["Do not change unrelated files."],
-                    "fixture": "example",
-                    "allowed_mutations": allowed_mutations,
-                    "required_mutations": ["src/**"],
-                    "checks": [[sys.executable, "tests/verify.py"]],
-                }
-            ],
+            "evals": [behavioral_case],
         },
     )
 
@@ -200,6 +206,39 @@ def write_fake_executor(tmp_path: Path, mutation: str) -> list[str]:
         encoding="utf-8",
     )
     return [sys.executable, str(executor)]
+
+
+def write_trace_executor(tmp_path: Path, *, include_red: bool) -> list[str]:
+    executor = tmp_path / "trace_executor.py"
+    red_event = (
+        "event('command_execution', command='python3 -m pytest -q', exit_code=1)\n"
+        if include_red
+        else ""
+    )
+    executor.write_text(
+        "import json\n"
+        "from pathlib import Path\n"
+        "def event(item_type, **details):\n"
+        "    print(json.dumps({\n"
+        "        'type': 'item.completed',\n"
+        "        'item': {'type': item_type, **details},\n"
+        "    }))\n"
+        f"{red_event}"
+        "path = Path('src/value.txt')\n"
+        "path.write_text('fixed\\n', encoding='utf-8')\n"
+        "event('file_change', changes=[{'path': str(path.resolve()), 'kind': 'update'}])\n"
+        "event('command_execution', command='python3 -m pytest -q', exit_code=0)\n",
+        encoding="utf-8",
+    )
+    return [sys.executable, str(executor)]
+
+
+def red_green_trace_assertion() -> dict[str, object]:
+    return {
+        "type": "red_green",
+        "command_contains": ["pytest"],
+        "mutation_patterns": ["src/**"],
+    }
 
 
 def test_behavioral_runner_captures_authorized_mutations_and_checks(
@@ -224,6 +263,68 @@ def test_behavioral_runner_captures_authorized_mutations_and_checks(
     )
     assert result.result_path.is_file()
     assert not result.workspace.exists()
+
+
+def test_behavioral_runner_accepts_red_green_trace_around_mutation(
+    tmp_path: Path,
+) -> None:
+    write_behavior_fixture(
+        tmp_path,
+        allowed_mutations=["src/**"],
+        trace_assertions=[red_green_trace_assertion()],
+    )
+
+    result = run_behavioral_case(
+        tmp_path,
+        "implementation",
+        "fix-value",
+        executor_command=write_trace_executor(tmp_path, include_red=True),
+        results_directory=tmp_path / "results",
+    )
+
+    assert result.mechanical_passed is True
+    assert result.trace_assertions[0].passed is True
+    serialized = json.loads(result.result_path.read_text(encoding="utf-8"))
+    assert serialized["trace_assertions"][0]["passed"] is True
+
+
+def test_behavioral_runner_rejects_green_only_trace(tmp_path: Path) -> None:
+    write_behavior_fixture(
+        tmp_path,
+        allowed_mutations=["src/**"],
+        trace_assertions=[red_green_trace_assertion()],
+    )
+
+    result = run_behavioral_case(
+        tmp_path,
+        "implementation",
+        "fix-value",
+        executor_command=write_trace_executor(tmp_path, include_red=False),
+        results_directory=tmp_path / "results",
+    )
+
+    assert result.mechanical_passed is False
+    assert result.trace_assertions[0].error == (
+        "no matching failing command completed before the first mutation"
+    )
+
+
+def test_evaluator_rejects_invalid_trace_assertion(tmp_path: Path) -> None:
+    write_behavior_fixture(
+        tmp_path,
+        allowed_mutations=["src/**"],
+        trace_assertions=[
+            {
+                "type": "green_only",
+                "command_contains": ["pytest"],
+                "mutation_patterns": ["src/**"],
+            }
+        ],
+    )
+
+    report = evaluate_repository(tmp_path)
+
+    assert any("invalid 'trace_assertions'" in error for error in report.errors)
 
 
 def test_behavioral_runner_commits_a_clean_fixture_baseline(tmp_path: Path) -> None:

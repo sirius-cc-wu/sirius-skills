@@ -264,6 +264,22 @@ def _validate_behavioral_cases(
                 f"{filename}: behavioral eval {case_id!r} has invalid "
                 "'file_assertions'"
             )
+        trace_assertions = case.get("trace_assertions", [])
+        if not isinstance(trace_assertions, list) or any(
+            not isinstance(assertion, dict)
+            or assertion.get("type") != "red_green"
+            or not _valid_string_list(
+                assertion.get("command_contains"), allow_empty=False
+            )
+            or not _valid_string_list(
+                assertion.get("mutation_patterns"), allow_empty=False
+            )
+            for assertion in trace_assertions
+        ):
+            report.errors.append(
+                f"{filename}: behavioral eval {case_id!r} has invalid "
+                "'trace_assertions'"
+            )
         trust_level = case.get("trust_level")
         if trust_level not in (None, "provisional", "fixture-backed"):
             report.errors.append(

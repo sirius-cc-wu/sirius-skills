@@ -46,6 +46,15 @@ class FileAssertionResult:
 
 
 @dataclass(frozen=True)
+class TraceAssertionResult:
+    assertion_type: str
+    passed: bool
+    command_contains: tuple[str, ...]
+    mutation_patterns: tuple[str, ...]
+    error: str | None = None
+
+
+@dataclass(frozen=True)
 class BehavioralResult:
     skill_name: str
     case_id: str | int
@@ -56,6 +65,7 @@ class BehavioralResult:
     missing_required_mutations: list[str]
     checks: tuple[CheckResult, ...]
     file_assertions: tuple[FileAssertionResult, ...]
+    trace_assertions: tuple[TraceAssertionResult, ...]
     workspace: Path
     trace_path: Path
     result_path: Path
@@ -196,6 +206,158 @@ def _file_assertion_specs(case: dict[str, object]) -> list[dict[str, object]]:
             )
         specifications.append(specification)
     return specifications
+
+
+def _trace_assertion_specs(case: dict[str, object]) -> list[dict[str, object]]:
+    value = case.get("trace_assertions", [])
+    if not isinstance(value, list):
+        raise ValueError(
+            f"behavioral eval {case.get('id')!r} has invalid trace_assertions"
+        )
+    specifications: list[dict[str, object]] = []
+    for specification in value:
+        if not isinstance(specification, dict):
+            raise ValueError(
+                f"behavioral eval {case.get('id')!r} has an invalid trace assertion"
+            )
+        command_contains = specification.get("command_contains")
+        mutation_patterns = specification.get("mutation_patterns")
+        if (
+            specification.get("type") != "red_green"
+            or not isinstance(command_contains, list)
+            or not command_contains
+            or not all(
+                isinstance(fragment, str) and fragment for fragment in command_contains
+            )
+            or not isinstance(mutation_patterns, list)
+            or not mutation_patterns
+            or not all(
+                isinstance(pattern, str) and pattern for pattern in mutation_patterns
+            )
+        ):
+            raise ValueError(
+                f"behavioral eval {case.get('id')!r} has an invalid trace assertion"
+            )
+        specifications.append(specification)
+    return specifications
+
+
+def _trace_events(trace: str) -> tuple[list[dict[str, object]], str | None]:
+    events: list[dict[str, object]] = []
+    for line_number, line in enumerate(trace.splitlines(), start=1):
+        if not line.strip():
+            continue
+        try:
+            event = json.loads(line)
+        except json.JSONDecodeError as exc:
+            return [], f"invalid JSONL trace at line {line_number}: {exc.msg}"
+        if not isinstance(event, dict):
+            return [], f"invalid JSONL trace object at line {line_number}"
+        events.append(event)
+    return events, None
+
+
+def _relative_trace_path(path: str, workspace: Path) -> str | None:
+    candidate = Path(path)
+    if not candidate.is_absolute():
+        return candidate.as_posix().removeprefix("./")
+    try:
+        return candidate.resolve().relative_to(workspace.resolve()).as_posix()
+    except ValueError:
+        return None
+
+
+def _red_green_trace_assertion(
+    specification: dict[str, object],
+    events: list[dict[str, object]],
+    workspace: Path,
+) -> TraceAssertionResult:
+    command_contains = tuple(
+        str(fragment) for fragment in specification["command_contains"]
+    )
+    mutation_patterns = tuple(
+        str(pattern) for pattern in specification["mutation_patterns"]
+    )
+    command_events: list[tuple[int, int]] = []
+    mutation_indices: list[int] = []
+    for index, event in enumerate(events):
+        if event.get("type") != "item.completed":
+            continue
+        item = event.get("item")
+        if not isinstance(item, dict):
+            continue
+        if item.get("type") == "command_execution":
+            command = item.get("command")
+            exit_code = item.get("exit_code")
+            if (
+                isinstance(command, str)
+                and isinstance(exit_code, int)
+                and all(fragment in command for fragment in command_contains)
+            ):
+                command_events.append((index, exit_code))
+        if item.get("type") != "file_change":
+            continue
+        changes = item.get("changes")
+        if not isinstance(changes, list):
+            continue
+        for change in changes:
+            if not isinstance(change, dict) or not isinstance(change.get("path"), str):
+                continue
+            relative = _relative_trace_path(str(change["path"]), workspace)
+            if relative is not None and any(
+                fnmatch.fnmatchcase(relative, pattern) for pattern in mutation_patterns
+            ):
+                mutation_indices.append(index)
+                break
+
+    error = None
+    if not mutation_indices:
+        error = "no trace file change matched the mutation patterns"
+    elif not any(
+        exit_code != 0 and index < mutation_indices[0]
+        for index, exit_code in command_events
+    ):
+        error = "no matching failing command completed before the first mutation"
+    elif not any(
+        exit_code == 0 and index > mutation_indices[-1]
+        for index, exit_code in command_events
+    ):
+        error = "no matching passing command completed after the last mutation"
+    return TraceAssertionResult(
+        assertion_type="red_green",
+        passed=error is None,
+        command_contains=command_contains,
+        mutation_patterns=mutation_patterns,
+        error=error,
+    )
+
+
+def _evaluate_trace_assertions(
+    case: dict[str, object], trace: str, workspace: Path
+) -> tuple[TraceAssertionResult, ...]:
+    specifications = _trace_assertion_specs(case)
+    if not specifications:
+        return ()
+    events, trace_error = _trace_events(trace)
+    if trace_error is not None:
+        return tuple(
+            TraceAssertionResult(
+                assertion_type=str(specification["type"]),
+                passed=False,
+                command_contains=tuple(
+                    str(item) for item in specification["command_contains"]
+                ),
+                mutation_patterns=tuple(
+                    str(item) for item in specification["mutation_patterns"]
+                ),
+                error=trace_error,
+            )
+            for specification in specifications
+        )
+    return tuple(
+        _red_green_trace_assertion(specification, events, workspace)
+        for specification in specifications
+    )
 
 
 def _plantuml_fenced_content(content: str) -> tuple[str, str | None]:
@@ -393,6 +555,7 @@ def _serialize_result(
     missing_required_mutations: list[str],
     checks: tuple[CheckResult, ...],
     file_assertions: tuple[FileAssertionResult, ...],
+    trace_assertions: tuple[TraceAssertionResult, ...],
     trace_path: Path,
     mechanical_passed: bool,
 ) -> dict[str, object]:
@@ -421,6 +584,7 @@ def _serialize_result(
             for check in checks
         ],
         "file_assertions": [asdict(assertion) for assertion in file_assertions],
+        "trace_assertions": [asdict(assertion) for assertion in trace_assertions],
         "semantic_expectations": {
             "status": "ungraded",
             "expectations": case.get("expectations", []),
@@ -447,6 +611,7 @@ def describe_behavioral_case(
         "required_mutations": _string_list(case, "required_mutations"),
         "checks": [list(command) for command in _check_commands(case)],
         "file_assertions": _file_assertion_specs(case),
+        "trace_assertions": _trace_assertion_specs(case),
         "model": model,
         "semantic_expectations": "ungraded",
     }
@@ -538,12 +703,16 @@ def run_behavioral_case(
             for command_to_run in _check_commands(case)
         )
         file_assertions = _evaluate_file_assertions(case, workspace)
+        trace_assertions = _evaluate_trace_assertions(
+            case, executor_stdout, workspace
+        )
         mechanical_passed = (
             executor_returncode == 0
             and not unauthorized
             and not missing_required
             and all(check.returncode == 0 for check in checks)
             and all(assertion.passed for assertion in file_assertions)
+            and all(assertion.passed for assertion in trace_assertions)
         )
         serialized = _serialize_result(
             root=root,
@@ -560,6 +729,7 @@ def run_behavioral_case(
             missing_required_mutations=missing_required,
             checks=checks,
             file_assertions=file_assertions,
+            trace_assertions=trace_assertions,
             trace_path=trace_path,
             mechanical_passed=mechanical_passed,
         )
@@ -577,6 +747,7 @@ def run_behavioral_case(
             missing_required_mutations=missing_required,
             checks=checks,
             file_assertions=file_assertions,
+            trace_assertions=trace_assertions,
             workspace=workspace,
             trace_path=trace_path,
             result_path=result_path,
