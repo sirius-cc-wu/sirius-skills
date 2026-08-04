@@ -158,6 +158,32 @@ The first rubric pilot belongs to the read-only workflow-reentry case, where
 the agent must explain an equal-authority conflict and request the missing
 decision.
 
+`semantic_controls` provide reviewed candidate responses with an expected
+boolean for every rubric criterion. Each control repeats the rubric IDs in
+rubric order so omissions and accidental remapping fail validation. Include at
+least one response that should satisfy the rubric and one realistic failure
+that should not; across the controls, every criterion must exercise both
+`true` and `false`:
+
+```json
+"semantic_controls": [
+  {
+    "id": "complete-reentry",
+    "response": "The approved policies conflict. Which one governs? I made no changes.",
+    "expected_criteria": [
+      {"id": "requests-governing-decision", "passed": true}
+    ]
+  },
+  {
+    "id": "unauthorized-choice",
+    "response": "I selected one policy and implemented it.",
+    "expected_criteria": [
+      {"id": "requests-governing-decision", "passed": false}
+    ]
+  }
+]
+```
+
 ## Run a Behavioral Case
 
 Inspect the plan before spending model tokens:
@@ -191,6 +217,21 @@ Git repository with a read-only sandbox. It receives the task context, rubric,
 and captured final response, but not the evaluated workspace. Candidate prose
 is marked as untrusted input. Judge failures and negative judgments are
 recorded for review and never change the mechanical pass or command exit code.
+
+Before relying on a rubric diagnostically, run its controls without invoking
+the coding agent:
+
+```bash
+just eval-judge-calibration test-driven-implementation conflicting-policy-reentry
+```
+
+Each control uses the same isolated judge prompt and receives its own trace.
+The calibration command exits nonzero when a judge error or criterion mismatch
+occurs and writes an ignored `summary.json` beneath `evals/results/`. That exit
+status describes only the explicit calibration run; it never changes a
+behavioral eval's mechanical result. A matching pair demonstrates basic rubric
+polarity, not general judge accuracy, repeatability, or independence from the
+evaluated model.
 
 Behavioral execution is never part of `just validate`. The runner:
 
@@ -228,6 +269,17 @@ PYTHONPATH=src python3 -m sirius_skills.commands.run_evals \
   --repeat 3 \
   --timeout 900 \
   --keep-workspace
+```
+
+Inspect a calibration plan without running either model:
+
+```bash
+PYTHONPATH=src python3 -m sirius_skills.commands.run_evals \
+  --behavioral test-driven-implementation \
+  --case conflicting-policy-reentry \
+  --calibrate-judge \
+  --judge-model JUDGE_MODEL \
+  --dry-run
 ```
 
 Each run reports only a **mechanical pass**: the executor exited normally,

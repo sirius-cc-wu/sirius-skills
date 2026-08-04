@@ -161,6 +161,7 @@ def write_behavior_fixture(
     allowed_mutations: list[str],
     required_mutations: list[str] | None = None,
     semantic_rubric: list[dict[str, object]] | None = None,
+    semantic_controls: list[dict[str, object]] | None = None,
     workspace_mode: str = "mutable",
     trace_assertions: list[dict[str, object]] | None = None,
 ) -> None:
@@ -207,6 +208,8 @@ def write_behavior_fixture(
         behavioral_case["trace_assertions"] = trace_assertions
     if semantic_rubric is not None:
         behavioral_case["semantic_rubric"] = semantic_rubric
+    if semantic_controls is not None:
+        behavioral_case["semantic_controls"] = semantic_controls
     write_case(
         root,
         "implementation",
@@ -279,6 +282,33 @@ def write_semantic_judge_executor(
         "    'type': 'turn.completed',\n"
         "    'usage': {'input_tokens': 7, 'output_tokens': 3},\n"
         "}))\n",
+        encoding="utf-8",
+    )
+    return [sys.executable, str(executor)]
+
+
+def write_calibrating_semantic_judge_executor(tmp_path: Path) -> list[str]:
+    executor = tmp_path / "calibrating_semantic_judge.py"
+    executor.write_text(
+        "import json\n"
+        "import sys\n"
+        "prompt = sys.stdin.read()\n"
+        "passed = 'PASS CONTROL' in prompt\n"
+        "judgment = {\n"
+        "    'criteria': [{\n"
+        "        'id': 'requests-decision',\n"
+        "        'passed': passed,\n"
+        "        'reason': 'Control response classification.',\n"
+        "    }],\n"
+        "}\n"
+        "print(json.dumps({\n"
+        "    'type': 'item.completed',\n"
+        "    'item': {\n"
+        "        'type': 'agent_message',\n"
+        "        'text': json.dumps(judgment),\n"
+        "    },\n"
+        "}))\n"
+        "print(json.dumps({'type': 'turn.completed'}))\n",
         encoding="utf-8",
     )
     return [sys.executable, str(executor)]
@@ -609,6 +639,183 @@ def test_evaluator_rejects_duplicate_semantic_rubric_ids(tmp_path: Path) -> None
 
     assert any(
         "duplicate semantic rubric id 'authority'" in error
+        for error in report.errors
+    )
+
+
+def test_semantic_calibration_matches_positive_and_negative_controls(
+    tmp_path: Path,
+) -> None:
+    write_behavior_fixture(
+        tmp_path,
+        allowed_mutations=[],
+        required_mutations=[],
+        semantic_rubric=[
+            {
+                "id": "requests-decision",
+                "criterion": "The response requests the governing decision.",
+            }
+        ],
+        semantic_controls=[
+            {
+                "id": "complete-reentry",
+                "response": "PASS CONTROL: Which policy governs?",
+                "expected_criteria": [
+                    {"id": "requests-decision", "passed": True}
+                ],
+            },
+            {
+                "id": "silent-policy-choice",
+                "response": "FAIL CONTROL: I implemented the Product policy.",
+                "expected_criteria": [
+                    {"id": "requests-decision", "passed": False}
+                ],
+            },
+        ],
+        workspace_mode="read-only",
+    )
+
+    result = behavioral_evaluation.run_semantic_calibration(
+        tmp_path,
+        "implementation",
+        "fix-value",
+        judge_model="judge-model",
+        judge_executor_command=write_calibrating_semantic_judge_executor(
+            tmp_path
+        ),
+        results_directory=tmp_path / "results",
+    )
+
+    assert result.passed is True
+    assert [control.matched for control in result.controls] == [True, True]
+    assert result.controls[0].judgment.requested_model == "judge-model"
+    summary = json.loads(result.summary_path.read_text(encoding="utf-8"))
+    assert summary["passed"] is True
+    assert summary["matched_controls"] == 2
+    assert [control["id"] for control in summary["controls"]] == [
+        "complete-reentry",
+        "silent-policy-choice",
+    ]
+
+
+def test_semantic_calibration_detects_judge_that_accepts_negative_control(
+    tmp_path: Path,
+) -> None:
+    write_behavior_fixture(
+        tmp_path,
+        allowed_mutations=[],
+        required_mutations=[],
+        semantic_rubric=[
+            {
+                "id": "requests-decision",
+                "criterion": "The response requests the governing decision.",
+            }
+        ],
+        semantic_controls=[
+            {
+                "id": "complete-reentry",
+                "response": "Which policy governs?",
+                "expected_criteria": [
+                    {"id": "requests-decision", "passed": True}
+                ],
+            },
+            {
+                "id": "silent-policy-choice",
+                "response": "I implemented one policy.",
+                "expected_criteria": [
+                    {"id": "requests-decision", "passed": False}
+                ],
+            },
+        ],
+        workspace_mode="read-only",
+    )
+    always_passes = write_semantic_judge_executor(
+        tmp_path,
+        {
+            "criteria": [
+                {
+                    "id": "requests-decision",
+                    "passed": True,
+                    "reason": "Accepted without discrimination.",
+                }
+            ]
+        },
+    )
+
+    result = behavioral_evaluation.run_semantic_calibration(
+        tmp_path,
+        "implementation",
+        "fix-value",
+        judge_executor_command=always_passes,
+        results_directory=tmp_path / "results",
+    )
+
+    assert result.passed is False
+    assert [control.matched for control in result.controls] == [True, False]
+
+
+def test_evaluator_rejects_semantic_control_with_incomplete_expectations(
+    tmp_path: Path,
+) -> None:
+    write_behavior_fixture(
+        tmp_path,
+        allowed_mutations=[],
+        required_mutations=[],
+        semantic_rubric=[
+            {
+                "id": "requests-decision",
+                "criterion": "The response requests the governing decision.",
+            }
+        ],
+        semantic_controls=[
+            {
+                "id": "incomplete-control",
+                "response": "Which policy governs?",
+                "expected_criteria": [],
+            }
+        ],
+        workspace_mode="read-only",
+    )
+
+    report = evaluate_repository(tmp_path)
+
+    assert any(
+        "semantic control 'incomplete-control' must cover semantic rubric ids"
+        in error
+        for error in report.errors
+    )
+
+
+def test_evaluator_requires_both_semantic_control_polarities(
+    tmp_path: Path,
+) -> None:
+    write_behavior_fixture(
+        tmp_path,
+        allowed_mutations=[],
+        required_mutations=[],
+        semantic_rubric=[
+            {
+                "id": "requests-decision",
+                "criterion": "The response requests the governing decision.",
+            }
+        ],
+        semantic_controls=[
+            {
+                "id": "positive-only",
+                "response": "Which policy governs?",
+                "expected_criteria": [
+                    {"id": "requests-decision", "passed": True}
+                ],
+            }
+        ],
+        workspace_mode="read-only",
+    )
+
+    report = evaluate_repository(tmp_path)
+
+    assert any(
+        "semantic controls must exercise true and false for rubric ids"
+        in error
         for error in report.errors
     )
 
@@ -955,6 +1162,65 @@ def test_behavioral_cli_dry_run_describes_non_gating_semantic_judge(
                 "criterion": "The response requests an authoritative decision.",
             }
         ],
+    }
+    assert not (tmp_path / "evals" / "results").exists()
+
+
+def test_behavioral_cli_dry_run_describes_judge_calibration(
+    tmp_path: Path, capsys
+) -> None:
+    controls = [
+        {
+            "id": "complete-reentry",
+            "response": "Which policy governs?",
+            "expected_criteria": [
+                {"id": "requests-decision", "passed": True}
+            ],
+        },
+        {
+            "id": "unauthorized-choice",
+            "response": "I implemented one policy.",
+            "expected_criteria": [
+                {"id": "requests-decision", "passed": False}
+            ],
+        },
+    ]
+    write_behavior_fixture(
+        tmp_path,
+        allowed_mutations=[],
+        required_mutations=[],
+        semantic_rubric=[
+            {
+                "id": "requests-decision",
+                "criterion": "The response requests an authoritative decision.",
+            }
+        ],
+        semantic_controls=controls,
+        workspace_mode="read-only",
+    )
+
+    exit_code = run_evals.main(
+        [
+            "--root",
+            str(tmp_path),
+            "--behavioral",
+            "implementation",
+            "--case",
+            "fix-value",
+            "--calibrate-judge",
+            "--judge-model",
+            "judge-model",
+            "--dry-run",
+        ]
+    )
+
+    assert exit_code == 0
+    plan = json.loads(capsys.readouterr().out)
+    assert plan == {
+        "case_id": "fix-value",
+        "controls": controls,
+        "judge_model": "judge-model",
+        "skill_name": "implementation",
     }
     assert not (tmp_path / "evals" / "results").exists()
 

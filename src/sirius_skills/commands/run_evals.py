@@ -8,8 +8,11 @@ from typing import Sequence
 
 from sirius_skills.behavioral_evaluation import (
     BehavioralResult,
+    SemanticCalibrationResult,
     describe_behavioral_case,
+    describe_semantic_calibration,
     run_behavioral_repetitions,
+    run_semantic_calibration,
 )
 from sirius_skills.evaluation import evaluate_repository
 from sirius_skills.paths import package_root
@@ -66,9 +69,22 @@ def _print_behavioral_result(
         print(f"Workspace: {result.workspace}")
 
 
+def _print_semantic_calibration(result: SemanticCalibrationResult) -> None:
+    print(
+        f"Semantic judge calibration {result.skill_name}/{result.case_id}: "
+        f"{'PASS' if result.passed else 'FAIL'}"
+    )
+    for control in result.controls:
+        status = "MATCH" if control.matched else "MISMATCH"
+        print(f"Control {control.control_id!r}: {status}")
+        if control.judgment.error:
+            print(f"  Judge error: {control.judgment.error}")
+    print(f"Summary: {result.summary_path}")
+
+
 def main(argv: Sequence[str] | None = None) -> int:
     parser = argparse.ArgumentParser(
-        description="Run deterministic Sirius skill routing evaluations."
+        description="Run Sirius routing and opt-in behavioral evaluations."
     )
     parser.add_argument(
         "--root",
@@ -99,7 +115,12 @@ def main(argv: Sequence[str] | None = None) -> int:
     )
     parser.add_argument(
         "--judge-model",
-        help="Optional model override for --judge; defaults to --model.",
+        help="Optional judge or calibration model; defaults to --model.",
+    )
+    parser.add_argument(
+        "--calibrate-judge",
+        action="store_true",
+        help="Run declared semantic controls without running the coding agent.",
     )
     parser.add_argument(
         "--keep-workspace",
@@ -124,13 +145,39 @@ def main(argv: Sequence[str] | None = None) -> int:
     if args.behavioral:
         if not args.case_id:
             parser.error("--case is required with --behavioral")
-        if args.judge_model and not args.judge:
-            parser.error("--judge-model requires --judge")
+        if args.judge and args.calibrate_judge:
+            parser.error("--judge and --calibrate-judge cannot be combined")
+        if args.judge_model and not (args.judge or args.calibrate_judge):
+            parser.error("--judge-model requires --judge or --calibrate-judge")
+        if args.calibrate_judge and args.keep_workspace:
+            parser.error("--keep-workspace does not apply to --calibrate-judge")
+        if args.calibrate_judge and args.repeat != 1:
+            parser.error("--repeat does not apply to --calibrate-judge")
         if args.timeout < 1:
             parser.error("--timeout must be positive")
         if args.repeat < 1:
             parser.error("--repeat must be positive")
         try:
+            if args.calibrate_judge:
+                judge_model = args.judge_model or args.model
+                if args.dry_run:
+                    plan = describe_semantic_calibration(
+                        root,
+                        args.behavioral,
+                        args.case_id,
+                        judge_model=judge_model,
+                    )
+                    print(json.dumps(plan, indent=2, sort_keys=True))
+                    return 0
+                calibration = run_semantic_calibration(
+                    root,
+                    args.behavioral,
+                    args.case_id,
+                    judge_model=judge_model,
+                    timeout_seconds=args.timeout,
+                )
+                _print_semantic_calibration(calibration)
+                return 0 if calibration.passed else 1
             if args.dry_run:
                 plan = describe_behavioral_case(
                     root,
@@ -195,6 +242,7 @@ def main(argv: Sequence[str] | None = None) -> int:
         or args.model
         or args.judge
         or args.judge_model
+        or args.calibrate_judge
         or args.keep_workspace
         or args.repeat != 1
     ):

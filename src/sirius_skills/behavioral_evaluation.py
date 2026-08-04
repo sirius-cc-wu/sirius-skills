@@ -95,6 +95,31 @@ class SemanticJudgment:
 
 
 @dataclass(frozen=True)
+class SemanticExpectedCriterion:
+    criterion_id: str | int
+    passed: bool
+
+
+@dataclass(frozen=True)
+class SemanticControlResult:
+    control_id: str | int
+    response: str
+    expected_criteria: tuple[SemanticExpectedCriterion, ...]
+    judgment: SemanticJudgment
+    matched: bool
+
+
+@dataclass(frozen=True)
+class SemanticCalibrationResult:
+    skill_name: str
+    case_id: str | int
+    judge_model: str | None
+    controls: tuple[SemanticControlResult, ...]
+    passed: bool
+    summary_path: Path
+
+
+@dataclass(frozen=True)
 class BehavioralResult:
     skill_name: str
     case_id: str | int
@@ -273,6 +298,83 @@ def _semantic_rubric(case: dict[str, object]) -> list[dict[str, object]]:
         seen_ids.add(criterion_id)
         rubric.append(criterion)
     return rubric
+
+
+def _semantic_controls(case: dict[str, object]) -> list[dict[str, object]]:
+    value = case.get("semantic_controls", [])
+    if not isinstance(value, list):
+        raise ValueError(
+            f"behavioral eval {case.get('id')!r} has invalid semantic_controls"
+        )
+    rubric_ids = [criterion["id"] for criterion in _semantic_rubric(case)]
+    if value and not rubric_ids:
+        raise ValueError(
+            f"behavioral eval {case.get('id')!r} has semantic controls without "
+            "a semantic rubric"
+        )
+    controls: list[dict[str, object]] = []
+    seen_control_ids: set[str | int] = set()
+    polarities = {criterion_id: set() for criterion_id in rubric_ids}
+    for control in value:
+        if not isinstance(control, dict):
+            raise ValueError(
+                f"behavioral eval {case.get('id')!r} has invalid semantic control"
+            )
+        control_id = control.get("id")
+        response = control.get("response")
+        expected = control.get("expected_criteria")
+        valid_control_id = (
+            isinstance(control_id, str) and bool(control_id.strip())
+        ) or (
+            isinstance(control_id, int) and not isinstance(control_id, bool)
+        )
+        if (
+            not valid_control_id
+            or control_id in seen_control_ids
+            or not isinstance(response, str)
+            or not response.strip()
+            or not isinstance(expected, list)
+        ):
+            raise ValueError(
+                f"behavioral eval {case.get('id')!r} has invalid semantic control"
+            )
+        expected_ids: list[str | int] = []
+        for criterion in expected:
+            if not isinstance(criterion, dict):
+                raise ValueError(
+                    f"semantic control {control_id!r} has invalid expectations"
+                )
+            criterion_id = criterion.get("id")
+            passed = criterion.get("passed")
+            if (
+                criterion_id not in rubric_ids
+                or criterion_id in expected_ids
+                or not isinstance(passed, bool)
+            ):
+                raise ValueError(
+                    f"semantic control {control_id!r} has invalid expectations"
+                )
+            expected_ids.append(criterion_id)
+        if expected_ids != rubric_ids:
+            raise ValueError(
+                f"semantic control {control_id!r} must cover semantic rubric ids "
+                "in rubric order"
+            )
+        for criterion in expected:
+            polarities[criterion["id"]].add(criterion["passed"])
+        seen_control_ids.add(control_id)
+        controls.append(control)
+    missing_polarities = [
+        criterion_id
+        for criterion_id, values in polarities.items()
+        if values != {False, True}
+    ]
+    if controls and missing_polarities:
+        raise ValueError(
+            "semantic controls must exercise true and false for rubric ids "
+            f"{missing_polarities!r}"
+        )
+    return controls
 
 
 def _check_commands(case: dict[str, object]) -> list[tuple[str, ...]]:
@@ -1004,6 +1106,120 @@ def _serialize_semantic_judgment(
             judgment.trace_path.name if judgment.trace_path is not None else None
         ),
     }
+
+
+def describe_semantic_calibration(
+    root: Path,
+    skill_name: str,
+    case_id: str | int,
+    *,
+    judge_model: str | None = None,
+) -> dict[str, object]:
+    case = _load_behavioral_case(root, skill_name, case_id)
+    controls = _semantic_controls(case)
+    if not controls:
+        raise ValueError(f"behavioral eval {case_id!r} has no semantic controls")
+    return {
+        "skill_name": skill_name,
+        "case_id": case["id"],
+        "judge_model": judge_model,
+        "controls": controls,
+    }
+
+
+def run_semantic_calibration(
+    root: Path,
+    skill_name: str,
+    case_id: str | int,
+    *,
+    judge_model: str | None = None,
+    timeout_seconds: int = 900,
+    judge_executor_command: Sequence[str] | None = None,
+    results_directory: Path | None = None,
+) -> SemanticCalibrationResult:
+    case = _load_behavioral_case(root, skill_name, case_id)
+    controls = _semantic_controls(case)
+    if not controls:
+        raise ValueError(f"behavioral eval {case_id!r} has no semantic controls")
+    result_directory = results_directory or root / "evals" / "results"
+    result_directory.mkdir(parents=True, exist_ok=True)
+    calibration_id = _new_result_id("calibration")
+    calibration_directory = _resolve_child(result_directory, calibration_id)
+    calibration_directory.mkdir(parents=True, exist_ok=False)
+    started_at = datetime.now(timezone.utc)
+    control_results: list[SemanticControlResult] = []
+    for index, control in enumerate(controls, start=1):
+        expected = tuple(
+            SemanticExpectedCriterion(
+                criterion_id=criterion["id"],
+                passed=bool(criterion["passed"]),
+            )
+            for criterion in control["expected_criteria"]
+        )
+        judgment = _run_semantic_judge(
+            case,
+            str(control["response"]),
+            enabled=True,
+            requested_model=judge_model,
+            timeout_seconds=timeout_seconds,
+            trace_path=calibration_directory / f"control-{index:03d}-trace.jsonl",
+            executor_command=judge_executor_command,
+        )
+        actual = {
+            criterion.criterion_id: criterion.passed
+            for criterion in judgment.criteria
+        }
+        matched = judgment.status == "completed" and all(
+            actual.get(criterion.criterion_id) == criterion.passed
+            for criterion in expected
+        )
+        control_results.append(
+            SemanticControlResult(
+                control_id=control["id"],
+                response=str(control["response"]),
+                expected_criteria=expected,
+                judgment=judgment,
+                matched=matched,
+            )
+        )
+    passed = all(control.matched for control in control_results)
+    summary_path = calibration_directory / "summary.json"
+    summary = {
+        "schema_version": 1,
+        "calibration_id": calibration_id,
+        "skill_name": skill_name,
+        "case_id": case["id"],
+        "judge_model": judge_model,
+        "started_at": started_at.isoformat(),
+        "completed_at": datetime.now(timezone.utc).isoformat(),
+        "behavioral_gate": False,
+        "passed": passed,
+        "matched_controls": sum(control.matched for control in control_results),
+        "control_count": len(control_results),
+        "controls": [
+            {
+                "id": control.control_id,
+                "response": control.response,
+                "expected_criteria": [
+                    asdict(criterion) for criterion in control.expected_criteria
+                ],
+                "matched": control.matched,
+                "judgment": _serialize_semantic_judgment(control.judgment),
+            }
+            for control in control_results
+        ],
+    }
+    summary_path.write_text(
+        json.dumps(summary, indent=2, sort_keys=True) + "\n", encoding="utf-8"
+    )
+    return SemanticCalibrationResult(
+        skill_name=skill_name,
+        case_id=case["id"],
+        judge_model=judge_model,
+        controls=tuple(control_results),
+        passed=passed,
+        summary_path=summary_path,
+    )
 
 
 def _serialize_result(

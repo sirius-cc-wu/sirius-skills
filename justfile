@@ -75,3 +75,7 @@ eval-behavior skill case repeat="1":
 # Add an opt-in, non-gating semantic judge to a behavioral case.
 eval-behavior-judged skill case repeat="1":
 	env PYTHONPATH="{{repo_root}}/src" python3 -m sirius_skills.commands.run_evals --root "{{repo_root}}" --behavioral {{quote(skill)}} --case {{quote(case)}} --repeat {{quote(repeat)}} --judge
+
+# Check a judge against the case's declared positive and negative controls.
+eval-judge-calibration skill case:
+	env PYTHONPATH="{{repo_root}}/src" python3 -m sirius_skills.commands.run_evals --root "{{repo_root}}" --behavioral {{quote(skill)}} --case {{quote(case)}} --calibrate-judge

@@ -304,13 +304,14 @@ def _validate_behavioral_cases(
                 "'trace_assertions'"
             )
         semantic_rubric = case.get("semantic_rubric", [])
+        rubric_ids: set[str | int] = set()
+        ordered_rubric_ids: list[str | int] = []
         if not isinstance(semantic_rubric, list):
             report.errors.append(
                 f"{filename}: behavioral eval {case_id!r} has invalid "
                 "'semantic_rubric'"
             )
         else:
-            rubric_ids: set[str | int] = set()
             for criterion in semantic_rubric:
                 criterion_id = (
                     criterion.get("id") if isinstance(criterion, dict) else None
@@ -342,6 +343,105 @@ def _validate_behavioral_cases(
                         f"semantic rubric id {criterion_id!r}"
                     )
                 rubric_ids.add(criterion_id)
+                ordered_rubric_ids.append(criterion_id)
+        semantic_controls = case.get("semantic_controls", [])
+        if not isinstance(semantic_controls, list):
+            report.errors.append(
+                f"{filename}: behavioral eval {case_id!r} has invalid "
+                "'semantic_controls'"
+            )
+        else:
+            control_ids: set[str | int] = set()
+            polarities = {
+                criterion_id: set() for criterion_id in ordered_rubric_ids
+            }
+            controls_valid = True
+            if semantic_controls and not ordered_rubric_ids:
+                controls_valid = False
+                report.errors.append(
+                    f"{filename}: behavioral eval {case_id!r} has semantic "
+                    "controls without a semantic rubric"
+                )
+            for control in semantic_controls:
+                control_id = (
+                    control.get("id") if isinstance(control, dict) else None
+                )
+                response = (
+                    control.get("response")
+                    if isinstance(control, dict)
+                    else None
+                )
+                expected = (
+                    control.get("expected_criteria")
+                    if isinstance(control, dict)
+                    else None
+                )
+                valid_control_id = (
+                    isinstance(control_id, str) and bool(control_id.strip())
+                ) or (
+                    isinstance(control_id, int)
+                    and not isinstance(control_id, bool)
+                )
+                if (
+                    not valid_control_id
+                    or control_id in control_ids
+                    or not isinstance(response, str)
+                    or not response.strip()
+                    or not isinstance(expected, list)
+                ):
+                    controls_valid = False
+                    report.errors.append(
+                        f"{filename}: behavioral eval {case_id!r} has invalid "
+                        "semantic control"
+                    )
+                    continue
+                control_ids.add(control_id)
+                expected_ids: list[str | int] = []
+                valid_expectations = True
+                for criterion in expected:
+                    expected_id = (
+                        criterion.get("id")
+                        if isinstance(criterion, dict)
+                        else None
+                    )
+                    passed = (
+                        criterion.get("passed")
+                        if isinstance(criterion, dict)
+                        else None
+                    )
+                    if (
+                        expected_id not in rubric_ids
+                        or expected_id in expected_ids
+                        or not isinstance(passed, bool)
+                    ):
+                        valid_expectations = False
+                        break
+                    expected_ids.append(expected_id)
+                if not valid_expectations:
+                    controls_valid = False
+                    report.errors.append(
+                        f"{filename}: semantic control {control_id!r} has "
+                        "invalid expectations"
+                    )
+                elif expected_ids != ordered_rubric_ids:
+                    controls_valid = False
+                    report.errors.append(
+                        f"{filename}: semantic control {control_id!r} must cover "
+                        "semantic rubric ids in rubric order"
+                    )
+                else:
+                    for criterion in expected:
+                        polarities[criterion["id"]].add(criterion["passed"])
+            missing_polarities = [
+                criterion_id
+                for criterion_id, values in polarities.items()
+                if values != {False, True}
+            ]
+            if semantic_controls and controls_valid and missing_polarities:
+                report.errors.append(
+                    f"{filename}: semantic controls must exercise true and "
+                    f"false for rubric ids {missing_polarities!r}"
+                )
         trust_level = case.get("trust_level")
         if trust_level not in (None, "provisional", "fixture-backed"):
             report.errors.append(
