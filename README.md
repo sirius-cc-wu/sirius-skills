@@ -54,7 +54,7 @@ and boundary. Common compositions are documented as workflow tracks:
 - [Client to Code](catalog/tracks/client-to-code.md), whose upstream discovery
   skills remain proposed
 
-The [Skill Relationships](catalog/skill-relationships.md) diagram summarizes
+The [Skill Relationships](catalog/skill-relationships.md) views summarize
 normal handoffs and optional feedback paths. Select the smallest set of skills
 that addresses the current risk or outcome.
 
