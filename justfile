@@ -57,5 +57,9 @@ uninstall skill_set="workflow":
 uninstall-packaged skill_set="workflow": (uninstall skill_set)
 
 # Validate all skills, profiles, catalogs, and collection-specific contracts.
-validate:
+validate: eval-routing
 	./scripts/validate_skills.sh
+
+# Run free, deterministic skill-description routing checks.
+eval-routing:
+	env PYTHONPATH="{{repo_root}}/src" python3 -m sirius_skills.commands.run_evals --root "{{repo_root}}"

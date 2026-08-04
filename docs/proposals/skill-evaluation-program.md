@@ -2,11 +2,16 @@
 type: "Capability Proposal"
 title: "Skill Evaluation Program"
 description: "Proposes staged routing, behavioral, and composition evals for Sirius skills."
-status: "proposed"
+status: "in-progress"
 tags: [evaluation, skills, quality]
 ---
 
 # Skill Evaluation Program
+
+Implementation is proceeding in risk-sized stages. The deterministic routing
+case format, runner, and six-skill pilot are owned by
+[`evals/`](../../evals/README.md); behavioral execution and composition remain
+planned until their respective stages are implemented and verified.
 
 ## At a Glance
 

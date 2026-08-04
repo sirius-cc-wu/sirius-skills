@@ -96,12 +96,23 @@ provenance.
 ## Validation
 
 Validate skill structure, profile membership, shared references, catalogs, and
-collection-specific contracts:
+collection-specific contracts. This also runs the free deterministic routing
+evals:
 
 ```bash
 just validate
 pytest -q
 ```
+
+Run only the routing evals while authoring skill descriptions or eval cases:
+
+```bash
+just eval-routing
+```
+
+See [Skill Evals](evals/README.md) for the case format, current pilot coverage,
+and the boundary between deterministic routing checks and model-executed
+behavioral evals.
 
 ## Repository layout
 
@@ -112,6 +123,7 @@ pytest -q
   related skill repositories and their documented workflow handoffs
 - `catalog/tracks/*.md`: optional workflow compositions
 - `catalog/sources.md`: intellectual and repository provenance
+- `evals/`: deterministic routing cases and opt-in behavioral evaluation data
 - `docs/shared/`: canonical references copied into self-contained skills
 - `docs/proposals/`: proposed, non-deployable capabilities
 - `scripts/validate_skills.sh`: catalog and collection validation

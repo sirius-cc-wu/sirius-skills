@@ -1,0 +1,49 @@
+{
+  "skill_name": "test-driven-implementation",
+  "trigger": {
+    "positive": [
+      {
+        "prompt": "Reproduce this invoice bug with a failing test, make the smallest fix, and run the regression suite",
+        "top_k": 3
+      },
+      {
+        "prompt": "Implement this behavior from an approved example using a test-first feedback loop",
+        "top_k": 3
+      },
+      {
+        "prompt": "Add executable checks for this invariant and then implement the bounded behavior",
+        "top_k": 3
+      }
+    ],
+    "negative": [
+      {
+        "prompt": "Refactor this duplicated code without changing its observable behavior",
+        "owner": "behavior-preserving-refactoring"
+      },
+      {
+        "prompt": "The requirements are unclear; identify actors, goals, and use-case scenarios before coding",
+        "owner": "use-case-modeling"
+      }
+    ]
+  },
+  "evals": [
+    {
+      "id": "bug-fix-discrimination",
+      "prompt": "Fix the reported invoice rounding defect.",
+      "expected_output": "The defect is reproduced, minimally fixed, and regression-tested.",
+      "expectations": [
+        "A check discriminates the defect before the production fix",
+        "Focused and regression checks pass after the fix"
+      ],
+      "prohibitions": [
+        "Do not weaken an existing valid expectation",
+        "Do not create a separate design document"
+      ],
+      "allowed_mutations": [
+        "src/**",
+        "tests/**"
+      ],
+      "trust_level": "provisional"
+    }
+  ]
+}

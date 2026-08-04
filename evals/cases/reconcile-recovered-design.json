@@ -1,0 +1,44 @@
+{
+  "skill_name": "reconcile-recovered-design",
+  "trigger": {
+    "positive": [
+      {
+        "prompt": "Compare code, tests, runtime observations, documentation, decisions, and history for design drift",
+        "top_k": 3
+      },
+      {
+        "prompt": "Reconcile the as-built architecture with the documented design and classify disagreements",
+        "top_k": 3
+      },
+      {
+        "prompt": "Decide which authoritative artifact should change when recovered evidence conflicts with intent",
+        "top_k": 3
+      }
+    ],
+    "negative": [
+      {
+        "prompt": "Recover the current API behavior from tests and runtime observations",
+        "owner": "recover-system-behavior"
+      },
+      {
+        "prompt": "Reconstruct modules, dependencies, runtime collaborations, and deployment from this codebase",
+        "owner": "reconstruct-software-architecture"
+      }
+    ]
+  },
+  "evals": [
+    {
+      "id": "unknown-intent-reconciliation",
+      "prompt": "The implementation, tests, and architecture document disagree, and intended behavior is unknown. Reconcile them.",
+      "expected_output": "A classified discrepancy with evidence, authority limits, and the smallest authoritative next action.",
+      "expectations": [
+        "The result distinguishes current evidence from intended design authority",
+        "Unknown intent remains explicit and is routed to an authoritative decision"
+      ],
+      "prohibitions": [
+        "Do not silently rewrite code, tests, or documentation to force agreement"
+      ],
+      "trust_level": "provisional"
+    }
+  ]
+}

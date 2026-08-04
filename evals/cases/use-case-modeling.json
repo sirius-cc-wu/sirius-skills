@@ -1,0 +1,44 @@
+{
+  "skill_name": "use-case-modeling",
+  "trigger": {
+    "positive": [
+      {
+        "prompt": "Identify the actors, their goals, and the main and alternate use-case scenarios",
+        "top_k": 3
+      },
+      {
+        "prompt": "Describe this feature as black-box system behavior from the user's perspective",
+        "top_k": 3
+      },
+      {
+        "prompt": "Model the user goal and extension flows without designing internal classes",
+        "top_k": 3
+      }
+    ],
+    "negative": [
+      {
+        "prompt": "Build a conceptual domain model of business concepts, associations, and attributes",
+        "owner": "domain-modeling"
+      },
+      {
+        "prompt": "Design the internal object messages and collaborations for this scenario",
+        "owner": "use-case-realization"
+      }
+    ]
+  },
+  "evals": [
+    {
+      "id": "black-box-goal-scenario",
+      "prompt": "Model how a customer renews a subscription, including payment failure.",
+      "expected_output": "A black-box use case with an actor goal, success scenario, and meaningful extensions.",
+      "expectations": [
+        "The result keeps the system boundary black-box",
+        "The main success and payment-failure scenarios remain tied to the actor's goal"
+      ],
+      "prohibitions": [
+        "Do not invent controllers, repositories, databases, or internal object messages"
+      ],
+      "trust_level": "provisional"
+    }
+  ]
+}

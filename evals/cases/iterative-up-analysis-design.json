@@ -1,0 +1,45 @@
+{
+  "skill_name": "iterative-up-analysis-design",
+  "trigger": {
+    "positive": [
+      {
+        "prompt": "Plan risk-driven iterations across inception, elaboration, construction, and durable design artifacts",
+        "top_k": 3
+      },
+      {
+        "prompt": "Plan requirements-to-design work across iterations, risks, durable artifacts, and incremental refinement",
+        "top_k": 3
+      },
+      {
+        "prompt": "Create an iteration plan around architectural risks and incremental refinement",
+        "top_k": 3
+      }
+    ],
+    "negative": [
+      {
+        "prompt": "Fix this invoice rounding defect with a discriminating regression test",
+        "owner": "test-driven-implementation"
+      },
+      {
+        "prompt": "Recover the commands, APIs, failures, and externally observable behavior of this existing service",
+        "owner": "recover-system-behavior"
+      }
+    ]
+  },
+  "evals": [
+    {
+      "id": "minimal-artifact-iteration",
+      "prompt": "Plan the next risk-sized iteration for this feature without creating unnecessary documents.",
+      "expected_output": "A bounded iteration objective with only justified durable artifacts and executable next steps.",
+      "expectations": [
+        "The plan selects the smallest artifact set that addresses the current risk",
+        "The plan includes concrete exit criteria and an implementation handoff"
+      ],
+      "prohibitions": [
+        "Do not require the full analysis and design lifecycle",
+        "Do not create a standalone document without a durable owner and lifecycle"
+      ],
+      "trust_level": "provisional"
+    }
+  ]
+}

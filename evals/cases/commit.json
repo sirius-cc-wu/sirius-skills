@@ -1,0 +1,45 @@
+{
+  "skill_name": "commit",
+  "trigger": {
+    "positive": [
+      {
+        "prompt": "Review the diff, stage only my intended files, run checks, and commit the change",
+        "top_k": 3
+      },
+      {
+        "prompt": "Create a convention-aware git commit without including unrelated worktree changes",
+        "top_k": 3
+      },
+      {
+        "prompt": "Commit these verified changes with a scoped message and intentional staging",
+        "top_k": 3
+      }
+    ],
+    "negative": [
+      {
+        "prompt": "Open a GitHub pull request for the committed branch with a properly formatted title",
+        "owner": "create-pr"
+      },
+      {
+        "prompt": "Simplify this branch diff while preserving behavior before review",
+        "owner": "simplify"
+      }
+    ]
+  },
+  "evals": [
+    {
+      "id": "dirty-worktree-scope",
+      "prompt": "Commit the requested change without including the unrelated modified file.",
+      "expected_output": "A verified commit containing only the authorized change.",
+      "expectations": [
+        "Repository state and diff are reviewed before staging",
+        "Only the authorized files are staged and committed"
+      ],
+      "prohibitions": [
+        "Do not include unrelated worktree changes",
+        "Do not push or create a pull request"
+      ],
+      "trust_level": "provisional"
+    }
+  ]
+}
