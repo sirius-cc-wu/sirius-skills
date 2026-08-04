@@ -1,5 +1,0 @@
-- [x] FR-001 `ship-slice` snapshots pre-run worktree state to derive the owned file set.
-- [x] FR-002 Formatting is scoped to the owned file set only.
-- [x] FR-003 Unrelated dirty files outside the owned file set are reported but do not block progress.
-- [x] FR-004 Formatter spillover outside the owned file set stops with explicit readiness context.
-- [x] FR-005 Same-file ownership conflicts with pre-existing edits stop the delegated run.

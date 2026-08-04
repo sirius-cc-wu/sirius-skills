@@ -1,44 +1,75 @@
 # Skills Methodology
 
-The managed collection contains four independent repository workflow skills.
-Use only the skills that match the work at hand; they are not a mandatory
-lifecycle or a spec-driven development process.
+The catalog contains independent skills grouped into installation profiles and
+optional workflow tracks. Choose the smallest skill or combination that
+addresses the current outcome and risk; installing a profile does not require
+following every step in it.
 
-## Typical change flow
+## Select a profile
 
-1. Implement and verify the requested change using the repository's own
-   guidance and tooling.
+| Need | Profile |
+|---|---|
+| Refine, record, and publish repository changes | `workflow` |
+| Discover requirements and move through analysis, object design, implementation, and refactoring | `iterative-design` |
+| Recover current behavior and architecture from an existing system | `reverse-engineering` |
+| Make the entire catalog available | `all` |
+
+`applying-uml-and-patterns` remains a compatibility alias for
+`iterative-design`.
+
+## Common compositions
+
+### Deliver an existing change
+
+1. Implement and verify the requested outcome.
 2. Use `simplify` for a focused cleanup pass over the branch or pull-request
-   diff. Preserve behavior and keep unrelated files out of scope.
-3. Use `commit` when the change is ready to record. Review the diff, run
-   relevant checks, stage only intended files, and follow configured message
-   conventions.
-4. Use `create-pr` when the committed branch is ready to share. Confirm the
-   worktree is clean, review the base/head diff, avoid duplicate pull requests,
-   and include concrete validation evidence.
+   diff while preserving behavior.
+3. Use `commit` to review, verify, and intentionally stage the change.
+4. Use `create-pr` to publish committed work when the user requests it.
 
-`governance-update` is intentionally orthogonal to that flow. Use it only when
-multiple examples reveal a durable policy gap. A one-off defect or stale file
-should normally be fixed at its direct owner instead of becoming a repository
-rule.
+`governance-update` is orthogonal. Use it only when repeated evidence reveals a
+durable policy gap.
+
+### Understand before changing
+
+1. Use `reverse-engineer-software-system` to frame the decision and recovery
+   scope.
+2. Use `survey-existing-system` for first contact.
+3. Recover observable behavior or reconstruct architecture only where the
+   decision requires it.
+4. Use `reconcile-recovered-design` when code, tests, observations,
+   documentation, intent, or history may disagree.
+5. Hand validated knowledge to iterative design or a bounded implementation.
+
+### Design and implement iteratively
+
+1. Use `iterative-up-analysis-design` to coordinate risk-sized iterations and
+   durable artifacts.
+2. Select requirements and analysis skills according to the uncertainty:
+   inception, use cases, domain modeling, system sequence diagrams, and
+   operation contracts.
+3. Assign responsibilities and collaborations with GRASP and use-case
+   realization; summarize stable structure with design class diagrams.
+4. Apply patterns and language adaptation only when concrete design forces
+   justify them.
+5. Use `test-driven-implementation` for behavior changes and
+   `behavior-preserving-refactoring` for verified structural improvement.
+
+The detailed handoffs and stopping rules live in [`catalog/tracks/`](catalog/tracks/).
 
 ## Shared principles
 
 - Follow the nearest `AGENTS.md` and repository-local instructions.
-- Keep staging, formatting, and validation scoped to the intended change set.
+- Keep actions within the authority granted by the user; one skill does not
+  implicitly authorize later commits or publication.
+- Preserve established layouts and canonical artifact ownership.
+- Keep staging, formatting, and validation scoped to the intended change.
 - Prefer project configuration over company- or tracker-specific hardcoding.
-- Treat identifiers as opaque values and validate them only when the repository
-  config defines a format.
-- Report the checks run, their results, and any intentional exception.
+- Report the checks run, their results, and material residual uncertainty.
 
 ## Configuration
 
-When `.skills/conventions.json` exists, `commit` and `create-pr` may use:
-
-- `commit_format` for commit summaries
-- `pr_title_format` for pull-request titles
-- `branch_extract_pattern` to obtain an identifier from a branch
-- `id_pattern` to validate identifiers
-
+When `.skills/conventions.json` exists, `commit` and `create-pr` may use
+`commit_format`, `pr_title_format`, `branch_extract_pattern`, and `id_pattern`.
 Without repository-specific configuration, both skills use their documented
 generic defaults.

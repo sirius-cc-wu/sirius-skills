@@ -4,33 +4,14 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "sirius-skills"
-version = "0.1.0"
-description = "CLI helpers for the sirius workflow collection."
+version = "0.2.0"
+description = "Packaging helpers for the sirius agent skill collection."
 readme = "README.md"
 requires-python = ">=3.11"
-dependencies = ["psutil>=5.9"]
+dependencies = []
 
 [project.optional-dependencies]
-dev = ["pytest>=8", "pyright>=1.1.411"]
-
-[project.scripts]
-sirius = "sirius_skills.cli:main"
+dev = ["pytest>=8"]
 
 [tool.setuptools.packages.find]
 where = ["src"]
-
-[tool.setuptools.package-data]
-sirius_skills = ["assets/*.md"]
-
-[tool.pyright]
-include = [
-    "src/sirius_skills/lib/workflow_state/inventory.py",
-    "src/sirius_skills/lib/workflow_state/models.py",
-    "src/sirius_skills/lib/workflow_state/owner_completion.py",
-    "src/sirius_skills/lib/workflow_state/semantic_preview.py",
-    "src/sirius_skills/lib/workflow_state/transitions.py",
-    "src/sirius_skills/commands/validate_workflow_state.py",
-]
-pythonVersion = "3.11"
-typeCheckingMode = "strict"
-reportMissingTypeStubs = false

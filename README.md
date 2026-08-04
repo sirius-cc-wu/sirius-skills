@@ -1,64 +1,116 @@
 # sirius-skills
 
-`sirius-skills` is a focused collection of four generic repository workflow
-skills. The former spec-driven development (SDD) catalog has been retired and
-is no longer included in the managed install.
-
-## Available skills
-
-| Skill | Purpose |
-|---|---|
-| [`simplify`](skills/simplify/SKILL.md) | Simplify branch or pull-request changes without intentionally changing behavior. |
-| [`create-pr`](skills/create-pr/SKILL.md) | Create a well-scoped GitHub pull request with convention-aware titles and validation. |
-| [`commit`](skills/commit/SKILL.md) | Review, verify, stage, and commit an intentional change set. |
-| [`governance-update`](skills/governance-update/SKILL.md) | Tighten durable repository guidance when repeated drift reveals a policy gap. |
-
-These are the only skills declared by `managed_skills` in `justfile` and the
-only skills registered by the supported install flow.
+`sirius-skills` is a curated collection of repository workflow, software
+discovery, iterative design, implementation, and evolution skills. Skills are
+independently deployable; profiles provide convenient installations without
+turning the catalog into a mandatory lifecycle.
 
 ## Install
 
-Install the managed skills globally for the configured agents:
+Install the four generic repository workflow skills by default:
 
 ```bash
 just install
 ```
 
-Remove the managed skills later with:
+Install a named profile:
+
+```bash
+just install iterative-design
+just install reverse-engineering
+just install all
+```
+
+Available profiles are defined in [`skill-sets/`](skill-sets/):
+
+| Profile | Purpose |
+|---|---|
+| `workflow` | Simplification, scoped commits, pull requests, and durable governance updates |
+| `iterative-design` | Requirements, analysis, object design, tested implementation, and refactoring |
+| `applying-uml-and-patterns` | Compatibility alias for `iterative-design` |
+| `reverse-engineering` | Evidence-driven system survey, behavior and architecture recovery, and reconciliation |
+| `all` | Every active skill in the catalog |
+
+Remove the default or a named profile later:
 
 ```bash
 just uninstall
+just uninstall iterative-design
 ```
 
-The explicit packaged aliases remain available and use the same flow:
+The `install-packaged` and `uninstall-packaged` aliases accept the same optional
+profile. Installation refreshes shared references from the checkout and uses
+`npx skills` for GitHub Copilot, Codex, Antigravity, and Antigravity CLI.
 
-```bash
-just install-packaged
-just uninstall-packaged
-```
+## Catalog and workflow tracks
 
-Installation refreshes shared references directly from the checkout, then uses
-`npx skills` to register only the four skills listed above. It does not install
-the repository's legacy Python helper package.
+The [Skill Catalog](catalog/skills.md) describes every skill's responsibility
+and boundary. Common compositions are documented as workflow tracks:
 
-## Conventions
+- [Repository Workflow](catalog/tracks/repository-workflow.md)
+- [Reverse Engineering](catalog/tracks/reverse-engineering.md)
+- [Iterative Analysis and Design](catalog/tracks/iterative-analysis-design.md)
+- [Implementation and Evolution](catalog/tracks/implementation-evolution.md)
+- [Client to Code](catalog/tracks/client-to-code.md), whose upstream discovery
+  skills remain proposed
 
-`commit` and `create-pr` can read `.skills/conventions.json` when a repository
-needs project-specific formatting. Supported fields include:
+The [Skill Relationships](catalog/skill-relationships.md) diagram summarizes
+normal handoffs and optional feedback paths. Select the smallest set of skills
+that addresses the current risk or outcome.
+
+## Repository conventions
+
+`commit` and `create-pr` can read `.skills/conventions.json` when a consuming
+repository needs project-specific formatting. Supported fields include:
 
 - `commit_format`
 - `pr_title_format`
 - `branch_extract_pattern`
 - `id_pattern`
 
-Keep shared skills generic. Put repository-specific naming and tracker rules in
-configuration instead of hardcoding them into a skill.
+Shared skills remain generic; project-specific tracker and naming rules belong
+in consuming-repository configuration.
 
-## Usage guidance
+## Design artifacts and sources
 
-See [`SKILLS_METHODOLOGY.md`](SKILLS_METHODOLOGY.md) for how the four skills fit
-together and [`PROMPT_GUIDE.md`](PROMPT_GUIDE.md) for example requests.
+The iterative-design collection treats use cases, domain models, system
+sequence diagrams, contracts, realizations, and design class diagrams as
+durable knowledge refined across iterations. It preserves established
+repository layouts and supplies layout and Markdown metadata guidance through
+the references owned by `iterative-up-analysis-design`.
 
-The material under `docs/features/`, `docs/wiki/`, and `slices/` records the
-repository's earlier SDD implementation history. It is retained as historical
-context, not as the current skill catalog or recommended operating workflow.
+The original analysis and design skills distill workflows from Craig Larman's
+*Applying UML and Patterns*. Reverse-engineering skills also draw from software
+reengineering, architecture reconstruction, architecture documentation, and
+code-reading sources. See the [Source Catalog](catalog/sources.md) for
+provenance.
+
+## Validation
+
+Validate skill structure, profile membership, shared references, catalogs, and
+collection-specific contracts:
+
+```bash
+just validate
+pytest -q
+```
+
+## Repository layout
+
+- `skills/*/SKILL.md`: deployable agent workflows
+- `skill-sets/*.txt`: canonical installation profiles
+- `catalog/skills.md`: skill responsibilities and boundaries
+- `catalog/tracks/*.md`: optional workflow compositions
+- `catalog/sources.md`: intellectual and repository provenance
+- `docs/shared/`: canonical references copied into self-contained skills
+- `docs/proposals/`: proposed, non-deployable capabilities
+- `scripts/validate_skills.sh`: catalog and collection validation
+- `src/sirius_skills/commands/sync_shared_references.py`: packaging helper
+
+## Consolidation history
+
+The iterative software design collection was consolidated into this repository
+with its Git history preserved. Sirius's former spec-driven development runtime
+and planning artifacts are not part of the active distribution; the annotated
+tag `pre-consolidation-2026-08-04` preserves the repository immediately before
+this consolidation.

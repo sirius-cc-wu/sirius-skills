@@ -1,0 +1,4 @@
+interface:
+  display_name: "Reconcile Recovered Design"
+  short_description: "Compare recovered design across evidence sources"
+  default_prompt: "Use $reconcile-recovered-design to compare the recovered model with code, tests, documentation, and decisions."

@@ -1,0 +1,4 @@
+interface:
+  display_name: "Reverse Engineer Software System"
+  short_description: "Coordinate evidence-driven system recovery"
+  default_prompt: "Use $reverse-engineer-software-system to plan an evidence-driven recovery of this codebase."

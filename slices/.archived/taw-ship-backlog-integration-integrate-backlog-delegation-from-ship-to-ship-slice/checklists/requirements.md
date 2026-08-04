@@ -1,5 +1,0 @@
-- [x] FR-001 `ship` reads delegation config from `.skills/execution.json`.
-- [x] FR-002 Enabled delegation invokes `ship-slice` and returns its result.
-- [x] FR-003 Disabled delegation preserves standalone ship behavior.
-- [x] FR-004 The repo execution config includes accelerator defaults.
-- [x] FR-005 Delegation is covered by focused regression tests.
