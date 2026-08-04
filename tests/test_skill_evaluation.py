@@ -584,6 +584,46 @@ def test_invoice_fixture_seeds_the_expected_rounding_failure() -> None:
     assert "assert '2.67' == '2.68'" in completed.stdout
 
 
+def test_order_cancellation_fixture_starts_green_without_approved_policy() -> None:
+    fixture = REPO_ROOT / "evals" / "fixtures" / "order-cancellation-feedback"
+
+    regression = subprocess.run(
+        [sys.executable, "-m", "pytest", "-q"],
+        cwd=fixture,
+        text=True,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.STDOUT,
+    )
+    missing_policy = subprocess.run(
+        [
+            sys.executable,
+            "-c",
+            (
+                "from src.order import Order; "
+                "order = Order('order-1'); "
+                "order.cancel(); "
+                "assert order.cancellation_reason is None"
+            ),
+        ],
+        cwd=fixture,
+        text=True,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.STDOUT,
+    )
+    independent_oracle = subprocess.run(
+        [sys.executable, "-m", "verification.verify_cancellation_policy"],
+        cwd=fixture,
+        text=True,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.STDOUT,
+    )
+
+    assert regression.returncode == 0, regression.stdout
+    assert missing_policy.returncode == 0, missing_policy.stdout
+    assert independent_oracle.returncode != 0
+    assert "cancel" in independent_oracle.stdout
+
+
 def test_behavioral_runner_checks_required_file_content(tmp_path: Path) -> None:
     write_skill(tmp_path, "visualize", "Create focused PlantUML architecture views.")
     fixture = tmp_path / "evals" / "fixtures" / "visual"

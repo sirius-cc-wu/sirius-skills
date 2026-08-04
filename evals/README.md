@@ -26,10 +26,13 @@ The initial pilot covers:
 - `reconstruct-software-architecture`; and
 - `uml-class-diagram-design`.
 
-The last two cases are the first consumers of the visual-design proposal. With
-the implementation bug case, they distinguish three outcomes: no diagram for
-a local fix, focused component and runtime views for cross-module
-comprehension, and a focused class view for justified stateful object design.
+The fixture-backed cases distinguish four outcomes: a local implementation fix
+that creates no design document, an approved domain rule that refines code,
+tests, and one existing canonical model, focused component and runtime views
+for cross-module comprehension, and a focused class view for justified
+stateful object design. The two implementation cases form the first paired
+check that design feedback is conditional rather than an automatic document
+step.
 
 ## Case Format
 

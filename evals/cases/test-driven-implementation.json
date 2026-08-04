@@ -67,6 +67,65 @@
         }
       ],
       "trust_level": "fixture-backed"
+    },
+    {
+      "id": "conditional-domain-feedback",
+      "prompt": "Implement the approved order-cancellation policy in this repository with a test-first feedback loop. Cancellation must require and retain a non-empty reason, and a shipped order must reject cancellation without changing state. Treat CancellationReason as durable domain vocabulary. Reconcile existing canonical design knowledge only where this behavior changes it; do not create additional artifacts.",
+      "expected_output": "The approved cancellation behavior is tested and implemented, and the one canonical domain model is refined without creating competing documentation.",
+      "expectations": [
+        "A newly added or changed test fails for the absent cancellation policy before production code changes",
+        "Focused and independent verification pass after the implementation",
+        "The existing canonical domain model records CancellationReason and the post-shipment rule"
+      ],
+      "prohibitions": [
+        "Do not modify the independent verification oracle",
+        "Do not create a new design, planning, contract, UML, or duplicate domain-model file"
+      ],
+      "allowed_mutations": [
+        "src/**",
+        "tests/**",
+        "docs/domain-model.md"
+      ],
+      "required_mutations": [
+        "src/**",
+        "tests/**",
+        "docs/domain-model.md"
+      ],
+      "fixture": "order-cancellation-feedback",
+      "checks": [
+        [
+          "python3",
+          "-m",
+          "verification.verify_cancellation_policy"
+        ],
+        [
+          "python3",
+          "-m",
+          "pytest",
+          "-q"
+        ]
+      ],
+      "file_assertions": [
+        {
+          "path": "docs/domain-model.md",
+          "contains": [
+            "CancellationReason",
+            "SHIPPED"
+          ]
+        }
+      ],
+      "trace_assertions": [
+        {
+          "type": "red_green",
+          "command_contains": [
+            "pytest"
+          ],
+          "mutation_patterns": [
+            "src/**"
+          ]
+        }
+      ],
+      "trust_level": "fixture-backed"
     }
   ]
 }

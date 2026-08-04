@@ -18,14 +18,18 @@ and focused class-view outcomes. Repeated runs retain independent evidence and
 summarize mechanical outcome, changed-path/kind, and duration stability.
 Executor version, requested and trace-observed model identity, and reported
 token usage are retained without guessing missing metadata. Semantic grading
-and broader feedback composition remain planned.
+remains planned. A paired implementation case now contrasts the invoice
+fixture's documentation restraint with an order-cancellation change that must
+refine the existing canonical domain model; broader workflow re-entry remains
+planned.
 
 ## At a Glance
 
 Sirius verifies repository structure, installation profiles, shared references,
-artifact guidance, and packaging behavior. It does not yet execute a coding
-agent to determine whether a skill is selected appropriately, respects its
-boundary, or produces the intended behavior.
+artifact guidance, and packaging behavior on every normal validation run. Its
+opt-in behavioral runner also executes a coding agent in disposable fixtures to
+observe whether a selected skill respects its boundary and produces the
+mechanically checkable parts of the intended behavior.
 
 The proposed program adds three capabilities in stages:
 
@@ -51,10 +55,10 @@ An eval should fail if the agent:
 - changes valid tests to accept the defect; or
 - mutates files outside the authorized fixture scope.
 
-A complementary scenario should confirm that feedback is not suppressed: when
-an operation contract exposes a missing domain concept, the agent should refine
-the existing canonical domain model rather than ignore the discrepancy or
-create a competing model.
+A complementary scenario confirms that feedback is not suppressed: when an
+approved cancellation policy introduces the durable `CancellationReason`
+concept, the agent should refine the existing canonical domain model rather
+than ignore the discrepancy or create a competing model.
 
 Together, these scenarios test the central Sirius claim: coding agents retain
 local autonomy while durable knowledge is reconciled when material evidence
@@ -193,7 +197,7 @@ Composition cases should target Sirius's highest-risk orchestration claims:
 |---|---|---|
 | Small bug with a clear oracle | Stay with implementation and executable evidence | Mandatory analysis chain or new design documents |
 | Non-trivial state change | Use or refine a contract when postconditions are genuinely needed | Guessing effects or writing contracts for trivial operations |
-| Missing concept exposed by a contract | Refine the canonical domain model | Ignore the gap or create a competing model |
+| Missing durable concept exposed by implementation or a contract | Refine the canonical domain model | Ignore the gap or create a competing model |
 | Local implementation detail | Keep the information with code and tests | Update unrelated durable artifacts |
 | Durable responsibility or interface change | Refine the owning realization or design model | Leave canonical design knowledge stale |
 | Recovered surprising behavior | Preserve the distinction between current behavior and intended requirements | Declare current code authoritative for intent |
@@ -269,7 +273,8 @@ definitions, evaluator code, and deliberately reviewed baselines.
 
 ### Stage 3: Evaluate Composition
 
-- Add the feedback and documentation-restraint scenarios.
+- Pair a documentation-restraint scenario with canonical design feedback.
+- Add contract-driven feedback and workflow re-entry scenarios.
 - Run composition cases periodically and before material workflow-boundary
   changes.
 - Compare failures with real skill usage before deciding which additional
