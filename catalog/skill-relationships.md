@@ -216,9 +216,88 @@ simplify ..> governance : repeated drift
 See the
 [Implementation and Evolution](tracks/implementation-evolution.md) and
 [Repository Workflow](tracks/repository-workflow.md) tracks for their entry
-conditions, safety rules, and authority boundaries. When refactoring exposes a
-durable design pressure, return to `grasp-responsibility-design` or
-`design-pattern-application`.
+conditions, safety rules, and authority boundaries.
+
+## Feedback and re-entry
+
+The forward diagrams stay small by collapsing feedback into a few dashed
+arrows and prose. This view expands only the paths where later evidence can
+refine earlier design knowledge, restart design work, or improve repository
+governance. A feedback edge is conditional: follow it only when the named
+trigger changes knowledge owned by the target skill.
+
+```plantuml
+@startuml sirius-skill-feedback
+top to bottom direction
+
+skinparam backgroundColor #FFFFFF
+skinparam shadowing false
+skinparam packageStyle rectangle
+skinparam linetype ortho
+skinparam defaultFontName Arial
+skinparam defaultTextAlignment center
+skinparam ArrowColor #A15C38
+skinparam rectangle {
+  BackgroundColor #FFFFFF
+  BorderColor #52606D
+  RoundCorner 12
+}
+skinparam rectangle<<coordinator>> {
+  BackgroundColor #DCEEFF
+  BorderColor #2F6690
+}
+
+package "Analysis and design knowledge" #EEF8EE {
+  rectangle "iterative-up-analysis-\ndesign" as iterative <<coordinator>>
+  rectangle "domain-modeling" as domain
+  rectangle "operation-contracts" as contracts
+  rectangle "grasp-responsibility-\ndesign" as grasp
+  rectangle "use-case-realization +\numl-class-diagram-design" as designviews
+  rectangle "design-pattern-\napplication" as patterns
+}
+
+package "Execution and evidence" #FFF5EA {
+  rectangle "test-driven-\nimplementation" as implementation
+  rectangle "behavior-preserving-\nrefactoring" as refactoring
+  rectangle "reconcile-recovered-\ndesign" as reconcile
+}
+
+package "Repository learning" #F3EEFF {
+  rectangle "simplify" as simplify
+  rectangle "governance-update" as governance
+}
+
+contracts ..> domain : missing concept or association
+patterns ..> designviews : participants or dependencies change
+
+implementation ..> contracts : postcondition changes
+implementation ..> designviews : responsibility, collaboration, or interface changes
+
+refactoring ..> grasp : responsibility or coupling pressure
+refactoring ..> patterns : justified variation pressure
+refactoring ..> designviews : durable structure changes
+
+reconcile ..> iterative : stakeholder-validated knowledge
+reconcile ..> implementation : authorized bounded correction
+
+simplify ..> governance : repeated repository drift
+@enduml
+```
+
+The combined `use-case-realization + uml-class-diagram-design` node keeps the
+view readable; implementation and refactoring can refine either or both. In
+particular:
+
+- contract feedback changes the domain model only when a postcondition exposes
+  missing domain vocabulary;
+- implementation and refactoring update design artifacts only when durable
+  postconditions, responsibilities, collaborations, interfaces, or dependency
+  direction changed;
+- reconciliation recommends the authoritative next action first—it does not
+  automatically turn current code into intended design or authorize a change;
+  and
+- `rewrite-technical-artifacts` is not a design-feedback edge because it must
+  preserve normative meaning.
 
 ## Cross-cutting skills
 
