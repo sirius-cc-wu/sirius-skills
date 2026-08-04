@@ -56,11 +56,29 @@ class TraceAssertionResult:
 
 
 @dataclass(frozen=True)
+class TokenUsage:
+    input_tokens: int
+    cached_input_tokens: int
+    cache_write_input_tokens: int
+    output_tokens: int
+    reasoning_output_tokens: int
+
+    @property
+    def uncached_input_tokens(self) -> int:
+        return max(self.input_tokens - self.cached_input_tokens, 0)
+
+
+@dataclass(frozen=True)
 class BehavioralResult:
     skill_name: str
     case_id: str | int
     mechanical_passed: bool
     duration_seconds: float
+    host: str
+    host_version: str | None
+    requested_model: str | None
+    observed_model: str | None
+    usage: TokenUsage | None
     executor_returncode: int
     changes: tuple[FileChange, ...]
     unauthorized_mutations: list[str]
@@ -81,6 +99,9 @@ class BehavioralBatchResult:
     mechanical_passes: int
     mechanically_stable: bool
     mutations_stable: bool
+    execution_environments_stable: bool
+    usage: TokenUsage | None
+    usage_runs: int
     summary_path: Path
 
 
@@ -273,6 +294,88 @@ def _trace_events(trace: str) -> tuple[list[dict[str, object]], str | None]:
             return [], f"invalid JSONL trace object at line {line_number}"
         events.append(event)
     return events, None
+
+
+def _token_value(usage: dict[str, object], key: str) -> int:
+    value = usage.get(key, 0)
+    return (
+        value
+        if isinstance(value, int) and not isinstance(value, bool) and value >= 0
+        else 0
+    )
+
+
+def _trace_execution_metadata(trace: str) -> tuple[str | None, TokenUsage | None]:
+    events, error = _trace_events(trace)
+    if error is not None:
+        return None, None
+    observed_model = next(
+        (
+            str(event["model"])
+            for event in events
+            if event.get("type") == "turn.started"
+            and isinstance(event.get("model"), str)
+        ),
+        None,
+    )
+    reported_usage = [
+        event["usage"]
+        for event in events
+        if event.get("type") == "turn.completed"
+        and isinstance(event.get("usage"), dict)
+    ]
+    if not reported_usage:
+        return observed_model, None
+    fields = (
+        "input_tokens",
+        "cached_input_tokens",
+        "cache_write_input_tokens",
+        "output_tokens",
+        "reasoning_output_tokens",
+    )
+    totals = {
+        field: sum(_token_value(usage, field) for usage in reported_usage)
+        for field in fields
+    }
+    return observed_model, TokenUsage(**totals)
+
+
+def _executor_host(command: Sequence[str]) -> str:
+    return (
+        "codex"
+        if len(command) >= 2
+        and Path(command[0]).name == "codex"
+        and command[1] == "exec"
+        else "test-adapter"
+    )
+
+
+def _executor_host_version(host: str, command: Sequence[str]) -> str | None:
+    if host != "codex":
+        return None
+    try:
+        completed = subprocess.run(
+            [command[0], "--version"],
+            text=True,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.DEVNULL,
+            timeout=10,
+        )
+    except (OSError, subprocess.TimeoutExpired):
+        return None
+    if completed.returncode != 0:
+        return None
+    version = completed.stdout.strip()
+    return version or None
+
+
+def _serialize_usage(usage: TokenUsage | None) -> dict[str, int] | None:
+    if usage is None:
+        return None
+    return {
+        **asdict(usage),
+        "uncached_input_tokens": usage.uncached_input_tokens,
+    }
 
 
 def _relative_trace_path(path: str, workspace: Path) -> str | None:
@@ -564,7 +667,11 @@ def _serialize_result(
     case: dict[str, object],
     prompt: str,
     command: Sequence[str],
-    model: str | None,
+    host: str,
+    host_version: str | None,
+    requested_model: str | None,
+    observed_model: str | None,
+    usage: TokenUsage | None,
     started_at: datetime,
     duration_seconds: float,
     executor_returncode: int,
@@ -583,8 +690,11 @@ def _serialize_result(
         "skill_name": skill_name,
         "case_id": case["id"],
         "skill_revision": _git_revision(root),
-        "host": "codex" if command[:2] == ["codex", "exec"] else "test-adapter",
-        "requested_model": model,
+        "host": host,
+        "host_version": host_version,
+        "requested_model": requested_model,
+        "observed_model": observed_model,
+        "usage": _serialize_usage(usage),
         "started_at": started_at.isoformat(),
         "duration_seconds": round(duration_seconds, 3),
         "prompt": prompt,
@@ -686,6 +796,8 @@ def run_behavioral_case(
             if executor_command is not None
             else build_codex_command(workspace, model=model)
         )
+        host = _executor_host(command)
+        host_version = _executor_host_version(host, command)
         execution_started_at = datetime.now(timezone.utc)
         started = time.monotonic()
         try:
@@ -707,6 +819,7 @@ def run_behavioral_case(
             executor_stderr = exc.stderr or f"timed out after {timeout_seconds} seconds"
         duration_seconds = time.monotonic() - started
         trace_path.write_text(executor_stdout, encoding="utf-8")
+        observed_model, usage = _trace_execution_metadata(executor_stdout)
 
         after = _snapshot(workspace)
         changes = _changes(before, after)
@@ -744,7 +857,11 @@ def run_behavioral_case(
             case=case,
             prompt=prompt,
             command=command,
-            model=model,
+            host=host,
+            host_version=host_version,
+            requested_model=model,
+            observed_model=observed_model,
+            usage=usage,
             started_at=execution_started_at,
             duration_seconds=duration_seconds,
             executor_returncode=executor_returncode,
@@ -767,6 +884,11 @@ def run_behavioral_case(
             case_id=case["id"],
             mechanical_passed=mechanical_passed,
             duration_seconds=duration_seconds,
+            host=host,
+            host_version=host_version,
+            requested_model=model,
+            observed_model=observed_model,
+            usage=usage,
             executor_returncode=executor_returncode,
             changes=changes,
             unauthorized_mutations=unauthorized,
@@ -825,6 +947,35 @@ def run_behavioral_repetitions(
     mechanical_passes = sum(result.mechanical_passed for result in runs)
     mechanically_stable = len({result.mechanical_passed for result in runs}) == 1
     mutations_stable = len({_mutation_signature(result) for result in runs}) == 1
+    execution_environments_stable = len(
+        {
+            (
+                result.host,
+                result.host_version,
+                result.requested_model,
+                result.observed_model,
+            )
+            for result in runs
+        }
+    ) == 1
+    reported_usage = [result.usage for result in runs if result.usage is not None]
+    usage = (
+        TokenUsage(
+            input_tokens=sum(item.input_tokens for item in reported_usage),
+            cached_input_tokens=sum(
+                item.cached_input_tokens for item in reported_usage
+            ),
+            cache_write_input_tokens=sum(
+                item.cache_write_input_tokens for item in reported_usage
+            ),
+            output_tokens=sum(item.output_tokens for item in reported_usage),
+            reasoning_output_tokens=sum(
+                item.reasoning_output_tokens for item in reported_usage
+            ),
+        )
+        if reported_usage
+        else None
+    )
     durations = [result.duration_seconds for result in runs]
     summary_path = batch_directory / "summary.json"
     summary = {
@@ -841,6 +992,27 @@ def run_behavioral_repetitions(
         "mechanical_pass_rate": mechanical_passes / repeat_count,
         "mechanically_stable": mechanically_stable,
         "mutations_stable": mutations_stable,
+        "execution_environments_stable": execution_environments_stable,
+        "hosts": sorted({result.host for result in runs}),
+        "host_versions": sorted(
+            {
+                result.host_version
+                for result in runs
+                if result.host_version is not None
+            }
+        ),
+        "observed_models": sorted(
+            {
+                result.observed_model
+                for result in runs
+                if result.observed_model is not None
+            }
+        ),
+        "usage": {
+            "reported_runs": len(reported_usage),
+            "missing_runs": repeat_count - len(reported_usage),
+            **(_serialize_usage(usage) or {}),
+        },
         "duration_seconds": {
             "minimum": round(min(durations), 3),
             "mean": round(sum(durations) / repeat_count, 3),
@@ -852,6 +1024,11 @@ def run_behavioral_repetitions(
                 "index": index,
                 "mechanical_passed": result.mechanical_passed,
                 "duration_seconds": round(result.duration_seconds, 3),
+                "host": result.host,
+                "host_version": result.host_version,
+                "requested_model": result.requested_model,
+                "observed_model": result.observed_model,
+                "usage": _serialize_usage(result.usage),
                 "changes": [asdict(change) for change in result.changes],
                 "trace_path": result.trace_path.relative_to(
                     batch_directory
@@ -873,5 +1050,8 @@ def run_behavioral_repetitions(
         mechanical_passes=mechanical_passes,
         mechanically_stable=mechanically_stable,
         mutations_stable=mutations_stable,
+        execution_environments_stable=execution_environments_stable,
+        usage=usage,
+        usage_runs=len(reported_usage),
         summary_path=summary_path,
     )

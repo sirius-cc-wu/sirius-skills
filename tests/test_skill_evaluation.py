@@ -227,6 +227,32 @@ def write_alternating_executor(tmp_path: Path) -> list[str]:
     return [sys.executable, str(executor)]
 
 
+def write_codex_metadata_executor(tmp_path: Path) -> list[str]:
+    executable = tmp_path / "bin" / "codex"
+    executable.parent.mkdir()
+    executable.write_text(
+        "#!/usr/bin/env python3\n"
+        "import json\n"
+        "import sys\n"
+        "from pathlib import Path\n"
+        "if sys.argv[1:] == ['--version']:\n"
+        "    print('codex-cli test-version')\n"
+        "    raise SystemExit\n"
+        "Path('src/value.txt').write_text('fixed\\n', encoding='utf-8')\n"
+        "print(json.dumps({'type': 'turn.started', 'model': 'resolved-test-model'}))\n"
+        "print(json.dumps({'type': 'turn.completed', 'usage': {\n"
+        "    'input_tokens': 10,\n"
+        "    'cached_input_tokens': 4,\n"
+        "    'cache_write_input_tokens': 2,\n"
+        "    'output_tokens': 3,\n"
+        "    'reasoning_output_tokens': 1,\n"
+        "}}))\n",
+        encoding="utf-8",
+    )
+    executable.chmod(0o755)
+    return [str(executable), "exec"]
+
+
 def write_trace_executor(tmp_path: Path, *, include_red: bool) -> list[str]:
     executor = tmp_path / "trace_executor.py"
     red_event = (
@@ -282,6 +308,38 @@ def test_behavioral_runner_captures_authorized_mutations_and_checks(
     )
     assert result.result_path.is_file()
     assert not result.workspace.exists()
+    assert result.host == "test-adapter"
+    assert result.host_version is None
+    assert result.usage is not None
+    assert result.usage.input_tokens == 1
+
+
+def test_behavioral_runner_records_reported_model_host_version_and_usage(
+    tmp_path: Path,
+) -> None:
+    write_behavior_fixture(tmp_path, allowed_mutations=["src/**"])
+
+    result = run_behavioral_case(
+        tmp_path,
+        "implementation",
+        "fix-value",
+        model="requested-test-model",
+        executor_command=write_codex_metadata_executor(tmp_path),
+        results_directory=tmp_path / "results",
+    )
+
+    assert result.host == "codex"
+    assert result.host_version == "codex-cli test-version"
+    assert result.requested_model == "requested-test-model"
+    assert result.observed_model == "resolved-test-model"
+    assert result.usage is not None
+    assert result.usage.input_tokens == 10
+    assert result.usage.cached_input_tokens == 4
+    assert result.usage.uncached_input_tokens == 6
+    serialized = json.loads(result.result_path.read_text(encoding="utf-8"))
+    assert serialized["host_version"] == "codex-cli test-version"
+    assert serialized["observed_model"] == "resolved-test-model"
+    assert serialized["usage"]["output_tokens"] == 3
 
 
 def test_behavioral_runner_preserves_prior_run_results(tmp_path: Path) -> None:
@@ -329,6 +387,10 @@ def test_behavioral_repetitions_summarize_stable_runs(tmp_path: Path) -> None:
     assert summary["mechanical_pass_rate"] == 1.0
     assert summary["mechanically_stable"] is True
     assert summary["mutations_stable"] is True
+    assert summary["execution_environments_stable"] is True
+    assert summary["usage"]["reported_runs"] == 3
+    assert summary["usage"]["input_tokens"] == 3
+    assert summary["usage"]["missing_runs"] == 0
     assert len(summary["runs"]) == 3
 
 
@@ -350,6 +412,7 @@ def test_behavioral_repetitions_report_variable_outcomes(tmp_path: Path) -> None
     summary = json.loads(batch.summary_path.read_text(encoding="utf-8"))
     assert summary["mechanical_pass_rate"] == 0.5
     assert [run["mechanical_passed"] for run in summary["runs"]] == [True, False]
+    assert summary["usage"] == {"reported_runs": 0, "missing_runs": 2}
 
 
 def test_behavioral_runner_accepts_red_green_trace_around_mutation(

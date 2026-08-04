@@ -142,8 +142,21 @@ def main(argv: Sequence[str] | None = None) -> int:
         print(
             "Stability: "
             f"mechanical={'stable' if batch.mechanically_stable else 'variable'}, "
-            f"mutations={'stable' if batch.mutations_stable else 'variable'}"
+            f"mutations={'stable' if batch.mutations_stable else 'variable'}, "
+            "environment="
+            f"{'stable' if batch.execution_environments_stable else 'variable'}"
         )
+        if batch.usage is None:
+            print(f"Usage: unavailable for all {len(batch.runs)} runs")
+        else:
+            print(
+                f"Usage ({batch.usage_runs}/{len(batch.runs)} runs): "
+                f"input={batch.usage.input_tokens}, "
+                f"cached={batch.usage.cached_input_tokens}, "
+                f"uncached={batch.usage.uncached_input_tokens}, "
+                f"output={batch.usage.output_tokens}, "
+                f"reasoning={batch.usage.reasoning_output_tokens}"
+            )
         print("Semantic expectations: UNGRADED")
         return 0 if batch.mechanical_passes == len(batch.runs) else 1
 

@@ -16,7 +16,9 @@ invoice pilot mechanically checks red–mutation–green ordering, and initial
 visual composition fixtures distinguish no-diagram, focused architecture-view,
 and focused class-view outcomes. Repeated runs retain independent evidence and
 summarize mechanical outcome, changed-path/kind, and duration stability.
-Semantic grading and broader feedback composition remain planned.
+Executor version, requested and trace-observed model identity, and reported
+token usage are retained without guessing missing metadata. Semantic grading
+and broader feedback composition remain planned.
 
 ## At a Glance
 

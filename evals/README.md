@@ -116,6 +116,14 @@ must complete after the last matching change. This establishes red–mutation–
 green ordering; it does not prove that the failing command discriminated the
 intended behavior.
 
+Each result records the executor host and its `--version` output when
+available, the explicitly requested model, any model name explicitly reported
+by the JSONL trace, and reported token usage. If the trace does not identify
+the resolved model, `observed_model` remains null; the runner does not infer it
+from local configuration. Usage distinguishes cached, cache-write, uncached,
+output, and reasoning tokens. Missing usage remains missing rather than being
+counted as zero.
+
 ## Run a Behavioral Case
 
 Inspect the plan before spending model tokens:
@@ -154,8 +162,9 @@ Behavioral execution is never part of `just validate`. The runner:
 8. runs declared verification commands without a shell; and
 9. writes every trace and mechanical result to a unique run directory under
    ignored `evals/results/`, plus a batch summary with pass rate, mechanical
-   outcome and changed-path/kind stability, and duration statistics, before
-   deleting each temporary workspace.
+   outcome, changed-path/kind, and execution-environment stability, aggregate
+   reported token usage, and duration statistics, before deleting each
+   temporary workspace.
 
 Use the lower-level command when a model override, timeout, or retained
 workspace is needed:
