@@ -140,6 +140,24 @@ non-empty completed `agent_message` in a valid Codex JSONL trace. It remains
 manual review and future semantic evaluation direct, but it is supporting
 evidence and does not affect the mechanical result.
 
+An optional `semantic_rubric` is a list of independently judgeable criteria
+with stable opaque IDs:
+
+```json
+"semantic_rubric": [
+  {
+    "id": "requests-governing-decision",
+    "criterion": "The response asks which policy governs cancellation after submission."
+  }
+]
+```
+
+Use it only for response qualities that deterministic workspace, command,
+file, or trace evidence cannot establish. IDs must be unique within the case.
+The first rubric pilot belongs to the read-only workflow-reentry case, where
+the agent must explain an equal-authority conflict and request the missing
+decision.
+
 ## Run a Behavioral Case
 
 Inspect the plan before spending model tokens:
@@ -162,6 +180,18 @@ evidence:
 just eval-behavior test-driven-implementation bug-fix-discrimination 3
 ```
 
+Cases with a `semantic_rubric` can run an additional opt-in judge:
+
+```bash
+just eval-behavior-judged test-driven-implementation conflicting-policy-reentry
+```
+
+The judge runs as a separate ephemeral Codex invocation in an empty temporary
+Git repository with a read-only sandbox. It receives the task context, rubric,
+and captured final response, but not the evaluated workspace. Candidate prose
+is marked as untrusted input. Judge failures and negative judgments are
+recorded for review and never change the mechanical pass or command exit code.
+
 Behavioral execution is never part of `just validate`. The runner:
 
 1. copies the declared fixture into a fresh temporary Git repository and
@@ -175,10 +205,11 @@ Behavioral execution is never part of `just validate`. The runner:
    read-only case, and reports missing `required_mutations`;
 6. evaluates declared JSONL trace-order assertions;
 7. checks required and forbidden output-file fragments;
-8. runs declared verification commands without a shell; and
-9. extracts the final completed agent response as ungraded supporting evidence;
-   and
-10. writes every trace and mechanical result to a unique run directory under
+8. runs declared verification commands without a shell;
+9. extracts the final completed agent response as supporting evidence;
+10. when explicitly enabled, evaluates the declared response rubric in an
+    isolated read-only judge process; and
+11. writes every trace and mechanical result to a unique run directory under
     ignored `evals/results/`, plus a batch summary with pass rate, mechanical
     outcome, changed-path/kind, and execution-environment stability, aggregate
     reported token usage, and duration statistics, before deleting each
@@ -190,8 +221,10 @@ workspace is needed:
 ```bash
 PYTHONPATH=src python3 -m sirius_skills.commands.run_evals \
   --behavioral test-driven-implementation \
-  --case bug-fix-discrimination \
+  --case conflicting-policy-reentry \
   --model MODEL \
+  --judge \
+  --judge-model JUDGE_MODEL \
   --repeat 3 \
   --timeout 900 \
   --keep-workspace
@@ -201,10 +234,13 @@ Each run reports only a **mechanical pass**: the executor exited normally,
 mutation boundaries held, required changes occurred or read-only state was
 preserved, and declared mechanical assertions and commands passed. The batch
 summary identifies variation; it does not turn repeated agreement into
-semantic proof. Full JSONL traces and semantic expectations are preserved, but
-expectations and prohibitions remain explicitly `ungraded` until a trustworthy
-semantic evaluator is implemented. Do not report a mechanical pass as proof
-that the skill behaved correctly.
+semantic proof. Without `--judge`, semantic expectations remain explicitly
+`ungraded`. With it, `result.json` records each criterion verdict and reason,
+judge errors, model metadata, duration, usage, prompt, response, and a separate
+judge trace. Primary-run usage totals do not include judge usage. Treat these
+judgments as diagnostic evidence rather than an authority for mutations,
+verification, or process exit. Do not report a mechanical pass or judge pass
+alone as proof that the skill behaved correctly.
 
 ## Scoring Boundaries
 

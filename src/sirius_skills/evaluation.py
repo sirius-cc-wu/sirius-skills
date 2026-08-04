@@ -303,6 +303,45 @@ def _validate_behavioral_cases(
                 f"{filename}: behavioral eval {case_id!r} has invalid "
                 "'trace_assertions'"
             )
+        semantic_rubric = case.get("semantic_rubric", [])
+        if not isinstance(semantic_rubric, list):
+            report.errors.append(
+                f"{filename}: behavioral eval {case_id!r} has invalid "
+                "'semantic_rubric'"
+            )
+        else:
+            rubric_ids: set[str | int] = set()
+            for criterion in semantic_rubric:
+                criterion_id = (
+                    criterion.get("id") if isinstance(criterion, dict) else None
+                )
+                description = (
+                    criterion.get("criterion")
+                    if isinstance(criterion, dict)
+                    else None
+                )
+                valid_id = (
+                    isinstance(criterion_id, str) and bool(criterion_id.strip())
+                ) or (
+                    isinstance(criterion_id, int)
+                    and not isinstance(criterion_id, bool)
+                )
+                if (
+                    not valid_id
+                    or not isinstance(description, str)
+                    or not description.strip()
+                ):
+                    report.errors.append(
+                        f"{filename}: behavioral eval {case_id!r} has invalid "
+                        "semantic rubric criterion"
+                    )
+                    continue
+                if criterion_id in rubric_ids:
+                    report.errors.append(
+                        f"{filename}: behavioral eval {case_id!r} has duplicate "
+                        f"semantic rubric id {criterion_id!r}"
+                    )
+                rubric_ids.add(criterion_id)
         trust_level = case.get("trust_level")
         if trust_level not in (None, "provisional", "fixture-backed"):
             report.errors.append(

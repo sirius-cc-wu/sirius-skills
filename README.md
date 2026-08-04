@@ -112,8 +112,8 @@ just eval-routing
 
 See [Skill Evals](evals/README.md) for the case format, current pilot coverage,
 and the boundary between deterministic routing checks and model-executed
-behavioral evals. Behavioral execution is opt-in and never runs as part of
-normal validation.
+behavioral evals. Behavioral execution and its optional non-gating semantic
+judge are opt-in and never run as part of normal validation.
 
 ## Repository layout
 

@@ -52,6 +52,14 @@ def _print_behavioral_result(
                 for assertion in failed_trace_assertions
             )
         )
+    judgment = result.semantic_judgment
+    if judgment.status == "completed":
+        print(
+            "Semantic judge: "
+            f"{'PASS' if judgment.passed else 'FAIL'} (non-gating)"
+        )
+    elif judgment.status == "error":
+        print(f"Semantic judge: ERROR (non-gating): {judgment.error}")
     print(f"Trace: {result.trace_path}")
     print(f"Result: {result.result_path}")
     if keep_workspace:
@@ -85,6 +93,15 @@ def main(argv: Sequence[str] | None = None) -> int:
     )
     parser.add_argument("--model", help="Optional Codex model override to record and use.")
     parser.add_argument(
+        "--judge",
+        action="store_true",
+        help="Run the case's semantic rubric through a non-gating Codex judge.",
+    )
+    parser.add_argument(
+        "--judge-model",
+        help="Optional model override for --judge; defaults to --model.",
+    )
+    parser.add_argument(
         "--keep-workspace",
         action="store_true",
         help="Keep the disposable behavioral workspace for diagnosis.",
@@ -93,7 +110,7 @@ def main(argv: Sequence[str] | None = None) -> int:
         "--timeout",
         type=int,
         default=900,
-        help="Behavioral executor timeout in seconds (default: 900).",
+        help="Per-executor timeout in seconds (default: 900).",
     )
     parser.add_argument(
         "--repeat",
@@ -107,6 +124,8 @@ def main(argv: Sequence[str] | None = None) -> int:
     if args.behavioral:
         if not args.case_id:
             parser.error("--case is required with --behavioral")
+        if args.judge_model and not args.judge:
+            parser.error("--judge-model requires --judge")
         if args.timeout < 1:
             parser.error("--timeout must be positive")
         if args.repeat < 1:
@@ -114,7 +133,12 @@ def main(argv: Sequence[str] | None = None) -> int:
         try:
             if args.dry_run:
                 plan = describe_behavioral_case(
-                    root, args.behavioral, args.case_id, model=args.model
+                    root,
+                    args.behavioral,
+                    args.case_id,
+                    model=args.model,
+                    semantic_judge=args.judge,
+                    judge_model=args.judge_model,
                 )
                 plan["repeat_count"] = args.repeat
                 print(json.dumps(plan, indent=2, sort_keys=True))
@@ -125,6 +149,8 @@ def main(argv: Sequence[str] | None = None) -> int:
                 args.case_id,
                 repeat_count=args.repeat,
                 model=args.model,
+                semantic_judge=args.judge,
+                judge_model=args.judge_model,
                 timeout_seconds=args.timeout,
                 keep_workspace=args.keep_workspace,
             )
@@ -157,13 +183,18 @@ def main(argv: Sequence[str] | None = None) -> int:
                 f"output={batch.usage.output_tokens}, "
                 f"reasoning={batch.usage.reasoning_output_tokens}"
             )
-        print("Semantic expectations: UNGRADED")
+        if args.judge:
+            print("Semantic judge: NON-GATING; see per-run results")
+        else:
+            print("Semantic expectations: UNGRADED")
         return 0 if batch.mechanical_passes == len(batch.runs) else 1
 
     if (
         args.case_id
         or args.dry_run
         or args.model
+        or args.judge
+        or args.judge_model
         or args.keep_workspace
         or args.repeat != 1
     ):

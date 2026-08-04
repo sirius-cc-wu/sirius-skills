@@ -18,8 +18,11 @@ and focused class-view outcomes. Repeated runs retain independent evidence and
 summarize mechanical outcome, changed-path/kind, and duration stability.
 Executor version, requested and trace-observed model identity, and reported
 token usage are retained without guessing missing metadata. Per-run results now
-extract the final completed agent response as ungraded supporting evidence.
-Semantic grading and contract-driven composition remain planned. Three
+extract the final completed agent response as supporting evidence. The first
+opt-in semantic rubric pilot judges workflow-reentry responses in a separate
+read-only Codex process and records criterion reasons, metadata, and usage. Its
+verdict is deliberately non-gating; broader semantic coverage, judge
+calibration, and contract-driven composition remain planned. Three
 implementation cases exercise local correction, canonical domain-model
 reconciliation, and read-only workflow re-entry when equal-authority
 requirements conflict.
@@ -167,6 +170,12 @@ Prefer deterministic assertions for observable facts. Use an LLM judge only
 for semantic expectations that cannot be checked mechanically, and never as
 the sole authority for mutation safety or command results.
 
+The initial judge is an on-demand diagnostic layer, not a gate. Each criterion
+has a stable opaque ID, boolean verdict, and reason. The judge sees the task
+context, rubric, and captured final response in an isolated empty repository;
+it does not inspect the evaluated workspace. Its trace, model metadata, usage,
+and errors remain separate from the primary execution evidence.
+
 A candidate case shape is:
 
 ```json
@@ -185,6 +194,12 @@ A candidate case shape is:
       "prohibitions": [
         "Do not weaken an existing valid expectation",
         "Do not create a separate design document"
+      ],
+      "semantic_rubric": [
+        {
+          "id": "explains-outcome",
+          "criterion": "The response explains the verified outcome without overstating the evidence."
+        }
       ],
       "allowed_mutations": ["src/**", "tests/**"]
     }

@@ -160,6 +160,7 @@ def write_behavior_fixture(
     *,
     allowed_mutations: list[str],
     required_mutations: list[str] | None = None,
+    semantic_rubric: list[dict[str, object]] | None = None,
     workspace_mode: str = "mutable",
     trace_assertions: list[dict[str, object]] | None = None,
 ) -> None:
@@ -204,6 +205,8 @@ def write_behavior_fixture(
     }
     if trace_assertions is not None:
         behavioral_case["trace_assertions"] = trace_assertions
+    if semantic_rubric is not None:
+        behavioral_case["semantic_rubric"] = semantic_rubric
     write_case(
         root,
         "implementation",
@@ -252,6 +255,30 @@ def write_response_executor(tmp_path: Path) -> list[str]:
         "event('command_execution', command='git status --short', exit_code=0)\n"
         "event('agent_message', text='Decision needed: choose Product or Risk.')\n"
         "print(json.dumps({'type': 'turn.completed'}))\n",
+        encoding="utf-8",
+    )
+    return [sys.executable, str(executor)]
+
+
+def write_semantic_judge_executor(
+    tmp_path: Path, judgment: dict[str, object]
+) -> list[str]:
+    index = len(list(tmp_path.glob("semantic_judge_*")))
+    executor = tmp_path / f"semantic_judge_{index}.py"
+    executor.write_text(
+        "import json\n"
+        f"judgment = {judgment!r}\n"
+        "print(json.dumps({\n"
+        "    'type': 'item.completed',\n"
+        "    'item': {\n"
+        "        'type': 'agent_message',\n"
+        "        'text': json.dumps(judgment),\n"
+        "    },\n"
+        "}))\n"
+        "print(json.dumps({\n"
+        "    'type': 'turn.completed',\n"
+        "    'usage': {'input_tokens': 7, 'output_tokens': 3},\n"
+        "}))\n",
         encoding="utf-8",
     )
     return [sys.executable, str(executor)]
@@ -436,6 +463,154 @@ def test_behavioral_runner_records_missing_agent_response_as_null(
     assert result.final_response is None
     serialized = json.loads(result.result_path.read_text(encoding="utf-8"))
     assert serialized["final_response"] is None
+
+
+def test_behavioral_runner_records_completed_semantic_judgment(
+    tmp_path: Path,
+) -> None:
+    rubric = [
+        {
+            "id": "requests-decision",
+            "criterion": "The response requests the governing policy decision.",
+        }
+    ]
+    write_behavior_fixture(
+        tmp_path,
+        allowed_mutations=[],
+        required_mutations=[],
+        semantic_rubric=rubric,
+        workspace_mode="read-only",
+    )
+    judge = write_semantic_judge_executor(
+        tmp_path,
+        {
+            "criteria": [
+                {
+                    "id": "requests-decision",
+                    "passed": True,
+                    "reason": "The response explicitly asks for a decision.",
+                }
+            ]
+        },
+    )
+
+    result = run_behavioral_case(
+        tmp_path,
+        "implementation",
+        "fix-value",
+        semantic_judge=True,
+        executor_command=write_response_executor(tmp_path),
+        judge_executor_command=judge,
+        results_directory=tmp_path / "results",
+    )
+
+    assert result.mechanical_passed is True
+    assert result.semantic_judgment.status == "completed"
+    assert result.semantic_judgment.passed is True
+    assert result.semantic_judgment.criteria[0].criterion_id == "requests-decision"
+    assert result.semantic_judgment.usage is not None
+    assert result.semantic_judgment.usage.input_tokens == 7
+    serialized = json.loads(result.result_path.read_text(encoding="utf-8"))
+    assert serialized["semantic_judgment"]["passed"] is True
+    assert serialized["semantic_judgment"]["non_gating"] is True
+
+
+def test_failed_semantic_judgment_does_not_change_mechanical_result(
+    tmp_path: Path,
+) -> None:
+    rubric = [
+        {
+            "id": "requests-decision",
+            "criterion": "The response requests the governing policy decision.",
+        }
+    ]
+    write_behavior_fixture(
+        tmp_path,
+        allowed_mutations=[],
+        required_mutations=[],
+        semantic_rubric=rubric,
+        workspace_mode="read-only",
+    )
+    judge = write_semantic_judge_executor(
+        tmp_path,
+        {
+            "criteria": [
+                {
+                    "id": "requests-decision",
+                    "passed": False,
+                    "reason": "No question was asked.",
+                }
+            ]
+        },
+    )
+
+    result = run_behavioral_case(
+        tmp_path,
+        "implementation",
+        "fix-value",
+        semantic_judge=True,
+        executor_command=write_response_executor(tmp_path),
+        judge_executor_command=judge,
+        results_directory=tmp_path / "results",
+    )
+
+    assert result.mechanical_passed is True
+    assert result.semantic_judgment.status == "completed"
+    assert result.semantic_judgment.passed is False
+
+
+def test_semantic_judge_error_does_not_change_mechanical_result(
+    tmp_path: Path,
+) -> None:
+    write_behavior_fixture(
+        tmp_path,
+        allowed_mutations=[],
+        required_mutations=[],
+        semantic_rubric=[
+            {
+                "id": "requests-decision",
+                "criterion": "The response requests the governing decision.",
+            }
+        ],
+        workspace_mode="read-only",
+    )
+
+    result = run_behavioral_case(
+        tmp_path,
+        "implementation",
+        "fix-value",
+        semantic_judge=True,
+        executor_command=write_response_executor(tmp_path),
+        judge_executor_command=write_response_executor(tmp_path),
+        results_directory=tmp_path / "results",
+    )
+
+    assert result.mechanical_passed is True
+    assert result.semantic_judgment.status == "error"
+    assert result.semantic_judgment.passed is None
+    assert "not valid JSON" in (result.semantic_judgment.error or "")
+    assert result.semantic_judgment.trace_path is not None
+    assert result.semantic_judgment.trace_path.is_file()
+
+
+def test_evaluator_rejects_duplicate_semantic_rubric_ids(tmp_path: Path) -> None:
+    write_behavior_fixture(
+        tmp_path,
+        allowed_mutations=[],
+        required_mutations=[],
+        semantic_rubric=[
+            {"id": "authority", "criterion": "Identify the policy owners."},
+            {"id": "authority", "criterion": "Identify equal precedence."},
+        ],
+        workspace_mode="read-only",
+    )
+
+    report = evaluate_repository(tmp_path)
+
+    assert any(
+        "duplicate semantic rubric id 'authority'" in error
+        for error in report.errors
+    )
 
 
 def test_behavioral_runner_preserves_prior_run_results(tmp_path: Path) -> None:
@@ -705,6 +880,11 @@ def test_codex_command_is_ephemeral_json_and_workspace_scoped(
     assert command[command.index("--model") + 1] == "test-model"
     assert command[-1] == "-"
 
+    judge_command = build_codex_command(
+        tmp_path, model="judge-model", sandbox="read-only"
+    )
+    assert judge_command[judge_command.index("--sandbox") + 1] == "read-only"
+
 
 def test_behavioral_cli_dry_run_does_not_execute(
     tmp_path: Path, capsys
@@ -729,6 +909,53 @@ def test_behavioral_cli_dry_run_does_not_execute(
     output = capsys.readouterr().out
     assert '"repeat_count": 3' in output
     assert '"semantic_expectations": "ungraded"' in output
+    assert not (tmp_path / "evals" / "results").exists()
+
+
+def test_behavioral_cli_dry_run_describes_non_gating_semantic_judge(
+    tmp_path: Path, capsys
+) -> None:
+    write_behavior_fixture(
+        tmp_path,
+        allowed_mutations=[],
+        required_mutations=[],
+        semantic_rubric=[
+            {
+                "id": "requests-decision",
+                "criterion": "The response requests an authoritative decision.",
+            }
+        ],
+        workspace_mode="read-only",
+    )
+
+    exit_code = run_evals.main(
+        [
+            "--root",
+            str(tmp_path),
+            "--behavioral",
+            "implementation",
+            "--case",
+            "fix-value",
+            "--judge",
+            "--judge-model",
+            "judge-model",
+            "--dry-run",
+        ]
+    )
+
+    assert exit_code == 0
+    plan = json.loads(capsys.readouterr().out)
+    assert plan["semantic_judge"] == {
+        "enabled": True,
+        "model": "judge-model",
+        "non_gating": True,
+        "rubric": [
+            {
+                "id": "requests-decision",
+                "criterion": "The response requests an authoritative decision.",
+            }
+        ],
+    }
     assert not (tmp_path / "evals" / "results").exists()
 
 

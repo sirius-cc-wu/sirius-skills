@@ -71,3 +71,7 @@ eval-behavior-dry-run skill case repeat="1":
 # Run an explicitly selected behavioral case through Codex one or more times.
 eval-behavior skill case repeat="1":
 	env PYTHONPATH="{{repo_root}}/src" python3 -m sirius_skills.commands.run_evals --root "{{repo_root}}" --behavioral {{quote(skill)}} --case {{quote(case)}} --repeat {{quote(repeat)}}
+
+# Add an opt-in, non-gating semantic judge to a behavioral case.
+eval-behavior-judged skill case repeat="1":
+	env PYTHONPATH="{{repo_root}}/src" python3 -m sirius_skills.commands.run_evals --root "{{repo_root}}" --behavioral {{quote(skill)}} --case {{quote(case)}} --repeat {{quote(repeat)}} --judge
