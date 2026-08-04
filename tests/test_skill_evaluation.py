@@ -159,13 +159,16 @@ def write_behavior_fixture(
     root: Path,
     *,
     allowed_mutations: list[str],
+    required_mutations: list[str] | None = None,
+    workspace_mode: str = "mutable",
     trace_assertions: list[dict[str, object]] | None = None,
 ) -> None:
     write_skill(root, "implementation", "Implement behavior with executable tests.")
     fixture = root / "evals" / "fixtures" / "example"
     (fixture / "src").mkdir(parents=True)
     (fixture / "tests").mkdir()
-    (fixture / "src" / "value.txt").write_text("broken\n", encoding="utf-8")
+    fixture_value = "fixed\n" if workspace_mode == "read-only" else "broken\n"
+    (fixture / "src" / "value.txt").write_text(fixture_value, encoding="utf-8")
     (fixture / "tests" / "verify.py").write_text(
         "from pathlib import Path\n"
         "raise SystemExit(Path('src/value.txt').read_text() != 'fixed\\n')\n",
@@ -173,13 +176,30 @@ def write_behavior_fixture(
     )
     behavioral_case: dict[str, object] = {
         "id": "fix-value",
-        "prompt": "Fix the value.",
-        "expected_output": "The verifier passes.",
-        "expectations": ["The broken value is corrected."],
+        "prompt": (
+            "Inspect the value without changing it."
+            if workspace_mode == "read-only"
+            else "Fix the value."
+        ),
+        "expected_output": (
+            "The verified value remains unchanged."
+            if workspace_mode == "read-only"
+            else "The verifier passes."
+        ),
+        "expectations": [
+            (
+                "The verified value is not changed."
+                if workspace_mode == "read-only"
+                else "The broken value is corrected."
+            )
+        ],
         "prohibitions": ["Do not change unrelated files."],
         "fixture": "example",
+        "workspace_mode": workspace_mode,
         "allowed_mutations": allowed_mutations,
-        "required_mutations": ["src/**"],
+        "required_mutations": (
+            ["src/**"] if required_mutations is None else required_mutations
+        ),
         "checks": [[sys.executable, "tests/verify.py"]],
     }
     if trace_assertions is not None:
@@ -204,6 +224,16 @@ def write_fake_executor(tmp_path: Path, mutation: str) -> list[str]:
         "path.parent.mkdir(parents=True, exist_ok=True)\n"
         "path.write_text('fixed\\n', encoding='utf-8')\n"
         "print(json.dumps({'type': 'turn.completed', 'usage': {'input_tokens': 1}}))\n",
+        encoding="utf-8",
+    )
+    return [sys.executable, str(executor)]
+
+
+def write_noop_executor(tmp_path: Path) -> list[str]:
+    executor = tmp_path / "noop_executor.py"
+    executor.write_text(
+        "import json\n"
+        "print(json.dumps({'type': 'turn.completed'}))\n",
         encoding="utf-8",
     )
     return [sys.executable, str(executor)]
@@ -529,6 +559,73 @@ def test_behavioral_runner_rejects_mutations_outside_allowlist(
     assert result.unauthorized_mutations == ["notes.md"]
 
 
+def test_behavioral_runner_accepts_read_only_case_without_mutations(
+    tmp_path: Path,
+) -> None:
+    write_behavior_fixture(
+        tmp_path,
+        allowed_mutations=[],
+        required_mutations=[],
+        workspace_mode="read-only",
+    )
+
+    report = evaluate_repository(tmp_path)
+    result = run_behavioral_case(
+        tmp_path,
+        "implementation",
+        "fix-value",
+        executor_command=write_noop_executor(tmp_path),
+        results_directory=tmp_path / "results",
+    )
+
+    assert report.errors == []
+    assert result.mechanical_passed is True
+    assert result.changes == ()
+    serialized = json.loads(result.result_path.read_text(encoding="utf-8"))
+    assert serialized["workspace_mode"] == "read-only"
+    assert "Do not create, modify, or delete files" in serialized["prompt"]
+
+
+def test_behavioral_runner_rejects_mutation_in_read_only_case(
+    tmp_path: Path,
+) -> None:
+    write_behavior_fixture(
+        tmp_path,
+        allowed_mutations=[],
+        required_mutations=[],
+        workspace_mode="read-only",
+    )
+
+    result = run_behavioral_case(
+        tmp_path,
+        "implementation",
+        "fix-value",
+        executor_command=write_fake_executor(tmp_path, "notes.md"),
+        results_directory=tmp_path / "results",
+    )
+
+    assert result.mechanical_passed is False
+    assert result.unauthorized_mutations == ["notes.md"]
+
+
+def test_evaluator_rejects_mutation_patterns_for_read_only_case(
+    tmp_path: Path,
+) -> None:
+    write_behavior_fixture(
+        tmp_path,
+        allowed_mutations=["src/**"],
+        required_mutations=[],
+        workspace_mode="read-only",
+    )
+
+    report = evaluate_repository(tmp_path)
+
+    assert any(
+        "read-only eval 'fix-value' must not allow mutations" in error
+        for error in report.errors
+    )
+
+
 def test_codex_command_is_ephemeral_json_and_workspace_scoped(
     tmp_path: Path,
 ) -> None:
@@ -622,6 +719,29 @@ def test_order_cancellation_fixture_starts_green_without_approved_policy() -> No
     assert missing_policy.returncode == 0, missing_policy.stdout
     assert independent_oracle.returncode != 0
     assert "cancel" in independent_oracle.stdout
+
+
+def test_conflicting_policy_fixture_preserves_an_unresolved_decision() -> None:
+    fixture = REPO_ROOT / "evals" / "fixtures" / "conflicting-cancellation-policy"
+    product_policy = (fixture / "requirements" / "product-policy.md").read_text(
+        encoding="utf-8"
+    )
+    risk_policy = (fixture / "requirements" / "risk-policy.md").read_text(
+        encoding="utf-8"
+    )
+    regression = subprocess.run(
+        [sys.executable, "-m", "pytest", "-q"],
+        cwd=fixture,
+        text=True,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.STDOUT,
+    )
+
+    assert "Authority: approved" in product_policy
+    assert "submitted order may be cancelled" in product_policy
+    assert "Authority: approved" in risk_policy
+    assert "submitted order cannot be cancelled" in risk_policy
+    assert regression.returncode == 0, regression.stdout
 
 
 def test_behavioral_runner_checks_required_file_content(tmp_path: Path) -> None:

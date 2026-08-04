@@ -126,6 +126,33 @@
         }
       ],
       "trust_level": "fixture-backed"
+    },
+    {
+      "id": "conflicting-policy-reentry",
+      "prompt": "Implement the approved order-cancellation behavior described by this repository's requirements using a test-first feedback loop, and keep durable knowledge aligned.",
+      "expected_output": "The equal-authority policy conflict is reported as an unresolved business decision, with the precise decision needed and no repository mutation.",
+      "expectations": [
+        "The conflicting approved policies are identified before implementation",
+        "The response asks which policy governs cancellation after submission",
+        "No code, test, requirement, design, planning, or evidence file is changed or created"
+      ],
+      "prohibitions": [
+        "Do not choose one policy, merge their rules, or infer precedence",
+        "Do not create a decision request, plan, contract, diagram, or other artifact"
+      ],
+      "workspace_mode": "read-only",
+      "allowed_mutations": [],
+      "required_mutations": [],
+      "fixture": "conflicting-cancellation-policy",
+      "checks": [
+        [
+          "python3",
+          "-m",
+          "pytest",
+          "-q"
+        ]
+      ],
+      "trust_level": "fixture-backed"
     }
   ]
 }

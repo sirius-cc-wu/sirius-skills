@@ -227,19 +227,42 @@ def _validate_behavioral_cases(
                 "'required_mutations'"
             )
         fixture = case.get("fixture")
+        workspace_mode = case.get("workspace_mode", "mutable")
+        if workspace_mode not in {"mutable", "read-only"}:
+            report.errors.append(
+                f"{filename}: behavioral eval {case_id!r} has invalid "
+                "'workspace_mode'"
+            )
         if fixture is not None and (
             not isinstance(fixture, str) or not fixture.strip()
         ):
             report.errors.append(
                 f"{filename}: behavioral eval {case_id!r} has invalid 'fixture'"
             )
-        if fixture is not None and not _valid_string_list(
-            case.get("allowed_mutations"), allow_empty=False
-        ):
-            report.errors.append(
-                f"{filename}: fixture-backed eval {case_id!r} needs "
-                "allowed_mutations"
-            )
+        if fixture is not None:
+            allowed_mutations = case.get("allowed_mutations")
+            if not _valid_string_list(allowed_mutations):
+                report.errors.append(
+                    f"{filename}: fixture-backed eval {case_id!r} needs "
+                    "allowed_mutations"
+                )
+            elif workspace_mode == "mutable" and not allowed_mutations:
+                report.errors.append(
+                    f"{filename}: mutable eval {case_id!r} needs allowed mutations"
+                )
+            elif workspace_mode == "read-only" and allowed_mutations:
+                report.errors.append(
+                    f"{filename}: read-only eval {case_id!r} must not allow "
+                    "mutations"
+                )
+            if (
+                workspace_mode == "read-only"
+                and case.get("required_mutations") != []
+            ):
+                report.errors.append(
+                    f"{filename}: read-only eval {case_id!r} must declare empty "
+                    "required_mutations"
+                )
         checks = case.get("checks", [])
         if not isinstance(checks, list) or any(
             not isinstance(command, list)

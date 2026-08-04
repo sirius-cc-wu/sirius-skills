@@ -197,6 +197,15 @@ def _string_list(case: dict[str, object], key: str) -> list[str]:
     return value
 
 
+def _workspace_mode(case: dict[str, object]) -> str:
+    value = case.get("workspace_mode", "mutable")
+    if value not in {"mutable", "read-only"}:
+        raise ValueError(
+            f"behavioral eval {case.get('id')!r} has invalid workspace_mode"
+        )
+    return value
+
+
 def _check_commands(case: dict[str, object]) -> list[tuple[str, ...]]:
     value = case.get("checks", [])
     if not isinstance(value, list):
@@ -556,6 +565,17 @@ def _build_prompt(skill_source: str, case: dict[str, object]) -> str:
     checks = "\n".join(
         f"- {' '.join(command)}" for command in _check_commands(case)
     ) or "- None declared."
+    workspace_mode = _workspace_mode(case)
+    if workspace_mode == "read-only":
+        authority = (
+            "- Read-only. Do not create, modify, or delete files. Inspect the "
+            "repository and report the unresolved decision instead."
+        )
+    else:
+        authority = "\n".join(
+            f"- Changes matching `{pattern}` are authorized."
+            for pattern in _string_list(case, "allowed_mutations")
+        )
     return f"""You are executing a controlled Sirius skill evaluation in a disposable repository.
 
 Follow the supplied skill instructions and complete the task in the current
@@ -577,6 +597,9 @@ Behavioral expectations:
 
 Prohibitions:
 {prohibitions}
+
+Workspace authority:
+{authority}
 
 Declared verification commands:
 {checks}
@@ -689,6 +712,7 @@ def _serialize_result(
         "schema_version": 1,
         "skill_name": skill_name,
         "case_id": case["id"],
+        "workspace_mode": _workspace_mode(case),
         "skill_revision": _git_revision(root),
         "host": host,
         "host_version": host_version,
@@ -736,6 +760,7 @@ def describe_behavioral_case(
         "skill_name": skill_name,
         "case_id": case["id"],
         "fixture": fixture.relative_to(root).as_posix(),
+        "workspace_mode": _workspace_mode(case),
         "allowed_mutations": _string_list(case, "allowed_mutations"),
         "required_mutations": _string_list(case, "required_mutations"),
         "checks": [list(command) for command in _check_commands(case)],
@@ -765,11 +790,20 @@ def run_behavioral_case(
     if not skill_path.is_file():
         raise ValueError(f"skill instructions do not exist: {skill_name}")
     prompt = _build_prompt(skill_path.read_text(encoding="utf-8"), case)
+    workspace_mode = _workspace_mode(case)
     allowed = _string_list(case, "allowed_mutations")
     required = _string_list(case, "required_mutations")
-    if not allowed:
+    if not allowed and workspace_mode != "read-only":
         raise ValueError(
             f"behavioral eval {case_id!r} must declare allowed_mutations"
+        )
+    if workspace_mode == "read-only" and (
+        case.get("allowed_mutations") != []
+        or case.get("required_mutations") != []
+    ):
+        raise ValueError(
+            f"read-only behavioral eval {case_id!r} must declare empty mutation "
+            "lists"
         )
 
     result_directory = results_directory or root / "evals" / "results"

@@ -18,10 +18,9 @@ and focused class-view outcomes. Repeated runs retain independent evidence and
 summarize mechanical outcome, changed-path/kind, and duration stability.
 Executor version, requested and trace-observed model identity, and reported
 token usage are retained without guessing missing metadata. Semantic grading
-remains planned. A paired implementation case now contrasts the invoice
-fixture's documentation restraint with an order-cancellation change that must
-refine the existing canonical domain model; broader workflow re-entry remains
-planned.
+and contract-driven composition remain planned. Three implementation cases now
+exercise local correction, canonical domain-model reconciliation, and read-only
+workflow re-entry when equal-authority requirements conflict.
 
 ## At a Glance
 
@@ -59,6 +58,11 @@ A complementary scenario confirms that feedback is not suppressed: when an
 approved cancellation policy introduces the durable `CancellationReason`
 concept, the agent should refine the existing canonical domain model rather
 than ignore the discrepancy or create a competing model.
+
+The third scenario supplies two incompatible approved policies with equal
+authority. The agent should preserve the repository, report the conflict, and
+ask which policy governs rather than converting uncertainty into code, tests,
+or a new decision document.
 
 Together, these scenarios test the central Sirius claim: coding agents retain
 local autonomy while durable knowledge is reconciled when material evidence
@@ -274,7 +278,8 @@ definitions, evaluator code, and deliberately reviewed baselines.
 ### Stage 3: Evaluate Composition
 
 - Pair a documentation-restraint scenario with canonical design feedback.
-- Add contract-driven feedback and workflow re-entry scenarios.
+- Add a read-only workflow-reentry scenario for conflicting authority.
+- Add contract-driven feedback scenarios.
 - Run composition cases periodically and before material workflow-boundary
   changes.
 - Compare failures with real skill usage before deciding which additional
@@ -298,7 +303,7 @@ Expand only if the pilot answers these questions positively:
 | Model variance creates flaky gates | Keep paid runs out of required CI initially; repeat and report distributions |
 | Lexical routing is mistaken for agent behavior | Label it as a description tripwire and retain model-executed selection cases |
 | Fixtures encode one repository's conventions | Use small generic repositories and state every fixture assumption |
-| The suite reinforces documentation micromanagement | Include explicit no-document and no-reentry cases |
+| The suite reinforces documentation micromanagement | Include explicit no-document and read-only re-entry cases |
 | A judge approves unauthorized changes | Enforce mutation allowlists mechanically |
 | Cost grows with catalog coverage | Use affected-case selection, staged coverage, and explicit budgets |
 | Multi-host support delays useful evidence | Start with one recorded host and add another only after the harness proves useful |

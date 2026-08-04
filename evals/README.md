@@ -26,13 +26,13 @@ The initial pilot covers:
 - `reconstruct-software-architecture`; and
 - `uml-class-diagram-design`.
 
-The fixture-backed cases distinguish four outcomes: a local implementation fix
-that creates no design document, an approved domain rule that refines code,
-tests, and one existing canonical model, focused component and runtime views
-for cross-module comprehension, and a focused class view for justified
-stateful object design. The two implementation cases form the first paired
-check that design feedback is conditional rather than an automatic document
-step.
+The fixture-backed cases distinguish five outcomes. Three implementation cases
+exercise the complete feedback branch: a local fix creates no design document,
+an approved domain rule refines code, tests, and one existing canonical model,
+and conflicting equal-authority policies return to the user without repository
+mutation. Two visual cases select focused component and runtime views for
+cross-module comprehension or a focused class view for justified stateful
+object design.
 
 ## Case Format
 
@@ -104,6 +104,13 @@ checking that a PlantUML block and requested diagram kind exist, not for
 judging whether the diagram communicates well. The deterministic tier
 validates the case shape but does not claim the behavior passed.
 
+`workspace_mode` defaults to `mutable`, which requires at least one
+`allowed_mutations` pattern. Set it to `read-only` only when unresolved intent
+or authority should prevent every repository change; both `allowed_mutations`
+and `required_mutations` must then be empty lists. The executor still receives
+a writable disposable workspace so attempted mutations are observable and fail
+the case rather than being hidden by sandbox denial.
+
 A file assertion examines the whole file by default. Set
 `"scope": "plantuml"` for Markdown diagram artifacts so `contains` and
 `not_contains` inspect only complete fenced `plantuml` blocks. This prevents
@@ -158,8 +165,8 @@ Behavioral execution is never part of `just validate`. The runner:
 3. supplies the selected `SKILL.md`, prompt, expectations, prohibitions, and
    checks as the evaluation prompt;
 4. captures created, modified, and deleted files while ignoring tool caches;
-5. rejects changes outside `allowed_mutations` and missing
-   `required_mutations`;
+5. rejects changes outside `allowed_mutations`, including every change in a
+   read-only case, and reports missing `required_mutations`;
 6. evaluates declared JSONL trace-order assertions;
 7. checks required and forbidden output-file fragments;
 8. runs declared verification commands without a shell; and
@@ -183,12 +190,13 @@ PYTHONPATH=src python3 -m sirius_skills.commands.run_evals \
 ```
 
 Each run reports only a **mechanical pass**: the executor exited normally,
-mutation boundaries held, required changes occurred, and declared mechanical
-assertions and commands passed. The batch summary identifies variation; it
-does not turn repeated agreement into semantic proof. Full JSONL traces and
-semantic expectations are preserved, but expectations and prohibitions remain
-explicitly `ungraded` until a trustworthy semantic evaluator is implemented.
-Do not report a mechanical pass as proof that the skill behaved correctly.
+mutation boundaries held, required changes occurred or read-only state was
+preserved, and declared mechanical assertions and commands passed. The batch
+summary identifies variation; it does not turn repeated agreement into
+semantic proof. Full JSONL traces and semantic expectations are preserved, but
+expectations and prohibitions remain explicitly `ungraded` until a trustworthy
+semantic evaluator is implemented. Do not report a mechanical pass as proof
+that the skill behaved correctly.
 
 ## Scoring Boundaries
 
