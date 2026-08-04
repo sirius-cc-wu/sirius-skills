@@ -22,7 +22,14 @@ The initial pilot covers:
 - `test-driven-implementation`;
 - `recover-system-behavior`;
 - `reconcile-recovered-design`; and
-- `commit`.
+- `commit`;
+- `reconstruct-software-architecture`; and
+- `uml-class-diagram-design`.
+
+The last two cases are the first consumers of the visual-design proposal. With
+the implementation bug case, they distinguish three outcomes: no diagram for
+a local fix, focused component and runtime views for cross-module
+comprehension, and a focused class view for justified stateful object design.
 
 ## Case Format
 
@@ -87,9 +94,12 @@ behavioral `expectations`. Optional `prohibitions` and `allowed_mutations`
 declare negative behavior and workspace authority.
 
 Behavioral entries remain `provisional` until they have a disposable fixture.
-A fixture-backed entry also declares `fixture`, `required_mutations`, and
-argument-vector `checks`. The deterministic tier validates their shape but
-does not claim they passed.
+A fixture-backed entry also declares `fixture`, `required_mutations`, optional
+argument-vector `checks`, and optional `file_assertions`. A file assertion can
+require or forbid literal fragments in a named output file; it is suitable for
+checking that a PlantUML block and requested diagram kind exist, not for
+judging whether the diagram communicates well. The deterministic tier
+validates the case shape but does not claim the behavior passed.
 
 ## Run a Behavioral Case
 
@@ -116,8 +126,9 @@ Behavioral execution is never part of `just validate`. The runner:
 4. captures created, modified, and deleted files while ignoring tool caches;
 5. rejects changes outside `allowed_mutations` and missing
    `required_mutations`;
-6. runs declared verification commands without a shell; and
-7. writes the trace and mechanical result under the ignored `evals/results/`
+6. checks required and forbidden output-file fragments;
+7. runs declared verification commands without a shell; and
+8. writes the trace and mechanical result under the ignored `evals/results/`
    directory before deleting the temporary workspace.
 
 Use the lower-level command when a model override, timeout, or retained

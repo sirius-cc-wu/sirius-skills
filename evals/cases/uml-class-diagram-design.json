@@ -1,0 +1,69 @@
+{
+  "skill_name": "uml-class-diagram-design",
+  "trigger": {
+    "positive": [
+      {
+        "prompt": "Create a focused UML class diagram of software types, methods, associations, interfaces, and visibility",
+        "top_k": 3
+      },
+      {
+        "prompt": "Summarize the stable implementation-facing class structure discovered during object design",
+        "top_k": 3
+      },
+      {
+        "prompt": "Show package boundaries, navigability, operations, and variation interfaces in a design class diagram",
+        "top_k": 3
+      }
+    ],
+    "negative": [
+      {
+        "prompt": "Build a conceptual domain model of business vocabulary, associations, and attributes without software methods",
+        "owner": "domain-modeling"
+      },
+      {
+        "prompt": "Recover as-built modules, components, runtime collaborations, state ownership, and deployment",
+        "owner": "reconstruct-software-architecture"
+      }
+    ]
+  },
+  "evals": [
+    {
+      "id": "stateful-order-class-view",
+      "prompt": "Create docs/order-design.md with a focused PlantUML class view that helps a reviewer understand the stateful Order design in src/order.py. Show only types, operations, and relationships that carry meaningful responsibilities or state-transition rules; explain scope and omissions.",
+      "expected_output": "A concise, implementation-facing PlantUML class view for the stateful order design.",
+      "expectations": [
+        "The view identifies Order's state-transition responsibilities and public operations",
+        "The status type and fulfillment dependency appear only because they affect behavior",
+        "The artifact distinguishes its focused software design scope from a conceptual domain model"
+      ],
+      "prohibitions": [
+        "Do not produce component, deployment, or runtime sequence views",
+        "Do not inventory incidental Python implementation details"
+      ],
+      "fixture": "stateful-order",
+      "allowed_mutations": [
+        "docs/order-design.md"
+      ],
+      "required_mutations": [
+        "docs/order-design.md"
+      ],
+      "file_assertions": [
+        {
+          "path": "docs/order-design.md",
+          "contains": [
+            "```plantuml",
+            "@startuml",
+            "class ",
+            "Order",
+            "@enduml"
+          ],
+          "not_contains": [
+            "component ",
+            "participant "
+          ]
+        }
+      ],
+      "trust_level": "fixture-backed"
+    }
+  ]
+}

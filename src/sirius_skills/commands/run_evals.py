@@ -92,6 +92,14 @@ def main(argv: Sequence[str] | None = None) -> int:
                 "Missing required mutations: "
                 + ", ".join(result.missing_required_mutations)
             )
+        failed_assertions = [
+            assertion for assertion in result.file_assertions if not assertion.passed
+        ]
+        if failed_assertions:
+            print(
+                "Failed file assertions: "
+                + ", ".join(assertion.path for assertion in failed_assertions)
+            )
         print(f"Trace: {result.trace_path}")
         print(f"Result: {result.result_path}")
         print("Semantic expectations: UNGRADED")

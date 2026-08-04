@@ -250,6 +250,19 @@ def _validate_behavioral_cases(
             report.errors.append(
                 f"{filename}: behavioral eval {case_id!r} has invalid 'checks'"
             )
+        file_assertions = case.get("file_assertions", [])
+        if not isinstance(file_assertions, list) or any(
+            not isinstance(assertion, dict)
+            or not isinstance(assertion.get("path"), str)
+            or not assertion.get("path")
+            or not _valid_string_list(assertion.get("contains", []))
+            or not _valid_string_list(assertion.get("not_contains", []))
+            for assertion in file_assertions
+        ):
+            report.errors.append(
+                f"{filename}: behavioral eval {case_id!r} has invalid "
+                "'file_assertions'"
+            )
         trust_level = case.get("trust_level")
         if trust_level not in (None, "provisional", "fixture-backed"):
             report.errors.append(

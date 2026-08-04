@@ -250,6 +250,13 @@ result is not to suppress OO techniques or diagrams. It is to distinguish the
 cases where a PlantUML view earns its maintenance cost, choose the view that
 answers the human question, and avoid producing the rest mechanically.
 
+The initial executable fixtures now cover the first three contrasting outcomes:
+a local bug fix whose mutation boundary excludes documentation, a cross-module
+order flow requiring component and runtime PlantUML views, and a stateful order
+design requiring a focused class view. Mechanical assertions verify mutation
+scope and diagram-kind markers; semantic diagram quality remains explicitly
+ungraded.
+
 ## Decision Still Required
 
 Before implementation, decide whether paradigm-neutral routing should:

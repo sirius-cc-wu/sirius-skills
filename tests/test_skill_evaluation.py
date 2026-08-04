@@ -119,8 +119,8 @@ def test_pilot_routing_cases_pass() -> None:
     report = evaluate_repository(REPO_ROOT)
 
     assert report.errors == []
-    assert report.case_files == 6
-    assert report.routing_checks >= 30
+    assert report.case_files == 8
+    assert report.routing_checks >= 40
 
 
 def write_behavior_fixture(root: Path, *, allowed_mutations: list[str]) -> None:
@@ -261,3 +261,105 @@ def test_invoice_fixture_seeds_the_expected_rounding_failure() -> None:
 
     assert completed.returncode == 1
     assert "assert '2.67' == '2.68'" in completed.stdout
+
+
+def test_behavioral_runner_checks_required_file_content(tmp_path: Path) -> None:
+    write_skill(tmp_path, "visualize", "Create focused PlantUML architecture views.")
+    fixture = tmp_path / "evals" / "fixtures" / "visual"
+    fixture.mkdir(parents=True)
+    write_case(
+        tmp_path,
+        "visualize",
+        {
+            "skill_name": "visualize",
+            "trigger": {"positive": [], "negative": []},
+            "evals": [
+                {
+                    "id": "component-view",
+                    "prompt": "Explain the components.",
+                    "expected_output": "A focused component diagram.",
+                    "expectations": ["The component boundary is visible."],
+                    "fixture": "visual",
+                    "allowed_mutations": ["docs/**"],
+                    "required_mutations": ["docs/architecture.md"],
+                    "file_assertions": [
+                        {
+                            "path": "docs/architecture.md",
+                            "contains": ["@startuml", "component", "@enduml"],
+                            "not_contains": ["class "],
+                        }
+                    ],
+                }
+            ],
+        },
+    )
+    executor = tmp_path / "visual_executor.py"
+    executor.write_text(
+        "from pathlib import Path\n"
+        "path = Path('docs/architecture.md')\n"
+        "path.parent.mkdir(parents=True)\n"
+        "path.write_text('```plantuml\\n@startuml\\ncomponent API\\n@enduml\\n```\\n')\n",
+        encoding="utf-8",
+    )
+
+    result = run_behavioral_case(
+        tmp_path,
+        "visualize",
+        "component-view",
+        executor_command=[sys.executable, str(executor)],
+        results_directory=tmp_path / "results",
+    )
+
+    assert result.mechanical_passed is True
+    assert result.file_assertions[0].passed is True
+
+
+def test_behavioral_runner_rejects_forbidden_file_content(tmp_path: Path) -> None:
+    write_skill(tmp_path, "visualize", "Create focused PlantUML architecture views.")
+    fixture = tmp_path / "evals" / "fixtures" / "visual"
+    fixture.mkdir(parents=True)
+    write_case(
+        tmp_path,
+        "visualize",
+        {
+            "skill_name": "visualize",
+            "trigger": {"positive": [], "negative": []},
+            "evals": [
+                {
+                    "id": "component-view",
+                    "prompt": "Explain the components.",
+                    "expected_output": "A focused component diagram.",
+                    "expectations": ["The component boundary is visible."],
+                    "fixture": "visual",
+                    "allowed_mutations": ["docs/**"],
+                    "required_mutations": ["docs/architecture.md"],
+                    "file_assertions": [
+                        {
+                            "path": "docs/architecture.md",
+                            "contains": ["@startuml", "component", "@enduml"],
+                            "not_contains": ["class "],
+                        }
+                    ],
+                }
+            ],
+        },
+    )
+    executor = tmp_path / "visual_executor.py"
+    executor.write_text(
+        "from pathlib import Path\n"
+        "path = Path('docs/architecture.md')\n"
+        "path.parent.mkdir(parents=True)\n"
+        "path.write_text('@startuml\\ncomponent API\\nclass Order\\n@enduml\\n')\n",
+        encoding="utf-8",
+    )
+
+    result = run_behavioral_case(
+        tmp_path,
+        "visualize",
+        "component-view",
+        executor_command=[sys.executable, str(executor)],
+        results_directory=tmp_path / "results",
+    )
+
+    assert result.mechanical_passed is False
+    assert result.file_assertions[0].unexpected_fragments == ("class ",)

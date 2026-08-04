@@ -9,11 +9,12 @@ tags: [evaluation, skills, quality]
 # Skill Evaluation Program
 
 Implementation is proceeding in risk-sized stages. The deterministic routing
-case format, runner, and six-skill pilot are owned by
+case format, runner, and eight-skill pilot are owned by
 [`evals/`](../../evals/README.md). Opt-in Codex execution now captures traces,
 workspace mutations, and verification results in a disposable fixture;
-semantic grading and composition coverage remain planned until their
-respective stages are implemented and verified.
+initial visual composition fixtures also distinguish no-diagram, focused
+architecture-view, and focused class-view outcomes. Semantic grading and
+broader feedback composition remain planned.
 
 ## At a Glance
 
@@ -29,7 +30,7 @@ The proposed program adds three capabilities in stages:
 3. composition evals for conditional feedback and documentation restraint.
 
 This is repository verification infrastructure, not a new deployable skill.
-The first investment should be a six-skill pilot that proves the evals detect
+The first investment should be a bounded pilot that proves the evals detect
 seeded failures before coverage expands across the catalog.
 
 ## Representative Scenario
@@ -207,7 +208,7 @@ These cases should distinguish three outcomes:
 
 ## Pilot Scope
 
-Begin with six skills that represent distinct failure risks:
+Begin with eight skills that represent distinct failure risks:
 
 | Skill | Risk exercised |
 |---|---|
@@ -217,6 +218,8 @@ Begin with six skills that represent distinct failure risks:
 | `recover-system-behavior` | Separating evidenced current behavior from intended requirements |
 | `reconcile-recovered-design` | Respecting authority and avoiding silent mutation |
 | `commit` | Scoping staged changes in a dirty worktree |
+| `reconstruct-software-architecture` | Selecting focused component and runtime views from as-built evidence instead of producing an exhaustive inventory |
+| `uml-class-diagram-design` | Producing a focused class view only when type responsibilities and relationships justify it |
 
 Do not expand to all skills merely to reach a coverage percentage. Expand when
 the pilot schema and runner reliably detect seeded routing, behavior, and
@@ -244,7 +247,7 @@ definitions, evaluator code, and deliberately reviewed baselines.
 
 ### Stage 1: Prove Routing Cases
 
-- Define the case schema for the six pilot skills.
+- Define the case schema for the eight pilot skills.
 - Implement the free deterministic runner.
 - Seed one description collision and one missing-vocabulary case to prove the
   runner fails for each.
@@ -253,7 +256,8 @@ definitions, evaluator code, and deliberately reviewed baselines.
 ### Stage 2: Prove Behavioral Discrimination
 
 - Select one supported host and model for the pilot.
-- Build disposable fixtures for the six skills.
+- Build disposable fixtures for representative pilot risks before expanding
+  fixture coverage mechanically to every pilot skill.
 - Add deterministic trace and diff assertions before adding an LLM judge.
 - Seed prohibited mutations and workflow overreach to prove the evaluator
   detects them.
@@ -310,7 +314,7 @@ representative fixtures, not through an exhaustive framework design.
 The proposal is ready to move into implementation planning when maintainers
 agree on:
 
-- the six-skill pilot and its representative risks;
+- the eight-skill pilot and its representative risks;
 - free routing checks as the first deliverable;
 - one-host behavioral execution as an on-demand experiment;
 - trace and diff evidence as primary behavioral oracles;

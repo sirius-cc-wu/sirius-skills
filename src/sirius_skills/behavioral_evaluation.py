@@ -37,6 +37,15 @@ class CheckResult:
 
 
 @dataclass(frozen=True)
+class FileAssertionResult:
+    path: str
+    passed: bool
+    missing_fragments: tuple[str, ...] = ()
+    unexpected_fragments: tuple[str, ...] = ()
+    error: str | None = None
+
+
+@dataclass(frozen=True)
 class BehavioralResult:
     skill_name: str
     case_id: str | int
@@ -46,6 +55,7 @@ class BehavioralResult:
     unauthorized_mutations: list[str]
     missing_required_mutations: list[str]
     checks: tuple[CheckResult, ...]
+    file_assertions: tuple[FileAssertionResult, ...]
     workspace: Path
     trace_path: Path
     result_path: Path
@@ -156,6 +166,74 @@ def _check_commands(case: dict[str, object]) -> list[tuple[str, ...]]:
     return commands
 
 
+def _file_assertion_specs(case: dict[str, object]) -> list[dict[str, object]]:
+    value = case.get("file_assertions", [])
+    if not isinstance(value, list):
+        raise ValueError(
+            f"behavioral eval {case.get('id')!r} has invalid file_assertions"
+        )
+    specifications: list[dict[str, object]] = []
+    for specification in value:
+        if not isinstance(specification, dict):
+            raise ValueError(
+                f"behavioral eval {case.get('id')!r} has an invalid file assertion"
+            )
+        path = specification.get("path")
+        contains = specification.get("contains", [])
+        not_contains = specification.get("not_contains", [])
+        if (
+            not isinstance(path, str)
+            or not path
+            or not isinstance(contains, list)
+            or not isinstance(not_contains, list)
+            or not all(isinstance(item, str) and item for item in contains)
+            or not all(isinstance(item, str) and item for item in not_contains)
+        ):
+            raise ValueError(
+                f"behavioral eval {case.get('id')!r} has an invalid file assertion"
+            )
+        specifications.append(specification)
+    return specifications
+
+
+def _evaluate_file_assertions(
+    case: dict[str, object], workspace: Path
+) -> tuple[FileAssertionResult, ...]:
+    results: list[FileAssertionResult] = []
+    for specification in _file_assertion_specs(case):
+        relative = str(specification["path"])
+        path = _resolve_child(workspace, relative)
+        contains = tuple(str(item) for item in specification.get("contains", []))
+        not_contains = tuple(
+            str(item) for item in specification.get("not_contains", [])
+        )
+        try:
+            content = path.read_text(encoding="utf-8")
+        except (OSError, UnicodeError) as exc:
+            results.append(
+                FileAssertionResult(
+                    path=relative,
+                    passed=False,
+                    missing_fragments=contains,
+                    error=str(exc),
+                )
+            )
+            continue
+        missing = tuple(fragment for fragment in contains if fragment not in content)
+        unexpected = tuple(
+            fragment for fragment in not_contains if fragment in content
+        )
+        results.append(
+            FileAssertionResult(
+                path=relative,
+                passed=not missing and not unexpected,
+                missing_fragments=missing,
+                unexpected_fragments=unexpected,
+            )
+        )
+    return tuple(results)
+
+
 def _build_prompt(skill_source: str, case: dict[str, object]) -> str:
     expectations = "\n".join(
         f"- {item}" for item in _string_list(case, "expectations")
@@ -246,6 +324,7 @@ def _serialize_result(
     unauthorized_mutations: list[str],
     missing_required_mutations: list[str],
     checks: tuple[CheckResult, ...],
+    file_assertions: tuple[FileAssertionResult, ...],
     trace_path: Path,
     mechanical_passed: bool,
 ) -> dict[str, object]:
@@ -273,6 +352,7 @@ def _serialize_result(
             }
             for check in checks
         ],
+        "file_assertions": [asdict(assertion) for assertion in file_assertions],
         "semantic_expectations": {
             "status": "ungraded",
             "expectations": case.get("expectations", []),
@@ -298,6 +378,7 @@ def describe_behavioral_case(
         "allowed_mutations": _string_list(case, "allowed_mutations"),
         "required_mutations": _string_list(case, "required_mutations"),
         "checks": [list(command) for command in _check_commands(case)],
+        "file_assertions": _file_assertion_specs(case),
         "model": model,
         "semantic_expectations": "ungraded",
     }
@@ -389,11 +470,13 @@ def run_behavioral_case(
             _run_check(command_to_run, workspace, check_timeout_seconds)
             for command_to_run in _check_commands(case)
         )
+        file_assertions = _evaluate_file_assertions(case, workspace)
         mechanical_passed = (
             executor_returncode == 0
             and not unauthorized
             and not missing_required
             and all(check.returncode == 0 for check in checks)
+            and all(assertion.passed for assertion in file_assertions)
         )
         serialized = _serialize_result(
             root=root,
@@ -409,6 +492,7 @@ def run_behavioral_case(
             unauthorized_mutations=unauthorized,
             missing_required_mutations=missing_required,
             checks=checks,
+            file_assertions=file_assertions,
             trace_path=trace_path,
             mechanical_passed=mechanical_passed,
         )
@@ -425,6 +509,7 @@ def run_behavioral_case(
             unauthorized_mutations=unauthorized,
             missing_required_mutations=missing_required,
             checks=checks,
+            file_assertions=file_assertions,
             workspace=workspace,
             trace_path=trace_path,
             result_path=result_path,
