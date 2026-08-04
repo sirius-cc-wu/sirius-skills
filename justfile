@@ -45,7 +45,10 @@ uninstall skill_set="workflow":
 
 	installed=$(npx skills ls -g --json | python3 -c 'import json, pathlib, sys; managed = {line.strip() for line in pathlib.Path(sys.argv[1]).read_text().splitlines() if line.strip() and not line.lstrip().startswith("#")}; installed = [item["name"] for item in json.load(sys.stdin) if item.get("name") in managed]; print("\n".join(installed))' "$skill_set_file")
 	if [ -n "$installed" ]; then
-		printf '%s\n' "$installed" | xargs npx skills remove {{common_flags}}
+		mapfile -t installed_skills <<< "$installed"
+		# Global agent aliases share the universal skill directory, so removal
+		# must not retain entries through agents outside the install target list.
+		npx skills remove "${installed_skills[@]}" --global --yes
 	else
 		echo "No installed skills found for profile: $skill_set"
 	fi

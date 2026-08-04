@@ -130,6 +130,12 @@ def test_uninstall_defaults_to_workflow_profile() -> None:
 
     assert "npx skills ls -g --json" in output
     assert "npx skills remove" in output
+    assert 'npx skills remove "${installed_skills[@]}" --global' in output
+    assert "xargs npx skills remove" not in output
+    remove_command = next(
+        line.strip() for line in output.splitlines() if "npx skills remove" in line
+    )
+    assert "--agent" not in remove_command
     assert "pip uninstall" not in output
     assert "skill_set='workflow'" in output
     assert 'skill-sets/${skill_set}.txt' in output
