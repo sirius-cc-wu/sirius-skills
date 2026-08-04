@@ -1,2 +1,0 @@
-- [x] Continuation policy is config-driven.
-- [x] Readiness exposes boundary and policy metadata.

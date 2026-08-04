@@ -1,10 +1,10 @@
 # Prompt Guide
 
 Name the skill and provide the repository outcome you want. Include constraints
-such as the intended file set, validation command, base branch, or required
-identifier when they matter.
+such as scope, revision, validation command, intended files, or publication
+state when they matter.
 
-## `simplify`
+## Repository workflow
 
 ```text
 Use simplify on the current branch diff. Preserve behavior, keep changes within
@@ -12,43 +12,57 @@ the files already touched, and run the focused test suite afterward.
 ```
 
 ```text
-Simplify this pull request after review feedback. Remove duplication and
-unnecessary state, but call out any cleanup that would change the public API.
-```
-
-## `commit`
-
-```text
-Use commit to review and commit only the changes for the retry fix. Run the
-relevant tests and follow this repository's configured commit format.
+Use commit to review and commit only the retry fix. Follow this repository's
+configured commit format and exclude unrelated working-tree changes.
 ```
 
 ```text
-Commit the documentation cleanup, excluding unrelated working-tree changes.
-```
-
-## `create-pr`
-
-```text
-Use create-pr to open a draft pull request against the repository's default
-branch. Derive the title from the commits and include the tests that passed.
+Use create-pr to open a draft pull request against the default branch. Include
+the checks that passed and avoid creating a duplicate PR.
 ```
 
 ```text
-Create a ready-for-review PR for the current branch with base release/2.x.
+Use governance-update to review these repeated formatter-spillover incidents
+and add the narrowest enforceable repository rule.
 ```
 
-## `governance-update`
+## Reverse engineering
 
 ```text
-Use governance-update to review these three repeated formatter spillover
-incidents and add the narrowest enforceable rule to AGENTS.md.
+Use reverse-engineer-software-system to recover the behavior and architecture
+needed to plan this migration. Fix the analysis to the current revision and
+separate observed facts from inferences.
 ```
 
 ```text
-Use governance-update to decide whether repeated commit-title drift belongs in
-AGENTS.md or .skills/conventions.json, then update the single best owner.
+Use survey-existing-system to map this repository's entry points, interfaces,
+state, side effects, verification surfaces, and highest-risk follow-up slices.
 ```
 
-Avoid invoking `governance-update` for an isolated typo, defect, or stale
-artifact. Fix those directly.
+## Iterative design and implementation
+
+```text
+Use iterative-up-analysis-design to plan the smallest risk-driven iteration for
+this feature. Preserve durable artifacts and avoid creating documents that do
+not reduce uncertainty.
+```
+
+```text
+Use use-case-modeling and domain-modeling to clarify the actor goals, main and
+alternate scenarios, domain vocabulary, associations, and rules before object
+design.
+```
+
+```text
+Use test-driven-implementation to add this behavior from the approved examples.
+Demonstrate that the focused checks detect the missing behavior, then run the
+relevant regression suite.
+```
+
+```text
+Use behavior-preserving-refactoring on this module behind the current passing
+tests. Keep behavior changes separate and verify each bounded transformation.
+```
+
+See [`catalog/skills.md`](catalog/skills.md) for the complete catalog and
+[`catalog/tracks/`](catalog/tracks/) for common compositions.

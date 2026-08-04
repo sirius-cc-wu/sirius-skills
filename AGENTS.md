@@ -4,24 +4,34 @@ Default guidance for agents working in `sirius-skills`.
 
 ## Repository shape
 
-- `skills/`: the four managed skills: `simplify`, `create-pr`, `commit`, and
-  `governance-update`
+- `skills/`: independently deployable repository workflow, reverse-engineering,
+  iterative-design, implementation, and evolution skills
+- `skill-sets/`: canonical installation profiles; `all.txt` lists every active
+  skill exactly once and `workflow.txt` defines the default install
+- `catalog/`: skill boundaries, provenance, workflow tracks, and relationship
+  guidance
 - `docs/shared/`: canonical shared references copied into consuming skills
+- `docs/proposals/`: proposed capabilities that are not deployable skills
 - `.github/`: repository guidance for GitHub tooling
-- `src/` and `tests/`: helper package code and its verification
-- `docs/features/`, `docs/wiki/`, and `slices/`: historical artifacts from the
-  retired spec-driven development workflow
+- `src/` and `tests/`: the shared-reference packaging helper and repository
+  verification
 - top-level installation and usage docs such as `README.md`,
   `SKILLS_METHODOLOGY.md`, `PROMPT_GUIDE.md`, and `justfile`
 
 ## Core rules
 
-### Keep the managed catalog focused
+### Keep the active catalog profile-driven
 
-The supported catalog contains only `simplify`, `create-pr`, `commit`, and
-`governance-update`. Do not reintroduce planning, execution, artifact-lifecycle,
-or other spec-driven development skills without an explicit repository-level
-decision.
+Every deployable skill belongs to `skill-sets/all.txt` and the skill catalog.
+Add it to the smallest user-facing profiles that represent its responsibility;
+profile membership expresses convenient composition, not a mandatory
+lifecycle. Preserve `workflow` as the no-argument install default and keep
+`applying-uml-and-patterns` equivalent to `iterative-design` for compatibility.
+
+Do not restore the retired Sirius spec-driven runtime, command catalog, or
+planning state model without a separate repository-level decision. The active
+iterative-design skills produce durable artifacts but do not depend on that
+retired runtime.
 
 ### Keep shared skills generic
 
@@ -35,9 +45,9 @@ When changing a skill or install behavior:
 
 - update the relevant `SKILL.md`
 - update top-level docs and examples that describe the behavior
-- update `managed_skills` and its focused tests when adding or retiring a skill
-- keep historical SDD material clearly labeled as historical rather than
-  current usage guidance
+- update `skill-sets/all.txt`, affected profiles, the skill catalog, and focused
+  tests when adding or retiring a skill
+- update the owning workflow track when a normal handoff or boundary changes
 
 ### Treat identifiers as opaque
 
@@ -62,9 +72,11 @@ behavior. Keep skill instructions concise, explicit, and actionable. A skill
 folder should contain its required `SKILL.md` plus only the scripts, references,
 or assets needed to perform that skill.
 
-Use `just install` and `just uninstall` for the supported packaged workflow.
-`just install-packaged` and `just uninstall-packaged` remain aliases. Packaged
-installation must register exactly the names in `managed_skills`.
+Use `just install` and `just uninstall` for the default workflow profile, or
+pass a profile name for another collection. `just install-packaged` and
+`just uninstall-packaged` remain aliases with the same profile parameter.
+Profile files are the single ownership surface for install and uninstall
+membership; do not add a parallel hard-coded managed-skill list.
 
 Use `apply_patch` for file edits. Preserve unrelated work in a dirty tree, use
 `rg` for searches, and run verification proportional to the changed behavior.
@@ -72,6 +84,9 @@ Use `apply_patch` for file edits. Preserve unrelated work in a dirty tree, use
 ## Checklist
 
 - Confirm only the intended skill packages and files changed.
+- Keep `all.txt`, named profiles, the catalog, and discovered skill directories
+  consistent.
 - Keep shared references and their packaged copies synchronized.
-- Update docs and focused tests with install-catalog changes.
+- Preserve the default workflow profile and documented compatibility aliases.
+- Update docs, tracks, and focused tests with install-catalog changes.
 - Run relevant validation and review the final diff before handoff.

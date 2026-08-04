@@ -1,17 +1,16 @@
 # Copilot Instructions
 
-Follow the repository's nearest `AGENTS.md` and the relevant skill's `SKILL.md`.
+Follow the repository's nearest `AGENTS.md` and the relevant skill's
+`SKILL.md`.
 
-The managed catalog contains only:
+The active catalog is profile-driven. `skill-sets/all.txt` lists every
+deployable skill, `workflow.txt` defines the default install, and the remaining
+profiles compose specialist workflows. Keep profile membership, the skill
+catalog, and discovered skill directories consistent.
 
-- `simplify`
-- `create-pr`
-- `commit`
-- `governance-update`
-
-Do not route work through the retired spec-driven planning, execution, slice,
-or artifact-maintenance skills. Material under `docs/features/`, `docs/wiki/`,
-and `slices/` is historical context unless a task explicitly targets it.
+Do not restore the retired Sirius spec-driven runtime, command catalog, or
+planning state model. The iterative-design skills create durable artifacts but
+do not depend on that runtime.
 
 Keep shared skills generic and place repository-specific title, identifier, and
 tracker rules in `.skills/conventions.json`. Preserve unrelated work, scope
