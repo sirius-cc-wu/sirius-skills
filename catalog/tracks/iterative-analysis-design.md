@@ -35,9 +35,12 @@ when the implementation language is known.
 ## Iteration Rule
 
 This is a dependency-oriented sequence, not a requirement to create every
-artifact. Select only the artifacts needed to reduce the current risk or
-support the current behavior slice, and refine durable artifacts as feedback
-arrives.
+artifact. Apply the
+[Artifact Selection Budget](../../skills/iterative-up-analysis-design/references/artifact-selection-budget.md)
+before creating a standalone document. Prefer implementation evidence, an
+existing canonical artifact, or an aggregate feature section unless a new file
+has clear value, distinct ownership, and an independent lifecycle. Refine
+durable artifacts as feedback arrives.
 
 Use
 [`rewrite-technical-artifacts`](../../skills/rewrite-technical-artifacts/SKILL.md)

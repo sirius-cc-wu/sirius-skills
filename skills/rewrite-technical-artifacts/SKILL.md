@@ -40,8 +40,10 @@ but it may instead add a small amount of orientation before exact specification.
    - Revise in place: default when the canonical artifact can serve the reader.
    - Diff-focused review: inspect only the changed reader-facing artifacts and
      their necessary canonical context before commit or review.
-   - Companion explanation: use only when a different audience or task cannot
-     safely be served by the canonical technical artifact.
+   - Companion explanation: first apply
+     [Artifact Selection Budget](../iterative-up-analysis-design/references/artifact-selection-budget.md),
+     then use only when a different audience or task cannot safely be served by
+     the canonical technical artifact.
 4. **Inventory meaning before editing.** Record frontmatter, lifecycle status,
    stable IDs, requirements, guarantees, prohibitions, states, operations,
    evidence qualifications, uncertainties, and traceability links.

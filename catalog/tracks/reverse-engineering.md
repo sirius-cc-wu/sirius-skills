@@ -49,5 +49,8 @@ inventoried.
 Do not execute every skill at full depth. A first-contact onboarding question
 may stop after the survey. A behavior-preserving migration may require behavior
 recovery and architecture reconstruction. Documentation drift requires
-reconciliation. Close each iteration when the original decision has enough
-evidence, and expose any residual uncertainty.
+reconciliation. Apply the
+[Artifact Selection Budget](../../skills/iterative-up-analysis-design/references/artifact-selection-budget.md)
+before splitting recovered evidence into another standalone document. Close
+each iteration when the original decision has enough evidence, and expose any
+residual uncertainty.

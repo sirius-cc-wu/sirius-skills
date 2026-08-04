@@ -70,6 +70,11 @@ convenient source.
 
 ## Recovery Record Template
 
+Before creating a new document, apply
+[Artifact Selection Budget](../iterative-up-analysis-design/references/artifact-selection-budget.md).
+Prefer updating an existing recovery record or keeping evidence near its
+executable source when either is a sufficient owner.
+
 When persisting a standalone Markdown record, follow
 [Markdown Artifact Frontmatter](../iterative-up-analysis-design/references/markdown-artifact-frontmatter.md)
 and [Readable Technical Artifacts](../iterative-up-analysis-design/references/readable-technical-artifacts.md).

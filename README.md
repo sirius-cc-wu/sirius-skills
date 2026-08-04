@@ -81,7 +81,10 @@ in consuming-repository configuration.
 The iterative-design collection treats use cases, domain models, system
 sequence diagrams, contracts, realizations, and design class diagrams as
 durable knowledge refined across iterations. It preserves established
-repository layouts and supplies layout and Markdown metadata guidance through
+repository layouts and applies an artifact-selection budget before creating a
+new standalone document. The budget prefers executable evidence and existing
+canonical artifacts, and requires new files to demonstrate value, distinct
+ownership, and an independent lifecycle. Layout and Markdown guidance lives in
 the references owned by `iterative-up-analysis-design`.
 
 The original analysis and design skills distill workflows from Craig Larman's

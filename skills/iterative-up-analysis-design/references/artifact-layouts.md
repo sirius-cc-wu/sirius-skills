@@ -26,13 +26,16 @@ iteration-specific copies of those artifacts.
 1. Inspect repository governance, documentation indexes, and neighboring files.
 2. Identify how readers primarily navigate: by feature, artifact type, product
    area, or chronology.
-3. Estimate whether a feature needs one document or several independently
+3. Apply [Artifact Selection Budget](artifact-selection-budget.md) to decide
+   whether documentation belongs in implementation evidence, an existing
+   artifact, an aggregate section, or a new standalone file.
+4. Estimate whether a feature needs one document or several independently
    changing artifacts.
-4. Select the smallest layout that gives each durable artifact one obvious
+5. Select the smallest layout that gives each durable artifact one obvious
    canonical location.
-5. Record canonical paths in the iteration record and assign stable IDs to
+6. Record canonical paths in the iteration record and assign stable IDs to
    artifacts referenced across iterations or by other artifacts.
-6. Revisit the layout only when growth, shared ownership, or navigation creates
+7. Revisit the layout only when growth, shared ownership, or navigation creates
    evidence that the current structure no longer works.
 
 ## Layout Options

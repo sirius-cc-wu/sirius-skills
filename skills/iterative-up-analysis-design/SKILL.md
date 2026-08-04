@@ -27,7 +27,7 @@ Use an iterative, risk-driven flow: produce just enough artifacts for the curren
 2. **Select an iteration objective.** Choose a thin slice driven by risk, learning value, or stakeholder priority.
 3. **Inspect repository conventions.** Read governance, indexes, and neighboring artifacts before selecting paths or creating directories.
 4. **Classify artifact lifecycles.** Refine design artifacts at canonical paths, create one historical record per iteration, and record durable cross-cutting decisions separately when needed.
-5. **Choose only necessary artifacts.** Do not create every artifact by default; create what reduces uncertainty for the current iteration.
+5. **Budget artifact creation.** Apply [Artifact Selection Budget](references/artifact-selection-budget.md). Create a standalone artifact only when it provides durable, reusable, or risk-reducing value, has no sufficient existing owner, and needs an independent lifecycle.
 6. **Choose artifact placement.** Preserve an established layout. When none exists, use the smallest suitable option from [Artifact Durability and Repository Layouts](references/artifact-layouts.md); default to the feature-iteration hybrid with flat feature files, promoting a feature to a package only when its artifacts change independently.
 7. **Sequence analysis before design.** Use cases lead to SSDs, domain model, contracts, GRASP decisions, realizations, and design class diagrams.
 8. **Keep durable artifacts evolving.** Mark canonical artifacts as started or refined; expect corrections as contracts, design, implementation, and feedback reveal gaps.
@@ -37,6 +37,11 @@ Use an iterative, risk-driven flow: produce just enough artifacts for the curren
 12. **End with executable next steps.** Convert design outcomes into implementation tasks and verification checks. Use [Test-Driven Implementation](../test-driven-implementation/SKILL.md) and [Behavior-Preserving Refactoring](../behavior-preserving-refactoring/SKILL.md) during construction, and feed design-relevant discoveries back into canonical artifacts.
 
 ## File Output
+
+Before creating a new document, apply
+[Artifact Selection Budget](references/artifact-selection-budget.md). Prefer
+code, tests, configuration, an existing canonical artifact, or an aggregate
+feature section when one of them is a sufficient owner.
 
 When persisting any standalone Markdown artifact, follow
 [Markdown Artifact Frontmatter](references/markdown-artifact-frontmatter.md).
@@ -80,6 +85,9 @@ Goal:
 Risks Addressed:
 - [Risk]
 
+Artifact Budget:
+- [create / update / embed / keep with implementation / omit]: `[path or subject]` - [consumer, decision, or risk] - [ownership and lifecycle reason]
+
 Artifacts to Start:
 - [Stable ID when cross-referenced, artifact]: `[canonical path]` - [why now]
 
@@ -105,13 +113,16 @@ Artifact Outcomes:
 - [started / refined / consulted / deferred]: [stable ID when cross-referenced, title, and canonical path] - [actual result]
 ```
 
-Keep the planned artifact headings unchanged when closing an iteration. Use
-`Artifact Outcomes` to record what actually happened, including work that was
-deferred or changed after the plan was written.
+Omit empty `Artifact Budget` dispositions rather than completing them as
+ceremony. Keep the planned artifact headings unchanged when closing an
+iteration. Use `Artifact Outcomes` to record what actually happened, including
+work that was deferred or changed after the plan was written.
 
 ## Red Flags
 
 - All artifacts are created at full detail before risk is understood.
+- A standalone document has no durable decision, named consumer, or material
+  risk, or it lacks an independently meaningful lifecycle.
 - Coding starts from a domain model without use cases or system events.
 - Artifact updates are treated as failure rather than expected refinement.
 - The plan follows phases mechanically instead of risk and learning.
@@ -123,7 +134,7 @@ deferred or changed after the plan was written.
 ## Verification
 
 - [ ] The current phase intent and iteration objective are explicit.
-- [ ] Artifact choices are justified by risk, learning, or implementation need.
+- [ ] Material documentation candidates have recorded dispositions; every new standalone artifact passes the value, ownership, and lifecycle gate.
 - [ ] Durable artifacts, iteration records, and decision records have distinct lifecycles.
 - [ ] Every started or refined artifact has one canonical path; artifacts cross-referenced across iterations or other artifacts have stable IDs.
 - [ ] The selected layout fits existing conventions and expected navigation without unnecessary directories.

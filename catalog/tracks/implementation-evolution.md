@@ -18,6 +18,11 @@ implement behavior, or when verified behavior needs structural improvement.
 4. Feed implementation discoveries back into durable requirements or design
    artifacts when their represented knowledge changes.
 
+Keep verification evidence with code, tests, schemas, or configuration by
+default. Apply the
+[Artifact Selection Budget](../../skills/iterative-up-analysis-design/references/artifact-selection-budget.md)
+before creating a separate behavior-slice or implementation record.
+
 ## Improve Existing Structure
 
 1. Establish a passing baseline that protects the behavior to preserve.

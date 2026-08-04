@@ -29,6 +29,11 @@ A domain model visualizes real-world conceptual classes in the problem domain. I
 
 ## Output Template
 
+Before creating a new document, apply
+[Artifact Selection Budget](../iterative-up-analysis-design/references/artifact-selection-budget.md).
+Prefer refining an existing domain model or aggregate feature artifact when it
+already owns the vocabulary.
+
 For a standalone Markdown file, follow
 [Markdown Artifact Frontmatter](../iterative-up-analysis-design/references/markdown-artifact-frontmatter.md)
 and [Readable Technical Artifacts](../iterative-up-analysis-design/references/readable-technical-artifacts.md),

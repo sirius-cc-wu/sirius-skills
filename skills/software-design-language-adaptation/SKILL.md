@@ -32,6 +32,11 @@ Preserve responsibility, collaboration, and variation decisions while expressing
 
 ## File Output
 
+Before creating a new document, apply
+[Artifact Selection Budget](../iterative-up-analysis-design/references/artifact-selection-budget.md).
+Prefer merging implementation-facing guidance into the design artifact it
+adapts when that artifact remains the clear owner.
+
 When persisting a standalone Markdown adaptation note, follow
 [Markdown Artifact Frontmatter](../iterative-up-analysis-design/references/markdown-artifact-frontmatter.md)
 and [Readable Technical Artifacts](../iterative-up-analysis-design/references/readable-technical-artifacts.md).

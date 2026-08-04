@@ -41,6 +41,11 @@ Improve internal structure through one independently reviewable transformation a
 
 ## Refactoring Record Template
 
+Before creating a separate evidence document, apply
+[Artifact Selection Budget](../iterative-up-analysis-design/references/artifact-selection-budget.md).
+Keep results with executable checks and the changed code unless a durable
+review, audit, or unresolved risk needs an independent record.
+
 Use this template when persisting refactoring evidence as a standalone Markdown
 file. Follow
 [Markdown Artifact Frontmatter](../iterative-up-analysis-design/references/markdown-artifact-frontmatter.md)

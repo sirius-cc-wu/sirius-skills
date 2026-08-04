@@ -31,6 +31,11 @@ Use cases capture how actors achieve goals with the system as a black box. They 
 
 ## Output Template
 
+Before creating a new document, apply
+[Artifact Selection Budget](../iterative-up-analysis-design/references/artifact-selection-budget.md).
+Prefer updating an existing use case or embedding the scenario in its
+aggregate feature artifact when either is a sufficient owner.
+
 For a standalone Markdown file, follow
 [Markdown Artifact Frontmatter](../iterative-up-analysis-design/references/markdown-artifact-frontmatter.md)
 and [Readable Technical Artifacts](../iterative-up-analysis-design/references/readable-technical-artifacts.md),
