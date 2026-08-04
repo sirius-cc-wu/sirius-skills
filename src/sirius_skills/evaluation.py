@@ -255,6 +255,7 @@ def _validate_behavioral_cases(
             not isinstance(assertion, dict)
             or not isinstance(assertion.get("path"), str)
             or not assertion.get("path")
+            or assertion.get("scope", "file") not in {"file", "plantuml"}
             or not _valid_string_list(assertion.get("contains", []))
             or not _valid_string_list(assertion.get("not_contains", []))
             for assertion in file_assertions

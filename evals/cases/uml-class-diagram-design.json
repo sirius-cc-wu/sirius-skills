@@ -50,6 +50,7 @@
       "file_assertions": [
         {
           "path": "docs/order-design.md",
+          "scope": "plantuml",
           "contains": [
             "```plantuml",
             "@startuml",

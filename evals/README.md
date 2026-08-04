@@ -101,6 +101,13 @@ checking that a PlantUML block and requested diagram kind exist, not for
 judging whether the diagram communicates well. The deterministic tier
 validates the case shape but does not claim the behavior passed.
 
+A file assertion examines the whole file by default. Set
+`"scope": "plantuml"` for Markdown diagram artifacts so `contains` and
+`not_contains` inspect only complete fenced `plantuml` blocks. This prevents
+ordinary prose such as “no class diagram” from satisfying or violating a
+diagram-notation assertion. A missing or unterminated PlantUML fence fails the
+assertion.
+
 ## Run a Behavioral Case
 
 Inspect the plan before spending model tokens:
@@ -118,7 +125,8 @@ just eval-behavior test-driven-implementation bug-fix-discrimination
 
 Behavioral execution is never part of `just validate`. The runner:
 
-1. copies the declared fixture into a fresh temporary Git repository;
+1. copies the declared fixture into a fresh temporary Git repository and
+   commits it as the clean comparison baseline;
 2. invokes `codex exec` ephemerally with JSONL output and a workspace-write
    sandbox;
 3. supplies the selected `SKILL.md`, prompt, expectations, prohibitions, and

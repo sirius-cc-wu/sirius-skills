@@ -179,11 +179,13 @@ def _file_assertion_specs(case: dict[str, object]) -> list[dict[str, object]]:
                 f"behavioral eval {case.get('id')!r} has an invalid file assertion"
             )
         path = specification.get("path")
+        scope = specification.get("scope", "file")
         contains = specification.get("contains", [])
         not_contains = specification.get("not_contains", [])
         if (
             not isinstance(path, str)
             or not path
+            or scope not in {"file", "plantuml"}
             or not isinstance(contains, list)
             or not isinstance(not_contains, list)
             or not all(isinstance(item, str) and item for item in contains)
@@ -194,6 +196,26 @@ def _file_assertion_specs(case: dict[str, object]) -> list[dict[str, object]]:
             )
         specifications.append(specification)
     return specifications
+
+
+def _plantuml_fenced_content(content: str) -> tuple[str, str | None]:
+    blocks: list[str] = []
+    current: list[str] = []
+    for line in content.splitlines(keepends=True):
+        marker = line.strip().casefold()
+        if not current:
+            if marker == "```plantuml":
+                current.append(line)
+            continue
+        current.append(line)
+        if marker == "```":
+            blocks.append("".join(current))
+            current = []
+    if current:
+        return "", "unterminated PlantUML fenced block"
+    if not blocks:
+        return "", "no PlantUML fenced block found"
+    return "\n".join(blocks), None
 
 
 def _evaluate_file_assertions(
@@ -219,16 +241,23 @@ def _evaluate_file_assertions(
                 )
             )
             continue
-        missing = tuple(fragment for fragment in contains if fragment not in content)
+        assertion_content = content
+        scope_error = None
+        if specification.get("scope", "file") == "plantuml":
+            assertion_content, scope_error = _plantuml_fenced_content(content)
+        missing = tuple(
+            fragment for fragment in contains if fragment not in assertion_content
+        )
         unexpected = tuple(
-            fragment for fragment in not_contains if fragment in content
+            fragment for fragment in not_contains if fragment in assertion_content
         )
         results.append(
             FileAssertionResult(
                 path=relative,
-                passed=not missing and not unexpected,
+                passed=scope_error is None and not missing and not unexpected,
                 missing_fragments=missing,
                 unexpected_fragments=unexpected,
+                error=scope_error,
             )
         )
     return tuple(results)
@@ -307,6 +336,45 @@ def _git_revision(root: Path) -> str | None:
         stderr=subprocess.DEVNULL,
     )
     return completed.stdout.strip() if completed.returncode == 0 else None
+
+
+def _initialize_git_baseline(workspace: Path) -> None:
+    subprocess.run(
+        ["git", "init", "-q"],
+        cwd=workspace,
+        check=True,
+        stdout=subprocess.DEVNULL,
+        stderr=subprocess.DEVNULL,
+    )
+    subprocess.run(
+        ["git", "add", "--all"],
+        cwd=workspace,
+        check=True,
+        stdout=subprocess.DEVNULL,
+        stderr=subprocess.DEVNULL,
+    )
+    subprocess.run(
+        [
+            "git",
+            "-c",
+            "user.name=Sirius Eval",
+            "-c",
+            "user.email=sirius-eval@example.invalid",
+            "-c",
+            "commit.gpgsign=false",
+            "-c",
+            "core.hooksPath=/dev/null",
+            "commit",
+            "-q",
+            "--allow-empty",
+            "-m",
+            "Initialize evaluation fixture",
+        ],
+        cwd=workspace,
+        check=True,
+        stdout=subprocess.DEVNULL,
+        stderr=subprocess.DEVNULL,
+    )
 
 
 def _serialize_result(
@@ -417,14 +485,13 @@ def run_behavioral_case(
     result_path = result_directory / f"{result_base}.result.json"
 
     try:
-        shutil.copytree(fixture, workspace, dirs_exist_ok=True)
-        subprocess.run(
-            ["git", "init", "-q"],
-            cwd=workspace,
-            check=True,
-            stdout=subprocess.DEVNULL,
-            stderr=subprocess.DEVNULL,
+        shutil.copytree(
+            fixture,
+            workspace,
+            dirs_exist_ok=True,
+            ignore=shutil.ignore_patterns(*IGNORED_WORKSPACE_PARTS, "*.pyc"),
         )
+        _initialize_git_baseline(workspace)
         before = _snapshot(workspace)
         command = (
             list(executor_command)

@@ -115,6 +115,37 @@ def test_evaluator_detects_description_collisions(tmp_path: Path) -> None:
     assert any("description collision" in error for error in report.errors)
 
 
+def test_evaluator_rejects_unknown_file_assertion_scope(tmp_path: Path) -> None:
+    write_skill(tmp_path, "visualize", "Create focused architecture diagrams.")
+    write_case(
+        tmp_path,
+        "visualize",
+        {
+            "skill_name": "visualize",
+            "trigger": {"positive": [], "negative": []},
+            "evals": [
+                {
+                    "id": "component-view",
+                    "prompt": "Create a component view.",
+                    "expected_output": "A focused component diagram.",
+                    "expectations": ["The component boundary is visible."],
+                    "file_assertions": [
+                        {
+                            "path": "docs/architecture.md",
+                            "scope": "diagram",
+                            "contains": ["component"],
+                        }
+                    ],
+                }
+            ],
+        },
+    )
+
+    report = evaluate_repository(tmp_path)
+
+    assert any("invalid 'file_assertions'" in error for error in report.errors)
+
+
 def test_pilot_routing_cases_pass() -> None:
     report = evaluate_repository(REPO_ROOT)
 
@@ -193,6 +224,41 @@ def test_behavioral_runner_captures_authorized_mutations_and_checks(
     )
     assert result.result_path.is_file()
     assert not result.workspace.exists()
+
+
+def test_behavioral_runner_commits_a_clean_fixture_baseline(tmp_path: Path) -> None:
+    write_behavior_fixture(tmp_path, allowed_mutations=["src/**"])
+    executor = tmp_path / "git_aware_executor.py"
+    executor.write_text(
+        "import json\n"
+        "import subprocess\n"
+        "from pathlib import Path\n"
+        "subprocess.run(['git', 'rev-parse', '--verify', 'HEAD'], check=True)\n"
+        "status = subprocess.run(\n"
+        "    ['git', 'status', '--short'], check=True, text=True, capture_output=True\n"
+        ").stdout\n"
+        "if status:\n"
+        "    raise SystemExit(f'fixture baseline is dirty: {status}')\n"
+        "Path('src/value.txt').write_text('fixed\\n', encoding='utf-8')\n"
+        "diff = subprocess.run(\n"
+        "    ['git', 'diff', '--', 'src/value.txt'],\n"
+        "    check=True, text=True, capture_output=True,\n"
+        ").stdout\n"
+        "if '-broken' not in diff or '+fixed' not in diff:\n"
+        "    raise SystemExit('fixture mutation is not visible in git diff')\n"
+        "print(json.dumps({'type': 'turn.completed'}))\n",
+        encoding="utf-8",
+    )
+
+    result = run_behavioral_case(
+        tmp_path,
+        "implementation",
+        "fix-value",
+        executor_command=[sys.executable, str(executor)],
+        results_directory=tmp_path / "results",
+    )
+
+    assert result.mechanical_passed is True
 
 
 def test_behavioral_runner_rejects_mutations_outside_allowlist(
@@ -285,6 +351,7 @@ def test_behavioral_runner_checks_required_file_content(tmp_path: Path) -> None:
                     "file_assertions": [
                         {
                             "path": "docs/architecture.md",
+                            "scope": "plantuml",
                             "contains": ["@startuml", "component", "@enduml"],
                             "not_contains": ["class "],
                         }
@@ -298,7 +365,10 @@ def test_behavioral_runner_checks_required_file_content(tmp_path: Path) -> None:
         "from pathlib import Path\n"
         "path = Path('docs/architecture.md')\n"
         "path.parent.mkdir(parents=True)\n"
-        "path.write_text('```plantuml\\n@startuml\\ncomponent API\\n@enduml\\n```\\n')\n",
+        "path.write_text(\n"
+        "    'No class diagram is included.\\n\\n'\n"
+        "    '```plantuml\\n@startuml\\ncomponent API\\n@enduml\\n```\\n'\n"
+        ")\n",
         encoding="utf-8",
     )
 
@@ -336,6 +406,7 @@ def test_behavioral_runner_rejects_forbidden_file_content(tmp_path: Path) -> Non
                     "file_assertions": [
                         {
                             "path": "docs/architecture.md",
+                            "scope": "plantuml",
                             "contains": ["@startuml", "component", "@enduml"],
                             "not_contains": ["class "],
                         }
@@ -349,7 +420,10 @@ def test_behavioral_runner_rejects_forbidden_file_content(tmp_path: Path) -> Non
         "from pathlib import Path\n"
         "path = Path('docs/architecture.md')\n"
         "path.parent.mkdir(parents=True)\n"
-        "path.write_text('@startuml\\ncomponent API\\nclass Order\\n@enduml\\n')\n",
+        "path.write_text(\n"
+        "    'No class diagram should be needed.\\n\\n'\n"
+        "    '```plantuml\\n@startuml\\ncomponent API\\nclass Order\\n@enduml\\n```\\n'\n"
+        ")\n",
         encoding="utf-8",
     )
 
