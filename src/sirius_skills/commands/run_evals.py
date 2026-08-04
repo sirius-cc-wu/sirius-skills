@@ -7,11 +7,55 @@ from pathlib import Path
 from typing import Sequence
 
 from sirius_skills.behavioral_evaluation import (
+    BehavioralResult,
     describe_behavioral_case,
-    run_behavioral_case,
+    run_behavioral_repetitions,
 )
 from sirius_skills.evaluation import evaluate_repository
 from sirius_skills.paths import package_root
+
+
+def _print_behavioral_result(
+    result: BehavioralResult, *, index: int, total: int, keep_workspace: bool
+) -> None:
+    print(
+        f"Behavioral eval {result.skill_name}/{result.case_id} "
+        f"run {index}/{total}: "
+        f"{'MECHANICAL PASS' if result.mechanical_passed else 'MECHANICAL FAIL'}"
+    )
+    print(f"Changes: {len(result.changes)}")
+    if result.unauthorized_mutations:
+        print(
+            "Unauthorized mutations: " + ", ".join(result.unauthorized_mutations)
+        )
+    if result.missing_required_mutations:
+        print(
+            "Missing required mutations: "
+            + ", ".join(result.missing_required_mutations)
+        )
+    failed_assertions = [
+        assertion for assertion in result.file_assertions if not assertion.passed
+    ]
+    if failed_assertions:
+        print(
+            "Failed file assertions: "
+            + ", ".join(assertion.path for assertion in failed_assertions)
+        )
+    failed_trace_assertions = [
+        assertion for assertion in result.trace_assertions if not assertion.passed
+    ]
+    if failed_trace_assertions:
+        print(
+            "Failed trace assertions: "
+            + ", ".join(
+                f"{assertion.assertion_type}: {assertion.error}"
+                for assertion in failed_trace_assertions
+            )
+        )
+    print(f"Trace: {result.trace_path}")
+    print(f"Result: {result.result_path}")
+    if keep_workspace:
+        print(f"Workspace: {result.workspace}")
 
 
 def main(argv: Sequence[str] | None = None) -> int:
@@ -51,6 +95,12 @@ def main(argv: Sequence[str] | None = None) -> int:
         default=900,
         help="Behavioral executor timeout in seconds (default: 900).",
     )
+    parser.add_argument(
+        "--repeat",
+        type=int,
+        default=1,
+        help="Behavioral repetitions to run and summarize (default: 1).",
+    )
     args = parser.parse_args(argv)
     root = args.root.resolve() if args.root is not None else package_root()
 
@@ -59,17 +109,21 @@ def main(argv: Sequence[str] | None = None) -> int:
             parser.error("--case is required with --behavioral")
         if args.timeout < 1:
             parser.error("--timeout must be positive")
+        if args.repeat < 1:
+            parser.error("--repeat must be positive")
         try:
             if args.dry_run:
                 plan = describe_behavioral_case(
                     root, args.behavioral, args.case_id, model=args.model
                 )
+                plan["repeat_count"] = args.repeat
                 print(json.dumps(plan, indent=2, sort_keys=True))
                 return 0
-            result = run_behavioral_case(
+            batch = run_behavioral_repetitions(
                 root,
                 args.behavioral,
                 args.case_id,
+                repeat_count=args.repeat,
                 model=args.model,
                 timeout_seconds=args.timeout,
                 keep_workspace=args.keep_workspace,
@@ -77,50 +131,29 @@ def main(argv: Sequence[str] | None = None) -> int:
         except (OSError, ValueError) as exc:
             print(f"ERROR: {exc}", file=sys.stderr)
             return 2
+        for index, result in enumerate(batch.runs, start=1):
+            _print_behavioral_result(
+                result,
+                index=index,
+                total=len(batch.runs),
+                keep_workspace=args.keep_workspace,
+            )
+        print(f"Summary: {batch.summary_path}")
         print(
-            f"Behavioral eval {result.skill_name}/{result.case_id}: "
-            f"{'MECHANICAL PASS' if result.mechanical_passed else 'MECHANICAL FAIL'}"
+            "Stability: "
+            f"mechanical={'stable' if batch.mechanically_stable else 'variable'}, "
+            f"mutations={'stable' if batch.mutations_stable else 'variable'}"
         )
-        print(f"Changes: {len(result.changes)}")
-        if result.unauthorized_mutations:
-            print(
-                "Unauthorized mutations: "
-                + ", ".join(result.unauthorized_mutations)
-            )
-        if result.missing_required_mutations:
-            print(
-                "Missing required mutations: "
-                + ", ".join(result.missing_required_mutations)
-            )
-        failed_assertions = [
-            assertion for assertion in result.file_assertions if not assertion.passed
-        ]
-        if failed_assertions:
-            print(
-                "Failed file assertions: "
-                + ", ".join(assertion.path for assertion in failed_assertions)
-            )
-        failed_trace_assertions = [
-            assertion
-            for assertion in result.trace_assertions
-            if not assertion.passed
-        ]
-        if failed_trace_assertions:
-            print(
-                "Failed trace assertions: "
-                + ", ".join(
-                    f"{assertion.assertion_type}: {assertion.error}"
-                    for assertion in failed_trace_assertions
-                )
-            )
-        print(f"Trace: {result.trace_path}")
-        print(f"Result: {result.result_path}")
         print("Semantic expectations: UNGRADED")
-        if args.keep_workspace:
-            print(f"Workspace: {result.workspace}")
-        return 0 if result.mechanical_passed else 1
+        return 0 if batch.mechanical_passes == len(batch.runs) else 1
 
-    if args.case_id or args.dry_run or args.model or args.keep_workspace:
+    if (
+        args.case_id
+        or args.dry_run
+        or args.model
+        or args.keep_workspace
+        or args.repeat != 1
+    ):
         parser.error("behavioral options require --behavioral")
     report = evaluate_repository(root)
 

@@ -131,6 +131,13 @@ CLI:
 just eval-behavior test-driven-implementation bug-fix-discrimination
 ```
 
+Pass a repetition count to measure stability without overwriting earlier
+evidence:
+
+```bash
+just eval-behavior test-driven-implementation bug-fix-discrimination 3
+```
+
 Behavioral execution is never part of `just validate`. The runner:
 
 1. copies the declared fixture into a fresh temporary Git repository and
@@ -145,8 +152,10 @@ Behavioral execution is never part of `just validate`. The runner:
 6. evaluates declared JSONL trace-order assertions;
 7. checks required and forbidden output-file fragments;
 8. runs declared verification commands without a shell; and
-9. writes the trace and mechanical result under the ignored `evals/results/`
-   directory before deleting the temporary workspace.
+9. writes every trace and mechanical result to a unique run directory under
+   ignored `evals/results/`, plus a batch summary with pass rate, mechanical
+   outcome and changed-path/kind stability, and duration statistics, before
+   deleting each temporary workspace.
 
 Use the lower-level command when a model override, timeout, or retained
 workspace is needed:
@@ -156,16 +165,18 @@ PYTHONPATH=src python3 -m sirius_skills.commands.run_evals \
   --behavioral test-driven-implementation \
   --case bug-fix-discrimination \
   --model MODEL \
+  --repeat 3 \
   --timeout 900 \
   --keep-workspace
 ```
 
-The result reports only a **mechanical pass**: the executor exited normally,
-mutation boundaries held, required changes occurred, and declared commands
-passed. The full JSONL trace and semantic expectations are preserved, but
-expectations and prohibitions remain explicitly `ungraded` until a trustworthy
-semantic evaluator is implemented. Do not report a mechanical pass as proof
-that the skill behaved correctly.
+Each run reports only a **mechanical pass**: the executor exited normally,
+mutation boundaries held, required changes occurred, and declared mechanical
+assertions and commands passed. The batch summary identifies variation; it
+does not turn repeated agreement into semantic proof. Full JSONL traces and
+semantic expectations are preserved, but expectations and prohibitions remain
+explicitly `ungraded` until a trustworthy semantic evaluator is implemented.
+Do not report a mechanical pass as proof that the skill behaved correctly.
 
 ## Scoring Boundaries
 

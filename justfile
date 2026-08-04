@@ -65,9 +65,9 @@ eval-routing:
 	env PYTHONPATH="{{repo_root}}/src" python3 -m sirius_skills.commands.run_evals --root "{{repo_root}}"
 
 # Print a behavioral eval plan without invoking Codex or spending tokens.
-eval-behavior-dry-run skill case:
-	env PYTHONPATH="{{repo_root}}/src" python3 -m sirius_skills.commands.run_evals --root "{{repo_root}}" --behavioral {{quote(skill)}} --case {{quote(case)}} --dry-run
+eval-behavior-dry-run skill case repeat="1":
+	env PYTHONPATH="{{repo_root}}/src" python3 -m sirius_skills.commands.run_evals --root "{{repo_root}}" --behavioral {{quote(skill)}} --case {{quote(case)}} --repeat {{quote(repeat)}} --dry-run
 
-# Run one explicitly selected behavioral case through Codex.
-eval-behavior skill case:
-	env PYTHONPATH="{{repo_root}}/src" python3 -m sirius_skills.commands.run_evals --root "{{repo_root}}" --behavioral {{quote(skill)}} --case {{quote(case)}}
+# Run an explicitly selected behavioral case through Codex one or more times.
+eval-behavior skill case repeat="1":
+	env PYTHONPATH="{{repo_root}}/src" python3 -m sirius_skills.commands.run_evals --root "{{repo_root}}" --behavioral {{quote(skill)}} --case {{quote(case)}} --repeat {{quote(repeat)}}

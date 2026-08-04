@@ -7,6 +7,7 @@ import shutil
 import subprocess
 import tempfile
 import time
+import uuid
 from dataclasses import asdict, dataclass
 from datetime import datetime, timezone
 from pathlib import Path
@@ -59,6 +60,7 @@ class BehavioralResult:
     skill_name: str
     case_id: str | int
     mechanical_passed: bool
+    duration_seconds: float
     executor_returncode: int
     changes: tuple[FileChange, ...]
     unauthorized_mutations: list[str]
@@ -69,6 +71,17 @@ class BehavioralResult:
     workspace: Path
     trace_path: Path
     result_path: Path
+
+
+@dataclass(frozen=True)
+class BehavioralBatchResult:
+    skill_name: str
+    case_id: str | int
+    runs: tuple[BehavioralResult, ...]
+    mechanical_passes: int
+    mechanically_stable: bool
+    mutations_stable: bool
+    summary_path: Path
 
 
 def build_codex_command(workspace: Path, *, model: str | None = None) -> list[str]:
@@ -96,6 +109,11 @@ def _resolve_child(root: Path, relative: str) -> Path:
     except ValueError as exc:
         raise ValueError(f"path escapes its root: {relative}") from exc
     return candidate
+
+
+def _new_result_id(prefix: str) -> str:
+    timestamp = datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%S%fZ")
+    return f"{prefix}-{timestamp}-{uuid.uuid4().hex[:8]}"
 
 
 def _load_behavioral_case(
@@ -547,6 +565,7 @@ def _serialize_result(
     prompt: str,
     command: Sequence[str],
     model: str | None,
+    started_at: datetime,
     duration_seconds: float,
     executor_returncode: int,
     executor_stderr: str,
@@ -566,7 +585,7 @@ def _serialize_result(
         "skill_revision": _git_revision(root),
         "host": "codex" if command[:2] == ["codex", "exec"] else "test-adapter",
         "requested_model": model,
-        "started_at": datetime.now(timezone.utc).isoformat(),
+        "started_at": started_at.isoformat(),
         "duration_seconds": round(duration_seconds, 3),
         "prompt": prompt,
         "command": list(command),
@@ -628,6 +647,7 @@ def run_behavioral_case(
     keep_workspace: bool = False,
     executor_command: Sequence[str] | None = None,
     results_directory: Path | None = None,
+    result_id: str | None = None,
 ) -> BehavioralResult:
     case = _load_behavioral_case(root, skill_name, case_id)
     fixture = _fixture_path(root, case)
@@ -642,12 +662,15 @@ def run_behavioral_case(
             f"behavioral eval {case_id!r} must declare allowed_mutations"
         )
 
-    workspace = Path(tempfile.mkdtemp(prefix=f"sirius-eval-{skill_name}-"))
     result_directory = results_directory or root / "evals" / "results"
     result_directory.mkdir(parents=True, exist_ok=True)
-    result_base = f"{skill_name}.{case['id']}"
-    trace_path = result_directory / f"{result_base}.trace.jsonl"
-    result_path = result_directory / f"{result_base}.result.json"
+    run_directory = _resolve_child(
+        result_directory, result_id or _new_result_id("run")
+    )
+    run_directory.mkdir(parents=True, exist_ok=False)
+    trace_path = run_directory / "trace.jsonl"
+    result_path = run_directory / "result.json"
+    workspace = Path(tempfile.mkdtemp(prefix=f"sirius-eval-{skill_name}-"))
 
     try:
         shutil.copytree(
@@ -663,6 +686,7 @@ def run_behavioral_case(
             if executor_command is not None
             else build_codex_command(workspace, model=model)
         )
+        execution_started_at = datetime.now(timezone.utc)
         started = time.monotonic()
         try:
             completed = subprocess.run(
@@ -721,6 +745,7 @@ def run_behavioral_case(
             prompt=prompt,
             command=command,
             model=model,
+            started_at=execution_started_at,
             duration_seconds=duration_seconds,
             executor_returncode=executor_returncode,
             executor_stderr=executor_stderr,
@@ -741,6 +766,7 @@ def run_behavioral_case(
             skill_name=skill_name,
             case_id=case["id"],
             mechanical_passed=mechanical_passed,
+            duration_seconds=duration_seconds,
             executor_returncode=executor_returncode,
             changes=changes,
             unauthorized_mutations=unauthorized,
@@ -755,3 +781,97 @@ def run_behavioral_case(
     finally:
         if not keep_workspace:
             shutil.rmtree(workspace, ignore_errors=True)
+
+
+def _mutation_signature(result: BehavioralResult) -> tuple[tuple[str, str], ...]:
+    return tuple((change.path, change.kind) for change in result.changes)
+
+
+def run_behavioral_repetitions(
+    root: Path,
+    skill_name: str,
+    case_id: str | int,
+    *,
+    repeat_count: int,
+    model: str | None = None,
+    timeout_seconds: int = 900,
+    check_timeout_seconds: int = 120,
+    keep_workspace: bool = False,
+    executor_command: Sequence[str] | None = None,
+    results_directory: Path | None = None,
+) -> BehavioralBatchResult:
+    if repeat_count < 1:
+        raise ValueError("behavioral repeat count must be positive")
+    result_directory = results_directory or root / "evals" / "results"
+    result_directory.mkdir(parents=True, exist_ok=True)
+    batch_id = _new_result_id("batch")
+    batch_directory = _resolve_child(result_directory, batch_id)
+    started_at = datetime.now(timezone.utc)
+    runs = tuple(
+        run_behavioral_case(
+            root,
+            skill_name,
+            case_id,
+            model=model,
+            timeout_seconds=timeout_seconds,
+            check_timeout_seconds=check_timeout_seconds,
+            keep_workspace=keep_workspace,
+            executor_command=executor_command,
+            results_directory=result_directory,
+            result_id=f"{batch_id}/run-{index:03d}",
+        )
+        for index in range(1, repeat_count + 1)
+    )
+    mechanical_passes = sum(result.mechanical_passed for result in runs)
+    mechanically_stable = len({result.mechanical_passed for result in runs}) == 1
+    mutations_stable = len({_mutation_signature(result) for result in runs}) == 1
+    durations = [result.duration_seconds for result in runs]
+    summary_path = batch_directory / "summary.json"
+    summary = {
+        "schema_version": 1,
+        "batch_id": batch_id,
+        "skill_name": skill_name,
+        "case_id": case_id,
+        "requested_model": model,
+        "started_at": started_at.isoformat(),
+        "completed_at": datetime.now(timezone.utc).isoformat(),
+        "repeat_count": repeat_count,
+        "mechanical_passes": mechanical_passes,
+        "mechanical_failures": repeat_count - mechanical_passes,
+        "mechanical_pass_rate": mechanical_passes / repeat_count,
+        "mechanically_stable": mechanically_stable,
+        "mutations_stable": mutations_stable,
+        "duration_seconds": {
+            "minimum": round(min(durations), 3),
+            "mean": round(sum(durations) / repeat_count, 3),
+            "maximum": round(max(durations), 3),
+            "total": round(sum(durations), 3),
+        },
+        "runs": [
+            {
+                "index": index,
+                "mechanical_passed": result.mechanical_passed,
+                "duration_seconds": round(result.duration_seconds, 3),
+                "changes": [asdict(change) for change in result.changes],
+                "trace_path": result.trace_path.relative_to(
+                    batch_directory
+                ).as_posix(),
+                "result_path": result.result_path.relative_to(
+                    batch_directory
+                ).as_posix(),
+            }
+            for index, result in enumerate(runs, start=1)
+        ],
+    }
+    summary_path.write_text(
+        json.dumps(summary, indent=2, sort_keys=True) + "\n", encoding="utf-8"
+    )
+    return BehavioralBatchResult(
+        skill_name=skill_name,
+        case_id=case_id,
+        runs=runs,
+        mechanical_passes=mechanical_passes,
+        mechanically_stable=mechanically_stable,
+        mutations_stable=mutations_stable,
+        summary_path=summary_path,
+    )

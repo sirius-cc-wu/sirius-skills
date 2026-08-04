@@ -14,8 +14,9 @@ case format, runner, and eight-skill pilot are owned by
 workspace mutations, and verification results in a disposable fixture. The
 invoice pilot mechanically checks red–mutation–green ordering, and initial
 visual composition fixtures distinguish no-diagram, focused architecture-view,
-and focused class-view outcomes. Semantic grading and broader feedback
-composition remain planned.
+and focused class-view outcomes. Repeated runs retain independent evidence and
+summarize mechanical outcome, changed-path/kind, and duration stability.
+Semantic grading and broader feedback composition remain planned.
 
 ## At a Glance
 

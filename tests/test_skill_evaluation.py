@@ -5,6 +5,7 @@ import subprocess
 import sys
 from pathlib import Path
 
+from sirius_skills import behavioral_evaluation
 from sirius_skills.behavioral_evaluation import (
     build_codex_command,
     run_behavioral_case,
@@ -208,6 +209,24 @@ def write_fake_executor(tmp_path: Path, mutation: str) -> list[str]:
     return [sys.executable, str(executor)]
 
 
+def write_alternating_executor(tmp_path: Path) -> list[str]:
+    executor = tmp_path / "alternating_executor.py"
+    counter = tmp_path / "alternating_executor.count"
+    executor.write_text(
+        "import json\n"
+        "from pathlib import Path\n"
+        f"counter = Path({str(counter)!r})\n"
+        "run = int(counter.read_text()) if counter.exists() else 0\n"
+        "counter.write_text(str(run + 1), encoding='utf-8')\n"
+        "Path('src/value.txt').write_text('fixed\\n', encoding='utf-8')\n"
+        "if run % 2:\n"
+        "    Path('notes.md').write_text('unexpected\\n', encoding='utf-8')\n"
+        "print(json.dumps({'type': 'turn.completed'}))\n",
+        encoding="utf-8",
+    )
+    return [sys.executable, str(executor)]
+
+
 def write_trace_executor(tmp_path: Path, *, include_red: bool) -> list[str]:
     executor = tmp_path / "trace_executor.py"
     red_event = (
@@ -263,6 +282,74 @@ def test_behavioral_runner_captures_authorized_mutations_and_checks(
     )
     assert result.result_path.is_file()
     assert not result.workspace.exists()
+
+
+def test_behavioral_runner_preserves_prior_run_results(tmp_path: Path) -> None:
+    write_behavior_fixture(tmp_path, allowed_mutations=["src/**"])
+    results_directory = tmp_path / "results"
+
+    first = run_behavioral_case(
+        tmp_path,
+        "implementation",
+        "fix-value",
+        executor_command=write_fake_executor(tmp_path, "src/value.txt"),
+        results_directory=results_directory,
+    )
+    second = run_behavioral_case(
+        tmp_path,
+        "implementation",
+        "fix-value",
+        executor_command=write_fake_executor(tmp_path, "src/value.txt"),
+        results_directory=results_directory,
+    )
+
+    assert first.result_path != second.result_path
+    assert first.result_path.is_file()
+    assert second.result_path.is_file()
+
+
+def test_behavioral_repetitions_summarize_stable_runs(tmp_path: Path) -> None:
+    write_behavior_fixture(tmp_path, allowed_mutations=["src/**"])
+
+    batch = behavioral_evaluation.run_behavioral_repetitions(
+        tmp_path,
+        "implementation",
+        "fix-value",
+        repeat_count=3,
+        executor_command=write_fake_executor(tmp_path, "src/value.txt"),
+        results_directory=tmp_path / "results",
+    )
+
+    assert len(batch.runs) == 3
+    assert batch.mechanical_passes == 3
+    assert batch.mechanically_stable is True
+    assert batch.mutations_stable is True
+    assert len({run.result_path for run in batch.runs}) == 3
+    summary = json.loads(batch.summary_path.read_text(encoding="utf-8"))
+    assert summary["mechanical_pass_rate"] == 1.0
+    assert summary["mechanically_stable"] is True
+    assert summary["mutations_stable"] is True
+    assert len(summary["runs"]) == 3
+
+
+def test_behavioral_repetitions_report_variable_outcomes(tmp_path: Path) -> None:
+    write_behavior_fixture(tmp_path, allowed_mutations=["src/**"])
+
+    batch = behavioral_evaluation.run_behavioral_repetitions(
+        tmp_path,
+        "implementation",
+        "fix-value",
+        repeat_count=2,
+        executor_command=write_alternating_executor(tmp_path),
+        results_directory=tmp_path / "results",
+    )
+
+    assert batch.mechanical_passes == 1
+    assert batch.mechanically_stable is False
+    assert batch.mutations_stable is False
+    summary = json.loads(batch.summary_path.read_text(encoding="utf-8"))
+    assert summary["mechanical_pass_rate"] == 0.5
+    assert [run["mechanical_passed"] for run in summary["runs"]] == [True, False]
 
 
 def test_behavioral_runner_accepts_red_green_trace_around_mutation(
@@ -406,12 +493,16 @@ def test_behavioral_cli_dry_run_does_not_execute(
             "implementation",
             "--case",
             "fix-value",
+            "--repeat",
+            "3",
             "--dry-run",
         ]
     )
 
     assert exit_code == 0
-    assert '"semantic_expectations": "ungraded"' in capsys.readouterr().out
+    output = capsys.readouterr().out
+    assert '"repeat_count": 3' in output
+    assert '"semantic_expectations": "ungraded"' in output
     assert not (tmp_path / "evals" / "results").exists()
 
 
