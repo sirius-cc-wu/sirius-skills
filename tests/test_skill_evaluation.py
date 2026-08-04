@@ -239,6 +239,24 @@ def write_noop_executor(tmp_path: Path) -> list[str]:
     return [sys.executable, str(executor)]
 
 
+def write_response_executor(tmp_path: Path) -> list[str]:
+    executor = tmp_path / "response_executor.py"
+    executor.write_text(
+        "import json\n"
+        "def event(item_type, **details):\n"
+        "    print(json.dumps({\n"
+        "        'type': 'item.completed',\n"
+        "        'item': {'type': item_type, **details},\n"
+        "    }))\n"
+        "event('agent_message', text='I am still inspecting the policies.')\n"
+        "event('command_execution', command='git status --short', exit_code=0)\n"
+        "event('agent_message', text='Decision needed: choose Product or Risk.')\n"
+        "print(json.dumps({'type': 'turn.completed'}))\n",
+        encoding="utf-8",
+    )
+    return [sys.executable, str(executor)]
+
+
 def write_alternating_executor(tmp_path: Path) -> list[str]:
     executor = tmp_path / "alternating_executor.py"
     counter = tmp_path / "alternating_executor.count"
@@ -370,6 +388,54 @@ def test_behavioral_runner_records_reported_model_host_version_and_usage(
     assert serialized["host_version"] == "codex-cli test-version"
     assert serialized["observed_model"] == "resolved-test-model"
     assert serialized["usage"]["output_tokens"] == 3
+
+
+def test_behavioral_runner_records_the_last_completed_agent_response(
+    tmp_path: Path,
+) -> None:
+    write_behavior_fixture(
+        tmp_path,
+        allowed_mutations=[],
+        required_mutations=[],
+        workspace_mode="read-only",
+    )
+
+    result = run_behavioral_case(
+        tmp_path,
+        "implementation",
+        "fix-value",
+        executor_command=write_response_executor(tmp_path),
+        results_directory=tmp_path / "results",
+    )
+
+    assert result.mechanical_passed is True
+    assert result.final_response == "Decision needed: choose Product or Risk."
+    serialized = json.loads(result.result_path.read_text(encoding="utf-8"))
+    assert serialized["final_response"] == result.final_response
+
+
+def test_behavioral_runner_records_missing_agent_response_as_null(
+    tmp_path: Path,
+) -> None:
+    write_behavior_fixture(
+        tmp_path,
+        allowed_mutations=[],
+        required_mutations=[],
+        workspace_mode="read-only",
+    )
+
+    result = run_behavioral_case(
+        tmp_path,
+        "implementation",
+        "fix-value",
+        executor_command=write_noop_executor(tmp_path),
+        results_directory=tmp_path / "results",
+    )
+
+    assert result.mechanical_passed is True
+    assert result.final_response is None
+    serialized = json.loads(result.result_path.read_text(encoding="utf-8"))
+    assert serialized["final_response"] is None
 
 
 def test_behavioral_runner_preserves_prior_run_results(tmp_path: Path) -> None:

@@ -17,10 +17,12 @@ visual composition fixtures distinguish no-diagram, focused architecture-view,
 and focused class-view outcomes. Repeated runs retain independent evidence and
 summarize mechanical outcome, changed-path/kind, and duration stability.
 Executor version, requested and trace-observed model identity, and reported
-token usage are retained without guessing missing metadata. Semantic grading
-and contract-driven composition remain planned. Three implementation cases now
-exercise local correction, canonical domain-model reconciliation, and read-only
-workflow re-entry when equal-authority requirements conflict.
+token usage are retained without guessing missing metadata. Per-run results now
+extract the final completed agent response as ungraded supporting evidence.
+Semantic grading and contract-driven composition remain planned. Three
+implementation cases exercise local correction, canonical domain-model
+reconciliation, and read-only workflow re-entry when equal-authority
+requirements conflict.
 
 ## At a Glance
 
@@ -158,7 +160,8 @@ repository. Capture:
 - files created, modified, or deleted;
 - the final repository diff;
 - elapsed time and token or monetary cost when available; and
-- the final response as supporting evidence, not the primary oracle.
+- the final response directly in each result as supporting evidence, not the
+  primary oracle.
 
 Prefer deterministic assertions for observable facts. Use an LLM judge only
 for semantic expectations that cannot be checked mechanically, and never as

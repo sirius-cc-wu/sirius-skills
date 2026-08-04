@@ -79,6 +79,7 @@ class BehavioralResult:
     requested_model: str | None
     observed_model: str | None
     usage: TokenUsage | None
+    final_response: str | None
     executor_returncode: int
     changes: tuple[FileChange, ...]
     unauthorized_mutations: list[str]
@@ -314,10 +315,12 @@ def _token_value(usage: dict[str, object], key: str) -> int:
     )
 
 
-def _trace_execution_metadata(trace: str) -> tuple[str | None, TokenUsage | None]:
+def _trace_execution_metadata(
+    trace: str,
+) -> tuple[str | None, TokenUsage | None, str | None]:
     events, error = _trace_events(trace)
     if error is not None:
-        return None, None
+        return None, None, None
     observed_model = next(
         (
             str(event["model"])
@@ -327,6 +330,16 @@ def _trace_execution_metadata(trace: str) -> tuple[str | None, TokenUsage | None
         ),
         None,
     )
+    responses = [
+        str(item["text"])
+        for event in events
+        if event.get("type") == "item.completed"
+        and isinstance((item := event.get("item")), dict)
+        and item.get("type") == "agent_message"
+        and isinstance(item.get("text"), str)
+        and str(item["text"]).strip()
+    ]
+    final_response = responses[-1] if responses else None
     reported_usage = [
         event["usage"]
         for event in events
@@ -334,7 +347,7 @@ def _trace_execution_metadata(trace: str) -> tuple[str | None, TokenUsage | None
         and isinstance(event.get("usage"), dict)
     ]
     if not reported_usage:
-        return observed_model, None
+        return observed_model, None, final_response
     fields = (
         "input_tokens",
         "cached_input_tokens",
@@ -346,7 +359,7 @@ def _trace_execution_metadata(trace: str) -> tuple[str | None, TokenUsage | None
         field: sum(_token_value(usage, field) for usage in reported_usage)
         for field in fields
     }
-    return observed_model, TokenUsage(**totals)
+    return observed_model, TokenUsage(**totals), final_response
 
 
 def _executor_host(command: Sequence[str]) -> str:
@@ -695,6 +708,7 @@ def _serialize_result(
     requested_model: str | None,
     observed_model: str | None,
     usage: TokenUsage | None,
+    final_response: str | None,
     started_at: datetime,
     duration_seconds: float,
     executor_returncode: int,
@@ -719,6 +733,7 @@ def _serialize_result(
         "requested_model": requested_model,
         "observed_model": observed_model,
         "usage": _serialize_usage(usage),
+        "final_response": final_response,
         "started_at": started_at.isoformat(),
         "duration_seconds": round(duration_seconds, 3),
         "prompt": prompt,
@@ -853,7 +868,9 @@ def run_behavioral_case(
             executor_stderr = exc.stderr or f"timed out after {timeout_seconds} seconds"
         duration_seconds = time.monotonic() - started
         trace_path.write_text(executor_stdout, encoding="utf-8")
-        observed_model, usage = _trace_execution_metadata(executor_stdout)
+        observed_model, usage, final_response = _trace_execution_metadata(
+            executor_stdout
+        )
 
         after = _snapshot(workspace)
         changes = _changes(before, after)
@@ -896,6 +913,7 @@ def run_behavioral_case(
             requested_model=model,
             observed_model=observed_model,
             usage=usage,
+            final_response=final_response,
             started_at=execution_started_at,
             duration_seconds=duration_seconds,
             executor_returncode=executor_returncode,
@@ -923,6 +941,7 @@ def run_behavioral_case(
             requested_model=model,
             observed_model=observed_model,
             usage=usage,
+            final_response=final_response,
             executor_returncode=executor_returncode,
             changes=changes,
             unauthorized_mutations=unauthorized,

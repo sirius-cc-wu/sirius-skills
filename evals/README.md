@@ -134,6 +134,12 @@ from local configuration. Usage distinguishes cached, cache-write, uncached,
 output, and reasoning tokens. Missing usage remains missing rather than being
 counted as zero.
 
+Each per-run `result.json` also records `final_response`, taken from the last
+non-empty completed `agent_message` in a valid Codex JSONL trace. It remains
+`null` when the executor reports no completed agent response. This field makes
+manual review and future semantic evaluation direct, but it is supporting
+evidence and does not affect the mechanical result.
+
 ## Run a Behavioral Case
 
 Inspect the plan before spending model tokens:
@@ -170,11 +176,13 @@ Behavioral execution is never part of `just validate`. The runner:
 6. evaluates declared JSONL trace-order assertions;
 7. checks required and forbidden output-file fragments;
 8. runs declared verification commands without a shell; and
-9. writes every trace and mechanical result to a unique run directory under
-   ignored `evals/results/`, plus a batch summary with pass rate, mechanical
-   outcome, changed-path/kind, and execution-environment stability, aggregate
-   reported token usage, and duration statistics, before deleting each
-   temporary workspace.
+9. extracts the final completed agent response as ungraded supporting evidence;
+   and
+10. writes every trace and mechanical result to a unique run directory under
+    ignored `evals/results/`, plus a batch summary with pass rate, mechanical
+    outcome, changed-path/kind, and execution-environment stability, aggregate
+    reported token usage, and duration statistics, before deleting each
+    temporary workspace.
 
 Use the lower-level command when a model override, timeout, or retained
 workspace is needed:
