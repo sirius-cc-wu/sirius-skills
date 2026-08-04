@@ -43,7 +43,19 @@
         "src/**",
         "tests/**"
       ],
-      "trust_level": "provisional"
+      "required_mutations": [
+        "src/**"
+      ],
+      "fixture": "invoice-rounding",
+      "checks": [
+        [
+          "python3",
+          "-m",
+          "pytest",
+          "-q"
+        ]
+      ],
+      "trust_level": "fixture-backed"
     }
   ]
 }

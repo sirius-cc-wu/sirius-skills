@@ -9,6 +9,7 @@ __pycache__/
 htmlcov/
 .tox/
 .nox/
+evals/results/
 build/
 dist/
 .eggs/

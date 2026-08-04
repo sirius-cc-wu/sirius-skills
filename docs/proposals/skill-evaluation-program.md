@@ -10,8 +10,10 @@ tags: [evaluation, skills, quality]
 
 Implementation is proceeding in risk-sized stages. The deterministic routing
 case format, runner, and six-skill pilot are owned by
-[`evals/`](../../evals/README.md); behavioral execution and composition remain
-planned until their respective stages are implemented and verified.
+[`evals/`](../../evals/README.md). Opt-in Codex execution now captures traces,
+workspace mutations, and verification results in a disposable fixture;
+semantic grading and composition coverage remain planned until their
+respective stages are implemented and verified.
 
 ## At a Glance
 

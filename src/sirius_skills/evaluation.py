@@ -219,6 +219,43 @@ def _validate_behavioral_cases(
                 report.errors.append(
                     f"{filename}: behavioral eval {case_id!r} has invalid '{key}'"
                 )
+        if "required_mutations" in case and not _valid_string_list(
+            case["required_mutations"]
+        ):
+            report.errors.append(
+                f"{filename}: behavioral eval {case_id!r} has invalid "
+                "'required_mutations'"
+            )
+        fixture = case.get("fixture")
+        if fixture is not None and (
+            not isinstance(fixture, str) or not fixture.strip()
+        ):
+            report.errors.append(
+                f"{filename}: behavioral eval {case_id!r} has invalid 'fixture'"
+            )
+        if fixture is not None and not _valid_string_list(
+            case.get("allowed_mutations"), allow_empty=False
+        ):
+            report.errors.append(
+                f"{filename}: fixture-backed eval {case_id!r} needs "
+                "allowed_mutations"
+            )
+        checks = case.get("checks", [])
+        if not isinstance(checks, list) or any(
+            not isinstance(command, list)
+            or not command
+            or any(not isinstance(argument, str) or not argument for argument in command)
+            for command in checks
+        ):
+            report.errors.append(
+                f"{filename}: behavioral eval {case_id!r} has invalid 'checks'"
+            )
+        trust_level = case.get("trust_level")
+        if trust_level not in (None, "provisional", "fixture-backed"):
+            report.errors.append(
+                f"{filename}: behavioral eval {case_id!r} has invalid "
+                "'trust_level'"
+            )
 
 
 def _load_case_files(root: Path, report: EvaluationReport) -> list[tuple[Path, object]]:

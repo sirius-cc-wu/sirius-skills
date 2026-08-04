@@ -1,8 +1,15 @@
 from __future__ import annotations
 
 import json
+import subprocess
+import sys
 from pathlib import Path
 
+from sirius_skills.behavioral_evaluation import (
+    build_codex_command,
+    run_behavioral_case,
+)
+from sirius_skills.commands import run_evals
 from sirius_skills.evaluation import evaluate_repository, rank_skills
 
 
@@ -114,3 +121,143 @@ def test_pilot_routing_cases_pass() -> None:
     assert report.errors == []
     assert report.case_files == 6
     assert report.routing_checks >= 30
+
+
+def write_behavior_fixture(root: Path, *, allowed_mutations: list[str]) -> None:
+    write_skill(root, "implementation", "Implement behavior with executable tests.")
+    fixture = root / "evals" / "fixtures" / "example"
+    (fixture / "src").mkdir(parents=True)
+    (fixture / "tests").mkdir()
+    (fixture / "src" / "value.txt").write_text("broken\n", encoding="utf-8")
+    (fixture / "tests" / "verify.py").write_text(
+        "from pathlib import Path\n"
+        "raise SystemExit(Path('src/value.txt').read_text() != 'fixed\\n')\n",
+        encoding="utf-8",
+    )
+    write_case(
+        root,
+        "implementation",
+        {
+            "skill_name": "implementation",
+            "trigger": {"positive": [], "negative": []},
+            "evals": [
+                {
+                    "id": "fix-value",
+                    "prompt": "Fix the value.",
+                    "expected_output": "The verifier passes.",
+                    "expectations": ["The broken value is corrected."],
+                    "prohibitions": ["Do not change unrelated files."],
+                    "fixture": "example",
+                    "allowed_mutations": allowed_mutations,
+                    "required_mutations": ["src/**"],
+                    "checks": [[sys.executable, "tests/verify.py"]],
+                }
+            ],
+        },
+    )
+
+
+def write_fake_executor(tmp_path: Path, mutation: str) -> list[str]:
+    executor = tmp_path / "fake_executor.py"
+    executor.write_text(
+        "import json\n"
+        "from pathlib import Path\n"
+        f"path = Path({mutation!r})\n"
+        "path.parent.mkdir(parents=True, exist_ok=True)\n"
+        "path.write_text('fixed\\n', encoding='utf-8')\n"
+        "print(json.dumps({'type': 'turn.completed', 'usage': {'input_tokens': 1}}))\n",
+        encoding="utf-8",
+    )
+    return [sys.executable, str(executor)]
+
+
+def test_behavioral_runner_captures_authorized_mutations_and_checks(
+    tmp_path: Path,
+) -> None:
+    write_behavior_fixture(tmp_path, allowed_mutations=["src/**"])
+
+    result = run_behavioral_case(
+        tmp_path,
+        "implementation",
+        "fix-value",
+        executor_command=write_fake_executor(tmp_path, "src/value.txt"),
+        results_directory=tmp_path / "results",
+    )
+
+    assert result.mechanical_passed is True
+    assert [change.path for change in result.changes] == ["src/value.txt"]
+    assert result.unauthorized_mutations == []
+    assert result.checks[0].returncode == 0
+    assert result.trace_path.read_text(encoding="utf-8").startswith(
+        '{"type": "turn.completed"'
+    )
+    assert result.result_path.is_file()
+    assert not result.workspace.exists()
+
+
+def test_behavioral_runner_rejects_mutations_outside_allowlist(
+    tmp_path: Path,
+) -> None:
+    write_behavior_fixture(tmp_path, allowed_mutations=["src/**"])
+
+    result = run_behavioral_case(
+        tmp_path,
+        "implementation",
+        "fix-value",
+        executor_command=write_fake_executor(tmp_path, "notes.md"),
+        results_directory=tmp_path / "results",
+    )
+
+    assert result.mechanical_passed is False
+    assert result.unauthorized_mutations == ["notes.md"]
+
+
+def test_codex_command_is_ephemeral_json_and_workspace_scoped(
+    tmp_path: Path,
+) -> None:
+    command = build_codex_command(tmp_path, model="test-model")
+
+    assert command[:2] == ["codex", "exec"]
+    assert "--ephemeral" in command
+    assert "--json" in command
+    assert command[command.index("--sandbox") + 1] == "workspace-write"
+    assert command[command.index("--cd") + 1] == str(tmp_path)
+    assert command[command.index("--model") + 1] == "test-model"
+    assert command[-1] == "-"
+
+
+def test_behavioral_cli_dry_run_does_not_execute(
+    tmp_path: Path, capsys
+) -> None:
+    write_behavior_fixture(tmp_path, allowed_mutations=["src/**"])
+
+    exit_code = run_evals.main(
+        [
+            "--root",
+            str(tmp_path),
+            "--behavioral",
+            "implementation",
+            "--case",
+            "fix-value",
+            "--dry-run",
+        ]
+    )
+
+    assert exit_code == 0
+    assert '"semantic_expectations": "ungraded"' in capsys.readouterr().out
+    assert not (tmp_path / "evals" / "results").exists()
+
+
+def test_invoice_fixture_seeds_the_expected_rounding_failure() -> None:
+    fixture = REPO_ROOT / "evals" / "fixtures" / "invoice-rounding"
+
+    completed = subprocess.run(
+        [sys.executable, "-m", "pytest", "-q"],
+        cwd=fixture,
+        text=True,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.STDOUT,
+    )
+
+    assert completed.returncode == 1
+    assert "assert '2.67' == '2.68'" in completed.stdout

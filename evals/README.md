@@ -86,10 +86,58 @@ stable `id`, a prompt, an outcome-oriented `expected_output`, and one or more
 behavioral `expectations`. Optional `prohibitions` and `allowed_mutations`
 declare negative behavior and workspace authority.
 
-Behavioral entries remain `provisional` until a disposable fixture and runner
-can observe tool events, commands, workspace mutations, and verification
-results. The deterministic tier validates their shape but does not claim they
-passed.
+Behavioral entries remain `provisional` until they have a disposable fixture.
+A fixture-backed entry also declares `fixture`, `required_mutations`, and
+argument-vector `checks`. The deterministic tier validates their shape but
+does not claim they passed.
+
+## Run a Behavioral Case
+
+Inspect the plan before spending model tokens:
+
+```bash
+just eval-behavior-dry-run test-driven-implementation bug-fix-discrimination
+```
+
+Then run that explicitly selected case through the locally authenticated Codex
+CLI:
+
+```bash
+just eval-behavior test-driven-implementation bug-fix-discrimination
+```
+
+Behavioral execution is never part of `just validate`. The runner:
+
+1. copies the declared fixture into a fresh temporary Git repository;
+2. invokes `codex exec` ephemerally with JSONL output and a workspace-write
+   sandbox;
+3. supplies the selected `SKILL.md`, prompt, expectations, prohibitions, and
+   checks as the evaluation prompt;
+4. captures created, modified, and deleted files while ignoring tool caches;
+5. rejects changes outside `allowed_mutations` and missing
+   `required_mutations`;
+6. runs declared verification commands without a shell; and
+7. writes the trace and mechanical result under the ignored `evals/results/`
+   directory before deleting the temporary workspace.
+
+Use the lower-level command when a model override, timeout, or retained
+workspace is needed:
+
+```bash
+PYTHONPATH=src python3 -m sirius_skills.commands.run_evals \
+  --behavioral test-driven-implementation \
+  --case bug-fix-discrimination \
+  --model MODEL \
+  --timeout 900 \
+  --keep-workspace
+```
+
+The result reports only a **mechanical pass**: the executor exited normally,
+mutation boundaries held, required changes occurred, and declared commands
+passed. The full JSONL trace and semantic expectations are preserved, but
+expectations and prohibitions remain explicitly `ungraded` until a trustworthy
+semantic evaluator is implemented. Do not report a mechanical pass as proof
+that the skill behaved correctly.
 
 ## Scoring Boundaries
 
