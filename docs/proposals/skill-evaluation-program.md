@@ -24,11 +24,12 @@ read-only Codex process and records criterion reasons, metadata, and usage. Its
 verdict is deliberately non-gating. Reviewed positive and negative responses
 now provide a repeatable standalone polarity and short-run stability check for
 that rubric. The same controls can also compare judge models for disagreement,
-stability, and token cost; broader semantic coverage and contract-driven
-composition remain planned. Three
-implementation cases exercise local correction, canonical domain-model
-reconciliation, and read-only workflow re-entry when equal-authority
-requirements conflict.
+stability, and token cost. A contract-driven fixture now verifies that an agent
+adds declarative state effects to the existing canonical analysis artifact
+without drifting into implementation design or creating another document;
+broader semantic coverage remains planned. Three implementation cases exercise
+local correction, canonical domain-model reconciliation, and read-only workflow
+re-entry when equal-authority requirements conflict.
 
 ## At a Glance
 
@@ -251,7 +252,9 @@ These cases should distinguish three outcomes:
 
 ## Pilot Scope
 
-Begin with eight skills that represent distinct failure risks:
+The pilot began with eight skills that represent distinct failure risks and
+later added `operation-contracts` for the remaining contract-driven composition
+risk:
 
 | Skill | Risk exercised |
 |---|---|
@@ -263,6 +266,7 @@ Begin with eight skills that represent distinct failure risks:
 | `commit` | Scoping staged changes in a dirty worktree |
 | `reconstruct-software-architecture` | Selecting focused component and runtime views from as-built evidence instead of producing an exhaustive inventory |
 | `uml-class-diagram-design` | Producing a focused class view only when type responsibilities and relationships justify it |
+| `operation-contracts` | Refining one canonical analysis aggregate with declarative state effects without adding implementation design or duplicate artifacts |
 
 Do not expand to all skills merely to reach a coverage percentage. Expand when
 the pilot schema and runner reliably detect seeded routing, behavior, and
@@ -310,7 +314,8 @@ definitions, evaluator code, and deliberately reviewed baselines.
 
 - Pair a documentation-restraint scenario with canonical design feedback.
 - Add a read-only workflow-reentry scenario for conflicting authority.
-- Add contract-driven feedback scenarios.
+- Add a contract-driven feedback scenario that refines the canonical aggregate
+  without implementation or artifact proliferation. **Implemented.**
 - Run composition cases periodically and before material workflow-boundary
   changes.
 - Compare failures with real skill usage before deciding which additional

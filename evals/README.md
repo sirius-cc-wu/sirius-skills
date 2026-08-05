@@ -21,21 +21,24 @@ The initial pilot covers:
 - `requirements-synthesis-validation`;
 - `implementation-slice-briefing`;
 - `iterative-up-analysis-design`;
+- `operation-contracts`;
 - `use-case-modeling`;
 - `test-driven-implementation`;
 - `recover-system-behavior`;
-- `reconcile-recovered-design`; and
+- `reconcile-recovered-design`;
 - `commit`;
 - `reconstruct-software-architecture`; and
 - `uml-class-diagram-design`.
 
-The fixture-backed cases distinguish five outcomes. Three implementation cases
+The fixture-backed cases distinguish six outcomes. Three implementation cases
 exercise the complete feedback branch: a local fix creates no design document,
 an approved domain rule refines code, tests, and one existing canonical model,
 and conflicting equal-authority policies return to the user without repository
 mutation. Two visual cases select focused component and runtime views for
 cross-module comprehension or a focused class view for justified stateful
-object design.
+object design. One contract case adds declarative state effects to an existing
+feature-analysis aggregate without creating code, implementation design, or a
+second artifact.
 
 ## Case Format
 
@@ -94,10 +97,10 @@ Keep one JSON file per evaluated skill at
 
 ### Behavioral Fields
 
-`evals[]` records the future model-executed oracle. Every entry has an opaque,
-stable `id`, a prompt, an outcome-oriented `expected_output`, and one or more
-behavioral `expectations`. Optional `prohibitions` and `allowed_mutations`
-declare negative behavior and workspace authority.
+`evals[]` records the model-executed behavioral oracle. Every entry has an
+opaque, stable `id`, a prompt, an outcome-oriented `expected_output`, and one
+or more behavioral `expectations`. Optional `prohibitions` and
+`allowed_mutations` declare negative behavior and workspace authority.
 
 Behavioral entries remain `provisional` until they have a disposable fixture.
 A fixture-backed entry also declares `fixture`, `required_mutations`, optional

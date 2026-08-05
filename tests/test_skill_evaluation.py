@@ -151,7 +151,7 @@ def test_pilot_routing_cases_pass() -> None:
     report = evaluate_repository(REPO_ROOT)
 
     assert report.errors == []
-    assert report.case_files == 11
+    assert report.case_files == 12
     assert report.routing_checks >= 40
 
 
@@ -1614,6 +1614,31 @@ def test_conflicting_policy_fixture_preserves_an_unresolved_decision() -> None:
     assert "Authority: approved" in risk_policy
     assert "submitted order cannot be cancelled" in risk_policy
     assert regression.returncode == 0, regression.stdout
+
+
+def test_order_submission_fixture_starts_without_operation_contract() -> None:
+    fixture = REPO_ROOT / "evals" / "fixtures" / "order-submission-contract"
+    feature = (fixture / "docs" / "order-submission.md").read_text(
+        encoding="utf-8"
+    )
+    approved_effects = (
+        fixture / "requirements" / "approved-submit-order-effects.md"
+    ).read_text(encoding="utf-8")
+
+    verification = subprocess.run(
+        [sys.executable, "-m", "verification.verify_operation_contract"],
+        cwd=fixture,
+        text=True,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.STDOUT,
+    )
+
+    assert "submitOrder(orderId)" in feature
+    assert "PaymentAuthorization" in approved_effects
+    assert "InventoryReservation" in approved_effects
+    assert "OrderSubmitted" in approved_effects
+    assert verification.returncode != 0
+    assert "missing operation contract" in verification.stdout
 
 
 def test_behavioral_runner_checks_required_file_content(tmp_path: Path) -> None:

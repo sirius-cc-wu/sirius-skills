@@ -1,0 +1,76 @@
+{
+  "skill_name": "operation-contracts",
+  "trigger": {
+    "positive": [
+      {
+        "prompt": "Specify the postconditions for a system operation that creates domain objects, forms associations, changes state, and records an event",
+        "top_k": 3
+      },
+      {
+        "prompt": "Turn this non-trivial SSD operation into precise declarative domain-state guarantees before object design",
+        "top_k": 3
+      },
+      {
+        "prompt": "Clarify the system-operation postconditions that must be true after submitOrder without describing controllers, repositories, or algorithm steps",
+        "top_k": 3
+      }
+    ],
+    "negative": [
+      {
+        "prompt": "Implement the approved submit-order contract with a failing test and the smallest production change",
+        "owner": "test-driven-implementation"
+      },
+      {
+        "prompt": "Draw the actor-system event sequence and name the submit-order system operation",
+        "owner": "system-sequence-diagrams"
+      }
+    ]
+  },
+  "evals": [
+    {
+      "id": "canonical-submit-order-contract",
+      "prompt": "Specify the operation contract for submitOrder(orderId) from the approved effects in this repository. Refine the existing canonical feature analysis rather than creating another artifact. Keep the contract declarative and use domain vocabulary; do not design implementation objects or algorithms.",
+      "expected_output": "The canonical feature analysis gains one readable, declarative submitOrder contract with its assumptions and all approved state effects.",
+      "expectations": [
+        "The contract explains the effect before listing exact preconditions and postconditions",
+        "Every approved creation, association, state change, event, and important non-creation is represented",
+        "The existing aggregate remains the only operation-contract artifact"
+      ],
+      "prohibitions": [
+        "Do not create a standalone contract or duplicate analysis artifact",
+        "Do not add controllers, services, repositories, database details, algorithm steps, code, or tests",
+        "Do not add a second frontmatter block inside the aggregate"
+      ],
+      "allowed_mutations": [
+        "docs/order-submission.md"
+      ],
+      "required_mutations": [
+        "docs/order-submission.md"
+      ],
+      "fixture": "order-submission-contract",
+      "checks": [
+        [
+          "python3",
+          "-m",
+          "verification.verify_operation_contract"
+        ]
+      ],
+      "file_assertions": [
+        {
+          "path": "docs/order-submission.md",
+          "contains": [
+            "## Contract: submitOrder(orderId)",
+            "PaymentAuthorization",
+            "InventoryReservation",
+            "OrderSubmitted"
+          ],
+          "not_contains": [
+            "OrderService",
+            "database table"
+          ]
+        }
+      ],
+      "trust_level": "fixture-backed"
+    }
+  ]
+}
