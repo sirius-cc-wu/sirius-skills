@@ -225,16 +225,24 @@ Before relying on a rubric diagnostically, run its controls without invoking
 the coding agent:
 
 ```bash
-just eval-judge-calibration test-driven-implementation conflicting-policy-reentry
+just eval-judge-calibration test-driven-implementation conflicting-policy-reentry 3
 ```
 
 Each control uses the same isolated judge prompt and receives its own trace.
 The calibration command exits nonzero when a judge error or criterion mismatch
 occurs and writes an ignored `summary.json` beneath `evals/results/`. That exit
 status describes only the explicit calibration run; it never changes a
-behavioral eval's mechanical result. A matching pair demonstrates basic rubric
-polarity, not general judge accuracy, repeatability, or independence from the
-evaluated model.
+behavioral eval's mechanical result.
+
+With a repetition count, every declared control runs that many times. The
+summary records whether each control's verdict signature—judge status, ordered
+criterion booleans, and any error—is stable, along with per-control match rate,
+aggregate reported token usage, and duration statistics. Calibration passes
+only when every judgment matches its reviewed criterion expectations;
+stability is reported separately so a consistently wrong judge is not mistaken
+for a calibrated one. Repeated agreement demonstrates basic polarity and
+short-run consistency for the selected judge, not general accuracy or
+independence from the evaluated model.
 
 Behavioral execution is never part of `just validate`. The runner:
 
@@ -282,6 +290,7 @@ PYTHONPATH=src python3 -m sirius_skills.commands.run_evals \
   --case conflicting-policy-reentry \
   --calibrate-judge \
   --judge-model JUDGE_MODEL \
+  --repeat 3 \
   --dry-run
 ```
 

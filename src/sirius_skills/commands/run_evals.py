@@ -72,13 +72,30 @@ def _print_behavioral_result(
 def _print_semantic_calibration(result: SemanticCalibrationResult) -> None:
     print(
         f"Semantic judge calibration {result.skill_name}/{result.case_id}: "
-        f"{'PASS' if result.passed else 'FAIL'}"
+        f"{'PASS' if result.passed else 'FAIL'} "
+        f"({result.repeat_count} repetition"
+        f"{'s' if result.repeat_count != 1 else ''})"
     )
     for control in result.controls:
         status = "MATCH" if control.matched else "MISMATCH"
-        print(f"Control {control.control_id!r}: {status}")
+        print(
+            f"Control {control.control_id!r} "
+            f"run {control.repetition}/{result.repeat_count}: {status}"
+        )
         if control.judgment.error:
             print(f"  Judge error: {control.judgment.error}")
+    print(f"Stability: {'stable' if result.stable else 'variable'}")
+    if result.usage is None:
+        print(f"Usage: unavailable for all {len(result.controls)} judgments")
+    else:
+        print(
+            f"Usage ({result.usage_runs}/{len(result.controls)} judgments): "
+            f"input={result.usage.input_tokens}, "
+            f"cached={result.usage.cached_input_tokens}, "
+            f"uncached={result.usage.uncached_input_tokens}, "
+            f"output={result.usage.output_tokens}, "
+            f"reasoning={result.usage.reasoning_output_tokens}"
+        )
     print(f"Summary: {result.summary_path}")
 
 
@@ -137,7 +154,7 @@ def main(argv: Sequence[str] | None = None) -> int:
         "--repeat",
         type=int,
         default=1,
-        help="Behavioral repetitions to run and summarize (default: 1).",
+        help="Behavioral or calibration repetitions to summarize (default: 1).",
     )
     args = parser.parse_args(argv)
     root = args.root.resolve() if args.root is not None else package_root()
@@ -151,8 +168,6 @@ def main(argv: Sequence[str] | None = None) -> int:
             parser.error("--judge-model requires --judge or --calibrate-judge")
         if args.calibrate_judge and args.keep_workspace:
             parser.error("--keep-workspace does not apply to --calibrate-judge")
-        if args.calibrate_judge and args.repeat != 1:
-            parser.error("--repeat does not apply to --calibrate-judge")
         if args.timeout < 1:
             parser.error("--timeout must be positive")
         if args.repeat < 1:
@@ -166,6 +181,7 @@ def main(argv: Sequence[str] | None = None) -> int:
                         args.behavioral,
                         args.case_id,
                         judge_model=judge_model,
+                        repeat_count=args.repeat,
                     )
                     print(json.dumps(plan, indent=2, sort_keys=True))
                     return 0
@@ -174,6 +190,7 @@ def main(argv: Sequence[str] | None = None) -> int:
                     args.behavioral,
                     args.case_id,
                     judge_model=judge_model,
+                    repeat_count=args.repeat,
                     timeout_seconds=args.timeout,
                 )
                 _print_semantic_calibration(calibration)

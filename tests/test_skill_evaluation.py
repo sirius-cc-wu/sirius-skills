@@ -308,6 +308,42 @@ def write_calibrating_semantic_judge_executor(tmp_path: Path) -> list[str]:
         "        'text': json.dumps(judgment),\n"
         "    },\n"
         "}))\n"
+        "print(json.dumps({\n"
+        "    'type': 'turn.completed',\n"
+        "    'usage': {'input_tokens': 7, 'output_tokens': 3},\n"
+        "}))\n",
+        encoding="utf-8",
+    )
+    return [sys.executable, str(executor)]
+
+
+def write_unstable_semantic_judge_executor(tmp_path: Path) -> list[str]:
+    executor = tmp_path / "unstable_semantic_judge.py"
+    counter = tmp_path / "unstable_semantic_judge.count"
+    executor.write_text(
+        "import json\n"
+        "import sys\n"
+        "from pathlib import Path\n"
+        f"counter = Path({str(counter)!r})\n"
+        "invocation = int(counter.read_text()) if counter.exists() else 0\n"
+        "counter.write_text(str(invocation + 1), encoding='utf-8')\n"
+        "prompt = sys.stdin.read()\n"
+        "expected = 'PASS CONTROL' in prompt\n"
+        "passed = expected if invocation // 2 == 0 else not expected\n"
+        "judgment = {\n"
+        "    'criteria': [{\n"
+        "        'id': 'requests-decision',\n"
+        "        'passed': passed,\n"
+        "        'reason': 'Variable control classification.',\n"
+        "    }],\n"
+        "}\n"
+        "print(json.dumps({\n"
+        "    'type': 'item.completed',\n"
+        "    'item': {\n"
+        "        'type': 'agent_message',\n"
+        "        'text': json.dumps(judgment),\n"
+        "    },\n"
+        "}))\n"
         "print(json.dumps({'type': 'turn.completed'}))\n",
         encoding="utf-8",
     )
@@ -695,6 +731,124 @@ def test_semantic_calibration_matches_positive_and_negative_controls(
     assert [control["id"] for control in summary["controls"]] == [
         "complete-reentry",
         "silent-policy-choice",
+    ]
+
+
+def test_semantic_calibration_repeats_and_aggregates_usage(
+    tmp_path: Path,
+) -> None:
+    write_behavior_fixture(
+        tmp_path,
+        allowed_mutations=[],
+        required_mutations=[],
+        semantic_rubric=[
+            {
+                "id": "requests-decision",
+                "criterion": "The response requests the governing decision.",
+            }
+        ],
+        semantic_controls=[
+            {
+                "id": "complete-reentry",
+                "response": "PASS CONTROL: Which policy governs?",
+                "expected_criteria": [
+                    {"id": "requests-decision", "passed": True}
+                ],
+            },
+            {
+                "id": "silent-policy-choice",
+                "response": "FAIL CONTROL: I implemented one policy.",
+                "expected_criteria": [
+                    {"id": "requests-decision", "passed": False}
+                ],
+            },
+        ],
+        workspace_mode="read-only",
+    )
+
+    result = behavioral_evaluation.run_semantic_calibration(
+        tmp_path,
+        "implementation",
+        "fix-value",
+        repeat_count=2,
+        judge_executor_command=write_calibrating_semantic_judge_executor(
+            tmp_path
+        ),
+        results_directory=tmp_path / "results",
+    )
+
+    assert result.passed is True
+    assert result.stable is True
+    assert result.repeat_count == 2
+    assert [control.repetition for control in result.controls] == [1, 1, 2, 2]
+    assert result.usage is not None
+    assert result.usage.input_tokens == 28
+    assert result.usage.output_tokens == 12
+    assert result.usage_runs == 4
+    summary = json.loads(result.summary_path.read_text(encoding="utf-8"))
+    assert summary["repeat_count"] == 2
+    assert summary["stable"] is True
+    assert summary["judgment_count"] == 4
+    assert summary["usage"]["reported_judgments"] == 4
+    assert summary["usage"]["input_tokens"] == 28
+    assert summary["stable_controls"] == 2
+
+
+def test_semantic_calibration_reports_variable_control_verdicts(
+    tmp_path: Path,
+) -> None:
+    write_behavior_fixture(
+        tmp_path,
+        allowed_mutations=[],
+        required_mutations=[],
+        semantic_rubric=[
+            {
+                "id": "requests-decision",
+                "criterion": "The response requests the governing decision.",
+            }
+        ],
+        semantic_controls=[
+            {
+                "id": "complete-reentry",
+                "response": "PASS CONTROL: Which policy governs?",
+                "expected_criteria": [
+                    {"id": "requests-decision", "passed": True}
+                ],
+            },
+            {
+                "id": "silent-policy-choice",
+                "response": "FAIL CONTROL: I implemented one policy.",
+                "expected_criteria": [
+                    {"id": "requests-decision", "passed": False}
+                ],
+            },
+        ],
+        workspace_mode="read-only",
+    )
+
+    result = behavioral_evaluation.run_semantic_calibration(
+        tmp_path,
+        "implementation",
+        "fix-value",
+        repeat_count=2,
+        judge_executor_command=write_unstable_semantic_judge_executor(tmp_path),
+        results_directory=tmp_path / "results",
+    )
+
+    assert result.passed is False
+    assert result.stable is False
+    assert [control.matched for control in result.controls] == [
+        True,
+        True,
+        False,
+        False,
+    ]
+    summary = json.loads(result.summary_path.read_text(encoding="utf-8"))
+    assert summary["stable"] is False
+    assert summary["stable_controls"] == 0
+    assert [item["stable"] for item in summary["control_stability"]] == [
+        False,
+        False,
     ]
 
 
@@ -1210,6 +1364,8 @@ def test_behavioral_cli_dry_run_describes_judge_calibration(
             "--calibrate-judge",
             "--judge-model",
             "judge-model",
+            "--repeat",
+            "3",
             "--dry-run",
         ]
     )
@@ -1220,6 +1376,7 @@ def test_behavioral_cli_dry_run_describes_judge_calibration(
         "case_id": "fix-value",
         "controls": controls,
         "judge_model": "judge-model",
+        "repeat_count": 3,
         "skill_name": "implementation",
     }
     assert not (tmp_path / "evals" / "results").exists()

@@ -107,6 +107,7 @@ class SemanticControlResult:
     expected_criteria: tuple[SemanticExpectedCriterion, ...]
     judgment: SemanticJudgment
     matched: bool
+    repetition: int = 1
 
 
 @dataclass(frozen=True)
@@ -116,6 +117,10 @@ class SemanticCalibrationResult:
     judge_model: str | None
     controls: tuple[SemanticControlResult, ...]
     passed: bool
+    repeat_count: int
+    stable: bool
+    usage: TokenUsage | None
+    usage_runs: int
     summary_path: Path
 
 
@@ -568,6 +573,22 @@ def _serialize_usage(usage: TokenUsage | None) -> dict[str, int] | None:
         **asdict(usage),
         "uncached_input_tokens": usage.uncached_input_tokens,
     }
+
+
+def _aggregate_usage(usages: Sequence[TokenUsage]) -> TokenUsage | None:
+    if not usages:
+        return None
+    return TokenUsage(
+        input_tokens=sum(item.input_tokens for item in usages),
+        cached_input_tokens=sum(item.cached_input_tokens for item in usages),
+        cache_write_input_tokens=sum(
+            item.cache_write_input_tokens for item in usages
+        ),
+        output_tokens=sum(item.output_tokens for item in usages),
+        reasoning_output_tokens=sum(
+            item.reasoning_output_tokens for item in usages
+        ),
+    )
 
 
 def _relative_trace_path(path: str, workspace: Path) -> str | None:
@@ -1114,7 +1135,10 @@ def describe_semantic_calibration(
     case_id: str | int,
     *,
     judge_model: str | None = None,
+    repeat_count: int = 1,
 ) -> dict[str, object]:
+    if repeat_count < 1:
+        raise ValueError("semantic calibration repeat count must be positive")
     case = _load_behavioral_case(root, skill_name, case_id)
     controls = _semantic_controls(case)
     if not controls:
@@ -1123,6 +1147,7 @@ def describe_semantic_calibration(
         "skill_name": skill_name,
         "case_id": case["id"],
         "judge_model": judge_model,
+        "repeat_count": repeat_count,
         "controls": controls,
     }
 
@@ -1133,10 +1158,13 @@ def run_semantic_calibration(
     case_id: str | int,
     *,
     judge_model: str | None = None,
+    repeat_count: int = 1,
     timeout_seconds: int = 900,
     judge_executor_command: Sequence[str] | None = None,
     results_directory: Path | None = None,
 ) -> SemanticCalibrationResult:
+    if repeat_count < 1:
+        raise ValueError("semantic calibration repeat count must be positive")
     case = _load_behavioral_case(root, skill_name, case_id)
     controls = _semantic_controls(case)
     if not controls:
@@ -1148,44 +1176,88 @@ def run_semantic_calibration(
     calibration_directory.mkdir(parents=True, exist_ok=False)
     started_at = datetime.now(timezone.utc)
     control_results: list[SemanticControlResult] = []
-    for index, control in enumerate(controls, start=1):
-        expected = tuple(
-            SemanticExpectedCriterion(
-                criterion_id=criterion["id"],
-                passed=bool(criterion["passed"]),
+    for repetition in range(1, repeat_count + 1):
+        for index, control in enumerate(controls, start=1):
+            expected = tuple(
+                SemanticExpectedCriterion(
+                    criterion_id=criterion["id"],
+                    passed=bool(criterion["passed"]),
+                )
+                for criterion in control["expected_criteria"]
             )
-            for criterion in control["expected_criteria"]
-        )
-        judgment = _run_semantic_judge(
-            case,
-            str(control["response"]),
-            enabled=True,
-            requested_model=judge_model,
-            timeout_seconds=timeout_seconds,
-            trace_path=calibration_directory / f"control-{index:03d}-trace.jsonl",
-            executor_command=judge_executor_command,
-        )
-        actual = {
-            criterion.criterion_id: criterion.passed
-            for criterion in judgment.criteria
-        }
-        matched = judgment.status == "completed" and all(
-            actual.get(criterion.criterion_id) == criterion.passed
-            for criterion in expected
-        )
-        control_results.append(
-            SemanticControlResult(
-                control_id=control["id"],
-                response=str(control["response"]),
-                expected_criteria=expected,
-                judgment=judgment,
-                matched=matched,
+            judgment = _run_semantic_judge(
+                case,
+                str(control["response"]),
+                enabled=True,
+                requested_model=judge_model,
+                timeout_seconds=timeout_seconds,
+                trace_path=(
+                    calibration_directory
+                    / f"repetition-{repetition:03d}-control-{index:03d}-trace.jsonl"
+                ),
+                executor_command=judge_executor_command,
             )
-        )
+            actual = {
+                criterion.criterion_id: criterion.passed
+                for criterion in judgment.criteria
+            }
+            matched = judgment.status == "completed" and all(
+                actual.get(criterion.criterion_id) == criterion.passed
+                for criterion in expected
+            )
+            control_results.append(
+                SemanticControlResult(
+                    control_id=control["id"],
+                    response=str(control["response"]),
+                    expected_criteria=expected,
+                    judgment=judgment,
+                    matched=matched,
+                    repetition=repetition,
+                )
+            )
     passed = all(control.matched for control in control_results)
+    control_stability = []
+    for control in controls:
+        runs = [
+            result
+            for result in control_results
+            if result.control_id == control["id"]
+        ]
+        signatures = {
+            (
+                run.judgment.status,
+                tuple(
+                    (criterion.criterion_id, criterion.passed)
+                    for criterion in run.judgment.criteria
+                ),
+                run.judgment.error if run.judgment.status == "error" else None,
+            )
+            for run in runs
+        }
+        control_stability.append(
+            {
+                "id": control["id"],
+                "stable": len(signatures) == 1,
+                "matched_judgments": sum(run.matched for run in runs),
+                "match_rate": sum(run.matched for run in runs) / repeat_count,
+            }
+        )
+    stable_controls = sum(item["stable"] for item in control_stability)
+    stable = stable_controls == len(controls)
+    reported_usage = [
+        control.judgment.usage
+        for control in control_results
+        if control.judgment.usage is not None
+    ]
+    usage = _aggregate_usage(reported_usage)
+    durations = [
+        control.judgment.duration_seconds
+        for control in control_results
+        if control.judgment.duration_seconds is not None
+    ]
     summary_path = calibration_directory / "summary.json"
     summary = {
-        "schema_version": 1,
+        "schema_version": 2,
         "calibration_id": calibration_id,
         "skill_name": skill_name,
         "case_id": case["id"],
@@ -1194,11 +1266,40 @@ def run_semantic_calibration(
         "completed_at": datetime.now(timezone.utc).isoformat(),
         "behavioral_gate": False,
         "passed": passed,
-        "matched_controls": sum(control.matched for control in control_results),
-        "control_count": len(control_results),
+        "repeat_count": repeat_count,
+        "stable": stable,
+        "stable_controls": stable_controls,
+        "matched_controls": sum(
+            item["matched_judgments"] == repeat_count
+            for item in control_stability
+        ),
+        "control_count": len(controls),
+        "matched_judgments": sum(control.matched for control in control_results),
+        "judgment_count": len(control_results),
+        "control_stability": control_stability,
+        "usage": {
+            "reported_judgments": len(reported_usage),
+            "missing_judgments": len(control_results) - len(reported_usage),
+            **(_serialize_usage(usage) or {}),
+        },
+        "duration_seconds": {
+            "reported_judgments": len(durations),
+            "missing_judgments": len(control_results) - len(durations),
+            **(
+                {
+                    "minimum": round(min(durations), 3),
+                    "mean": round(sum(durations) / len(durations), 3),
+                    "maximum": round(max(durations), 3),
+                    "total": round(sum(durations), 3),
+                }
+                if durations
+                else {}
+            ),
+        },
         "controls": [
             {
                 "id": control.control_id,
+                "repetition": control.repetition,
                 "response": control.response,
                 "expected_criteria": [
                     asdict(criterion) for criterion in control.expected_criteria
@@ -1218,6 +1319,10 @@ def run_semantic_calibration(
         judge_model=judge_model,
         controls=tuple(control_results),
         passed=passed,
+        repeat_count=repeat_count,
+        stable=stable,
+        usage=usage,
+        usage_runs=len(reported_usage),
         summary_path=summary_path,
     )
 

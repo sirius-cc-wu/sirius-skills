@@ -22,9 +22,9 @@ extract the final completed agent response as supporting evidence. The first
 opt-in semantic rubric pilot judges workflow-reentry responses in a separate
 read-only Codex process and records criterion reasons, metadata, and usage. Its
 verdict is deliberately non-gating. Reviewed positive and negative responses
-now provide a standalone polarity check for that rubric; broader semantic
-coverage, repeated or cross-model calibration, and contract-driven composition
-remain planned. Three
+now provide a repeatable standalone polarity and short-run stability check for
+that rubric; broader semantic coverage, cross-model calibration, and
+contract-driven composition remain planned. Three
 implementation cases exercise local correction, canonical domain-model
 reconciliation, and read-only workflow re-entry when equal-authority
 requirements conflict.
@@ -181,9 +181,11 @@ and errors remain separate from the primary execution evidence.
 Calibration controls exercise the same prompt against reviewed good and bad
 responses, with an expected boolean for each rubric criterion. A standalone
 calibration command records each trace and reports mismatches without running
-the coding agent or changing behavioral mechanical outcomes. One matching
-positive/negative pair establishes only that the rubric has basic polarity for
-the selected judge; it does not establish broad accuracy or stability.
+the coding agent or changing behavioral mechanical outcomes. Repeated controls
+report complete-verdict stability, match rates, duration, and aggregate token
+usage. Matching repetitions establish only basic polarity and short-run
+consistency for the selected judge; they do not establish broad accuracy or
+cross-model independence.
 
 A candidate case shape is:
 
