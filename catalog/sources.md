@@ -10,6 +10,10 @@ may distill concepts from several sources.
 |---|---|---|
 | Sirius repository history and accumulated repository workflow practice | `simplify`, `commit`, `create-pr`, `governance-update` | Diff-scoped cleanup, intentional staging, convention-aware change publication, and evidence-based governance updates |
 | Craig Larman, *Applying UML and Patterns* | Skills in [`applying-uml-and-patterns.txt`](../skill-sets/applying-uml-and-patterns.txt) | Iterative Unified Process framing, inception, use cases, domain models, system sequence diagrams, operation contracts, GRASP, use-case realizations, design class diagrams, patterns, implementation, testing, and refactoring |
+| James Robertson, Suzanne Robertson, and Adrian Reed, *Mastering the Requirements Process* | `stakeholder-requirements-elicitation`, `requirements-synthesis-validation` | Problem scope, stakeholder discovery, elicitation methods, evidence quality, requirements synthesis, measurable fit criteria, and validation |
+| Steve Portigal, *Interviewing Users* | `stakeholder-requirements-elicitation` | Interview planning, contextual methods, neutral questioning, evidence capture, and responsible reporting |
+| Gojko Adzic, *Specification by Example* | `requirements-synthesis-validation`, `implementation-slice-briefing` | Collaborative examples, concrete playback, validation, traceable requirement knowledge, and executable handoff |
+| Jeff Patton, *User Story Mapping* | `implementation-slice-briefing` | User journeys, coherent vertical delivery slices, and explicit release boundaries |
 | Serge Demeyer, Stéphane Ducasse, and Oscar Nierstrasz, *Object-Oriented Reengineering Patterns* | All reverse-engineering skills | Question-driven reengineering, first contact, initial understanding, detailed model capture, tests as evidence, and bounded recovery |
 | Rick Kazman, Liam O'Brien, and Chris Verhoef, *Architecture Reconstruction Guidelines, Third Edition* | `reverse-engineer-software-system`, `reconstruct-software-architecture`, `reconcile-recovered-design` | Extracting implementation facts, building successive abstractions, recovering as-built views, and checking as-built against as-designed |
 | Paul Clements et al., *Documenting Software Architectures: Views and Beyond* | `reconstruct-software-architecture`, `reconcile-recovered-design` | Question-driven view selection, module and component-and-connector views, deployment, interfaces, behavior, and architecture review |
@@ -20,19 +24,15 @@ The detailed concept-to-skill mapping is maintained in the
 
 ## Proposed Sources
 
-These sources inform the client-discovery proposal but have not yet been
-distilled into deployable skills.
+This remaining source informs a possible future client-discovery capability but
+has not been materially distilled into a deployable skill.
 
 | Source | Candidate skills | Candidate concepts |
 |---|---|---|
-| James Robertson, Suzanne Robertson, and Adrian Reed, *Mastering the Requirements Process* | `stakeholder-requirements-elicitation`, `requirements-synthesis-validation` | Problem scope, stakeholder discovery, elicitation, fit criteria, and requirements quality |
-| Steve Portigal, *Interviewing Users* | `stakeholder-requirements-elicitation` | Interview planning, contextual methods, evidence capture, and synthesis |
-| Gojko Adzic, *Specification by Example* | `requirements-synthesis-validation`, `implementation-slice-briefing` | Collaborative examples, executable specifications, validation, and living documentation |
-| Jeff Patton, *User Story Mapping* | `implementation-slice-briefing` | User journeys, coherent delivery slices, and release boundaries |
 | Teresa Torres, *Continuous Discovery Habits* | A possible future continuous-discovery skill | Outcomes, recurring interviews, opportunities, assumptions, and experiments |
 
 See the [client-discovery proposal](../docs/proposals/client-discovery-skills.md)
-for the proposed boundaries and full reference links.
+for the implemented boundaries, design rationale, and full reference links.
 
 ## Provenance Rules
 

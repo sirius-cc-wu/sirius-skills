@@ -1,0 +1,71 @@
+{
+  "skill_name": "requirements-synthesis-validation",
+  "trigger": {
+    "positive": [
+      {
+        "prompt": "Turn these interview, observation, and policy notes into source-linked candidate requirements and play them back to the authorized stakeholders",
+        "top_k": 3
+      },
+      {
+        "prompt": "Synthesize the evidence into goals, workflows, rules, constraints, quality attributes, and concrete examples while preserving disagreements",
+        "top_k": 3
+      },
+      {
+        "prompt": "Record which requirements were validated, approved, rejected, or contested and who had authority for each decision",
+        "top_k": 3
+      }
+    ],
+    "negative": [
+      {
+        "prompt": "Plan neutral interviews and observation, map missing stakeholder roles, and capture what each source actually said",
+        "owner": "stakeholder-requirements-elicitation"
+      },
+      {
+        "prompt": "Write the actor goal as a black-box main success scenario with alternate and failure flows",
+        "owner": "use-case-modeling"
+      }
+    ]
+  },
+  "evals": [
+    {
+      "id": "synthesize-authority-aware-requirements",
+      "prompt": "Review every file under evidence/ and playback/. Create discovery/requirements-brief.md. Synthesize source-linked goals, workflow, rules, constraints, examples, and open decisions; apply validation or approval only where the playback role has the documented authority. Preserve disagreement and leave any unauthorized retention value unresolved. Stop before software design or implementation planning.",
+      "expected_output": "A sanitized requirements discovery brief with provenance, revision-specific validation and approval, concrete examples, unresolved conflicts, and downstream requirements handoffs.",
+      "expectations": [
+        "The dashboard request remains distinguishable from the reconciliation outcome",
+        "Every material requirement links to supporting or contradicting source evidence IDs",
+        "Validation and approval reflect the authority declared in playback",
+        "The unresolved retention question remains open without an invented value"
+      ],
+      "prohibitions": [
+        "Do not erase rejected or conflicting evidence",
+        "Do not invent approval, dates, thresholds, or retention rules",
+        "Do not choose software architecture or implementation tasks"
+      ],
+      "fixture": "requirements-synthesis",
+      "allowed_mutations": [
+        "discovery/**"
+      ],
+      "required_mutations": [
+        "discovery/requirements-brief.md"
+      ],
+      "file_assertions": [
+        {
+          "path": "discovery/requirements-brief.md",
+          "contains": [
+            "Requirements Discovery Brief",
+            "Candidate Requirements",
+            "Source evidence IDs",
+            "Validation and Decision Log",
+            "Conflicts and Open Questions"
+          ],
+          "not_contains": [
+            "## Architecture",
+            "## Implementation Plan"
+          ]
+        }
+      ],
+      "trust_level": "provisional"
+    }
+  ]
+}

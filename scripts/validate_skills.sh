@@ -162,6 +162,18 @@ for name in "${recovery_skills[@]}"; do
   grep -Fq "\$$name" "$metadata" || fail "$name metadata default prompt missing skill invocation"
 done
 
+client_discovery_skills=(
+  stakeholder-requirements-elicitation
+  requirements-synthesis-validation
+  implementation-slice-briefing
+)
+
+for name in "${client_discovery_skills[@]}"; do
+  metadata="$root/skills/$name/agents/openai.yaml"
+  test -f "$metadata" || fail "missing $metadata"
+  grep -Fq "\$$name" "$metadata" || fail "$name metadata default prompt missing skill invocation"
+done
+
 rewrite_metadata="$root/skills/rewrite-technical-artifacts/agents/openai.yaml"
 rewrite_skill="$root/skills/rewrite-technical-artifacts/SKILL.md"
 test -f "$rewrite_metadata" || fail "rewrite-technical-artifacts missing agents/openai.yaml"
@@ -170,6 +182,9 @@ grep -q '^## Diff-Focused Review Mode$' "$rewrite_skill" || fail "rewrite skill 
 grep -q '^## Final Editorial Pass$' "$readability_reference" || fail "readability reference missing final editorial handoff"
 
 template_types=(
+  "stakeholder-requirements-elicitation|Stakeholder Evidence Record"
+  "requirements-synthesis-validation|Requirements Discovery Brief"
+  "implementation-slice-briefing|Implementation Slice Brief"
   "reverse-engineer-software-system|Reverse Engineering Record"
   "survey-existing-system|System Survey"
   "recover-system-behavior|Recovered Behavior Model"

@@ -1,6 +1,6 @@
 ---
 name: recover-system-behavior
-description: Recovers black-box system behavior with traceable evidence. Use when requirements are missing or stale and current commands, APIs, events, user interactions, failures, or externally visible constraints must be inferred from interfaces, tests, safe runtime observations, and implementation before design or change.
+description: Documents what users can observe today by recovering black-box system behavior with traceable implementation and runtime evidence. Use when requirements are missing or stale and current commands, APIs, events, user interactions, failures, or externally visible constraints must be inferred from interfaces, tests, safe runtime observations, and implementation before design or change.
 ---
 
 # Recover System Behavior

@@ -42,6 +42,24 @@ state, side effects, verification surfaces, and highest-risk follow-up slices.
 ## Iterative design and implementation
 
 ```text
+Use stakeholder-requirements-elicitation to identify the affected roles and
+capture interview, observation, and policy evidence without turning feature
+requests into requirements or design.
+```
+
+```text
+Use requirements-synthesis-validation to turn this identified evidence set into
+source-linked candidate requirements and examples. Record validation and
+approval only for roles with documented authority, and preserve open conflicts.
+```
+
+```text
+Use implementation-slice-briefing to select the smallest ready vertical
+behavior slice from these approved requirements and design inputs. Fix the brief
+to the current repository revision and expose every exclusion and stop condition.
+```
+
+```text
 Use iterative-up-analysis-design to plan the smallest risk-driven iteration for
 this feature. Preserve durable artifacts and avoid creating documents that do
 not reduce uncertainty.

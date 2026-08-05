@@ -51,8 +51,8 @@ and boundary. Common compositions are documented as workflow tracks:
 - [Reverse Engineering](catalog/tracks/reverse-engineering.md)
 - [Iterative Analysis and Design](catalog/tracks/iterative-analysis-design.md)
 - [Implementation and Evolution](catalog/tracks/implementation-evolution.md)
-- [Client to Code](catalog/tracks/client-to-code.md), whose upstream discovery
-  skills remain proposed
+- [Client to Code](catalog/tracks/client-to-code.md), from stakeholder evidence
+  through validated requirements to a traceable implementation slice brief
 
 The [Skill Relationships](catalog/skill-relationships.md) views summarize
 normal handoffs and optional feedback paths. Select the smallest set of skills
@@ -126,7 +126,8 @@ and judge calibration are opt-in and never run as part of normal validation.
 - `catalog/sources.md`: intellectual and repository provenance
 - `evals/`: deterministic routing cases and opt-in behavioral evaluation data
 - `docs/shared/`: canonical references copied into self-contained skills
-- `docs/proposals/`: proposed, non-deployable capabilities
+- `docs/proposals/`: capability proposals, implementation rationale, and
+  historical iteration records
 - `scripts/validate_skills.sh`: catalog and collection validation
 - `src/sirius_skills/commands/sync_shared_references.py`: packaging helper
 

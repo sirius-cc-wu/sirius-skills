@@ -309,10 +309,9 @@ keeps the diagrams readable without changing where they apply.
 | `software-design-language-adaptation` | `grasp-responsibility-design`, `use-case-realization`, `uml-class-diagram-design`, `design-pattern-application`, and `test-driven-implementation` | Language-specific ownership, errors, concurrency, lifecycle, or interface conventions affect the design |
 | `rewrite-technical-artifacts` | Recovered artifacts, iterative-design artifacts, behavior-slice evidence, and refactoring records | The knowledge is sound but its reading order or progressive disclosure needs improvement |
 
-## Proposed upstream path
+## Client discovery upstream path
 
-Three client-discovery skills are proposed but not deployable from this
-repository. Their intended handoff remains:
+All three client-discovery skills in this optional handoff are deployable:
 
 ```text
 stakeholder-requirements-elicitation
@@ -322,9 +321,10 @@ stakeholder-requirements-elicitation
   → test-driven-implementation
 ```
 
-The [Client to Code track](tracks/client-to-code.md) and
-[client-discovery proposal](../docs/proposals/client-discovery-skills.md) are
-the authoritative sources for this future path.
+The [Client to Code track](tracks/client-to-code.md) is the active handoff
+guide. The
+[client-discovery proposal](../docs/proposals/client-discovery-skills.md)
+records the skill-family rationale and implementation history.
 
 The [workflow tracks](tracks/) remain the authoritative descriptions of when
 to select each skill.
