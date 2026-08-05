@@ -10,7 +10,7 @@ following every step in it.
 | Need | Profile |
 |---|---|
 | Refine, record, and publish repository changes | `workflow` |
-| Discover requirements and move through analysis, object design, implementation, and refactoring | `iterative-design` |
+| Assess external development inputs, discover requirements, and move through analysis, object design, implementation, and refactoring | `iterative-design` |
 | Recover current behavior and architecture from an existing system | `reverse-engineering` |
 | Make the entire catalog available | `all` |
 
@@ -18,6 +18,22 @@ following every step in it.
 `iterative-design`.
 
 ## Common compositions
+
+### Route an external development input
+
+1. Use `assess-development-input` when a specification, proposal, scenario set,
+   story map, brainstorm result, or other requirements-shaped input exists but
+   its Sirius entry point is unclear.
+2. Preserve the source's revision, approval state, non-goals, and unresolved
+   questions; assess readiness from content rather than format or originating
+   method.
+3. Return to the relevant external authority when a missing decision cannot be
+   owned by a Sirius skill.
+4. Invoke the one recommended Sirius skill only when the user authorizes the
+   downstream work.
+
+The assessment is an intake boundary, not a mandatory first step or a
+replacement for discovery and specification methods.
 
 ### Deliver an existing change
 

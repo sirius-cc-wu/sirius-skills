@@ -4,6 +4,12 @@ Use this track when an existing system must be understood before maintenance,
 migration, modernization, audit, onboarding, resumed development, or
 redocumentation.
 
+When externally prepared requirements or proposals contain unevidenced claims
+about the current system,
+[`assess-development-input`](../../skills/assess-development-input/SKILL.md)
+may route them here before those claims are used as intended behavior or
+implementation inputs.
+
 ## Sequence
 
 1. [`reverse-engineer-software-system`](../../skills/reverse-engineer-software-system/SKILL.md)

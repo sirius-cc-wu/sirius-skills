@@ -3,6 +3,12 @@
 Use this track when requirements or design inputs are sufficiently clear to
 implement behavior, or when verified behavior needs structural improvement.
 
+When an external specification, scenario set, or proposal appears ready for
+implementation but its approval, uncertainty, or independent oracle is unclear,
+use
+[`assess-development-input`](../../skills/assess-development-input/SKILL.md)
+before entering this track.
+
 ## Add or Change Behavior
 
 1. Start with an approved use case, operation contract, acceptance example,

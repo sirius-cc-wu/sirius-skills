@@ -6,6 +6,8 @@ reduce the current risk or complete the current behavior slice.
 
 ## Choose a track
 
+- Use **Assess Development Input** when requirements-shaped material already
+  exists but its readiness or correct Sirius entry point is unclear.
 - Start with **Reverse Engineering** when an existing system must be understood.
 - Start with **Iterative Analysis and Design** when intended behavior, scope, or
   object design is not yet clear.
@@ -38,7 +40,13 @@ rectangle "Reverse Engineering\nunderstand an existing system" as reverse #EAF4F
 rectangle "Iterative Analysis and Design\nclarify behavior and design" as design #EEF8EE
 rectangle "Implementation and Evolution\nchange verified behavior or structure" as implementation #FFF5EA
 rectangle "Repository Workflow\nrefine, record, and publish" as repository #F3EEFF
+rectangle "Requirements-shaped input\nfrom any method or format" as external #F2F2F2
+rectangle "assess-development-input\nassess readiness and select owner" as intake #FFF4CC
 
+external --> intake
+intake --> reverse : current-system claims need evidence
+intake --> design : requirement or design gap
+intake --> implementation : bounded behavior has an oracle
 reverse --> design : stakeholder-validated knowledge
 reverse --> implementation : safely bounded change
 design --> implementation : selected behavior and design inputs
@@ -46,6 +54,16 @@ implementation ..> design : discoveries or durable design pressure
 implementation --> repository : verified change
 @enduml
 ```
+
+## External development inputs
+
+`assess-development-input` is an optional content-based gateway. It accepts
+intent statements, specifications, proposals, BDD scenarios, story maps,
+brainstorm notes, and similar material without depending on the tool or method
+that produced them. It selects the narrowest skill that owns the first material
+gap, or reports an external prerequisite when no Sirius skill can responsibly
+proceed. The assessment neither rewrites the source nor executes the selected
+skill.
 
 ## Reverse engineering
 
@@ -309,7 +327,7 @@ keeps the diagrams readable without changing where they apply.
 | `software-design-language-adaptation` | `grasp-responsibility-design`, `use-case-realization`, `uml-class-diagram-design`, `design-pattern-application`, and `test-driven-implementation` | Language-specific ownership, errors, concurrency, lifecycle, or interface conventions affect the design |
 | `rewrite-technical-artifacts` | Recovered artifacts, iterative-design artifacts, behavior-slice evidence, and refactoring records | The knowledge is sound but its reading order or progressive disclosure needs improvement |
 
-## Proposed upstream path
+## Proposed upstream discovery path
 
 Three client-discovery skills are proposed but not deployable from this
 repository. Their intended handoff remains:
@@ -321,6 +339,11 @@ stakeholder-requirements-elicitation
   → implementation-slice-briefing
   → test-driven-implementation
 ```
+
+The deployed `assess-development-input` skill does not implement that proposal.
+It can assess outputs from the proposed skills or any other external discovery
+and specification method, but it cannot gather stakeholder evidence, validate
+requirements, or prepare an implementation brief on their behalf.
 
 The [Client to Code track](tracks/client-to-code.md) and
 [client-discovery proposal](../docs/proposals/client-discovery-skills.md) are

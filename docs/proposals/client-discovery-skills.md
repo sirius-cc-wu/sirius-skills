@@ -29,6 +29,21 @@ Design, tests, and implementation
 Stakeholder feedback
 ```
 
+## Relationship to Generic Input Assessment
+
+The deployable
+[`assess-development-input`](../../skills/assess-development-input/SKILL.md)
+skill is an intentionally smaller integration boundary. It can assess intent
+statements, specifications, proposals, BDD scenarios, story maps, brainstorm
+notes, and other requirements-shaped inputs from any method, then recommend the
+next Sirius skill based on their content.
+
+That gateway does not implement this proposal. It does not identify or
+interview stakeholders, turn evidence into validated requirements, or assemble
+an implementation-ready slice. A readiness assessment may therefore route an
+input back to an external authority instead of making incomplete material look
+ready.
+
 ## Representative Path
 
 A sponsor asks for a dashboard. An operator interview reveals that the real

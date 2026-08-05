@@ -1,0 +1,47 @@
+{
+  "skill_name": "assess-development-input",
+  "trigger": {
+    "positive": [
+      {
+        "prompt": "I have BDD scenarios and workshop notes from another process. Assess whether they are ready and tell me which Sirius workflow should take them next without rewriting them.",
+        "top_k": 3
+      },
+      {
+        "prompt": "Review this feature proposal, expose any unresolved assumptions, and route it to the right analysis or implementation workflow.",
+        "top_k": 3
+      },
+      {
+        "prompt": "Given this externally produced specification, decide whether it needs inception, use cases, system recovery, or can go straight to tested implementation.",
+        "top_k": 3
+      }
+    ],
+    "negative": [
+      {
+        "prompt": "Identify the actors, their goals, and the main and alternate use-case scenarios for this feature.",
+        "owner": "use-case-modeling"
+      },
+      {
+        "prompt": "Implement this approved behavior from its acceptance examples using a test-first feedback loop.",
+        "owner": "test-driven-implementation"
+      }
+    ]
+  },
+  "evals": [
+    {
+      "id": "route-external-requirements-input",
+      "prompt": "Assess these externally prepared story-map notes and acceptance scenarios, then recommend the next Sirius skill.",
+      "expected_output": "A concise readiness assessment that exposes material uncertainty and recommends one Sirius skill with a content-based rationale.",
+      "expectations": [
+        "The assessment judges the content rather than the source method or external tool",
+        "The recommendation names one next skill and explains the readiness evidence or gap",
+        "Unresolved decisions and stop conditions remain visible"
+      ],
+      "prohibitions": [
+        "Do not rewrite the input into a new specification format",
+        "Do not invent missing requirements or silently claim approval",
+        "Do not create a standalone document unless durable handoff value justifies it"
+      ],
+      "trust_level": "provisional"
+    }
+  ]
+}

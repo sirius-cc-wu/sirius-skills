@@ -4,6 +4,13 @@ This proposed track covers the missing path from stakeholder evidence to a
 bounded, traceable coding-agent brief. The discovery skills named below do not
 exist yet.
 
+The deployed
+[`assess-development-input`](../../skills/assess-development-input/SKILL.md)
+provides a smaller, method-independent alternative when requirements-shaped
+material already exists. It assesses that material and selects a Sirius entry
+point; it does not perform the stakeholder discovery, validation, or briefing
+proposed by this track.
+
 ## Proposed Sequence
 
 1. `stakeholder-requirements-elicitation` identifies relevant stakeholders and
