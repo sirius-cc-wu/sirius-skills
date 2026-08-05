@@ -311,8 +311,9 @@ keeps the diagrams readable without changing where they apply.
 
 ## Client discovery upstream path
 
-`stakeholder-requirements-elicitation` is deployable. The synthesis and
-briefing skills in its intended handoff remain proposed:
+`stakeholder-requirements-elicitation` and
+`requirements-synthesis-validation` are deployable. The briefing skill in their
+intended handoff remains proposed:
 
 ```text
 stakeholder-requirements-elicitation
@@ -322,9 +323,10 @@ stakeholder-requirements-elicitation
   → test-driven-implementation
 ```
 
-The [Client to Code track](tracks/client-to-code.md) and
-[client-discovery proposal](../docs/proposals/client-discovery-skills.md) are
-the authoritative sources for this future path.
+The [Client to Code track](tracks/client-to-code.md) is the active handoff
+guide. The
+[client-discovery proposal](../docs/proposals/client-discovery-skills.md)
+records the remaining briefing direction and design rationale.
 
 The [workflow tracks](tracks/) remain the authoritative descriptions of when
 to select each skill.

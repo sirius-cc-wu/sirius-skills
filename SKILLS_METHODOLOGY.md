@@ -47,14 +47,17 @@ durable policy gap.
    durable artifacts.
 2. Use `stakeholder-requirements-elicitation` when the affected roles, current
    work, authority, or evidence coverage is unclear.
-3. Select requirements and analysis skills according to the uncertainty:
+3. Use `requirements-synthesis-validation` to turn an identified evidence set
+   into source-linked candidate requirements, concrete examples, and
+   authority-aware validation states.
+4. Select requirements and analysis skills according to the uncertainty:
    inception, use cases, domain modeling, system sequence diagrams, and
    operation contracts.
-4. Assign responsibilities and collaborations with GRASP and use-case
+5. Assign responsibilities and collaborations with GRASP and use-case
    realization; summarize stable structure with design class diagrams.
-5. Apply patterns and language adaptation only when concrete design forces
+6. Apply patterns and language adaptation only when concrete design forces
    justify them.
-6. Use `test-driven-implementation` for behavior changes and
+7. Use `test-driven-implementation` for behavior changes and
    `behavior-preserving-refactoring` for verified structural improvement.
 
 The detailed handoffs and stopping rules live in [`catalog/tracks/`](catalog/tracks/).

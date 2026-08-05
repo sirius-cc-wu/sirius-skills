@@ -1,17 +1,18 @@
 # Client to Code
 
-This proposed track covers the missing path from stakeholder evidence to a
-bounded, traceable coding-agent brief. Stakeholder elicitation is active; the
-synthesis and briefing skills named below remain proposed.
+This evolving track covers the path from stakeholder evidence to a bounded,
+traceable coding-agent brief. Stakeholder elicitation and requirements
+synthesis are active; implementation briefing remains proposed.
 
 ## Proposed Sequence
 
 1. [`stakeholder-requirements-elicitation`](../../skills/stakeholder-requirements-elicitation/SKILL.md)
    identifies relevant stakeholders and collects evidence through interviews,
    observation, workshops, documents, and prototypes.
-2. `requirements-synthesis-validation` turns the evidence into candidate goals,
-   workflows, rules, constraints, quality attributes, scenarios, assumptions,
-   and decisions, then plays them back to stakeholders.
+2. [`requirements-synthesis-validation`](../../skills/requirements-synthesis-validation/SKILL.md)
+   turns the evidence into candidate goals, workflows, rules, constraints,
+   quality attributes, scenarios, assumptions, and decisions, then plays them
+   back to stakeholders.
 3. [`inception`](../../skills/inception/SKILL.md) frames the validated business
    case, scope, feasibility, and major risks.
 4. [`use-case-modeling`](../../skills/use-case-modeling/SKILL.md) expresses

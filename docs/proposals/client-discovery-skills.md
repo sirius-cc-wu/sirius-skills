@@ -93,8 +93,10 @@ three skills at full detail before any has been exercised:
 
 Each increment should graduate one independently useful skill with focused
 routing and behavioral evaluations. This is an implementation order, not a
-mandatory lifecycle for skill users. The first planned increment is
-[Validate Stakeholder Evidence Elicitation](iterations/client-discovery-elicitation-e1.md).
+mandatory lifecycle for skill users. Completed iteration records:
+
+- [Validate Stakeholder Evidence Elicitation](iterations/client-discovery-elicitation-e1.md)
+- [Validate Requirements Synthesis and Playback](iterations/client-discovery-synthesis-e2.md)
 
 ## Recommended Skill Family
 

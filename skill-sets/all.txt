@@ -10,6 +10,7 @@ reconcile-recovered-design
 rewrite-technical-artifacts
 iterative-up-analysis-design
 stakeholder-requirements-elicitation
+requirements-synthesis-validation
 inception
 use-case-modeling
 domain-modeling

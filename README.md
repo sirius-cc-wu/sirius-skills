@@ -52,7 +52,8 @@ and boundary. Common compositions are documented as workflow tracks:
 - [Iterative Analysis and Design](catalog/tracks/iterative-analysis-design.md)
 - [Implementation and Evolution](catalog/tracks/implementation-evolution.md)
 - [Client to Code](catalog/tracks/client-to-code.md), whose stakeholder
-  elicitation skill is active while synthesis and briefing remain proposed
+  elicitation and requirements synthesis skills are active while implementation
+  briefing remains proposed
 
 The [Skill Relationships](catalog/skill-relationships.md) views summarize
 normal handoffs and optional feedback paths. Select the smallest set of skills

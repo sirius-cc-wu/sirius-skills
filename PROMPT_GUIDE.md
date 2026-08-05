@@ -48,6 +48,12 @@ requests into requirements or design.
 ```
 
 ```text
+Use requirements-synthesis-validation to turn this identified evidence set into
+source-linked candidate requirements and examples. Record validation and
+approval only for roles with documented authority, and preserve open conflicts.
+```
+
+```text
 Use iterative-up-analysis-design to plan the smallest risk-driven iteration for
 this feature. Preserve durable artifacts and avoid creating documents that do
 not reduce uncertainty.
