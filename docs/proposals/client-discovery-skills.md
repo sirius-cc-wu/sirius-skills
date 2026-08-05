@@ -29,6 +29,54 @@ Design, tests, and implementation
 Stakeholder feedback
 ```
 
+## Representative Path
+
+A sponsor asks for a dashboard. An operator interview reveals that the real
+problem is reconciling records from several systems, while a compliance review
+shows that some records must not be exported. The original request, the
+operator's workflow, and the compliance constraint are all evidence; none is
+automatically the specification.
+
+The elicitation skill records the participants, observations, sources, and
+conflict. The synthesis skill plays back candidate workflows and rules until
+the relevant decision-makers validate them. The briefing skill then selects
+only an approved behavior slice and tells the coding agent to stop if a missing
+retention or authorization rule would require guessing.
+
+## Related Skill Collections
+
+The
+[agent-skill repository comparison](../../catalog/agent-skill-repository-structures.md)
+shows two useful neighboring approaches:
+
+- Addy Osmani's collection clarifies one requester's intent, refines ideas,
+  writes an approved specification, and breaks it into vertical implementation
+  slices with acceptance criteria.
+- gstack challenges demand, status quo, target user, and the narrowest valuable
+  wedge before producing an approved design document and a repository-grounded,
+  executable issue.
+
+These are strong precedents for explicit restatement, non-goals, approval,
+verified repository context, bounded slices, and pass/fail acceptance
+conditions. They do not replace the proposed skills: neither collection owns a
+generic workflow for selecting multiple stakeholders, acquiring evidence
+through several methods, preserving conflicts and provenance, or validating
+requirements with the people authorized to decide them.
+
+Two patterns should not become the evidence standard here. A leading guess can
+accelerate clarification with an empowered requester but can bias a research
+interview. Likewise, agent confidence or spec-executability scores can expose
+ambiguity but cannot substitute for stakeholder coverage, source evidence, or
+approval authority.
+
+## Recommendation
+
+Keep three independently deployable skills. Their artifact boundaries matter
+more than forcing every engagement through a mandatory sequence. A low-risk
+change with one authoritative requester may compose elicitation and synthesis
+in one conversation, but it should still keep source evidence distinct from
+candidate requirements and decisions.
+
 ## Recommended Skill Family
 
 Initially, this could be a family of three skills.
@@ -42,6 +90,104 @@ Initially, this could be a family of three skills.
 If the first skill becomes too large, it could later split into
 `stakeholder-analysis` and `requirements-elicitation`. That split should wait
 until actual usage demonstrates the need.
+
+## Shared Evidence and Decision Model
+
+The skills need a small common model so that information does not lose its
+origin as it moves toward implementation. Identifiers are opaque and may be
+assigned manually; their format must follow repository conventions rather than
+assuming dates or sequence numbers. Evidence claims should reuse
+[Recovery Evidence and Confidence](../../skills/reverse-engineer-software-system/references/recovery-evidence.md)
+where its vocabulary fits instead of creating a competing confidence model.
+
+An evidence record should preserve:
+
+- Stable source ID
+- Acquisition method, such as interview, observation, workshop, document
+  review, prototype, or repository inspection
+- Source or stakeholder role and relevant decision authority
+- Capture date, document revision, or observation conditions
+- The statement, quote, observation, or repository fact
+- Claim status such as observed, corroborated, inferred, contradicted, or
+  unknown
+- Confidence, open questions, and conflicting evidence
+- Sensitivity, retention, and publication constraints
+
+A candidate requirement, example, or decision should preserve:
+
+- Stable ID and precise statement
+- Status such as candidate, validated, approved, contested, or superseded
+- Source evidence IDs
+- Applicable actors, scenarios, rules, constraints, and quality attributes
+- Concrete examples or measurable fit criteria
+- Decision-maker or approving role and approval date
+- Unresolved questions and the person or group responsible for resolving them
+
+Raw notes remain evidence. Synthesis creates traceable candidate requirements;
+it does not rewrite the notes to make later decisions appear inevitable.
+
+## Skill Entry, Exit, and Stop Rules
+
+### `stakeholder-requirements-elicitation`
+
+Enter when the relevant people, current work, underlying need, or decision
+authority is not sufficiently understood.
+
+The skill should:
+
+- identify sponsors, operators, end users, support, compliance, and other
+  affected roles without assuming the paying client represents all of them;
+- choose proportionate methods and prepare an elicitation plan;
+- ask neutral questions during evidence discovery and label researcher or
+  agent hypotheses separately;
+- capture observed work, statements, documents, prototypes, open questions,
+  disagreements, and missing participants as evidence records; and
+- distinguish what a participant experiences from the solution they request.
+
+Exit when the planned evidence has been captured or the remaining coverage gap
+is explicit. Stop rather than claiming adequate coverage when a material
+stakeholder is unavailable, consent is missing, or contradictory evidence
+cannot yet be investigated.
+
+### `requirements-synthesis-validation`
+
+Enter with an identified evidence set, including known limitations and
+conflicts.
+
+The skill should:
+
+- synthesize goals, current workflows, rules, constraints, quality attributes,
+  scenarios, assumptions, and candidate decisions without erasing their source;
+- turn important behavior into concrete examples that stakeholders can confirm
+  or correct;
+- play the synthesis back to the relevant stakeholders and record validation,
+  rejection, approval, abstention, and unresolved conflict; and
+- route accepted results into inception, use cases, domain models,
+  supplementary requirements, or other owning artifacts.
+
+Exit with a discovery brief whose statements have explicit status and source
+links. Stop before software design, and do not resolve a conflict merely
+because one participant is more available or more senior unless that person
+has the documented authority to decide it.
+
+### `implementation-slice-briefing`
+
+Enter when a coherent behavior slice has approved requirements and the
+downstream analysis or design decisions needed to implement it.
+
+The skill should:
+
+- select a vertical behavior slice that produces a testable outcome;
+- assemble approved requirements, examples, decisions, non-goals, repository
+  evidence, and required verification without changing their meaning;
+- identify the exact source revision or status on which the brief depends; and
+- make every remaining uncertainty and coding-agent stop condition visible.
+
+Exit with a bounded brief that an unfamiliar implementer can follow and trace.
+Route missing business rules back to synthesis, missing scope or feasibility
+decisions to inception, missing behavioral detail to use cases or contracts,
+and missing architecture to the relevant design workflow. Never fill those
+gaps merely to make the brief appear executable.
 
 ## What an Agent-Ready Brief Should Contain
 
@@ -69,6 +215,37 @@ That distinction matters: an interview transcript is evidence, not
 automatically a specification. A requested feature may be a proposed solution
 rather than the underlying need, and the paying client may not represent
 operators, end users, compliance staff, or support personnel.
+
+## Confidentiality and Responsible Capture
+
+Stakeholder discovery can expose personal, contractual, operational, or
+commercially sensitive information. Each skill should therefore:
+
+- establish consent and intended use before recording interviews or
+  observations;
+- collect the minimum identifying detail needed and prefer roles over personal
+  names when identity is not material;
+- keep private raw evidence separate from sanitized requirements and
+  implementation briefs;
+- record retention, access, and deletion expectations for raw material;
+- review and redact confidential information before publishing an issue,
+  committing an artifact, or sending content to an external service; and
+- preserve a trace link to a protected source without copying sensitive content
+  into broadly visible artifacts.
+
+## Validation, Feedback, and Change
+
+Approval is revision-specific. A later interview, changed policy, delivery
+observation, or stakeholder test may corroborate, contradict, or supersede an
+earlier requirement. Preserve that history instead of silently rewriting the
+old record.
+
+An implementation brief becomes stale when one of its approved sources or
+decisions changes. Delivery evidence and stakeholder feedback should return to
+`requirements-synthesis-validation`, which updates statuses and examples before
+a revised slice is briefed. Technical verification can show that the software
+matches the brief; it cannot by itself show that the brief still represents the
+stakeholders' needs.
 
 ## Recommended References
 
