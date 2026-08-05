@@ -79,3 +79,7 @@ eval-behavior-judged skill case repeat="1":
 # Check a judge repeatedly against declared positive and negative controls.
 eval-judge-calibration skill case repeat="1":
 	env PYTHONPATH="{{repo_root}}/src" python3 -m sirius_skills.commands.run_evals --root "{{repo_root}}" --behavioral {{quote(skill)}} --case {{quote(case)}} --calibrate-judge --repeat {{quote(repeat)}}
+
+# Compare the same calibration controls across two judge models.
+eval-judge-comparison skill case base_model compare_model repeat="1":
+	env PYTHONPATH="{{repo_root}}/src" python3 -m sirius_skills.commands.run_evals --root "{{repo_root}}" --behavioral {{quote(skill)}} --case {{quote(case)}} --calibrate-judge --judge-model {{quote(base_model)}} --compare-judge-model {{quote(compare_model)}} --repeat {{quote(repeat)}}

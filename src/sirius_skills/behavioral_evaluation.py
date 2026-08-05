@@ -11,7 +11,7 @@ import uuid
 from dataclasses import asdict, dataclass
 from datetime import datetime, timezone
 from pathlib import Path
-from typing import Sequence
+from typing import Mapping, Sequence
 
 
 IGNORED_WORKSPACE_PARTS = {
@@ -119,6 +119,19 @@ class SemanticCalibrationResult:
     passed: bool
     repeat_count: int
     stable: bool
+    usage: TokenUsage | None
+    usage_runs: int
+    summary_path: Path
+
+
+@dataclass(frozen=True)
+class SemanticCalibrationMatrixResult:
+    skill_name: str
+    case_id: str | int
+    judge_models: tuple[str, ...]
+    calibrations: tuple[SemanticCalibrationResult, ...]
+    passed: bool
+    models_agree: bool
     usage: TokenUsage | None
     usage_runs: int
     summary_path: Path
@@ -1323,6 +1336,203 @@ def run_semantic_calibration(
         stable=stable,
         usage=usage,
         usage_runs=len(reported_usage),
+        summary_path=summary_path,
+    )
+
+
+def _validated_judge_models(judge_models: Sequence[str]) -> tuple[str, ...]:
+    models = tuple(judge_models)
+    if (
+        len(models) < 2
+        or any(
+            not isinstance(model, str) or not model.strip() for model in models
+        )
+        or len(set(models)) != len(models)
+    ):
+        raise ValueError(
+            "cross-model semantic calibration requires at least two unique models"
+        )
+    return models
+
+
+def describe_semantic_calibration_matrix(
+    root: Path,
+    skill_name: str,
+    case_id: str | int,
+    *,
+    judge_models: Sequence[str],
+    repeat_count: int = 1,
+) -> dict[str, object]:
+    models = _validated_judge_models(judge_models)
+    plan = describe_semantic_calibration(
+        root,
+        skill_name,
+        case_id,
+        repeat_count=repeat_count,
+    )
+    return {
+        "skill_name": skill_name,
+        "case_id": plan["case_id"],
+        "judge_models": list(models),
+        "repeat_count": repeat_count,
+        "controls": plan["controls"],
+    }
+
+
+def _judgment_signature(
+    judgment: SemanticJudgment,
+) -> tuple[str, tuple[tuple[str | int, bool], ...], str | None]:
+    return (
+        judgment.status,
+        tuple(
+            (criterion.criterion_id, criterion.passed)
+            for criterion in judgment.criteria
+        ),
+        judgment.error if judgment.status == "error" else None,
+    )
+
+
+def run_semantic_calibration_matrix(
+    root: Path,
+    skill_name: str,
+    case_id: str | int,
+    *,
+    judge_models: Sequence[str],
+    repeat_count: int = 1,
+    timeout_seconds: int = 900,
+    judge_executor_commands: Mapping[str, Sequence[str]] | None = None,
+    results_directory: Path | None = None,
+) -> SemanticCalibrationMatrixResult:
+    models = _validated_judge_models(judge_models)
+    if repeat_count < 1:
+        raise ValueError("semantic calibration repeat count must be positive")
+    result_directory = results_directory or root / "evals" / "results"
+    result_directory.mkdir(parents=True, exist_ok=True)
+    matrix_id = _new_result_id("calibration-matrix")
+    matrix_directory = _resolve_child(result_directory, matrix_id)
+    matrix_directory.mkdir(parents=True, exist_ok=False)
+    started_at = datetime.now(timezone.utc)
+    commands = judge_executor_commands or {}
+    calibrations = tuple(
+        run_semantic_calibration(
+            root,
+            skill_name,
+            case_id,
+            judge_model=model,
+            repeat_count=repeat_count,
+            timeout_seconds=timeout_seconds,
+            judge_executor_command=commands.get(model),
+            results_directory=matrix_directory,
+        )
+        for model in models
+    )
+    outcomes: dict[
+        tuple[str | int, int], list[tuple[str, SemanticControlResult]]
+    ] = {}
+    for calibration in calibrations:
+        for control in calibration.controls:
+            outcomes.setdefault((control.control_id, control.repetition), []).append(
+                (calibration.judge_model or "", control)
+            )
+    disagreements = []
+    for (control_id, repetition), results in outcomes.items():
+        signatures = {
+            _judgment_signature(control.judgment) for _, control in results
+        }
+        if len(signatures) == 1:
+            continue
+        disagreements.append(
+            {
+                "control_id": control_id,
+                "repetition": repetition,
+                "outcomes": [
+                    {
+                        "judge_model": model,
+                        "status": control.judgment.status,
+                        "criteria": [
+                            {
+                                "id": criterion.criterion_id,
+                                "passed": criterion.passed,
+                            }
+                            for criterion in control.judgment.criteria
+                        ],
+                        "error": control.judgment.error,
+                        "matched": control.matched,
+                    }
+                    for model, control in results
+                ],
+            }
+        )
+    reported_usage = [
+        calibration.usage
+        for calibration in calibrations
+        if calibration.usage is not None
+    ]
+    usage = _aggregate_usage(reported_usage)
+    passed = all(calibration.passed for calibration in calibrations)
+    models_agree = not disagreements
+    summary_path = matrix_directory / "summary.json"
+    summary = {
+        "schema_version": 1,
+        "matrix_id": matrix_id,
+        "skill_name": skill_name,
+        "case_id": calibrations[0].case_id,
+        "judge_models": list(models),
+        "repeat_count": repeat_count,
+        "started_at": started_at.isoformat(),
+        "completed_at": datetime.now(timezone.utc).isoformat(),
+        "behavioral_gate": False,
+        "passed": passed,
+        "models_agree": models_agree,
+        "comparison_count": len(outcomes),
+        "disagreement_count": len(disagreements),
+        "disagreements": disagreements,
+        "usage": {
+            "reported_judgments": sum(
+                calibration.usage_runs for calibration in calibrations
+            ),
+            "missing_judgments": sum(
+                len(calibration.controls) - calibration.usage_runs
+                for calibration in calibrations
+            ),
+            **(_serialize_usage(usage) or {}),
+        },
+        "models": [
+            {
+                "judge_model": calibration.judge_model,
+                "passed": calibration.passed,
+                "stable": calibration.stable,
+                "usage": _serialize_usage(calibration.usage),
+                "reported_judgments": calibration.usage_runs,
+                "missing_judgments": (
+                    len(calibration.controls) - calibration.usage_runs
+                ),
+                "duration_seconds": round(
+                    sum(
+                        control.judgment.duration_seconds or 0
+                        for control in calibration.controls
+                    ),
+                    3,
+                ),
+                "summary_path": calibration.summary_path.relative_to(
+                    matrix_directory
+                ).as_posix(),
+            }
+            for calibration in calibrations
+        ],
+    }
+    summary_path.write_text(
+        json.dumps(summary, indent=2, sort_keys=True) + "\n", encoding="utf-8"
+    )
+    return SemanticCalibrationMatrixResult(
+        skill_name=skill_name,
+        case_id=calibrations[0].case_id,
+        judge_models=models,
+        calibrations=calibrations,
+        passed=passed,
+        models_agree=models_agree,
+        usage=usage,
+        usage_runs=sum(calibration.usage_runs for calibration in calibrations),
         summary_path=summary_path,
     )
 

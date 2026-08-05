@@ -8,11 +8,14 @@ from typing import Sequence
 
 from sirius_skills.behavioral_evaluation import (
     BehavioralResult,
+    SemanticCalibrationMatrixResult,
     SemanticCalibrationResult,
     describe_behavioral_case,
     describe_semantic_calibration,
+    describe_semantic_calibration_matrix,
     run_behavioral_repetitions,
     run_semantic_calibration,
+    run_semantic_calibration_matrix,
 )
 from sirius_skills.evaluation import evaluate_repository
 from sirius_skills.paths import package_root
@@ -99,6 +102,32 @@ def _print_semantic_calibration(result: SemanticCalibrationResult) -> None:
     print(f"Summary: {result.summary_path}")
 
 
+def _print_semantic_calibration_matrix(
+    result: SemanticCalibrationMatrixResult,
+) -> None:
+    print(
+        f"Cross-model judge calibration {result.skill_name}/{result.case_id}: "
+        f"{'PASS' if result.passed else 'FAIL'}"
+    )
+    for calibration in result.calibrations:
+        print(
+            f"Model {calibration.judge_model}: "
+            f"{'PASS' if calibration.passed else 'FAIL'}, "
+            f"{'stable' if calibration.stable else 'variable'}"
+        )
+    print(f"Agreement: {'complete' if result.models_agree else 'disagreement'}")
+    if result.usage is not None:
+        print(
+            f"Usage ({result.usage_runs} judgments): "
+            f"input={result.usage.input_tokens}, "
+            f"cached={result.usage.cached_input_tokens}, "
+            f"uncached={result.usage.uncached_input_tokens}, "
+            f"output={result.usage.output_tokens}, "
+            f"reasoning={result.usage.reasoning_output_tokens}"
+        )
+    print(f"Summary: {result.summary_path}")
+
+
 def main(argv: Sequence[str] | None = None) -> int:
     parser = argparse.ArgumentParser(
         description="Run Sirius routing and opt-in behavioral evaluations."
@@ -140,6 +169,13 @@ def main(argv: Sequence[str] | None = None) -> int:
         help="Run declared semantic controls without running the coding agent.",
     )
     parser.add_argument(
+        "--compare-judge-model",
+        action="append",
+        default=[],
+        metavar="MODEL",
+        help="Additional calibration model to compare; may be repeated.",
+    )
+    parser.add_argument(
         "--keep-workspace",
         action="store_true",
         help="Keep the disposable behavioral workspace for diagnosis.",
@@ -164,8 +200,14 @@ def main(argv: Sequence[str] | None = None) -> int:
             parser.error("--case is required with --behavioral")
         if args.judge and args.calibrate_judge:
             parser.error("--judge and --calibrate-judge cannot be combined")
+        if args.compare_judge_model and not args.calibrate_judge:
+            parser.error("--compare-judge-model requires --calibrate-judge")
         if args.judge_model and not (args.judge or args.calibrate_judge):
             parser.error("--judge-model requires --judge or --calibrate-judge")
+        if args.compare_judge_model and not (args.judge_model or args.model):
+            parser.error(
+                "--compare-judge-model requires --judge-model or --model"
+            )
         if args.calibrate_judge and args.keep_workspace:
             parser.error("--keep-workspace does not apply to --calibrate-judge")
         if args.timeout < 1:
@@ -175,6 +217,28 @@ def main(argv: Sequence[str] | None = None) -> int:
         try:
             if args.calibrate_judge:
                 judge_model = args.judge_model or args.model
+                judge_models = [judge_model, *args.compare_judge_model]
+                if args.compare_judge_model:
+                    if args.dry_run:
+                        plan = describe_semantic_calibration_matrix(
+                            root,
+                            args.behavioral,
+                            args.case_id,
+                            judge_models=judge_models,
+                            repeat_count=args.repeat,
+                        )
+                        print(json.dumps(plan, indent=2, sort_keys=True))
+                        return 0
+                    matrix = run_semantic_calibration_matrix(
+                        root,
+                        args.behavioral,
+                        args.case_id,
+                        judge_models=judge_models,
+                        repeat_count=args.repeat,
+                        timeout_seconds=args.timeout,
+                    )
+                    _print_semantic_calibration_matrix(matrix)
+                    return 0 if matrix.passed else 1
                 if args.dry_run:
                     plan = describe_semantic_calibration(
                         root,
@@ -260,6 +324,7 @@ def main(argv: Sequence[str] | None = None) -> int:
         or args.judge
         or args.judge_model
         or args.calibrate_judge
+        or args.compare_judge_model
         or args.keep_workspace
         or args.repeat != 1
     ):

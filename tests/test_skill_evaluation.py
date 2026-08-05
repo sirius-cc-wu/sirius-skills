@@ -852,6 +852,98 @@ def test_semantic_calibration_reports_variable_control_verdicts(
     ]
 
 
+def test_semantic_calibration_matrix_reports_disagreement_and_costs(
+    tmp_path: Path,
+) -> None:
+    write_behavior_fixture(
+        tmp_path,
+        allowed_mutations=[],
+        required_mutations=[],
+        semantic_rubric=[
+            {
+                "id": "requests-decision",
+                "criterion": "The response requests the governing decision.",
+            }
+        ],
+        semantic_controls=[
+            {
+                "id": "complete-reentry",
+                "response": "PASS CONTROL: Which policy governs?",
+                "expected_criteria": [
+                    {"id": "requests-decision", "passed": True}
+                ],
+            },
+            {
+                "id": "silent-policy-choice",
+                "response": "FAIL CONTROL: I implemented one policy.",
+                "expected_criteria": [
+                    {"id": "requests-decision", "passed": False}
+                ],
+            },
+        ],
+        workspace_mode="read-only",
+    )
+    correct_judge = write_calibrating_semantic_judge_executor(tmp_path)
+    always_passes = write_semantic_judge_executor(
+        tmp_path,
+        {
+            "criteria": [
+                {
+                    "id": "requests-decision",
+                    "passed": True,
+                    "reason": "Accepted without discrimination.",
+                }
+            ]
+        },
+    )
+
+    result = behavioral_evaluation.run_semantic_calibration_matrix(
+        tmp_path,
+        "implementation",
+        "fix-value",
+        judge_models=["judge-a", "judge-b"],
+        judge_executor_commands={
+            "judge-a": correct_judge,
+            "judge-b": always_passes,
+        },
+        results_directory=tmp_path / "results",
+    )
+
+    assert result.passed is False
+    assert result.models_agree is False
+    assert [calibration.judge_model for calibration in result.calibrations] == [
+        "judge-a",
+        "judge-b",
+    ]
+    assert result.usage is not None
+    assert result.usage.input_tokens == 28
+    assert result.usage.output_tokens == 12
+    summary = json.loads(result.summary_path.read_text(encoding="utf-8"))
+    assert summary["comparison_count"] == 2
+    assert summary["disagreement_count"] == 1
+    assert summary["disagreements"][0]["control_id"] == "silent-policy-choice"
+    assert [model["judge_model"] for model in summary["models"]] == [
+        "judge-a",
+        "judge-b",
+    ]
+    assert summary["usage"]["reported_judgments"] == 4
+
+    agreement = behavioral_evaluation.run_semantic_calibration_matrix(
+        tmp_path,
+        "implementation",
+        "fix-value",
+        judge_models=["judge-c", "judge-d"],
+        judge_executor_commands={
+            "judge-c": correct_judge,
+            "judge-d": correct_judge,
+        },
+        results_directory=tmp_path / "results",
+    )
+
+    assert agreement.passed is True
+    assert agreement.models_agree is True
+
+
 def test_semantic_calibration_detects_judge_that_accepts_negative_control(
     tmp_path: Path,
 ) -> None:
@@ -1377,6 +1469,70 @@ def test_behavioral_cli_dry_run_describes_judge_calibration(
         "controls": controls,
         "judge_model": "judge-model",
         "repeat_count": 3,
+        "skill_name": "implementation",
+    }
+    assert not (tmp_path / "evals" / "results").exists()
+
+
+def test_behavioral_cli_dry_run_describes_cross_model_calibration(
+    tmp_path: Path, capsys
+) -> None:
+    controls = [
+        {
+            "id": "complete-reentry",
+            "response": "Which policy governs?",
+            "expected_criteria": [
+                {"id": "requests-decision", "passed": True}
+            ],
+        },
+        {
+            "id": "unauthorized-choice",
+            "response": "I implemented one policy.",
+            "expected_criteria": [
+                {"id": "requests-decision", "passed": False}
+            ],
+        },
+    ]
+    write_behavior_fixture(
+        tmp_path,
+        allowed_mutations=[],
+        required_mutations=[],
+        semantic_rubric=[
+            {
+                "id": "requests-decision",
+                "criterion": "The response requests an authoritative decision.",
+            }
+        ],
+        semantic_controls=controls,
+        workspace_mode="read-only",
+    )
+
+    exit_code = run_evals.main(
+        [
+            "--root",
+            str(tmp_path),
+            "--behavioral",
+            "implementation",
+            "--case",
+            "fix-value",
+            "--calibrate-judge",
+            "--judge-model",
+            "judge-a",
+            "--compare-judge-model",
+            "judge-b",
+            "--repeat",
+            "2",
+            "--dry-run",
+        ]
+    )
+
+    assert exit_code == 0
+    plan = json.loads(capsys.readouterr().out)
+    assert plan == {
+        "case_id": "fix-value",
+        "controls": controls,
+        "judge_models": ["judge-a", "judge-b"],
+        "repeat_count": 2,
         "skill_name": "implementation",
     }
     assert not (tmp_path / "evals" / "results").exists()

@@ -244,6 +244,25 @@ for a calibrated one. Repeated agreement demonstrates basic polarity and
 short-run consistency for the selected judge, not general accuracy or
 independence from the evaluated model.
 
+Compare the same controls across judge models when model-specific bias or cost
+is material:
+
+```bash
+just eval-judge-comparison \
+  test-driven-implementation \
+  conflicting-policy-reentry \
+  BASE_MODEL \
+  COMPARISON_MODEL
+```
+
+The comparison runner preserves each model's normal calibration summary and
+adds a matrix summary. It reports disagreements by control, repetition, status,
+and criterion boolean; prose reasons are retained in the underlying traces but
+do not define agreement. Per-model and aggregate token usage and duration make
+the quality/cost tradeoff visible. All models remain diagnostic and
+non-gating. The comparison command exits nonzero if any model misses a reviewed
+expectation.
+
 Behavioral execution is never part of `just validate`. The runner:
 
 1. copies the declared fixture into a fresh temporary Git repository and
@@ -293,6 +312,10 @@ PYTHONPATH=src python3 -m sirius_skills.commands.run_evals \
   --repeat 3 \
   --dry-run
 ```
+
+Add one or more comparison models with repeated
+`--compare-judge-model MODEL`. An explicit `--judge-model` or `--model` supplies
+the base model.
 
 Each run reports only a **mechanical pass**: the executor exited normally,
 mutation boundaries held, required changes occurred or read-only state was
