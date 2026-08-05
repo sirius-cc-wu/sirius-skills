@@ -171,6 +171,7 @@ grep -q '^## Final Editorial Pass$' "$readability_reference" || fail "readabilit
 
 template_types=(
   "assess-development-input|Development Input Assessment"
+  "author-software-proposal|Software Proposal"
   "reverse-engineer-software-system|Reverse Engineering Record"
   "survey-existing-system|System Survey"
   "recover-system-behavior|Recovered Behavior Model"

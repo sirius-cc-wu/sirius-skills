@@ -9,6 +9,7 @@ reconstruct-software-architecture
 reconcile-recovered-design
 rewrite-technical-artifacts
 assess-development-input
+author-software-proposal
 iterative-up-analysis-design
 inception
 use-case-modeling

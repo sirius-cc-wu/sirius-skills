@@ -73,6 +73,7 @@ The source method or file format never determines the route.
 | Content condition | Next Sirius skill |
 |---|---|
 | Claims about current commands, behavior, architecture, or constraints need evidence | `reverse-engineer-software-system` |
+| Technical discussions, findings, incidents, or candidate changes need a consequential direction framed for review | `author-software-proposal` |
 | Opportunity, vision, business case, feasibility, basic scope, or major risks are unclear | `inception` |
 | Actors, user goals, system boundary, main scenarios, or extensions are unclear | `use-case-modeling` |
 | Several requirements and design artifacts need a risk-sized iteration and durable ownership | `iterative-up-analysis-design` |

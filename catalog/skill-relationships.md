@@ -8,6 +8,8 @@ reduce the current risk or complete the current behavior slice.
 
 - Use **Assess Development Input** when requirements-shaped material already
   exists but its readiness or correct Sirius entry point is unclear.
+- Use **Author Software Proposal** when technical input needs a consequential
+  direction framed for responsible review.
 - Start with **Reverse Engineering** when an existing system must be understood.
 - Start with **Iterative Analysis and Design** when intended behavior, scope, or
   object design is not yet clear.
@@ -42,8 +44,14 @@ rectangle "Implementation and Evolution\nchange verified behavior or structure" 
 rectangle "Repository Workflow\nrefine, record, and publish" as repository #F3EEFF
 rectangle "Requirements-shaped input\nfrom any method or format" as external #F2F2F2
 rectangle "assess-development-input\nassess readiness and select owner" as intake #FFF4CC
+rectangle "Technical discussion, findings,\nor candidate change" as candidate #F2F2F2
+rectangle "author-software-proposal\nframe a direction for review" as author #FFF4CC
+rectangle "Draft proposal\nand responsible review" as proposal #F2F2F2
 
 external --> intake
+candidate --> author
+author --> proposal
+proposal ..> intake : after review, when routing is unclear
 intake --> reverse : current-system claims need evidence
 intake --> design : requirement or design gap
 intake --> implementation : bounded behavior has an oracle
@@ -64,6 +72,20 @@ that produced them. It selects the narrowest skill that owns the first material
 gap, or reports an external prerequisite when no Sirius skill can responsibly
 proceed. The assessment neither rewrites the source nor executes the selected
 skill.
+
+## Software proposal authoring
+
+`author-software-proposal` turns technical discussions, findings, incidents,
+candidate changes, or an existing draft into a decision-ready proposal. It
+separates current evidence from proposed intent, makes alternatives and risks
+reviewable, and defines acceptance evidence without implying that the proposal
+has been accepted. The responsible authority reviews the draft outside the
+skill. After that review, `assess-development-input` can select a Sirius owner
+when the next step remains unclear.
+
+Proposal authoring is not a substitute for inception, requirements discovery,
+current-system recovery, or an accepted decision record. It may expose a need
+for any of those owners and stop at that boundary.
 
 ## Reverse engineering
 

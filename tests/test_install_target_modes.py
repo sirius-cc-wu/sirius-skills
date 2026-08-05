@@ -25,6 +25,7 @@ WORKFLOW_SKILLS = {
 }
 ITERATIVE_DESIGN_SKILLS = {
     "assess-development-input",
+    "author-software-proposal",
     "iterative-up-analysis-design",
     "rewrite-technical-artifacts",
     "inception",
@@ -160,4 +161,4 @@ def test_validation_covers_the_consolidated_catalog() -> None:
     )
 
     assert result.returncode == 0, result.stdout
-    assert "Validated 24 skills" in result.stdout
+    assert "Validated 25 skills" in result.stdout
