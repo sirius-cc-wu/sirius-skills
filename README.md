@@ -126,7 +126,8 @@ normal validation.
 - `catalog/sources.md`: intellectual and repository provenance
 - `evals/`: deterministic routing cases and opt-in behavioral evaluation data
 - `docs/shared/`: canonical references copied into self-contained skills
-- `docs/proposals/`: proposed, non-deployable capabilities
+- `docs/proposals/`: capability proposals, implementation rationale, and
+  historical iteration records
 - `scripts/validate_skills.sh`: catalog and collection validation
 - `src/sirius_skills/commands/sync_shared_references.py`: packaging helper
 

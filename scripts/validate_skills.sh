@@ -162,6 +162,18 @@ for name in "${recovery_skills[@]}"; do
   grep -Fq "\$$name" "$metadata" || fail "$name metadata default prompt missing skill invocation"
 done
 
+client_discovery_skills=(
+  stakeholder-requirements-elicitation
+  requirements-synthesis-validation
+  implementation-slice-briefing
+)
+
+for name in "${client_discovery_skills[@]}"; do
+  metadata="$root/skills/$name/agents/openai.yaml"
+  test -f "$metadata" || fail "missing $metadata"
+  grep -Fq "\$$name" "$metadata" || fail "$name metadata default prompt missing skill invocation"
+done
+
 rewrite_metadata="$root/skills/rewrite-technical-artifacts/agents/openai.yaml"
 rewrite_skill="$root/skills/rewrite-technical-artifacts/SKILL.md"
 test -f "$rewrite_metadata" || fail "rewrite-technical-artifacts missing agents/openai.yaml"

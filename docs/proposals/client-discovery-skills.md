@@ -1,6 +1,15 @@
 # Client Discovery Skills for Coding-Agent Handoffs
 
-The missing area is best described as **stakeholder-driven requirements
+This capability is implemented by
+[`stakeholder-requirements-elicitation`](../../skills/stakeholder-requirements-elicitation/SKILL.md),
+[`requirements-synthesis-validation`](../../skills/requirements-synthesis-validation/SKILL.md),
+and
+[`implementation-slice-briefing`](../../skills/implementation-slice-briefing/SKILL.md).
+The active handoff is documented in the
+[Client to Code track](../../catalog/tracks/client-to-code.md); this document
+preserves the problem, design rationale, safeguards, and delivery history.
+
+The gap they fill is best described as **stakeholder-driven requirements
 discovery**, not merely prompt writing.
 
 The existing pipeline starts after useful client knowledge already exists:
@@ -13,7 +22,7 @@ The existing pipeline starts after useful client knowledge already exists:
   expects approved examples, requirements, or contracts and explicitly avoids
   guessing missing business rules.
 
-Therefore, the missing loop is:
+The implemented loop is:
 
 ```text
 Stakeholders
@@ -58,10 +67,10 @@ shows two useful neighboring approaches:
 
 These are strong precedents for explicit restatement, non-goals, approval,
 verified repository context, bounded slices, and pass/fail acceptance
-conditions. They do not replace the proposed skills: neither collection owns a
-generic workflow for selecting multiple stakeholders, acquiring evidence
-through several methods, preserving conflicts and provenance, or validating
-requirements with the people authorized to decide them.
+conditions. They do not replace the implemented skills: neither collection
+owns a generic workflow for selecting multiple stakeholders, acquiring
+evidence through several methods, preserving conflicts and provenance, or
+validating requirements with the people authorized to decide them.
 
 Two patterns should not become the evidence standard here. A leading guess can
 accelerate clarification with an empowered requester but can bias a research
@@ -69,7 +78,7 @@ interview. Likewise, agent confidence or spec-executability scores can expose
 ambiguity but cannot substitute for stakeholder coverage, source evidence, or
 approval authority.
 
-## Recommendation
+## Decision
 
 Keep three independently deployable skills. Their artifact boundaries matter
 more than forcing every engagement through a mandatory sequence. A low-risk
@@ -77,37 +86,38 @@ change with one authoritative requester may compose elicitation and synthesis
 in one conversation, but it should still keep source evidence distinct from
 candidate requirements and decisions.
 
-## Iterative Delivery
+## Delivery History
 
-Implement the family through risk-driven increments rather than authoring all
-three skills at full detail before any has been exercised:
+The family was implemented through risk-driven increments rather than authoring
+all three skills at full detail before any had been exercised:
 
-1. Validate `stakeholder-requirements-elicitation` against contradictory
+1. Validated `stakeholder-requirements-elicitation` against contradictory
    sponsor, operator, and compliance evidence.
-2. Build `requirements-synthesis-validation` against evidence produced by the
+2. Built `requirements-synthesis-validation` against evidence shaped by the
    first skill, including conflicts and approval authority.
-3. Build `implementation-slice-briefing` against approved requirements plus
+3. Built `implementation-slice-briefing` against approved requirements plus
    the smallest necessary downstream analysis and design artifacts.
-4. Exercise the complete handoff and use the results to refine the canonical
-   proposal, workflow track, and skill boundaries.
+4. Reconciled the complete handoff against the proposal, active catalog,
+   profiles, routing and behavioral evaluations, and focused handoff tests.
 
-Each increment should graduate one independently useful skill with focused
-routing and behavioral evaluations. This is an implementation order, not a
-mandatory lifecycle for skill users. Completed iteration records:
+Each skill graduated independently with focused routing and behavioral
+evaluations. The order below records implementation history, not a mandatory
+lifecycle for skill users:
 
 - [Validate Stakeholder Evidence Elicitation](iterations/client-discovery-elicitation-e1.md)
 - [Validate Requirements Synthesis and Playback](iterations/client-discovery-synthesis-e2.md)
 - [Validate Implementation Slice Briefing](iterations/client-discovery-briefing-e3.md)
+- [Reconcile the Client Discovery Handoff](iterations/client-discovery-integration-e4.md)
 
-## Recommended Skill Family
+## Implemented Skill Family
 
-Initially, this could be a family of three skills.
+The active family contains three independently deployable skills.
 
-| Possible skill | Responsibility | Main output | Important boundary |
+| Skill | Responsibility | Main output | Important boundary |
 |---|---|---|---|
-| `stakeholder-requirements-elicitation` | Identify the right participants and learn how their work actually operates through interviews, observation, workshops, document review, and prototypes | Stakeholder map, elicitation plan, evidence notes, open questions, conflicts | Records evidence; does not silently convert every client statement into a requirement |
-| `requirements-synthesis-validation` | Turn evidence into goals, workflows, rules, constraints, quality attributes, scenarios, assumptions, and decisions; play these back to stakeholders | Discovery brief, candidate requirements, validated examples, decision/conflict log | Routes results into inception, use cases, domain models, and supplementary requirements; does not design software |
-| `implementation-slice-briefing` | Select a sufficiently understood behavior slice and assemble its approved sources into a coding-agent-ready brief | Bounded implementation brief with traceable acceptance conditions | Packages existing decisions; never invents missing business rules or architecture |
+| `stakeholder-requirements-elicitation` | Identify the right participants and learn how their work actually operates through interviews, observation, workshops, document review, and prototypes | Stakeholder Evidence Record with coverage, plan, sources, conflicts, and open questions | Records evidence; does not silently convert every client statement into a requirement |
+| `requirements-synthesis-validation` | Turn evidence into goals, workflows, rules, constraints, quality attributes, scenarios, assumptions, and decisions; play these back to stakeholders | Requirements Discovery Brief with candidates, validated examples, and decision/conflict log | Routes results into inception, use cases, domain models, and supplementary requirements; does not design software |
+| `implementation-slice-briefing` | Select a sufficiently understood behavior slice and assemble its approved sources into a coding-agent-ready brief | Implementation Slice Brief with approved examples, traceability, verification, and stop conditions | Packages existing decisions; never invents missing business rules or architecture |
 
 If the first skill becomes too large, it could later split into
 `stakeholder-analysis` and `requirements-elicitation`. That split should wait
@@ -115,12 +125,18 @@ until actual usage demonstrates the need.
 
 ## Shared Evidence and Decision Model
 
-The skills need a small common model so that information does not lose its
+The skills use a small compatible model so that information does not lose its
 origin as it moves toward implementation. Identifiers are opaque and may be
 assigned manually; their format must follow repository conventions rather than
 assuming dates or sequence numbers. Evidence claims should reuse
 [Recovery Evidence and Confidence](../../skills/reverse-engineer-software-system/references/recovery-evidence.md)
 where its vocabulary fits instead of creating a competing confidence model.
+
+This compatibility contract does not require a separately packaged shared
+reference. Each owning skill defines the fields it produces or consumes, and
+the focused
+[client-discovery handoff tests](../../tests/test_client_discovery_handoffs.py)
+guard the source-ID, authority, status, freshness, and track-link boundaries.
 
 An evidence record should preserve:
 
@@ -241,19 +257,18 @@ operators, end users, compliance staff, or support personnel.
 ## Confidentiality and Responsible Capture
 
 Stakeholder discovery can expose personal, contractual, operational, or
-commercially sensitive information. Each skill should therefore:
+commercially sensitive information. Across the family:
 
-- establish consent and intended use before recording interviews or
-  observations;
-- collect the minimum identifying detail needed and prefer roles over personal
-  names when identity is not material;
-- keep private raw evidence separate from sanitized requirements and
-  implementation briefs;
-- record retention, access, and deletion expectations for raw material;
-- review and redact confidential information before publishing an issue,
-  committing an artifact, or sending content to an external service; and
-- preserve a trace link to a protected source without copying sensitive content
-  into broadly visible artifacts.
+- elicitation establishes consent and intended use before recording interviews
+  or observations, collects the minimum identifying detail, prefers roles over
+  personal names, and records retention, access, deletion, and publication
+  expectations;
+- synthesis and briefing carry those handling constraints forward, keep private
+  raw evidence separate from sanitized requirements and implementation briefs,
+  and review permitted use before publishing an issue, committing an artifact,
+  or sending content to an external service; and
+- the skills preserve a trace link to a protected source without copying
+  sensitive content into broadly visible artifacts.
 
 ## Validation, Feedback, and Change
 
@@ -277,8 +292,7 @@ If choosing one comprehensive foundation, use **Mastering the Requirements
 Process, 4th Edition** by James Robertson, Suzanne Robertson, and Adrian Reed.
 It covers problem scoping, stakeholder discovery, prototypes, functional and
 non-functional requirements, measurable fit criteria, stories, and iterative
-requirements work. It is probably the strongest backbone for all three
-proposed skills.
+requirements work. It is probably the strongest backbone for all three skills.
 
 - [Mastering the Requirements Process — Pearson](https://www.pearson.com/en-us/subject-catalog/p/mastering-the-requirements-process-getting-requirements-right/P200000011135/9780137969500)
 
@@ -320,14 +334,14 @@ management.
   disciplined behavioral scenarios.
   [Pearson](https://www.pearson.com/en-us/subject-catalog/p/writing-effective-use-cases/P200000009217/9780321605801)
 
-## Suggested Starting Stack
+## Reference Stack
 
 1. *Mastering the Requirements Process* for the overall model.
 2. *Interviewing Users* for evidence acquisition.
 3. *Specification by Example* for validation and executable handoff.
-4. *User Story Mapping* when designing the delivery-slice skill.
+4. *User Story Mapping* when refining the delivery-slice skill.
 
-The central design principle should be:
+The central design principle is:
 
 > Coding agents receive validated decisions plus visible uncertainty—not a
 > prompt that makes uncertainty disappear.

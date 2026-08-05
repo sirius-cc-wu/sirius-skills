@@ -39,6 +39,13 @@ dependency, risk, or stop condition. When approval vocabulary differs, record
 the repository's original state and the evidence that it is authorized for the
 slice.
 
+Carry source sensitivity, access, retention, and publication restrictions into
+the handoff. Copy only sanitized requirements and examples whose intended use
+permits implementation briefing. Link to protected evidence without reproducing
+raw participant, contractual, operational, or commercial details. If the brief
+cannot expose enough authorized information for safe implementation, mark it
+blocked and route the publication or access decision to its owner.
+
 ## Readiness Gate
 
 A slice is ready only when all behavior it requires has:
@@ -187,6 +194,7 @@ tags: ["implementation", "brief"]
   that no source approved.
 - Mixing repository facts with client-provided requirements or treating current
   code as proof of desired behavior.
+- Copying protected raw evidence into a broadly visible implementation brief.
 - Proposing architecture, interfaces, schemas, or component ownership to make a
   blocked brief appear executable.
 - Omitting source revisions, approval state, important failure behavior,
@@ -205,6 +213,8 @@ tags: ["implementation", "brief"]
       business rules, architecture, or acceptance conditions were invented.
 - [ ] Repository facts are revision-fixed and distinguishable from intended
       behavior and agent inference.
+- [ ] Source sensitivity, access, retention, and publication restrictions
+      remain enforceable without copying protected raw evidence.
 - [ ] Existing design inputs are sufficient for the slice or the brief is
       blocked and routed to the appropriate design skill.
 - [ ] Verification names an independent oracle and established focused and
