@@ -1,35 +1,26 @@
 ---
 type: "Capability Proposal"
 title: "Skill Evaluation Program"
-description: "Proposes staged routing, behavioral, and composition evals for Sirius skills."
-status: "in-progress"
+description: "Records the implemented routing, behavioral, semantic, and composition evaluation pilot for Sirius skills."
+status: "implemented"
 tags: [evaluation, skills, quality]
 ---
 
 # Skill Evaluation Program
 
-Implementation is proceeding in risk-sized stages. The deterministic routing
-case format, runner, and eight-skill pilot are owned by
-[`evals/`](../../evals/README.md). Opt-in Codex execution now captures traces,
-workspace mutations, and verification results in a disposable fixture. The
-invoice pilot mechanically checks red–mutation–green ordering, and initial
-visual composition fixtures distinguish no-diagram, focused architecture-view,
-and focused class-view outcomes. Repeated runs retain independent evidence and
-summarize mechanical outcome, changed-path/kind, and duration stability.
-Executor version, requested and trace-observed model identity, and reported
-token usage are retained without guessing missing metadata. Per-run results now
-extract the final completed agent response as supporting evidence. The first
-opt-in semantic rubric pilot judges workflow-reentry responses in a separate
-read-only Codex process and records criterion reasons, metadata, and usage. Its
-verdict is deliberately non-gating. Reviewed positive and negative responses
-now provide a repeatable standalone polarity and short-run stability check for
-that rubric. The same controls can also compare judge models for disagreement,
-stability, and token cost. A contract-driven fixture now verifies that an agent
-adds declarative state effects to the existing canonical analysis artifact
-without drifting into implementation design or creating another document;
-broader semantic coverage remains planned. Three implementation cases exercise
-local correction, canonical domain-model reconciliation, and read-only workflow
-re-entry when equal-authority requirements conflict.
+The bounded pilot is implemented and owned by
+[`evals/`](../../evals/README.md). It combines free deterministic routing checks
+with explicitly selected Codex runs in disposable repositories. Those runs
+capture traces, workspace changes, verification, model metadata, usage, and the
+final response without treating missing metadata as known.
+
+At closure, six fixture-backed cases exercise red–mutation–green
+implementation, documentation restraint, conditional canonical-model feedback,
+read-only workflow re-entry, focused architecture and class views, and a
+declarative operation contract added to an existing analysis aggregate.
+Repeated runs can report mechanical, mutation, environment, duration, and usage
+stability. A separate read-only semantic judge has reviewed controls and
+cross-model comparison, but remains diagnostic and non-gating.
 
 ## At a Glance
 
@@ -39,15 +30,32 @@ opt-in behavioral runner also executes a coding agent in disposable fixtures to
 observe whether a selected skill respects its boundary and produces the
 mechanically checkable parts of the intended behavior.
 
-The proposed program adds three capabilities in stages:
+The program adds three capabilities:
 
 1. free catalog-routing and boundary evals;
 2. model-executed behavioral trace evals in disposable repositories; and
 3. composition evals for conditional feedback and documentation restraint.
 
-This is repository verification infrastructure, not a new deployable skill.
-The first investment should be a bounded pilot that proves the evals detect
-seeded failures before coverage expands across the catalog.
+This is repository verification infrastructure, not a deployable skill. The
+pilot is intentionally selective: deterministic routing stays in normal
+validation, while paid behavioral and semantic checks run only when selected.
+
+## Decision and Operating Policy
+
+Keep the pilot as the repository's evaluation foundation, with these limits:
+
+- run routing checks in `just validate`;
+- run affected fixture-backed behavioral cases on demand before consequential
+  skill-boundary changes;
+- keep semantic judging and judge-model comparison opt-in and non-gating;
+- retain large traces and results as ignored local or CI artifacts rather than
+  committed documentation; and
+- add coverage when a real failure mode or material skill-boundary change
+  justifies it, not to reach a catalog-wide percentage.
+
+Do not add mandatory paid CI, broad multi-host support, or a rubric for every
+case without new evidence that its diagnostic value exceeds its cost and
+variance.
 
 ## Representative Scenario
 
@@ -73,22 +81,40 @@ authority. The agent should preserve the repository, report the conflict, and
 ask which policy governs rather than converting uncertainty into code, tests,
 or a new decision document.
 
+The contract scenario supplies approved effects for a non-trivial system
+operation. The agent should add one declarative operation contract to the
+existing feature-analysis aggregate, cover every approved effect, and avoid
+creating implementation objects, code, tests, or a competing document.
+
 Together, these scenarios test the central Sirius claim: coding agents retain
 local autonomy while durable knowledge is reconciled when material evidence
 changes it.
 
-## Current Gap
+## Pilot Evidence and Remaining Limits
 
-Current checks establish that skills are packaged consistently and that their
-instructions contain required structural guidance. They do not establish:
+The implemented checks establish more than packaging consistency:
 
-- whether realistic user language selects the correct skill;
-- whether neighboring skill descriptions collide or over-trigger;
-- whether an agent follows required and forbidden behavior;
-- whether tool calls and workspace mutations stay within authority;
-- whether feedback edges are treated as conditional knowledge reconciliation
-  rather than mandatory skill hops; or
-- whether the same scenario behaves consistently across repeated runs.
+- 12 routing case files at closure exercise 60 positive and owned-negative
+  routes across the 26-skill catalog;
+- disposable fixtures enforce mutation allowlists, required changes,
+  verification commands, output fragments, and selected trace ordering;
+- the red–mutation–green fixture proves its seeded initial failure before an
+  agent changes production code;
+- the composition fixtures distinguish local correction, canonical
+  reconciliation, workflow re-entry, focused visual design, and contract-driven
+  analysis without artifact proliferation; and
+- reviewed semantic controls exercise both passing and failing rubric polarity,
+  repetition, and cross-model disagreement reporting.
+
+The evidence remains bounded. Lexical routing is only a description tripwire,
+14 skills have no dedicated routing case at closure, and behavioral coverage is
+selective.
+The live pilot uses one agent host; repeated agreement cannot prove semantic
+correctness, cross-host portability, or freedom from shared model bias. Only
+the workflow-reentry response has a semantic rubric. Mechanical assertions can
+verify required concepts and boundaries, but not whether prose or diagrams are
+maximally clear. Usage reporting does not estimate price, and local ignored
+results are not a permanent reviewed baseline.
 
 The [repository comparison](../../catalog/agent-skill-repository-structures.md)
 shows two useful precedents. Addy Osmani's collection emphasizes inexpensive
@@ -105,7 +131,7 @@ copy either system wholesale.
   neighboring responsibility.
 - Detect violations of skill boundaries, authority, and mutation scope.
 - Verify outcomes from tool traces and workspace state, not final prose alone.
-- Measure unnecessary skill invocation and artifact creation explicitly.
+- Detect workflow overreach and unnecessary artifact creation explicitly.
 - Preserve enough run metadata to compare results across skill, host, model,
   and prompt revisions.
 - Add paid or nondeterministic checks only after free checks have reached their
@@ -122,9 +148,9 @@ copy either system wholesale.
 - Treat lexical routing scores as proof of model selection.
 - Introduce a deployable `skill-evaluation` skill.
 
-## Proposed Evaluation Model
+## Evaluation Model
 
-| Level | Question | Mechanism | Initial execution |
+| Level | Question | Mechanism | Execution |
 |---|---|---|---|
 | Existing repository checks | Is the catalog structurally consistent and installable? | Shell validation and Python tests | Every change |
 | Catalog routing | Can realistic prompts distinguish a skill from its neighbors and non-applicable cases? | Deterministic case files, ranking, collision, and coverage checks | Every change |
@@ -133,8 +159,8 @@ copy either system wholesale.
 
 ### 1. Catalog Routing and Boundary Evals
 
-Store one case file per evaluated skill under a future `evals/cases/`
-directory. Each case may contain:
+Store one case file per evaluated skill under `evals/cases/`. Each case may
+contain:
 
 - positive prompts expressed as users would naturally ask;
 - negative prompts owned by a neighboring skill;
@@ -142,10 +168,9 @@ directory. Each case may contain:
 - expected ranking tolerance; and
 - the skill revision or case-schema version when needed for diagnosis.
 
-The first runner should be deterministic, dependency-light, and CI-safe. A
-lexical or similarly transparent ranker is acceptable as a description-quality
-tripwire, provided reports state that it approximates routing rather than
-observing an agent host.
+The runner is deterministic, dependency-light, and CI-safe. Its transparent
+lexical ranker is a description-quality tripwire; reports state that it
+approximates routing rather than observing an agent host.
 
 The runner should detect:
 
@@ -166,7 +191,7 @@ repository. Capture:
 - commands, exit status, and relevant output;
 - files created, modified, or deleted;
 - the final repository diff;
-- elapsed time and token or monetary cost when available; and
+- elapsed time and reported token usage when available; and
 - the final response directly in each result as supporting evidence, not the
   primary oracle.
 
@@ -187,10 +212,10 @@ the coding agent or changing behavioral mechanical outcomes. Repeated controls
 report complete-verdict stability, match rates, duration, and aggregate token
 usage. Matching repetitions establish only basic polarity and short-run
 consistency for the selected judge. Cross-model runs retain each calibration
-and report criterion-level disagreement and per-model cost; agreement still
-does not establish broad accuracy.
+and report criterion-level disagreement, duration, and per-model token usage;
+agreement still does not establish broad accuracy.
 
-A candidate case shape is:
+The case shape includes:
 
 ```json
 {
@@ -221,9 +246,9 @@ A candidate case shape is:
 }
 ```
 
-Each behavioral case should include a negative control or seeded violation so
-the evaluator demonstrates that it can fail for the behavior it claims to
-detect.
+Fixture-backed behavioral cases include a seeded initial failure, approved
+negative example, read-only boundary, or other mechanically detectable
+violation appropriate to the behavior they claim to detect.
 
 ### 3. Composition and Feedback Evals
 
@@ -281,92 +306,87 @@ Report individual signals rather than one opaque quality score:
 - behavioral expectation and prohibition results;
 - task completion and verification results;
 - unauthorized mutation rate;
-- unnecessary skill invocation and artifact creation rates;
+- workflow-overreach and unnecessary-artifact rates;
 - repeatability across identical runs;
-- duration, turns, tokens, and estimated cost; and
+- duration and reported token usage; and
 - changes from a named baseline run.
 
 Persist large transcripts and run results as CI or local artifacts by default,
 not as committed repository documentation. Commit only small fixtures, case
 definitions, evaluator code, and deliberately reviewed baselines.
 
-## Staged Adoption
+## Staged Adoption Result
 
-### Stage 1: Prove Routing Cases
+### Stage 1: Routing Cases — Completed
 
-- Define the case schema for the eight pilot skills.
-- Implement the free deterministic runner.
-- Seed one description collision and one missing-vocabulary case to prove the
-  runner fails for each.
-- Run the free tier in normal repository validation.
+- Defined the case schema and implemented the free deterministic runner.
+- Exercised description-collision and missing-vocabulary failures in tests.
+- Added the routing tier to normal repository validation.
 
-### Stage 2: Prove Behavioral Discrimination
+### Stage 2: Behavioral Discrimination — Completed for the Pilot
 
-- Select one supported host and model for the pilot.
-- Build disposable fixtures for representative pilot risks before expanding
-  fixture coverage mechanically to every pilot skill.
-- Add deterministic trace and diff assertions before adding an LLM judge.
-- Seed prohibited mutations and workflow overreach to prove the evaluator
-  detects them.
-- Establish repeatability, duration, and cost baselines through several runs.
+- Selected the locally authenticated Codex CLI as the recorded host.
+- Built disposable fixtures for representative risks rather than every skill.
+- Added deterministic trace, diff, mutation, file, and command assertions
+  before adding semantic judging.
+- Exercised seeded failures, prohibited mutations, and workflow overreach.
+- Added repeated-run summaries for mechanical, mutation, environment, duration,
+  and reported-token stability.
 
-### Stage 3: Evaluate Composition
+### Stage 3: Composition — Completed for the Pilot
 
-- Pair a documentation-restraint scenario with canonical design feedback.
-- Add a read-only workflow-reentry scenario for conflicting authority.
-- Add a contract-driven feedback scenario that refines the canonical aggregate
-  without implementation or artifact proliferation. **Implemented.**
-- Run composition cases periodically and before material workflow-boundary
-  changes.
-- Compare failures with real skill usage before deciding which additional
-  skills need coverage.
+- Paired documentation restraint with conditional canonical design feedback.
+- Added read-only workflow re-entry for conflicting authority.
+- Added focused visual-design cases and a contract-driven case that refines a
+  canonical aggregate without implementation or artifact proliferation.
 
-### Stage 4: Decide on Expansion
+### Stage 4: Expansion Decision — Keep Coverage Risk-Driven
 
-Expand only if the pilot answers these questions positively:
-
-- Do routing failures identify actionable description defects?
-- Do behavioral cases fail when seeded violations occur?
-- Can maintainers diagnose failures from recorded evidence?
-- Is nondeterminism low enough to distinguish regression from noise?
-- Does the suite find consequential problems at an acceptable cost?
+The runner catches actionable routing and authority defects, seeded behavioral
+failures are diagnosable from recorded evidence, and repeated runs expose
+rather than hide nondeterminism. That is sufficient to retain the
+infrastructure. It is not sufficient to justify paid gating or blanket
+catalog-wide fixtures. Expansion remains an affected-case decision based on
+real usage failures and consequential boundary changes.
 
 ## Risks and Mitigations
 
 | Risk | Mitigation |
 |---|---|
 | Evals reward exact prose instead of correct behavior | Assert tool traces, commands, and workspace state first |
-| Model variance creates flaky gates | Keep paid runs out of required CI initially; repeat and report distributions |
-| Lexical routing is mistaken for agent behavior | Label it as a description tripwire and retain model-executed selection cases |
+| Model variance creates flaky gates | Keep paid runs out of required CI; repeat and report distributions |
+| Lexical routing is mistaken for agent behavior | Label it as a description tripwire and do not claim that it observes host selection |
 | Fixtures encode one repository's conventions | Use small generic repositories and state every fixture assumption |
 | The suite reinforces documentation micromanagement | Include explicit no-document and read-only re-entry cases |
 | A judge approves unauthorized changes | Enforce mutation allowlists mechanically |
 | Cost grows with catalog coverage | Use affected-case selection, staged coverage, and explicit budgets |
 | Multi-host support delays useful evidence | Start with one recorded host and add another only after the harness proves useful |
 
-## Decisions Deferred to Elaboration
+## Resolved Pilot Decisions
 
-- The initial host, model, and version policy.
-- Whether to adapt an existing compatible eval-case schema or define a minimal
-  Sirius-specific extension.
-- The transparent ranking algorithm for the deterministic tier.
-- The fixture format and sandbox mechanism.
-- How behavioral cases declare tool and mutation authority across hosts.
-- The repetition count and evidence threshold required before a paid result can
-  block a change.
-- The retention policy for transcripts, cost history, and reviewed baselines.
+- Host: the locally authenticated Codex CLI, with its version and explicitly
+  requested model recorded per run; a trace-reported model remains null when
+  unavailable rather than inferred.
+- Schema: a small Sirius-specific JSON case format validated by the free tier.
+- Routing: a dependency-free normalized TF-IDF approximation used only as a
+  transparent description tripwire.
+- Isolation: a fresh temporary Git repository per behavioral or judge run,
+  with mechanical diff and mutation checks after execution.
+- Authority: each case declares mutable or read-only workspace mode plus
+  allowed and required mutation patterns.
+- Repetition and gating: repetition is explicit and reports distributions;
+  paid behavioral and semantic results do not block normal validation.
+- Retention: large traces and results remain ignored local or CI artifacts;
+  only reviewed cases, fixtures, runner code, and deliberate small baselines
+  belong in Git.
 
-These decisions should be made through a small runner spike and two
-representative fixtures, not through an exhaustive framework design.
+## Closure
 
-## Proposal Exit Criteria
-
-The proposal is ready to move into implementation planning when maintainers
-agree on:
-
-- the eight-skill pilot and its representative risks;
-- free routing checks as the first deliverable;
-- one-host behavioral execution as an on-demand experiment;
-- trace and diff evidence as primary behavioral oracles;
-- feedback restraint as an explicit composition concern; and
-- evidence-based expansion rather than immediate catalog-wide coverage.
+The exit criteria are met: the repository has a bounded representative pilot,
+free routing checks in normal validation, one-host opt-in behavioral execution,
+trace and diff evidence as the primary oracle, explicit feedback-restraint and
+workflow-reentry scenarios, a contract-driven composition case, and
+evidence-based expansion rules. Active behavior is authoritative in
+[`evals/`](../../evals/README.md), its case files, runner code, and tests. This
+proposal remains as the rationale, staged delivery record, and statement of the
+pilot's limits.
