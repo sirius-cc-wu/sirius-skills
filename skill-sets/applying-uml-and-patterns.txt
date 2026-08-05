@@ -1,5 +1,6 @@
 iterative-up-analysis-design
 rewrite-technical-artifacts
+stakeholder-requirements-elicitation
 inception
 use-case-modeling
 domain-modeling

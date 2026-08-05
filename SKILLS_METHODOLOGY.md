@@ -45,14 +45,16 @@ durable policy gap.
 
 1. Use `iterative-up-analysis-design` to coordinate risk-sized iterations and
    durable artifacts.
-2. Select requirements and analysis skills according to the uncertainty:
+2. Use `stakeholder-requirements-elicitation` when the affected roles, current
+   work, authority, or evidence coverage is unclear.
+3. Select requirements and analysis skills according to the uncertainty:
    inception, use cases, domain modeling, system sequence diagrams, and
    operation contracts.
-3. Assign responsibilities and collaborations with GRASP and use-case
+4. Assign responsibilities and collaborations with GRASP and use-case
    realization; summarize stable structure with design class diagrams.
-4. Apply patterns and language adaptation only when concrete design forces
+5. Apply patterns and language adaptation only when concrete design forces
    justify them.
-5. Use `test-driven-implementation` for behavior changes and
+6. Use `test-driven-implementation` for behavior changes and
    `behavior-preserving-refactoring` for verified structural improvement.
 
 The detailed handoffs and stopping rules live in [`catalog/tracks/`](catalog/tracks/).

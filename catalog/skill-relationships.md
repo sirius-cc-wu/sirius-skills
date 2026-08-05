@@ -309,10 +309,10 @@ keeps the diagrams readable without changing where they apply.
 | `software-design-language-adaptation` | `grasp-responsibility-design`, `use-case-realization`, `uml-class-diagram-design`, `design-pattern-application`, and `test-driven-implementation` | Language-specific ownership, errors, concurrency, lifecycle, or interface conventions affect the design |
 | `rewrite-technical-artifacts` | Recovered artifacts, iterative-design artifacts, behavior-slice evidence, and refactoring records | The knowledge is sound but its reading order or progressive disclosure needs improvement |
 
-## Proposed upstream path
+## Client discovery upstream path
 
-Three client-discovery skills are proposed but not deployable from this
-repository. Their intended handoff remains:
+`stakeholder-requirements-elicitation` is deployable. The synthesis and
+briefing skills in its intended handoff remain proposed:
 
 ```text
 stakeholder-requirements-elicitation

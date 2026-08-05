@@ -170,6 +170,7 @@ grep -q '^## Diff-Focused Review Mode$' "$rewrite_skill" || fail "rewrite skill 
 grep -q '^## Final Editorial Pass$' "$readability_reference" || fail "readability reference missing final editorial handoff"
 
 template_types=(
+  "stakeholder-requirements-elicitation|Stakeholder Evidence Record"
   "reverse-engineer-software-system|Reverse Engineering Record"
   "survey-existing-system|System Survey"
   "recover-system-behavior|Recovered Behavior Model"

@@ -9,6 +9,7 @@ reconstruct-software-architecture
 reconcile-recovered-design
 rewrite-technical-artifacts
 iterative-up-analysis-design
+stakeholder-requirements-elicitation
 inception
 use-case-modeling
 domain-modeling

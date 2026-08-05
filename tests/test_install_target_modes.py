@@ -26,6 +26,7 @@ WORKFLOW_SKILLS = {
 ITERATIVE_DESIGN_SKILLS = {
     "iterative-up-analysis-design",
     "rewrite-technical-artifacts",
+    "stakeholder-requirements-elicitation",
     "inception",
     "use-case-modeling",
     "domain-modeling",
@@ -159,4 +160,4 @@ def test_validation_covers_the_consolidated_catalog() -> None:
     )
 
     assert result.returncode == 0, result.stdout
-    assert "Validated 23 skills" in result.stdout
+    assert "Validated 24 skills" in result.stdout

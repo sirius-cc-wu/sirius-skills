@@ -1,14 +1,14 @@
 # Client to Code
 
 This proposed track covers the missing path from stakeholder evidence to a
-bounded, traceable coding-agent brief. The discovery skills named below do not
-exist yet.
+bounded, traceable coding-agent brief. Stakeholder elicitation is active; the
+synthesis and briefing skills named below remain proposed.
 
 ## Proposed Sequence
 
-1. `stakeholder-requirements-elicitation` identifies relevant stakeholders and
-   collects evidence through interviews, observation, workshops, documents,
-   and prototypes.
+1. [`stakeholder-requirements-elicitation`](../../skills/stakeholder-requirements-elicitation/SKILL.md)
+   identifies relevant stakeholders and collects evidence through interviews,
+   observation, workshops, documents, and prototypes.
 2. `requirements-synthesis-validation` turns the evidence into candidate goals,
    workflows, rules, constraints, quality attributes, scenarios, assumptions,
    and decisions, then plays them back to stakeholders.

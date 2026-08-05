@@ -1,0 +1,4 @@
+interface:
+  display_name: "Stakeholder Requirements Elicitation"
+  short_description: "Gather traceable stakeholder evidence safely"
+  default_prompt: "Use $stakeholder-requirements-elicitation to plan and capture stakeholder evidence without turning it into requirements."

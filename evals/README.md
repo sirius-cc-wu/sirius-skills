@@ -17,6 +17,7 @@ description-collision failures.
 
 The initial pilot covers:
 
+- `stakeholder-requirements-elicitation`;
 - `iterative-up-analysis-design`;
 - `use-case-modeling`;
 - `test-driven-implementation`;

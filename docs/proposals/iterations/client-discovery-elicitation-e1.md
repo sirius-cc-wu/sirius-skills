@@ -4,7 +4,7 @@ title: "Iteration: Validate Stakeholder Evidence Elicitation"
 description: "Validate that stakeholder evidence can be acquired and preserved without prematurely becoming requirements or design."
 id: "client-discovery-elicitation-e1"
 phase: "elaboration"
-status: "planned"
+status: "completed"
 tags: ["iteration", "client-discovery", "requirements"]
 ---
 
@@ -152,8 +152,49 @@ claiming sufficient coverage.
 
 ## Results
 
-- Pending execution.
+- Added and cataloged the deployable `stakeholder-requirements-elicitation`
+  skill. Its workflow covers stakeholder coverage, authority, consent,
+  sensitivity, neutral inquiry, source-linked evidence, contradictions, and
+  explicit stop conditions without synthesizing requirements or design.
+- Kept the minimum evidence-record shape in the skill rather than creating a
+  shared reference. The shape was sufficient for the representative slice;
+  independent reuse will be tested by the synthesis iteration before extracting
+  it.
+- Kept stakeholder analysis and evidence capture cohesive. The stakeholder map
+  determines whose evidence is needed and under what authority, so separating
+  it would add a handoff before useful evidence exists.
+- Added the skill to `all`, `iterative-design`, and the compatible
+  `applying-uml-and-patterns` alias. No new client-discovery profile is needed
+  while the capability family is incomplete.
+- Clarified the existing `recover-system-behavior` routing description after
+  its implementation-and-runtime evidence responsibility overlapped with the
+  new stakeholder-evidence description.
+- `just validate` passed with 24 cataloged skills and 45 routing cases across 9
+  case files. The behavioral evaluation
+  `preserve-contradictory-stakeholder-evidence` passed its mechanical checks
+  within the declared mutation boundary.
+- `pytest -q` passed all 29 repository tests in an isolated environment with
+  the optional development dependency enabled.
+- Manual review of the preserved behavioral trace found every declared semantic
+  expectation and prohibition satisfied: the output separated sponsor,
+  operator, and compliance evidence; omitted the private identity; retained
+  authority and publication limits; exposed conflicts and missing roles; kept
+  inference separate; stopped before requirements, design, or implementation;
+  and proposed proportionate follow-up elicitation. These semantic findings are
+  review evidence, not mechanically graded results.
 
 ## Artifact Outcomes
 
-- Pending iteration closure.
+- Started: `skills/stakeholder-requirements-elicitation/SKILL.md`, its agent
+  metadata, routing and behavioral cases, and the disposable
+  `stakeholder-discovery` fixture.
+- Refined: the active catalog, iterative-design profiles, client-to-code track,
+  skill relationships, source provenance, user guidance, evaluation inventory,
+  and repository validation counts.
+- Unchanged: the canonical proposal's responsibility boundaries and handoff.
+  Observed behavior supported the proposed direction without requiring a scope
+  change.
+- Deferred: a standalone shared evidence-model reference until the synthesis
+  skill demonstrates a second owner and concrete lifecycle pressure.
+- Omitted: use-case, domain, design, and implementation artifacts; the bounded
+  interaction produced no evidence that they were needed in this iteration.

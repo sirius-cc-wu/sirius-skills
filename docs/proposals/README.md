@@ -11,6 +11,6 @@ canonical description of the evolving capability.
 
 | Proposal | Status |
 |---|---|
-| [Client discovery skills](client-discovery-skills.md) | Proposed |
+| [Client discovery skills](client-discovery-skills.md) | In progress |
 | [Visual, paradigm-neutral software design](paradigm-neutral-software-design.md) | Proposed |
 | [Skill evaluation program](skill-evaluation-program.md) | In progress |

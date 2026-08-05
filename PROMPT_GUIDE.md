@@ -42,6 +42,12 @@ state, side effects, verification surfaces, and highest-risk follow-up slices.
 ## Iterative design and implementation
 
 ```text
+Use stakeholder-requirements-elicitation to identify the affected roles and
+capture interview, observation, and policy evidence without turning feature
+requests into requirements or design.
+```
+
+```text
 Use iterative-up-analysis-design to plan the smallest risk-driven iteration for
 this feature. Preserve durable artifacts and avoid creating documents that do
 not reduce uncertainty.
