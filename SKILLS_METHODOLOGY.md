@@ -57,7 +57,10 @@ durable policy gap.
    realization; summarize stable structure with design class diagrams.
 6. Apply patterns and language adaptation only when concrete design forces
    justify them.
-7. Use `test-driven-implementation` for behavior changes and
+7. Use `implementation-slice-briefing` when an unfamiliar implementer needs one
+   ready vertical slice assembled from approved requirements, examples, design
+   inputs, and revision-fixed repository facts.
+8. Use `test-driven-implementation` for behavior changes and
    `behavior-preserving-refactoring` for verified structural improvement.
 
 The detailed handoffs and stopping rules live in [`catalog/tracks/`](catalog/tracks/).

@@ -51,9 +51,8 @@ and boundary. Common compositions are documented as workflow tracks:
 - [Reverse Engineering](catalog/tracks/reverse-engineering.md)
 - [Iterative Analysis and Design](catalog/tracks/iterative-analysis-design.md)
 - [Implementation and Evolution](catalog/tracks/implementation-evolution.md)
-- [Client to Code](catalog/tracks/client-to-code.md), whose stakeholder
-  elicitation and requirements synthesis skills are active while implementation
-  briefing remains proposed
+- [Client to Code](catalog/tracks/client-to-code.md), from stakeholder evidence
+  through validated requirements to a traceable implementation slice brief
 
 The [Skill Relationships](catalog/skill-relationships.md) views summarize
 normal handoffs and optional feedback paths. Select the smallest set of skills

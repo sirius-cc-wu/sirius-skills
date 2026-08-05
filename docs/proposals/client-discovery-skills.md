@@ -97,6 +97,7 @@ mandatory lifecycle for skill users. Completed iteration records:
 
 - [Validate Stakeholder Evidence Elicitation](iterations/client-discovery-elicitation-e1.md)
 - [Validate Requirements Synthesis and Playback](iterations/client-discovery-synthesis-e2.md)
+- [Validate Implementation Slice Briefing](iterations/client-discovery-briefing-e3.md)
 
 ## Recommended Skill Family
 

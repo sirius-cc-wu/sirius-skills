@@ -54,6 +54,12 @@ approval only for roles with documented authority, and preserve open conflicts.
 ```
 
 ```text
+Use implementation-slice-briefing to select the smallest ready vertical
+behavior slice from these approved requirements and design inputs. Fix the brief
+to the current repository revision and expose every exclusion and stop condition.
+```
+
+```text
 Use iterative-up-analysis-design to plan the smallest risk-driven iteration for
 this feature. Preserve durable artifacts and avoid creating documents that do
 not reduce uncertainty.

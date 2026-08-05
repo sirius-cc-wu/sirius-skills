@@ -1,10 +1,10 @@
 # Client to Code
 
-This evolving track covers the path from stakeholder evidence to a bounded,
-traceable coding-agent brief. Stakeholder elicitation and requirements
-synthesis are active; implementation briefing remains proposed.
+This track covers the path from stakeholder evidence to a bounded, traceable
+coding-agent brief. Its discovery, synthesis, and briefing skills are active and
+remain independently selectable.
 
-## Proposed Sequence
+## Sequence
 
 1. [`stakeholder-requirements-elicitation`](../../skills/stakeholder-requirements-elicitation/SKILL.md)
    identifies relevant stakeholders and collects evidence through interviews,
@@ -21,9 +21,9 @@ synthesis are active; implementation briefing remains proposed.
    [iterative analysis and design track](iterative-analysis-design.md) supplies
    only the downstream artifacts needed for the selected risk and behavior
    slice.
-6. `implementation-slice-briefing` assembles approved decisions, visible
-   uncertainty, acceptance examples, non-goals, trace links, and verification
-   expectations.
+6. [`implementation-slice-briefing`](../../skills/implementation-slice-briefing/SKILL.md)
+   assembles approved decisions, visible uncertainty, acceptance examples,
+   non-goals, trace links, and verification expectations.
 7. The
    [implementation and evolution track](implementation-evolution.md) turns the
    brief into verified production behavior.
@@ -37,4 +37,4 @@ briefing step must not make unresolved requirements appear settled or invent
 business rules, architecture, or acceptance criteria.
 
 See the [client-discovery proposal](../../docs/proposals/client-discovery-skills.md)
-for candidate skill boundaries and reference material.
+for the skill-family rationale and reference material.
