@@ -77,6 +77,25 @@ change with one authoritative requester may compose elicitation and synthesis
 in one conversation, but it should still keep source evidence distinct from
 candidate requirements and decisions.
 
+## Iterative Delivery
+
+Implement the family through risk-driven increments rather than authoring all
+three skills at full detail before any has been exercised:
+
+1. Validate `stakeholder-requirements-elicitation` against contradictory
+   sponsor, operator, and compliance evidence.
+2. Build `requirements-synthesis-validation` against evidence produced by the
+   first skill, including conflicts and approval authority.
+3. Build `implementation-slice-briefing` against approved requirements plus
+   the smallest necessary downstream analysis and design artifacts.
+4. Exercise the complete handoff and use the results to refine the canonical
+   proposal, workflow track, and skill boundaries.
+
+Each increment should graduate one independently useful skill with focused
+routing and behavioral evaluations. This is an implementation order, not a
+mandatory lifecycle for skill users. The first planned increment is
+[Validate Stakeholder Evidence Elicitation](iterations/client-discovery-elicitation-e1.md).
+
 ## Recommended Skill Family
 
 Initially, this could be a family of three skills.
