@@ -4,12 +4,76 @@ Use this guide to choose a workflow track and understand its normal handoffs.
 The skills remain independently deployable: follow only the path needed to
 reduce the current risk or complete the current behavior slice.
 
+## Bird's-eye view
+
+This view groups all 28 deployable skills by responsibility. It shows only the
+main movement between groups so readers can locate a starting point before
+using the detailed views below. Solid arrows are normal handoffs, not a
+mandatory waterfall. Dashed arrows are optional routing, support, or feedback.
+
+```plantuml
+@startuml sirius-skills-birds-eye
+top to bottom direction
+
+skinparam backgroundColor #FFFFFF
+skinparam shadowing false
+skinparam linetype ortho
+skinparam defaultFontName Arial
+skinparam defaultTextAlignment center
+skinparam ArrowColor #52606D
+skinparam nodesep 35
+skinparam ranksep 45
+skinparam rectangle {
+  BackgroundColor #FFFFFF
+  BorderColor #52606D
+  RoundCorner 12
+}
+
+rectangle "**Intake and Direction**\nassess-development-input\nauthor-software-proposal" as intake #FFF4CC
+
+rectangle "**Client Discovery**\nstakeholder-requirements-elicitation\nrequirements-synthesis-validation\nimplementation-slice-briefing" as discovery #E8F5E9
+
+rectangle "**Reverse Engineering**\nreverse-engineer-software-system\nsurvey-existing-system\nrecover-system-behavior\nreconstruct-software-architecture\nreconcile-recovered-design" as reverse #EAF4FB
+
+rectangle "**Iterative Analysis and Design**\niterative-up-analysis-design\ninception\nuse-case-modeling\ndomain-modeling\nsystem-sequence-diagrams\noperation-contracts\ngrasp-responsibility-design\nuse-case-realization\numl-class-diagram-design\ndesign-pattern-application" as design #EEF8EE
+
+rectangle "**Implementation and Evolution**\ntest-driven-implementation\nbehavior-preserving-refactoring" as implementation #FFF5EA
+
+rectangle "**Repository Workflow**\nsimplify\ncommit\ncreate-pr\ngovernance-update" as repository #F3EEFF
+
+rectangle "**Cross-cutting Support**\nsoftware-design-language-adaptation\nrewrite-technical-artifacts" as support #FFFBEA
+
+intake -[hidden]right-> discovery
+discovery -[hidden]right-> reverse
+design -[hidden]right-> support
+
+intake ..> reverse
+intake ..> design
+intake ..> implementation
+discovery --> design
+discovery --> implementation
+reverse --> design
+reverse ..> implementation
+design --> implementation
+implementation ..> design : durable feedback
+implementation --> repository
+@enduml
+```
+
+The groups are navigation aids, not installation profiles or lifecycle gates.
+The diagrams that follow show the internal choices and conditional feedback
+that this overview deliberately collapses. Cross-cutting support is left
+unconnected because it is selected for a specific language or readability need,
+not as a required workflow stage.
+
 ## Choose a track
 
 - Use **Assess Development Input** when requirements-shaped material already
   exists but its readiness or correct Sirius entry point is unclear.
 - Use **Author Software Proposal** when technical input needs a consequential
   direction framed for responsible review.
+- Start with **Client Discovery** when stakeholder evidence must be gathered,
+  synthesized, and validated before a coding handoff can be prepared.
 - Start with **Reverse Engineering** when an existing system must be understood.
 - Start with **Iterative Analysis and Design** when intended behavior, scope, or
   object design is not yet clear.
@@ -17,51 +81,6 @@ reduce the current risk or complete the current behavior slice.
   change is already sufficiently bounded.
 - Use **Repository Workflow** after a change is verified and authorized for
   cleanup, recording, or publication.
-
-Solid arrows show a normal handoff, not a mandatory waterfall. Dashed arrows
-show an optional alternative or feedback path.
-
-```plantuml
-@startuml skill-track-overview
-top to bottom direction
-
-skinparam backgroundColor #FFFFFF
-skinparam shadowing false
-skinparam packageStyle rectangle
-skinparam linetype ortho
-skinparam defaultFontName Arial
-skinparam defaultTextAlignment center
-skinparam ArrowColor #52606D
-skinparam rectangle {
-  BackgroundColor #FFFFFF
-  BorderColor #52606D
-  RoundCorner 12
-}
-
-rectangle "Reverse Engineering\nunderstand an existing system" as reverse #EAF4FB
-rectangle "Iterative Analysis and Design\nclarify behavior and design" as design #EEF8EE
-rectangle "Implementation and Evolution\nchange verified behavior or structure" as implementation #FFF5EA
-rectangle "Repository Workflow\nrefine, record, and publish" as repository #F3EEFF
-rectangle "Requirements-shaped input\nfrom any method or format" as external #F2F2F2
-rectangle "assess-development-input\nassess readiness and select owner" as intake #FFF4CC
-rectangle "Technical discussion, findings,\nor candidate change" as candidate #F2F2F2
-rectangle "author-software-proposal\nframe a direction for review" as author #FFF4CC
-rectangle "Draft proposal\nand responsible review" as proposal #F2F2F2
-
-external --> intake
-candidate --> author
-author --> proposal
-proposal ..> intake : after review, when routing is unclear
-intake --> reverse : current-system claims need evidence
-intake --> design : requirement or design gap
-intake --> implementation : bounded behavior has an oracle
-reverse --> design : stakeholder-validated knowledge
-reverse --> implementation : safely bounded change
-design --> implementation : selected behavior and design inputs
-implementation ..> design : discoveries or durable design pressure
-implementation --> repository : verified change
-@enduml
-```
 
 ## External development inputs
 
