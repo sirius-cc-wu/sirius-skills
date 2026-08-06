@@ -6,7 +6,8 @@ reduce the current risk or complete the current behavior slice.
 
 ## Bird's-eye view
 
-This view groups all 28 deployable skills by responsibility. It shows only the
+This view groups all 28 deployable Sirius skills by responsibility and shows
+two optional external intent-shaping skills at the boundary. It shows only the
 main movement between groups so readers can locate a starting point before
 using the detailed views below. Solid arrows are normal handoffs, not a
 mandatory waterfall. Dashed arrows are optional routing, support, or feedback.
@@ -17,6 +18,7 @@ top to bottom direction
 
 skinparam backgroundColor #FFFFFF
 skinparam shadowing false
+skinparam packageStyle rectangle
 skinparam linetype ortho
 skinparam defaultFontName Arial
 skinparam defaultTextAlignment center
@@ -28,8 +30,20 @@ skinparam rectangle {
   BorderColor #52606D
   RoundCorner 12
 }
+skinparam rectangle<<external>> {
+  BackgroundColor #F2F2F2
+  BorderColor #888888
+}
 
-rectangle "**Intake and Direction**\nassess-development-input\nauthor-software-proposal" as intake #FFF4CC
+package "Optional external intent shaping\naddyosmani/agent-skills" as addy #F2F2F2 {
+  rectangle "interview-me" as addyInterview <<external>>
+  rectangle "idea-refine" as addyIdea <<external>>
+}
+
+package "**Sirius: Intake and Direction**" as intake #FFF4CC {
+  rectangle "assess-development-input" as assess
+  rectangle "author-software-proposal" as proposal
+}
 
 rectangle "**Client Discovery**\nstakeholder-requirements-elicitation\nrequirements-synthesis-validation\nimplementation-slice-briefing" as discovery #E8F5E9
 
@@ -43,13 +57,19 @@ rectangle "**Repository Workflow**\nsimplify\ncommit\ncreate-pr\ngovernance-upda
 
 rectangle "**Cross-cutting Support**\nsoftware-design-language-adaptation\nrewrite-technical-artifacts" as support #FFFBEA
 
-intake -[hidden]right-> discovery
+proposal -[hidden]right-> assess
+assess -[hidden]right-> discovery
 discovery -[hidden]right-> reverse
 design -[hidden]right-> support
 
-intake ..> reverse
-intake ..> design
-intake ..> implementation
+addyInterview --> addyIdea : confirmed intent
+addyIdea --> proposal : refined idea
+addyInterview ..> proposal : intent already concrete
+proposal ..> assess : reviewed; route unclear
+assess ..> discovery : stakeholder evidence needed
+assess ..> reverse
+assess ..> design
+assess ..> implementation
 discovery --> design
 discovery --> implementation
 reverse --> design
@@ -60,11 +80,22 @@ implementation --> repository
 @enduml
 ```
 
-The groups are navigation aids, not installation profiles or lifecycle gates.
-The diagrams that follow show the internal choices and conditional feedback
-that this overview deliberately collapses. Cross-cutting support is left
-unconnected because it is selected for a specific language or readability need,
-not as a required workflow stage.
+The gray nodes belong to Addy Osmani's external `agent-skills` collection, not
+the Sirius catalog or installation profiles. They make one common composition
+visible: `interview-me` confirms the requester's actual intent, `idea-refine`
+turns that intent into a focused and user-confirmed idea one-pager, and
+`author-software-proposal` turns that input into a decision-ready software
+proposal. If the intent is already concrete, `idea-refine` can be skipped.
+
+The proposal still requires review by the responsible authority. The dashed
+edge to `assess-development-input` applies only when the reviewed proposal's
+next Sirius owner remains unclear.
+
+The Sirius groups are navigation aids, not installation profiles or lifecycle
+gates. The diagrams that follow show the internal choices and conditional
+feedback that this overview deliberately collapses. Cross-cutting support is
+left unconnected because it is selected for a specific language or readability
+need, not as a required workflow stage.
 
 ## Choose a track
 
@@ -91,6 +122,28 @@ that produced them. It selects the narrowest skill that owns the first material
 gap, or reports an external prerequisite when no Sirius skill can responsibly
 proceed. The assessment neither rewrites the source nor executes the selected
 skill.
+
+A common cross-repository path uses Addy Osmani's
+[`interview-me`](https://github.com/addyosmani/agent-skills/blob/98967c45a42b88d6b8fb3a88b7ff6273920763d6/skills/interview-me/SKILL.md)
+and
+[`idea-refine`](https://github.com/addyosmani/agent-skills/blob/98967c45a42b88d6b8fb3a88b7ff6273920763d6/skills/idea-refine/SKILL.md)
+before Sirius proposal authoring:
+
+```text
+interview-me
+  → idea-refine
+  → author-software-proposal
+```
+
+The handoffs depend on output meaning, not shared runtime state. A confirmed
+intent feeds idea refinement; its confirmed problem, direction, assumptions,
+MVP scope, and non-goals then provide source material for proposal authoring.
+The Sirius proposal skill remains responsible for separating evidence from
+proposed intent, documenting alternatives and risks, and stopping before
+approval or implementation. Clarifying one requester's intent does not replace
+client discovery when several stakeholder roles, evidence sources, conflicts,
+or decision authorities matter; `assess-development-input` can route that gap
+to the client-discovery skills.
 
 ## Software proposal authoring
 
