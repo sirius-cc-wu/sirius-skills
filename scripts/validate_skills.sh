@@ -159,10 +159,14 @@ grep -q "^## Creation Gate$" "$budget_reference" || fail "artifact budget missin
 grep -q "^## Disposition Order$" "$budget_reference" || fail "artifact budget missing disposition guidance"
 grep -q "^## Artifact Lifecycles$" "$layout_reference" || fail "artifact layout reference missing lifecycle guidance"
 grep -q "^## Layout Options$" "$layout_reference" || fail "artifact layout reference missing layout options"
+grep -q "^## Proposal Placement$" "$layout_reference" || fail "artifact layout reference missing proposal placement guidance"
 grep -q "^## Linking Rules$" "$layout_reference" || fail "artifact layout reference missing linking rules"
 grep -q '^type: "\[Descriptive artifact type\]"$' "$frontmatter_reference" || fail "frontmatter reference missing base type field"
 grep -q '^## Writing Flow$' "$readability_reference" || fail "readability reference missing writing flow"
 grep -q '^## Preserve Meaning$' "$readability_reference" || fail "readability reference missing meaning-preservation guidance"
+
+proposal_skill="$root/skills/author-software-proposal/SKILL.md"
+grep -q 'artifact-layouts.md#proposal-placement' "$proposal_skill" || fail "software proposal skill missing proposal placement guidance"
 
 recovery_evidence_reference="$root/skills/reverse-engineer-software-system/references/recovery-evidence.md"
 test -f "$recovery_evidence_reference" || fail "missing $recovery_evidence_reference"

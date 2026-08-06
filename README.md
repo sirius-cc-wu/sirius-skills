@@ -102,7 +102,11 @@ or automatically executing the handoff.
 Use `author-software-proposal` when technical discussions, findings, incidents,
 or candidate changes need a decision-ready proposal. It separates current
 evidence from proposed behavior and stops before approval, implementation,
-commit, or publication unless those actions are separately authorized.
+commit, or publication unless those actions are separately authorized. It
+preserves an established proposal location; otherwise, the
+[artifact layout guidance](skills/iterative-up-analysis-design/references/artifact-layouts.md#proposal-placement)
+selects a proposal collection or feature/product-area co-location according to
+how reviewers navigate the repository.
 
 The [repository structure and skill-relationship comparison](catalog/agent-skill-repository-structures.md)
 uses PlantUML views to show how two related projects organize skill authoring,

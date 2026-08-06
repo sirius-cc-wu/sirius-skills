@@ -8,6 +8,7 @@ structure unless it is causing a concrete navigation or ownership problem.
 
 | Artifact kind | Examples | Lifecycle |
 |---|---|---|
+| Proposal | Candidate direction, scope, alternatives, risks, requested decision | Keep it draft or proposed while review is pending. After a decision, record the outcome and link to the authoritative decision, design, or implementation artifact instead of leaving the proposal as an ambiguous current source of truth. |
 | Durable design artifact | Use case, domain model, SSD, operation contract, realization, design class diagram | Refine the canonical artifact in place across iterations; retain a stable ID when other artifacts or iterations reference it. |
 | Iteration record | Objective, risks, selected scope, exit criteria, results | Create one record per iteration, close it when evidence is known, and retain it as history. |
 | Decision record | Architectural choice, rejected alternatives, consequences | Keep the accepted decision durable; supersede it explicitly rather than silently rewriting its history. |
@@ -20,6 +21,11 @@ realizations, implementation, and feedback reveal better information.
 Iteration records are historically stable but usually become less important
 after closure. They should point to canonical artifacts instead of containing
 iteration-specific copies of those artifacts.
+
+Proposals are decision-seeking artifacts, not substitutes for confirmed intent,
+current design knowledge, accepted decision records, or implementation briefs.
+Preserve those lifecycle boundaries even when one proposal supplies source
+material for the next artifact.
 
 ## Selection Workflow
 
@@ -38,12 +44,33 @@ iteration-specific copies of those artifacts.
 7. Revisit the layout only when growth, shared ownership, or navigation creates
    evidence that the current structure no longer works.
 
+## Proposal Placement
+
+Preserve an established proposal path, index, and naming rule. When none exists,
+use the smallest placement that matches how reviewers find pending decisions:
+
+- Prefer `docs/proposals/<topic>.md` when proposals span product areas or
+  readers navigate them by lifecycle or artifact type.
+- Prefer `docs/features/<feature>/proposal.md` or
+  `docs/<product-area>/proposals/<topic>.md` when review ownership and
+  navigation follow that feature or product area.
+- Prefer one proposal file. Create a proposal directory only when supporting
+  evidence has independent value but shares the proposal lifecycle.
+
+Keep a proposal in draft or proposed state until the responsible authority
+decides it. After acceptance, rejection, or supersession, preserve the outcome
+according to repository policy and link to the artifact that now owns the
+decision or intended behavior. Do not silently treat an undecided proposal as
+the current design.
+
 ## Layout Options
 
 ### Feature-Iteration Hybrid
 
 ```text
 docs/
+  proposals/
+    view-markdown-with-plantuml.md
   features/
     view-markdown-with-plantuml/
       index.md

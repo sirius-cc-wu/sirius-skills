@@ -99,8 +99,11 @@ the same proposal lifecycle.
 
 ## File Output
 
-Follow repository-defined proposal frontmatter when it exists. Otherwise,
-follow
+Follow repository-defined proposal paths and frontmatter when they exist. When
+the repository has no established proposal location, use
+[Proposal Placement](../iterative-up-analysis-design/references/artifact-layouts.md#proposal-placement)
+to choose between a proposal collection and feature or product-area
+co-location. When no proposal frontmatter convention exists, follow
 [Markdown Artifact Frontmatter](../iterative-up-analysis-design/references/markdown-artifact-frontmatter.md)
 with this minimal fallback:
 
