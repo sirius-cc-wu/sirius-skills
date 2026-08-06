@@ -7,6 +7,7 @@ source_catalog="$root/catalog/sources.md"
 track_directory="$root/catalog/tracks"
 profile_directory="$root/skill-sets"
 all_profile="$profile_directory/all.txt"
+retired_ledger="$root/catalog/retired-skills.tsv"
 
 fail() {
   echo "$1" >&2
@@ -23,6 +24,7 @@ test -f "$skill_catalog" || fail "missing $skill_catalog"
 test -f "$source_catalog" || fail "missing $source_catalog"
 test -d "$track_directory" || fail "missing $track_directory"
 test -f "$all_profile" || fail "missing $all_profile"
+test -f "$retired_ledger" || fail "missing $retired_ledger"
 
 profiles=(
   workflow
@@ -64,6 +66,25 @@ declare -A managed_by_name=()
 for name in "${expected[@]}"; do
   managed_by_name["$name"]=1
 done
+
+declare -A retired_by_name=()
+retired_count=0
+while IFS= read -r line; do
+  test -n "$line" || continue
+  [[ "$line" == \#* ]] && continue
+  IFS=$'\t' read -r name revision extra <<< "$line"
+  test -n "$name" && test -n "$revision" && test -z "${extra:-}" ||
+    fail "malformed retired skill entry: $line"
+  [[ "$name" =~ ^[a-z0-9][a-z0-9-]*$ ]] || fail "invalid retired skill name: $name"
+  [[ "$revision" =~ ^[0-9a-f]{40}$ ]] || fail "invalid retirement evidence revision for $name"
+  test -z "${retired_by_name[$name]:-}" || fail "duplicate retired skill: $name"
+  test -z "${managed_by_name[$name]:-}" || fail "active skill is also retired: $name"
+  test ! -d "$root/skills/$name" || fail "retired skill still has a package: $name"
+  retired_by_name["$name"]="$revision"
+  retired_count=$((retired_count + 1))
+done < "$retired_ledger"
+
+test "$retired_count" -gt 0 || fail "retired skill ledger is empty"
 
 for profile in "${profiles[@]}"; do
   while IFS= read -r name; do
@@ -217,3 +238,4 @@ grep -q "^## Catalog and workflow tracks$" "$root/README.md" || fail "README mis
 grep -q "^## Consolidation history$" "$root/README.md" || fail "README missing consolidation history"
 
 echo "Validated ${#expected[@]} skills across ${#profiles[@]} profiles."
+echo "Validated $retired_count retired skill tombstones."

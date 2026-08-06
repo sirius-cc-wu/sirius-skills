@@ -41,7 +41,42 @@ just uninstall iterative-design
 
 The `install-packaged` and `uninstall-packaged` aliases accept the same optional
 profile. Installation refreshes shared references from the checkout and uses
-`npx skills` for GitHub Copilot, Codex, Antigravity, and Antigravity CLI.
+`npx skills` for GitHub Copilot, Codex, Antigravity, and Antigravity CLI. A
+successful installation also records its skill names in host-local state at
+`$XDG_STATE_HOME/sirius-skills/managed-skills.txt`, or
+`~/.local/state/sirius-skills/managed-skills.txt` when `XDG_STATE_HOME` is not
+set.
+
+## Skill lifecycle and retired installations
+
+A deprecated skill remains in the active catalog and profiles until users have
+migration guidance. Once retired, its name is removed from those active
+surfaces and appended to the [retirement ledger](catalog/retired-skills.tsv).
+The ledger currently records 50 local skills recovered by intersecting Git
+history for former installer manifests with historical `skills/*/SKILL.md`
+packages. External skills once installed alongside Sirius were excluded.
+
+Every normal install and uninstall first prunes installed skill names that are
+both in the retirement ledger and in this computer's Sirius ownership state.
+You can run that safe cleanup directly:
+
+```bash
+just prune-retired
+```
+
+Installations made before ownership state existed cannot be attributed safely:
+`npx skills` currently reports their names and paths but no source repository.
+The safe command reports matching unowned names without deleting them. After
+checking that those names are old Sirius copies rather than same-named skills
+from another project, remove them explicitly:
+
+```bash
+just prune-retired-legacy
+```
+
+The legacy command removes matching global skills by name, so review its
+candidates first. Each computer must run updated repository tooling at least
+once; one computer cannot remove installations on another computer.
 
 ## Catalog and workflow tracks
 
@@ -126,6 +161,8 @@ and judge calibration are opt-in and never run as part of normal validation.
 - `skills/*/SKILL.md`: deployable agent workflows
 - `skill-sets/*.txt`: canonical installation profiles
 - `catalog/skills.md`: skill responsibilities and boundaries
+- `catalog/retired-skills.tsv`: append-only retired-name tombstones with Git
+  evidence revisions
 - `catalog/agent-skill-repository-structures.md`: comparative PlantUML views of
   related skill repositories and their documented workflow handoffs
 - `catalog/tracks/*.md`: optional workflow compositions
@@ -136,6 +173,8 @@ and judge calibration are opt-in and never run as part of normal validation.
   historical iteration records
 - `scripts/validate_skills.sh`: catalog and collection validation
 - `src/sirius_skills/commands/sync_shared_references.py`: packaging helper
+- `src/sirius_skills/commands/manage_installed_skills.py`: host ownership and
+  retired-installation reconciliation
 
 ## Consolidation history
 

@@ -9,7 +9,7 @@ Default guidance for agents working in `sirius-skills`.
 - `skill-sets/`: canonical installation profiles; `all.txt` lists every active
   skill exactly once and `workflow.txt` defines the default install
 - `catalog/`: skill boundaries, provenance, workflow tracks, and relationship
-  guidance
+  guidance; `retired-skills.tsv` is the append-only retirement ledger
 - `docs/shared/`: canonical shared references copied into consuming skills
 - `docs/proposals/`: proposed capabilities that are not deployable skills
 - `.github/`: repository guidance for GitHub tooling
@@ -32,6 +32,23 @@ Do not restore the retired Sirius spec-driven runtime, command catalog, or
 planning state model without a separate repository-level decision. The active
 iterative-design skills produce durable artifacts but do not depend on that
 retired runtime.
+
+### Make skill retirement durable
+
+Treat a deprecated skill as active until it is actually retired: keep it in
+`skills/`, `skill-sets/all.txt`, the catalog, and every applicable profile while
+its replacement or migration guidance remains available. To retire it, remove
+those active surfaces and append its name plus a full Git evidence revision to
+`catalog/retired-skills.tsv`. Do not reuse or delete a retired name; correct bad
+evidence explicitly without erasing the tombstone.
+
+Profile files remain the source of truth for active install membership. The
+host-local managed-skill state is only an ownership receipt written after a
+successful installation; it must not become another active profile. Normal
+install and uninstall operations may automatically remove only installed names
+present in both that state and the retirement ledger. Cleanup by historical
+name alone requires the explicit legacy migration command because old generic
+names can collide with skills installed from another repository.
 
 ### Keep shared skills generic
 
@@ -76,7 +93,10 @@ Use `just install` and `just uninstall` for the default workflow profile, or
 pass a profile name for another collection. `just install-packaged` and
 `just uninstall-packaged` remain aliases with the same profile parameter.
 Profile files are the single ownership surface for install and uninstall
-membership; do not add a parallel hard-coded managed-skill list.
+membership; do not add a parallel hard-coded managed-skill list. Use
+`just prune-retired` for ownership-verified cleanup. Use
+`just prune-retired-legacy` only after reviewing the reported unowned names on
+a computer whose Sirius installation predates host-local ownership state.
 
 Use `apply_patch` for file edits. Preserve unrelated work in a dirty tree, use
 `rg` for searches, and run verification proportional to the changed behavior.
@@ -86,6 +106,8 @@ Use `apply_patch` for file edits. Preserve unrelated work in a dirty tree, use
 - Confirm only the intended skill packages and files changed.
 - Keep `all.txt`, named profiles, the catalog, and discovered skill directories
   consistent.
+- Add a retirement tombstone when removing a previously installable skill, and
+  keep active names disjoint from retired names.
 - Keep shared references and their packaged copies synchronized.
 - Preserve the default workflow profile and documented compatibility aliases.
 - Update docs, tracks, and focused tests with install-catalog changes.

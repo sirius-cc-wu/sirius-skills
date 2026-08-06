@@ -82,6 +82,9 @@ def test_install_defaults_to_workflow_profile_and_keeps_reference_sync() -> None
     assert "sync_shared_skill_runtime.py" not in output
     assert PACKAGED_REPO_SOURCE in output
     assert output.count("npx skills add") == 1
+    assert "prune-retired" in output
+    assert "record-installed" in output
+    assert "set -euo pipefail" in output
     assert "skill_set='workflow'" in output
     assert 'skill-sets/${skill_set}.txt' in output
 
@@ -106,7 +109,7 @@ def test_install_rejects_an_unknown_profile_before_invoking_npx() -> None:
     assert result.returncode != 0
     assert "Unknown skill set: not-a-profile" in result.stdout
     assert "workflow" in result.stdout
-    assert "npx skills add" not in result.stdout
+    assert "npx skills" not in result.stdout
 
 
 def test_profiles_partition_the_active_catalog() -> None:
@@ -144,6 +147,25 @@ def test_uninstall_defaults_to_workflow_profile() -> None:
     assert "pip uninstall" not in output
     assert "skill_set='workflow'" in output
     assert 'skill-sets/${skill_set}.txt' in output
+    assert "prune-retired" in output
+    assert "forget-profile" in output
+    assert "set -euo pipefail" in output
+
+
+def test_prune_retired_defaults_to_owned_skills_only() -> None:
+    output = render_just("prune-retired")
+
+    assert "select-retired" in output
+    assert "--include-unowned" not in output
+    assert "npx skills remove" in output
+    assert "forget-retired" in output
+
+
+def test_prune_retired_legacy_requires_the_explicit_alias() -> None:
+    output = render_just("prune-retired-legacy")
+
+    assert "select-retired" in output
+    assert "--include-unowned" in output
 
 
 @pytest.mark.parametrize("profile", PROFILE_NAMES)
