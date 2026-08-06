@@ -16,3 +16,4 @@ closure without becoming the active capability contract.
 | [Client discovery skills](client-discovery-skills.md) | Implemented |
 | [Visual, paradigm-neutral software design](paradigm-neutral-software-design.md) | Proposed |
 | [Skill evaluation program](skill-evaluation-program.md) | Implemented |
+| [Sirius repository workbench CLI](sirius-repository-workbench-cli.md) | Proposed |
