@@ -1,0 +1,4 @@
+interface:
+  display_name: "Assess Development Input"
+  short_description: "Assess external inputs and route them into Sirius"
+  default_prompt: "Use $assess-development-input to assess this requirements-shaped input and recommend the next Sirius skill."

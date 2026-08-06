@@ -182,6 +182,8 @@ grep -q '^## Diff-Focused Review Mode$' "$rewrite_skill" || fail "rewrite skill 
 grep -q '^## Final Editorial Pass$' "$readability_reference" || fail "readability reference missing final editorial handoff"
 
 template_types=(
+  "assess-development-input|Development Input Assessment"
+  "author-software-proposal|Software Proposal"
   "stakeholder-requirements-elicitation|Stakeholder Evidence Record"
   "requirements-synthesis-validation|Requirements Discovery Brief"
   "implementation-slice-briefing|Implementation Slice Brief"

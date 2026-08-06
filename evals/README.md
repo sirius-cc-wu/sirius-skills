@@ -17,6 +17,8 @@ description-collision failures.
 
 The initial pilot covers:
 
+- `assess-development-input`;
+- `author-software-proposal`;
 - `stakeholder-requirements-elicitation`;
 - `requirements-synthesis-validation`;
 - `implementation-slice-briefing`;

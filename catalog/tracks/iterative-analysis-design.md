@@ -3,6 +3,21 @@
 Use this track when a system or feature needs requirements, analysis, and
 object design before or alongside incremental implementation.
 
+When requirements-shaped input was produced outside Sirius and the correct
+entry point is unclear, first use
+[`assess-development-input`](../../skills/assess-development-input/SKILL.md).
+Continue with this track only when the assessment identifies a requirements or
+design gap owned here; the assessment may instead route to recovery,
+implementation, or an external prerequisite.
+
+Use
+[`author-software-proposal`](../../skills/author-software-proposal/SKILL.md)
+when technical discussions, findings, incidents, or candidate changes need a
+direction reviewed before further design or implementation. Proposal authoring
+is optional rather than the first step of every iteration. It produces or
+substantively revises a draft; it does not accept the proposal or execute its
+handoff.
+
 ## Sequence
 
 1. [`iterative-up-analysis-design`](../../skills/iterative-up-analysis-design/SKILL.md)

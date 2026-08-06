@@ -4,6 +4,13 @@ This track covers the path from stakeholder evidence to a bounded, traceable
 coding-agent brief. Its discovery, synthesis, and briefing skills are active and
 remain independently selectable.
 
+The deployed
+[`assess-development-input`](../../skills/assess-development-input/SKILL.md)
+provides a smaller, method-independent alternative when requirements-shaped
+material already exists. It assesses that material and selects a Sirius entry
+point; it does not perform the stakeholder discovery, validation, or briefing
+performed by this track.
+
 ## Sequence
 
 1. [`stakeholder-requirements-elicitation`](../../skills/stakeholder-requirements-elicitation/SKILL.md)

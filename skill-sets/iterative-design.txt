@@ -1,3 +1,5 @@
+assess-development-input
+author-software-proposal
 iterative-up-analysis-design
 rewrite-technical-artifacts
 stakeholder-requirements-elicitation

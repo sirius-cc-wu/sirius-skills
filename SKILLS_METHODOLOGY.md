@@ -10,7 +10,7 @@ following every step in it.
 | Need | Profile |
 |---|---|
 | Refine, record, and publish repository changes | `workflow` |
-| Discover requirements and move through analysis, object design, implementation, and refactoring | `iterative-design` |
+| Assess external development inputs, author software proposals, discover requirements, and move through analysis, object design, implementation, and refactoring | `iterative-design` |
 | Recover current behavior and architecture from an existing system | `reverse-engineering` |
 | Make the entire catalog available | `all` |
 
@@ -18,6 +18,38 @@ following every step in it.
 `iterative-design`.
 
 ## Common compositions
+
+### Route an external development input
+
+1. Use `assess-development-input` when a specification, proposal, scenario set,
+   story map, brainstorm result, or other requirements-shaped input exists but
+   its Sirius entry point is unclear.
+2. Preserve the source's revision, approval state, non-goals, and unresolved
+   questions; assess readiness from content rather than format or originating
+   method.
+3. Return to the relevant external authority when a missing decision cannot be
+   owned by a Sirius skill.
+4. Invoke the one recommended Sirius skill only when the user authorizes the
+   downstream work.
+
+The assessment is an intake boundary, not a mandatory first step or a
+replacement for discovery and specification methods.
+
+### Develop a candidate change into a proposal
+
+1. Use `author-software-proposal` when technical input needs a consequential
+   direction reviewed before implementation or broader design work.
+2. Preserve the repository's proposal governance, canonical owner, lifecycle,
+   and index; prefer one proposal file unless supporting references justify a
+   proposal directory.
+3. Separate current evidence and inference from proposed behavior, approval,
+   and unresolved decisions.
+4. Stop with a draft and a clear next decision unless the user separately
+   authorizes acceptance, implementation, commit, or publication.
+
+Once a proposal exists, use `assess-development-input` only when its readiness
+or next Sirius owner is unclear. Use `rewrite-technical-artifacts` when its
+meaning is already sound and only its reading path needs improvement.
 
 ### Deliver an existing change
 

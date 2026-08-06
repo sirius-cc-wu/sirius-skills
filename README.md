@@ -1,9 +1,10 @@
 # sirius-skills
 
-`sirius-skills` is a curated collection of repository workflow, software
-discovery, iterative design, implementation, and evolution skills. Skills are
-independently deployable; profiles provide convenient installations without
-turning the catalog into a mandatory lifecycle.
+`sirius-skills` is a curated collection of development-input assessment,
+proposal authoring, repository workflow, software discovery, iterative design,
+implementation, and evolution skills. Skills are independently deployable;
+profiles provide convenient installations without turning the catalog into a
+mandatory lifecycle.
 
 ## Install
 
@@ -26,7 +27,7 @@ Available profiles are defined in [`skill-sets/`](skill-sets/):
 | Profile | Purpose |
 |---|---|
 | `workflow` | Simplification, scoped commits, pull requests, and durable governance updates |
-| `iterative-design` | Requirements, analysis, object design, tested implementation, and refactoring |
+| `iterative-design` | External-input assessment, proposal authoring, requirements, analysis, object design, tested implementation, and refactoring |
 | `applying-uml-and-patterns` | Compatibility alias for `iterative-design` |
 | `reverse-engineering` | Evidence-driven system survey, behavior and architecture recovery, and reconciliation |
 | `all` | Every active skill in the catalog |
@@ -57,6 +58,16 @@ and boundary. Common compositions are documented as workflow tracks:
 The [Skill Relationships](catalog/skill-relationships.md) views summarize
 normal handoffs and optional feedback paths. Select the smallest set of skills
 that addresses the current risk or outcome.
+
+Use `assess-development-input` when requirements-shaped material comes from an
+external or mixed workflow and its Sirius entry point is unclear. It evaluates
+the content and recommends one next Sirius skill without rewriting the source
+or automatically executing the handoff.
+
+Use `author-software-proposal` when technical discussions, findings, incidents,
+or candidate changes need a decision-ready proposal. It separates current
+evidence from proposed behavior and stops before approval, implementation,
+commit, or publication unless those actions are separately authorized.
 
 The [repository structure and skill-relationship comparison](catalog/agent-skill-repository-structures.md)
 uses PlantUML views to show how two related projects organize skill authoring,
