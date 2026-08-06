@@ -13,5 +13,6 @@ planning state model. The iterative-design skills create durable artifacts but
 do not depend on that runtime.
 
 Keep shared skills generic and place repository-specific title, identifier, and
-tracker rules in `.skills/conventions.json`. Preserve unrelated work, scope
+tracker rules in the nearest applicable `AGENTS.md`. Do not introduce a
+parallel convention-file control plane. Preserve unrelated work, scope
 formatters and staging carefully, and report verification evidence.

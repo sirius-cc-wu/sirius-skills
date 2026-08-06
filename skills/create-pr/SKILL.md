@@ -11,15 +11,14 @@ Open GitHub PRs with the intended base, commits, title, and body.
 
 Default format: `<ID/Scope>: <summary>`.
 
-Read `.skills/conventions.json` when present:
+Read the applicable `AGENTS.md` files and repository guidance for explicit
+branch-identifier extraction, identifier validation, and pull-request title
+rules.
 
-- `branch_extract_pattern`: extract an ID from the branch.
-- `id_pattern`: validate extracted or user-provided IDs.
-- `pr_title_format`: format the title with `{ID}`, `{id}`, `{scope}`, and `{summary}`.
 - If an ID is invalid, or required but unavailable, stop and ask for a corrected ID or explicit title.
-- Do not assume Jira or any other tracker unless configured.
+- Do not assume Jira or any other tracker without an explicit repository rule.
 
-When no configured format requires an ID, use a logical scope from the branch or changed area. Write the summary in imperative present tense, capitalize it, keep it concise, and omit the final period.
+When no repository rule requires an ID, use a logical scope from the branch or changed area. Write the summary in imperative present tense, capitalize it, keep it concise, and omit the final period.
 
 ## Workflow
 
@@ -52,7 +51,7 @@ When no configured format requires an ID, use a logical scope from the branch or
    Run upstream commands only when an upstream exists. If an open PR already exists, report it instead of creating a duplicate unless explicitly requested. If no upstream exists, use `git push -u <remote> HEAD`; if only ahead, use `git push`; if behind or diverged, stop and ask.
 
 4. **Prepare title and checks**:
-   - Apply the title rules above after reading conventions.
+   - Apply the title rules above after reading the repository guidance.
    - Derive the summary from commits and changed files, not just the branch name.
    - Review relevant project checklists when they exist; do not proceed with pending required items unless the user confirms the exception and the PR body explains it.
 
@@ -101,6 +100,6 @@ When no configured format requires an ID, use a logical scope from the branch or
 
 ## Validation
 
-When no project-specific format is configured, the title should generally match `^[^:]+: [A-Z].+[^.]$`.
+When no project-specific format is defined, the title should generally match `^[^:]+: [A-Z].+[^.]$`.
 
 Before creating the PR, confirm the worktree is clean, base/head are correct, commits and diff match scope, no duplicate open PR exists unless requested, the body has no placeholders and includes testing evidence, and draft status matches the user request.

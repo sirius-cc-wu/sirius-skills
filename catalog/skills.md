@@ -7,7 +7,7 @@ See [Source Catalog](sources.md) for intellectual provenance and
 | Skill | Source Concepts Preserved | Primary Artifact | Boundary |
 |---|---|---|---|
 | `simplify` | Diff-scoped cleanup, behavior preservation, configuration ownership, and proportional verification | Verified simplified change set | Improves an existing change without intentionally expanding its behavior or scope |
-| `commit` | Intentional staging, repository checks, configurable message conventions, and concise change records | Git commit | Records an already prepared change; does not broaden scope, discard unrelated work, or publish it |
+| `commit` | Intentional staging, repository checks, repository-governed message conventions, and concise change records | Git commit | Records an already prepared change; does not broaden scope, discard unrelated work, or publish it |
 | `create-pr` | Base and head verification, duplicate detection, convention-aware titles, validation evidence, and draft-first publication | GitHub pull request | Publishes committed work for review; does not implement, silently commit, or resolve divergent history |
 | `governance-update` | Repeated-drift evidence, narrow rule ownership, generic defaults, and enforceable repository guidance | Updated governance surface | Changes durable policy only when recurring evidence justifies it; does not turn one-off defects into rules |
 | `reverse-engineer-software-system` | Question-driven recovery, evidence perspectives, confidence calibration, risk-sized investigation, as-of-revision artifact lifecycles | Reverse-engineering record and recovered-artifact map | Coordinates recovery skills and handoffs; does not model an entire repository or convert inference into intended requirements |

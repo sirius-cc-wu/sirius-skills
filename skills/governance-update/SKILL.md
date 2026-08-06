@@ -21,7 +21,7 @@ Read these references when relevant:
 2. Decide whether the problem belongs in governance at all or should remain a
    one-off artifact/code change.
 3. Update the narrowest durable surface that should own the rule, such as
-   `AGENTS.md`, `.skills/conventions.json`, or closely related top-level docs.
+   the nearest applicable `AGENTS.md` or closely related top-level docs.
 4. Keep rules specific, minimal, and enforceable instead of adding broad
    preference lists.
 5. When the gap is really about ownership, name the code, configuration, skill,
@@ -33,14 +33,13 @@ Read these references when relevant:
 
 - one repeated problem pattern or source of drift
 - 1-3 concrete examples that show the gap
-- an optional target surface such as `AGENTS.md` or `.skills/conventions.json`
+- an optional target `AGENTS.md` or closely related governance surface
 - context about whether the rule should stay generic or become repo-local
 
 ## Workflow
 
 1. Read the current governance surfaces first:
-   - nearest `AGENTS.md`
-   - relevant `.skills/*.json` files when they already own conventions
+   - the applicable `AGENTS.md` files from repository root to the affected path
    - top-level docs that describe the same skill family or policy
 2. Read the concrete artifacts, diffs, or examples that motivated the update.
 3. Decide whether a governance change is the right fix:
@@ -69,8 +68,9 @@ Read these references when relevant:
 - Keep shared skills generic; do not hardcode company-specific trackers, naming
   rules, or workflow steps unless the repo explicitly opts into them.
 - Prefer defaults, heuristics, and examples over giant checklists.
-- Treat new configuration surfaces as suspicious; if governance touches config,
-  preserve existing typed ownership and document the owning boundary clearly.
+- Treat new governance or configuration surfaces as suspicious; prefer the
+  applicable `AGENTS.md`, preserve existing typed ownership, and document the
+  owning boundary clearly.
 - If a better fix is “update one artifact” or “create one new skill,” say so
   explicitly instead of forcing a governance rule.
 

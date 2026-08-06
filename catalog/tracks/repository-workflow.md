@@ -30,5 +30,5 @@ policy gap. A one-off defect or stale artifact should normally be fixed at its
 direct owner instead of becoming a repository rule.
 
 Repository-specific naming and tracker conventions belong in
-`.skills/conventions.json`; the shared workflow skills retain useful generic
-defaults.
+the nearest applicable `AGENTS.md`; the shared workflow skills retain useful
+generic defaults.

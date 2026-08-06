@@ -23,12 +23,14 @@ Use when the user asks to commit repository changes.
 - When adding a body, start with a brief why, then add bullets for specific changes.
 - Avoid vague bodies and restating the summary.
 
-### 4. Apply Conventions
-- If `.skills/conventions.json` exists, prefer `commit_format`.
-- Supported placeholders: `{ID}`, `{id}`, `{scope}`, `{summary}`.
-- When an ID is required, extract it with `branch_extract_pattern` or ask the user.
-- Validate IDs with `id_pattern` when configured.
-- Do not assume Jira, Azure DevOps, or another tracker unless configured.
+### 4. Apply Repository Rules
+- Read the applicable `AGENTS.md` files and repository guidance for explicit
+  commit-message, identifier-extraction, and identifier-validation rules.
+- When a rule requires an ID, follow its extraction and validation guidance or
+  ask the user when the required ID is unavailable.
+- When no explicit rule exists, use the generic summary format above.
+- Do not assume Jira, Azure DevOps, or another tracker without an explicit
+  repository rule.
 
 ### 5. Commit
 - For multi-line messages, create a message file with the approved file-editing mechanism and run `git commit -F <file>`.

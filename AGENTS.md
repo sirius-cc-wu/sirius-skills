@@ -36,8 +36,8 @@ retired runtime.
 ### Keep shared skills generic
 
 Do not hardcode company trackers, naming rules, or domain logic. Put
-repository-specific conventions in `.skills/conventions.json` and preserve a
-useful generic default.
+repository-specific conventions in the nearest applicable `AGENTS.md`, avoid a
+parallel convention-file control plane, and preserve a useful generic default.
 
 ### Keep documentation aligned
 
@@ -52,7 +52,7 @@ When changing a skill or install behavior:
 ### Treat identifiers as opaque
 
 Do not assume IDs are dates or sequence numbers. Preserve manual identifiers
-and validate them only against configured conventions.
+and validate them only against explicit rules in the applicable `AGENTS.md`.
 
 ### Keep technical documentation approachable
 

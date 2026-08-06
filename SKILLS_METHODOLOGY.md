@@ -104,12 +104,13 @@ The detailed handoffs and stopping rules live in [`catalog/tracks/`](catalog/tra
   implicitly authorize later commits or publication.
 - Preserve established layouts and canonical artifact ownership.
 - Keep staging, formatting, and validation scoped to the intended change.
-- Prefer project configuration over company- or tracker-specific hardcoding.
+- Prefer explicit repository rules in the applicable `AGENTS.md` over company-
+  or tracker-specific hardcoding in shared skills.
 - Report the checks run, their results, and material residual uncertainty.
 
-## Configuration
+## Repository rules
 
-When `.skills/conventions.json` exists, `commit` and `create-pr` may use
-`commit_format`, `pr_title_format`, `branch_extract_pattern`, and `id_pattern`.
-Without repository-specific configuration, both skills use their documented
-generic defaults.
+When the applicable `AGENTS.md` defines commit-message, pull-request-title,
+branch-identifier, or identifier-validation rules, `commit` and `create-pr`
+follow them. Without explicit repository rules, both skills use their
+documented generic defaults.

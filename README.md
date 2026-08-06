@@ -76,16 +76,11 @@ handoffs.
 
 ## Repository conventions
 
-`commit` and `create-pr` can read `.skills/conventions.json` when a consuming
-repository needs project-specific formatting. Supported fields include:
-
-- `commit_format`
-- `pr_title_format`
-- `branch_extract_pattern`
-- `id_pattern`
-
-Shared skills remain generic; project-specific tracker and naming rules belong
-in consuming-repository configuration.
+`commit` and `create-pr` follow explicit repository-specific message, title,
+identifier, and tracker rules from the nearest applicable `AGENTS.md`. Without
+such rules, both skills use their documented generic defaults. Shared skills
+remain generic; consuming repositories own their local conventions in
+`AGENTS.md`.
 
 ## Design artifacts and sources
 
