@@ -41,8 +41,9 @@ just uninstall iterative-design
 
 The `install-packaged` and `uninstall-packaged` aliases accept the same optional
 profile. Installation refreshes shared references from the checkout and uses
-`npx skills` for GitHub Copilot, Codex, Antigravity, and Antigravity CLI. A
-successful installation also records its skill names in host-local state at
+`npx --yes skills` so the CLI can bootstrap noninteractively for GitHub Copilot,
+Codex, Antigravity, and Antigravity CLI. A successful installation also records
+its skill names in host-local state at
 `$XDG_STATE_HOME/sirius-skills/managed-skills.txt`, or
 `~/.local/state/sirius-skills/managed-skills.txt` when `XDG_STATE_HOME` is not
 set.

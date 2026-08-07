@@ -8,7 +8,8 @@ import pytest
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
 SYNC_REFERENCES = "sirius_skills.commands.sync_shared_references"
-PACKAGED_ADD = 'npx skills add "'
+NPX_SKILLS = "npx --yes skills"
+PACKAGED_ADD = f'{NPX_SKILLS} add "'
 PACKAGED_REPO_SOURCE = f'{PACKAGED_ADD}{REPO_ROOT}"'
 PROFILE_NAMES = (
     "workflow",
@@ -81,7 +82,7 @@ def test_install_defaults_to_workflow_profile_and_keeps_reference_sync() -> None
     assert SYNC_REFERENCES in output
     assert "sync_shared_skill_runtime.py" not in output
     assert PACKAGED_REPO_SOURCE in output
-    assert output.count("npx skills add") == 1
+    assert output.count(f"{NPX_SKILLS} add") == 1
     assert "prune-retired" in output
     assert "record-installed" in output
     assert "set -euo pipefail" in output
@@ -129,19 +130,29 @@ def test_install_packaged_alias_matches_install() -> None:
     assert SYNC_REFERENCES in output
     assert "sync_shared_skill_runtime.py" not in output
     assert PACKAGED_REPO_SOURCE in output
-    assert output.count("npx skills add") == 1
+    assert output.count(f"{NPX_SKILLS} add") == 1
     assert "skill_set='workflow'" in output
+
+
+@pytest.mark.parametrize(
+    "target", ("install", "uninstall", "prune-retired", "prune-retired-legacy")
+)
+def test_npx_can_bootstrap_skills_without_an_interactive_prompt(target: str) -> None:
+    output = render_just(target)
+
+    assert "npx skills" not in output
+    assert NPX_SKILLS in output
 
 
 def test_uninstall_defaults_to_workflow_profile() -> None:
     output = render_just("uninstall")
 
-    assert "npx skills ls -g --json" in output
-    assert "npx skills remove" in output
-    assert 'npx skills remove "${installed_skills[@]}" --global' in output
-    assert "xargs npx skills remove" not in output
+    assert f"{NPX_SKILLS} ls -g --json" in output
+    assert f"{NPX_SKILLS} remove" in output
+    assert f'{NPX_SKILLS} remove "${{installed_skills[@]}}" --global' in output
+    assert f"xargs {NPX_SKILLS} remove" not in output
     remove_command = next(
-        line.strip() for line in output.splitlines() if "npx skills remove" in line
+        line.strip() for line in output.splitlines() if f"{NPX_SKILLS} remove" in line
     )
     assert "--agent" not in remove_command
     assert "pip uninstall" not in output
@@ -157,7 +168,7 @@ def test_prune_retired_defaults_to_owned_skills_only() -> None:
 
     assert "select-retired" in output
     assert "--include-unowned" not in output
-    assert "npx skills remove" in output
+    assert f"{NPX_SKILLS} remove" in output
     assert "forget-retired" in output
 
 
@@ -173,7 +184,7 @@ def test_uninstall_accepts_each_named_profile(profile: str) -> None:
     output = render_just("uninstall", profile)
 
     assert f"skill_set='{profile}'" in output
-    assert "npx skills ls -g --json" in output
+    assert f"{NPX_SKILLS} ls -g --json" in output
 
 
 def test_validation_covers_the_consolidated_catalog() -> None:

@@ -27,7 +27,7 @@ install skill_set="workflow": sync-shared-references
 	for skill in "${skills[@]}"; do
 		skill_flags+=(--skill "$skill")
 	done
-	npx skills add "{{repo_root}}" {{common_flags}} "${skill_flags[@]}"
+	npx --yes skills add "{{repo_root}}" {{common_flags}} "${skill_flags[@]}"
 	env PYTHONPATH="{{repo_root}}/src" python3 -m sirius_skills.commands.manage_installed_skills \
 		record-installed --profile "$skill_set_file"
 
@@ -42,12 +42,12 @@ sync-shared-references:
 prune-retired:
 	#!/usr/bin/env bash
 	set -euo pipefail
-	retired=$(npx skills ls -g --json | \
+	retired=$(npx --yes skills ls -g --json | \
 		env PYTHONPATH="{{repo_root}}/src" python3 -m sirius_skills.commands.manage_installed_skills \
 			select-retired --ledger "{{retired_ledger}}")
 	if [ -n "$retired" ]; then
 		mapfile -t retired_skills <<< "$retired"
-		npx skills remove "${retired_skills[@]}" --global --yes
+		npx --yes skills remove "${retired_skills[@]}" --global --yes
 	else
 		echo "No owned retired Sirius skills found."
 	fi
@@ -58,12 +58,12 @@ prune-retired:
 prune-retired-legacy:
 	#!/usr/bin/env bash
 	set -euo pipefail
-	retired=$(npx skills ls -g --json | \
+	retired=$(npx --yes skills ls -g --json | \
 		env PYTHONPATH="{{repo_root}}/src" python3 -m sirius_skills.commands.manage_installed_skills \
 			select-retired --ledger "{{retired_ledger}}" --include-unowned)
 	if [ -n "$retired" ]; then
 		mapfile -t retired_skills <<< "$retired"
-		npx skills remove "${retired_skills[@]}" --global --yes
+		npx --yes skills remove "${retired_skills[@]}" --global --yes
 	else
 		echo "No retired Sirius skill names found."
 	fi
@@ -82,12 +82,12 @@ uninstall skill_set="workflow":
 	fi
 	just --justfile "{{repo_root}}/justfile" prune-retired
 
-	installed=$(npx skills ls -g --json | python3 -c 'import json, pathlib, sys; managed = {line.strip() for line in pathlib.Path(sys.argv[1]).read_text().splitlines() if line.strip() and not line.lstrip().startswith("#")}; installed = [item["name"] for item in json.load(sys.stdin) if item.get("name") in managed]; print("\n".join(installed))' "$skill_set_file")
+	installed=$(npx --yes skills ls -g --json | python3 -c 'import json, pathlib, sys; managed = {line.strip() for line in pathlib.Path(sys.argv[1]).read_text().splitlines() if line.strip() and not line.lstrip().startswith("#")}; installed = [item["name"] for item in json.load(sys.stdin) if item.get("name") in managed]; print("\n".join(installed))' "$skill_set_file")
 	if [ -n "$installed" ]; then
 		mapfile -t installed_skills <<< "$installed"
 		# Global agent aliases share the universal skill directory, so removal
 		# must not retain entries through agents outside the install target list.
-		npx skills remove "${installed_skills[@]}" --global --yes
+		npx --yes skills remove "${installed_skills[@]}" --global --yes
 	else
 		echo "No installed skills found for profile: $skill_set"
 	fi
