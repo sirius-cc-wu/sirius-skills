@@ -31,6 +31,14 @@ def default_state_path() -> Path:
     return base / "sirius-skills/managed-skills.txt"
 
 
+def default_canonical_skills_dir() -> Path:
+    return Path.home() / ".agents/skills"
+
+
+def default_antigravity_skills_dir() -> Path:
+    return Path.home() / ".gemini/config/skills"
+
+
 def read_name_file(path: Path) -> set[str]:
     if not path.exists():
         return set()
@@ -155,9 +163,130 @@ def forget_retired(ledger_path: Path, state_path: Path) -> None:
     forget_names((entry.name for entry in read_retirements(ledger_path)), state_path)
 
 
+def link_points_to(path: Path, expected_target: Path) -> bool:
+    if not path.is_symlink():
+        return False
+
+    link_target = Path(os.readlink(path))
+    if not link_target.is_absolute():
+        link_target = path.parent / link_target
+    return link_target.resolve(strict=False) == expected_target.resolve(strict=False)
+
+
+def skill_roots_are_equivalent(source_dir: Path, target_dir: Path) -> bool:
+    return source_dir.resolve(strict=False) == target_dir.resolve(strict=False)
+
+
+def link_names(
+    names: Iterable[str],
+    *,
+    source_dir: Path,
+    target_dir: Path,
+) -> None:
+    normalized = sorted(set(names))
+    if skill_roots_are_equivalent(source_dir, target_dir):
+        return
+    if target_dir.is_symlink() and not target_dir.is_dir():
+        raise ValueError(f"Antigravity skill directory is a broken link: {target_dir}")
+    if target_dir.exists() and not target_dir.is_dir():
+        raise ValueError(f"Antigravity skill directory is not a directory: {target_dir}")
+
+    links_to_create: list[tuple[Path, Path]] = []
+    for name in normalized:
+        source = source_dir / name
+        target = target_dir / name
+        if not source.is_dir():
+            raise ValueError(f"canonical skill directory is missing: {source}")
+        if target.is_symlink():
+            if link_points_to(target, source):
+                continue
+            raise ValueError(f"refusing to replace existing Antigravity skill: {target}")
+        if target.exists():
+            raise ValueError(f"refusing to replace existing Antigravity skill: {target}")
+        links_to_create.append((source, target))
+
+    target_dir.mkdir(parents=True, exist_ok=True)
+    for source, target in links_to_create:
+        relative_source = os.path.relpath(source, start=target.parent)
+        target.symlink_to(relative_source, target_is_directory=True)
+
+
+def unlink_names(
+    names: Iterable[str],
+    *,
+    source_dir: Path,
+    target_dir: Path,
+) -> None:
+    if skill_roots_are_equivalent(source_dir, target_dir):
+        return
+
+    for name in sorted(set(names)):
+        source = source_dir / name
+        target = target_dir / name
+        if link_points_to(target, source):
+            target.unlink()
+
+
+def link_profile(
+    profile_path: Path,
+    *,
+    source_dir: Path,
+    target_dir: Path,
+) -> None:
+    link_names(
+        read_name_file(profile_path),
+        source_dir=source_dir,
+        target_dir=target_dir,
+    )
+
+
+def unlink_profile(
+    profile_path: Path,
+    *,
+    source_dir: Path,
+    target_dir: Path,
+) -> None:
+    unlink_names(
+        read_name_file(profile_path),
+        source_dir=source_dir,
+        target_dir=target_dir,
+    )
+
+
+def unlink_retired(
+    ledger_path: Path,
+    *,
+    state_path: Path,
+    source_dir: Path,
+    target_dir: Path,
+    include_unowned: bool = False,
+) -> None:
+    retired = {entry.name for entry in read_retirements(ledger_path)}
+    names = retired if include_unowned else retired & read_name_file(state_path)
+    unlink_names(names, source_dir=source_dir, target_dir=target_dir)
+
+
+def add_skill_dir_arguments(parser: argparse.ArgumentParser) -> None:
+    parser.add_argument(
+        "--source-dir",
+        type=Path,
+        default=default_canonical_skills_dir(),
+        help="canonical global skill directory (default: %(default)s)",
+    )
+    parser.add_argument(
+        "--target-dir",
+        type=Path,
+        default=default_antigravity_skills_dir(),
+        help="Antigravity global skill directory (default: %(default)s)",
+    )
+
+
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
-        description="Track Sirius-installed skills and select retired installations safely."
+        description=(
+            "Track Sirius-installed skills, expose them to Antigravity, and select "
+            "retired installations safely."
+        )
     )
     parser.add_argument(
         "--state",
@@ -177,6 +306,25 @@ def build_parser() -> argparse.ArgumentParser:
         "record-installed", help="record a successfully installed profile"
     )
     record_parser.add_argument("--profile", type=Path, required=True)
+
+    link_profile_parser = subparsers.add_parser(
+        "link-profile", help="expose an installed profile to Antigravity"
+    )
+    link_profile_parser.add_argument("--profile", type=Path, required=True)
+    add_skill_dir_arguments(link_profile_parser)
+
+    unlink_profile_parser = subparsers.add_parser(
+        "unlink-profile", help="remove a profile's Antigravity compatibility links"
+    )
+    unlink_profile_parser.add_argument("--profile", type=Path, required=True)
+    add_skill_dir_arguments(unlink_profile_parser)
+
+    unlink_retired_parser = subparsers.add_parser(
+        "unlink-retired", help="remove retired Antigravity compatibility links"
+    )
+    unlink_retired_parser.add_argument("--ledger", type=Path, required=True)
+    unlink_retired_parser.add_argument("--include-unowned", action="store_true")
+    add_skill_dir_arguments(unlink_retired_parser)
 
     forget_profile_parser = subparsers.add_parser(
         "forget-profile", help="forget ownership for an uninstalled profile"
@@ -216,6 +364,26 @@ def main(argv: Sequence[str] | None = None) -> int:
                 )
         elif args.command == "record-installed":
             record_installed(args.profile, args.state)
+        elif args.command == "link-profile":
+            link_profile(
+                args.profile,
+                source_dir=args.source_dir,
+                target_dir=args.target_dir,
+            )
+        elif args.command == "unlink-profile":
+            unlink_profile(
+                args.profile,
+                source_dir=args.source_dir,
+                target_dir=args.target_dir,
+            )
+        elif args.command == "unlink-retired":
+            unlink_retired(
+                args.ledger,
+                state_path=args.state,
+                source_dir=args.source_dir,
+                target_dir=args.target_dir,
+                include_unowned=args.include_unowned,
+            )
         elif args.command == "forget-profile":
             forget_profile(args.profile, args.state)
         elif args.command == "forget-retired":

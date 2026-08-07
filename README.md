@@ -42,8 +42,14 @@ just uninstall iterative-design
 The `install-packaged` and `uninstall-packaged` aliases accept the same optional
 profile. Installation refreshes shared references from the checkout and uses
 `npx --yes skills` so the CLI can bootstrap noninteractively for GitHub Copilot,
-Codex, Antigravity, and Antigravity CLI. A successful installation also records
-its skill names in host-local state at
+Codex, Antigravity, and Antigravity CLI. The upstream CLI stores these shared
+global skills in `~/.agents/skills`, while Antigravity CLI discovers global
+skills in `~/.gemini/config/skills`. Installation therefore creates a
+per-skill compatibility symlink in the Antigravity directory without replacing
+unrelated entries already there. Uninstall and retired-skill cleanup remove
+only symlinks that still point to their expected Sirius installation.
+
+A successful installation also records its skill names in host-local state at
 `$XDG_STATE_HOME/sirius-skills/managed-skills.txt`, or
 `~/.local/state/sirius-skills/managed-skills.txt` when `XDG_STATE_HOME` is not
 set.
@@ -178,8 +184,8 @@ and judge calibration are opt-in and never run as part of normal validation.
   historical iteration records
 - `scripts/validate_skills.sh`: catalog and collection validation
 - `src/sirius_skills/commands/sync_shared_references.py`: packaging helper
-- `src/sirius_skills/commands/manage_installed_skills.py`: host ownership and
-  retired-installation reconciliation
+- `src/sirius_skills/commands/manage_installed_skills.py`: host ownership,
+  Antigravity compatibility links, and retired-installation reconciliation
 
 ## Consolidation history
 

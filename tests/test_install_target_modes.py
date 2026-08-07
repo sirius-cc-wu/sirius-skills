@@ -84,6 +84,7 @@ def test_install_defaults_to_workflow_profile_and_keeps_reference_sync() -> None
     assert PACKAGED_REPO_SOURCE in output
     assert output.count(f"{NPX_SKILLS} add") == 1
     assert "prune-retired" in output
+    assert "link-profile" in output
     assert "record-installed" in output
     assert "set -euo pipefail" in output
     assert "skill_set='workflow'" in output
@@ -159,6 +160,7 @@ def test_uninstall_defaults_to_workflow_profile() -> None:
     assert "skill_set='workflow'" in output
     assert 'skill-sets/${skill_set}.txt' in output
     assert "prune-retired" in output
+    assert "unlink-profile" in output
     assert "forget-profile" in output
     assert "set -euo pipefail" in output
 
@@ -169,6 +171,7 @@ def test_prune_retired_defaults_to_owned_skills_only() -> None:
     assert "select-retired" in output
     assert "--include-unowned" not in output
     assert f"{NPX_SKILLS} remove" in output
+    assert "unlink-retired" in output
     assert "forget-retired" in output
 
 
@@ -176,6 +179,7 @@ def test_prune_retired_legacy_requires_the_explicit_alias() -> None:
     output = render_just("prune-retired-legacy")
 
     assert "select-retired" in output
+    assert "unlink-retired" in output
     assert "--include-unowned" in output
 
 

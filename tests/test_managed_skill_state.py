@@ -88,6 +88,116 @@ def test_forget_retired_cleans_stale_ownership_entries(tmp_path: Path) -> None:
     assert state_path.read_text(encoding="utf-8") == "current-skill\n"
 
 
+def test_link_profile_exposes_canonical_skills_and_is_idempotent(
+    tmp_path: Path,
+) -> None:
+    profile_path = tmp_path / "profile.txt"
+    source_dir = tmp_path / ".agents" / "skills"
+    target_dir = tmp_path / ".gemini" / "config" / "skills"
+    profile_path.write_text("commit\nsimplify\n", encoding="utf-8")
+    for name in ("commit", "simplify"):
+        (source_dir / name).mkdir(parents=True)
+    target_dir.mkdir(parents=True)
+    (target_dir / "external-skill").mkdir()
+
+    manage_installed_skills.link_profile(
+        profile_path,
+        source_dir=source_dir,
+        target_dir=target_dir,
+    )
+    manage_installed_skills.link_profile(
+        profile_path,
+        source_dir=source_dir,
+        target_dir=target_dir,
+    )
+
+    assert (target_dir / "commit").is_symlink()
+    assert (target_dir / "commit").resolve() == source_dir / "commit"
+    assert (target_dir / "simplify").resolve() == source_dir / "simplify"
+    assert (target_dir / "external-skill").is_dir()
+
+
+def test_link_profile_rejects_conflicts_before_creating_any_links(
+    tmp_path: Path,
+) -> None:
+    profile_path = tmp_path / "profile.txt"
+    source_dir = tmp_path / ".agents" / "skills"
+    target_dir = tmp_path / ".gemini" / "config" / "skills"
+    profile_path.write_text("commit\nsimplify\n", encoding="utf-8")
+    for name in ("commit", "simplify"):
+        (source_dir / name).mkdir(parents=True)
+    (target_dir / "simplify").mkdir(parents=True)
+
+    with pytest.raises(ValueError, match="refusing to replace"):
+        manage_installed_skills.link_profile(
+            profile_path,
+            source_dir=source_dir,
+            target_dir=target_dir,
+        )
+
+    assert not (target_dir / "commit").exists()
+    assert (target_dir / "simplify").is_dir()
+
+
+def test_unlink_profile_removes_only_links_to_expected_canonical_skills(
+    tmp_path: Path,
+) -> None:
+    profile_path = tmp_path / "profile.txt"
+    source_dir = tmp_path / ".agents" / "skills"
+    target_dir = tmp_path / ".gemini" / "config" / "skills"
+    foreign_dir = tmp_path / "foreign"
+    profile_path.write_text("commit\nsimplify\n", encoding="utf-8")
+    for name in ("commit", "simplify"):
+        (source_dir / name).mkdir(parents=True)
+    target_dir.mkdir(parents=True)
+    foreign_dir.mkdir()
+    (target_dir / "commit").symlink_to(source_dir / "commit", target_is_directory=True)
+    (target_dir / "simplify").symlink_to(foreign_dir, target_is_directory=True)
+
+    manage_installed_skills.unlink_profile(
+        profile_path,
+        source_dir=source_dir,
+        target_dir=target_dir,
+    )
+
+    assert not (target_dir / "commit").exists()
+    assert (target_dir / "simplify").is_symlink()
+    assert (target_dir / "simplify").resolve() == foreign_dir
+
+
+def test_unlink_retired_links_respects_ownership_by_default(tmp_path: Path) -> None:
+    ledger_path = tmp_path / "retired-skills.tsv"
+    state_path = tmp_path / "managed-skills.txt"
+    source_dir = tmp_path / ".agents" / "skills"
+    target_dir = tmp_path / ".gemini" / "config" / "skills"
+    write_ledger(ledger_path)
+    state_path.write_text("old-workflow\n", encoding="utf-8")
+    source_dir.mkdir(parents=True)
+    target_dir.mkdir(parents=True)
+    for name in ("design", "old-workflow"):
+        (target_dir / name).symlink_to(source_dir / name, target_is_directory=True)
+
+    manage_installed_skills.unlink_retired(
+        ledger_path,
+        state_path=state_path,
+        source_dir=source_dir,
+        target_dir=target_dir,
+    )
+
+    assert (target_dir / "design").is_symlink()
+    assert not (target_dir / "old-workflow").is_symlink()
+
+    manage_installed_skills.unlink_retired(
+        ledger_path,
+        state_path=state_path,
+        source_dir=source_dir,
+        target_dir=target_dir,
+        include_unowned=True,
+    )
+
+    assert not (target_dir / "design").is_symlink()
+
+
 @pytest.mark.parametrize(
     "line",
     [

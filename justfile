@@ -29,6 +29,8 @@ install skill_set="workflow": sync-shared-references
 	done
 	npx --yes skills add "{{repo_root}}" {{common_flags}} "${skill_flags[@]}"
 	env PYTHONPATH="{{repo_root}}/src" python3 -m sirius_skills.commands.manage_installed_skills \
+		link-profile --profile "$skill_set_file"
+	env PYTHONPATH="{{repo_root}}/src" python3 -m sirius_skills.commands.manage_installed_skills \
 		record-installed --profile "$skill_set_file"
 
 # Compatibility alias for profile installation.
@@ -52,6 +54,8 @@ prune-retired:
 		echo "No owned retired Sirius skills found."
 	fi
 	env PYTHONPATH="{{repo_root}}/src" python3 -m sirius_skills.commands.manage_installed_skills \
+		unlink-retired --ledger "{{retired_ledger}}"
+	env PYTHONPATH="{{repo_root}}/src" python3 -m sirius_skills.commands.manage_installed_skills \
 		forget-retired --ledger "{{retired_ledger}}"
 
 # Explicit migration for installations created before ownership state existed.
@@ -67,6 +71,8 @@ prune-retired-legacy:
 	else
 		echo "No retired Sirius skill names found."
 	fi
+	env PYTHONPATH="{{repo_root}}/src" python3 -m sirius_skills.commands.manage_installed_skills \
+		unlink-retired --ledger "{{retired_ledger}}" --include-unowned
 	env PYTHONPATH="{{repo_root}}/src" python3 -m sirius_skills.commands.manage_installed_skills \
 		forget-retired --ledger "{{retired_ledger}}"
 
@@ -91,6 +97,8 @@ uninstall skill_set="workflow":
 	else
 		echo "No installed skills found for profile: $skill_set"
 	fi
+	env PYTHONPATH="{{repo_root}}/src" python3 -m sirius_skills.commands.manage_installed_skills \
+		unlink-profile --profile "$skill_set_file"
 	env PYTHONPATH="{{repo_root}}/src" python3 -m sirius_skills.commands.manage_installed_skills \
 		forget-profile --profile "$skill_set_file"
 
