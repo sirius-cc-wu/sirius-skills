@@ -14,182 +14,107 @@ knowledge, not software design or an implementation plan.
 
 ## When to Use
 
-- Stakeholder statements, observations, policies, documents, or prototype
-  responses have been gathered but remain difficult to act on together.
-- Evidence conflicts, requested solutions obscure the underlying need, or the
-  relevant decision authority is unclear.
-- Important behavior needs concrete examples or measurable fit criteria before
-  it can be confirmed.
-- A requirement must be played back, corrected, validated, approved, contested,
-  or superseded without losing its source history.
+- Gathered stakeholder evidence needs synthesis, concrete examples, fit
+  criteria, conflict handling, or authority-aware validation.
+- Requirements need correction, approval, contest, or supersession without
+  losing source history.
 - Do not use to collect missing evidence, define project feasibility, write
   detailed use cases, choose architecture, or create implementation tasks.
 
 ## Evidence and Decision Discipline
 
-Read the input evidence and the evidence-record guidance in
+Read the input evidence and
 [Stakeholder Requirements Elicitation](../stakeholder-requirements-elicitation/SKILL.md).
-Reuse source IDs exactly as supplied. Do not rewrite raw notes, collapse
-contradictory accounts, or infer stakeholder approval from agent confidence.
+Reuse source IDs; do not rewrite raw notes, erase contradictions, or convert
+agent confidence into stakeholder approval.
 
 Use these requirement states consistently:
 
-- `candidate`: synthesized but not yet validated by an appropriate stakeholder;
-- `validated`: confirmed as an accurate statement or example by a relevant
-  stakeholder, but not necessarily authorized as a binding decision;
-- `approved`: accepted for the stated revision by the role authorized to make
-  that decision;
-- `contested`: relevant sources or authorities still disagree; and
+- `candidate`: synthesized but not validated by an appropriate stakeholder;
+- `validated`: confirmed accurate by a relevant stakeholder, but not binding;
+- `approved`: accepted for this revision by the authorized role;
+- `contested`: relevant sources or authorities disagree;
 - `superseded`: replaced by a traceable later requirement or decision.
 
 Validation and approval are revision-specific. Record rejection and abstention
-in the decision log without inventing a requirement status that hides what
-happened.
+without inventing a status that hides the outcome.
+
+Every material candidate retains the fields `Source evidence IDs:`,
+`Validation and approval:`, and
+`Status: [candidate | validated | approved | contested | superseded]`, whether
+embedded in an existing owner or written to a standalone brief.
 
 ## Workflow
 
-1. **Bound the synthesis.** Identify the decision or problem being clarified,
-   the exact evidence set and revisions in scope, known coverage gaps, and what
-   this activity will not decide.
-2. **Check readiness.** Confirm that material source IDs, source roles,
-   authority, sensitivity, conflicts, and evidence limits are visible. Route
-   missing evidence or stakeholder access to
+1. **Bound the synthesis.** Name the decision or problem, exact evidence set and
+   revisions, coverage gaps, and non-goals.
+2. **Check readiness.** Confirm source IDs, roles, authority, sensitivity,
+   conflicts, and limits. Route missing evidence or access to
    `stakeholder-requirements-elicitation`; do not simulate it.
-3. **Synthesize without erasing provenance.** Derive candidate goals, current
-   workflows, rules, constraints, quality attributes, scenarios, assumptions,
-   and decisions. Link each statement to its supporting and contradicting
-   source IDs. Keep a requested solution distinct from the outcome or problem
-   it may represent.
-4. **Shape inspectable candidates.** Give each material candidate an opaque ID,
-   precise statement, kind, status, applicable actor or scenario, source links,
-   authority needed, limits, and unresolved questions. Preserve manual IDs and
-   validate them only against repository conventions.
-5. **Make behavior concrete.** Add representative examples and counterexamples,
-   or measurable fit criteria for quality attributes. Label values that still
-   need stakeholder confirmation instead of choosing convenient thresholds.
-6. **Expose conflicts and assumptions.** State which claims disagree, whose
-   authority applies to each decision, the consequence of leaving it open, and
-   the next evidence or decision needed. Availability or seniority alone does
-   not settle a conflict.
-7. **Play back by authority.** Present the smallest coherent set to the roles
-   who can validate its accuracy and approve its decisions. Record the artifact
-   revision, participant role, authority, outcome, corrections, abstentions,
-   and date when known. Apply resulting status changes without rewriting the
-   earlier history.
-8. **Route accepted knowledge.** Update an existing canonical owner where one
-   exists. Route vision, scope, feasibility, and business risks to `inception`;
-   black-box actor goals and scenarios to `use-case-modeling`; domain terms and
-   rules to `domain-modeling`; and cross-cutting quality attributes to a
-   supplementary specification or established equivalent.
-9. **Close or stop visibly.** Produce the discovery brief, requirement records,
-   examples, decision and conflict log, open questions, and handoffs. Stop
-   before software design. If a material decision lacks evidence or an
-   authorized decision-maker, leave it candidate or contested rather than
-   declaring the synthesis ready for implementation.
+3. **Synthesize with provenance.** Derive candidate goals, workflows, rules,
+   constraints, qualities, scenarios, assumptions, and decisions. Link each to
+   supporting and contradicting sources; separate requested solutions from
+   underlying outcomes.
+4. **Shape inspectable candidates.** Record an opaque ID, precise statement,
+   kind, status, context, sources, needed authority, limits, and open questions.
+   Preserve manual IDs and repository validation rules.
+5. **Make behavior concrete.** Add examples, counterexamples, or measurable fit
+   criteria. Label unconfirmed values instead of inventing thresholds.
+6. **Expose conflicts and assumptions.** Record the disagreement, applicable
+   authority, consequence, and next evidence or decision. Availability or
+   seniority does not settle authority.
+7. **Play back by authority.** Present the smallest coherent set to validating
+   and approving roles. Record revision, role, authority, outcome, corrections,
+   abstentions, and known date. Apply status changes without rewriting history.
+8. **Route accepted knowledge.** Update existing canonical owners: vision,
+   scope, feasibility, and risk to `inception`; actor goals and scenarios to
+   `use-case-modeling`; domain terms and rules to `domain-modeling`; and
+   cross-cutting qualities to the established supplementary owner.
+9. **Close or stop visibly.** Produce requirements, examples, decision and
+   conflict history, open questions, and handoffs. Stop before design. Leave
+   unsupported or unauthorized decisions candidate or contested.
 
-When live playback is unavailable, prepare the candidates and playback
-questions, retain their `candidate` or `contested` states, and record the access
-gap. Never manufacture validation, approval, participant quotes, or dates.
+Without live playback, prepare questions, retain `candidate` or `contested`
+states, and record the access gap. Never manufacture validation, approval,
+quotes, or dates.
 
 ## Confidentiality
 
-Carry forward sensitivity, access, retention, and publication constraints.
-Prefer sanitized claims and protected-source links over copying raw personal,
-contractual, or commercially sensitive evidence. Before publishing a discovery
-brief or sending it to an external service, confirm that every included source
-permits that use.
+Carry sensitivity, access, retention, and publication constraints forward.
+Prefer sanitized claims and protected links. Confirm source permission before
+publishing or sending material to an external service.
 
 ## File Output
 
-Before creating a document, apply
+Apply
 [Artifact Selection Budget](../iterative-up-analysis-design/references/artifact-selection-budget.md).
-Prefer updating existing requirements owners. A standalone discovery brief is
-justified when the synthesis, validation history, and conflict log are reused
-together and change independently from raw evidence.
+Prefer existing requirements owners. Create a standalone brief only when its
+synthesis, validation history, and conflict log change independently.
 
 For standalone Markdown, follow
 [Markdown Artifact Frontmatter](../iterative-up-analysis-design/references/markdown-artifact-frontmatter.md)
 and [Readable Technical Artifacts](../iterative-up-analysis-design/references/readable-technical-artifacts.md).
-Use this proportionate shape, omitting empty sections:
-
-```markdown
----
-type: "Requirements Discovery Brief"
-title: "Requirements Discovery: [Problem or Decision]"
-description: "[Synthesis scope and important unresolved consequence]"
-id: "[Stable opaque ID when cross-referenced]"
-status: "[active | completed | completed-with-gaps | blocked | superseded]"
-tags: ["requirements", "validation"]
----
-
-# Requirements Discovery: [Problem or Decision]
-
-## Purpose and Boundary
-
-- Decision informed: [decision]
-- Evidence set: [source IDs and revisions]
-- Coverage limits: [known gaps]
-- Non-goals: [what this synthesis does not decide]
-
-## Synthesized Understanding
-
-- Goal or outcome: [source-linked synthesis]
-- Current workflow: [source-linked synthesis]
-- Material constraints and quality attributes: [source-linked synthesis]
-
-## Candidate Requirements
-
-### [Opaque requirement ID]: [Short name]
-
-- Kind: [goal | workflow | rule | constraint | quality attribute | scenario | decision]
-- Statement: [precise, solution-neutral where possible]
-- Status: [candidate | validated | approved | contested | superseded]
-- Source evidence IDs: [supporting and contradicting IDs]
-- Applies to: [actors, scenarios, data, or boundary]
-- Example or fit criterion: [concrete behavior or measurable result]
-- Validation and approval: [role, authority, revision, outcome, date if known]
-- Limits and open questions: [uncertainty and responsible resolver]
-
-## Validation and Decision Log
-
-| Requirement | Revision | Participant role | Authority | Outcome | Correction or rationale |
-|---|---|---|---|---|---|
-
-## Conflicts and Open Questions
-
-- [conflict, consequence, responsible role, and next evidence or decision]
-
-## Handoffs
-
-- [accepted knowledge, canonical owner, and status]
-```
+When a standalone brief is justified, read and adapt the
+[Requirements Discovery Brief Template](references/requirements-discovery-brief-template.md).
 
 ## Red Flags
 
-- Producing polished requirements with no source IDs or evidence limitations.
-- Treating a sponsor's solution request as the underlying outcome.
-- Marking a requirement approved after playback to someone without authority.
-- Resolving disagreement by majority vote, availability, or organizational rank
-  when a different role owns the decision.
-- Inventing thresholds, examples, business rules, quotes, or approval dates.
-- Copying sensitive raw evidence into a broadly visible brief.
-- Choosing interfaces, data schemas, components, architecture, or implementation
-  tasks.
+- Requirements lack source IDs or evidence limits.
+- A requested solution is treated as the underlying outcome.
+- Validation is treated as approval, or approval comes from the wrong role.
+- Rank, availability, or majority vote substitutes for decision authority.
+- Thresholds, examples, rules, quotes, or dates are invented.
+- Sensitive raw evidence is copied into a broadly visible brief.
+- The synthesis chooses interfaces, schemas, architecture, or implementation.
 
 ## Verification
 
-- [ ] The evidence set, revisions, coverage gaps, and synthesis boundary are
-      explicit.
-- [ ] Every material candidate has an opaque ID, precise statement, status,
-      source links, applicable context, and unresolved limits.
+- [ ] Evidence revisions, coverage gaps, and synthesis boundaries are explicit.
+- [ ] Each candidate has an opaque ID, precise statement, status, sources, context, and limits.
 - [ ] Requested solutions remain distinguishable from goals and evidence.
-- [ ] Concrete examples, counterexamples, or fit criteria are traceable and do
-      not contain invented values.
-- [ ] Validation, rejection, approval, abstention, conflict, and supersession
-      preserve role, authority, revision, and history.
+- [ ] Examples, counterexamples, and fit criteria are traceable and contain no invented values.
+- [ ] Validation, rejection, approval, abstention, conflict, and supersession preserve role, authority, revision, and history.
 - [ ] Confidentiality and publication constraints survive synthesis.
-- [ ] Missing evidence routes back to elicitation; accepted knowledge routes to
-      the smallest canonical requirements owner.
+- [ ] Missing evidence returns to elicitation; accepted knowledge reaches its smallest canonical owner.
 - [ ] The result stops before software design and implementation planning.
-- [ ] A standalone record has one frontmatter block and a reader-oriented
-      opening.
+- [ ] Standalone Markdown has one frontmatter block and a reader-oriented opening.

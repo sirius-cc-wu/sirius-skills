@@ -14,213 +14,118 @@ slice or manufacture the decisions needed to make it look ready.
 
 ## When to Use
 
-- Approved requirements and examples exist, but they span more behavior than
-  one implementation increment should own.
-- Requirements, use cases, contracts, design decisions, and repository facts
-  need one traceable implementation handoff.
-- A coding agent needs explicit in-scope behavior, non-goals, verification, and
-  conditions that require it to stop.
-- A prior implementation brief may be stale because a source revision, status,
-  decision, or repository boundary changed.
+- Approved requirements and examples span more than one implementation
+  increment, or need one traceable handoff with design and repository facts.
+- A coding agent needs explicit scope, non-goals, verification, and stop
+  conditions, or an existing brief may be stale.
 - Do not use to elicit or approve requirements, create missing analysis or
   design, write production code, or execute the implementation workflow.
 
 ## Source and Authority Discipline
 
-Treat approved requirements, examples, and decisions as the oracle for intended
-behavior. Treat repository inspection as evidence about the current codebase,
-not client intent. Preserve opaque identifiers and exact source revisions or
-commit IDs. Approval is revision-specific: a later source change makes the
-dependent brief stale until it is reconciled.
+Treat approved requirements, examples, and decisions as the intended-behavior
+oracle; repository inspection establishes current code facts only. Preserve
+opaque IDs, exact revisions, statuses, approving roles, and supersession links.
+A changed source makes the dependent brief stale until reconciled.
 
-Do not promote `candidate`, `validated`, `contested`, or superseded material to
-an implementation expectation. It may appear only as an explicit exclusion,
-dependency, risk, or stop condition. When approval vocabulary differs, record
-the repository's original state and the evidence that it is authorized for the
-slice.
+Do not promote `candidate`, `validated`, `contested`, superseded, or otherwise
+unauthorized material into implementation expectations. Record it only as an
+exclusion, dependency, risk, or stop condition. Preserve repository-specific
+approval vocabulary and its authorization evidence.
 
-Carry source sensitivity, access, retention, and publication restrictions into
-the handoff. Copy only sanitized requirements and examples whose intended use
-permits implementation briefing. Link to protected evidence without reproducing
-raw participant, contractual, operational, or commercial details. If the brief
-cannot expose enough authorized information for safe implementation, mark it
-blocked and route the publication or access decision to its owner.
+Carry sensitivity, access, retention, and publication restrictions forward.
+Copy only authorized sanitized requirements and examples.
+Link to protected evidence without reproducing it. Mark the brief blocked when
+an implementer cannot receive enough authorized information, and route the
+access or publication decision to its owner.
 
 ## Readiness Gate
 
-A slice is ready only when all behavior it requires has:
+A slice is ready only when it has:
 
-- an approved outcome and system boundary;
-- approved scenarios, examples, rules, constraints, and quality expectations
-  needed to determine success and important failure behavior;
-- the necessary analysis or design decisions for its implementation boundary;
-- exact source status and revision links;
-- a repository revision and verified current entry points, tests, conventions,
-  and commands; and
-- no unresolved question whose answer could materially change expected
-  behavior, data handling, authorization, irreversible effects, or architecture.
+- an approved outcome, boundary, success and important failure behavior;
+- approved examples, rules, constraints, quality expectations, and necessary
+  design decisions;
+- exact source status and revision links plus a fixed repository revision with
+  verified entry points, tests, conventions, and commands; and
+- no unresolved question that could materially change behavior, data handling,
+  authorization, irreversible effects, or architecture.
 
-If the larger feature fails this gate, shrink to a coherent ready slice when
-one still produces a testable actor or business outcome. Otherwise issue a
-blocked brief or stop without creating one. Never call a layer-only task such
-as “add the schema” a vertical slice merely because it avoids the open rule.
+If the feature fails this gate, shrink to a coherent actor- or business-visible
+outcome. Otherwise issue a blocked brief or stop. A layer-only task such as
+“add the schema” is not a vertical slice.
 
 ## Workflow
 
-1. **Name the handoff decision.** State the intended implementer, user or
-   business outcome, repository boundary, and why a new or revised brief is
-   needed.
+1. **Name the handoff.** State the implementer, observable outcome, repository
+   boundary, and why a new or revised brief is needed.
 2. **Inventory authoritative inputs.** List approved requirements, examples,
-   non-goals, use cases, contracts, design decisions, policies, and quality
-   constraints with exact IDs, revisions, statuses, approving roles, and known
-   supersession links.
+   non-goals, contracts, decisions, policies, and constraints with their IDs,
+   revisions, statuses, authorities, and supersession links.
 3. **Apply the readiness gate.** Trace every needed expectation to an authorized
    source. Classify gaps rather than filling them: missing evidence or business
    rules go to `requirements-synthesis-validation`; scope or feasibility to
    `inception`; black-box behavior to `use-case-modeling` or
    `operation-contracts`; architecture or responsibility decisions to the
    relevant design skill.
-4. **Select one vertical behavior slice.** Choose an actor-visible or
-   business-visible outcome with its necessary success path, important failure
-   behavior, rules, and constraints. Exclude unrelated behavior and any portion
-   that depends on an unresolved decision. Explain why the slice remains
+4. **Select one vertical slice.** Choose one observable outcome with its
+   necessary success path, important failure behavior, rules, and constraints.
+   Exclude unrelated or unresolved behavior and explain why the remainder is
    coherent and testable.
 5. **Inspect the repository read-only.** Follow local governance. Record the
-   exact revision, existing public boundaries, related code and tests,
-   configuration, data migrations, verification commands, and current
-   constraints. Label these as repository facts and separate inference. Do not
-   change code while briefing.
-6. **Assemble the behavior contract.** Restate only approved in-scope behavior,
-   examples, rules, quality attributes, and non-goals without strengthening or
-   weakening them. Link every expectation to its source ID, revision, and
-   status.
-7. **Package existing design inputs.** Include only decisions already needed
-   and approved for the selected boundary. If implementation requires a missing
-   interface, ownership, persistence, security, or architecture decision, stop
-   and route it instead of proposing one in the brief.
-8. **Define verification and stops.** Identify approved examples or contracts
-   that can serve as independent oracles, established repository commands, and
-   required focused and regression evidence. State concrete conditions under
-   which the coding agent must stop rather than guess.
-9. **Check freshness and hand off.** Verify every source still has the recorded
-   revision and status, every trace resolves, and no excluded issue leaks into
-   scope. Mark the brief `ready`, `blocked`, `stale`, or `superseded`, then hand
-   a ready brief to `test-driven-implementation`.
+   exact revision, public boundaries, related code, tests, configuration,
+   migrations, commands, and constraints. Separate facts from inference; do not
+   change code.
+6. **Assemble the behavior contract.** Restate approved in-scope behavior,
+   examples, rules, qualities, and non-goals without changing their meaning.
+   Link each expectation to its source ID, revision, and status.
+7. **Package existing design inputs.** Include only approved decisions needed
+   for the boundary. Stop and route any missing interface, ownership,
+   persistence, security, or architecture decision.
+8. **Define verification and stops.** Name independent approved oracles,
+   established focused and regression commands, required evidence, and concrete
+   conditions under which the coding agent must stop.
+9. **Check freshness and hand off.** Verify source revisions, statuses, traces,
+   and exclusions. Mark the brief `ready`, `blocked`, `stale`, or `superseded`;
+   hand only a ready brief to `test-driven-implementation`.
 
 ## File Output
 
-Before creating a document, apply
+Apply
 [Artifact Selection Budget](../iterative-up-analysis-design/references/artifact-selection-budget.md).
-Prefer an existing issue, work item, or feature artifact when it can own the
-same bounded contract and lifecycle. A standalone brief is justified when an
-implementation slice needs independent assignment, freshness, and completion.
+Prefer an existing issue, work item, or feature artifact. Create a standalone
+brief only for independent assignment, freshness, and completion.
 
 For standalone Markdown, follow
 [Markdown Artifact Frontmatter](../iterative-up-analysis-design/references/markdown-artifact-frontmatter.md)
 and [Readable Technical Artifacts](../iterative-up-analysis-design/references/readable-technical-artifacts.md).
-Use this proportionate shape, omitting empty sections:
+When a standalone brief is justified, read and adapt the
+[Implementation Slice Brief Template](references/implementation-slice-brief-template.md).
 
-```markdown
----
-type: "Implementation Slice Brief"
-title: "Implementation Slice: [Observable Outcome]"
-description: "[Behavior delivered and important boundary]"
-id: "[Stable opaque brief ID when cross-referenced]"
-status: "[ready | blocked | stale | superseded]"
-tags: ["implementation", "brief"]
----
-
-# Implementation Slice: [Observable Outcome]
-
-## Outcome and Boundary
-
-- Actor or business outcome: [approved result]
-- In scope: [coherent behavior]
-- Non-goals: [explicit exclusions]
-- Slice rationale: [why this is vertical, testable, and appropriately sized]
-
-## Source Baseline
-
-| Source | Revision | Status | Authority | Used for |
-|---|---|---|---|---|
-
-## Approved Behavior and Examples
-
-1. [Main behavior or approved concrete example]
-2. [Important alternate or failure behavior]
-
-## Rules, Constraints, and Quality Expectations
-
-- [approved rule or constraint with source]
-
-## Existing Design Inputs
-
-- [approved boundary, responsibility, interface, or decision with source]
-
-## Repository Context
-
-- Revision: [commit or other stable revision]
-- Existing boundaries and files: [verified repository facts]
-- Related verification: [tests, commands, and conventions]
-- Inferences: [clearly labeled, or none]
-
-## Traceability
-
-| Brief expectation | Source ID | Revision and status | Notes |
-|---|---|---|---|
-
-## Verification Handoff
-
-- Independent oracle: [approved example, use case, contract, invariant]
-- Focused verification: [established boundary and command]
-- Regression verification: [established command]
-
-## Coding-Agent Stop Conditions
-
-- Stop and route to [owner] if [material missing or changed condition].
-
-## Readiness
-
-- Status: [ready | blocked | stale | superseded]
-- Remaining exclusions and dependencies: [items not authorized for this slice]
-```
+Whether embedded or standalone, retain the source baseline fields
+`Source | Revision | Status | Authority | Used for`, the instruction
+`Stop and route to [owner]`, and independent-oracle, focused-verification,
+regression-verification, readiness, exclusion, and dependency fields.
 
 ## Red Flags
 
-- Calling a feature, UI shell, database migration, or service layer a vertical
-  slice without an observable outcome.
-- Copying candidate, contested, or superseded material into in-scope behavior.
-- Writing new acceptance criteria, examples, rules, thresholds, or non-goals
-  that no source approved.
-- Mixing repository facts with client-provided requirements or treating current
-  code as proof of desired behavior.
-- Copying protected raw evidence into a broadly visible implementation brief.
-- Proposing architecture, interfaces, schemas, or component ownership to make a
-  blocked brief appear executable.
-- Omitting source revisions, approval state, important failure behavior,
-  verification, or coding-agent stop conditions.
-- Modifying production or test files while the task is only to create a brief.
+- A layer, migration, or shell is called vertical without an observable outcome.
+- Unauthorized material becomes in-scope behavior, or new rules are invented.
+- Repository facts are confused with intended behavior or agent inference.
+- Protected raw evidence is copied into a broadly visible brief.
+- Missing architecture or design is invented to make a blocked brief executable.
+- Revisions, approval, failure behavior, verification, or stops are omitted.
+- Production or tests change while the task is only briefing.
 
 ## Verification
 
-- [ ] The slice produces one coherent actor-visible or business-visible outcome
-      and includes its necessary failure behavior and constraints.
-- [ ] Every in-scope expectation traces to an approved source ID, exact
-      revision, status, and appropriate authority.
-- [ ] Candidate, contested, superseded, and stale material appears only as an
-      exclusion, risk, dependency, or stop condition.
-- [ ] Approved examples and rules retain their original meaning; no thresholds,
-      business rules, architecture, or acceptance conditions were invented.
-- [ ] Repository facts are revision-fixed and distinguishable from intended
-      behavior and agent inference.
-- [ ] Source sensitivity, access, retention, and publication restrictions
-      remain enforceable without copying protected raw evidence.
-- [ ] Existing design inputs are sufficient for the slice or the brief is
-      blocked and routed to the appropriate design skill.
-- [ ] Verification names an independent oracle and established focused and
-      regression commands without claiming unexecuted results.
+- [ ] One coherent observable outcome includes necessary failure behavior and constraints.
+- [ ] Every expectation traces to an approved source ID, revision, status, and authority.
+- [ ] Unauthorized material appears only as an exclusion, risk, dependency, or stop.
+- [ ] No rule, threshold, architecture, or acceptance condition was invented.
+- [ ] Repository facts, intended behavior, and inference remain distinct.
+- [ ] Source handling restrictions remain enforceable without exposing raw evidence.
+- [ ] Missing design blocks the brief and is routed instead of being invented.
+- [ ] Verification names independent oracles and established commands without claiming results.
 - [ ] Source-change and unresolved-decision stop conditions are concrete.
-- [ ] Only the brief or its existing owner changed; implementation was not
-      performed.
-- [ ] A standalone brief has one frontmatter block and a reader-oriented
-      opening.
+- [ ] Only the brief or existing owner changed; standalone Markdown follows repository guidance and has a reader-oriented opening.

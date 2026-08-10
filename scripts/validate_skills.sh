@@ -233,7 +233,13 @@ template_types=(
 for entry in "${template_types[@]}"; do
   name="${entry%%|*}"
   type="${entry#*|}"
-  grep -q "^type: \"$type\"$" "$root/skills/$name/SKILL.md" || fail "$name template missing type: $type"
+  template_files=("$root/skills/$name/SKILL.md")
+  if [[ -d "$root/skills/$name/references" ]]; then
+    while IFS= read -r reference; do
+      template_files+=("$reference")
+    done < <(find "$root/skills/$name/references" -maxdepth 1 -type f -name '*.md' -print)
+  fi
+  grep -q "^type: \"$type\"$" "${template_files[@]}" || fail "$name template missing type: $type"
 done
 
 grep -q "^# Skill Catalog$" "$skill_catalog" || fail "skill catalog missing title"

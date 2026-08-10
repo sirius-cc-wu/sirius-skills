@@ -107,13 +107,14 @@ the content and recommends one next Sirius skill without rewriting the source
 or automatically executing the handoff.
 
 Use `author-software-proposal` when technical discussions, findings, incidents,
-or candidate changes need a decision-ready proposal. It separates current
-evidence from proposed behavior and stops before approval, implementation,
-commit, or publication unless those actions are separately authorized. It
-preserves an established proposal location; otherwise, the
+or candidate changes need a decision-seeking artifact. For one focused,
+consequential choice it prefers a proposed decision record or ADR; broader
+exploration keeps a software proposal. It separates current evidence from
+proposed behavior and stops before approval, implementation, commit, or
+publication unless those actions are separately authorized. It preserves an
+established decision or proposal location; otherwise, the
 [artifact layout guidance](skills/iterative-up-analysis-design/references/artifact-layouts.md#proposal-placement)
-selects a proposal collection or feature/product-area co-location according to
-how reviewers navigate the repository.
+selects the repository location according to how reviewers navigate it.
 
 The [repository structure and skill-relationship comparison](catalog/agent-skill-repository-structures.md)
 uses PlantUML views to show how two related projects organize skill authoring,

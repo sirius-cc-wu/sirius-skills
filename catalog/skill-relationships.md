@@ -84,12 +84,14 @@ The gray nodes belong to Addy Osmani's external `agent-skills` collection, not
 the Sirius catalog or installation profiles. They make one common composition
 visible: `interview-me` confirms the requester's actual intent, `idea-refine`
 turns that intent into a focused and user-confirmed idea one-pager, and
-`author-software-proposal` turns that input into a decision-ready software
-proposal. If the intent is already concrete, `idea-refine` can be skipped.
+`author-software-proposal` turns that input into one decision-seeking artifact:
+a proposed decision record for one focused choice or a software proposal for
+broader exploration. If the intent is already concrete, `idea-refine` can be
+skipped.
 
-The proposal still requires review by the responsible authority. The dashed
-edge to `assess-development-input` applies only when the reviewed proposal's
-next Sirius owner remains unclear.
+The resulting artifact still requires review by the responsible authority.
+The dashed edge to `assess-development-input` applies only when the reviewed
+artifact's next Sirius owner remains unclear.
 
 The Sirius groups are navigation aids, not installation profiles or lifecycle
 gates. The diagrams that follow show the internal choices and conditional
@@ -148,16 +150,20 @@ to the client-discovery skills.
 ## Software proposal authoring
 
 `author-software-proposal` turns technical discussions, findings, incidents,
-candidate changes, or an existing draft into a decision-ready proposal. It
-separates current evidence from proposed intent, makes alternatives and risks
-reviewable, and defines acceptance evidence without implying that the proposal
-has been accepted. The responsible authority reviews the draft outside the
-skill. After that review, `assess-development-input` can select a Sirius owner
-when the next step remains unclear.
+candidate changes, or an existing draft into one decision-seeking artifact. It
+uses a proposed decision record for one focused consequential choice and a
+software proposal when broader exploration or several decisions need review.
+It separates current evidence from proposed intent, makes alternatives and
+risks reviewable, and defines acceptance evidence without implying acceptance.
+The responsible authority reviews the draft outside the skill. After that
+review, `assess-development-input` can select a Sirius owner when the next
+step remains unclear.
 
-Proposal authoring is not a substitute for inception, requirements discovery,
-current-system recovery, or an accepted decision record. It may expose a need
-for any of those owners and stop at that boundary.
+Decision-seeking authoring is not a substitute for inception, requirements
+discovery, current-system recovery, or an accepted decision record. It may
+expose a need for any of those owners and stop at that boundary. It should not
+create both a proposal and a proposed decision record for the same focused
+choice unless their audiences or lifecycles differ.
 
 ## Reverse engineering
 
