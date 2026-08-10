@@ -13,10 +13,11 @@ implementation, or an external prerequisite.
 Use
 [`author-software-proposal`](../../skills/author-software-proposal/SKILL.md)
 when technical discussions, findings, incidents, or candidate changes need a
-direction reviewed before further design or implementation. Proposal authoring
-is optional rather than the first step of every iteration. It produces or
-substantively revises a draft; it does not accept the proposal or execute its
-handoff.
+direction reviewed before further design or implementation. For one focused,
+consequential choice it prefers a proposed decision record or ADR; broader
+exploration uses a software proposal. Authoring is optional rather than the
+first step of every iteration. It produces or substantively revises a draft;
+it does not accept the artifact or execute its handoff.
 
 ## Sequence
 
