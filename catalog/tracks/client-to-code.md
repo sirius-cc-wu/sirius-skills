@@ -24,17 +24,20 @@ performed by this track.
    case, scope, feasibility, and major risks.
 4. [`use-case-modeling`](../../skills/use-case-modeling/SKILL.md) expresses
    validated actor goals and black-box behavior.
-5. The
+5. [`behavior-driven-specification`](../../skills/behavior-driven-specification/SKILL.md)
+   makes selected behavior concrete through shared examples and acceptance
+   scenarios.
+6. The
    [iterative analysis and design track](iterative-analysis-design.md) supplies
    only the downstream artifacts needed for the selected risk and behavior
    slice.
-6. [`implementation-slice-briefing`](../../skills/implementation-slice-briefing/SKILL.md)
+7. [`implementation-slice-briefing`](../../skills/implementation-slice-briefing/SKILL.md)
    assembles approved decisions, visible uncertainty, acceptance examples,
    non-goals, trace links, and verification expectations.
-7. The
+8. The
    [implementation and evolution track](implementation-evolution.md) turns the
    brief into verified production behavior.
-8. Delivery evidence and stakeholder feedback refine the canonical
+9. Delivery evidence and stakeholder feedback refine the canonical
    requirements and design artifacts.
 
 ## Handoff Rule

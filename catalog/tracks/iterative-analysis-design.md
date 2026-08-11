@@ -27,19 +27,22 @@ it does not accept the artifact or execute its handoff.
    feasibility, business case, and major risks.
 3. [`use-case-modeling`](../../skills/use-case-modeling/SKILL.md) identifies
    actors, goals, scenarios, and related requirements.
-4. [`domain-modeling`](../../skills/domain-modeling/SKILL.md) captures
+4. [`behavior-driven-specification`](../../skills/behavior-driven-specification/SKILL.md)
+   turns approved or explicitly candidate behavior into concrete examples and
+   observable acceptance scenarios.
+5. [`domain-modeling`](../../skills/domain-modeling/SKILL.md) captures
    conceptual classes, associations, and attributes.
-5. [`system-sequence-diagrams`](../../skills/system-sequence-diagrams/SKILL.md)
+6. [`system-sequence-diagrams`](../../skills/system-sequence-diagrams/SKILL.md)
    identifies actor-system events.
-6. [`operation-contracts`](../../skills/operation-contracts/SKILL.md) specifies
+7. [`operation-contracts`](../../skills/operation-contracts/SKILL.md) specifies
    non-trivial system-operation effects.
-7. [`grasp-responsibility-design`](../../skills/grasp-responsibility-design/SKILL.md)
+8. [`grasp-responsibility-design`](../../skills/grasp-responsibility-design/SKILL.md)
    assigns object responsibilities.
-8. [`use-case-realization`](../../skills/use-case-realization/SKILL.md) designs
+9. [`use-case-realization`](../../skills/use-case-realization/SKILL.md) designs
    object collaborations for selected scenarios.
-9. [`uml-class-diagram-design`](../../skills/uml-class-diagram-design/SKILL.md)
+10. [`uml-class-diagram-design`](../../skills/uml-class-diagram-design/SKILL.md)
    summarizes the resulting software design.
-10. [`design-pattern-application`](../../skills/design-pattern-application/SKILL.md)
+11. [`design-pattern-application`](../../skills/design-pattern-application/SKILL.md)
     addresses justified creation, structure, communication, or variation
     pressures.
 

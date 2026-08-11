@@ -6,7 +6,7 @@ reduce the current risk or complete the current behavior slice.
 
 ## Bird's-eye view
 
-This view groups all 28 deployable Sirius skills by responsibility and shows
+This view groups all 29 deployable Sirius skills by responsibility and shows
 two optional external intent-shaping skills at the boundary. It shows only the
 main movement between groups so readers can locate a starting point before
 using the detailed views below. Solid arrows are normal handoffs, not a
@@ -49,7 +49,7 @@ rectangle "**Client Discovery**\nstakeholder-requirements-elicitation\nrequireme
 
 rectangle "**Reverse Engineering**\nreverse-engineer-software-system\nsurvey-existing-system\nrecover-system-behavior\nreconstruct-software-architecture\nreconcile-recovered-design" as reverse #EAF4FB
 
-rectangle "**Iterative Analysis and Design**\niterative-up-analysis-design\ninception\nuse-case-modeling\ndomain-modeling\nsystem-sequence-diagrams\noperation-contracts\ngrasp-responsibility-design\nuse-case-realization\numl-class-diagram-design\ndesign-pattern-application" as design #EEF8EE
+rectangle "**Iterative Analysis and Design**\niterative-up-analysis-design\ninception\nuse-case-modeling\nbehavior-driven-specification\ndomain-modeling\nsystem-sequence-diagrams\noperation-contracts\ngrasp-responsibility-design\nuse-case-realization\numl-class-diagram-design\ndesign-pattern-application" as design #EEF8EE
 
 rectangle "**Implementation and Evolution**\ntest-driven-implementation\nbehavior-preserving-refactoring" as implementation #FFF5EA
 
@@ -242,6 +242,7 @@ rectangle "iterative-up-analysis-\ndesign" as iterative <<coordinator>>
 package "Requirements and analysis" #EEF8EE {
   rectangle "inception" as inception
   rectangle "use-case-modeling" as usecases
+  rectangle "behavior-driven-\nspecification" as behavior
   rectangle "domain-modeling" as domain
   rectangle "system-sequence-diagrams" as ssd
   rectangle "operation-contracts" as contracts
@@ -256,8 +257,10 @@ package "Object design" #F3EEFF {
 
 iterative --> inception
 inception --> usecases
+usecases --> behavior
 usecases --> domain
 usecases --> ssd
+behavior ..> contracts : clarify observable effects
 domain ..> contracts : refine vocabulary
 ssd --> contracts
 domain --> grasp
@@ -434,7 +437,8 @@ All three client-discovery skills in this optional handoff are deployable:
 ```text
 stakeholder-requirements-elicitation
   → requirements-synthesis-validation
-  → inception, use-case modeling, and selected analysis/design
+  → inception, use-case modeling, behavior-driven-specification when examples
+    are needed, and selected analysis/design
   → implementation-slice-briefing
   → test-driven-implementation
 ```

@@ -25,6 +25,7 @@ The initial pilot covers:
 - `iterative-up-analysis-design`;
 - `operation-contracts`;
 - `use-case-modeling`;
+- `behavior-driven-specification`;
 - `test-driven-implementation`;
 - `recover-system-behavior`;
 - `reconcile-recovered-design`;

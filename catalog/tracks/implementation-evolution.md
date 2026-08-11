@@ -13,15 +13,19 @@ before entering this track.
 
 1. Start with an approved use case, operation contract, acceptance example,
    invariant, defect report, or other independent oracle.
-2. Use
+2. If the approved behavior lacks shared examples or has important boundary
+   cases, use
+   [`behavior-driven-specification`](../../skills/behavior-driven-specification/SKILL.md)
+   before implementation.
+3. Use
    [`software-design-language-adaptation`](../../skills/software-design-language-adaptation/SKILL.md)
    when language-specific ownership, errors, concurrency, or interface
    conventions affect the design.
-3. Use
+4. Use
    [`test-driven-implementation`](../../skills/test-driven-implementation/SKILL.md)
    to size the behavior slice, demonstrate discriminatory verification, and
    implement the smallest coherent change.
-4. Feed implementation discoveries back into durable requirements or design
+5. Feed implementation discoveries back into durable requirements or design
    artifacts when their represented knowledge changes.
 
 Keep verification evidence with code, tests, schemas, or configuration by

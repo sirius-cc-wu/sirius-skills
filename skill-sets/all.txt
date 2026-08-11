@@ -16,6 +16,7 @@ requirements-synthesis-validation
 implementation-slice-briefing
 inception
 use-case-modeling
+behavior-driven-specification
 domain-modeling
 system-sequence-diagrams
 operation-contracts
