@@ -1,0 +1,4 @@
+interface:
+  display_name: "Design Rust Lifecycles"
+  short_description: "Design ownership-safe Rust resource lifecycles"
+  default_prompt: "Use $design-rust-lifecycles to design this Rust lifecycle with explicit ownership, startup, rollback, cancellation, and cleanup."

@@ -140,11 +140,13 @@ canonical artifacts, and requires new files to demonstrate value, distinct
 ownership, and an independent lifecycle. Layout and Markdown guidance lives in
 the references owned by `iterative-up-analysis-design`.
 
-The original analysis and design skills distill workflows from Craig Larman's
-*Applying UML and Patterns*. Reverse-engineering skills also draw from software
-reengineering, architecture reconstruction, architecture documentation, and
-code-reading sources. See the [Source Catalog](catalog/sources.md) for
-provenance.
+The original analysis and object-design skills distill workflows from Craig
+Larman's *Applying UML and Patterns*. Rust lifecycle design adds
+ownership-driven preparation, resource transfer, rollback, cancellation,
+supervision, and fallible cleanup. Reverse-engineering skills also draw from
+software reengineering, architecture reconstruction, architecture
+documentation, and code-reading sources. See the
+[Source Catalog](catalog/sources.md) for provenance.
 
 ## Validation
 

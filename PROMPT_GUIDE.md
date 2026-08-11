@@ -72,6 +72,13 @@ design.
 ```
 
 ```text
+Use design-rust-lifecycles to turn this approved validation-run behavior into
+an ownership-safe Rust lifecycle. Define preparation, resource transfer,
+readiness, partial-start rollback, cancellation, and fallible cleanup without
+introducing speculative traits or typestate.
+```
+
+```text
 Use test-driven-implementation to add this behavior from the approved examples.
 Demonstrate that the focused checks detect the missing behavior, then run the
 relevant regression suite.

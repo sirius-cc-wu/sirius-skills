@@ -51,6 +51,13 @@ Use
 alongside responsibility design, realizations, patterns, and implementation
 when the implementation language is known.
 
+Use
+[`design-rust-lifecycles`](../../skills/design-rust-lifecycles/SKILL.md)
+when Rust ownership, resource transfer, staged startup, rollback, cancellation,
+supervision, or fallible cleanup is a central design risk. It produces one
+implementation-facing lifecycle design rather than a parallel document for
+each conceptual collaborator.
+
 ## Iteration Rule
 
 This is a dependency-oriented sequence, not a requirement to create every

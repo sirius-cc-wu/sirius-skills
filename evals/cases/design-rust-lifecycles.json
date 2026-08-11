@@ -1,0 +1,51 @@
+{
+  "skill_name": "design-rust-lifecycles",
+  "trigger": {
+    "positive": [
+      {
+        "prompt": "Design the Rust ownership lifecycle for reserved sockets, child tasks, partial startup rollback, cancellation, and fallible cleanup",
+        "top_k": 3
+      },
+      {
+        "prompt": "Decide how this prepared Rust service should transfer resource handles into a running state and preserve the startup error when cleanup also fails",
+        "top_k": 3
+      },
+      {
+        "prompt": "Model an async Rust supervisor so processes and tasks cannot outlive their run and every cancellation point has a defined cleanup owner",
+        "top_k": 3
+      }
+    ],
+    "negative": [
+      {
+        "prompt": "Translate this GRASP controller and strategy design into idiomatic TypeScript constructs",
+        "owner": "software-design-language-adaptation"
+      },
+      {
+        "prompt": "Specify submitOrder postconditions for created domain objects, new associations, attribute changes, and required non-creations",
+        "owner": "operation-contracts"
+      }
+    ]
+  },
+  "evals": [
+    {
+      "id": "resource-owned-validation-run",
+      "prompt": "Create an implementation-facing Rust lifecycle design for this approved validation-run behavior. Cover preparation, ownership transfer, readiness, partial-start rollback, async cancellation, explicit completion and abort, emergency Drop behavior, and verification obligations. Prefer one existing design artifact if it already owns this lifecycle.",
+      "expected_output": "One traceable Rust lifecycle design makes ownership, transitions, failure, cancellation, and cleanup explicit without inventing product behavior or speculative abstractions.",
+      "expectations": [
+        "Every material resource has an owner, transfer point, explicit release, and bounded Drop fallback",
+        "Preparation and the externally visible startup boundary are distinct",
+        "Partial failure and cancellation preserve the primary result while reporting cleanup failures",
+        "Traits and typestate are selected only for demonstrated variation or transition risk"
+      ],
+      "prohibitions": [
+        "Do not invent business, protocol, or compatibility behavior",
+        "Do not create one class, struct, trait, or document per conceptual collaborator",
+        "Do not implement production code"
+      ],
+      "allowed_mutations": [
+        "docs/**"
+      ],
+      "trust_level": "provisional"
+    }
+  ]
+}

@@ -22,10 +22,15 @@ before entering this track.
    when language-specific ownership, errors, concurrency, or interface
    conventions affect the design.
 4. Use
+   [`design-rust-lifecycles`](../../skills/design-rust-lifecycles/SKILL.md)
+   before implementation when Rust resource ownership, startup, rollback,
+   cancellation, supervision, or fallible cleanup requires an explicit
+   implementation-facing lifecycle.
+5. Use
    [`test-driven-implementation`](../../skills/test-driven-implementation/SKILL.md)
    to size the behavior slice, demonstrate discriminatory verification, and
    implement the smallest coherent change.
-5. Feed implementation discoveries back into durable requirements or design
+6. Feed implementation discoveries back into durable requirements or design
    artifacts when their represented knowledge changes.
 
 Keep verification evidence with code, tests, schemas, or configuration by

@@ -16,5 +16,6 @@ use-case-realization
 uml-class-diagram-design
 design-pattern-application
 software-design-language-adaptation
+design-rust-lifecycles
 test-driven-implementation
 behavior-preserving-refactoring

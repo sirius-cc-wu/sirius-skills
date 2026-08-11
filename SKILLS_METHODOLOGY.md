@@ -88,7 +88,9 @@ durable policy gap.
 5. Assign responsibilities and collaborations with GRASP and use-case
    realization; summarize stable structure with design class diagrams.
 6. Apply patterns and language adaptation only when concrete design forces
-   justify them.
+   justify them. Use `design-rust-lifecycles` when Rust ownership, resource
+   transfer, startup, rollback, cancellation, or fallible cleanup is itself a
+   material design problem.
 7. Use `implementation-slice-briefing` when an unfamiliar implementer needs one
    ready vertical slice assembled from approved requirements, examples, design
    inputs, and revision-fixed repository facts.

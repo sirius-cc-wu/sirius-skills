@@ -6,7 +6,7 @@ reduce the current risk or complete the current behavior slice.
 
 ## Bird's-eye view
 
-This view groups all 29 deployable Sirius skills by responsibility and shows
+This view groups all 30 deployable Sirius skills by responsibility and shows
 two optional external intent-shaping skills at the boundary. It shows only the
 main movement between groups so readers can locate a starting point before
 using the detailed views below. Solid arrows are normal handoffs, not a
@@ -55,7 +55,7 @@ rectangle "**Implementation and Evolution**\ntest-driven-implementation\nbehavio
 
 rectangle "**Repository Workflow**\nsimplify\ncommit\ncreate-pr\ngovernance-update" as repository #F3EEFF
 
-rectangle "**Cross-cutting Support**\nsoftware-design-language-adaptation\nrewrite-technical-artifacts" as support #FFFBEA
+rectangle "**Cross-cutting Support**\nsoftware-design-language-adaptation\ndesign-rust-lifecycles\nrewrite-technical-artifacts" as support #FFFBEA
 
 proposal -[hidden]right-> assess
 assess -[hidden]right-> discovery
@@ -428,6 +428,7 @@ keeps the diagrams readable without changing where they apply.
 | Skill | Use with | Selection trigger |
 |---|---|---|
 | `software-design-language-adaptation` | `grasp-responsibility-design`, `use-case-realization`, `uml-class-diagram-design`, `design-pattern-application`, and `test-driven-implementation` | Language-specific ownership, errors, concurrency, lifecycle, or interface conventions affect the design |
+| `design-rust-lifecycles` | Approved scenarios and contracts, responsibility design, language adaptation, implementation briefing, and Rust implementation | Ownership, capability transfer, staged startup, readiness, rollback, cancellation, supervision, or fallible cleanup creates a material Rust design risk |
 | `rewrite-technical-artifacts` | Recovered artifacts, iterative-design artifacts, behavior-slice evidence, and refactoring records | The knowledge is sound but its reading order or progressive disclosure needs improvement |
 
 ## Client discovery upstream path

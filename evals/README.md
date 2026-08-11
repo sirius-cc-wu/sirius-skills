@@ -24,6 +24,7 @@ The initial pilot covers:
 - `implementation-slice-briefing`;
 - `iterative-up-analysis-design`;
 - `operation-contracts`;
+- `design-rust-lifecycles`;
 - `use-case-modeling`;
 - `behavior-driven-specification`;
 - `test-driven-implementation`;
