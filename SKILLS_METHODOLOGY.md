@@ -10,7 +10,7 @@ following every step in it.
 | Need | Profile |
 |---|---|
 | Refine, record, and publish repository changes | `workflow` |
-| Assess external development inputs, author software proposals, discover requirements, and move through analysis, object design, implementation, and refactoring | `iterative-design` |
+| Assess external development inputs, author software proposals, and run question-driven analysis, design, implementation, simplification, and scoped-commit iterations | `iterative-design` |
 | Recover current behavior and architecture from an existing system | `reverse-engineering` |
 | Make the entire catalog available | `all` |
 
@@ -75,27 +75,35 @@ durable policy gap.
 
 ### Design and implement iteratively
 
-1. Use `iterative-up-analysis-design` to coordinate risk-sized iterations and
-   durable artifacts.
+1. Use `run-development-iteration` to execute one approved, risk-sized
+   iteration, validate it, create one authorized commit, and stop.
 2. Use `stakeholder-requirements-elicitation` when the affected roles, current
    work, authority, or evidence coverage is unclear.
 3. Use `requirements-synthesis-validation` to turn an identified evidence set
    into source-linked candidate requirements, concrete examples, and
    authority-aware validation states.
-4. Select requirements and analysis skills according to the uncertainty:
-   inception, use cases, domain modeling, system sequence diagrams, and
-   operation contracts.
-5. Assign responsibilities and collaborations with GRASP and use-case
-   realization; summarize stable structure with design class diagrams.
-6. Apply patterns and language adaptation only when concrete design forces
-   justify them. Use `design-rust-lifecycles` when Rust ownership, resource
-   transfer, startup, rollback, cancellation, or fallible cleanup is itself a
-   material design problem.
+4. Select requirements and analysis skills from the current uncertainty:
+   scope, behavior, examples, vocabulary, system events, or state effects.
+5. Use `iterative-up-analysis-design` only when a team explicitly wants UP
+   phase framing or a multi-iteration use-case and object-design plan. Select
+   GRASP, realizations, class diagrams, and patterns only when their questions
+   or design forces are present.
+6. Use `software-design-language-adaptation` when implementation-facing design
+   must reflect a target language. Use `design-rust-lifecycles` when Rust
+   ownership, resource transfer, startup, rollback, cancellation, or fallible
+   cleanup is itself a material design problem. Add future language
+   specialists by demonstrated design pressure, not by completing a language
+   matrix.
 7. Use `implementation-slice-briefing` when an unfamiliar implementer needs one
    ready vertical slice assembled from approved requirements, examples, design
    inputs, and revision-fixed repository facts.
 8. Use `test-driven-implementation` for behavior changes and
    `behavior-preserving-refactoring` for verified structural improvement.
+
+One iteration may coordinate several specialists only when they serve the same
+objective and coherent commit. A separate Markdown iteration record is
+optional; create one only when it passes the artifact budget. Commit and push
+remain separately authorized effects.
 
 The detailed handoffs and stopping rules live in [`catalog/tracks/`](catalog/tracks/).
 

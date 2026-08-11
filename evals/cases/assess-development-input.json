@@ -7,7 +7,7 @@
         "top_k": 3
       },
       {
-        "prompt": "Review this feature proposal, expose any unresolved assumptions, and route it to the right analysis or implementation workflow.",
+        "prompt": "Assess whether this reviewed feature proposal is ready for its next Sirius owner, expose unresolved assumptions, and route it without rewriting or executing it.",
         "top_k": 3
       },
       {
@@ -23,6 +23,14 @@
       {
         "prompt": "Implement this approved behavior from its acceptance examples using a test-first feedback loop.",
         "owner": "test-driven-implementation"
+      },
+      {
+        "prompt": "Advance this approved proposal through one risk-sized design iteration, validate it, commit once, and stop.",
+        "owner": "run-development-iteration"
+      },
+      {
+        "prompt": "Design the Rust ownership, staged startup, rollback, cancellation, and cleanup lifecycle for this approved behavior.",
+        "owner": "design-rust-lifecycles"
       }
     ]
   },

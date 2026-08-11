@@ -22,9 +22,11 @@ The initial pilot covers:
 - `stakeholder-requirements-elicitation`;
 - `requirements-synthesis-validation`;
 - `implementation-slice-briefing`;
+- `run-development-iteration`;
 - `iterative-up-analysis-design`;
 - `operation-contracts`;
 - `design-rust-lifecycles`;
+- `software-design-language-adaptation`;
 - `use-case-modeling`;
 - `behavior-driven-specification`;
 - `test-driven-implementation`;

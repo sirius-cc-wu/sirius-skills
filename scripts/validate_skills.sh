@@ -125,12 +125,18 @@ for target in \
   cmp -s "$shared_reference" "$target" || fail "shared reference is out of sync: $target"
 done
 
-# Iterative-design and reverse-engineering skills share durable artifact rules.
+# Documentation-producing iterative-design and reverse-engineering skills share
+# durable artifact rules. Workflow skills may overlap those profiles without
+# becoming documentation specialists.
 mapfile -t specialist_skills < <(
-  {
-    read_profile "$profile_directory/iterative-design.txt"
-    read_profile "$profile_directory/reverse-engineering.txt"
-  } | sort -u
+  comm -23 \
+    <(
+      {
+        read_profile "$profile_directory/iterative-design.txt"
+        read_profile "$profile_directory/reverse-engineering.txt"
+      } | sort -u
+    ) \
+    <(read_profile "$profile_directory/workflow.txt" | sort -u)
 )
 
 for name in "${specialist_skills[@]}"; do

@@ -3,15 +3,15 @@
   "trigger": {
     "positive": [
       {
-        "prompt": "Plan risk-driven iterations across inception, elaboration, construction, and durable design artifacts",
+        "prompt": "Plan risk-driven Unified Process iterations across inception, elaboration, construction, and selected durable design artifacts",
         "top_k": 3
       },
       {
-        "prompt": "Plan requirements-to-design work across iterations, risks, durable artifacts, and incremental refinement",
+        "prompt": "Plan multi-iteration requirements-to-object-design work using UP phases, risks, use-case-driven artifact dependencies, and incremental refinement",
         "top_k": 3
       },
       {
-        "prompt": "Create an iteration plan around architectural risks and incremental refinement",
+        "prompt": "Create a UP elaboration plan around architectural risks, selected use-case artifacts, and incremental refinement",
         "top_k": 3
       }
     ],
@@ -23,14 +23,18 @@
       {
         "prompt": "Recover the commands, APIs, failures, and externally observable behavior of this existing service",
         "owner": "recover-system-behavior"
+      },
+      {
+        "prompt": "Run exactly one approved development iteration, validate it, make one coherent commit, and stop before the next iteration",
+        "owner": "run-development-iteration"
       }
     ]
   },
   "evals": [
     {
       "id": "minimal-artifact-iteration",
-      "prompt": "Plan the next risk-sized iteration for this feature without creating unnecessary documents.",
-      "expected_output": "A bounded iteration objective with only justified durable artifacts and executable next steps.",
+      "prompt": "Plan the next Unified Process elaboration iteration for this feature without creating unnecessary documents.",
+      "expected_output": "A bounded UP iteration objective with only justified selected artifacts and executable next steps.",
       "expectations": [
         "The plan selects the smallest artifact set that addresses the current risk",
         "The plan includes concrete exit criteria and an implementation handoff"

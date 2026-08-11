@@ -1,0 +1,50 @@
+{
+  "skill_name": "software-design-language-adaptation",
+  "trigger": {
+    "positive": [
+      {
+        "prompt": "Adapt this language-neutral state and boundary design into idiomatic TypeScript data, runtime validation, errors, and async interfaces without adding class ceremony",
+        "top_k": 3
+      },
+      {
+        "prompt": "Map these approved operation invariants and collaborations into Python functions, values, protocols, and task lifecycle semantics",
+        "top_k": 3
+      },
+      {
+        "prompt": "Express this implementation-facing design using native C++ ownership, error, concurrency, and interface mechanisms",
+        "top_k": 3
+      }
+    ],
+    "negative": [
+      {
+        "prompt": "Design the detailed Rust resource ownership, partial startup rollback, cancellation, supervision, and cleanup lifecycle",
+        "owner": "design-rust-lifecycles"
+      },
+      {
+        "prompt": "Specify the language-neutral postconditions and invariant-preserving state changes of this system operation",
+        "owner": "operation-contracts"
+      }
+    ]
+  },
+  "evals": [
+    {
+      "id": "paradigm-neutral-typescript-adaptation",
+      "prompt": "Adapt this approved language-neutral queue-processing design to TypeScript. Preserve behavior, state transitions, boundaries, and cancellation semantics while choosing native data, validation, error, async, and variation mechanisms. Do not assume an object model.",
+      "expected_output": "An implementation-facing TypeScript adaptation preserves approved design intent and explains native runtime choices without rewriting requirements or forcing classes.",
+      "expectations": [
+        "Approved behavior, invariants, boundaries, and dependency direction remain traceable",
+        "Language mechanisms are selected from TypeScript runtime and type-system forces",
+        "Classes, interfaces, and patterns appear only when justified"
+      ],
+      "prohibitions": [
+        "Do not change language-neutral requirements or contracts",
+        "Do not recreate an object-oriented diagram mechanically",
+        "Do not implement production code"
+      ],
+      "allowed_mutations": [
+        "docs/**"
+      ],
+      "trust_level": "provisional"
+    }
+  ]
+}

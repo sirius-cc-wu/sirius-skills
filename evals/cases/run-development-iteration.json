@@ -1,0 +1,54 @@
+{
+  "skill_name": "run-development-iteration",
+  "trigger": {
+    "positive": [
+      {
+        "prompt": "Promote this approved proposal revision into the canonical feature brief, complete one risk-sized analysis and design iteration, validate it, commit it, and stop",
+        "top_k": 3
+      },
+      {
+        "prompt": "Advance this feature by exactly one development iteration without an object-oriented artifact checklist, make one coherent commit, and do not start the next iteration",
+        "top_k": 3
+      },
+      {
+        "prompt": "Coordinate the smallest requirements, language design, and implementation work needed for one approved iteration with explicit exit evidence",
+        "top_k": 3
+      }
+    ],
+    "negative": [
+      {
+        "prompt": "Plan several elaboration and construction iterations using Unified Process phases, use-case-driven artifact dependencies, and durable iteration records",
+        "owner": "iterative-up-analysis-design"
+      },
+      {
+        "prompt": "Design the Rust ownership transfer, staged startup rollback, async cancellation, and fallible cleanup lifecycle for this approved service behavior",
+        "owner": "design-rust-lifecycles"
+      },
+      {
+        "prompt": "Implement this bounded approved behavior from its acceptance example with a failing test first",
+        "owner": "test-driven-implementation"
+      }
+    ]
+  },
+  "evals": [
+    {
+      "id": "approved-proposal-single-iteration",
+      "prompt": "The proposal at docs/proposals/session-boundary.md is approved at the current revision. Promote it into the canonical feature owner, run one question-driven design iteration suitable for the repository language, create one commit after validation, and stop.",
+      "expected_output": "One approved, traceable iteration updates only justified canonical owners, uses specialists selected by the actual question and language forces, validates the result, creates one authorized commit, and stops.",
+      "expectations": [
+        "The accepted proposal revision, one objective, non-goals, and exit evidence bound the iteration",
+        "Artifact and specialist selection follows current questions rather than a mandatory object-oriented sequence",
+        "The result stops after one scoped validated commit and names residual risk"
+      ],
+      "prohibitions": [
+        "Do not invent approval, product behavior, or compatibility rules",
+        "Do not require use cases, SSDs, a domain model, GRASP, realizations, and a class diagram as a fixed chain",
+        "Do not push, publish, or begin the next iteration"
+      ],
+      "allowed_mutations": [
+        "docs/**"
+      ],
+      "trust_level": "provisional"
+    }
+  ]
+}

@@ -27,7 +27,7 @@ Available profiles are defined in [`skill-sets/`](skill-sets/):
 | Profile | Purpose |
 |---|---|
 | `workflow` | Simplification, scoped commits, pull requests, and durable governance updates |
-| `iterative-design` | External-input assessment, proposal authoring, requirements, analysis, object design, tested implementation, and refactoring |
+| `iterative-design` | External-input assessment, proposal authoring, question-driven iterations, optional UP/object design, language adaptation, tested implementation, simplification, and scoped commits |
 | `applying-uml-and-patterns` | Compatibility alias for `iterative-design` |
 | `reverse-engineering` | Evidence-driven system survey, behavior and architecture recovery, and reconciliation |
 | `all` | Every active skill in the catalog |
@@ -131,19 +131,30 @@ remain generic; consuming repositories own their local conventions in
 
 ## Design artifacts and sources
 
-The iterative-design collection treats use cases, domain models, system
-sequence diagrams, contracts, realizations, and design class diagrams as
-durable knowledge refined across iterations. It preserves established
-repository layouts and applies an artifact-selection budget before creating a
-new standalone document. The budget prefers executable evidence and existing
-canonical artifacts, and requires new files to demonstrate value, distinct
-ownership, and an independent lifecycle. Layout and Markdown guidance lives in
-the references owned by `iterative-up-analysis-design`.
+The iterative-design collection uses `run-development-iteration` to execute one
+approved, risk-sized objective and stop after one authorized commit. It selects
+requirements, analysis, design, language, and implementation specialists from
+the current question rather than requiring an object-oriented artifact chain.
+`iterative-up-analysis-design` remains available for teams that explicitly
+want UP phase framing and use-case-driven artifact dependencies.
 
-The original analysis and object-design skills distill workflows from Craig
-Larman's *Applying UML and Patterns*. Rust lifecycle design adds
+Selected use cases, domain models, system sequence diagrams, contracts,
+realizations, design class diagrams, and language-specific designs remain
+durable knowledge refined across iterations. The collection preserves
+established repository layouts and applies an artifact-selection budget before
+creating a standalone document. The budget prefers executable evidence and
+existing canonical artifacts, and requires new files to demonstrate value,
+distinct ownership, and an independent lifecycle. A narrow iteration can rely
+on canonical changes and its commit instead of creating a separate iteration
+record. Layout and Markdown guidance lives in the references owned by
+`iterative-up-analysis-design`.
+
+The optional UP analysis and object-design skills distill workflows from Craig
+Larman's *Applying UML and Patterns*. General language adaptation covers Rust,
+Python, TypeScript, C#, and C++, while Rust lifecycle design adds
 ownership-driven preparation, resource transfer, rollback, cancellation,
-supervision, and fallible cleanup. Reverse-engineering skills also draw from
+supervision, and fallible cleanup as the first pressure-specific language
+specialist. Reverse-engineering skills also draw from
 software reengineering, architecture reconstruction, architecture
 documentation, and code-reading sources. See the
 [Source Catalog](catalog/sources.md) for provenance.

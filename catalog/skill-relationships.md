@@ -6,7 +6,7 @@ reduce the current risk or complete the current behavior slice.
 
 ## Bird's-eye view
 
-This view groups all 30 deployable Sirius skills by responsibility and shows
+This view groups all 31 deployable Sirius skills by responsibility and shows
 two optional external intent-shaping skills at the boundary. It shows only the
 main movement between groups so readers can locate a starting point before
 using the detailed views below. Solid arrows are normal handoffs, not a
@@ -49,7 +49,7 @@ rectangle "**Client Discovery**\nstakeholder-requirements-elicitation\nrequireme
 
 rectangle "**Reverse Engineering**\nreverse-engineer-software-system\nsurvey-existing-system\nrecover-system-behavior\nreconstruct-software-architecture\nreconcile-recovered-design" as reverse #EAF4FB
 
-rectangle "**Iterative Analysis and Design**\niterative-up-analysis-design\ninception\nuse-case-modeling\nbehavior-driven-specification\ndomain-modeling\nsystem-sequence-diagrams\noperation-contracts\ngrasp-responsibility-design\nuse-case-realization\numl-class-diagram-design\ndesign-pattern-application" as design #EEF8EE
+rectangle "**Iterative Analysis and Design**\nrun-development-iteration\niterative-up-analysis-design\ninception\nuse-case-modeling\nbehavior-driven-specification\ndomain-modeling\nsystem-sequence-diagrams\noperation-contracts\ngrasp-responsibility-design\nuse-case-realization\numl-class-diagram-design\ndesign-pattern-application" as design #EEF8EE
 
 rectangle "**Implementation and Evolution**\ntest-driven-implementation\nbehavior-preserving-refactoring" as implementation #FFF5EA
 
@@ -108,8 +108,8 @@ need, not as a required workflow stage.
 - Start with **Client Discovery** when stakeholder evidence must be gathered,
   synthesized, and validated before a coding handoff can be prepared.
 - Start with **Reverse Engineering** when an existing system must be understood.
-- Start with **Iterative Analysis and Design** when intended behavior, scope, or
-  object design is not yet clear.
+- Start with **Iterative Analysis and Design** when an approved change needs a
+  bounded behavior, analysis, design, language, or implementation iteration.
 - Start with **Implementation and Evolution** when the behavior or structural
   change is already sufficiently bounded.
 - Use **Repository Workflow** after a change is verified and authorized for
@@ -212,10 +212,11 @@ rules, stopping conditions, and selection examples.
 
 ## Iterative analysis and design
 
-`iterative-up-analysis-design` coordinates risk-driven iterations. The diagram
-shows artifact dependencies, not a requirement to create every artifact.
-Choose only the analysis and design work needed for the selected risk and
-behavior slice.
+`run-development-iteration` executes one approved, risk-sized objective and
+stops after validation and one authorized commit. It routes to the smallest
+specialists that answer the current question. `iterative-up-analysis-design`
+remains an optional planner when a team explicitly wants UP phase framing and
+use-case-driven artifact dependencies.
 
 ```plantuml
 @startuml iterative-design-skill-relationships
@@ -237,7 +238,8 @@ skinparam rectangle<<coordinator>> {
   BorderColor #2F6690
 }
 
-rectangle "iterative-up-analysis-\ndesign" as iterative <<coordinator>>
+rectangle "run-development-\niteration" as iterative <<coordinator>>
+rectangle "iterative-up-analysis-\ndesign" as up
 
 package "Requirements and analysis" #EEF8EE {
   rectangle "inception" as inception
@@ -248,14 +250,21 @@ package "Requirements and analysis" #EEF8EE {
   rectangle "operation-contracts" as contracts
 }
 
-package "Object design" #F3EEFF {
+package "Optional object design" #F3EEFF {
   rectangle "grasp-responsibility-\ndesign" as grasp
   rectangle "use-case-realization" as realization
   rectangle "uml-class-diagram-\ndesign" as classdiagram
   rectangle "design-pattern-\napplication" as patterns
 }
 
-iterative --> inception
+iterative ..> inception : scope or feasibility
+iterative ..> usecases : actors or scenarios
+iterative ..> behavior : observable examples
+iterative ..> domain : vocabulary
+iterative ..> ssd : system events
+iterative ..> contracts : state effects
+iterative ..> up : explicit UP planning
+up --> usecases
 inception --> usecases
 usecases --> behavior
 usecases --> domain
@@ -369,7 +378,7 @@ skinparam rectangle<<coordinator>> {
 }
 
 package "Analysis and design knowledge" #EEF8EE {
-  rectangle "iterative-up-analysis-\ndesign" as iterative <<coordinator>>
+  rectangle "run-development-\niteration" as iterative <<coordinator>>
   rectangle "domain-modeling" as domain
   rectangle "operation-contracts" as contracts
   rectangle "grasp-responsibility-\ndesign" as grasp
@@ -427,8 +436,8 @@ keeps the diagrams readable without changing where they apply.
 
 | Skill | Use with | Selection trigger |
 |---|---|---|
-| `software-design-language-adaptation` | `grasp-responsibility-design`, `use-case-realization`, `uml-class-diagram-design`, `design-pattern-application`, and `test-driven-implementation` | Language-specific ownership, errors, concurrency, lifecycle, or interface conventions affect the design |
-| `design-rust-lifecycles` | Approved scenarios and contracts, responsibility design, language adaptation, implementation briefing, and Rust implementation | Ownership, capability transfer, staged startup, readiness, rollback, cancellation, supervision, or fallible cleanup creates a material Rust design risk |
+| `software-design-language-adaptation` | `run-development-iteration`, approved behavior and contracts, optional object design, and `test-driven-implementation` | Language-specific data, interfaces, ownership, errors, concurrency, lifecycle, or runtime conventions affect the design |
+| `design-rust-lifecycles` | `run-development-iteration`, approved scenarios and contracts, language adaptation, implementation briefing, and Rust implementation | Ownership, capability transfer, staged startup, readiness, rollback, cancellation, supervision, or fallible cleanup creates a material Rust design risk |
 | `rewrite-technical-artifacts` | Recovered artifacts, iterative-design artifacts, behavior-slice evidence, and refactoring records | The knowledge is sound but its reading order or progressive disclosure needs improvement |
 
 ## Client discovery upstream path

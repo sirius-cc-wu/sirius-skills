@@ -102,7 +102,7 @@ more of the visual method's internal reasoning structure. That fine-grained
 toolbox is valuable, but presenting it as a single sequence increases routing
 and coordination cost for both the user and the coding agent.
 
-## The Current Tension
+## Original Tension and Implemented Foundation
 
 Sirius already contains strong limiting rules:
 
@@ -117,16 +117,24 @@ Sirius already contains strong limiting rules:
   permits a bounded implementation to begin from a bug report, approved
   example, invariant, or other independent oracle.
 
-The coordinator nevertheless instructs the agent to sequence use cases, SSDs,
-domain models, contracts, GRASP decisions, realizations, and design class
-diagrams. The methodology similarly describes the profile as moving through
-requirements, analysis, object design, implementation, and refactoring.
+The former coordinator nevertheless instructed the agent to sequence use
+cases, SSDs, domain models, contracts, GRASP decisions, realizations, and design
+class diagrams. The methodology similarly described the profile as moving
+through requirements, analysis, object design, implementation, and
+refactoring.
 
-Consequently, the repository says the detailed chain is optional while its
-central workflow still presents that chain as the normal design route. The
-limiting rules reduce unwanted artifacts, but they do not fully remove the
-object-first selection bias or explicitly state that rapid human comprehension
-is the reason to create a diagram.
+Sirius now addresses that workflow-level bias with
+[`run-development-iteration`](../../skills/run-development-iteration/SKILL.md).
+The coordinator executes one approved objective, selects specialists from the
+current question and implementation forces, applies the artifact budget,
+creates one authorized commit, and stops. `iterative-up-analysis-design`
+remains an optional UP planning specialization. The language-adaptation skill
+now accepts language-neutral behavior, boundaries, state, and collaborations
+without requiring GRASP or class-design input.
+
+The remaining proposal is narrower: make rapid human comprehension an explicit
+design outcome and provide question-driven visual routing where existing
+design and architecture-recovery specialists do not already own the view.
 
 ## Is Object-Oriented Design Outdated?
 
@@ -184,10 +192,10 @@ and class structure.
    omit a materially useful view as well as scenarios that create an
    unjustified diagram set.
 
-This direction does not require immediately merging or retiring skills. First
-change the top-level routing model and test it. Skill consolidation should
-follow only if evaluation or actual use shows that adjacent skills cannot be
-selected reliably or provide too little independent value.
+The top-level routing foundation is now implemented and covered by focused
+routing cases. Skill consolidation should still follow only if evaluation or
+actual use shows that adjacent skills cannot be selected reliably or provide
+too little independent value.
 
 ## Proposed Capability Shape
 
@@ -205,11 +213,11 @@ A future visual-design coordinator would ask:
 7. What evidence is sufficient to begin or continue implementation?
 8. Did implementation change knowledge that the durable view owns?
 
-The existing `iterative-up-analysis-design` capability could then remain an
-explicit UP/OO specialization for work that benefits from its full vocabulary
-and traceability model. `reconstruct-software-architecture` would remain the
-specialist for recovering as-built views from existing code. The coordinator
-would select between them rather than duplicate their detailed procedures.
+The existing `iterative-up-analysis-design` capability now remains an explicit
+UP/OO specialization for work that benefits from its full vocabulary and
+traceability model. `reconstruct-software-architecture` remains the specialist
+for recovering as-built views from existing code. A future visual coordinator
+should select between them rather than duplicate their detailed procedures.
 
 ## Diagram Trust and Lifecycle
 
@@ -257,19 +265,13 @@ design requiring a focused class view. Mechanical assertions verify mutation
 scope and diagram-kind markers; semantic diagram quality remains explicitly
 ungraded.
 
-## Decision Still Required
+## Remaining Decision
 
-Before implementation, decide whether paradigm-neutral routing should:
-
-- replace the current coordinator's top-level responsibility;
-- become a new coordinator while `iterative-up-analysis-design` remains
-  unchanged; or
-- be expressed first as a simpler profile and relationship model without a new
-  deployable skill.
-
-Also decide whether the first change should broaden an existing UML skill or
-introduce a small cross-cutting diagram-selection skill that routes to current
-design and architecture-recovery capabilities.
+The general paradigm-neutral iteration route is implemented. The remaining
+decision is whether visual comprehension needs a small cross-cutting
+diagram-selection skill that routes to current prospective-design and
+architecture-recovery capabilities, or whether improved relationship guidance
+and evaluations are sufficient.
 
 That choice should be informed by routing and behavioral evals rather than by
 catalog aesthetics alone.

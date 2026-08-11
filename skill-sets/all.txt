@@ -10,6 +10,7 @@ reconcile-recovered-design
 rewrite-technical-artifacts
 assess-development-input
 author-software-proposal
+run-development-iteration
 iterative-up-analysis-design
 stakeholder-requirements-elicitation
 requirements-synthesis-validation

@@ -1,21 +1,29 @@
 ---
 name: iterative-up-analysis-design
-description: Guides iterative Unified Process-style analysis and design. Use when planning requirements-to-design work across inception, elaboration, construction, risks, durable artifacts, repository layouts, and incremental refinement.
+description: Plans optional Unified Process-style analysis and design across inception, elaboration, construction, risks, durable artifacts, repository layouts, and incremental refinement. Use when a team explicitly wants UP phase framing, use-case-driven artifact dependencies, or a multi-iteration analysis and object-design plan; use run-development-iteration to execute one paradigm-neutral iteration.
 ---
 
 # Iterative UP Analysis and Design
 
 ## Overview
 
-Use an iterative, risk-driven flow: produce just enough artifacts for the current decision, preserve durable design knowledge across iterations, and drive design from use cases and architectural risk.
+Use an iterative, risk-driven UP flow: produce just enough artifacts for the
+current decision, preserve selected durable design knowledge across iterations,
+and use scenarios and architectural risk to decide which UP techniques help.
+This is an optional planning specialization, not the default coordinator for
+all languages or development iterations.
 
 ## When to Use
 
-- A feature or system needs requirements, analysis, and object design rather than immediate coding.
+- A feature or system benefits from explicit UP phase framing and selected
+  requirements, analysis, or object-design techniques rather than immediate
+  coding.
 - Work spans multiple artifacts such as vision, use cases, domain model, SSDs, contracts, and design model.
 - Architectural risk or unclear requirements require iterative exploration.
 - Design artifacts and iteration records need durable, navigable repository locations.
-- Do not use for isolated bug fixes or trivial implementation tasks.
+- Do not use for isolated bug fixes, trivial implementation tasks, one
+  language-native design question, or execution of one paradigm-neutral
+  iteration.
 
 ## Workflow
 
@@ -29,7 +37,11 @@ Use an iterative, risk-driven flow: produce just enough artifacts for the curren
 4. **Classify artifact lifecycles.** Refine design artifacts at canonical paths, create one historical record per iteration, and record durable cross-cutting decisions separately when needed.
 5. **Budget artifact creation.** Apply [Artifact Selection Budget](references/artifact-selection-budget.md). Create a standalone artifact only when it provides durable, reusable, or risk-reducing value, has no sufficient existing owner, and needs an independent lifecycle.
 6. **Choose artifact placement.** Preserve an established layout. When none exists, use the smallest suitable option from [Artifact Durability and Repository Layouts](references/artifact-layouts.md); default to the feature-iteration hybrid with flat feature files, promoting a feature to a package only when its artifacts change independently.
-7. **Sequence analysis before design.** Use cases lead to SSDs, domain model, contracts, GRASP decisions, realizations, and design class diagrams.
+7. **Apply dependencies selectively.** Use cases may lead to examples, SSDs,
+   domain concepts, or contracts when those questions matter. Add GRASP,
+   realizations, patterns, or design class diagrams only when object
+   responsibility or collaboration is the selected design problem. Do not
+   treat the dependency graph as a deliverable checklist.
 8. **Keep durable artifacts evolving.** Mark canonical artifacts as started or refined; expect corrections as contracts, design, implementation, and feedback reveal gaps.
 9. **Tie artifacts together.** Each design decision should trace back to use cases, system events, contracts, risks, or verification evidence.
 10. **Timebox detail.** Fully detail architecturally significant use cases; keep low-risk artifacts lightweight.
@@ -57,7 +69,8 @@ Treat `index.md` and `log.md` as reserved structural files.
 
 ## Artifact Durability
 
-- Treat use cases, domain models, SSDs, contracts, realizations, and design class diagrams as durable, evolving sources of truth.
+- When selected, treat use cases, domain models, SSDs, contracts, realizations,
+  and design class diagrams as durable, evolving sources of truth.
 - Give artifacts referenced across iterations or by other artifacts stable identifiers and one canonical path; local supporting notes may use only a title and path.
 - Treat iteration goals, selected risks, scope, exit criteria, and results as a historical iteration record.
 - Link iteration records to canonical artifacts and state whether each artifact was started, refined, or consulted.
@@ -123,7 +136,7 @@ work that was deferred or changed after the plan was written.
 - All artifacts are created at full detail before risk is understood.
 - A standalone document has no durable decision, named consumer, or material
   risk, or it lacks an independently meaningful lifecycle.
-- Coding starts from a domain model without use cases or system events.
+- Object design starts from a domain model without behavior or system events.
 - Artifact updates are treated as failure rather than expected refinement.
 - The plan follows phases mechanically instead of risk and learning.
 - Durable design artifacts are copied into each iteration directory, leaving no obvious current source of truth.
@@ -138,7 +151,8 @@ work that was deferred or changed after the plan was written.
 - [ ] Durable artifacts, iteration records, and decision records have distinct lifecycles.
 - [ ] Every started or refined artifact has one canonical path; artifacts cross-referenced across iterations or other artifacts have stable IDs.
 - [ ] The selected layout fits existing conventions and expected navigation without unnecessary directories.
-- [ ] Use cases drive downstream analysis and design artifacts.
+- [ ] Every selected downstream UP artifact traces to a scenario, risk, or
+      design question; no artifact exists merely to complete the UP sequence.
 - [ ] Design decisions trace to requirements or contracts.
 - [ ] The iteration has concrete exit criteria and implementation handoff points.
 - [ ] A closed iteration records results and links to canonical artifacts without duplicating them.

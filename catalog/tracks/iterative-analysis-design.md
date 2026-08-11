@@ -1,77 +1,97 @@
 # Iterative Analysis and Design
 
-Use this track when a system or feature needs requirements, analysis, and
-object design before or alongside incremental implementation.
+Use this track when an approved change needs analysis, design, and possibly
+implementation in bounded, risk-sized iterations. Select work from the current
+question and implementation forces rather than following a mandatory artifact
+or object-design sequence.
 
 When requirements-shaped input was produced outside Sirius and the correct
 entry point is unclear, first use
 [`assess-development-input`](../../skills/assess-development-input/SKILL.md).
-Continue with this track only when the assessment identifies a requirements or
-design gap owned here; the assessment may instead route to recovery,
-implementation, or an external prerequisite.
+Continue only when the input has sufficient authority for the selected work.
+The assessment may instead route to recovery, proposal authoring, a localized
+specialist, implementation, or an external prerequisite.
 
 Use
 [`author-software-proposal`](../../skills/author-software-proposal/SKILL.md)
 when technical discussions, findings, incidents, or candidate changes need a
-direction reviewed before further design or implementation. For one focused,
-consequential choice it prefers a proposed decision record or ADR; broader
-exploration uses a software proposal. Authoring is optional rather than the
-first step of every iteration. It produces or substantively revises a draft;
-it does not accept the artifact or execute its handoff.
+direction reviewed before design or implementation. Proposal authoring stops
+before acceptance. Once the responsible authority approves the proposal,
+preserve its accepted revision and outcome as the next iteration establishes a
+canonical feature, requirement, decision, or design owner.
 
-## Sequence
-
-1. [`iterative-up-analysis-design`](../../skills/iterative-up-analysis-design/SKILL.md)
-   coordinates risk-driven iterations and artifact durability.
-2. [`inception`](../../skills/inception/SKILL.md) frames vision, scope,
-   feasibility, business case, and major risks.
-3. [`use-case-modeling`](../../skills/use-case-modeling/SKILL.md) identifies
-   actors, goals, scenarios, and related requirements.
-4. [`behavior-driven-specification`](../../skills/behavior-driven-specification/SKILL.md)
-   turns approved or explicitly candidate behavior into concrete examples and
-   observable acceptance scenarios.
-5. [`domain-modeling`](../../skills/domain-modeling/SKILL.md) captures
-   conceptual classes, associations, and attributes.
-6. [`system-sequence-diagrams`](../../skills/system-sequence-diagrams/SKILL.md)
-   identifies actor-system events.
-7. [`operation-contracts`](../../skills/operation-contracts/SKILL.md) specifies
-   non-trivial system-operation effects.
-8. [`grasp-responsibility-design`](../../skills/grasp-responsibility-design/SKILL.md)
-   assigns object responsibilities.
-9. [`use-case-realization`](../../skills/use-case-realization/SKILL.md) designs
-   object collaborations for selected scenarios.
-10. [`uml-class-diagram-design`](../../skills/uml-class-diagram-design/SKILL.md)
-   summarizes the resulting software design.
-11. [`design-pattern-application`](../../skills/design-pattern-application/SKILL.md)
-    addresses justified creation, structure, communication, or variation
-    pressures.
+## Run One Iteration
 
 Use
-[`software-design-language-adaptation`](../../skills/software-design-language-adaptation/SKILL.md)
-alongside responsibility design, realizations, patterns, and implementation
-when the implementation language is known.
+[`run-development-iteration`](../../skills/run-development-iteration/SKILL.md)
+to execute exactly one approved, risk-sized iteration. It fixes the source
+revision, selects one objective and exit evidence, coordinates only the needed
+specialists, validates the result, creates one commit when authorized, and
+stops before the next iteration.
+
+Choose the narrowest specialist for each material question:
+
+| Current question or force | Candidate owner |
+|---|---|
+| Vision, feasibility, project scope, or major business risk | [`inception`](../../skills/inception/SKILL.md) |
+| Actors, goals, system boundary, or scenario flow | [`use-case-modeling`](../../skills/use-case-modeling/SKILL.md) |
+| Observable examples and boundary cases | [`behavior-driven-specification`](../../skills/behavior-driven-specification/SKILL.md) |
+| Business concepts and shared vocabulary | [`domain-modeling`](../../skills/domain-modeling/SKILL.md) |
+| Actor-system events and operation names | [`system-sequence-diagrams`](../../skills/system-sequence-diagrams/SKILL.md) |
+| Non-trivial state effects and invariants | [`operation-contracts`](../../skills/operation-contracts/SKILL.md) |
+| Object responsibility or collaboration, when deliberately selected | [`grasp-responsibility-design`](../../skills/grasp-responsibility-design/SKILL.md) and [`use-case-realization`](../../skills/use-case-realization/SKILL.md) |
+| Stable object-oriented structure that needs a summary | [`uml-class-diagram-design`](../../skills/uml-class-diagram-design/SKILL.md) |
+| Demonstrated creation, structural, communication, or variation pressure | [`design-pattern-application`](../../skills/design-pattern-application/SKILL.md) |
+| General mapping into a target language and runtime | [`software-design-language-adaptation`](../../skills/software-design-language-adaptation/SKILL.md) |
+| Rust ownership, transfer, startup, rollback, cancellation, or cleanup | [`design-rust-lifecycles`](../../skills/design-rust-lifecycles/SKILL.md) |
+| A bounded behavior with an independent verification oracle | [`test-driven-implementation`](../../skills/test-driven-implementation/SKILL.md) |
+
+Several specialists may contribute to one iteration only when they answer the
+same objective. Do not create one artifact merely because another artifact can
+feed it.
+
+## Optional UP Planning
 
 Use
-[`design-rust-lifecycles`](../../skills/design-rust-lifecycles/SKILL.md)
-when Rust ownership, resource transfer, staged startup, rollback, cancellation,
-supervision, or fallible cleanup is a central design risk. It produces one
-implementation-facing lifecycle design rather than a parallel document for
-each conceptual collaborator.
+[`iterative-up-analysis-design`](../../skills/iterative-up-analysis-design/SKILL.md)
+when a team explicitly wants Unified Process phase framing, a multi-iteration
+risk plan, or use-case-driven dependencies among selected UP artifacts. It is
+an optional planning specialization, not the generic execution coordinator.
+Its artifact graph describes dependencies when those techniques are selected;
+it is not a checklist for every feature or language.
 
-## Iteration Rule
+## Language Extension Rule
 
-This is a dependency-oriented sequence, not a requirement to create every
-artifact. Apply the
+Keep requirements and analysis independent of implementation language. Use the
+general language adapter for ordinary implementation mapping. Add or select a
+language specialist only when repeated, material runtime semantics require a
+distinct workflow and output. Rust lifecycle design is the first such
+specialist; it does not make Rust the coordinator's default.
+
+Future specialists should be driven by concrete forces such as memory and
+ownership, ABI compatibility, runtime validation, cancellation, resource
+disposal, process boundaries, or concurrency. Do not create a parallel skill
+or document template for every language merely to complete a matrix.
+
+## Artifact and Commit Rule
+
+Apply the
 [Artifact Selection Budget](../../skills/iterative-up-analysis-design/references/artifact-selection-budget.md)
-before creating a standalone document. Prefer implementation evidence, an
-existing canonical artifact, or an aggregate feature section unless a new file
-has clear value, distinct ownership, and an independent lifecycle. Refine
-durable artifacts as feedback arrives.
+before creating a standalone document. Prefer executable evidence, an existing
+canonical artifact, or an aggregate feature section unless a new file has
+clear value, distinct ownership, and an independent lifecycle.
+
+A narrow iteration does not require a Markdown iteration record. Its canonical
+changes, validation, and scoped commit can preserve sufficient history. Create
+a historical iteration record only when coordination, audit, cross-session
+continuity, or durable unresolved risk justifies it. Never copy canonical
+artifact bodies into the record.
+
+One commit per iteration is an execution boundary, not permission to commit or
+push. Create the commit only when the user authorizes it, keep staging scoped,
+and stop after the commit. Push or publication requires separate authority.
 
 Use
 [`rewrite-technical-artifacts`](../../skills/rewrite-technical-artifacts/SKILL.md)
-when an existing artifact contains the required knowledge but needs
-progressive disclosure or a clearer reading path, or as a focused final review
-of substantial changed artifacts before commit or review. The pass is optional
-for narrow structural artifacts and must preserve normative meaning,
-identifiers, lifecycle, and traceability.
+when existing knowledge needs progressive disclosure or a clearer reading
+path. Use it only as a semantic-preserving pass.

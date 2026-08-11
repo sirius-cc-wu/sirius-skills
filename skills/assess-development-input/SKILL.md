@@ -76,7 +76,8 @@ The source method or file format never determines the route.
 | Technical discussions, findings, incidents, or candidate changes need a consequential direction framed for review | `author-software-proposal` |
 | Opportunity, vision, business case, feasibility, basic scope, or major risks are unclear | `inception` |
 | Actors, user goals, system boundary, main scenarios, or extensions are unclear | `use-case-modeling` |
-| Several requirements and design artifacts need a risk-sized iteration and durable ownership | `iterative-up-analysis-design` |
+| An approved change needs one coordinated, risk-sized analysis, design, or construction iteration | `run-development-iteration` |
+| A team explicitly needs a multi-iteration UP phase and artifact plan | `iterative-up-analysis-design` |
 | Business concepts, vocabulary, associations, or attributes are unclear | `domain-modeling` |
 | Actor-system events or system operations are unclear | `system-sequence-diagrams` |
 | Non-trivial state changes, preconditions, or postconditions are unclear | `operation-contracts` |
@@ -85,6 +86,7 @@ The source method or file format never determines the route.
 | Stable software structure needs a class-level summary | `uml-class-diagram-design` |
 | Concrete creation, structural, communication, or variation forces justify pattern selection | `design-pattern-application` |
 | A language-neutral design needs idiomatic language-specific adaptation | `software-design-language-adaptation` |
+| Approved Rust behavior has material ownership, startup, rollback, cancellation, or cleanup risk | `design-rust-lifecycles` |
 | A bounded behavior has an independent oracle such as an approved example, invariant, reference, or defect | `test-driven-implementation` |
 | Observable behavior is protected and only internal structure should change | `behavior-preserving-refactoring` |
 | Existing technical knowledge is authoritative but difficult to read | `rewrite-technical-artifacts` |
