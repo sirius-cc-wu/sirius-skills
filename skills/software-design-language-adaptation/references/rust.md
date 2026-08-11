@@ -9,13 +9,18 @@ Preserve responsibilities and collaborations without translating classes literal
 | Information Expert | An `impl` method on the value owning the required state, or a free function when no value is the natural expert. |
 | Creator | An associated function, validated conversion, builder, or composition-root factory with the initialization data. |
 | Controller | A thin function or stateful struct that accepts a system event and delegates domain work. |
+| Low Coupling | Narrow dependencies with stable direction; pass only the capabilities required instead of whole contexts or concrete infrastructure. |
+| High Cohesion | Keep state and behavior that uphold one invariant or change for one reason together; separate unrelated domain, orchestration, and infrastructure work. |
 | Polymorphism | An enum for closed alternatives; a generic bound or trait object for open alternatives. |
 | Pure Fabrication | A cohesive module, adapter type, or stateless function, not automatically a `Service` or `Manager`. |
+| Indirection | A function, wrapper, channel, adapter type, module API, or narrow trait introduced only when direct coupling creates demonstrated pressure. |
 | Protected Variations | A narrow trait, wrapper, channel, or module API at a demonstrated source of change. |
 
 - Let receiver choice communicate responsibility: `&self` observes, `&mut self` mutates exclusively, and `self` consumes or transitions.
 - Express collaborators as parameters, owned fields, generic bounds, or trait-object fields rather than hidden global access.
 - Keep transport controllers thin; orchestration alone does not require a class-shaped struct.
+- Treat private and `pub(crate)` visibility as tools for shrinking exposure, not as proof of low coupling or high cohesion; inspect dependency direction and reasons to change.
+- Creation responsibility means owning the knowledge needed to validate or assemble a value. It does not require an aggregate constructor to manufacture every nested value when accepting a separately validated value preserves clearer invariants.
 
 ## Choosing Constructs
 
@@ -48,6 +53,7 @@ Preserve responsibilities and collaborations without translating classes literal
 - Use `new` for straightforward invariant-preserving creation and `TryFrom` or a `Result`-returning constructor for validation.
 - Add a builder only for many optional inputs, staged configuration, or a meaningful terminal operation.
 - Select concrete adapters at the composition root and inject only the capability required downstream.
+- Do not add a trait merely because code uses a third-party crate. Isolate trivial translation with a function, newtype, wrapper, or module API; introduce a consumer-owned trait when substitution or dependency-inversion pressure is demonstrated.
 - Model expected failures as `Result<T, E>` with meaningful error variants; use `Option<T>` only for absence.
 - Translate infrastructure failures at boundaries and propagate with `?` without erasing useful context.
 - Let RAII release resources. Add explicit `close`, `shutdown`, or `finish` when cleanup can fail or ordering matters.

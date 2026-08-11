@@ -28,7 +28,7 @@ When the implementation language is known, also use [Software Design Language Ad
 4. **Choose a Controller for system events.** Use a facade controller for system-wide events or a use-case/session controller for scenario coordination.
 5. **Check Low Coupling.** Reject assignments that create unnecessary dependency chains or knowledge of unstable details.
 6. **Check High Cohesion.** Reject assignments that overload an object with unrelated work.
-7. **Use Polymorphism for type-varying behavior.** Put alternatives behind a common interface rather than branching on type.
+7. **Use Polymorphism for type-varying behavior.** Put open alternatives behind a common interface rather than ad hoc branching on concrete types. When the variants are fixed, let language adaptation determine whether a closed sum type and exhaustive matching are the more natural mechanism.
 8. **Use Pure Fabrication when domain objects would become bloated or coupled.** Create a service-like object only to preserve cohesion and reuse.
 9. **Use Indirection to mediate dependencies.** Insert an intermediate object when direct coupling creates design pressure.
 10. **Use Protected Variations.** Identify likely variation points and stabilize access through interfaces or adapters.
@@ -80,7 +80,7 @@ tags: [design, grasp]
 
 - A controller performs business rules instead of coordinating.
 - A domain object knows about UI, persistence, infrastructure, or external APIs.
-- Type checks replace polymorphic dispatch for stable variants.
+- Ad hoc type checks replace polymorphic dispatch for open or extensible variants. Do not confuse exhaustive matching over a language-native closed sum type with this smell.
 - "Service" or "Manager" is chosen before evaluating Expert, Creator, and Controller.
 
 ## Verification
