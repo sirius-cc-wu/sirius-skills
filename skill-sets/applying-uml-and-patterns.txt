@@ -1,5 +1,6 @@
 assess-development-input
 author-software-proposal
+design-repository-artifact-layout
 run-development-iteration
 simplify
 commit

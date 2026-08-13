@@ -33,6 +33,7 @@ Choose the narrowest specialist for each material question:
 
 | Current question or force | Candidate owner |
 |---|---|
+| Canonical repository homes, lifecycle separation, or artifact migration | [`design-repository-artifact-layout`](../../skills/design-repository-artifact-layout/SKILL.md) |
 | Vision, feasibility, project scope, or major business risk | [`inception`](../../skills/inception/SKILL.md) |
 | Actors, goals, system boundary, or scenario flow | [`use-case-modeling`](../../skills/use-case-modeling/SKILL.md) |
 | Observable examples and boundary cases | [`behavior-driven-specification`](../../skills/behavior-driven-specification/SKILL.md) |
@@ -58,7 +59,10 @@ when a team explicitly wants Unified Process phase framing, a multi-iteration
 risk plan, or use-case-driven dependencies among selected UP artifacts. It is
 an optional planning specialization, not the generic execution coordinator.
 Its artifact graph describes dependencies when those techniques are selected;
-it is not a checklist for every feature or language.
+it is not a checklist for every feature or language. When that plan exposes a
+material choice among repository layouts, use
+[`design-repository-artifact-layout`](../../skills/design-repository-artifact-layout/SKILL.md)
+rather than coupling the choice to UP phases.
 
 ## Language Extension Rule
 
@@ -80,6 +84,11 @@ Apply the
 before creating a standalone document. Prefer executable evidence, an existing
 canonical artifact, or an aggregate feature section unless a new file has
 clear value, distinct ownership, and an independent lifecycle.
+
+When a standalone artifact passes that budget but lacks a clear canonical
+home, use
+[`design-repository-artifact-layout`](../../skills/design-repository-artifact-layout/SKILL.md)
+to preserve local conventions or select the smallest lifecycle-aware addition.
 
 A narrow iteration does not require a Markdown iteration record. Its canonical
 changes, validation, and scoped commit can preserve sufficient history. Create

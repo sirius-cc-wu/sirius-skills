@@ -1,0 +1,4 @@
+interface:
+  display_name: "Design Repository Artifact Layout"
+  short_description: "Choose minimal canonical homes for technical artifacts"
+  default_prompt: "Use $design-repository-artifact-layout to recommend the smallest lifecycle-aware artifact layout that preserves this repository's conventions."

@@ -10,8 +10,8 @@ following every step in it.
 | Need | Profile |
 |---|---|
 | Refine, record, and publish repository changes | `workflow` |
-| Assess external development inputs, author software proposals, and run question-driven analysis, design, implementation, simplification, and scoped-commit iterations | `iterative-design` |
-| Recover current behavior and architecture from an existing system | `reverse-engineering` |
+| Assess external development inputs, design artifact layouts, author software proposals, and run question-driven analysis, design, implementation, simplification, and scoped-commit iterations | `iterative-design` |
+| Recover current behavior and architecture and place durable recovered knowledge | `reverse-engineering` |
 | Make the entire catalog available | `all` |
 
 `applying-uml-and-patterns` remains a compatibility alias for
@@ -51,6 +51,20 @@ Once a proposal exists, use `assess-development-input` only when its readiness
 or next Sirius owner is unclear. Use `rewrite-technical-artifacts` when its
 meaning is already sound and only its reading path needs improvement.
 
+### Design durable artifact placement
+
+1. Use `design-repository-artifact-layout` when the primary outcome is a
+   canonical home or migration plan for durable technical artifacts.
+2. Inspect local governance, indexes, and neighboring files; preserve a coherent
+   established structure unless a concrete navigation or ownership problem
+   justifies change.
+3. Apply the artifact-selection budget before assigning new files or
+   directories, and separate current knowledge, proposals, decisions,
+   verification evidence, and historical iteration records by lifecycle.
+4. Keep a recommendation read-only unless the user explicitly authorizes file
+   creation or migration. Return content authoring to the artifact's owning
+   specialist.
+
 ### Deliver an existing change
 
 1. Implement and verify the requested outcome.
@@ -87,7 +101,8 @@ durable policy gap.
 5. Use `iterative-up-analysis-design` only when a team explicitly wants UP
    phase framing or a multi-iteration use-case and object-design plan. Select
    GRASP, realizations, class diagrams, and patterns only when their questions
-   or design forces are present.
+   or design forces are present. Delegate a material repository-placement
+   question to `design-repository-artifact-layout`.
 6. Use `software-design-language-adaptation` when implementation-facing design
    must reflect a target language. Use `design-rust-lifecycles` when Rust
    ownership, resource transfer, startup, rollback, cancellation, or fallible

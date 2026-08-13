@@ -41,7 +41,9 @@ proposed, and what remains undecided.
 
 1. **Read local authority.** Inspect repository guidance, proposal and decision
    governance, indexes, templates, validators, and neighboring artifacts.
-   Preserve local paths, lifecycle states, identifiers, and frontmatter.
+   Preserve local paths, lifecycle states, identifiers, and frontmatter. When
+   several homes compete or no convention exists, use
+   `design-repository-artifact-layout` for the placement decision.
 2. **Choose the artifact form and confirm ownership.** Apply the
    [Artifact Selection Budget](../iterative-up-analysis-design/references/artifact-selection-budget.md).
    Inspect existing proposals and decision records, and choose one canonical
@@ -107,7 +109,7 @@ location, frontmatter, and supersession convention.
 
 Follow repository-defined paths and frontmatter. When no proposal convention
 exists, use
-[Proposal Placement](../iterative-up-analysis-design/references/artifact-layouts.md#proposal-placement)
+[Proposal Placement](../design-repository-artifact-layout/references/artifact-layouts.md#proposal-placement)
 to choose a proposal collection or feature/product-area co-location. Follow
 [Markdown Artifact Frontmatter](../iterative-up-analysis-design/references/markdown-artifact-frontmatter.md)
 with this fallback:

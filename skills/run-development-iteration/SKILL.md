@@ -94,8 +94,11 @@ When the iteration promotes a proposal:
 
 ## File Output
 
-Follow established repository paths. When a standalone Markdown artifact is
-justified, follow
+Follow established repository paths. If a justified artifact lacks a clear
+canonical home, several paths compete, or migration is material, use
+[Design Repository Artifact Layout](../design-repository-artifact-layout/SKILL.md)
+for that placement decision. When a standalone Markdown artifact is justified,
+follow
 [Markdown Artifact Frontmatter](../iterative-up-analysis-design/references/markdown-artifact-frontmatter.md)
 and
 [Readable Technical Artifacts](../iterative-up-analysis-design/references/readable-technical-artifacts.md).

@@ -1,6 +1,6 @@
 ---
 name: iterative-up-analysis-design
-description: Plans optional Unified Process-style analysis and design across inception, elaboration, construction, risks, durable artifacts, repository layouts, and incremental refinement. Use when a team explicitly wants UP phase framing, use-case-driven artifact dependencies, or a multi-iteration analysis and object-design plan; use run-development-iteration to execute one paradigm-neutral iteration.
+description: Plans optional Unified Process-style analysis and design across inception, elaboration, construction, risks, durable artifacts, and incremental refinement. Use when a team explicitly wants UP phase framing, use-case-driven artifact dependencies, or a multi-iteration analysis and object-design plan; use run-development-iteration to execute one paradigm-neutral iteration and design-repository-artifact-layout for a standalone repository-placement question.
 ---
 
 # Iterative UP Analysis and Design
@@ -20,7 +20,7 @@ all languages or development iterations.
   coding.
 - Work spans multiple artifacts such as vision, use cases, domain model, SSDs, contracts, and design model.
 - Architectural risk or unclear requirements require iterative exploration.
-- Design artifacts and iteration records need durable, navigable repository locations.
+- Selected durable artifacts and historical iteration records need lifecycle-aware ownership across a multi-iteration UP plan.
 - Do not use for isolated bug fixes, trivial implementation tasks, one
   language-native design question, or execution of one paradigm-neutral
   iteration.
@@ -36,7 +36,7 @@ all languages or development iterations.
 3. **Inspect repository conventions.** Read governance, indexes, and neighboring artifacts before selecting paths or creating directories.
 4. **Classify artifact lifecycles.** Refine design artifacts at canonical paths, create one historical record per iteration, and record durable cross-cutting decisions separately when needed.
 5. **Budget artifact creation.** Apply [Artifact Selection Budget](references/artifact-selection-budget.md). Create a standalone artifact only when it provides durable, reusable, or risk-reducing value, has no sufficient existing owner, and needs an independent lifecycle.
-6. **Choose artifact placement.** Preserve an established layout. When none exists, use the smallest suitable option from [Artifact Durability and Repository Layouts](references/artifact-layouts.md); default to the feature-iteration hybrid with flat feature files, promoting a feature to a package only when its artifacts change independently.
+6. **Choose artifact placement.** Preserve established canonical paths. When no convention exists, several homes compete, or migration is material, use [Design Repository Artifact Layout](../design-repository-artifact-layout/SKILL.md) to make the repository-placement decision; do not make UP phases the directory structure.
 7. **Apply dependencies selectively.** Use cases may lead to examples, SSDs,
    domain concepts, or contracts when those questions matter. Add GRASP,
    realizations, patterns, or design class diagrams only when object
@@ -141,7 +141,7 @@ work that was deferred or changed after the plan was written.
 - The plan follows phases mechanically instead of risk and learning.
 - Durable design artifacts are copied into each iteration directory, leaving no obvious current source of truth.
 - An iteration record becomes the only canonical location for a use case, contract, or design model.
-- A new documentation taxonomy is imposed without checking existing repository conventions.
+- A new documentation taxonomy is imposed without checking existing repository conventions or using the artifact-layout specialist for a material placement decision.
 - Artifacts are moved between phase directories as they mature.
 
 ## Verification

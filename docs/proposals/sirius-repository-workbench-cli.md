@@ -10,11 +10,13 @@ tags: [cli, repositories, artifact-layout, evaluation, agents]
 
 ## At a Glance
 
-Sirius contains repository-layout guidance, but a developer must currently know
-that the guidance belongs to `iterative-up-analysis-design` and ask a coding
-agent to apply it. Once a repository has a clear documentation structure,
-coding agents usually follow that precedent without needing to know where the
-underlying method came from.
+Sirius exposes repository-layout guidance through
+`design-repository-artifact-layout`, so a coding agent can route a standalone
+placement question without treating it as Unified Process planning. A developer
+must still discover and invoke that agent capability, and it does not provide a
+stable machine-readable observation contract. Once a repository has a clear
+documentation structure, coding agents usually follow that precedent without
+needing to know where the underlying method came from.
 
 This proposal recommends a read-only `sirius` CLI whose first useful command is:
 
@@ -87,16 +89,17 @@ and remains subject to its normal mutation authority.
 
 The following statements describe the repository today:
 
-- [`artifact-layouts.md`](../../skills/iterative-up-analysis-design/references/artifact-layouts.md)
+- [`artifact-layouts.md`](../../skills/design-repository-artifact-layout/references/artifact-layouts.md)
   already defines a repository-first selection workflow, several layout
   options, a selection matrix, and migration guidance.
 - [`artifact-selection-budget.md`](../../skills/iterative-up-analysis-design/references/artifact-selection-budget.md)
   already limits standalone artifacts to knowledge with durable value, clear
   ownership, and an independent lifecycle.
-- The layout guidance is reached through the
-  [`iterative-up-analysis-design`](../../skills/iterative-up-analysis-design/SKILL.md)
-  skill. A developer who only wants placement advice must know or discover
-  that routing relationship.
+- The layout guidance is owned by the independently deployable
+  [`design-repository-artifact-layout`](../../skills/design-repository-artifact-layout/SKILL.md)
+  skill and reused by proposal authoring and optional UP planning. This solves
+  agent routing without creating a deterministic developer-facing command or
+  versioned output contract.
 - The Python package currently describes itself as packaging support and does
   not expose a console-script entry point in [`pyproject.toml`](../../pyproject.toml).
 - The existing [evaluation runner](../../evals/README.md) can execute Codex in
@@ -252,17 +255,19 @@ field reinterpretation.
 
 ## Relationship to Skills
 
-The CLI would expose a narrow result currently available only by correctly
-routing through a broader analysis-and-design coordinator. It would not turn
-`artifact-layouts.md` into a deployable skill and would not make
-`iterative-up-analysis-design` obsolete.
+The CLI would provide a deterministic, developer-facing form of the narrow
+result owned by `design-repository-artifact-layout`. It would not make that
+skill or `iterative-up-analysis-design` obsolete.
 
-- Use the CLI when the immediate question is where durable artifacts should
-  live in this repository.
-- Use `iterative-up-analysis-design` when choosing a risk-sized iteration,
+- Use `design-repository-artifact-layout` when a coding agent should inspect
+  context, exercise judgment, recommend placement, or perform an explicitly
+  authorized migration.
+- Use the CLI when a developer or tool needs read-only, reproducible layout
+  observations in Markdown or versioned JSON without invoking an agent.
+- Use `iterative-up-analysis-design` when choosing a risk-sized UP iteration,
   artifact set, analysis sequence, design work, and implementation handoff.
-- Use `author-software-proposal` when repository-specific evidence needs human
-  judgment, richer alternatives, or a durable decision-seeking artifact.
+- Use `author-software-proposal` when repository-specific evidence needs a
+  durable decision-seeking artifact.
 
 The human reference and executable rules could drift if maintained
 independently. Implementation must therefore add focused cases for every row in
@@ -311,18 +316,18 @@ adapters, or evaluation manifests.
 
 ## Alternatives Considered
 
-### Keep Layout Guidance Skill-Only
+### Stop at the Artifact-Layout Skill
 
-This preserves the current packaging model and adds no executable surface. It
-does not solve the discoverability problem: the developer must still know to
-ask for iterative UP when their actual question concerns repository layout.
+The dedicated skill now gives agents a discoverable, repository-first workflow
+and can perform an explicitly authorized migration. Stopping there avoids a new
+executable surface, but developers and non-agent tools still lack reproducible
+read-only observations and a versioned machine-readable contract.
 
-### Create an Artifact-Layout Skill
+### Keep Layout Guidance Under UP Planning
 
-A dedicated skill would improve routing but package passive reference material
-as another user-visible capability. It would still depend on agent discovery
-and would not supply a stable machine-readable observation contract for future
-tools or evaluations.
+This would avoid another user-visible capability, but it would restore the
+routing problem that the extraction solved: repository placement is useful for
+proposals and recovered knowledge even when no Unified Process plan is needed.
 
 ### Bootstrap a Directory Tree Automatically
 

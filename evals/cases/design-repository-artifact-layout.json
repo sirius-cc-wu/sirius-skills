@@ -1,0 +1,51 @@
+{
+  "skill_name": "design-repository-artifact-layout",
+  "trigger": {
+    "positive": [
+      {
+        "prompt": "Inspect this repository and recommend the smallest documentation layout for durable feature design, decisions, and iteration history without replacing useful local conventions.",
+        "top_k": 3
+      },
+      {
+        "prompt": "Resolve these competing homes for architecture and recovery artifacts, giving each current artifact one canonical path and preserving links and historical records.",
+        "top_k": 3
+      },
+      {
+        "prompt": "Decide whether this flat feature document should remain one file or become a package of independently maintained requirements, analysis, and design artifacts.",
+        "top_k": 3
+      }
+    ],
+    "negative": [
+      {
+        "prompt": "Draft a software proposal for changing our request scheduler, with alternatives, risks, open decisions, and acceptance evidence.",
+        "owner": "author-software-proposal"
+      },
+      {
+        "prompt": "Plan several elaboration and construction iterations using Unified Process phases and use-case-driven artifact dependencies.",
+        "owner": "iterative-up-analysis-design"
+      },
+      {
+        "prompt": "Improve the reading order of this authoritative architecture document without changing its decisions or technical meaning.",
+        "owner": "rewrite-technical-artifacts"
+      }
+    ]
+  },
+  "evals": [
+    {
+      "id": "preserve-conventions-and-minimize-layout",
+      "prompt": "Inspect the existing documentation structure and recommend canonical homes for current feature knowledge, decisions, proposals, verification evidence, and iteration history. Preserve useful conventions and do not create or move files.",
+      "expected_output": "A read-only, evidence-based recommendation for the smallest lifecycle-aware layout, including preserved paths, canonical homes, credible alternatives, and uncertainty.",
+      "expectations": [
+        "The recommendation cites observed repository paths and distinguishes established conventions from incidental files",
+        "Different artifact lifecycles receive clear canonical ownership without unnecessary directories",
+        "Any migration identifies affected links, indexes, stable identifiers, and historical records"
+      ],
+      "prohibitions": [
+        "Do not create directories, move files, or rewrite artifact content",
+        "Do not impose a generic taxonomy over a coherent established layout",
+        "Do not create a standalone layout proposal without an independent owner and lifecycle"
+      ],
+      "trust_level": "provisional"
+    }
+  ]
+}

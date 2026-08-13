@@ -42,6 +42,13 @@ state, side effects, verification surfaces, and highest-risk follow-up slices.
 ## Iterative design and implementation
 
 ```text
+Use design-repository-artifact-layout to inspect the existing documentation
+structure and recommend canonical homes for durable feature knowledge,
+decisions, verification evidence, and iteration history. Preserve established
+conventions and do not move files.
+```
+
+```text
 Use stakeholder-requirements-elicitation to identify the affected roles and
 capture interview, observation, and policy evidence without turning feature
 requests into requirements or design.

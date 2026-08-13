@@ -74,6 +74,7 @@ The source method or file format never determines the route.
 |---|---|
 | Claims about current commands, behavior, architecture, or constraints need evidence | `reverse-engineer-software-system` |
 | Technical discussions, findings, incidents, or candidate changes need a consequential direction framed for review | `author-software-proposal` |
+| Durable technical artifacts need canonical repository homes, lifecycle separation, or migration | `design-repository-artifact-layout` |
 | Opportunity, vision, business case, feasibility, basic scope, or major risks are unclear | `inception` |
 | Actors, user goals, system boundary, main scenarios, or extensions are unclear | `use-case-modeling` |
 | An approved change needs one coordinated, risk-sized analysis, design, or construction iteration | `run-development-iteration` |

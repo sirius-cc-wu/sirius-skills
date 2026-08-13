@@ -1,8 +1,9 @@
 # sirius-skills
 
 `sirius-skills` is a curated collection of development-input assessment,
-proposal authoring, repository workflow, software discovery, iterative design,
-implementation, and evolution skills. Skills are independently deployable;
+proposal authoring, repository artifact-layout, repository workflow, software
+discovery, iterative design, implementation, and evolution skills. Skills are
+independently deployable;
 profiles provide convenient installations without turning the catalog into a
 mandatory lifecycle.
 
@@ -27,9 +28,9 @@ Available profiles are defined in [`skill-sets/`](skill-sets/):
 | Profile | Purpose |
 |---|---|
 | `workflow` | Simplification, scoped commits, pull requests, and durable governance updates |
-| `iterative-design` | External-input assessment, proposal authoring, question-driven iterations, optional UP/object design, language adaptation, tested implementation, simplification, and scoped commits |
+| `iterative-design` | External-input assessment, proposal and artifact-layout design, question-driven iterations, optional UP/object design, language adaptation, tested implementation, simplification, and scoped commits |
 | `applying-uml-and-patterns` | Compatibility alias for `iterative-design` |
-| `reverse-engineering` | Evidence-driven system survey, behavior and architecture recovery, and reconciliation |
+| `reverse-engineering` | Evidence-driven system survey, behavior and architecture recovery, reconciliation, and durable recovered-artifact placement |
 | `all` | Every active skill in the catalog |
 
 Remove the default or a named profile later:
@@ -106,6 +107,13 @@ external or mixed workflow and its Sirius entry point is unclear. It evaluates
 the content and recommends one next Sirius skill without rewriting the source
 or automatically executing the handoff.
 
+Use `design-repository-artifact-layout` when the primary question is where
+durable proposals, requirements, analysis, design, recovery, decisions,
+verification evidence, or iteration history should live. It preserves coherent
+local conventions, separates artifact lifecycles, and recommends the smallest
+structure with obvious canonical paths. Recommendations are read-only unless
+repository changes are explicitly authorized.
+
 Use `author-software-proposal` when technical discussions, findings, incidents,
 or candidate changes need a decision-seeking artifact. For one focused,
 consequential choice it prefers a proposed decision record or ADR; broader
@@ -113,7 +121,7 @@ exploration keeps a software proposal. It separates current evidence from
 proposed behavior and stops before approval, implementation, commit, or
 publication unless those actions are separately authorized. It preserves an
 established decision or proposal location; otherwise, the
-[artifact layout guidance](skills/iterative-up-analysis-design/references/artifact-layouts.md#proposal-placement)
+[artifact layout guidance](skills/design-repository-artifact-layout/references/artifact-layouts.md#proposal-placement)
 selects the repository location according to how reviewers navigate it.
 
 The [repository structure and skill-relationship comparison](catalog/agent-skill-repository-structures.md)
@@ -146,8 +154,9 @@ creating a standalone document. The budget prefers executable evidence and
 existing canonical artifacts, and requires new files to demonstrate value,
 distinct ownership, and an independent lifecycle. A narrow iteration can rely
 on canonical changes and its commit instead of creating a separate iteration
-record. Layout and Markdown guidance lives in the references owned by
-`iterative-up-analysis-design`.
+record. Repository-placement guidance lives in `design-repository-artifact-layout`;
+artifact budgeting, Markdown metadata, and readability guidance remain in the
+references owned by `iterative-up-analysis-design`.
 
 The optional UP analysis and object-design skills distill workflows from Craig
 Larman's *Applying UML and Patterns*. General language adaptation covers Rust,

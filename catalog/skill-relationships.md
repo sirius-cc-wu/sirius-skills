@@ -6,7 +6,7 @@ reduce the current risk or complete the current behavior slice.
 
 ## Bird's-eye view
 
-This view groups all 31 deployable Sirius skills by responsibility and shows
+This view groups all 32 deployable Sirius skills by responsibility and shows
 two optional external intent-shaping skills at the boundary. It shows only the
 main movement between groups so readers can locate a starting point before
 using the detailed views below. Solid arrows are normal handoffs, not a
@@ -55,7 +55,7 @@ rectangle "**Implementation and Evolution**\ntest-driven-implementation\nbehavio
 
 rectangle "**Repository Workflow**\nsimplify\ncommit\ncreate-pr\ngovernance-update" as repository #F3EEFF
 
-rectangle "**Cross-cutting Support**\nsoftware-design-language-adaptation\ndesign-rust-lifecycles\nrewrite-technical-artifacts" as support #FFFBEA
+rectangle "**Cross-cutting Support**\ndesign-repository-artifact-layout\nsoftware-design-language-adaptation\ndesign-rust-lifecycles\nrewrite-technical-artifacts" as support #FFFBEA
 
 proposal -[hidden]right-> assess
 assess -[hidden]right-> discovery
@@ -96,8 +96,8 @@ artifact's next Sirius owner remains unclear.
 The Sirius groups are navigation aids, not installation profiles or lifecycle
 gates. The diagrams that follow show the internal choices and conditional
 feedback that this overview deliberately collapses. Cross-cutting support is
-left unconnected because it is selected for a specific language or readability
-need, not as a required workflow stage.
+left unconnected because it is selected for a specific artifact-placement,
+language, or readability need, not as a required workflow stage.
 
 ## Choose a track
 
@@ -114,6 +114,8 @@ need, not as a required workflow stage.
   change is already sufficiently bounded.
 - Use **Repository Workflow** after a change is verified and authorized for
   cleanup, recording, or publication.
+- Use `design-repository-artifact-layout` across tracks when durable technical
+  artifacts need canonical homes, lifecycle separation, or migration.
 
 ## External development inputs
 
@@ -216,7 +218,9 @@ rules, stopping conditions, and selection examples.
 stops after validation and one authorized commit. It routes to the smallest
 specialists that answer the current question. `iterative-up-analysis-design`
 remains an optional planner when a team explicitly wants UP phase framing and
-use-case-driven artifact dependencies.
+use-case-driven artifact dependencies. Both preserve established canonical
+paths and delegate a material placement or migration decision to
+`design-repository-artifact-layout`.
 
 ```plantuml
 @startuml iterative-design-skill-relationships
@@ -436,6 +440,7 @@ keeps the diagrams readable without changing where they apply.
 
 | Skill | Use with | Selection trigger |
 |---|---|---|
+| `design-repository-artifact-layout` | Proposal authoring, reverse engineering, iterative analysis and design, implementation evidence, and durable repository documentation | A justified artifact lacks a canonical home, artifact lifecycles conflict, or repository migration must preserve links, IDs, indexes, and history |
 | `software-design-language-adaptation` | `run-development-iteration`, approved behavior and contracts, optional object design, and `test-driven-implementation` | Language-specific data, interfaces, ownership, errors, concurrency, lifecycle, or runtime conventions affect the design |
 | `design-rust-lifecycles` | `run-development-iteration`, approved scenarios and contracts, language adaptation, implementation briefing, and Rust implementation | Ownership, capability transfer, staged startup, readiness, rollback, cancellation, supervision, or fallible cleanup creates a material Rust design risk |
 | `rewrite-technical-artifacts` | Recovered artifacts, iterative-design artifacts, behavior-slice evidence, and refactoring records | The knowledge is sound but its reading order or progressive disclosure needs improvement |

@@ -8,6 +8,7 @@ recover-system-behavior
 reconstruct-software-architecture
 reconcile-recovered-design
 rewrite-technical-artifacts
+design-repository-artifact-layout
 assess-development-input
 author-software-proposal
 run-development-iteration
