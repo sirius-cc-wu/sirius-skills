@@ -111,6 +111,9 @@ for name in "${expected[@]}"; do
   test -f "$file" || fail "missing $file"
   grep -q "^name: $name$" "$file" || fail "bad or missing name in $file"
   grep -q "^description: ." "$file" || fail "bad or missing description in $file"
+  description="$(sed -n 's/^description: //p' "$file" | head -n 1)"
+  [[ "$description" != *": "* || "$description" =~ ^\".*\"$ || "$description" =~ ^\'.*\'$ ]] ||
+    fail "description containing ': ' must be YAML-quoted in $file"
   grep -q "^## Workflow" "$file" || fail "missing Workflow in $file"
   grep -Fq "| \`$name\` |" "$skill_catalog" || fail "skill catalog missing $name"
 done

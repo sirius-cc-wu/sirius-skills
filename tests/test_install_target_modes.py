@@ -197,6 +197,21 @@ def test_uninstall_accepts_each_named_profile(profile: str) -> None:
     assert f"{NPX_SKILLS} ls -g --json" in output
 
 
+def test_skill_descriptions_with_yaml_indicator_text_are_quoted() -> None:
+    for skill_file in (REPO_ROOT / "skills").glob("*/SKILL.md"):
+        description_line = next(
+            line
+            for line in skill_file.read_text(encoding="utf-8").splitlines()
+            if line.startswith("description: ")
+        )
+        value = description_line.removeprefix("description: ")
+        assert ": " not in value or (
+            len(value) >= 2
+            and value[0] == value[-1]
+            and value[0] in "\"'"
+        ), skill_file
+
+
 def test_validation_covers_the_consolidated_catalog() -> None:
     result = subprocess.run(
         ["just", "validate"],
