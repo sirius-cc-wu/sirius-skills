@@ -81,7 +81,7 @@ framework.
    contract, defect, or decision. Record the intended verification boundary
    and any scenario that remains unimplemented or human-owned.
 8. **Choose the canonical location.** Apply the
-   [Artifact Selection Budget](../iterative-up-analysis-design/references/artifact-selection-budget.md).
+   [Artifact Selection Budget](../select-technical-artifacts/references/artifact-selection-budget.md).
    Prefer the existing requirements brief, use case, acceptance section, or
    test file. Create a standalone scenario artifact only when it has distinct
    ownership, review value, and lifecycle.

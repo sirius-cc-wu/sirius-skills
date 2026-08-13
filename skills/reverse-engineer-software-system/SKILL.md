@@ -71,7 +71,7 @@ convenient source.
 ## Recovery Record Template
 
 Before creating a new document, apply
-[Artifact Selection Budget](../iterative-up-analysis-design/references/artifact-selection-budget.md).
+[Artifact Selection Budget](../select-technical-artifacts/references/artifact-selection-budget.md).
 Prefer updating an existing recovery record or keeping evidence near its
 executable source when either is a sufficient owner.
 

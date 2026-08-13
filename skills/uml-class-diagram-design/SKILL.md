@@ -36,7 +36,7 @@ When the implementation language is known, also use [Software Design Language Ad
 ## Output Template
 
 Before creating a new document, apply
-[Artifact Selection Budget](../iterative-up-analysis-design/references/artifact-selection-budget.md).
+[Artifact Selection Budget](../select-technical-artifacts/references/artifact-selection-budget.md).
 Prefer updating the canonical design model or embedding a local class view in
 its owning feature artifact when either is sufficient.
 

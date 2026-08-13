@@ -37,6 +37,7 @@ Choose the narrowest specialist for each material question:
 
 | Current question or force | Candidate owner |
 |---|---|
+| Whether candidate knowledge should be created, updated, embedded, kept with implementation, omitted, or deferred | [`select-technical-artifacts`](../../skills/select-technical-artifacts/SKILL.md) |
 | Canonical repository homes, lifecycle separation, or artifact migration | [`design-repository-artifact-layout`](../../skills/design-repository-artifact-layout/SKILL.md) |
 | One consequential architecture choice needs proposed review, accepted history, or supersession | [`record-architecture-decision`](../../skills/record-architecture-decision/SKILL.md) |
 | Vision, feasibility, project scope, or major business risk | [`inception`](../../skills/inception/SKILL.md) |
@@ -84,11 +85,14 @@ or document template for every language merely to complete a matrix.
 
 ## Artifact and Commit Rule
 
-Apply the
-[Artifact Selection Budget](../../skills/iterative-up-analysis-design/references/artifact-selection-budget.md)
-before creating a standalone document. Prefer executable evidence, an existing
-canonical artifact, or an aggregate feature section unless a new file has
-clear value, distinct ownership, and an independent lifecycle.
+Apply
+[`select-technical-artifacts`](../../skills/select-technical-artifacts/SKILL.md)
+when artifact selection is a material question. Its
+[Artifact Selection Budget](../../skills/select-technical-artifacts/references/artifact-selection-budget.md)
+remains the local creation gate for every owning skill: prefer executable
+evidence, an existing canonical artifact, or an aggregate feature section
+unless a new file has clear value, distinct ownership, and an independent
+lifecycle.
 
 When a standalone artifact passes that budget but lacks a clear canonical
 home, use

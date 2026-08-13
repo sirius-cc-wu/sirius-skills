@@ -1,4 +1,5 @@
 reverse-engineer-software-system
+select-technical-artifacts
 design-repository-artifact-layout
 record-architecture-decision
 survey-existing-system

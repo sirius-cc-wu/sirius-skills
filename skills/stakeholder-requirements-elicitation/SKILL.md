@@ -79,7 +79,7 @@ sources without copying confidential material.
 ## File Output
 
 Apply
-[Artifact Selection Budget](../iterative-up-analysis-design/references/artifact-selection-budget.md).
+[Artifact Selection Budget](../select-technical-artifacts/references/artifact-selection-budget.md).
 Prefer an existing discovery record or aggregate feature artifact.
 
 For a standalone Markdown record, follow

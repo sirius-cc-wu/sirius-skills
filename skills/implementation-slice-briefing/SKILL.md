@@ -92,7 +92,7 @@ outcome. Otherwise issue a blocked brief or stop. A layer-only task such as
 ## File Output
 
 Apply
-[Artifact Selection Budget](../iterative-up-analysis-design/references/artifact-selection-budget.md).
+[Artifact Selection Budget](../select-technical-artifacts/references/artifact-selection-budget.md).
 Prefer an existing issue, work item, or feature artifact. Create a standalone
 brief only for independent assignment, freshness, and completion.
 

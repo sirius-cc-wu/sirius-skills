@@ -25,7 +25,8 @@ authorizes those repository changes.
 - Current artifacts need a migration plan that preserves stable identifiers,
   inbound links, indexes, and historical records.
 - Do not use merely to decide whether any standalone document should exist;
-  apply the artifact-selection budget first.
+  use `select-technical-artifacts` when that is the material question, or apply
+  its artifact-selection budget locally when the disposition is clear.
 - Do not author or semantically rewrite the artifact body, plan UP iterations,
   or choose implementation design on behalf of the corresponding specialist.
 
@@ -42,10 +43,12 @@ authorizes those repository changes.
    product knowledge, architecture and recovery views, verification evidence,
    and iteration history. Distinguish an established layout from an incidental
    directory or one-off file.
-4. **Apply the creation gate.** Use the
-   [Artifact Selection Budget](../iterative-up-analysis-design/references/artifact-selection-budget.md)
-   before assigning a new file or directory. Prefer executable evidence, an
-   existing canonical owner, or an aggregate section when it is sufficient.
+4. **Confirm selection.** Require every artifact in scope to pass the
+   [Artifact Selection Budget](../select-technical-artifacts/references/artifact-selection-budget.md)
+   before assigning a new file or directory. If several candidate artifacts or
+   dispositions remain material, route that decision to
+   `select-technical-artifacts`. Prefer executable evidence, an existing
+   canonical owner, or an aggregate section when it is sufficient.
 5. **Separate lifecycles.** Classify current evolving knowledge, historical
    iteration records, decision-seeking proposals, accepted decisions, and
    executable or retained verification evidence. Do not co-locate them merely

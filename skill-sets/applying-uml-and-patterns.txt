@@ -1,4 +1,5 @@
 assess-development-input
+select-technical-artifacts
 design-repository-artifact-layout
 record-architecture-decision
 run-development-iteration

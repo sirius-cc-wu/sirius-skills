@@ -31,7 +31,7 @@ Operation contracts define what a system operation guarantees, especially change
 ## Output Template
 
 Before creating a new document, apply
-[Artifact Selection Budget](../iterative-up-analysis-design/references/artifact-selection-budget.md).
+[Artifact Selection Budget](../select-technical-artifacts/references/artifact-selection-budget.md).
 Prefer refining the owning feature artifact when a contract will not be reused
 or maintained independently.
 

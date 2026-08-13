@@ -45,7 +45,7 @@ identifiers, repository-local conventions, evidence, and authorization.
    identifier rules, and relevant accepted or superseded records. Preserve the
    established location, format, filename scheme, headings, and statuses.
 2. **Apply the creation gate.** Use the
-   [Artifact Selection Budget](../iterative-up-analysis-design/references/artifact-selection-budget.md).
+   [Artifact Selection Budget](../select-technical-artifacts/references/artifact-selection-budget.md).
    Update an existing proposed ADR when it already owns the choice. Create one
    standalone ADR only when the decision is durable, has no sufficient owner,
    and needs an independent lifecycle.

@@ -6,7 +6,7 @@ reduce the current risk or complete the current behavior slice.
 
 ## Bird's-eye view
 
-This view groups all 32 deployable Sirius skills by responsibility and shows
+This view groups all 33 deployable Sirius skills by responsibility and shows
 two optional external intent-shaping skills at the boundary. It shows only the
 main movement between groups so readers can locate a starting point before
 using the detailed views below. Solid arrows are normal handoffs, not a
@@ -52,7 +52,7 @@ rectangle "**Implementation and Evolution**\ntest-driven-implementation\nbehavio
 
 rectangle "**Repository Workflow**\nsimplify\ncommit\ncreate-pr\ngovernance-update" as repository #F3EEFF
 
-rectangle "**Cross-cutting Support**\ndesign-repository-artifact-layout\nrecord-architecture-decision\nsoftware-design-language-adaptation\ndesign-rust-lifecycles\nrewrite-technical-artifacts" as support #FFFBEA
+rectangle "**Cross-cutting Support**\nselect-technical-artifacts\ndesign-repository-artifact-layout\nrecord-architecture-decision\nsoftware-design-language-adaptation\ndesign-rust-lifecycles\nrewrite-technical-artifacts" as support #FFFBEA
 
 assess -[hidden]right-> discovery
 discovery -[hidden]right-> reverse
@@ -91,8 +91,9 @@ artifact's next Sirius owner remains unclear.
 The Sirius groups are navigation aids, not installation profiles or lifecycle
 gates. The diagrams that follow show the internal choices and conditional
 feedback that this overview deliberately collapses. Cross-cutting support is
-left unconnected because it is selected for a specific artifact-placement,
-language, or readability need, not as a required workflow stage.
+left unconnected because it is selected for a specific artifact-selection,
+artifact-placement, language, or readability need, not as a required workflow
+stage.
 
 ## Choose a track
 
@@ -109,7 +110,9 @@ language, or readability need, not as a required workflow stage.
   change is already sufficiently bounded.
 - Use **Repository Workflow** after a change is verified and authorized for
   cleanup, recording, or publication.
-- Use `design-repository-artifact-layout` across tracks when durable technical
+- Use `select-technical-artifacts` across tracks when candidate knowledge needs
+  a create, update, embed, keep-with-implementation, omit, or defer disposition.
+- Use `design-repository-artifact-layout` across tracks when justified durable
   artifacts need canonical homes, lifecycle separation, or migration.
 - Use `record-architecture-decision` across tracks when one consequential
   architecture choice needs a proposed, accepted, or superseding ADR, or when
@@ -420,6 +423,7 @@ keeps the diagrams readable without changing where they apply.
 
 | Skill | Use with | Selection trigger |
 |---|---|---|
+| `select-technical-artifacts` | Candidate directions, reverse engineering, iterative analysis and design, implementation evidence, architecture decisions, and durable repository documentation | Candidate knowledge needs a create, update, embed, keep-with-implementation, omit, or defer disposition, or a proposed artifact set needs minimization |
 | `design-repository-artifact-layout` | Candidate directions, reverse engineering, iterative analysis and design, implementation evidence, architecture decisions, and durable repository documentation | A justified artifact lacks a canonical home, artifact lifecycles conflict, or repository migration must preserve links, IDs, indexes, and history |
 | `record-architecture-decision` | Approved requirements, architecture and language design, consequential pattern or responsibility choices, implementation discoveries, and reconciliation | Governing ADRs must be found, or one bounded, cross-cutting, or expensive-to-reverse architecture choice needs proposed review, an accepted historical record, or linked supersession |
 | `software-design-language-adaptation` | `run-development-iteration`, approved behavior and contracts, optional object design, and `test-driven-implementation` | Language-specific data, interfaces, ownership, errors, concurrency, lifecycle, or runtime conventions affect the design |

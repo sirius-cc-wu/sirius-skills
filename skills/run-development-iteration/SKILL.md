@@ -39,11 +39,13 @@ not from a mandatory artifact sequence or programming paradigm.
    language specialist only when runtime semantics matter. Prefer one
    localized specialist over this coordinator when no coordination remains.
 4. **Budget artifacts.** Apply
-   [Artifact Selection Budget](../iterative-up-analysis-design/references/artifact-selection-budget.md).
+   [Artifact Selection Budget](../select-technical-artifacts/references/artifact-selection-budget.md).
    Prefer code, tests, configuration, an existing canonical artifact, or an
-   embedded section. A Git commit can preserve narrow iteration history; do
-   not require a separate iteration record unless coordination, audit, or
-   durable unresolved risk gives it an independent lifecycle.
+   embedded section. Use `select-technical-artifacts` when the iteration exposes
+   a material choice among several artifact owners or dispositions. A Git
+   commit can preserve narrow iteration history; do not require a separate
+   iteration record unless coordination, audit, or durable unresolved risk
+   gives it an independent lifecycle.
 5. **Execute only the selected iteration.** Read and follow every selected
    specialist skill. Keep all work tied to the shared objective and stop if a
    missing approval, product rule, compatibility decision, or verification

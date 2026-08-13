@@ -87,7 +87,7 @@ publishing or sending material to an external service.
 ## File Output
 
 Apply
-[Artifact Selection Budget](../iterative-up-analysis-design/references/artifact-selection-budget.md).
+[Artifact Selection Budget](../select-technical-artifacts/references/artifact-selection-budget.md).
 Prefer existing requirements owners. Create a standalone brief only when its
 synthesis, validation history, and conflict log change independently.
 

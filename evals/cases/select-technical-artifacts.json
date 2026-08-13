@@ -1,0 +1,72 @@
+{
+  "skill_name": "select-technical-artifacts",
+  "trigger": {
+    "positive": [
+      {
+        "prompt": "Review this proposed set of vision, use-case, architecture, ADR, test-plan, and iteration documents and select the smallest set we should actually maintain.",
+        "top_k": 3
+      },
+      {
+        "prompt": "Should these recovered findings become a separate document, update the existing architecture overview, stay with executable tests, or be omitted?",
+        "top_k": 3
+      },
+      {
+        "prompt": "Audit the artifact budget for this feature and classify each candidate as create, update, embed, keep with implementation, defer, or omit.",
+        "top_k": 3
+      }
+    ],
+    "negative": [
+      {
+        "prompt": "Choose canonical repository paths and indexes for these already-approved durable design and decision artifacts.",
+        "owner": "design-repository-artifact-layout"
+      },
+      {
+        "prompt": "Write the accepted PostgreSQL architecture decision with its authority, alternatives, consequences, and supersession links.",
+        "owner": "record-architecture-decision"
+      },
+      {
+        "prompt": "Improve this design document's reading order without changing its technical meaning, identifiers, or lifecycle.",
+        "owner": "rewrite-technical-artifacts"
+      },
+      {
+        "prompt": "Run one approved implementation iteration, coordinate the needed specialists, validate it, and create one authorized commit.",
+        "owner": "run-development-iteration"
+      }
+    ]
+  },
+  "evals": [
+    {
+      "id": "minimize-proposed-artifact-set",
+      "prompt": "Inspect the repository's existing technical artifacts and review a proposed feature documentation set. Recommend create, update, embed, keep with implementation, omit, or defer for every candidate. Do not create or edit files.",
+      "expected_output": "A read-only artifact disposition table that selects the smallest durable set from repository evidence and routes later content and placement work to their narrow owners.",
+      "expectations": [
+        "Every candidate receives exactly one disposition",
+        "Every create recommendation names concrete value, the absence of a sufficient owner, and an independent lifecycle",
+        "Existing code, tests, configuration, and canonical artifacts are considered before new files",
+        "Duplicate candidates with equivalent owners and lifecycles are consolidated",
+        "Deferred candidates receive evidence-based promotion triggers"
+      ],
+      "prohibitions": [
+        "Do not create, rewrite, move, commit, or publish artifacts",
+        "Do not invent canonical paths, identifiers, or templates before placement is selected",
+        "Do not require artifacts merely because a methodology or template names them"
+      ],
+      "trust_level": "provisional"
+    },
+    {
+      "id": "apply-authorized-budget-update",
+      "prompt": "Review the proposed artifacts in docs/iteration.md, then update only its Artifact Budget dispositions and rationale. Do not create any selected artifact or change implementation.",
+      "expected_output": "An evidence-based, authorized update to the existing artifact budget that records one disposition per candidate and leaves selected artifact creation to later owners.",
+      "expectations": [
+        "Only artifact dispositions and their value, ownership, lifecycle, or deferral rationale change",
+        "The updated budget preserves unrelated plan content and repository conventions",
+        "Every create disposition passes all three gates and every defer disposition names a promotion trigger"
+      ],
+      "prohibitions": [
+        "Do not create or author the selected artifacts",
+        "Do not invent paths, implement code, commit, or publish"
+      ],
+      "trust_level": "provisional"
+    }
+  ]
+}

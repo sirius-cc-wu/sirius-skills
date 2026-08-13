@@ -143,15 +143,19 @@ for name in "${specialist_skills[@]}"; do
   file="$root/skills/$name/SKILL.md"
   grep -q "^## When to Use" "$file" || fail "missing When to Use in $file"
   grep -q "artifact-selection-budget.md" "$file" || fail "missing artifact selection budget guidance in $file"
-  grep -q "markdown-artifact-frontmatter.md" "$file" || fail "missing Markdown artifact frontmatter guidance in $file"
-  grep -q "readable-technical-artifacts.md" "$file" || fail "missing readable technical artifact guidance in $file"
+  if [[ "$name" != "select-technical-artifacts" ]]; then
+    grep -q "markdown-artifact-frontmatter.md" "$file" || fail "missing Markdown artifact frontmatter guidance in $file"
+    grep -q "readable-technical-artifacts.md" "$file" || fail "missing readable technical artifact guidance in $file"
+  fi
   grep -q "^## Verification" "$file" || fail "missing Verification in $file"
 done
 
 up_skill="$root/skills/iterative-up-analysis-design/SKILL.md"
+selection_skill="$root/skills/select-technical-artifacts/SKILL.md"
+selection_metadata="$root/skills/select-technical-artifacts/agents/openai.yaml"
 layout_skill="$root/skills/design-repository-artifact-layout/SKILL.md"
 layout_reference="$root/skills/design-repository-artifact-layout/references/artifact-layouts.md"
-budget_reference="$root/skills/iterative-up-analysis-design/references/artifact-selection-budget.md"
+budget_reference="$root/skills/select-technical-artifacts/references/artifact-selection-budget.md"
 frontmatter_reference="$root/skills/iterative-up-analysis-design/references/markdown-artifact-frontmatter.md"
 readability_reference="$root/skills/iterative-up-analysis-design/references/readable-technical-artifacts.md"
 
@@ -165,6 +169,12 @@ grep -q "^Artifact Budget:$" "$up_skill" || fail "iteration template missing art
 grep -q "^Artifact Outcomes:$" "$up_skill" || fail "iteration template missing artifact outcomes"
 grep -q "^## Creation Gate$" "$budget_reference" || fail "artifact budget missing creation gate"
 grep -q "^## Disposition Order$" "$budget_reference" || fail "artifact budget missing disposition guidance"
+test -f "$selection_metadata" || fail "select-technical-artifacts missing agents/openai.yaml"
+grep -Fq '$select-technical-artifacts' "$selection_metadata" || fail "artifact selection metadata missing skill invocation"
+grep -q '^## Output$' "$selection_skill" || fail "artifact selection skill missing output guidance"
+grep -q '^## Boundaries$' "$selection_skill" || fail "artifact selection skill missing boundary guidance"
+grep -q 'keep with implementation' "$selection_skill" || fail "artifact selection skill missing executable disposition"
+grep -q 'authorizes updating an existing artifact budget or plan' "$selection_skill" || fail "artifact selection skill missing authorized budget-update mode"
 grep -q "^## Output$" "$layout_skill" || fail "artifact layout skill missing output guidance"
 grep -q "^## Artifact Lifecycles$" "$layout_reference" || fail "artifact layout reference missing lifecycle guidance"
 grep -q "^## Layout Options$" "$layout_reference" || fail "artifact layout reference missing layout options"

@@ -64,7 +64,7 @@ than implementation details.
 ## Artifact Output
 
 Before creating a file, apply
-[Artifact Selection Budget](../iterative-up-analysis-design/references/artifact-selection-budget.md).
+[Artifact Selection Budget](../select-technical-artifacts/references/artifact-selection-budget.md).
 Prefer refining an existing implementation-facing design when it owns the same
 lifecycle. Otherwise, copy and tailor
 [Rust Lifecycle Design Template](assets/rust-lifecycle-design.md).

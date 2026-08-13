@@ -35,7 +35,7 @@ all languages or development iterations.
 2. **Select an iteration objective.** Choose a thin slice driven by risk, learning value, or stakeholder priority.
 3. **Inspect repository conventions.** Read governance, indexes, and neighboring artifacts before selecting paths or creating directories.
 4. **Classify artifact lifecycles.** Refine design artifacts at canonical paths, create one historical record per iteration, and record durable cross-cutting decisions separately when needed.
-5. **Budget artifact creation.** Apply [Artifact Selection Budget](references/artifact-selection-budget.md). Create a standalone artifact only when it provides durable, reusable, or risk-reducing value, has no sufficient existing owner, and needs an independent lifecycle.
+5. **Budget artifact creation.** Apply [Artifact Selection Budget](../select-technical-artifacts/references/artifact-selection-budget.md). Use `select-technical-artifacts` when choosing among several material artifact owners or dispositions. Create a standalone artifact only when it provides durable, reusable, or risk-reducing value, has no sufficient existing owner, and needs an independent lifecycle.
 6. **Choose artifact placement.** Preserve established canonical paths. When no convention exists, several homes compete, or migration is material, use [Design Repository Artifact Layout](../design-repository-artifact-layout/SKILL.md) to make the repository-placement decision; do not make UP phases the directory structure.
 7. **Apply dependencies selectively.** Use cases may lead to examples, SSDs,
    domain concepts, or contracts when those questions matter. Add GRASP,
@@ -51,7 +51,7 @@ all languages or development iterations.
 ## File Output
 
 Before creating a new document, apply
-[Artifact Selection Budget](references/artifact-selection-budget.md). Prefer
+[Artifact Selection Budget](../select-technical-artifacts/references/artifact-selection-budget.md). Prefer
 code, tests, configuration, an existing canonical artifact, or an aggregate
 feature section when one of them is a sufficient owner.
 

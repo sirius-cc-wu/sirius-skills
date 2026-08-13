@@ -68,7 +68,7 @@ stakeholder confirmation for intent.
 ## Reconciliation Template
 
 Before creating a new document, apply
-[Artifact Selection Budget](../iterative-up-analysis-design/references/artifact-selection-budget.md).
+[Artifact Selection Budget](../select-technical-artifacts/references/artifact-selection-budget.md).
 Prefer updating the existing reconciliation when it owns the same baseline,
 scope, and decision.
 

@@ -30,7 +30,7 @@ A system sequence diagram shows external actors sending events to the system tre
 ## Output Template
 
 Before creating a new document, apply
-[Artifact Selection Budget](../iterative-up-analysis-design/references/artifact-selection-budget.md).
+[Artifact Selection Budget](../select-technical-artifacts/references/artifact-selection-budget.md).
 Prefer embedding a small SSD beside its use-case scenario when it does not need
 an independent lifecycle.
 

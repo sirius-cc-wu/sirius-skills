@@ -66,9 +66,12 @@ inventoried.
 Do not execute every skill at full depth. A first-contact onboarding question
 may stop after the survey. A behavior-preserving migration may require behavior
 recovery and architecture reconstruction. Documentation drift requires
-reconciliation. Apply the
-[Artifact Selection Budget](../../skills/iterative-up-analysis-design/references/artifact-selection-budget.md)
-before splitting recovered evidence into another standalone document. When a
+reconciliation. Use
+[`select-technical-artifacts`](../../skills/select-technical-artifacts/SKILL.md)
+when the recovered artifact set itself is a material question. Apply its
+[Artifact Selection Budget](../../skills/select-technical-artifacts/references/artifact-selection-budget.md)
+locally before splitting recovered evidence into another standalone document.
+When a
 justified recovered artifact has no obvious home, several paths compete, or a
 migration must preserve links and history, use
 [`design-repository-artifact-layout`](../../skills/design-repository-artifact-layout/SKILL.md)

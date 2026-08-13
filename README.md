@@ -1,9 +1,9 @@
 # sirius-skills
 
 `sirius-skills` is a curated collection of development-input assessment,
-architecture-decision recording, repository artifact-layout, repository
-workflow, software discovery, iterative design, implementation, and evolution
-skills. Skills are independently
+technical-artifact selection, architecture-decision recording, repository
+artifact-layout, repository workflow, software discovery, iterative design,
+implementation, and evolution skills. Skills are independently
 deployable; profiles provide convenient installations without turning the
 catalog into a mandatory lifecycle.
 
@@ -28,9 +28,9 @@ Available profiles are defined in [`skill-sets/`](skill-sets/):
 | Profile | Purpose |
 |---|---|
 | `workflow` | Simplification, scoped commits, pull requests, and durable governance updates |
-| `iterative-design` | External-input assessment, architecture-decision recording, artifact-layout design, question-driven iterations, optional UP/object design, language adaptation, tested implementation, simplification, and scoped commits |
+| `iterative-design` | External-input assessment, technical-artifact selection, architecture-decision recording, artifact-layout design, question-driven iterations, optional UP/object design, language adaptation, tested implementation, simplification, and scoped commits |
 | `applying-uml-and-patterns` | Compatibility alias for `iterative-design` |
-| `reverse-engineering` | Evidence-driven system survey, behavior and architecture recovery, recorded-decision discovery, reconciliation, and durable recovered-artifact placement |
+| `reverse-engineering` | Evidence-driven system survey, behavior and architecture recovery, recorded-decision discovery, recovered-artifact selection, reconciliation, and durable placement |
 | `all` | Every active skill in the catalog |
 
 Remove the default or a named profile later:
@@ -106,12 +106,17 @@ external or mixed workflow and its Sirius entry point is unclear. It evaluates
 the content and recommends one next Sirius skill without rewriting the source
 or automatically executing the handoff.
 
-Use `design-repository-artifact-layout` when the primary question is where
-durable proposals, requirements, analysis, design, recovery, decisions,
-verification evidence, or iteration history should live. It preserves coherent
-local conventions, separates artifact lifecycles, and recommends the smallest
-structure with obvious canonical paths. Recommendations are read-only unless
-repository changes are explicitly authorized.
+Use `select-technical-artifacts` when the primary question is whether technical
+knowledge should become a standalone artifact, update or embed in an existing
+owner, remain with implementation, be deferred, or be omitted. It applies the
+value, ownership, and lifecycle gate and normally returns a read-only minimal
+artifact set.
+
+Use `design-repository-artifact-layout` after a justified artifact needs a
+canonical home or migration. It preserves coherent local conventions,
+separates artifact lifecycles, and recommends the smallest structure with
+obvious canonical paths. Recommendations are read-only unless repository
+changes are explicitly authorized.
 
 For upstream intent and idea refinement, optionally compose Addy Osmani's
 [`interview-me`](https://github.com/addyosmani/agent-skills/blob/5a1b82d6445d1e2f0abeea1072851419a50c0e5c/skills/interview-me/SKILL.md)
@@ -171,9 +176,10 @@ creating a standalone document. The budget prefers executable evidence and
 existing canonical artifacts, and requires new files to demonstrate value,
 distinct ownership, and an independent lifecycle. A narrow iteration can rely
 on canonical changes and its commit instead of creating a separate iteration
-record. Repository-placement guidance lives in `design-repository-artifact-layout`;
-artifact budgeting, Markdown metadata, and readability guidance remain in the
-references owned by `iterative-up-analysis-design`.
+record. Artifact selection and its detailed budget live in
+`select-technical-artifacts`; repository-placement guidance lives in
+`design-repository-artifact-layout`; Markdown metadata and readability guidance
+remain references owned by `iterative-up-analysis-design`.
 
 The optional UP analysis and object-design skills distill workflows from Craig
 Larman's *Applying UML and Patterns*. General language adaptation covers Rust,

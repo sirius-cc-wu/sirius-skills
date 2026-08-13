@@ -42,7 +42,7 @@ but it may instead add a small amount of orientation before exact specification.
    - Diff-focused review: inspect only the changed reader-facing artifacts and
      their necessary canonical context before commit or review.
    - Companion explanation: first apply
-     [Artifact Selection Budget](../iterative-up-analysis-design/references/artifact-selection-budget.md),
+     [Artifact Selection Budget](../select-technical-artifacts/references/artifact-selection-budget.md),
      then use only when a different audience or task cannot safely be served by
      the canonical technical artifact.
 4. **Inventory meaning before editing.** Record frontmatter, lifecycle status,

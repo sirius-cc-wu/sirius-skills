@@ -92,12 +92,14 @@ The following statements describe the repository today:
 - [`artifact-layouts.md`](../../skills/design-repository-artifact-layout/references/artifact-layouts.md)
   already defines a repository-first selection workflow, several layout
   options, a selection matrix, and migration guidance.
-- [`artifact-selection-budget.md`](../../skills/iterative-up-analysis-design/references/artifact-selection-budget.md)
+- [`artifact-selection-budget.md`](../../skills/select-technical-artifacts/references/artifact-selection-budget.md)
   already limits standalone artifacts to knowledge with durable value, clear
   ownership, and an independent lifecycle.
-- The layout guidance is owned by the independently deployable
-  [`design-repository-artifact-layout`](../../skills/design-repository-artifact-layout/SKILL.md)
-  skill and reused by proposal placement guidance and optional UP planning.
+- The selection gate is owned by the independently deployable
+  [`select-technical-artifacts`](../../skills/select-technical-artifacts/SKILL.md)
+  skill, while layout guidance is owned by
+  [`design-repository-artifact-layout`](../../skills/design-repository-artifact-layout/SKILL.md).
+  Both are reused by owning artifact skills and optional UP planning.
   This solves agent routing without creating a deterministic developer-facing
   command or versioned output contract.
 - The Python package currently describes itself as packaging support and does

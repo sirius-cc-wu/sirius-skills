@@ -59,6 +59,13 @@ state, side effects, verification surfaces, and highest-risk follow-up slices.
 ## Iterative design and implementation
 
 ```text
+Use select-technical-artifacts to review the proposed vision, use-case,
+architecture, ADR, test-plan, and iteration documents. Classify each as create,
+update, embed, keep with implementation, omit, or defer; select the smallest
+durable set; do not create or edit files.
+```
+
+```text
 Use record-architecture-decision to capture our accepted choice of PostgreSQL
 for transactional services. Preserve local ADR conventions; record authority,
 forces, serious alternatives, consequences, confidence, and reconsideration

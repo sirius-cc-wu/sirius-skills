@@ -10,8 +10,8 @@ following every step in it.
 | Need | Profile |
 |---|---|
 | Refine, record, and publish repository changes | `workflow` |
-| Assess external development inputs, record architecture decisions, design artifact layouts, and run question-driven analysis, design, implementation, simplification, and scoped-commit iterations | `iterative-design` |
-| Recover current behavior and architecture, find governing ADRs, and place durable recovered knowledge | `reverse-engineering` |
+| Assess external development inputs, select technical artifacts, record architecture decisions, design artifact layouts, and run question-driven analysis, design, implementation, simplification, and scoped-commit iterations | `iterative-design` |
+| Recover current behavior and architecture, find governing ADRs, select durable recovered artifacts, and place them | `reverse-engineering` |
 | Make the entire catalog available | `all` |
 
 `applying-uml-and-patterns` remains a compatibility alias for
@@ -73,6 +73,22 @@ Use the corresponding design specialist when the choice is unresolved. Keep a
 local pattern or responsibility decision in its owning artifact unless the
 choice is independently consequential and expensive to reverse.
 
+### Select the smallest durable artifact set
+
+1. Use `select-technical-artifacts` when the material question is whether
+   candidate knowledge should be created, updated, embedded, kept with
+   implementation, omitted, or deferred.
+2. Inspect executable and canonical owners, then require standalone artifacts
+   to demonstrate concrete value, insufficient existing ownership, and an
+   independent lifecycle.
+3. Consolidate candidates that share an owner and lifecycle. Route selected
+   content to its specialist and material placement questions to
+   `design-repository-artifact-layout`.
+4. Keep the recommendation read-only unless the user separately authorizes an
+   existing budget or plan update. Creating selected artifacts and executing
+   their handoffs remain separate actions. Owning skills may apply the same
+   budget locally when selection is straightforward.
+
 ### Design durable artifact placement
 
 1. Use `design-repository-artifact-layout` when the primary outcome is a
@@ -80,8 +96,8 @@ choice is independently consequential and expensive to reverse.
 2. Inspect local governance, indexes, and neighboring files; preserve a coherent
    established structure unless a concrete navigation or ownership problem
    justifies change.
-3. Apply the artifact-selection budget before assigning new files or
-   directories, and separate current knowledge, proposals, decisions,
+3. Require justified artifacts before assigning new files or directories, and
+   separate current knowledge, proposals, decisions,
    verification evidence, and historical iteration records by lifecycle.
 4. Keep a recommendation read-only unless the user explicitly authorizes file
    creation or migration. Return content authoring to the artifact's owning

@@ -62,7 +62,7 @@ intent hypotheses.
 ## Survey Template
 
 Before creating a new document, apply
-[Artifact Selection Budget](../iterative-up-analysis-design/references/artifact-selection-budget.md).
+[Artifact Selection Budget](../select-technical-artifacts/references/artifact-selection-budget.md).
 Prefer updating an existing system survey or aggregate recovery record when it
 already owns the scope and evidence.
 

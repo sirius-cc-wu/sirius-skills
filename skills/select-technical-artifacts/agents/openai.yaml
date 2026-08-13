@@ -1,0 +1,4 @@
+interface:
+  display_name: "Select Technical Artifacts"
+  short_description: "Choose the smallest durable artifact set"
+  default_prompt: "Use $select-technical-artifacts to classify each candidate as create, update, embed, keep with implementation, omit, or defer."

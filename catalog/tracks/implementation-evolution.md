@@ -34,9 +34,11 @@ before entering this track.
    artifacts when their represented knowledge changes.
 
 Keep verification evidence with code, tests, schemas, or configuration by
-default. Apply the
-[Artifact Selection Budget](../../skills/iterative-up-analysis-design/references/artifact-selection-budget.md)
-before creating a separate behavior-slice or implementation record.
+default. Use
+[`select-technical-artifacts`](../../skills/select-technical-artifacts/SKILL.md)
+when several evidence artifacts compete; otherwise apply its
+[Artifact Selection Budget](../../skills/select-technical-artifacts/references/artifact-selection-budget.md)
+locally before creating a separate behavior-slice or implementation record.
 
 ## Improve Existing Structure
 

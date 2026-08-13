@@ -51,7 +51,7 @@ Implement a risk-sized slice of observable behavior: establish an implementation
 ## Behavior Slice Template
 
 Before creating a separate evidence document, apply
-[Artifact Selection Budget](../iterative-up-analysis-design/references/artifact-selection-budget.md).
+[Artifact Selection Budget](../select-technical-artifacts/references/artifact-selection-budget.md).
 Keep results with executable tests, code, or configuration unless a durable
 review, audit, or unresolved risk needs an independent record.
 

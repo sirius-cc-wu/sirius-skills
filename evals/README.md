@@ -18,6 +18,7 @@ description-collision failures.
 The initial pilot covers:
 
 - `assess-development-input`;
+- `select-technical-artifacts`;
 - `design-repository-artifact-layout`;
 - `record-architecture-decision`;
 - `stakeholder-requirements-elicitation`;

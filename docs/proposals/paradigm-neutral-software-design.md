@@ -110,7 +110,7 @@ Sirius already contains strong limiting rules:
   skill or combination that addresses the current outcome and risk.
 - The [skill relationship guide](../../catalog/skill-relationships.md) says its
   arrows are handoffs rather than a mandatory waterfall.
-- The [artifact selection budget](../../skills/iterative-up-analysis-design/references/artifact-selection-budget.md)
+- The [artifact selection budget](../../skills/select-technical-artifacts/references/artifact-selection-budget.md)
   prefers code, tests, configuration, or an existing canonical artifact over a
   new document.
 - [`test-driven-implementation`](../../skills/test-driven-implementation/SKILL.md)

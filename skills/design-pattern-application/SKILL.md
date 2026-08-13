@@ -39,7 +39,7 @@ When the implementation language is known, also use [Software Design Language Ad
 ## Decision Template
 
 Before creating a new document, apply
-[Artifact Selection Budget](../iterative-up-analysis-design/references/artifact-selection-budget.md).
+[Artifact Selection Budget](../select-technical-artifacts/references/artifact-selection-budget.md).
 Prefer recording a local pattern choice in the owning design artifact. When the
 choice is cross-cutting, expensive to reverse, and needs an independent
 architecture-decision lifecycle, use

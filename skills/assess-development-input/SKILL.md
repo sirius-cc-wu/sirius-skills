@@ -75,7 +75,8 @@ The source method or file format never determines the route.
 | Content condition | Next Sirius skill |
 |---|---|
 | Claims about current commands, behavior, architecture, or constraints need evidence | `reverse-engineer-software-system` |
-| Durable technical artifacts need canonical repository homes, lifecycle separation, or migration | `design-repository-artifact-layout` |
+| Candidate technical knowledge needs create, update, embed, keep-with-implementation, omit, or defer dispositions | `select-technical-artifacts` |
+| Justified durable technical artifacts need canonical repository homes, lifecycle separation, or migration | `design-repository-artifact-layout` |
 | One bounded architecture choice has explicit proposed or accepted status and needs a durable ADR | `record-architecture-decision` |
 | Opportunity, vision, business case, feasibility, basic scope, or major risks are unclear | `inception` |
 | Actors, user goals, system boundary, main scenarios, or extensions are unclear | `use-case-modeling` |
@@ -137,7 +138,7 @@ Prerequisite or stop condition:
 
 Keep the assessment conversational unless it needs a durable cross-session or
 cross-team handoff. Before creating a standalone document, apply the
-[Artifact Selection Budget](../iterative-up-analysis-design/references/artifact-selection-budget.md).
+[Artifact Selection Budget](../select-technical-artifacts/references/artifact-selection-budget.md).
 Prefer an existing issue, proposal, or aggregate feature artifact when it is a
 sufficient owner.
 

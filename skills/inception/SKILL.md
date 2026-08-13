@@ -34,7 +34,7 @@ Inception is the initial short step to establish a common vision, basic scope, a
 ## File Output
 
 Before creating a new document, apply
-[Artifact Selection Budget](../iterative-up-analysis-design/references/artifact-selection-budget.md).
+[Artifact Selection Budget](../select-technical-artifacts/references/artifact-selection-budget.md).
 Prefer updating an existing vision, plan, risk list, or aggregate inception
 artifact when it is a sufficient owner.
 

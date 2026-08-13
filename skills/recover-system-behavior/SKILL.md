@@ -60,7 +60,7 @@ requirement that should persist.
 ## Behavior Model Template
 
 Before creating a new document, apply
-[Artifact Selection Budget](../iterative-up-analysis-design/references/artifact-selection-budget.md).
+[Artifact Selection Budget](../select-technical-artifacts/references/artifact-selection-budget.md).
 Prefer refining an existing behavior model or keeping executable observations
 with tests when either is a sufficient owner.
 

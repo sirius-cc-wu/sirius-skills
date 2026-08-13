@@ -38,7 +38,7 @@ artifact.
 2. Identify how readers primarily navigate: by feature, artifact type, product
    area, or chronology.
 3. Apply
-   [Artifact Selection Budget](../../iterative-up-analysis-design/references/artifact-selection-budget.md)
+   [Artifact Selection Budget](../../select-technical-artifacts/references/artifact-selection-budget.md)
    to decide whether documentation belongs in implementation evidence, an
    existing artifact, an aggregate section, or a new standalone file.
 4. Estimate whether a feature needs one document or several independently
