@@ -46,13 +46,13 @@ rectangle "**Client Discovery**\nstakeholder-requirements-elicitation\nrequireme
 
 rectangle "**Reverse Engineering**\nreverse-engineer-software-system\nsurvey-existing-system\nrecover-system-behavior\nreconstruct-software-architecture\nreconcile-recovered-design" as reverse #EAF4FB
 
-rectangle "**Iterative Analysis and Design**\nrun-development-iteration\nplan-up-iterations\ninception\nuse-case-modeling\nbehavior-driven-specification\ndomain-modeling\nsystem-sequence-diagrams\noperation-contracts\ngrasp-responsibility-design\nuse-case-realization\numl-class-diagram-design\ndesign-pattern-application" as design #EEF8EE
+rectangle "**Iterative Analysis and Design**\nrun-development-iteration\nplan-up-iterations\ninception\nuse-case-modeling\nbehavior-driven-specification\ndomain-modeling\nsystem-sequence-diagrams\noperation-contracts\ngrasp-responsibility-design\nuse-case-realization\numl-class-diagram-design\ndesign-pattern-application\nsoftware-design-language-adaptation\ndesign-rust-lifecycles" as design #EEF8EE
 
 rectangle "**Implementation and Evolution**\ntest-driven-implementation\nbehavior-preserving-refactoring" as implementation #FFF5EA
 
 rectangle "**Repository Workflow**\nsimplify\ncommit\ncreate-pr" as repository #F3EEFF
 
-rectangle "**Cross-cutting Support**\nselect-technical-artifacts\ndesign-repository-artifact-layout\nrecord-architecture-decision\nsoftware-design-language-adaptation\ndesign-rust-lifecycles\nrewrite-technical-artifacts" as support #FFFBEA
+rectangle "**Cross-cutting Support**\nselect-technical-artifacts\ndesign-repository-artifact-layout\nrecord-architecture-decision\nrewrite-technical-artifacts" as support #FFFBEA
 
 assess -[hidden]right-> discovery
 discovery -[hidden]right-> reverse
@@ -92,8 +92,10 @@ The Sirius groups are navigation aids, not installation profiles or lifecycle
 gates. The diagrams that follow show the internal choices and conditional
 feedback that this overview deliberately collapses. Cross-cutting support is
 left unconnected because it is selected for a specific artifact-selection,
-artifact-placement, language, or readability need, not as a required workflow
-stage.
+artifact-placement, decision-recording, or readability need, not as a required
+workflow stage. Language adaptation and Rust lifecycle design remain in
+Iterative Analysis and Design because they produce implementation-facing
+design.
 
 ## Choose a track
 
@@ -227,7 +229,7 @@ skinparam rectangle<<coordinator>> {
 }
 
 rectangle "run-development-\niteration" as iterative <<coordinator>>
-rectangle "iterative-up-analysis-\ndesign" as up
+rectangle "plan-up-\niterations" as up
 
 package "Requirements and analysis" #EEF8EE {
   rectangle "inception" as inception
@@ -245,12 +247,19 @@ package "Optional object design" #F3EEFF {
   rectangle "design-pattern-\napplication" as patterns
 }
 
+package "Implementation-facing design" #FFFBEA {
+  rectangle "software-design-language-\nadaptation" as language
+  rectangle "design-rust-\nlifecycles" as rust
+}
+
 iterative ..> inception : scope or feasibility
 iterative ..> usecases : actors or scenarios
 iterative ..> behavior : observable examples
 iterative ..> domain : vocabulary
 iterative ..> ssd : system events
 iterative ..> contracts : state effects
+iterative ..> language : target-language forces
+iterative ..> rust : Rust lifecycle risk
 iterative ..> up : multi-iteration UP roadmap
 up ..> iterative : one ready candidate
 up --> usecases
@@ -269,6 +278,9 @@ grasp --> realization
 realization --> classdiagram
 grasp ..> patterns : justified pressure
 classdiagram ..> patterns : justified pressure
+contracts ..> language : state and contracts
+grasp ..> language : responsibilities
+language ..> rust : Rust lifecycle pressure
 @enduml
 ```
 
@@ -414,8 +426,6 @@ keeps the diagrams readable without changing where they apply.
 | `select-technical-artifacts` | Candidate directions, reverse engineering, iterative analysis and design, implementation evidence, architecture decisions, and durable repository documentation | Candidate knowledge needs a create, update, embed, keep-with-implementation, omit, or defer disposition, or a proposed artifact set needs minimization |
 | `design-repository-artifact-layout` | Candidate directions, reverse engineering, iterative analysis and design, implementation evidence, architecture decisions, and durable repository documentation | A justified artifact lacks a canonical home, artifact lifecycles conflict, or repository migration must preserve links, IDs, indexes, and history |
 | `record-architecture-decision` | Approved requirements, architecture and language design, consequential pattern or responsibility choices, implementation discoveries, and reconciliation | Governing ADRs must be found, or one bounded, cross-cutting, or expensive-to-reverse architecture choice needs proposed review, an accepted historical record, or linked supersession |
-| `software-design-language-adaptation` | `run-development-iteration`, approved behavior and contracts, optional object design, and `test-driven-implementation` | Language-specific data, interfaces, ownership, errors, concurrency, lifecycle, or runtime conventions affect the design |
-| `design-rust-lifecycles` | `run-development-iteration`, approved scenarios and contracts, language adaptation, implementation briefing, and Rust implementation | Ownership, capability transfer, staged startup, readiness, rollback, cancellation, supervision, or fallible cleanup creates a material Rust design risk |
 | `rewrite-technical-artifacts` | Recovered artifacts, iterative-design artifacts, behavior-slice evidence, and refactoring records | The knowledge is sound but its reading order or progressive disclosure needs improvement |
 
 ## Client discovery upstream path
