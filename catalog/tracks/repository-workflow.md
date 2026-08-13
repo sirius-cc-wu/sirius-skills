@@ -24,11 +24,9 @@ Each step requires the authority appropriate to its effects. Selecting
 
 ## Governance feedback
 
-[`governance-update`](../../skills/governance-update/SKILL.md) is orthogonal to
-the delivery sequence. Use it only when multiple examples expose a durable
-policy gap. A one-off defect or stale artifact should normally be fixed at its
-direct owner instead of becoming a repository rule.
-
-Repository-specific naming and tracker conventions belong in
-the nearest applicable `AGENTS.md`; the shared workflow skills retain useful
+When multiple examples expose a durable policy gap, directly update the
+nearest applicable `AGENTS.md` with the narrowest enforceable rule. A one-off
+defect or stale artifact should normally be fixed at its direct owner instead
+of becoming repository policy. Repository-specific naming and tracker
+conventions belong in `AGENTS.md`; the shared workflow skills retain useful
 generic defaults.

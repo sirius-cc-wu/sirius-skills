@@ -10,7 +10,6 @@ from sirius_skills.paths import package_root
 
 REFERENCE_RELATIVE_PATH = Path("docs/shared/config-surface-governance.md")
 TARGET_RELATIVE_PATHS = (
-    Path("skills/governance-update/references/config-surface-governance.md"),
     Path("skills/simplify/references/config-surface-governance.md"),
 )
 

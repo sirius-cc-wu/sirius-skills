@@ -22,8 +22,9 @@ the checks that passed and avoid creating a duplicate PR.
 ```
 
 ```text
-Use governance-update to review these repeated formatter-spillover incidents
-and add the narrowest enforceable repository rule.
+Review these repeated formatter-spillover incidents and update the nearest
+applicable AGENTS.md with the narrowest enforceable rule. Avoid duplicating
+existing guidance or codifying a one-off incident.
 ```
 
 ## Optional upstream intent and idea refinement

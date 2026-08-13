@@ -1,7 +1,6 @@
 simplify
 create-pr
 commit
-governance-update
 reverse-engineer-software-system
 survey-existing-system
 recover-system-behavior

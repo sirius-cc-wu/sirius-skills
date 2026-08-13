@@ -111,8 +111,10 @@ choice is independently consequential and expensive to reverse.
 3. Use `commit` to review, verify, and intentionally stage the change.
 4. Use `create-pr` to publish committed work when the user requests it.
 
-`governance-update` is orthogonal. Use it only when repeated evidence reveals a
-durable policy gap.
+`governance-update` is retired. When repeated evidence reveals a durable policy
+gap, directly update the nearest applicable `AGENTS.md` with the narrowest
+enforceable rule. Do not turn a one-off defect into policy or duplicate an
+existing rule owner.
 
 ### Understand before changing
 

@@ -6,7 +6,7 @@ reduce the current risk or complete the current behavior slice.
 
 ## Bird's-eye view
 
-This view groups all 33 deployable Sirius skills by responsibility and shows
+This view groups all 32 deployable Sirius skills by responsibility and shows
 two optional external intent-shaping skills at the boundary. It shows only the
 main movement between groups so readers can locate a starting point before
 using the detailed views below. Solid arrows are normal handoffs, not a
@@ -50,7 +50,7 @@ rectangle "**Iterative Analysis and Design**\nrun-development-iteration\niterati
 
 rectangle "**Implementation and Evolution**\ntest-driven-implementation\nbehavior-preserving-refactoring" as implementation #FFF5EA
 
-rectangle "**Repository Workflow**\nsimplify\ncommit\ncreate-pr\ngovernance-update" as repository #F3EEFF
+rectangle "**Repository Workflow**\nsimplify\ncommit\ncreate-pr" as repository #F3EEFF
 
 rectangle "**Cross-cutting Support**\nselect-technical-artifacts\ndesign-repository-artifact-layout\nrecord-architecture-decision\nsoftware-design-language-adaptation\ndesign-rust-lifecycles\nrewrite-technical-artifacts" as support #FFFBEA
 
@@ -301,11 +301,6 @@ skinparam rectangle<<input>> {
   BackgroundColor #F2F2F2
   BorderColor #888888
 }
-skinparam rectangle<<support>> {
-  BackgroundColor #FFF4CC
-  BorderColor #A66B00
-}
-
 rectangle "Approved behavior or design input" as oracle <<input>>
 
 package "Implementation and Evolution" #FFF5EA {
@@ -317,7 +312,6 @@ package "Repository Workflow" #F3EEFF {
   rectangle "simplify" as simplify
   rectangle "commit" as commit
   rectangle "create-pr" as createpr
-  rectangle "governance-update" as governance <<support>>
 }
 
 oracle --> implementation
@@ -326,7 +320,6 @@ implementation ..> simplify : optional cleanup
 refactoring ..> simplify : optional cleanup
 simplify --> commit
 commit --> createpr
-simplify ..> governance : repeated drift
 @enduml
 ```
 
@@ -339,9 +332,9 @@ conditions, safety rules, and authority boundaries.
 
 The forward diagrams stay small by collapsing feedback into a few dashed
 arrows and prose. This view expands only the paths where later evidence can
-refine earlier design knowledge, restart design work, or improve repository
-governance. A feedback edge is conditional: follow it only when the named
-trigger changes knowledge owned by the target skill.
+refine earlier design knowledge or restart design work. A feedback edge is
+conditional: follow it only when the named trigger changes knowledge owned by
+the target skill.
 
 ```plantuml
 @startuml sirius-skill-feedback
@@ -379,11 +372,6 @@ package "Execution and evidence" #FFF5EA {
   rectangle "reconcile-recovered-\ndesign" as reconcile
 }
 
-package "Repository learning" #F3EEFF {
-  rectangle "simplify" as simplify
-  rectangle "governance-update" as governance
-}
-
 contracts ..> domain : missing concept or association
 patterns ..> designviews : participants or dependencies change
 
@@ -396,8 +384,6 @@ refactoring ..> designviews : durable structure changes
 
 reconcile ..> iterative : stakeholder-validated knowledge
 reconcile ..> implementation : authorized bounded correction
-
-simplify ..> governance : repeated repository drift
 @enduml
 ```
 

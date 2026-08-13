@@ -119,7 +119,6 @@ done
 shared_reference="$root/docs/shared/config-surface-governance.md"
 test -f "$shared_reference" || fail "missing $shared_reference"
 for target in \
-  "$root/skills/governance-update/references/config-surface-governance.md" \
   "$root/skills/simplify/references/config-surface-governance.md"; do
   test -f "$target" || fail "missing $target"
   cmp -s "$shared_reference" "$target" || fail "shared reference is out of sync: $target"

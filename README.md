@@ -9,7 +9,7 @@ catalog into a mandatory lifecycle.
 
 ## Install
 
-Install the four generic repository workflow skills by default:
+Install the three generic repository workflow skills by default:
 
 ```bash
 just install
@@ -27,7 +27,7 @@ Available profiles are defined in [`skill-sets/`](skill-sets/):
 
 | Profile | Purpose |
 |---|---|
-| `workflow` | Simplification, scoped commits, pull requests, and durable governance updates |
+| `workflow` | Simplification, scoped commits, and pull requests |
 | `iterative-design` | External-input assessment, technical-artifact selection, architecture-decision recording, artifact-layout design, question-driven iterations, optional UP/object design, language adaptation, tested implementation, simplification, and scoped commits |
 | `applying-uml-and-patterns` | Compatibility alias for `iterative-design` |
 | `reverse-engineering` | Evidence-driven system survey, behavior and architecture recovery, recorded-decision discovery, recovered-artifact selection, reconciliation, and durable placement |
@@ -158,6 +158,11 @@ identifier, and tracker rules from the nearest applicable `AGENTS.md`. Without
 such rules, both skills use their documented generic defaults. Shared skills
 remain generic; consuming repositories own their local conventions in
 `AGENTS.md`.
+
+`governance-update` is retired. When repeated examples reveal a durable policy
+gap, directly ask the agent to update the nearest applicable `AGENTS.md` with
+the narrowest enforceable rule. Avoid duplicating guidance or codifying a
+one-off incident.
 
 ## Design artifacts and sources
 
