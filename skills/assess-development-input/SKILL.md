@@ -80,8 +80,8 @@ The source method or file format never determines the route.
 | One bounded architecture choice has explicit proposed or accepted status and needs a durable ADR | `record-architecture-decision` |
 | Opportunity, vision, business case, feasibility, basic scope, or major risks are unclear | `inception` |
 | Actors, user goals, system boundary, main scenarios, or extensions are unclear | `use-case-modeling` |
-| An approved change needs one coordinated, risk-sized analysis, design, or construction iteration | `run-development-iteration` |
-| A team explicitly needs a multi-iteration UP phase and artifact plan | `iterative-up-analysis-design` |
+| An approved change or selected UP roadmap candidate needs one coordinated, risk-sized analysis, design, or construction iteration | `run-development-iteration` |
+| A team explicitly needs an advisory multi-iteration UP phase and artifact roadmap | `plan-up-iterations` |
 | Business concepts, vocabulary, associations, or attributes are unclear | `domain-modeling` |
 | Actor-system events or system operations are unclear | `system-sequence-diagrams` |
 | Non-trivial state changes, preconditions, or postconditions are unclear | `operation-contracts` |
@@ -143,9 +143,9 @@ Prefer an existing issue, proposal, or aggregate feature artifact when it is a
 sufficient owner.
 
 When a standalone Markdown assessment is justified, follow
-[Markdown Artifact Frontmatter](../iterative-up-analysis-design/references/markdown-artifact-frontmatter.md)
+[Markdown Artifact Frontmatter](../plan-up-iterations/references/markdown-artifact-frontmatter.md)
 and
-[Readable Technical Artifacts](../iterative-up-analysis-design/references/readable-technical-artifacts.md).
+[Readable Technical Artifacts](../plan-up-iterations/references/readable-technical-artifacts.md).
 Use this frontmatter, giving the record a stable ID only when it will be
 cross-referenced, then place the concise output fields in the body without
 copying the source material:

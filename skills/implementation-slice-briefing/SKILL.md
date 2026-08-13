@@ -97,8 +97,8 @@ Prefer an existing issue, work item, or feature artifact. Create a standalone
 brief only for independent assignment, freshness, and completion.
 
 For standalone Markdown, follow
-[Markdown Artifact Frontmatter](../iterative-up-analysis-design/references/markdown-artifact-frontmatter.md)
-and [Readable Technical Artifacts](../iterative-up-analysis-design/references/readable-technical-artifacts.md).
+[Markdown Artifact Frontmatter](../plan-up-iterations/references/markdown-artifact-frontmatter.md)
+and [Readable Technical Artifacts](../plan-up-iterations/references/readable-technical-artifacts.md).
 When a standalone brief is justified, read and adapt the
 [Implementation Slice Brief Template](references/implementation-slice-brief-template.md).
 

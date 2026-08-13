@@ -37,8 +37,8 @@ Prefer updating an existing use case or embedding the scenario in its
 aggregate feature artifact when either is a sufficient owner.
 
 For a standalone Markdown file, follow
-[Markdown Artifact Frontmatter](../iterative-up-analysis-design/references/markdown-artifact-frontmatter.md)
-and [Readable Technical Artifacts](../iterative-up-analysis-design/references/readable-technical-artifacts.md),
+[Markdown Artifact Frontmatter](../plan-up-iterations/references/markdown-artifact-frontmatter.md)
+and [Readable Technical Artifacts](../plan-up-iterations/references/readable-technical-artifacts.md),
 then use this shape. The main success scenario normally serves as the
 representative scenario. When embedding the use case in an aggregate file,
 omit the frontmatter and adjust heading levels.

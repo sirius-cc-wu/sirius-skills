@@ -65,8 +65,8 @@ Prefer refining an existing behavior model or keeping executable observations
 with tests when either is a sufficient owner.
 
 When persisting a standalone Markdown model, follow
-[Markdown Artifact Frontmatter](../iterative-up-analysis-design/references/markdown-artifact-frontmatter.md)
-and [Readable Technical Artifacts](../iterative-up-analysis-design/references/readable-technical-artifacts.md).
+[Markdown Artifact Frontmatter](../plan-up-iterations/references/markdown-artifact-frontmatter.md)
+and [Readable Technical Artifacts](../plan-up-iterations/references/readable-technical-artifacts.md).
 The main observed scenario provides the representative scenario; keep its
 evidence status distinct from intended behavior.
 

@@ -41,8 +41,8 @@ Prefer updating the canonical design model or embedding a local class view in
 its owning feature artifact when either is sufficient.
 
 For a standalone Markdown file, follow
-[Markdown Artifact Frontmatter](../iterative-up-analysis-design/references/markdown-artifact-frontmatter.md)
-and [Readable Technical Artifacts](../iterative-up-analysis-design/references/readable-technical-artifacts.md),
+[Markdown Artifact Frontmatter](../plan-up-iterations/references/markdown-artifact-frontmatter.md)
+and [Readable Technical Artifacts](../plan-up-iterations/references/readable-technical-artifacts.md),
 then use this shape. When embedding the design model in an aggregate file, omit
 the frontmatter and adjust heading levels.
 

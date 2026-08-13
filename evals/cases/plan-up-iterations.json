@@ -1,0 +1,57 @@
+{
+  "skill_name": "plan-up-iterations",
+  "trigger": {
+    "positive": [
+      {
+        "prompt": "Plan several risk-driven Unified Process iterations across inception, elaboration, construction, and selected durable design artifacts without executing them.",
+        "top_k": 3
+      },
+      {
+        "prompt": "Create a multi-iteration requirements-to-object-design roadmap using UP phase intent, risks, use-case-driven dependencies, and incremental refinement.",
+        "top_k": 3
+      },
+      {
+        "prompt": "Sequence multiple UP elaboration and construction candidates around architectural risks, selected use-case artifacts, exit evidence, and separate execution handoffs.",
+        "top_k": 3
+      }
+    ],
+    "negative": [
+      {
+        "prompt": "Execute the next authorized elaboration candidate from this UP roadmap, validate it, make one coherent commit, and stop.",
+        "owner": "run-development-iteration"
+      },
+      {
+        "prompt": "Fix this invoice rounding defect with a discriminating regression test.",
+        "owner": "test-driven-implementation"
+      },
+      {
+        "prompt": "Recover the commands, APIs, failures, and externally observable behavior of this existing service.",
+        "owner": "recover-system-behavior"
+      },
+      {
+        "prompt": "Plan one ordinary development iteration from this approved feature, without Unified Process roadmap framing.",
+        "owner": "run-development-iteration"
+      }
+    ]
+  },
+  "evals": [
+    {
+      "id": "multi-iteration-up-roadmap",
+      "prompt": "Plan three risk-driven Unified Process iterations for this approved feature across elaboration and construction. Select only justified analysis and design methods, give each candidate exit evidence and replanning triggers, and hand off the first ready candidate without executing it.",
+      "expected_output": "A multi-iteration UP roadmap with phase context, bounded candidates, risk-driven dependencies, minimal artifact dispositions, and exactly one separate execution handoff.",
+      "expectations": [
+        "The roadmap contains multiple iteration candidates with one objective and concrete exit evidence each",
+        "UP phase labels provide risk context rather than mandatory gates or directory names",
+        "Selected artifacts and methods answer explicit risks or dependencies instead of completing a fixed sequence",
+        "The first authorized ready candidate routes to run-development-iteration while later candidates remain unexecuted",
+        "Each candidate can stop or trigger replanning when evidence changes"
+      ],
+      "prohibitions": [
+        "Do not execute an iteration, validate implementation, create a commit, or begin a later candidate",
+        "Do not require the full analysis and object-design artifact chain",
+        "Do not treat approval of the roadmap as execution authority for every candidate"
+      ],
+      "trust_level": "provisional"
+    }
+  ]
+}

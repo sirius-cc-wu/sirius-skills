@@ -97,9 +97,9 @@ identifiers, repository-local conventions, evidence, and authorization.
 ## ADR Shape
 
 Preserve an established template. Without one, follow
-[Markdown Artifact Frontmatter](../iterative-up-analysis-design/references/markdown-artifact-frontmatter.md)
+[Markdown Artifact Frontmatter](../plan-up-iterations/references/markdown-artifact-frontmatter.md)
 and
-[Readable Technical Artifacts](../iterative-up-analysis-design/references/readable-technical-artifacts.md),
+[Readable Technical Artifacts](../plan-up-iterations/references/readable-technical-artifacts.md),
 then use this proportionate shape. Remove optional fields and empty sections.
 
 ```markdown

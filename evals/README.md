@@ -25,7 +25,7 @@ The initial pilot covers:
 - `requirements-synthesis-validation`;
 - `implementation-slice-briefing`;
 - `run-development-iteration`;
-- `iterative-up-analysis-design`;
+- `plan-up-iterations`;
 - `operation-contracts`;
 - `design-rust-lifecycles`;
 - `software-design-language-adaptation`;

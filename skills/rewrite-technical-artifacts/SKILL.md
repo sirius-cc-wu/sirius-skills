@@ -52,7 +52,7 @@ but it may instead add a small amount of orientation before exact specification.
    introduced before context, mixed audiences, repeated rules, and detail that
    obscures the main decision or behavior.
 6. **Restructure with progressive disclosure.** Follow
-   [Readable Technical Artifacts](../iterative-up-analysis-design/references/readable-technical-artifacts.md).
+   [Readable Technical Artifacts](../plan-up-iterations/references/readable-technical-artifacts.md).
    Explain the problem, behavior or decision, and consequence first. Use a
    representative scenario when the behavior is unfamiliar, stateful, or
    concurrent. Keep exact rules and reference detail afterward.
@@ -90,7 +90,7 @@ Use this mode as a final cleanup pass over a branch or pull-request diff:
 
 When revising a standalone Markdown artifact, preserve its existing
 frontmatter and follow
-[Markdown Artifact Frontmatter](../iterative-up-analysis-design/references/markdown-artifact-frontmatter.md).
+[Markdown Artifact Frontmatter](../plan-up-iterations/references/markdown-artifact-frontmatter.md).
 Do not add nested frontmatter or change identity and lifecycle metadata as a
 writing side effect.
 

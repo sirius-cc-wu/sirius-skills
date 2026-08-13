@@ -31,7 +31,7 @@ ITERATIVE_DESIGN_SKILLS = {
     "run-development-iteration",
     "commit",
     "simplify",
-    "iterative-up-analysis-design",
+    "plan-up-iterations",
     "rewrite-technical-artifacts",
     "stakeholder-requirements-elicitation",
     "requirements-synthesis-validation",

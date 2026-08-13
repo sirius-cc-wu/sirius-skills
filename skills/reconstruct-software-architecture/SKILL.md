@@ -75,8 +75,8 @@ Prefer adding the smallest necessary view to an existing architecture artifact
 when it already owns the question and evidence.
 
 When persisting a standalone Markdown reconstruction, follow
-[Markdown Artifact Frontmatter](../iterative-up-analysis-design/references/markdown-artifact-frontmatter.md)
-and [Readable Technical Artifacts](../iterative-up-analysis-design/references/readable-technical-artifacts.md).
+[Markdown Artifact Frontmatter](../plan-up-iterations/references/markdown-artifact-frontmatter.md)
+and [Readable Technical Artifacts](../plan-up-iterations/references/readable-technical-artifacts.md).
 Use the representative runtime scenario before exhaustive element inventories
 when runtime behavior is the architectural question.
 

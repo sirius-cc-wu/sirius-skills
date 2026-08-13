@@ -99,9 +99,10 @@ to the current repository revision and expose every exclusion and stop condition
 ```
 
 ```text
-Use iterative-up-analysis-design to plan the smallest risk-driven iteration for
-this feature. Preserve durable artifacts and avoid creating documents that do
-not reduce uncertainty.
+Use plan-up-iterations to plan several risk-driven UP iterations for
+this feature. Give each candidate one objective and exit evidence, preserve
+only justified durable artifacts, and hand off the first ready candidate to
+run-development-iteration without executing it.
 ```
 
 ```text

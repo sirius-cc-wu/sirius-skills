@@ -61,7 +61,7 @@ docs/
 
 The developer wants a stable home for feature requirements, analysis,
 PlantUML views, and iteration history, but should not need to discover or name
-`iterative-up-analysis-design`. They run:
+`plan-up-iterations`. They run:
 
 ```bash
 sirius layout propose .
@@ -259,15 +259,16 @@ field reinterpretation.
 
 The CLI would provide a deterministic, developer-facing form of the narrow
 result owned by `design-repository-artifact-layout`. It would not make that
-skill or `iterative-up-analysis-design` obsolete.
+skill or `plan-up-iterations` obsolete.
 
 - Use `design-repository-artifact-layout` when a coding agent should inspect
   context, exercise judgment, recommend placement, or perform an explicitly
   authorized migration.
 - Use the CLI when a developer or tool needs read-only, reproducible layout
   observations in Markdown or versioned JSON without invoking an agent.
-- Use `iterative-up-analysis-design` when choosing a risk-sized UP iteration,
-  artifact set, analysis sequence, design work, and implementation handoff.
+- Use `plan-up-iterations` when planning several risk-sized UP
+  iterations, their artifact set, analysis sequence, design work, and one
+  separate execution handoff.
 - Use an established ideas, proposals, feature, or decision path when the
   recommendation needs durable review; do not create duplicate idea and
   proposal artifacts for the same candidate direction.
@@ -391,7 +392,7 @@ Implementation would be acceptable when the following evidence exists:
 
 Behavioral evaluation should then test the key product assumption: given the
 CLI proposal, a coding agent places a requested artifact consistently without
-being told to invoke `iterative-up-analysis-design`. That result should be
+being told to invoke `plan-up-iterations`. That result should be
 compared with a control prompt that lacks the proposal before claiming that the
 CLI improves agent behavior.
 

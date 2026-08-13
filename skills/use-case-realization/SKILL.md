@@ -40,8 +40,8 @@ Prefer updating or embedding the realization in its owning feature artifact
 when it does not change independently.
 
 For a standalone Markdown file, follow
-[Markdown Artifact Frontmatter](../iterative-up-analysis-design/references/markdown-artifact-frontmatter.md)
-and [Readable Technical Artifacts](../iterative-up-analysis-design/references/readable-technical-artifacts.md),
+[Markdown Artifact Frontmatter](../plan-up-iterations/references/markdown-artifact-frontmatter.md)
+and [Readable Technical Artifacts](../plan-up-iterations/references/readable-technical-artifacts.md),
 then use this shape. The realized use-case scenario supplies the representative
 scenario; summarize its outcome instead of repeating the black-box steps. When
 embedding the realization in an aggregate file, omit the frontmatter and adjust

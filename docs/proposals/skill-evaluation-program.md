@@ -283,7 +283,7 @@ risk:
 
 | Skill | Risk exercised |
 |---|---|
-| `iterative-up-analysis-design` | Selecting a minimal artifact set instead of enforcing a lifecycle waterfall |
+| `plan-up-iterations` | Planning multiple risk-driven UP candidates without enforcing a lifecycle waterfall or executing them |
 | `use-case-modeling` | Preserving the black-box boundary and avoiding internal design |
 | `test-driven-implementation` | Demonstrating discriminatory verification without changing valid expectations |
 | `recover-system-behavior` | Separating evidenced current behavior from intended requirements |

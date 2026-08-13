@@ -39,8 +39,8 @@ Prefer updating an existing vision, plan, risk list, or aggregate inception
 artifact when it is a sufficient owner.
 
 When persisting an inception artifact as a standalone Markdown file, follow
-[Markdown Artifact Frontmatter](../iterative-up-analysis-design/references/markdown-artifact-frontmatter.md)
-and [Readable Technical Artifacts](../iterative-up-analysis-design/references/readable-technical-artifacts.md).
+[Markdown Artifact Frontmatter](../plan-up-iterations/references/markdown-artifact-frontmatter.md)
+and [Readable Technical Artifacts](../plan-up-iterations/references/readable-technical-artifacts.md).
 Use the artifact-specific type (`Vision`, `Business Case`, `Risk List`,
 `Development Case`, `Phase Plan`, and so on), not a generic `Inception`
 type. Put identity, summary, and lifecycle metadata in frontmatter while

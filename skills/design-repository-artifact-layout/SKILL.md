@@ -27,8 +27,9 @@ authorizes those repository changes.
 - Do not use merely to decide whether any standalone document should exist;
   use `select-technical-artifacts` when that is the material question, or apply
   its artifact-selection budget locally when the disposition is clear.
-- Do not author or semantically rewrite the artifact body, plan UP iterations,
-  or choose implementation design on behalf of the corresponding specialist.
+- Do not author or semantically rewrite the artifact body, plan a multi-iteration
+  UP roadmap, or choose implementation design on behalf of the corresponding
+  specialist.
 
 ## Workflow
 
@@ -100,9 +101,9 @@ Alternatives and uncertainty:
 Do not create a layout proposal file unless it independently passes the
 artifact-selection budget. If a standalone Markdown recommendation is
 justified, follow
-[Markdown Artifact Frontmatter](../iterative-up-analysis-design/references/markdown-artifact-frontmatter.md)
+[Markdown Artifact Frontmatter](../plan-up-iterations/references/markdown-artifact-frontmatter.md)
 and
-[Readable Technical Artifacts](../iterative-up-analysis-design/references/readable-technical-artifacts.md).
+[Readable Technical Artifacts](../plan-up-iterations/references/readable-technical-artifacts.md).
 Do not add placeholder indexes or empty directory trees merely to make a
 recommendation visible.
 

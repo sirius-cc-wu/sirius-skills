@@ -46,7 +46,7 @@ rectangle "**Client Discovery**\nstakeholder-requirements-elicitation\nrequireme
 
 rectangle "**Reverse Engineering**\nreverse-engineer-software-system\nsurvey-existing-system\nrecover-system-behavior\nreconstruct-software-architecture\nreconcile-recovered-design" as reverse #EAF4FB
 
-rectangle "**Iterative Analysis and Design**\nrun-development-iteration\niterative-up-analysis-design\ninception\nuse-case-modeling\nbehavior-driven-specification\ndomain-modeling\nsystem-sequence-diagrams\noperation-contracts\ngrasp-responsibility-design\nuse-case-realization\numl-class-diagram-design\ndesign-pattern-application" as design #EEF8EE
+rectangle "**Iterative Analysis and Design**\nrun-development-iteration\nplan-up-iterations\ninception\nuse-case-modeling\nbehavior-driven-specification\ndomain-modeling\nsystem-sequence-diagrams\noperation-contracts\ngrasp-responsibility-design\nuse-case-realization\numl-class-diagram-design\ndesign-pattern-application" as design #EEF8EE
 
 rectangle "**Implementation and Evolution**\ntest-driven-implementation\nbehavior-preserving-refactoring" as implementation #FFF5EA
 
@@ -199,11 +199,12 @@ rules, stopping conditions, and selection examples.
 
 `run-development-iteration` executes one approved, risk-sized objective and
 stops after validation and one authorized commit. It routes to the smallest
-specialists that answer the current question. `iterative-up-analysis-design`
-remains an optional planner when a team explicitly wants UP phase framing and
-use-case-driven artifact dependencies. Both preserve established canonical
-paths and delegate a material placement or migration decision to
-`design-repository-artifact-layout`.
+specialists that answer the current question. `plan-up-iterations`
+plans at least two explicitly UP-framed candidates with risks, exit evidence,
+and use-case-driven dependencies, but executes none. One separately authorized
+candidate hands off to `run-development-iteration`, which rechecks its current
+baseline. Both preserve established canonical paths and delegate a material
+placement or migration decision to `design-repository-artifact-layout`.
 
 ```plantuml
 @startuml iterative-design-skill-relationships
@@ -250,7 +251,8 @@ iterative ..> behavior : observable examples
 iterative ..> domain : vocabulary
 iterative ..> ssd : system events
 iterative ..> contracts : state effects
-iterative ..> up : explicit UP planning
+iterative ..> up : multi-iteration UP roadmap
+up ..> iterative : one ready candidate
 up --> usecases
 inception --> usecases
 usecases --> behavior

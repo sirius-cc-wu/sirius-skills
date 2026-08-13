@@ -1,6 +1,6 @@
 ---
 name: run-development-iteration
-description: Runs exactly one risk-sized, language-neutral development iteration from an approved proposal or other authoritative input, selecting specialist analysis, design, implementation, and repository skills, controlling artifact creation, validating the result, and creating one authorized commit before stopping. Use when asked to promote an approved proposal, advance a feature by one iteration, perform iterative analysis and design without prescribing object-oriented artifacts, or work one commit per iteration.
+description: Runs exactly one risk-sized, language-neutral development iteration from an approved proposal, one selected UP roadmap candidate, or other authoritative input, selecting specialist analysis, design, implementation, and repository skills, controlling artifact creation, validating the result, and creating one authorized commit before stopping. Use when asked to promote an approved proposal, execute the next authorized UP iteration, advance a feature by one iteration, perform iterative analysis and design without prescribing object-oriented artifacts, or work one commit per iteration.
 ---
 
 # Run Development Iteration
@@ -13,15 +13,17 @@ not from a mandatory artifact sequence or programming paradigm.
 
 ## When to Use
 
-- An approved proposal or feature source should advance through one bounded
-  analysis, design, or construction iteration.
+- An approved proposal, feature source, or selected candidate from an explicit
+  UP roadmap should advance through one bounded analysis, design, or
+  construction iteration.
 - The user requests one commit per iteration and expects work to stop at that
   boundary.
 - Several specialist skills may apply, but they must serve one shared
   objective and one coherent change.
-- Do not use merely to assess readiness, plan a multi-iteration roadmap,
+- Do not use merely to assess readiness, plan a multi-iteration UP roadmap,
   perform one already-localized specialist task, commit an existing diff, or
-  publish completed work.
+  publish completed work. Use `plan-up-iterations` for explicit
+  multi-iteration UP planning.
 
 ## Workflow
 
@@ -30,9 +32,11 @@ not from a mandatory artifact sequence or programming paradigm.
    non-goals, current branch, and unrelated workspace changes. Do not promote
    candidate intent or absorb unrelated work.
 2. **Choose one iteration objective.** State one behavior, decision, risk, or
-   learning question plus concrete exit evidence. Keep the objective small
-   enough for one coherent commit. Treat phase names as context, not as an
-   artifact checklist.
+   learning question plus concrete exit evidence. If a UP roadmap supplied the
+   candidate, preserve its traceability but recheck its assumptions, readiness,
+   and artifact dispositions against the current baseline. Keep the objective
+   small enough for one coherent commit. Treat phase names as context, not as
+   an artifact checklist.
 3. **Select the narrowest owners.** Route each material uncertainty to an
    existing specialist. Use language-neutral requirements and analysis skills
    for product intent; use implementation-facing language adaptation or a
@@ -72,6 +76,20 @@ not from a mandatory artifact sequence or programming paradigm.
     validation, commit when created, residual risk, and one candidate next
     iteration. Do not execute that candidate.
 
+## UP Roadmap Candidate Mode
+
+When executing a candidate planned by `plan-up-iterations`:
+
+1. Treat the roadmap as planning input, not blanket execution authority.
+2. Require explicit authority for this candidate and fix its current source
+   revisions, non-goals, dependencies, and exit evidence.
+3. Re-evaluate the selected specialists and artifact budget from current
+   evidence; preserve traceability while correcting stale plan assumptions.
+4. Execute only this candidate, record actual results in justified canonical or
+   historical owners, make at most one authorized commit, and stop.
+5. Report whether later roadmap candidates remain plausible or need replanning;
+   do not update or execute them unless separately authorized.
+
 ## Proposal Promotion Mode
 
 When the iteration promotes a proposal:
@@ -104,17 +122,20 @@ canonical home, several paths compete, or migration is material, use
 [Design Repository Artifact Layout](../design-repository-artifact-layout/SKILL.md)
 for that placement decision. When a standalone Markdown artifact is justified,
 follow
-[Markdown Artifact Frontmatter](../iterative-up-analysis-design/references/markdown-artifact-frontmatter.md)
+[Markdown Artifact Frontmatter](../plan-up-iterations/references/markdown-artifact-frontmatter.md)
 and
-[Readable Technical Artifacts](../iterative-up-analysis-design/references/readable-technical-artifacts.md).
-Refine canonical artifacts in place. If a durable iteration record is
-justified, use the iteration-record structure owned by
-[`iterative-up-analysis-design`](../iterative-up-analysis-design/SKILL.md)
-without copying canonical artifact bodies into it.
+[Readable Technical Artifacts](../plan-up-iterations/references/readable-technical-artifacts.md).
+Refine canonical artifacts in place. If a durable execution record is
+justified, adapt the selected-candidate structure from
+[`plan-up-iterations`](../plan-up-iterations/SKILL.md),
+record actual results and artifact outcomes, and do not copy canonical artifact
+bodies into it.
 
 ## Verification
 
 - [ ] The input authority, revision, lifecycle state, and non-goals are fixed.
+- [ ] A UP roadmap, when present, was treated as planning input rather than
+      blanket execution authority.
 - [ ] One objective and its exit evidence bound the iteration.
 - [ ] Selected specialists match actual questions or implementation forces.
 - [ ] No language, programming paradigm, phase, or artifact chain was assumed.

@@ -70,9 +70,9 @@ lifecycle. Otherwise, copy and tailor
 [Rust Lifecycle Design Template](assets/rust-lifecycle-design.md).
 
 For a standalone artifact, follow
-[Markdown Artifact Frontmatter](../iterative-up-analysis-design/references/markdown-artifact-frontmatter.md)
+[Markdown Artifact Frontmatter](../plan-up-iterations/references/markdown-artifact-frontmatter.md)
 and
-[Readable Technical Artifacts](../iterative-up-analysis-design/references/readable-technical-artifacts.md).
+[Readable Technical Artifacts](../plan-up-iterations/references/readable-technical-artifacts.md).
 Use this artifact type:
 
 ```yaml

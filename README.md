@@ -170,8 +170,11 @@ The iterative-design collection uses `run-development-iteration` to execute one
 approved, risk-sized objective and stop after one authorized commit. It selects
 requirements, analysis, design, language, and implementation specialists from
 the current question rather than requiring an object-oriented artifact chain.
-`iterative-up-analysis-design` remains available for teams that explicitly
-want UP phase framing and use-case-driven artifact dependencies.
+`plan-up-iterations` remains available for teams that explicitly want an
+advisory multi-iteration UP roadmap with phase framing and use-case-driven
+artifact dependencies. Each selected roadmap candidate executes separately
+through `run-development-iteration`. The former name
+`iterative-up-analysis-design` is retired; use `plan-up-iterations`.
 
 Selected use cases, domain models, system sequence diagrams, contracts,
 realizations, design class diagrams, and language-specific designs remain
@@ -184,7 +187,7 @@ on canonical changes and its commit instead of creating a separate iteration
 record. Artifact selection and its detailed budget live in
 `select-technical-artifacts`; repository-placement guidance lives in
 `design-repository-artifact-layout`; Markdown metadata and readability guidance
-remain references owned by `iterative-up-analysis-design`.
+remain references owned by `plan-up-iterations`.
 
 The optional UP analysis and object-design skills distill workflows from Craig
 Larman's *Applying UML and Patterns*. General language adaptation covers Rust,

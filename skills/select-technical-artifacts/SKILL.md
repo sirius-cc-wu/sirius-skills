@@ -116,9 +116,10 @@ artifact-budget document merely to record that fewer artifacts should exist.
   and verification specialists own artifact meaning and authoring.
 - **Selection versus editing:** `rewrite-technical-artifacts` improves an
   existing artifact without changing its normative meaning or lifecycle.
-- **Selection versus coordination:** `run-development-iteration` owns one
-  iteration and may apply this method locally; this skill reviews a material
-  artifact-set question without running the iteration.
+- **Selection versus coordination:** `plan-up-iterations` plans an
+  explicit multi-iteration UP roadmap, while `run-development-iteration` owns
+  one execution. This skill reviews a material artifact-set question without
+  planning or running those iterations.
 
 ## Red Flags
 

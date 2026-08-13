@@ -47,8 +47,8 @@ architecture-decision lifecycle, use
 instead of creating a duplicate pattern record.
 
 For a standalone Markdown file, follow
-[Markdown Artifact Frontmatter](../iterative-up-analysis-design/references/markdown-artifact-frontmatter.md)
-and [Readable Technical Artifacts](../iterative-up-analysis-design/references/readable-technical-artifacts.md),
+[Markdown Artifact Frontmatter](../plan-up-iterations/references/markdown-artifact-frontmatter.md)
+and [Readable Technical Artifacts](../plan-up-iterations/references/readable-technical-artifacts.md),
 then use this shape. The force and its consequence normally provide the
 reader-oriented opening; do not add a generic summary that repeats them. When
 embedding the decision in an aggregate file, omit the frontmatter and adjust

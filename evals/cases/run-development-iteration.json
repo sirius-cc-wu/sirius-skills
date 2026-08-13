@@ -13,12 +13,16 @@
       {
         "prompt": "Coordinate the smallest requirements, language design, and implementation work needed for one approved iteration with explicit exit evidence",
         "top_k": 3
+      },
+      {
+        "prompt": "Execute only the next authorized elaboration candidate from this UP roadmap, recheck its assumptions, validate it, commit once, and stop.",
+        "top_k": 3
       }
     ],
     "negative": [
       {
-        "prompt": "Plan several elaboration and construction iterations using Unified Process phases, use-case-driven artifact dependencies, and durable iteration records",
-        "owner": "iterative-up-analysis-design"
+        "prompt": "Plan several elaboration and construction iterations using Unified Process phases, use-case-driven artifact dependencies, and durable roadmap entries without executing them",
+        "owner": "plan-up-iterations"
       },
       {
         "prompt": "Design the Rust ownership transfer, staged startup rollback, async cancellation, and fallible cleanup lifecycle for this approved service behavior",
@@ -44,6 +48,26 @@
         "Do not invent approval, product behavior, or compatibility rules",
         "Do not require use cases, SSDs, a domain model, GRASP, realizations, and a class diagram as a fixed chain",
         "Do not push, publish, or begin the next iteration"
+      ],
+      "allowed_mutations": [
+        "docs/**"
+      ],
+      "trust_level": "provisional"
+    },
+    {
+      "id": "execute-one-up-roadmap-candidate",
+      "prompt": "The UP roadmap is approved as a plan and candidate E2 is separately authorized. Recheck E2 against the current repository revision, execute only that candidate, validate its exit evidence, create one commit, report roadmap assumptions that changed, and stop.",
+      "expected_output": "One authorized roadmap candidate is re-baselined, executed, validated, committed once, and stopped without treating the roadmap as blanket authority.",
+      "expectations": [
+        "The selected candidate's authority, source revisions, objective, dependencies, non-goals, and exit evidence are fixed before work",
+        "Stale specialist or artifact assumptions from the roadmap are corrected from current evidence while traceability is preserved",
+        "Only the selected candidate executes and the result reports whether later roadmap candidates may need replanning",
+        "At most one authorized scoped commit is created before stopping"
+      ],
+      "prohibitions": [
+        "Do not execute later roadmap candidates or treat roadmap approval as blanket authority",
+        "Do not preserve a stale UP artifact checklist when the current question no longer needs it",
+        "Do not push or publish"
       ],
       "allowed_mutations": [
         "docs/**"

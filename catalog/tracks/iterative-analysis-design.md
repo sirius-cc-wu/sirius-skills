@@ -28,10 +28,11 @@ establishes a canonical feature, requirement, decision, or design owner.
 
 Use
 [`run-development-iteration`](../../skills/run-development-iteration/SKILL.md)
-to execute exactly one approved, risk-sized iteration. It fixes the source
-revision, selects one objective and exit evidence, coordinates only the needed
-specialists, validates the result, creates one commit when authorized, and
-stops before the next iteration.
+to execute exactly one approved, risk-sized iteration, including one separately
+authorized candidate from a UP roadmap. It fixes the source revision, selects
+one objective and exit evidence, coordinates only the needed specialists,
+validates the result, creates one commit when authorized, and stops before the
+next iteration.
 
 Choose the narrowest specialist for each material question:
 
@@ -60,13 +61,15 @@ feed it.
 ## Optional UP Planning
 
 Use
-[`iterative-up-analysis-design`](../../skills/iterative-up-analysis-design/SKILL.md)
-when a team explicitly wants Unified Process phase framing, a multi-iteration
-risk plan, or use-case-driven dependencies among selected UP artifacts. It is
-an optional planning specialization, not the generic execution coordinator.
-Its artifact graph describes dependencies when those techniques are selected;
-it is not a checklist for every feature or language. When that plan exposes a
-material choice among repository layouts, use
+[`plan-up-iterations`](../../skills/plan-up-iterations/SKILL.md)
+when a team explicitly wants an advisory roadmap containing at least two
+Unified Process iterations with phase intent, risk sequencing, exit evidence,
+and use-case-driven dependencies among selected artifacts. It does not execute
+or close an iteration. Hand one separately authorized ready candidate to
+`run-development-iteration`, which rechecks the current baseline and stops
+after that candidate. The roadmap is not blanket execution authority or a
+checklist for every feature or language. When it exposes a material choice
+among repository layouts, use
 [`design-repository-artifact-layout`](../../skills/design-repository-artifact-layout/SKILL.md)
 rather than coupling the choice to UP phases.
 

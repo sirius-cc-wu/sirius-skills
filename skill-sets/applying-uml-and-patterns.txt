@@ -5,7 +5,7 @@ record-architecture-decision
 run-development-iteration
 simplify
 commit
-iterative-up-analysis-design
+plan-up-iterations
 rewrite-technical-artifacts
 stakeholder-requirements-elicitation
 requirements-synthesis-validation

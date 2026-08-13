@@ -76,8 +76,8 @@ Prefer updating an existing recovery record or keeping evidence near its
 executable source when either is a sufficient owner.
 
 When persisting a standalone Markdown record, follow
-[Markdown Artifact Frontmatter](../iterative-up-analysis-design/references/markdown-artifact-frontmatter.md)
-and [Readable Technical Artifacts](../iterative-up-analysis-design/references/readable-technical-artifacts.md).
+[Markdown Artifact Frontmatter](../plan-up-iterations/references/markdown-artifact-frontmatter.md)
+and [Readable Technical Artifacts](../plan-up-iterations/references/readable-technical-artifacts.md).
 The decision and scope normally provide the reader-oriented opening; retain
 evidence status and uncertainty when simplifying later sections.
 

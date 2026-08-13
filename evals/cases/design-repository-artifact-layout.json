@@ -22,7 +22,7 @@
       },
       {
         "prompt": "Plan several elaboration and construction iterations using Unified Process phases and use-case-driven artifact dependencies.",
-        "owner": "iterative-up-analysis-design"
+        "owner": "plan-up-iterations"
       },
       {
         "prompt": "Improve the reading order of this authoritative architecture document without changing its decisions or technical meaning.",
