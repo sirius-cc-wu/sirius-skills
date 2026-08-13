@@ -1,6 +1,6 @@
 ---
 name: rewrite-technical-artifacts
-description: Reviews and restructures requirements, analysis, design, decision, planning, verification, or recovery Markdown for cognitive simplicity and progressive disclosure without changing normative meaning, identifiers, lifecycle status, evidence, or traceability. Use when an artifact is difficult to read, contains avoidable repetition or ceremony, needs a reader-oriented opening or representative scenario, or needs a semantic-preserving final pass across a branch or pull-request diff.
+description: Reviews and restructures requirements, analysis, design, architecture decision records (ADRs), planning, verification, or recovery Markdown for cognitive simplicity and progressive disclosure without changing normative meaning, identifiers, lifecycle status, evidence, or traceability. Use when an artifact or proposed ADR is difficult to read, contains avoidable repetition or ceremony, needs a reader-oriented opening or representative scenario, an accepted ADR needs read-only editorial review, or a branch or pull-request diff needs a semantic-preserving final pass.
 ---
 
 # Rewrite Technical Artifacts
@@ -37,6 +37,7 @@ but it may instead add a small amount of orientation before exact specification.
    and the question that reader brings to it.
 3. **Choose the mode.**
    - Review only: report problems and a proposed reading order without editing.
+     Use this for an accepted ADR whose lifecycle forbids substantive revision.
    - Revise in place: default when the canonical artifact can serve the reader.
    - Diff-focused review: inspect only the changed reader-facing artifacts and
      their necessary canonical context before commit or review.

@@ -6,7 +6,7 @@ reduce the current risk or complete the current behavior slice.
 
 ## Bird's-eye view
 
-This view groups all 31 deployable Sirius skills by responsibility and shows
+This view groups all 32 deployable Sirius skills by responsibility and shows
 two optional external intent-shaping skills at the boundary. It shows only the
 main movement between groups so readers can locate a starting point before
 using the detailed views below. Solid arrows are normal handoffs, not a
@@ -52,7 +52,7 @@ rectangle "**Implementation and Evolution**\ntest-driven-implementation\nbehavio
 
 rectangle "**Repository Workflow**\nsimplify\ncommit\ncreate-pr\ngovernance-update" as repository #F3EEFF
 
-rectangle "**Cross-cutting Support**\ndesign-repository-artifact-layout\nsoftware-design-language-adaptation\ndesign-rust-lifecycles\nrewrite-technical-artifacts" as support #FFFBEA
+rectangle "**Cross-cutting Support**\ndesign-repository-artifact-layout\nrecord-architecture-decision\nsoftware-design-language-adaptation\ndesign-rust-lifecycles\nrewrite-technical-artifacts" as support #FFFBEA
 
 assess -[hidden]right-> discovery
 discovery -[hidden]right-> reverse
@@ -111,6 +111,9 @@ language, or readability need, not as a required workflow stage.
   cleanup, recording, or publication.
 - Use `design-repository-artifact-layout` across tracks when durable technical
   artifacts need canonical homes, lifecycle separation, or migration.
+- Use `record-architecture-decision` across tracks when one consequential
+  architecture choice needs a proposed, accepted, or superseding ADR, or when
+  the governing recorded decisions must be found.
 
 ## External development inputs
 
@@ -140,10 +143,9 @@ narrowest Sirius owner. Clarifying one requester's intent does not replace
 client discovery when several stakeholder roles, evidence sources, conflicts,
 or decision authorities matter. Current-system claims route to recovery; scope
 and feasibility to inception; stakeholder authority to client discovery;
-acceptance behavior to behavior-driven specification; and accepted
-architectural decisions to repository-local ADR governance, optionally through
-Addy Osmani's
-[`documentation-and-adrs`](https://github.com/addyosmani/agent-skills/blob/5a1b82d6445d1e2f0abeea1072851419a50c0e5c/skills/documentation-and-adrs/SKILL.md).
+acceptance behavior to behavior-driven specification; and one independently
+consequential proposed, accepted, or superseding architecture choice to
+`record-architecture-decision`.
 
 ## Reverse engineering
 
@@ -418,7 +420,8 @@ keeps the diagrams readable without changing where they apply.
 
 | Skill | Use with | Selection trigger |
 |---|---|---|
-| `design-repository-artifact-layout` | Proposal authoring, reverse engineering, iterative analysis and design, implementation evidence, and durable repository documentation | A justified artifact lacks a canonical home, artifact lifecycles conflict, or repository migration must preserve links, IDs, indexes, and history |
+| `design-repository-artifact-layout` | Candidate directions, reverse engineering, iterative analysis and design, implementation evidence, architecture decisions, and durable repository documentation | A justified artifact lacks a canonical home, artifact lifecycles conflict, or repository migration must preserve links, IDs, indexes, and history |
+| `record-architecture-decision` | Approved requirements, architecture and language design, consequential pattern or responsibility choices, implementation discoveries, and reconciliation | Governing ADRs must be found, or one bounded, cross-cutting, or expensive-to-reverse architecture choice needs proposed review, an accepted historical record, or linked supersession |
 | `software-design-language-adaptation` | `run-development-iteration`, approved behavior and contracts, optional object design, and `test-driven-implementation` | Language-specific data, interfaces, ownership, errors, concurrency, lifecycle, or runtime conventions affect the design |
 | `design-rust-lifecycles` | `run-development-iteration`, approved scenarios and contracts, language adaptation, implementation briefing, and Rust implementation | Ownership, capability transfer, staged startup, readiness, rollback, cancellation, supervision, or fallible cleanup creates a material Rust design risk |
 | `rewrite-technical-artifacts` | Recovered artifacts, iterative-design artifacts, behavior-slice evidence, and refactoring records | The knowledge is sound but its reading order or progressive disclosure needs improvement |

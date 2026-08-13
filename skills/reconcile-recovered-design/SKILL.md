@@ -58,7 +58,10 @@ stakeholder confirmation for intent.
    overstating certainty.
 7. **Recommend the authority and next action.** Identify the stakeholder,
    experiment, test, code change, document refinement, retirement marker, or
-   decision record needed. Do not perform that action unless requested.
+   decision record needed. When an authority confirms one consequential
+   architecture choice that needs durable history, route it to
+   `record-architecture-decision`; do not turn recovered code rationale into an
+   ADR. Do not perform the next action unless requested.
 8. **Close traceability.** Link each discrepancy to its evidence and affected
    canonical artifact or implementation boundary.
 

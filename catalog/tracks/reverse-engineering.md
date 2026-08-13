@@ -33,6 +33,17 @@ implementation inputs.
    the [implementation and evolution track](implementation-evolution.md) when
    a safely bounded change is already justified.
 
+## Recorded Decision Discovery
+
+Use
+[`record-architecture-decision`](../../skills/record-architecture-decision/SKILL.md)
+in read-only mode when the investigation needs to identify which ADRs currently
+govern a product, subsystem, or concern. Follow supersession links and preserve
+proposed, accepted, and historical states. An ADR is evidence of a recorded
+choice and rationale at its revision; it does not prove that current code still
+conforms. Missing ADRs do not authorize inferring undocumented decisions from
+implementation.
+
 ## Evidence Rule
 
 Every material claim identifies its perspective, status, confidence, temporal

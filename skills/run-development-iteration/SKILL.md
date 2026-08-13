@@ -51,7 +51,10 @@ not from a mandatory artifact sequence or programming paradigm.
 6. **Reconcile durable knowledge.** Feed discoveries back only when they
    change knowledge owned by a canonical requirement, design, decision, test,
    schema, or configuration artifact. Preserve proposal and decision history
-   rather than silently rewriting it.
+   rather than silently rewriting it. Use
+   `record-architecture-decision` only when one authoritative, consequential
+   architecture choice needs an independent proposed, accepted, or superseding
+   lifecycle.
 7. **Validate exit evidence.** Run repository-required and changed-scope
    checks. Distinguish completed evidence from human-owned or unavailable
    validation. Do not close or commit an iteration whose stated exit evidence

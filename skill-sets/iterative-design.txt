@@ -1,5 +1,6 @@
 assess-development-input
 design-repository-artifact-layout
+record-architecture-decision
 run-development-iteration
 simplify
 commit

@@ -13,7 +13,7 @@ structure unless it is causing a concrete navigation or ownership problem.
 | Durable current artifact | Approved requirement, use case, domain model, SSD, operation contract, realization, design class diagram | Refine the canonical artifact in place across iterations; retain a stable ID when other artifacts or iterations reference it. |
 | Recovered knowledge | System survey, recovered behavior, reconstructed architecture, reconciliation | Fix claims to the inspected revision and preserve evidence status. Refine in place only while the artifact continues to describe that baseline; create or supersede it explicitly when a later baseline must remain distinguishable. |
 | Iteration record | Objective, risks, selected scope, exit criteria, results | Create one record per iteration, close it when evidence is known, and retain it as history. |
-| Decision record | Architectural choice, rejected alternatives, consequences | Keep the accepted decision durable; supersede it explicitly rather than silently rewriting its history. |
+| Architecture decision record | One consequential choice, context and forces, serious alternatives, consequences, confidence, reconsideration triggers | Keep an accepted decision substantively stable; replace it with a linked superseding ADR rather than rewriting its history. |
 | Verification evidence | Acceptance test, experiment result, benchmark, threat-model check | Keep it near executable verification or link to it from the iteration result and affected design artifact. |
 
 Durability does not mean immutability. Durable current artifacts remain the
@@ -225,8 +225,9 @@ product-area-oriented architecture, and artifact-oriented shared models.
 ## Linking Rules
 
 - Give artifacts referenced across iterations or by other artifacts stable IDs
-  such as `UC-01`, `SSD-01`, or `ADR-003`. Local supporting notes may use only
-  a title and canonical path.
+  that follow explicit repository rules. Treat IDs as opaque; do not infer a
+  date or monotonic sequence from examples or neighboring names. Local
+  supporting notes may use only a title and canonical path.
 - Keep one canonical path for each current artifact or fixed recovery baseline.
 - Link iteration records to canonical artifacts and identify whether each was
   started, refined, or only consulted.

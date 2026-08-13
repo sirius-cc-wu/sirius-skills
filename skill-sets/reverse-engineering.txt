@@ -1,5 +1,6 @@
 reverse-engineer-software-system
 design-repository-artifact-layout
+record-architecture-decision
 survey-existing-system
 recover-system-behavior
 reconstruct-software-architecture

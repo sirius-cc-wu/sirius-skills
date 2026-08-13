@@ -40,8 +40,11 @@ When the implementation language is known, also use [Software Design Language Ad
 
 Before creating a new document, apply
 [Artifact Selection Budget](../iterative-up-analysis-design/references/artifact-selection-budget.md).
-Prefer recording a local pattern choice in the owning design artifact; create
-a separate decision only for a durable, independently consequential choice.
+Prefer recording a local pattern choice in the owning design artifact. When the
+choice is cross-cutting, expensive to reverse, and needs an independent
+architecture-decision lifecycle, use
+[Record Architecture Decision](../record-architecture-decision/SKILL.md)
+instead of creating a duplicate pattern record.
 
 For a standalone Markdown file, follow
 [Markdown Artifact Frontmatter](../iterative-up-analysis-design/references/markdown-artifact-frontmatter.md)

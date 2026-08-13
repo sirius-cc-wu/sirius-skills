@@ -59,6 +59,13 @@ state, side effects, verification surfaces, and highest-risk follow-up slices.
 ## Iterative design and implementation
 
 ```text
+Use record-architecture-decision to capture our accepted choice of PostgreSQL
+for transactional services. Preserve local ADR conventions; record authority,
+forces, serious alternatives, consequences, confidence, and reconsideration
+triggers; do not implement or commit anything.
+```
+
+```text
 Use design-repository-artifact-layout to inspect the existing documentation
 structure and recommend canonical homes for durable feature knowledge,
 decisions, verification evidence, and iteration history. Preserve established

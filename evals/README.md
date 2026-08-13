@@ -19,6 +19,7 @@ The initial pilot covers:
 
 - `assess-development-input`;
 - `design-repository-artifact-layout`;
+- `record-architecture-decision`;
 - `stakeholder-requirements-elicitation`;
 - `requirements-synthesis-validation`;
 - `implementation-slice-briefing`;

@@ -1,0 +1,73 @@
+{
+  "skill_name": "record-architecture-decision",
+  "trigger": {
+    "positive": [
+      {
+        "prompt": "Record our accepted choice of PostgreSQL over MongoDB as a short ADR with context, trade-offs, consequences, and reconsideration triggers.",
+        "top_k": 3
+      },
+      {
+        "prompt": "Draft a proposed architecture decision record for moving the orders service to event sourcing without claiming the team has accepted it.",
+        "top_k": 3
+      },
+      {
+        "prompt": "Supersede the governing queue topology ADR now that its scaling assumption no longer holds, preserving the old decision history.",
+        "top_k": 3
+      },
+      {
+        "prompt": "Show me which accepted architecture decisions currently govern storage and how they supersede the older ADRs.",
+        "top_k": 3
+      }
+    ],
+    "negative": [
+      {
+        "prompt": "Choose whether Strategy or a simple conditional best resolves this demonstrated algorithm-variation pressure.",
+        "owner": "design-pattern-application"
+      },
+      {
+        "prompt": "Recover whether the current queue topology came from an accepted decision or merely evolved in code and deployment configuration.",
+        "owner": "reconcile-recovered-design"
+      },
+      {
+        "prompt": "Perform a read-only editorial review of this accepted ADR's reading order without changing its decision, status, evidence, or consequences.",
+        "owner": "rewrite-technical-artifacts"
+      }
+    ]
+  },
+  "evals": [
+    {
+      "id": "record-authorized-cross-cutting-choice",
+      "prompt": "Record the explicitly accepted decision to standardize new transactional services on PostgreSQL. Preserve this repository's ADR conventions and make the decision easy for future maintainers to find. The decision authority approved the attached comparison at revision R7; do not implement or commit anything.",
+      "expected_output": "One short accepted ADR that preserves local conventions and records authority, context and forces, serious alternatives, consequences, uncertainty, reconsideration triggers, and links to supporting evidence.",
+      "expectations": [
+        "The ADR records one bounded architecture decision and cites the exact authority evidence",
+        "The decision, status, and important consequence precede supporting detail",
+        "Serious alternatives include material trade-offs without invented rationale",
+        "Confidence, residual uncertainty, and concrete reconsideration triggers are explicit",
+        "The record preserves repository path, identifier, template, lifecycle, and index conventions"
+      ],
+      "prohibitions": [
+        "Do not infer acceptance from code, requester preference, or agent confidence",
+        "Do not invent a numeric sequence, date-like identifier, directory, or index that conflicts with local governance",
+        "Do not implement, commit, publish, or rewrite an accepted predecessor"
+      ],
+      "trust_level": "provisional"
+    },
+    {
+      "id": "find-governing-decisions",
+      "prompt": "Identify which recorded architecture decisions currently govern storage for this repository. Follow supersession links and do not change any files.",
+      "expected_output": "A read-only inventory of relevant ADRs that distinguishes governing accepted decisions, proposals, superseded history, successors, and gaps with canonical paths.",
+      "expectations": [
+        "The inventory is scoped to the requested concern and cites canonical ADR paths",
+        "Accepted, proposed, and superseded records remain distinguishable",
+        "Supersession links identify the currently governing decision without hiding history",
+        "Missing or conflicting records are reported as gaps rather than inferred from code"
+      ],
+      "prohibitions": [
+        "Do not infer undocumented decisions or rationale from implementation",
+        "Do not create, update, reclassify, or index ADRs during read-only discovery"
+      ],
+      "trust_level": "provisional"
+    }
+  ]
+}

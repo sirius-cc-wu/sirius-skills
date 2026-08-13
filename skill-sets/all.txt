@@ -10,6 +10,7 @@ reconcile-recovered-design
 rewrite-technical-artifacts
 design-repository-artifact-layout
 assess-development-input
+record-architecture-decision
 run-development-iteration
 iterative-up-analysis-design
 stakeholder-requirements-elicitation

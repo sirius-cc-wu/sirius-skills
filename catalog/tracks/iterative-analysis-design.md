@@ -38,6 +38,7 @@ Choose the narrowest specialist for each material question:
 | Current question or force | Candidate owner |
 |---|---|
 | Canonical repository homes, lifecycle separation, or artifact migration | [`design-repository-artifact-layout`](../../skills/design-repository-artifact-layout/SKILL.md) |
+| One consequential architecture choice needs proposed review, accepted history, or supersession | [`record-architecture-decision`](../../skills/record-architecture-decision/SKILL.md) |
 | Vision, feasibility, project scope, or major business risk | [`inception`](../../skills/inception/SKILL.md) |
 | Actors, goals, system boundary, or scenario flow | [`use-case-modeling`](../../skills/use-case-modeling/SKILL.md) |
 | Observable examples and boundary cases | [`behavior-driven-specification`](../../skills/behavior-driven-specification/SKILL.md) |
@@ -93,6 +94,10 @@ When a standalone artifact passes that budget but lacks a clear canonical
 home, use
 [`design-repository-artifact-layout`](../../skills/design-repository-artifact-layout/SKILL.md)
 to preserve local conventions or select the smallest lifecycle-aware addition.
+When one independently consequential architecture choice needs durable proposed,
+accepted, or superseding history, use
+[`record-architecture-decision`](../../skills/record-architecture-decision/SKILL.md)
+instead of copying the whole design artifact into an ADR.
 
 A narrow iteration does not require a Markdown iteration record. Its canonical
 changes, validation, and scoped commit can preserve sufficient history. Create

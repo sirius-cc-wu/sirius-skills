@@ -1,8 +1,9 @@
 # sirius-skills
 
 `sirius-skills` is a curated collection of development-input assessment,
-repository artifact-layout, repository workflow, software discovery, iterative
-design, implementation, and evolution skills. Skills are independently
+architecture-decision recording, repository artifact-layout, repository
+workflow, software discovery, iterative design, implementation, and evolution
+skills. Skills are independently
 deployable; profiles provide convenient installations without turning the
 catalog into a mandatory lifecycle.
 
@@ -27,9 +28,9 @@ Available profiles are defined in [`skill-sets/`](skill-sets/):
 | Profile | Purpose |
 |---|---|
 | `workflow` | Simplification, scoped commits, pull requests, and durable governance updates |
-| `iterative-design` | External-input assessment, artifact-layout design, question-driven iterations, optional UP/object design, language adaptation, tested implementation, simplification, and scoped commits |
+| `iterative-design` | External-input assessment, architecture-decision recording, artifact-layout design, question-driven iterations, optional UP/object design, language adaptation, tested implementation, simplification, and scoped commits |
 | `applying-uml-and-patterns` | Compatibility alias for `iterative-design` |
-| `reverse-engineering` | Evidence-driven system survey, behavior and architecture recovery, reconciliation, and durable recovered-artifact placement |
+| `reverse-engineering` | Evidence-driven system survey, behavior and architecture recovery, recorded-decision discovery, reconciliation, and durable recovered-artifact placement |
 | `all` | Every active skill in the catalog |
 
 Remove the default or a named profile later:
@@ -128,11 +129,17 @@ installed by Sirius profiles.
 historical paths. Route current-system claims to reverse engineering, scope and
 feasibility to `inception`, stakeholder authority to the client-discovery
 skills, acceptance behavior to `behavior-driven-specification`, and placement
-questions to `design-repository-artifact-layout`. Record accepted architectural
-decisions under repository-local ADR governance, optionally using Addy
-Osmani's
-[`documentation-and-adrs`](https://github.com/addyosmani/agent-skills/blob/5a1b82d6445d1e2f0abeea1072851419a50c0e5c/skills/documentation-and-adrs/SKILL.md),
-instead of creating a second idea and proposal artifact.
+questions to `design-repository-artifact-layout`.
+
+Use `record-architecture-decision` when one consequential architecture choice
+needs a short, discoverable ADR or when maintainers need to find which recorded
+decisions currently govern a concern. It preserves local ADR conventions,
+explicit status and authority, serious alternatives, positive and negative
+consequences,
+confidence, reconsideration triggers, and linked supersession. It does not
+choose unresolved design or infer rationale from code. Keep local pattern and
+responsibility choices in their owning design artifacts unless they need an
+independent architecture-decision lifecycle.
 
 The [repository structure and skill-relationship comparison](catalog/agent-skill-repository-structures.md)
 uses PlantUML views to show how two related projects organize skill authoring,

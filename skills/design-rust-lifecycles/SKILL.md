@@ -81,8 +81,10 @@ language: "rust"
 ```
 
 Keep ownership, state, startup, rollback, cancellation, cleanup, API shape,
-and verification in one artifact unless one decision has a genuinely
-independent lifecycle and requires its own proposed decision record.
+and verification in one artifact unless one cross-cutting, expensive-to-reverse
+choice has a genuinely independent lifecycle. In that case, use
+[Record Architecture Decision](../record-architecture-decision/SKILL.md)
+without copying the lifecycle design into the ADR.
 
 ## Boundaries
 

@@ -10,8 +10,8 @@ following every step in it.
 | Need | Profile |
 |---|---|
 | Refine, record, and publish repository changes | `workflow` |
-| Assess external development inputs, design artifact layouts, and run question-driven analysis, design, implementation, simplification, and scoped-commit iterations | `iterative-design` |
-| Recover current behavior and architecture and place durable recovered knowledge | `reverse-engineering` |
+| Assess external development inputs, record architecture decisions, design artifact layouts, and run question-driven analysis, design, implementation, simplification, and scoped-commit iterations | `iterative-design` |
+| Recover current behavior and architecture, find governing ADRs, and place durable recovered knowledge | `reverse-engineering` |
 | Make the entire catalog available | `all` |
 
 `applying-uml-and-patterns` remains a compatibility alias for
@@ -53,9 +53,25 @@ replacement for discovery and specification methods.
 `author-software-proposal` is retired because its normal output overlapped the
 confirmed idea one-pager. Existing proposal artifacts remain valid. Use
 `rewrite-technical-artifacts` when their meaning is sound and only their
-reading path needs improvement. Preserve accepted decisions under the
-repository's ADR or decision-record governance, optionally using Addy Osmani's
-[`documentation-and-adrs`](https://github.com/addyosmani/agent-skills/blob/5a1b82d6445d1e2f0abeea1072851419a50c0e5c/skills/documentation-and-adrs/SKILL.md).
+reading path needs improvement.
+
+### Record a consequential architecture decision
+
+1. Use `record-architecture-decision` after one bounded architecture choice is
+   ready for proposed review, has been explicitly accepted, or must supersede a
+   governing ADR.
+2. Apply the artifact-selection budget and preserve established ADR paths,
+   templates, statuses, opaque identifiers, and indexes.
+3. Put the decision, status, authority, and important consequence first; retain
+   context and forces, serious alternatives, positive and negative consequences,
+   confidence, reconsideration triggers, and material advice.
+4. Keep proposed status distinct from acceptance. Do not reconstruct rationale
+   from code, rewrite an accepted decision when it changes, or continue into
+   implementation, commit, or publication without separate authority.
+
+Use the corresponding design specialist when the choice is unresolved. Keep a
+local pattern or responsibility decision in its owning artifact unless the
+choice is independently consequential and expensive to reverse.
 
 ### Design durable artifact placement
 

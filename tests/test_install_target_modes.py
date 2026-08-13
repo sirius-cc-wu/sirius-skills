@@ -27,6 +27,7 @@ WORKFLOW_SKILLS = {
 ITERATIVE_DESIGN_SKILLS = {
     "assess-development-input",
     "design-repository-artifact-layout",
+    "record-architecture-decision",
     "run-development-iteration",
     "commit",
     "simplify",
@@ -53,6 +54,7 @@ ITERATIVE_DESIGN_SKILLS = {
 REVERSE_ENGINEERING_SKILLS = {
     "reverse-engineer-software-system",
     "design-repository-artifact-layout",
+    "record-architecture-decision",
     "survey-existing-system",
     "recover-system-behavior",
     "reconstruct-software-architecture",
@@ -207,4 +209,4 @@ def test_validation_covers_the_consolidated_catalog() -> None:
     )
 
     assert result.returncode == 0, result.stdout
-    assert "Validated 31 skills" in result.stdout
+    assert "Validated 32 skills" in result.stdout

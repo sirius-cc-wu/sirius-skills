@@ -1,6 +1,6 @@
 ---
 name: assess-development-input
-description: Assesses requirements-shaped inputs from external or mixed workflows and decides whether their content is ready for system recovery, inception, use-case modeling, iterative design, or tested implementation while preserving source meaning, approval state, and unresolved uncertainty. Use when intent statements, specifications, proposals, BDD scenarios, story maps, brainstorm notes, issue descriptions, or similar material exist but their readiness and correct Sirius entry point are unclear.
+description: Assesses requirements-shaped inputs from external or mixed workflows and decides whether their content is ready for system recovery, inception, use-case modeling, architecture-decision recording, iterative design, or tested implementation while preserving source meaning, approval state, and unresolved uncertainty. Use when intent statements, specifications, proposals, BDD scenarios, story maps, brainstorm notes, issue descriptions, or similar material exist but their readiness and correct Sirius entry point are unclear.
 ---
 
 # Assess Development Input
@@ -76,6 +76,7 @@ The source method or file format never determines the route.
 |---|---|
 | Claims about current commands, behavior, architecture, or constraints need evidence | `reverse-engineer-software-system` |
 | Durable technical artifacts need canonical repository homes, lifecycle separation, or migration | `design-repository-artifact-layout` |
+| One bounded architecture choice has explicit proposed or accepted status and needs a durable ADR | `record-architecture-decision` |
 | Opportunity, vision, business case, feasibility, basic scope, or major risks are unclear | `inception` |
 | Actors, user goals, system boundary, main scenarios, or extensions are unclear | `use-case-modeling` |
 | An approved change needs one coordinated, risk-sized analysis, design, or construction iteration | `run-development-iteration` |
