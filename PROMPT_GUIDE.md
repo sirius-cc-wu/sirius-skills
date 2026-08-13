@@ -26,6 +26,23 @@ Use governance-update to review these repeated formatter-spillover incidents
 and add the narrowest enforceable repository rule.
 ```
 
+## Optional upstream intent and idea refinement
+
+These skills come from Addy Osmani's external `agent-skills` collection and are
+not installed by Sirius profiles.
+
+```text
+Use interview-me to ask one question at a time until my intended outcome, user,
+success condition, binding constraint, and non-goals are explicit. Do not plan
+or implement yet.
+```
+
+```text
+Use idea-refine to explore alternatives for this confirmed intent, test the key
+assumptions, and converge on one candidate direction with MVP scope and a Not
+Doing list. Preserve this repository's established ideas or proposals path.
+```
+
 ## Reverse engineering
 
 ```text

@@ -53,7 +53,9 @@ can responsibly proceed.
    oracle. Ignore optional detail that does not block the next useful step.
 4. **Select one owner.** Use the routing guide below to choose the narrowest
    Sirius skill that owns that decision. Prefer a specialist over a coordinator
-   when the gap is already localized.
+   when the gap is already localized. If the requester's intent or candidate
+   direction itself is still unconfirmed, name external clarification or idea
+   refinement as the prerequisite instead of forcing a Sirius owner.
 5. **Assess readiness.** Mark the input `ready`, `needs prerequisite`, or
    `blocked` for the selected skill. Base the status on visible content,
    evidence, and approval rather than a numeric confidence or completeness
@@ -73,7 +75,6 @@ The source method or file format never determines the route.
 | Content condition | Next Sirius skill |
 |---|---|
 | Claims about current commands, behavior, architecture, or constraints need evidence | `reverse-engineer-software-system` |
-| Technical discussions, findings, incidents, or candidate changes need a consequential direction framed for review | `author-software-proposal` |
 | Durable technical artifacts need canonical repository homes, lifecycle separation, or migration | `design-repository-artifact-layout` |
 | Opportunity, vision, business case, feasibility, basic scope, or major risks are unclear | `inception` |
 | Actors, user goals, system boundary, main scenarios, or extensions are unclear | `use-case-modeling` |
@@ -91,6 +92,12 @@ The source method or file format never determines the route.
 | A bounded behavior has an independent oracle such as an approved example, invariant, reference, or defect | `test-driven-implementation` |
 | Observable behavior is protected and only internal structure should change | `behavior-preserving-refactoring` |
 | Existing technical knowledge is authoritative but difficult to read | `rewrite-technical-artifacts` |
+
+If one requester's actual intent is unclear, external `interview-me` may provide
+the prerequisite. If a raw candidate direction still needs alternatives,
+assumption testing, and MVP scoping, external `idea-refine` may provide it.
+Neither requester confirmation nor a polished idea document establishes
+organizational approval.
 
 If the blocking decision belongs to a stakeholder, product owner, external
 source owner, or another authority outside Sirius, report `blocked` and name
@@ -161,6 +168,8 @@ tags: [intake, routing]
 - Rewriting the input into a preferred Sirius format before choosing its owner.
 - Sending every input to the iterative coordinator when a specialist owns the
   first gap.
+- Treating a confirmed requester intent or refined idea as organizational
+  approval.
 - Sending incomplete behavior to implementation because acceptance-language
   syntax is present.
 - Producing a roadmap of many downstream skills instead of choosing the next

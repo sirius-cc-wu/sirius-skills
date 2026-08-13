@@ -1,11 +1,10 @@
 # sirius-skills
 
 `sirius-skills` is a curated collection of development-input assessment,
-proposal authoring, repository artifact-layout, repository workflow, software
-discovery, iterative design, implementation, and evolution skills. Skills are
-independently deployable;
-profiles provide convenient installations without turning the catalog into a
-mandatory lifecycle.
+repository artifact-layout, repository workflow, software discovery, iterative
+design, implementation, and evolution skills. Skills are independently
+deployable; profiles provide convenient installations without turning the
+catalog into a mandatory lifecycle.
 
 ## Install
 
@@ -28,7 +27,7 @@ Available profiles are defined in [`skill-sets/`](skill-sets/):
 | Profile | Purpose |
 |---|---|
 | `workflow` | Simplification, scoped commits, pull requests, and durable governance updates |
-| `iterative-design` | External-input assessment, proposal and artifact-layout design, question-driven iterations, optional UP/object design, language adaptation, tested implementation, simplification, and scoped commits |
+| `iterative-design` | External-input assessment, artifact-layout design, question-driven iterations, optional UP/object design, language adaptation, tested implementation, simplification, and scoped commits |
 | `applying-uml-and-patterns` | Compatibility alias for `iterative-design` |
 | `reverse-engineering` | Evidence-driven system survey, behavior and architecture recovery, reconciliation, and durable recovered-artifact placement |
 | `all` | Every active skill in the catalog |
@@ -60,9 +59,8 @@ set.
 A deprecated skill remains in the active catalog and profiles until users have
 migration guidance. Once retired, its name is removed from those active
 surfaces and appended to the [retirement ledger](catalog/retired-skills.tsv).
-The ledger currently records 50 local skills recovered by intersecting Git
-history for former installer manifests with historical `skills/*/SKILL.md`
-packages. External skills once installed alongside Sirius were excluded.
+The ledger records retired local skills recovered from Git history and later
+catalog retirements. External skills installed alongside Sirius are excluded.
 
 Every normal install and uninstall first prunes installed skill names that are
 both in the retirement ledger and in this computer's Sirius ownership state.
@@ -114,15 +112,27 @@ local conventions, separates artifact lifecycles, and recommends the smallest
 structure with obvious canonical paths. Recommendations are read-only unless
 repository changes are explicitly authorized.
 
-Use `author-software-proposal` when technical discussions, findings, incidents,
-or candidate changes need a decision-seeking artifact. For one focused,
-consequential choice it prefers a proposed decision record or ADR; broader
-exploration keeps a software proposal. It separates current evidence from
-proposed behavior and stops before approval, implementation, commit, or
-publication unless those actions are separately authorized. It preserves an
-established decision or proposal location; otherwise, the
-[artifact layout guidance](skills/design-repository-artifact-layout/references/artifact-layouts.md#proposal-placement)
-selects the repository location according to how reviewers navigate it.
+For upstream intent and idea refinement, optionally compose Addy Osmani's
+[`interview-me`](https://github.com/addyosmani/agent-skills/blob/5a1b82d6445d1e2f0abeea1072851419a50c0e5c/skills/interview-me/SKILL.md)
+and
+[`idea-refine`](https://github.com/addyosmani/agent-skills/blob/5a1b82d6445d1e2f0abeea1072851419a50c0e5c/skills/idea-refine/SKILL.md).
+`interview-me` confirms what one requester actually wants; `idea-refine`
+explores alternatives and produces a confirmed candidate-direction one-pager.
+Save that one-pager under an established `docs/ideas/`, `docs/proposals/`, or
+feature path rather than duplicating it under several names. It remains
+candidate input, not organizational approval. Use `assess-development-input`
+only when its next Sirius owner is unclear. These external skills are not
+installed by Sirius profiles.
+
+`author-software-proposal` is retired. Existing proposals remain valid at their
+historical paths. Route current-system claims to reverse engineering, scope and
+feasibility to `inception`, stakeholder authority to the client-discovery
+skills, acceptance behavior to `behavior-driven-specification`, and placement
+questions to `design-repository-artifact-layout`. Record accepted architectural
+decisions under repository-local ADR governance, optionally using Addy
+Osmani's
+[`documentation-and-adrs`](https://github.com/addyosmani/agent-skills/blob/5a1b82d6445d1e2f0abeea1072851419a50c0e5c/skills/documentation-and-adrs/SKILL.md),
+instead of creating a second idea and proposal artifact.
 
 The [repository structure and skill-relationship comparison](catalog/agent-skill-repository-structures.md)
 uses PlantUML views to show how two related projects organize skill authoring,

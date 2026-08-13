@@ -10,7 +10,7 @@ following every step in it.
 | Need | Profile |
 |---|---|
 | Refine, record, and publish repository changes | `workflow` |
-| Assess external development inputs, design artifact layouts, author software proposals, and run question-driven analysis, design, implementation, simplification, and scoped-commit iterations | `iterative-design` |
+| Assess external development inputs, design artifact layouts, and run question-driven analysis, design, implementation, simplification, and scoped-commit iterations | `iterative-design` |
 | Recover current behavior and architecture and place durable recovered knowledge | `reverse-engineering` |
 | Make the entire catalog available | `all` |
 
@@ -35,21 +35,27 @@ following every step in it.
 The assessment is an intake boundary, not a mandatory first step or a
 replacement for discovery and specification methods.
 
-### Develop a candidate change into a proposal
+### Clarify intent and refine a candidate direction
 
-1. Use `author-software-proposal` when technical input needs a consequential
-   direction reviewed before implementation or broader design work.
-2. Preserve the repository's proposal governance, canonical owner, lifecycle,
-   and index; prefer one proposal file unless supporting references justify a
-   proposal directory.
-3. Separate current evidence and inference from proposed behavior, approval,
-   and unresolved decisions.
-4. Stop with a draft and a clear next decision unless the user separately
-   authorizes acceptance, implementation, commit, or publication.
+1. When one requester's actual outcome, user, success condition, constraint, or
+   non-goals are unclear, optionally use Addy Osmani's
+   [`interview-me`](https://github.com/addyosmani/agent-skills/blob/5a1b82d6445d1e2f0abeea1072851419a50c0e5c/skills/interview-me/SKILL.md).
+2. When a raw idea needs alternatives, assumption testing, MVP scope, and an
+   explicit not-doing list, optionally use
+   [`idea-refine`](https://github.com/addyosmani/agent-skills/blob/5a1b82d6445d1e2f0abeea1072851419a50c0e5c/skills/idea-refine/SKILL.md).
+3. Treat the confirmed idea one-pager as candidate input, not approval. Preserve
+   an established `docs/ideas/`, `docs/proposals/`, or feature location rather
+   than translating the same direction into a second artifact.
+4. Use `assess-development-input` only when the next Sirius owner is unclear.
+   Route evidence, stakeholder authority, scope, acceptance behavior, design,
+   and implementation readiness to their narrow specialists.
 
-Once a proposal exists, use `assess-development-input` only when its readiness
-or next Sirius owner is unclear. Use `rewrite-technical-artifacts` when its
-meaning is already sound and only its reading path needs improvement.
+`author-software-proposal` is retired because its normal output overlapped the
+confirmed idea one-pager. Existing proposal artifacts remain valid. Use
+`rewrite-technical-artifacts` when their meaning is sound and only their
+reading path needs improvement. Preserve accepted decisions under the
+repository's ADR or decision-record governance, optionally using Addy Osmani's
+[`documentation-and-adrs`](https://github.com/addyosmani/agent-skills/blob/5a1b82d6445d1e2f0abeea1072851419a50c0e5c/skills/documentation-and-adrs/SKILL.md).
 
 ### Design durable artifact placement
 

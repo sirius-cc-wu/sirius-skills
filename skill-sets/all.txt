@@ -10,7 +10,6 @@ reconcile-recovered-design
 rewrite-technical-artifacts
 design-repository-artifact-layout
 assess-development-input
-author-software-proposal
 run-development-iteration
 iterative-up-analysis-design
 stakeholder-requirements-elicitation

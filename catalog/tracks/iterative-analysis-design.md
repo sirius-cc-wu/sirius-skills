@@ -9,16 +9,20 @@ When requirements-shaped input was produced outside Sirius and the correct
 entry point is unclear, first use
 [`assess-development-input`](../../skills/assess-development-input/SKILL.md).
 Continue only when the input has sufficient authority for the selected work.
-The assessment may instead route to recovery, proposal authoring, a localized
-specialist, implementation, or an external prerequisite.
+The assessment may instead route to recovery, a localized specialist,
+implementation, or an external prerequisite.
 
-Use
-[`author-software-proposal`](../../skills/author-software-proposal/SKILL.md)
-when technical discussions, findings, incidents, or candidate changes need a
-direction reviewed before design or implementation. Proposal authoring stops
-before acceptance. Once the responsible authority approves the proposal,
-preserve its accepted revision and outcome as the next iteration establishes a
-canonical feature, requirement, decision, or design owner.
+When the upstream request or direction is still vague, optionally use Addy
+Osmani's
+[`interview-me`](https://github.com/addyosmani/agent-skills/blob/5a1b82d6445d1e2f0abeea1072851419a50c0e5c/skills/interview-me/SKILL.md)
+and
+[`idea-refine`](https://github.com/addyosmani/agent-skills/blob/5a1b82d6445d1e2f0abeea1072851419a50c0e5c/skills/idea-refine/SKILL.md)
+before entering this track. Their confirmed idea one-pager remains candidate
+input until the responsible
+authority approves it. Preserve an established ideas, proposals, or feature
+path instead of translating the same direction into a duplicate artifact. Once
+approved, preserve the accepted revision and outcome as the next iteration
+establishes a canonical feature, requirement, decision, or design owner.
 
 ## Run One Iteration
 

@@ -81,7 +81,7 @@ sirius layout propose . --format json
 
 The agent receives the same observations, recommendation, alternatives, and
 uncertainties as structured data. It may present that result to the developer
-or use the `author-software-proposal` workflow to add project-specific context.
+or place a durable candidate direction under established repository governance.
 The CLI supplies evidence and Sirius policy; the coding agent retains judgment
 and remains subject to its normal mutation authority.
 
@@ -97,9 +97,9 @@ The following statements describe the repository today:
   ownership, and an independent lifecycle.
 - The layout guidance is owned by the independently deployable
   [`design-repository-artifact-layout`](../../skills/design-repository-artifact-layout/SKILL.md)
-  skill and reused by proposal authoring and optional UP planning. This solves
-  agent routing without creating a deterministic developer-facing command or
-  versioned output contract.
+  skill and reused by proposal placement guidance and optional UP planning.
+  This solves agent routing without creating a deterministic developer-facing
+  command or versioned output contract.
 - The Python package currently describes itself as packaging support and does
   not expose a console-script entry point in [`pyproject.toml`](../../pyproject.toml).
 - The existing [evaluation runner](../../evals/README.md) can execute Codex in
@@ -266,8 +266,9 @@ skill or `iterative-up-analysis-design` obsolete.
   observations in Markdown or versioned JSON without invoking an agent.
 - Use `iterative-up-analysis-design` when choosing a risk-sized UP iteration,
   artifact set, analysis sequence, design work, and implementation handoff.
-- Use `author-software-proposal` when repository-specific evidence needs a
-  durable decision-seeking artifact.
+- Use an established ideas, proposals, feature, or decision path when the
+  recommendation needs durable review; do not create duplicate idea and
+  proposal artifacts for the same candidate direction.
 
 The human reference and executable rules could drift if maintained
 independently. Implementation must therefore add focused cases for every row in

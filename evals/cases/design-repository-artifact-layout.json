@@ -17,8 +17,8 @@
     ],
     "negative": [
       {
-        "prompt": "Draft a software proposal for changing our request scheduler, with alternatives, risks, open decisions, and acceptance evidence.",
-        "owner": "author-software-proposal"
+        "prompt": "Clarify the product vision, business case, feasibility, scope, and major risks for this candidate change before design.",
+        "owner": "inception"
       },
       {
         "prompt": "Plan several elaboration and construction iterations using Unified Process phases and use-case-driven artifact dependencies.",
@@ -33,11 +33,12 @@
   "evals": [
     {
       "id": "preserve-conventions-and-minimize-layout",
-      "prompt": "Inspect the existing documentation structure and recommend canonical homes for current feature knowledge, decisions, proposals, verification evidence, and iteration history. Preserve useful conventions and do not create or move files.",
+      "prompt": "Inspect the existing documentation structure and recommend canonical homes for current feature knowledge, candidate ideas or proposals, decisions, verification evidence, and iteration history. Preserve useful conventions and do not create or move files.",
       "expected_output": "A read-only, evidence-based recommendation for the smallest lifecycle-aware layout, including preserved paths, canonical homes, credible alternatives, and uncertainty.",
       "expectations": [
         "The recommendation cites observed repository paths and distinguishes established conventions from incidental files",
         "Different artifact lifecycles receive clear canonical ownership without unnecessary directories",
+        "One candidate direction uses one established ideas or proposals home unless distinct ownership and lifecycle justify both",
         "Any migration identifies affected links, indexes, stable identifiers, and historical records"
       ],
       "prohibitions": [

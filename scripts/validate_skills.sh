@@ -174,8 +174,6 @@ grep -q '^type: "\[Descriptive artifact type\]"$' "$frontmatter_reference" || fa
 grep -q '^## Writing Flow$' "$readability_reference" || fail "readability reference missing writing flow"
 grep -q '^## Preserve Meaning$' "$readability_reference" || fail "readability reference missing meaning-preservation guidance"
 
-proposal_skill="$root/skills/author-software-proposal/SKILL.md"
-grep -q 'design-repository-artifact-layout/references/artifact-layouts.md#proposal-placement' "$proposal_skill" || fail "software proposal skill missing proposal placement guidance"
 layout_metadata="$root/skills/design-repository-artifact-layout/agents/openai.yaml"
 test -f "$layout_metadata" || fail "design-repository-artifact-layout missing agents/openai.yaml"
 grep -Fq '$design-repository-artifact-layout' "$layout_metadata" || fail "artifact layout metadata missing skill invocation"
@@ -220,7 +218,6 @@ grep -q '^## Final Editorial Pass$' "$readability_reference" || fail "readabilit
 
 template_types=(
   "assess-development-input|Development Input Assessment"
-  "author-software-proposal|Software Proposal"
   "stakeholder-requirements-elicitation|Stakeholder Evidence Record"
   "requirements-synthesis-validation|Requirements Discovery Brief"
   "implementation-slice-briefing|Implementation Slice Brief"

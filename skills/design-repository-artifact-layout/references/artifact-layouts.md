@@ -9,7 +9,7 @@ structure unless it is causing a concrete navigation or ownership problem.
 
 | Artifact kind | Examples | Lifecycle |
 |---|---|---|
-| Proposal | Candidate direction, scope, alternatives, risks, requested decision | Keep it draft or proposed while review is pending. After a decision, record the outcome and link to the authoritative decision, design, or implementation artifact instead of leaving the proposal as an ambiguous current source of truth. |
+| Candidate direction | Confirmed idea one-pager, proposal, scope, alternatives, risks, requested decision | Keep it draft or proposed while review is pending. After a decision, record the outcome and link to the authoritative decision, design, or implementation artifact instead of leaving the idea or proposal as an ambiguous current source of truth. |
 | Durable current artifact | Approved requirement, use case, domain model, SSD, operation contract, realization, design class diagram | Refine the canonical artifact in place across iterations; retain a stable ID when other artifacts or iterations reference it. |
 | Recovered knowledge | System survey, recovered behavior, reconstructed architecture, reconciliation | Fix claims to the inspected revision and preserve evidence status. Refine in place only while the artifact continues to describe that baseline; create or supersede it explicitly when a later baseline must remain distinguishable. |
 | Iteration record | Objective, risks, selected scope, exit criteria, results | Create one record per iteration, close it when evidence is known, and retain it as history. |
@@ -26,11 +26,11 @@ Iteration records are historically stable but usually become less important
 after closure. They should point to canonical artifacts instead of containing
 iteration-specific copies of those artifacts.
 
-Proposals are decision-seeking artifacts, not substitutes for confirmed intent,
-current requirements or design knowledge, accepted decision records, or
-implementation briefs.
-Preserve those lifecycle boundaries even when one proposal supplies source
-material for the next artifact.
+Idea one-pagers and proposals are candidate-direction artifacts, not substitutes
+for confirmed intent, current requirements or design knowledge, accepted
+decision records, or implementation briefs. Preserve those lifecycle boundaries
+even when one candidate direction supplies source material for the next
+artifact.
 
 ## Selection Workflow
 
@@ -54,8 +54,12 @@ material for the next artifact.
 
 ## Proposal Placement
 
-Preserve an established proposal path, index, and naming rule. When none exists,
-use the smallest placement that matches how reviewers find pending decisions:
+Treat `docs/ideas/` and `docs/proposals/` as alternative homes for a candidate
+direction unless repository governance gives them different audiences, owners,
+or lifecycles. Preserve an established path, index, and naming rule; do not copy
+the same direction from one collection into the other merely to rename its
+artifact type. When no convention exists, use the smallest placement that
+matches how reviewers find pending decisions:
 
 - Prefer `docs/proposals/<topic>.md` when proposals span product areas or
   readers navigate them by lifecycle or artifact type.
@@ -65,11 +69,11 @@ use the smallest placement that matches how reviewers find pending decisions:
 - Prefer one proposal file. Create a proposal directory only when supporting
   evidence has independent value but shares the proposal lifecycle.
 
-Keep a proposal in draft or proposed state until the responsible authority
-decides it. After acceptance, rejection, or supersession, preserve the outcome
-according to repository policy and link to the artifact that now owns the
-decision or intended behavior. Do not silently treat an undecided proposal as
-the current design.
+Keep an idea one-pager or proposal in draft or proposed state until the
+responsible authority decides it. After acceptance, rejection, or supersession,
+preserve the outcome according to repository policy and link to the artifact
+that now owns the decision or intended behavior. Do not silently treat an
+undecided candidate direction as the current design.
 
 ## Layout Options
 

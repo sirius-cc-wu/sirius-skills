@@ -110,7 +110,10 @@ recommendation visible.
   owner or independently changing content.
 - Current design knowledge is copied into iteration records or organized by UP
   phase, obscuring its canonical source.
-- One pending proposal is treated as accepted intent or an accepted decision.
+- One pending idea or proposal is treated as accepted intent or an accepted
+  decision.
+- The same candidate direction is copied into both an idea and a proposal even
+  though their audience, owner, and lifecycle do not differ.
 - A file is split because it is long rather than because its parts have
   independent ownership or lifecycles.
 - Stable identifiers, inbound links, indexes, or historical records are lost

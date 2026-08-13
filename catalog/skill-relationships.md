@@ -6,7 +6,7 @@ reduce the current risk or complete the current behavior slice.
 
 ## Bird's-eye view
 
-This view groups all 32 deployable Sirius skills by responsibility and shows
+This view groups all 31 deployable Sirius skills by responsibility and shows
 two optional external intent-shaping skills at the boundary. It shows only the
 main movement between groups so readers can locate a starting point before
 using the detailed views below. Solid arrows are normal handoffs, not a
@@ -40,10 +40,7 @@ package "Optional external intent shaping\naddyosmani/agent-skills" as addy #F2F
   rectangle "idea-refine" as addyIdea <<external>>
 }
 
-package "**Sirius: Intake and Direction**" as intake #FFF4CC {
-  rectangle "assess-development-input" as assess
-  rectangle "author-software-proposal" as proposal
-}
+rectangle "**Sirius: Intake**\nassess-development-input" as assess #FFF4CC
 
 rectangle "**Client Discovery**\nstakeholder-requirements-elicitation\nrequirements-synthesis-validation\nimplementation-slice-briefing" as discovery #E8F5E9
 
@@ -57,15 +54,13 @@ rectangle "**Repository Workflow**\nsimplify\ncommit\ncreate-pr\ngovernance-upda
 
 rectangle "**Cross-cutting Support**\ndesign-repository-artifact-layout\nsoftware-design-language-adaptation\ndesign-rust-lifecycles\nrewrite-technical-artifacts" as support #FFFBEA
 
-proposal -[hidden]right-> assess
 assess -[hidden]right-> discovery
 discovery -[hidden]right-> reverse
 design -[hidden]right-> support
 
 addyInterview --> addyIdea : confirmed intent
-addyIdea --> proposal : refined idea
-addyInterview ..> proposal : intent already concrete
-proposal ..> assess : reviewed; route unclear
+addyIdea ..> assess : refined input; route unclear
+addyInterview ..> assess : intent concrete; route unclear
 assess ..> discovery : stakeholder evidence needed
 assess ..> reverse
 assess ..> design
@@ -81,16 +76,16 @@ implementation --> repository
 ```
 
 The gray nodes belong to Addy Osmani's external `agent-skills` collection, not
-the Sirius catalog or installation profiles. They make one common composition
-visible: `interview-me` confirms the requester's actual intent, `idea-refine`
-turns that intent into a focused and user-confirmed idea one-pager, and
-`author-software-proposal` turns that input into one decision-seeking artifact:
-a proposed decision record for one focused choice or a software proposal for
-broader exploration. If the intent is already concrete, `idea-refine` can be
-skipped.
+the Sirius catalog or installation profiles. They make one optional composition
+visible: `interview-me` confirms one requester's actual intent and `idea-refine`
+turns that intent into a focused, user-confirmed candidate-direction one-pager.
+If intent is already concrete, `interview-me` can be skipped; if the direction
+is already focused, `idea-refine` can be skipped.
 
-The resulting artifact still requires review by the responsible authority.
-The dashed edge to `assess-development-input` applies only when the reviewed
+The one-pager may use an established `docs/ideas/`, `docs/proposals/`, or feature
+path; creating both an idea and proposal for the same direction adds no
+independent owner or lifecycle. Requester confirmation is not organizational
+approval. The dashed edge to `assess-development-input` applies only when the
 artifact's next Sirius owner remains unclear.
 
 The Sirius groups are navigation aids, not installation profiles or lifecycle
@@ -103,8 +98,8 @@ language, or readability need, not as a required workflow stage.
 
 - Use **Assess Development Input** when requirements-shaped material already
   exists but its readiness or correct Sirius entry point is unclear.
-- Use **Author Software Proposal** when technical input needs a consequential
-  direction framed for responsible review.
+- Use external `interview-me` or `idea-refine` before Sirius when requester
+  intent or a candidate direction still needs interactive refinement.
 - Start with **Client Discovery** when stakeholder evidence must be gathered,
   synthesized, and validated before a coding handoff can be prepared.
 - Start with **Reverse Engineering** when an existing system must be understood.
@@ -128,44 +123,27 @@ proceed. The assessment neither rewrites the source nor executes the selected
 skill.
 
 A common cross-repository path uses Addy Osmani's
-[`interview-me`](https://github.com/addyosmani/agent-skills/blob/98967c45a42b88d6b8fb3a88b7ff6273920763d6/skills/interview-me/SKILL.md)
+[`interview-me`](https://github.com/addyosmani/agent-skills/blob/5a1b82d6445d1e2f0abeea1072851419a50c0e5c/skills/interview-me/SKILL.md)
 and
-[`idea-refine`](https://github.com/addyosmani/agent-skills/blob/98967c45a42b88d6b8fb3a88b7ff6273920763d6/skills/idea-refine/SKILL.md)
-before Sirius proposal authoring:
+[`idea-refine`](https://github.com/addyosmani/agent-skills/blob/5a1b82d6445d1e2f0abeea1072851419a50c0e5c/skills/idea-refine/SKILL.md):
 
 ```text
-interview-me
-  → idea-refine
-  → author-software-proposal
+interview-me, when intent is unclear
+  → idea-refine, when the direction needs exploration
+  → assess-development-input, only when the next owner is unclear
 ```
 
 The handoffs depend on output meaning, not shared runtime state. A confirmed
-intent feeds idea refinement; its confirmed problem, direction, assumptions,
-MVP scope, and non-goals then provide source material for proposal authoring.
-The Sirius proposal skill remains responsible for separating evidence from
-proposed intent, documenting alternatives and risks, and stopping before
-approval or implementation. Clarifying one requester's intent does not replace
+intent can feed idea refinement; its confirmed problem, direction, assumptions,
+MVP scope, non-goals, and open questions then become candidate input to the
+narrowest Sirius owner. Clarifying one requester's intent does not replace
 client discovery when several stakeholder roles, evidence sources, conflicts,
-or decision authorities matter; `assess-development-input` can route that gap
-to the client-discovery skills.
-
-## Software proposal authoring
-
-`author-software-proposal` turns technical discussions, findings, incidents,
-candidate changes, or an existing draft into one decision-seeking artifact. It
-uses a proposed decision record for one focused consequential choice and a
-software proposal when broader exploration or several decisions need review.
-It separates current evidence from proposed intent, makes alternatives and
-risks reviewable, and defines acceptance evidence without implying acceptance.
-The responsible authority reviews the draft outside the skill. After that
-review, `assess-development-input` can select a Sirius owner when the next
-step remains unclear.
-
-Decision-seeking authoring is not a substitute for inception, requirements
-discovery, current-system recovery, or an accepted decision record. It may
-expose a need for any of those owners and stop at that boundary. It should not
-create both a proposal and a proposed decision record for the same focused
-choice unless their audiences or lifecycles differ.
+or decision authorities matter. Current-system claims route to recovery; scope
+and feasibility to inception; stakeholder authority to client discovery;
+acceptance behavior to behavior-driven specification; and accepted
+architectural decisions to repository-local ADR governance, optionally through
+Addy Osmani's
+[`documentation-and-adrs`](https://github.com/addyosmani/agent-skills/blob/5a1b82d6445d1e2f0abeea1072851419a50c0e5c/skills/documentation-and-adrs/SKILL.md).
 
 ## Reverse engineering
 

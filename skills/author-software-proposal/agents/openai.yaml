@@ -1,4 +1,0 @@
-interface:
-  display_name: "Author Software Proposal"
-  short_description: "Turn technical input into decision-ready proposals"
-  default_prompt: "Use $author-software-proposal to turn this technical input into a decision-ready software proposal."
