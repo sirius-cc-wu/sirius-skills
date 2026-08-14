@@ -41,7 +41,7 @@ Prefer updating the canonical design model or embedding a local class view in
 its owning feature artifact when either is sufficient.
 
 For a standalone Markdown file, follow
-[Markdown Artifact Frontmatter](../plan-up-iterations/references/markdown-artifact-frontmatter.md)
+[Markdown Artifact Frontmatter](../iterative-risk-driven-analysis-design/references/markdown-artifact-frontmatter.md)
 and use STE-style,
 then use this shape. When embedding the design model in an aggregate file, omit
 the frontmatter and adjust heading levels.

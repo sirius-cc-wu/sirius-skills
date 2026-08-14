@@ -30,7 +30,7 @@ canonical feature, requirement, decision, or design owner.
 Use
 [`run-development-iteration`](../../skills/run-development-iteration/SKILL.md)
 to execute one or more approved, risk-sized iterations, including a separately
-authorized candidate from a UP roadmap. By default, a request for one commit per
+authorized analysis/design candidate. By default, a request for one commit per
 iteration continues until the requested work is complete. An explicit request
 for one iteration uses single-iteration mode. Each iteration fixes its source
 revision, selects one objective and exit evidence, coordinates only the needed
@@ -60,21 +60,15 @@ Several specialists may contribute to one iteration only when they answer the
 same objective. Do not create one artifact merely because another artifact can
 feed it.
 
-## Optional UP Planning
+## Risk-Driven Analysis and Design
 
 Use
-[`plan-up-iterations`](../../skills/plan-up-iterations/SKILL.md)
-when a team explicitly wants an advisory roadmap containing at least two
-Unified Process iterations with phase intent, risk sequencing, exit evidence,
-and use-case-driven dependencies among selected artifacts. It does not execute
-or close an iteration. Hand one separately authorized ready candidate to
-`run-development-iteration`, which rechecks the current baseline. The roadmap
-is not blanket execution authority or a checklist for every feature or
-language. Use single-iteration mode for this handoff unless continuous execution
-is explicitly authorized. When it exposes a material choice
-among repository layouts, use
-[`design-repository-artifact-layout`](../../skills/design-repository-artifact-layout/SKILL.md)
-rather than coupling the choice to UP phases.
+[`iterative-risk-driven-analysis-design`](../../skills/iterative-risk-driven-analysis-design/SKILL.md)
+when an approved change needs iterative analysis or design. It selects one
+risk, learning, decision, or delivery objective and applies only the methods
+that answer that objective. It evolves canonical artifacts and hands
+implementation to `run-development-iteration`. It does not implement product
+code, create commits, or require a complete object-design chain.
 
 ## Language Extension Rule
 

@@ -83,7 +83,7 @@ Apply
 Prefer an existing discovery record or aggregate feature artifact.
 
 For a standalone Markdown record, follow
-[Markdown Artifact Frontmatter](../plan-up-iterations/references/markdown-artifact-frontmatter.md)
+[Markdown Artifact Frontmatter](../iterative-risk-driven-analysis-design/references/markdown-artifact-frontmatter.md)
 and use STE-style.
 When a standalone record is justified, read and adapt the
 [Stakeholder Evidence Record Template](references/stakeholder-evidence-record-template.md).

@@ -28,7 +28,7 @@ Available profiles are defined in [`skill-sets/`](skill-sets/):
 | Profile | Purpose |
 |---|---|
 | `workflow` | Simplification, scoped commits, and pull requests |
-| `iterative-design` | External-input assessment, technical-artifact selection, architecture-decision recording, artifact-layout design, question-driven iterations, optional UP/object design, language adaptation, tested implementation, simplification, and scoped commits |
+| `iterative-design` | External-input assessment, technical-artifact selection, architecture-decision recording, artifact-layout design, question-driven iterations, optional object design, language adaptation, tested implementation, simplification, and scoped commits |
 | `applying-uml-and-patterns` | Compatibility alias for `iterative-design` |
 | `reverse-engineering` | Evidence-driven system survey, behavior and architecture recovery, recorded-decision discovery, recovered-artifact selection, reconciliation, and durable placement |
 | `all` | Every active skill in the catalog |
@@ -168,17 +168,17 @@ one-off incident.
 
 ## Design artifacts and sources
 
-The iterative-design collection uses `run-development-iteration` to execute
-approved, risk-sized objectives. When the user requests one commit per
-iteration, it continues by default until the requested work is complete. It
-selects requirements, analysis, design, language, and implementation specialists
-from
-the current question rather than requiring an object-oriented artifact chain.
-`plan-up-iterations` remains available for teams that explicitly want an
-advisory multi-iteration UP roadmap with phase framing and use-case-driven
-artifact dependencies. Each selected roadmap candidate executes separately
-through `run-development-iteration`. The former name
-`iterative-up-analysis-design` is retired; use `plan-up-iterations`.
+The iterative-design collection uses
+`iterative-risk-driven-analysis-design` for approved, risk-sized analysis and
+design objectives. It selects requirements, analysis, language, and optional
+object-design specialists from the current question and implementation forces.
+It evolves canonical artifacts and hands implementation to
+`run-development-iteration`.
+
+`run-development-iteration` executes approved objectives. When the user requests
+one commit per iteration, it continues by default until the requested work is
+complete. It selects implementation and repository specialists without
+requiring an object-oriented artifact chain.
 
 Selected use cases, domain models, system sequence diagrams, contracts,
 realizations, design class diagrams, and language-specific designs remain
@@ -191,9 +191,10 @@ on canonical changes and its commit instead of creating a separate iteration
 record. Artifact selection and its detailed budget live in
 `select-technical-artifacts`; repository-placement guidance lives in
 `design-repository-artifact-layout`; Markdown frontmatter guidance remains a
-reference owned by `plan-up-iterations`, and artifact prose uses STE-style.
+reference owned by `iterative-risk-driven-analysis-design`, and artifact prose
+uses STE-style.
 
-The optional UP analysis and object-design skills distill workflows from Craig
+The optional analysis and object-design skills distill workflows from Craig
 Larman's *Applying UML and Patterns*. General language adaptation covers Rust,
 Python, TypeScript, C#, and C++, while Rust lifecycle design adds
 ownership-driven preparation, resource transfer, rollback, cancellation,

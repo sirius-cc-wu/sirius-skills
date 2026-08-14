@@ -283,7 +283,7 @@ risk:
 
 | Skill | Risk exercised |
 |---|---|
-| `plan-up-iterations` | Planning multiple risk-driven UP candidates without enforcing a lifecycle waterfall or executing them |
+| `iterative-risk-driven-analysis-design` | Selecting risk-driven analysis and design methods without enforcing a lifecycle waterfall or executing implementation |
 | `use-case-modeling` | Preserving the black-box boundary and avoiding internal design |
 | `test-driven-implementation` | Demonstrating discriminatory verification without changing valid expectations |
 | `recover-system-behavior` | Separating evidenced current behavior from intended requirements |

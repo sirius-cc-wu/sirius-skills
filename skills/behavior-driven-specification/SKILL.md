@@ -110,7 +110,7 @@ inside the canonical requirements or use-case artifact:
 ```
 
 For a standalone Markdown artifact, follow
-[Markdown Artifact Frontmatter](../plan-up-iterations/references/markdown-artifact-frontmatter.md)
+[Markdown Artifact Frontmatter](../iterative-risk-driven-analysis-design/references/markdown-artifact-frontmatter.md)
 and use STE-style:
 
 ```markdown

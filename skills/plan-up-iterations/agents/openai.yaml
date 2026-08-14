@@ -1,4 +1,0 @@
-interface:
-  display_name: "Plan UP Iterations"
-  short_description: "Plan a risk-driven multi-iteration UP roadmap"
-  default_prompt: "Use $plan-up-iterations to plan several risk-driven UP iterations, then hand off only one ready candidate for separate execution."

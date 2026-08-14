@@ -128,8 +128,8 @@ Sirius now addresses that workflow-level bias with
 [`run-development-iteration`](../../skills/run-development-iteration/SKILL.md).
 The coordinator executes one approved objective, selects specialists from the
 current question and implementation forces, applies the artifact budget,
-creates one authorized commit, and stops. `plan-up-iterations`
-remains an advisory multi-iteration UP planning specialization; each ready
+creates one authorized commit, and stops. `iterative-risk-driven-analysis-design`
+remains the risk-driven analysis and design specialization; each ready
 candidate executes separately through `run-development-iteration`. The
 language-adaptation skill
 now accepts language-neutral behavior, boundaries, state, and collaborations
@@ -216,8 +216,9 @@ A future visual-design coordinator would ask:
 7. What evidence is sufficient to begin or continue implementation?
 8. Did implementation change knowledge that the durable view owns?
 
-The existing `plan-up-iterations` capability now remains an explicit
-multi-iteration UP/OO planning specialization for work that benefits from its
+The existing `iterative-risk-driven-analysis-design` capability now remains
+an explicit risk-driven analysis and design specialization for work that
+benefits from its
 full vocabulary and traceability model. It hands one ready candidate to
 `run-development-iteration` rather than executing work itself.
 `reconstruct-software-architecture` remains the specialist for recovering

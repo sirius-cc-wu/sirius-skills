@@ -1,6 +1,6 @@
 ---
 name: run-development-iteration
-description: Runs one risk-sized, language-neutral development iteration at a time from an approved idea, selected UP roadmap candidate, or other authoritative input. Selects specialist analysis, design, implementation, and repository skills; controls artifact creation; validates the result; and creates at most one authorized commit per iteration. Use when asked to promote an approved idea, execute one approved development iteration, advance a feature continuously, perform iterative analysis and design without prescribing object-oriented artifacts, or work one commit per iteration until the requested work is complete.
+description: Runs one risk-sized, language-neutral development iteration at a time from an approved idea, selected analysis/design candidate, or other authoritative input. Selects specialist analysis, design, implementation, and repository skills; controls artifact creation; validates the result; and creates at most one authorized commit per iteration. Use when asked to promote an approved idea, execute one approved development iteration, advance a feature continuously, perform iterative analysis and design without prescribing object-oriented artifacts, or work one commit per iteration until the requested work is complete.
 ---
 
 # Run Development Iteration
@@ -21,10 +21,10 @@ Do not follow a mandatory artifact sequence or programming paradigm.
   the commit.
 - Several specialist skills may apply, but they must serve one objective and
   one coherent change.
-- Do not use this skill to assess readiness, plan a multi-iteration UP roadmap,
-  perform one localized specialist task, commit an existing diff, or publish
-  completed work. Use `plan-up-iterations` for explicit multi-iteration
-  planning.
+- Do not use this skill to assess readiness, coordinate iterative analysis and
+  design, perform one localized specialist task, commit an existing diff, or
+  publish completed work. Use `iterative-risk-driven-analysis-design` for
+  risk-driven analysis and design coordination.
 
 ## Execution Modes
 
@@ -90,20 +90,21 @@ Do not follow a mandatory artifact sequence or programming paradigm.
     objective, and continue until the requested work or an explicit stop
     condition ends the run.
 
-## UP Roadmap Candidate Mode
+## Prepared Analysis Candidate Mode
 
-When executing a candidate planned by `plan-up-iterations`:
+When executing a candidate prepared by
+`iterative-risk-driven-analysis-design`:
 
-1. Treat the roadmap as planning input, not blanket execution authority.
+1. Treat the candidate as planning input, not execution authority by itself.
 2. Require explicit authority for the candidate. Fix its current source
    revisions, non-goals, dependencies, and exit evidence.
 3. Re-evaluate the selected specialists and artifact budget from current
-   evidence. Preserve traceability while correcting stale plan assumptions.
+   evidence. Preserve traceability while correcting stale assumptions.
 4. Execute only this candidate. Record actual results in justified canonical or
    historical owners. Make at most one authorized commit for this candidate.
-5. Apply the selected execution mode. Do not update or execute later roadmap
-   candidates without separate authorization. Report whether they remain
-   plausible or need replanning.
+5. Apply the selected execution mode. Continue only when the user requested
+   continuous execution. Report whether more risk-driven objectives remain or
+   need replanning.
 
 ## Idea Promotion Mode
 
@@ -138,12 +139,12 @@ canonical home, several paths compete, or migration is material, use
 [Design Repository Artifact Layout](../design-repository-artifact-layout/SKILL.md)
 for that placement decision. When a standalone Markdown artifact is justified,
 follow
-[Markdown Artifact Frontmatter](../plan-up-iterations/references/markdown-artifact-frontmatter.md)
+[Markdown Artifact Frontmatter](../iterative-risk-driven-analysis-design/references/markdown-artifact-frontmatter.md)
 and use STE-style.
 
 Refine canonical artifacts in place. If a durable execution record is justified,
-adapt the selected-candidate structure from
-[`plan-up-iterations`](../plan-up-iterations/SKILL.md). Record actual results and
+adapt the selected-objective structure from
+[`iterative-risk-driven-analysis-design`](../iterative-risk-driven-analysis-design/SKILL.md). Record actual results and
 artifact outcomes. Do not copy canonical artifact bodies into the record.
 
 ## Verification

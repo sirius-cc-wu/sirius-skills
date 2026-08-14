@@ -142,14 +142,11 @@ existing rule owner.
    authority-aware validation states.
 4. Select requirements and analysis skills from the current uncertainty:
    scope, behavior, examples, vocabulary, system events, or state effects.
-5. Use `plan-up-iterations` only when a team explicitly wants an
-   advisory multi-iteration UP roadmap. The former
-   `iterative-up-analysis-design` name is retired. Give each candidate one
-   risk-sized objective and exit evidence; select GRASP, realizations, class
-   diagrams, and
-   patterns only when their questions or design forces are present. Execute one
-   separately authorized candidate through `run-development-iteration`, and
-   delegate material repository placement to
+5. Use `iterative-risk-driven-analysis-design` when an approved change needs
+   risk-driven analysis or design. Give the objective exit evidence. Select
+   GRASP, realizations, class diagrams, and patterns only when their questions
+   or design forces are present. Hand implementation to
+   `run-development-iteration`, and delegate material repository placement to
    `design-repository-artifact-layout`.
 6. Use `software-design-language-adaptation` when implementation-facing design
    must reflect a target language. Use `design-rust-lifecycles` when Rust

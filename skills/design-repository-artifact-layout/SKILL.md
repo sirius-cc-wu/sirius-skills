@@ -102,7 +102,7 @@ Alternatives and uncertainty:
 Do not create a layout recommendation file unless it independently passes the
 artifact-selection budget. If a standalone Markdown recommendation is justified,
 follow
-[Markdown Artifact Frontmatter](../plan-up-iterations/references/markdown-artifact-frontmatter.md)
+[Markdown Artifact Frontmatter](../iterative-risk-driven-analysis-design/references/markdown-artifact-frontmatter.md)
 and
 use STE-style.
 Do not add placeholder indexes or empty directory trees merely to make a

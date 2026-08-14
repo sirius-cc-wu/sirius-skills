@@ -46,7 +46,7 @@ rectangle "**Client Discovery**\nstakeholder-requirements-elicitation\nrequireme
 
 rectangle "**Reverse Engineering**\nreverse-engineer-software-system\nsurvey-existing-system\nrecover-system-behavior\nreconstruct-software-architecture\nreconcile-recovered-design" as reverse #EAF4FB
 
-rectangle "**Iterative Analysis and Design**\nrun-development-iteration\nplan-up-iterations\ninception\nuse-case-modeling\nbehavior-driven-specification\ndomain-modeling\nsystem-sequence-diagrams\noperation-contracts\ngrasp-responsibility-design\nuse-case-realization\numl-class-diagram-design\ndesign-pattern-application\nsoftware-design-language-adaptation\ndesign-rust-lifecycles" as design #EEF8EE
+rectangle "**Iterative Analysis and Design**\nrun-development-iteration\niterative-risk-driven-analysis-design\ninception\nuse-case-modeling\nbehavior-driven-specification\ndomain-modeling\nsystem-sequence-diagrams\noperation-contracts\ngrasp-responsibility-design\nuse-case-realization\numl-class-diagram-design\ndesign-pattern-application\nsoftware-design-language-adaptation\ndesign-rust-lifecycles" as design #EEF8EE
 
 rectangle "**Implementation and Evolution**\ntest-driven-implementation\nbehavior-preserving-refactoring" as implementation #FFF5EA
 
@@ -210,12 +210,17 @@ default until the requested work is complete. It validates each iteration and
 creates at most one authorized commit per iteration. It selects the smallest
 specialists that answer the current question.
 
-`plan-up-iterations` plans at least two explicitly UP-framed candidates. The
-plan includes risks, exit evidence, and use-case-driven dependencies. It does
-not execute candidates. One separately authorized candidate goes to
-`run-development-iteration`, which rechecks the current baseline. Both skills
-preserve established canonical paths. They delegate material placement or
-migration decisions to `design-repository-artifact-layout`.
+`iterative-risk-driven-analysis-design` coordinates one approved, risk-sized
+analysis or design objective. It selects methods from the current risk and
+question, evolves canonical artifacts, and hands implementation to
+`run-development-iteration`. It does not enforce a complete object-design
+chain, implement product code, or commit.
+
+`run-development-iteration` executes one or more approved objectives. When the
+user requests one commit per iteration, it continues by default until the
+requested work is complete. Both skills preserve established canonical paths
+and delegate material placement or migration decisions to
+`design-repository-artifact-layout`.
 
 ```plantuml
 @startuml iterative-design-skill-relationships
@@ -238,7 +243,7 @@ skinparam rectangle<<coordinator>> {
 }
 
 rectangle "run-development-\niteration" as iterative <<coordinator>>
-rectangle "plan-up-\niterations" as up
+rectangle "iterative-risk-driven-\nanalysis-design" as analysisdesign <<coordinator>>
 
 package "Requirements and analysis" #EEF8EE {
   rectangle "inception" as inception
@@ -269,9 +274,13 @@ iterative ..> ssd : system events
 iterative ..> contracts : state effects
 iterative ..> language : target-language forces
 iterative ..> rust : Rust lifecycle risk
-iterative ..> up : multi-iteration UP roadmap
-up ..> iterative : one ready candidate
-up --> usecases
+iterative ..> analysisdesign : analysis/design objective
+analysisdesign ..> usecases : selected scenarios
+analysisdesign ..> behavior : selected examples
+analysisdesign ..> domain : selected vocabulary
+analysisdesign ..> ssd : selected system events
+analysisdesign ..> contracts : selected state effects
+analysisdesign ..> grasp : selected object responsibilities
 inception --> usecases
 usecases --> behavior
 usecases --> domain

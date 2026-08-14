@@ -65,7 +65,7 @@ Prefer refining an existing behavior model or keeping executable observations
 with tests when either is a sufficient owner.
 
 When persisting a standalone Markdown model, follow
-[Markdown Artifact Frontmatter](../plan-up-iterations/references/markdown-artifact-frontmatter.md)
+[Markdown Artifact Frontmatter](../iterative-risk-driven-analysis-design/references/markdown-artifact-frontmatter.md)
 and use STE-style.
 The main observed scenario provides the representative scenario; keep its
 evidence status distinct from intended behavior.

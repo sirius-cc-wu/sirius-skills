@@ -15,7 +15,7 @@
         "top_k": 3
       },
       {
-        "prompt": "Execute only the next authorized elaboration candidate from this UP roadmap, recheck its assumptions, validate it, commit once, and stop.",
+        "prompt": "Execute only the next authorized analysis/design candidate prepared by the risk-driven iteration skill, recheck its assumptions, validate it, commit once, and stop.",
         "top_k": 3
       },
       {
@@ -25,8 +25,8 @@
     ],
     "negative": [
       {
-        "prompt": "Plan several elaboration and construction iterations using Unified Process phases, use-case-driven artifact dependencies, and durable roadmap entries without executing them",
-        "owner": "plan-up-iterations"
+        "prompt": "Select risk-driven UP analysis and design methods for this approved change without implementing it.",
+        "owner": "iterative-risk-driven-analysis-design"
       },
       {
         "prompt": "Design the Rust ownership transfer, staged startup rollback, async cancellation, and fallible cleanup lifecycle for this approved service behavior",
@@ -59,17 +59,17 @@
       "trust_level": "provisional"
     },
     {
-      "id": "execute-one-up-roadmap-candidate",
-      "prompt": "The UP roadmap is approved as a plan and candidate E2 is separately authorized. Recheck E2 against the current repository revision, execute only that candidate, validate its exit evidence, create one commit, report roadmap assumptions that changed, and stop.",
-      "expected_output": "One authorized roadmap candidate is re-baselined, executed, validated, committed once, and stopped without treating the roadmap as blanket authority.",
+      "id": "execute-one-prepared-analysis-candidate",
+      "prompt": "The risk-driven analysis/design candidate E2 is separately authorized. Recheck E2 against the current repository revision, execute only that candidate, validate its exit evidence, create one commit, report assumptions that changed, and stop.",
+      "expected_output": "One authorized analysis/design candidate is re-baselined, executed, validated, committed once, and stopped without treating prior analysis approval as blanket execution authority.",
       "expectations": [
         "The selected candidate's authority, source revisions, objective, dependencies, non-goals, and exit evidence are fixed before work",
         "Stale specialist or artifact assumptions from the roadmap are corrected from current evidence while traceability is preserved",
-        "Only the selected candidate executes and the result reports whether later roadmap candidates may need replanning",
+        "Only the selected candidate executes and the result reports whether later objectives may need replanning",
         "At most one authorized scoped commit is created before stopping"
       ],
       "prohibitions": [
-        "Do not execute later roadmap candidates or treat roadmap approval as blanket authority",
+        "Do not execute later objectives or treat prior analysis approval as blanket authority",
         "Do not preserve a stale UP artifact checklist when the current question no longer needs it",
         "Do not push or publish"
       ],

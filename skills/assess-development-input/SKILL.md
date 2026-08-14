@@ -81,7 +81,7 @@ method or file format never determines the route.
 | Opportunity, vision, business case, feasibility, scope, or major risks are unclear | `inception` |
 | Actors, user goals, system boundary, main scenarios, or extensions are unclear | `use-case-modeling` |
 | An approved change or UP candidate needs one coordinated, risk-sized iteration | `run-development-iteration` |
-| A team needs an advisory multi-iteration UP phase and artifact roadmap | `plan-up-iterations` |
+| An approved objective needs risk-driven iterative analysis and design | `iterative-risk-driven-analysis-design` |
 | Business concepts, vocabulary, associations, or attributes are unclear | `domain-modeling` |
 | Actor-system events or system operations are unclear | `system-sequence-diagrams` |
 | Non-trivial state changes, preconditions, or postconditions are unclear | `operation-contracts` |
@@ -141,7 +141,7 @@ Prefer an existing issue, idea, or aggregate feature artifact when it is a
 sufficient owner.
 
 When a standalone Markdown assessment is justified, follow
-[Markdown Artifact Frontmatter](../plan-up-iterations/references/markdown-artifact-frontmatter.md)
+[Markdown Artifact Frontmatter](../iterative-risk-driven-analysis-design/references/markdown-artifact-frontmatter.md)
 and use STE-style. Use this frontmatter. Give the record a stable ID only when
 it will be cross-referenced. Put the concise output fields in the body. Do not
 copy the source material.

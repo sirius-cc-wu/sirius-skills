@@ -5,7 +5,7 @@ record-architecture-decision
 run-development-iteration
 simplify
 commit
-plan-up-iterations
+iterative-risk-driven-analysis-design
 stakeholder-requirements-elicitation
 requirements-synthesis-validation
 implementation-slice-briefing

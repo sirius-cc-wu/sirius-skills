@@ -11,7 +11,7 @@ design-repository-artifact-layout
 assess-development-input
 record-architecture-decision
 run-development-iteration
-plan-up-iterations
+iterative-risk-driven-analysis-design
 stakeholder-requirements-elicitation
 requirements-synthesis-validation
 implementation-slice-briefing

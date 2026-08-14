@@ -1,0 +1,58 @@
+{
+  "skill_name": "iterative-risk-driven-analysis-design",
+  "trigger": {
+    "positive": [
+      {
+        "prompt": "Run a risk-driven analysis and design iteration for this approved feature. Choose one objective and only the methods that answer it; do not implement.",
+        "top_k": 3
+      },
+      {
+        "prompt": "Refine the canonical use case, domain model, system sequence, and contract artifacts needed to reduce this architectural risk. Use scenarios and exit evidence instead of a fixed object-design chain.",
+        "top_k": 3
+      },
+      {
+        "prompt": "Coordinate one iterative analysis and design objective, decide whether GRASP and design patterns are justified, evolve the canonical artifacts, and hand implementation to the execution skill.",
+        "top_k": 3
+      }
+    ],
+    "negative": [
+      {
+        "prompt": "Execute the approved behavior, validate it, make one coherent commit, and continue with the next iteration until the work is complete.",
+        "owner": "run-development-iteration"
+      },
+      {
+        "prompt": "Design the Rust ownership transfer, staged startup rollback, async cancellation, and fallible cleanup lifecycle for this approved service behavior.",
+        "owner": "design-rust-lifecycles"
+      },
+      {
+        "prompt": "Build the conceptual domain model for these business concepts and associations without designing software objects.",
+        "owner": "domain-modeling"
+      },
+      {
+        "prompt": "Choose the canonical repository paths and indexes for these already-approved artifacts without changing their content.",
+        "owner": "design-repository-artifact-layout"
+      }
+    ]
+  },
+  "evals": [
+    {
+      "id": "risk-driven-analysis-design-iteration",
+      "prompt": "The feature direction is approved, but the event-ordering risk is unresolved. Run one risk-driven analysis and design iteration. Select only the use-case, scenario, system-sequence, contract, domain, or object-design methods needed to resolve that risk; preserve canonical ownership, record exit evidence, and hand implementation to run-development-iteration without writing product code or committing.",
+      "expected_output": "One bounded analysis and design iteration that states the risk, chooses justified methods, refines or creates only budget-approved canonical artifacts, records evidence and uncertainty, and provides an implementation handoff without executing implementation.",
+      "expectations": [
+        "One risk, learning question, or design objective and concrete exit evidence bind the iteration",
+        "Selected methods answer the current risk instead of completing a fixed analysis or object-design sequence",
+        "Canonical artifact ownership, lifecycle, identifiers, and traceability are preserved",
+        "The result distinguishes established evidence, inference, unresolved questions, and remaining risk",
+        "Implementation remains a separate handoff to run-development-iteration"
+      ],
+      "prohibitions": [
+        "Do not implement product code, run the execution loop, create a commit, or publish",
+        "Do not require every use-case, analysis, GRASP, realization, pattern, or class-diagram artifact",
+        "Do not create a standalone artifact without applying the artifact selection budget",
+        "Do not convert an unresolved design choice into an accepted decision"
+      ],
+      "trust_level": "provisional"
+    }
+  ]
+}

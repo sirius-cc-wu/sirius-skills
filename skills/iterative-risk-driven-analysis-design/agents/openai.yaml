@@ -1,0 +1,4 @@
+interface:
+  display_name: "Iterative Risk-Driven Analysis and Design"
+  short_description: "Run risk-driven iterative analysis and design"
+  default_prompt: "Use $iterative-risk-driven-analysis-design to select one risk-sized analysis or design objective, apply only the needed methods, refine canonical artifacts, and hand implementation to run-development-iteration."

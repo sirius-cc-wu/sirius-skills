@@ -61,7 +61,7 @@ docs/
 
 The developer wants a stable home for feature requirements, analysis,
 PlantUML views, and iteration history, but should not need to discover or name
-`plan-up-iterations`. They run:
+`iterative-risk-driven-analysis-design`. They run:
 
 ```bash
 sirius layout propose .
@@ -69,8 +69,7 @@ sirius layout propose .
 
 The command cites the observed paths, recognizes that decisions and proposals
 already have canonical homes, and recommends the smallest compatible addition
-for feature artifacts. It explains why a complete artifact-oriented UP tree
-would be unnecessary and reports any uncertainty. The repository remains
+for feature artifacts. It explains why a complete artifact-oriented phase tree would be unnecessary and reports any uncertainty. The repository remains
 unchanged.
 
 A coding agent can instead run:
@@ -99,7 +98,7 @@ The following statements describe the repository today:
   [`select-technical-artifacts`](../../skills/select-technical-artifacts/SKILL.md)
   skill, while layout guidance is owned by
   [`design-repository-artifact-layout`](../../skills/design-repository-artifact-layout/SKILL.md).
-  Both are reused by owning artifact skills and optional UP planning.
+  Both are reused by owning artifact skills and optional phase-based planning.
   This solves agent routing without creating a deterministic developer-facing
   command or versioned output contract.
 - The Python package currently describes itself as packaging support and does
@@ -259,15 +258,16 @@ field reinterpretation.
 
 The CLI would provide a deterministic, developer-facing form of the narrow
 result owned by `design-repository-artifact-layout`. It would not make that
-skill or `plan-up-iterations` obsolete.
+skill or `iterative-risk-driven-analysis-design` obsolete.
 
 - Use `design-repository-artifact-layout` when a coding agent should inspect
   context, exercise judgment, recommend placement, or perform an explicitly
   authorized migration.
 - Use the CLI when a developer or tool needs read-only, reproducible layout
   observations in Markdown or versioned JSON without invoking an agent.
-- Use `plan-up-iterations` when planning several risk-sized UP
-  iterations, their artifact set, analysis sequence, design work, and one
+- Use `iterative-risk-driven-analysis-design` when selecting risk-sized
+  analysis and design work, its artifact set, and its implementation handoff.
+  `run-development-iteration` executes the approved objective and one
   separate execution handoff.
 - Use one established ideas, feature, or decision path for a new candidate
   direction when the recommendation needs durable review. This legacy proposal
@@ -328,11 +328,11 @@ and can perform an explicitly authorized migration. Stopping there avoids a new
 executable surface, but developers and non-agent tools still lack reproducible
 read-only observations and a versioned machine-readable contract.
 
-### Keep Layout Guidance Under UP Planning
+### Keep Layout Guidance Under Iterative Analysis and Design
 
 This would avoid another user-visible capability, but it would restore the
 routing problem that the extraction solved: repository placement is useful for
-proposals and recovered knowledge even when no Unified Process plan is needed.
+proposals and recovered knowledge even when no phase-based plan is needed.
 
 ### Bootstrap a Directory Tree Automatically
 
@@ -393,7 +393,8 @@ Implementation would be acceptable when the following evidence exists:
 
 Behavioral evaluation should then test the key product assumption: given the
 CLI proposal, a coding agent places a requested artifact consistently without
-being told to invoke `plan-up-iterations`. That result should be
+being told to invoke `iterative-risk-driven-analysis-design`. That result
+should be
 compared with a control prompt that lacks the proposal before claiming that the
 CLI improves agent behavior.
 

@@ -101,10 +101,10 @@ to the current repository revision and expose every exclusion and stop condition
 ```
 
 ```text
-Use plan-up-iterations to plan several risk-driven UP iterations for
-this feature. Give each candidate one objective and exit evidence, preserve
-only justified durable artifacts, and hand off the first ready candidate to
-run-development-iteration without executing it.
+Use iterative-risk-driven-analysis-design to select one risk-driven analysis
+or design objective for this feature. Use only the methods and durable
+artifacts that the objective justifies. Hand implementation to
+run-development-iteration.
 ```
 
 ```text

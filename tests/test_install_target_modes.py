@@ -31,7 +31,7 @@ ITERATIVE_DESIGN_SKILLS = {
     "run-development-iteration",
     "commit",
     "simplify",
-    "plan-up-iterations",
+    "iterative-risk-driven-analysis-design",
     "stakeholder-requirements-elicitation",
     "requirements-synthesis-validation",
     "implementation-slice-briefing",

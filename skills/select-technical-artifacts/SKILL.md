@@ -113,10 +113,10 @@ artifact-budget document merely to record that fewer artifacts should exist.
   after selection.
 - **Selection versus content:** requirements, design, ADR, recovery, planning,
   and verification specialists own artifact meaning and authoring in STE-style.
-- **Selection versus coordination:** `plan-up-iterations` plans an
-  explicit multi-iteration UP roadmap, while `run-development-iteration` owns
-  one execution. This skill reviews a material artifact-set question without
-  planning or running those iterations.
+- **Selection versus coordination:** `iterative-risk-driven-analysis-design`
+  coordinates risk-driven analysis and design, while
+  `run-development-iteration` owns execution. This skill reviews a material
+  artifact-set question without planning or running an iteration.
 
 ## Red Flags
 
