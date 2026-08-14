@@ -11,6 +11,16 @@ SYNC_REFERENCES = "sirius_skills.commands.sync_shared_references"
 NPX_SKILLS = "npx --yes skills"
 PACKAGED_ADD = f'{NPX_SKILLS} add "'
 PACKAGED_REPO_SOURCE = f'{PACKAGED_ADD}{REPO_ROOT}"'
+ADDY_EXTERNAL_PROFILE = REPO_ROOT / "catalog/external-skill-sets/addy-osmani.txt"
+ADDY_SOURCE = (
+    "https://github.com/addyosmani/agent-skills/archive/"
+    "5a1b82d6445d1e2f0abeea1072851419a50c0e5c.tar.gz"
+)
+ADDY_SKILLS = {
+    "interview-me",
+    "idea-refine",
+    "code-review-and-quality",
+}
 PROFILE_NAMES = (
     "workflow",
     "iterative-design",
@@ -81,6 +91,22 @@ def read_profile(name: str) -> set[str]:
     }
 
 
+def read_external_profile(path: Path) -> set[str]:
+    return {
+        line.strip()
+        for line in path.read_text(encoding="utf-8").splitlines()
+        if line.strip() and not line.lstrip().startswith("#")
+    }
+
+
+def assert_addy_install_is_guarded_to_all(output: str) -> None:
+    guard = 'if [[ "$skill_set" == "all" ]]'
+    source_position = output.index(ADDY_SOURCE)
+    guard_start = output.rfind(guard, 0, source_position)
+    guard_end = output.index("\nfi", guard_start)
+    assert guard_start < source_position < guard_end
+
+
 def test_install_defaults_to_workflow_profile_and_keeps_reference_sync() -> None:
     output = render_just("install")
 
@@ -88,7 +114,7 @@ def test_install_defaults_to_workflow_profile_and_keeps_reference_sync() -> None
     assert SYNC_REFERENCES in output
     assert "sync_shared_skill_runtime.py" not in output
     assert PACKAGED_REPO_SOURCE in output
-    assert output.count(f"{NPX_SKILLS} add") == 1
+    assert 'if [[ "$skill_set" == "all" ]]' in output
     assert "prune-retired" in output
     assert "link-profile" in output
     assert "record-installed" in output
@@ -103,6 +129,35 @@ def test_install_accepts_each_named_profile(profile: str) -> None:
 
     assert f"skill_set='{profile}'" in output
     assert PACKAGED_REPO_SOURCE in output
+
+
+def test_install_all_adds_the_pinned_external_addy_profile() -> None:
+    output = render_just("install", "all")
+
+    assert read_external_profile(ADDY_EXTERNAL_PROFILE) == ADDY_SKILLS
+    assert ADDY_SOURCE in output
+    assert str(ADDY_EXTERNAL_PROFILE) in output
+    assert_addy_install_is_guarded_to_all(output)
+    assert output.count(f"{NPX_SKILLS} add") == 2
+    assert "external_skills" in output
+    assert "combined_profile" in output
+    assert "--global" in output
+
+
+def test_named_profiles_guard_external_addy_install_to_all() -> None:
+    output = render_just("install", "iterative-design")
+
+    assert ADDY_SOURCE in output
+    assert str(ADDY_EXTERNAL_PROFILE) in output
+    assert_addy_install_is_guarded_to_all(output)
+    assert output.count(f"{NPX_SKILLS} add") == 2
+
+
+def test_uninstall_all_manages_the_external_addy_profile() -> None:
+    output = render_just("uninstall", "all")
+
+    assert str(ADDY_EXTERNAL_PROFILE) in output
+    assert "combined_profile" in output
 
 
 def test_install_rejects_an_unknown_profile_before_invoking_npx() -> None:
@@ -137,7 +192,7 @@ def test_install_packaged_alias_matches_install() -> None:
     assert SYNC_REFERENCES in output
     assert "sync_shared_skill_runtime.py" not in output
     assert PACKAGED_REPO_SOURCE in output
-    assert output.count(f"{NPX_SKILLS} add") == 1
+    assert 'if [[ "$skill_set" == "all" ]]' in output
     assert "skill_set='workflow'" in output
 
 

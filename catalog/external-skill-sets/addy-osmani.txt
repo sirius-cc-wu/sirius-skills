@@ -1,0 +1,6 @@
+# Addy Osmani agent-skills installed by the Sirius all profile.
+# Source revision: 5a1b82d6445d1e2f0abeea1072851419a50c0e5c
+# This manifest is external to the Sirius active catalog.
+interview-me
+idea-refine
+code-review-and-quality

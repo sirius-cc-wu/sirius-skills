@@ -29,8 +29,9 @@ existing guidance or codifying a one-off incident.
 
 ## Optional upstream intent and idea refinement
 
-These skills come from Addy Osmani's external `agent-skills` collection and are
-not installed by Sirius profiles.
+These skills come from Addy Osmani's external `agent-skills` collection. The
+`all` installation provides the curated add-on set; the skills remain outside
+the Sirius catalog and named profiles.
 
 ```text
 Use interview-me to ask one question at a time until my intended outcome, user,
@@ -44,6 +45,12 @@ assumptions, and converge on one candidate direction with MVP scope and a Not
 Doing list. Store the confirmed idea in an established ideas path or a
 feature path defined by local governance. Do not create a new proposal artifact.
 Preserve existing legacy proposals at their historical paths.
+```
+
+```text
+Use code-review-and-quality before merging this change. Review correctness,
+readability, architecture, security, and performance; label findings by
+severity and report the verification evidence.
 ```
 
 ## Reverse engineering

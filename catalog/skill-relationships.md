@@ -6,8 +6,8 @@ current risk or complete the current behavior slice.
 
 ## Overview
 
-This diagram groups all 31 deployable Sirius skills by responsibility. It also
-shows two optional external skills for shaping intent. The diagram shows only
+This diagram groups all 30 deployable Sirius skills by responsibility. It also
+shows three external Addy add-ons. The diagram shows only
 the main movement between groups. Use the detailed diagrams below for
 conditional routes. Solid arrows show normal handoffs. They do not require a
 fixed sequence. Dashed arrows show optional routing, support, or feedback.
@@ -35,9 +35,10 @@ skinparam rectangle<<external>> {
   BorderColor #888888
 }
 
-package "Optional external intent shaping\naddyosmani/agent-skills" as addy #F2F2F2 {
+package "External Addy add-ons\naddyosmani/agent-skills" as addy #F2F2F2 {
   rectangle "interview-me" as addyInterview <<external>>
   rectangle "idea-refine" as addyIdea <<external>>
+  rectangle "code-review-and-quality" as addyReview <<external>>
 }
 
 rectangle "**Sirius: Intake**\nassess-development-input" as assess #FFF4CC
@@ -71,13 +72,16 @@ reverse --> design
 reverse ..> implementation
 design --> implementation
 implementation ..> design : durable feedback
+implementation --> addyReview : review before merge
+addyReview --> repository
 implementation --> repository
 @enduml
 ```
 
 The gray nodes belong to Addy Osmani's external `agent-skills` collection. They
-are not part of the Sirius catalog or installation profiles. The diagram shows
-one optional composition. `interview-me` confirms one requester's intent.
+are not part of the Sirius catalog or named profiles. `just install all` installs
+the three curated add-ons; other profiles do not. The diagram shows one
+optional composition. `interview-me` confirms one requester's intent.
 `idea-refine` turns that intent into a focused, user-confirmed candidate
 one-pager. Skip `interview-me` when intent is concrete. Skip `idea-refine` when
 the direction is already focused.

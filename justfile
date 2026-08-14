@@ -5,8 +5,11 @@ set shell := ["bash", "-c"]
 repo_root := justfile_directory()
 common_flags := "--global --yes --agent github-copilot --agent codex --agent antigravity --agent antigravity-cli"
 retired_ledger := repo_root / "catalog/retired-skills.tsv"
+addy_source := "https://github.com/addyosmani/agent-skills/archive/5a1b82d6445d1e2f0abeea1072851419a50c0e5c.tar.gz"
+addy_profile := repo_root / "catalog/external-skill-sets/addy-osmani.txt"
 
-# Install the workflow profile by default, or one named profile.
+# Install the workflow profile by default, or one named profile. The all
+# profile also installs the pinned external Addy add-on set.
 install skill_set="workflow": sync-shared-references
 	#!/usr/bin/env bash
 	set -euo pipefail
@@ -22,16 +25,32 @@ install skill_set="workflow": sync-shared-references
 	fi
 	just --justfile "{{repo_root}}/justfile" prune-retired
 
+	combined_profile=$(mktemp)
+	trap 'rm -f "$combined_profile"' EXIT
+	cat "$skill_set_file" > "$combined_profile"
+	if [[ "$skill_set" == "all" ]]; then
+		test -f "{{addy_profile}}"
+		cat "{{addy_profile}}" >> "$combined_profile"
+	fi
+
 	mapfile -t skills < <(sed -e '/^[[:space:]]*#/d' -e '/^[[:space:]]*$/d' "$skill_set_file")
 	skill_flags=()
 	for skill in "${skills[@]}"; do
 		skill_flags+=(--skill "$skill")
 	done
 	npx --yes skills add "{{repo_root}}" {{common_flags}} "${skill_flags[@]}"
+	if [[ "$skill_set" == "all" ]]; then
+		mapfile -t external_skills < <(sed -e '/^[[:space:]]*#/d' -e '/^[[:space:]]*$/d' "{{addy_profile}}")
+		external_skill_flags=()
+		for skill in "${external_skills[@]}"; do
+			external_skill_flags+=(--skill "$skill")
+		done
+		npx --yes skills add "{{addy_source}}" {{common_flags}} "${external_skill_flags[@]}"
+	fi
 	env PYTHONPATH="{{repo_root}}/src" python3 -m sirius_skills.commands.manage_installed_skills \
-		link-profile --profile "$skill_set_file"
+		link-profile --profile "$combined_profile"
 	env PYTHONPATH="{{repo_root}}/src" python3 -m sirius_skills.commands.manage_installed_skills \
-		record-installed --profile "$skill_set_file"
+		record-installed --profile "$combined_profile"
 
 # Compatibility alias for profile installation.
 install-packaged skill_set="workflow": (install skill_set)
@@ -88,7 +107,15 @@ uninstall skill_set="workflow":
 	fi
 	just --justfile "{{repo_root}}/justfile" prune-retired
 
-	installed=$(npx --yes skills ls -g --json | python3 -c 'import json, pathlib, sys; managed = {line.strip() for line in pathlib.Path(sys.argv[1]).read_text().splitlines() if line.strip() and not line.lstrip().startswith("#")}; installed = [item["name"] for item in json.load(sys.stdin) if item.get("name") in managed]; print("\n".join(installed))' "$skill_set_file")
+	combined_profile=$(mktemp)
+	trap 'rm -f "$combined_profile"' EXIT
+	cat "$skill_set_file" > "$combined_profile"
+	if [[ "$skill_set" == "all" ]]; then
+		test -f "{{addy_profile}}"
+		cat "{{addy_profile}}" >> "$combined_profile"
+	fi
+
+	installed=$(npx --yes skills ls -g --json | python3 -c 'import json, pathlib, sys; managed = {line.strip() for line in pathlib.Path(sys.argv[1]).read_text().splitlines() if line.strip() and not line.lstrip().startswith("#")}; installed = [item["name"] for item in json.load(sys.stdin) if item.get("name") in managed]; print("\n".join(installed))' "$combined_profile")
 	if [ -n "$installed" ]; then
 		mapfile -t installed_skills <<< "$installed"
 		# Global agent aliases share the universal skill directory, so removal
@@ -98,9 +125,9 @@ uninstall skill_set="workflow":
 		echo "No installed skills found for profile: $skill_set"
 	fi
 	env PYTHONPATH="{{repo_root}}/src" python3 -m sirius_skills.commands.manage_installed_skills \
-		unlink-profile --profile "$skill_set_file"
+		unlink-profile --profile "$combined_profile"
 	env PYTHONPATH="{{repo_root}}/src" python3 -m sirius_skills.commands.manage_installed_skills \
-		forget-profile --profile "$skill_set_file"
+		forget-profile --profile "$combined_profile"
 
 # Compatibility alias for profile removal.
 uninstall-packaged skill_set="workflow": (uninstall skill_set)

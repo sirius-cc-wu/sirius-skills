@@ -31,7 +31,7 @@ Available profiles are defined in [`skill-sets/`](skill-sets/):
 | `iterative-design` | External-input assessment, technical-artifact selection, architecture-decision recording, artifact-layout design, question-driven iterations, boundary-sensitive refactoring gates, native responsibility and optional object design, language adaptation, tested implementation, simplification, and scoped commits |
 | `applying-uml-and-patterns` | Compatibility alias for `iterative-design` |
 | `reverse-engineering` | Evidence-driven system survey, behavior and architecture recovery, recorded-decision discovery, recovered-artifact selection, reconciliation, and durable placement |
-| `all` | Every active skill in the catalog |
+| `all` | Every active Sirius skill in the catalog, plus the pinned Addy add-ons |
 
 Remove the default or a named profile later:
 
@@ -48,7 +48,14 @@ global skills in `~/.agents/skills`, while Antigravity CLI discovers global
 skills in `~/.gemini/config/skills`. Installation therefore creates a
 per-skill compatibility symlink in the Antigravity directory without replacing
 unrelated entries already there. Uninstall and retired-skill cleanup remove
-only symlinks that still point to their expected Sirius installation.
+only symlinks that still point to their expected canonical installation.
+
+`just install all` also installs the three skills listed in
+[`catalog/external-skill-sets/addy-osmani.txt`](catalog/external-skill-sets/addy-osmani.txt)
+from Addy Osmani's pinned agent-skills revision. They remain external to the
+Sirius catalog and are not installed by other profiles. The external install
+uses the same global (`--global`) scope as Sirius skills. `just uninstall all`
+removes and unlinks the same external names.
 
 A successful installation also records its skill names in host-local state at
 `$XDG_STATE_HOME/sirius-skills/managed-skills.txt`, or
@@ -142,8 +149,9 @@ Choose one candidate-direction artifact. Use `docs/ideas/` for an idea
 one-pager from `idea-refine`. Use a feature path only when local governance
 defines it. Do not create a new proposal artifact. The result remains candidate
 input, not organizational approval. Use `assess-development-input` only when
-its next Sirius owner is unclear. These external skills are not installed by
-Sirius profiles.
+its next Sirius owner is unclear. `just install all` provides these two skills
+as external add-ons; they are not Sirius catalog entries or named-profile
+members.
 
 `author-software-proposal` is retired. Existing legacy proposal artifacts
 remain valid at their migrated paths. Use `idea-refine` for new candidate
@@ -247,6 +255,7 @@ and judge calibration are opt-in and never run as part of normal validation.
 
 - `skills/*/SKILL.md`: deployable agent workflows
 - `skill-sets/*.txt`: canonical installation profiles
+- `catalog/external-skill-sets/`: pinned membership for external add-ons
 - `catalog/skills.md`: skill responsibilities and boundaries
 - `catalog/retired-skills.tsv`: append-only retired-name tombstones with Git
   evidence revisions

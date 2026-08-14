@@ -27,6 +27,15 @@ may distill concepts from several sources.
 The detailed concept-to-skill mapping is maintained in the
 [Skill Catalog](skills.md).
 
+## External skill add-ons
+
+The `all` installation fetches these upstream skills without copying them into
+the Sirius active catalog:
+
+| Source | Pinned revision | Installed names | Installation surface |
+|---|---|---|---|
+| Addy Osmani's [`agent-skills`](https://github.com/addyosmani/agent-skills/tree/5a1b82d6445d1e2f0abeea1072851419a50c0e5c) | `5a1b82d6445d1e2f0abeea1072851419a50c0e5c` | `interview-me`, `idea-refine`, `code-review-and-quality` | `just install all` only |
+
 ## Proposed Sources
 
 This remaining source informs a possible future client-discovery capability but

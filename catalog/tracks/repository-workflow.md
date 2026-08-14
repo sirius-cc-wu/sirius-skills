@@ -4,6 +4,11 @@ Use this track to refine, record, and publish an already implemented change.
 The skills remain independently selectable; the sequence is a common handoff,
 not authority to perform later publication steps without the user's request.
 
+When the `all` installation is available, optionally use Addy Osmani's external
+[`code-review-and-quality`](https://github.com/addyosmani/agent-skills/blob/5a1b82d6445d1e2f0abeea1072851419a50c0e5c/skills/code-review-and-quality/SKILL.md)
+before commit or pull-request publication. It remains an external review
+skill, not a Sirius catalog entry or lifecycle gate.
+
 ## Typical change flow
 
 1. Implement and verify the requested outcome using the repository's own

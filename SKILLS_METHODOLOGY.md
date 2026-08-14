@@ -12,10 +12,12 @@ following every step in it.
 | Refine, record, and publish repository changes | `workflow` |
 | Assess external development inputs, select technical artifacts, record architecture decisions, design artifact layouts, and run question-driven analysis, design, implementation, simplification, and scoped-commit iterations | `iterative-design` |
 | Recover current behavior and architecture, find governing ADRs, select durable recovered artifacts, and place them | `reverse-engineering` |
-| Make the entire catalog available | `all` |
+| Make the entire Sirius catalog available, with the curated Addy add-ons | `all` |
 
 `applying-uml-and-patterns` remains a compatibility alias for
-`iterative-design`.
+`iterative-design`. The `all` profile additionally installs the pinned external
+Addy add-on set; those skills remain outside the Sirius catalog and named
+profiles.
 
 ## Common compositions
 
