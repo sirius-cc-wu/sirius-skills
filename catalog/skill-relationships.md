@@ -83,19 +83,18 @@ one-pager. Skip `interview-me` when intent is concrete. Skip `idea-refine` when
 the direction is already focused.
 
 Use `idea-refine` for a candidate direction. Save the confirmed
-one-pager in `docs/ideas/` or a feature path defined by local governance. Do not
-create a second candidate artifact. Preserve existing migrated candidate
-documents at their paths. Requester confirmation is not organizational
-approval. Use the dashed edge to `assess-development-input` only when the
-artifact's next
-Sirius owner is unclear.
+one-pager in `docs/ideas/` or a feature path defined by local governance. Use
+one canonical idea document for each candidate direction. Do not create a second
+document for a direction that already has one. Requester confirmation is not
+organizational approval. Use the dashed edge to `assess-development-input` only
+when the artifact's next Sirius owner is unclear.
 
-The Sirius groups are navigation aids. They are not installation profiles or
-lifecycle gates. The detailed diagrams show the conditional choices and
-feedback that this overview omits. The diagram does not connect cross-cutting
-support to every consumer. Select it for a specific artifact-selection,
-artifact-placement, or decision-recording need. It is not a required workflow
-stage. Language adaptation and Rust lifecycle design remain
+The groups in this diagram help readers navigate the skill collection. They
+are not installation profiles or lifecycle gates. The detailed diagrams show
+the conditional choices and feedback that this overview omits. The diagram does
+not connect cross-cutting support to every consumer. Select it for a specific
+artifact-selection, artifact-placement, or decision-recording need. It is not a
+required workflow stage. Language adaptation and Rust lifecycle design remain
 in Iterative Analysis and Design because they produce implementation-facing
 design.
 
