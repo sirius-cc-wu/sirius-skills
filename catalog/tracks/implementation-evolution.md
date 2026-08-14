@@ -25,7 +25,9 @@ before entering this track.
    [`design-rust-lifecycles`](../../skills/design-rust-lifecycles/SKILL.md)
    before implementation when Rust resource ownership, startup, rollback,
    cancellation, supervision, or fallible cleanup requires an explicit
-   implementation-facing lifecycle.
+   implementation-facing lifecycle. Establish the system boundary,
+   representative scenario, native responsibilities, and verification oracle
+   first when the change is boundary-sensitive.
 5. Use
    [`test-driven-implementation`](../../skills/test-driven-implementation/SKILL.md)
    to size the behavior slice, demonstrate discriminatory verification, and
@@ -43,11 +45,22 @@ locally before creating a separate behavior-slice or implementation record.
 ## Improve Existing Structure
 
 1. Establish a passing baseline that protects the behavior to preserve.
-2. Use
+2. Classify boundary impact. If the refactoring creates or moves a material
+   test seam, composition root, backend, entrypoint, process-global dependency,
+   runtime owner, readiness condition, cleanup boundary, or end-to-end
+   verification boundary, use
+   [`iterative-risk-driven-development`](../../skills/iterative-risk-driven-development/SKILL.md)
+   before treating it as a local transformation.
+3. Use
    [`behavior-preserving-refactoring`](../../skills/behavior-preserving-refactoring/SKILL.md)
-   for independently reviewable structural transformations.
-3. Return to responsibility design or pattern selection only when the
-   refactoring exposes a durable design pressure.
+   for independently reviewable local structural transformations.
+4. Return to responsibility design or pattern selection when the refactoring
+   exposes a durable design pressure. Assign responsibilities to native
+   modules, functions, tasks, adapters, handles, types, or composition roots as
+   appropriate.
+5. Retain material integration and end-to-end oracles. Report a new seam as an
+   enabling result until a representative vertical flow proves the parent
+   outcome.
 
 Do not use refactoring to conceal intentional behavior changes, and do not ask
 the implementation skill to guess unresolved business rules.

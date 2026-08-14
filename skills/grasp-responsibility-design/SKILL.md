@@ -1,37 +1,80 @@
 ---
 name: grasp-responsibility-design
-description: Assigns object responsibilities with GRASP. Use when deciding which object should create, know, coordinate, vary, mediate, or protect behavior in an object-oriented design.
+description: Assigns software responsibilities with GRASP to classes or language-native modules, functions, tasks, values, adapters, and resource handles. Use when deciding which unit should know, create, coordinate, vary, mediate, supervise, or protect behavior while controlling coupling and cohesion.
 ---
 
 # GRASP Responsibility Design
 
 ## Overview
 
-GRASP patterns are decision tools for assigning responsibilities. Use them to keep behavior near the right information while controlling coupling, cohesion, and variation.
+GRASP patterns are decision tools for assigning software responsibilities. Use
+them to keep behavior near the required information and capabilities while
+controlling coupling, cohesion, coordination, and variation. A responsibility
+owner may be a class, module, function, task, value, adapter, resource handle,
+or composition root.
 
 ## When to Use
 
-- You have use cases, SSDs, contracts, or domain concepts and need software object responsibilities.
-- Multiple classes could plausibly perform the same behavior.
+- You have scenarios, system events, contracts, recovered collaborations, or
+  domain concepts and need software responsibility decisions.
+- Multiple classes or language-native units could plausibly own the same
+  behavior.
+- A boundary-sensitive refactoring moves coordination, supervision, cleanup,
+  dependency direction, or another durable responsibility.
 - Creation, coordination, variation, or dependency pressure is unclear.
-- Do not use as a naming exercise after responsibilities have already been chosen.
+- Do not use as an as-built module inventory, a naming exercise after
+  responsibilities are chosen, or an exact resource-ownership design.
 
 ## Language Adaptation
 
-When the implementation language is known, also use [Software Design Language Adaptation](../software-design-language-adaptation/SKILL.md) and read only its matching language reference. Preserve the GRASP rationale while allowing a responsibility owner to become a native type, function, module, callable, or other appropriate construct rather than forcing a class.
+GRASP supplies language-neutral assignment reasoning; it does not require a
+class-shaped result. When the implementation language is known, also use
+[Software Design Language Adaptation](../software-design-language-adaptation/SKILL.md)
+and read only its matching language reference. Preserve the rationale while
+selecting a native type, function, module, task, callable, adapter, resource
+handle, composition root, or other appropriate construct.
 
 ## Workflow
 
-1. **Start from a responsibility.** Phrase it as "Who should know..." or "Who should do..."
-2. **Try Information Expert first.** Assign behavior to the class with the information needed to fulfill it.
-3. **Apply Creator for object creation.** Prefer a creator that contains, aggregates, records, closely uses, or has initialization data for the created object.
-4. **Choose a Controller for system events.** Use a facade controller for system-wide events or a use-case/session controller for scenario coordination.
-5. **Check Low Coupling.** Reject assignments that create unnecessary dependency chains or knowledge of unstable details.
-6. **Check High Cohesion.** Reject assignments that overload an object with unrelated work.
-7. **Use Polymorphism for type-varying behavior.** Put open alternatives behind a common interface rather than ad hoc branching on concrete types. When the variants are fixed, let language adaptation determine whether a closed sum type and exhaustive matching are the more natural mechanism.
-8. **Use Pure Fabrication when domain objects would become bloated or coupled.** Create a service-like object only to preserve cohesion and reuse.
-9. **Use Indirection to mediate dependencies.** Insert an intermediate object when direct coupling creates design pressure.
-10. **Use Protected Variations.** Identify likely variation points and stabilize access through interfaces or adapters.
+1. **Start from behavior.** Use an approved or recovered scenario, system event,
+   contract effect, collaboration, or invariant. Phrase each responsibility as
+   “Who should know...?”, “Who should do...?”, or “Who should coordinate...?”
+2. **List native candidates.** Consider the domain object and the actual
+   language-native units at the boundary: module, type, function, task,
+   adapter, resource handle, and composition root. Do not select an owner from
+   names alone.
+3. **Try Information Expert first.** Prefer the unit with the information or
+   capability needed to fulfill the responsibility. Logical information
+   responsibility does not by itself decide exact Rust memory or resource
+   ownership.
+4. **Apply Creator for construction.** Prefer the unit that contains,
+   aggregates, records, closely uses, or has the initialization knowledge for
+   the created value, task, or resource owner.
+5. **Choose a Controller for system events.** Use a facade, use-case/session
+   controller, composition function, or composition root to receive and
+   coordinate the scenario. Keep domain and service work in its selected
+   experts.
+6. **Check Low Coupling.** Reject assignments that create unnecessary
+   dependency chains, unstable knowledge, process-global access, or hidden
+   control flow.
+7. **Check High Cohesion.** Reject assignments that combine unrelated
+   preparation, business behavior, transport, supervision, and cleanup.
+8. **Use Polymorphism only for demonstrated variation.** Let language
+   adaptation choose an enum, callable, generic, trait, object, or other native
+   mechanism according to whether alternatives are open or closed.
+9. **Use Pure Fabrication when existing owners would become bloated or
+   coupled.** Prefer a cohesive module, adapter, function, or service-like type
+   that has one clear reason to change.
+10. **Use Indirection to mediate dependencies.** Insert the smallest native
+    mechanism when direct coupling creates demonstrated pressure.
+11. **Use Protected Variations.** Identify a real source of change and
+    stabilize access through a suitable boundary without predicting arbitrary
+    future variation.
+12. **Record ownership feedback.** Name the selected responsibility owner and
+    dependency direction. If Rust resource ownership, task supervision, or
+    fallible cleanup is material, hand the assignment to
+    `design-rust-lifecycles`. Revise the responsibility when lifecycle evidence
+    shows that the assignment is unsafe or incohesive.
 
 ## Decision Record Template
 
@@ -71,7 +114,7 @@ tags: [design, grasp]
 
 ## Candidates
 
-- [Class]: [reason for/against]
+- [Class or language-native unit]: [reason for/against]
 
 ## Rationale
 
@@ -79,19 +122,42 @@ tags: [design, grasp]
 - Variation point: [none or protected by interface/polymorphism]
 ```
 
+## Boundaries
+
+- Use `reconstruct-software-architecture` when the question is which modules or
+  runtime participants exist today. This skill decides who should own behavior.
+- Use `design-rust-lifecycles` for exact ownership transfer, borrowing,
+  cancellation, joining, rollback, `Drop`, and fallible cleanup after the
+  native responsibilities are explicit.
+- Use `use-case-realization` when one scenario needs a detailed internal
+  collaboration. A responsibility decision does not require a complete
+  realization or class diagram.
+- Keep requirements and domain models free of implementation-unit choices.
+
 ## Red Flags
 
-- A controller performs business rules instead of coordinating.
+- A controller or composition root performs business or service rules instead
+  of coordinating.
 - A domain object knows about UI, persistence, infrastructure, or external APIs.
-- Ad hoc type checks replace polymorphic dispatch for open or extensible variants. Do not confuse exhaustive matching over a language-native closed sum type with this smell.
-- "Service" or "Manager" is chosen before evaluating Expert, Creator, and Controller.
+- A module named `service`, `manager`, or `runtime` accumulates preparation,
+  protocol behavior, task supervision, and cleanup without one cohesive reason.
+- Every responsibility becomes a struct or trait even when a module, function,
+  enum, task, or handle is the natural owner.
+- Ad hoc type checks replace polymorphic dispatch for open or extensible
+  variants. Do not confuse exhaustive matching over a language-native closed
+  sum type with this smell.
+- A current module inventory is reported as an intended responsibility design.
 
 ## Verification
 
-- [ ] Each non-trivial behavior has an explicit owner.
-- [ ] Responsibility decisions cite at least one GRASP rationale.
-- [ ] Controllers coordinate but do not absorb domain logic.
-- [ ] Coupling and cohesion were checked for each major assignment.
-- [ ] Variation points are protected by polymorphism, interfaces, adapters, or indirection.
+- [ ] Each non-trivial behavior has an explicit class or language-native owner.
+- [ ] Responsibility decisions cite at least one applicable GRASP rationale.
+- [ ] Controllers and composition roots coordinate but do not absorb domain or
+      service logic.
+- [ ] Coupling, cohesion, and dependency direction were checked for each major
+      assignment.
+- [ ] Variation points use the smallest justified native protection mechanism.
+- [ ] Responsibility ownership remains distinct from exact memory, task, or
+      resource ownership, with a Rust lifecycle handoff when material.
 - [ ] The decision explains its problem and consequence before comparing candidates.
 - [ ] A standalone Markdown decision exposes identity, responsibility, chosen owner, GRASP basis, and lifecycle metadata in one frontmatter block.

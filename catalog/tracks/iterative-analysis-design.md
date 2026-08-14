@@ -1,9 +1,10 @@
 # Iterative Analysis and Design
 
 Use this track when an approved change needs analysis, design, and possibly
-implementation in bounded, risk-sized iterations. Select work from the current
-question and implementation forces rather than following a mandatory artifact
-or object-design sequence.
+implementation in bounded, risk-sized iterations. It also applies when a
+complex refactoring moves a system, test, responsibility, runtime, or resource
+boundary. Select work from the current question and implementation forces
+rather than following a mandatory artifact or object-design sequence.
 
 When requirements-shaped input was produced outside Sirius and the correct
 entry point is unclear, first use
@@ -49,7 +50,8 @@ Choose the narrowest specialist for each material question:
 | Business concepts and shared vocabulary | [`domain-modeling`](../../skills/domain-modeling/SKILL.md) |
 | Actor-system events and operation names | [`system-sequence-diagrams`](../../skills/system-sequence-diagrams/SKILL.md) |
 | Non-trivial state effects and invariants | [`operation-contracts`](../../skills/operation-contracts/SKILL.md) |
-| Object responsibility or collaboration, when deliberately selected | [`grasp-responsibility-design`](../../skills/grasp-responsibility-design/SKILL.md) and [`use-case-realization`](../../skills/use-case-realization/SKILL.md) |
+| Native software responsibility, cohesion, coupling, coordination, or dependency direction | [`grasp-responsibility-design`](../../skills/grasp-responsibility-design/SKILL.md) |
+| Detailed internal collaboration for one selected scenario | [`use-case-realization`](../../skills/use-case-realization/SKILL.md) |
 | Stable object-oriented structure that needs a summary | [`uml-class-diagram-design`](../../skills/uml-class-diagram-design/SKILL.md) |
 | Demonstrated creation, structural, communication, or variation pressure | [`design-pattern-application`](../../skills/design-pattern-application/SKILL.md) |
 | General mapping into a target language and runtime | [`software-design-language-adaptation`](../../skills/software-design-language-adaptation/SKILL.md) |
@@ -61,9 +63,35 @@ same objective. Do not create one artifact merely because another artifact can
 feed it.
 
 The coordinator selects the narrowest specialists for each material question.
-It can coordinate requirements, analysis, object design, implementation,
-verification, and Rust lifecycle design in one risk-sized loop. It does not
-require a complete object-design chain.
+It can coordinate requirements, analysis, native responsibility design,
+optional object design, implementation, verification, and Rust lifecycle design
+in one risk-sized loop. It does not require a complete object-design chain.
+
+## Boundary-Sensitive Refactoring
+
+Do not assume that a refactoring is local merely because observable behavior
+should remain unchanged. Apply the coordinator's design-sufficiency gate when
+work creates or moves a material test seam, composition root, backend,
+entrypoint, process-global dependency, runtime task, resource owner, readiness
+condition, or cleanup boundary.
+
+Before implementation, retain the smallest sufficient account of:
+
+- the system boundary and representative vertical behavior to preserve;
+- responsibilities assigned to native modules, functions, tasks, adapters,
+  handles, types, or composition roots;
+- material resource ownership, transfer, supervision, cancellation, joining,
+  and cleanup;
+- focused, integration, end-to-end, and human-owned verification; and
+- whether the iteration closes the approved parent outcome or completes an
+  enabling boundary for later integration.
+
+Select recovery skills when current behavior or architecture is unclear. Use
+`grasp-responsibility-design` for intended responsibility placement and
+`design-rust-lifecycles` for exact Rust ownership realization. Let ownership
+pressure feed back into responsibility design. Do not require a standalone
+artifact for these answers or report a local seam as the parent outcome without
+a representative end-to-end flow.
 
 ## Language Extension Rule
 

@@ -14,7 +14,7 @@ define the active capability contract.
 
 | Candidate document | Status |
 |---|---|
-| [Boundary-aware Rust refactoring design](boundary-aware-rust-refactoring-design.md) | Proposed |
+| [Boundary-aware Rust refactoring design](boundary-aware-rust-refactoring-design.md) | Implemented |
 | [Client discovery skills](client-discovery-skills.md) | Implemented |
 | [Visual, paradigm-neutral software design](paradigm-neutral-software-design.md) | Proposed |
 | [Skill evaluation program](skill-evaluation-program.md) | Implemented |

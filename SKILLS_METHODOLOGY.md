@@ -143,26 +143,37 @@ existing rule owner.
 4. Select requirements and analysis skills from the current uncertainty:
    scope, behavior, examples, vocabulary, system events, or state effects.
 5. Use `iterative-risk-driven-development` when an approved change needs
-   risk-driven progress. Give each objective exit evidence. Select GRASP,
-   realizations, class diagrams, patterns, and Rust lifecycle design only when
-   their questions or design forces are present. Delegate material repository
-   placement to `design-repository-artifact-layout`.
+   risk-driven progress. Give each objective exit evidence and name whether it
+   closes the parent outcome or enables later work. For a boundary-sensitive
+   refactoring, retain the system boundary, representative vertical scenario,
+   native responsibilities, ownership consequences, and verification ownership
+   before implementation. Select GRASP, realizations, class diagrams, patterns,
+   and Rust lifecycle design only when their questions or design forces are
+   present. Delegate material repository placement to
+   `design-repository-artifact-layout`.
 6. Use `software-design-language-adaptation` when implementation-facing design
-   must reflect a target language. Use `design-rust-lifecycles` when Rust
-   ownership, resource transfer, startup, rollback, cancellation, or fallible
-   cleanup is itself a material design problem. Add future language
-   specialists by demonstrated design pressure, not by completing a language
-   matrix.
+   must reflect a target language. Use `grasp-responsibility-design` to assign
+   behavior to native modules, functions, tasks, adapters, handles, types, or
+   composition roots when responsibility or dependency placement is unclear.
+   Use `design-rust-lifecycles` when Rust ownership, resource transfer,
+   startup, rollback, cancellation, or fallible cleanup is itself a material
+   design problem. Do not use lifecycle design to replace missing system or
+   responsibility decisions. Add future language specialists by demonstrated
+   design pressure, not by completing a language matrix.
 7. Use `implementation-slice-briefing` when an unfamiliar implementer needs one
    ready vertical slice assembled from approved requirements, examples, design
    inputs, and revision-fixed repository facts.
 8. Use `test-driven-implementation` for behavior changes and
-   `behavior-preserving-refactoring` for verified structural improvement.
+   `behavior-preserving-refactoring` for verified local structural improvement.
+   Return to coordinated design when a refactoring creates or moves a material
+   test seam, backend, composition root, entrypoint, runtime owner, readiness
+   condition, cleanup boundary, or end-to-end verification boundary.
 
 One iteration may coordinate several specialists only when they serve the same
-objective and coherent commit. A separate Markdown iteration record is
-optional; create one only when it passes the artifact budget. Commit and push
-remain separately authorized effects.
+objective and coherent commit. Focused component checks must not displace a
+material integration or end-to-end oracle. A separate Markdown iteration record
+is optional; create one only when it passes the artifact budget. Commit and
+push remain separately authorized effects.
 
 The detailed handoffs and stopping rules live in [`catalog/tracks/`](catalog/tracks/).
 

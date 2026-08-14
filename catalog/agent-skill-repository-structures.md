@@ -589,10 +589,14 @@ gDiagram --> gMakePdf : render source
 ### Sirius: intake to risk-driven delivery
 
 Sirius uses content-based intake and separate recovery and discovery tracks. A
-single risk-driven coordinator selects the needed specialists, including the
-Rust lifecycle specialist when ownership or resource semantics create material
-pressure. The same coordinator owns implementation, verification, continuous
-iteration, and one-commit-per-iteration execution.
+single risk-driven coordinator selects the needed specialists, including native
+responsibility design and the Rust lifecycle specialist when ownership or
+resource semantics create material pressure. For boundary-sensitive
+refactorings, the coordinator retains the system boundary, representative
+vertical oracle, responsibility assignment, ownership consequences,
+verification ownership, and parent completion boundary. The same coordinator
+owns implementation, verification, continuous iteration, and
+one-commit-per-iteration execution.
 
 ```plantuml
 @startuml sirius-skill-relationships-comparison
@@ -630,7 +634,7 @@ package "Discover the change" #E8F5E9 {
 
 package "Risk-driven development" #EEF8EE {
   component "iterative-risk-driven-development" as sIterative
-  component "analysis and design specialists" as sDesign
+  component "analysis, responsibility,\nand design specialists" as sDesign
   component "design-rust-lifecycles\nwhen Rust pressure is material" as sRust
 }
 
@@ -661,8 +665,9 @@ sReconcile --> sIterative : validated knowledge
 sIterative ..> sSelect : artifact choice
 sIterative ..> sLayout : placement choice
 sIterative ..> sAdr : consequential decision
-sIterative ..> sDesign : current question
+sIterative ..> sDesign : boundary and responsibilities
 sIterative ..> sRust : Rust lifecycle pressure
+sRust ..> sDesign : ownership feedback
 sIterative --> sSimplify : changed code
 sSimplify --> sCommit
 sCommit --> sPr
@@ -676,7 +681,7 @@ sCommit --> sPr
 | Primary router | `using-agent-skills` selects a lifecycle skill | `autoplan` sequences planning reviewers; several other skills orchestrate specialist clusters | `assess-development-input` routes by content; tracks and the risk-driven coordinator manage handoffs |
 | Main delivery shape | A mostly linear define-plan-build-verify-review-ship spine with optional specializations | A product-delivery spine surrounded by tool-backed design, browser, safety, deployment, and platform loops | Intake, recovery, discovery, risk-driven development, and repository workflow; each risk-sized iteration can continue until the requested work is complete |
 | Reuse mechanism | Phase-specific skills are composed by commands and selected when risk warrants | Skills invoke other skills and shared executable runtimes; plan artifacts are handed to later skills | Skills link to narrow specialists, profiles compose packages, and shared references are packaged into consuming skills |
-| Feedback loops | Debugging returns to regression testing; simplification returns to review | Live design/DevEx review follows planning; QA and canary feed fixes back before or after shipping | Recovery reconciliation, design/implementation feedback, and continuous iteration return evidence to canonical artifacts |
+| Feedback loops | Debugging returns to regression testing; simplification returns to review | Live design/DevEx review follows planning; QA and canary feed fixes back before or after shipping | Recovery reconciliation, ownership-to-responsibility feedback, parent-outcome checks, design/implementation feedback, and continuous iteration return evidence to canonical artifacts |
 | Relationship authority | Explicit routing and example sequences in the meta-skill and command docs | README sprint model plus orchestration encoded in generated skill templates | Catalog, workflow tracks, skill boundaries, and profile membership |
 | Coverage choice here | All 24 skills | Documented connected workflows plus named independent utilities; not an exhaustive catalog | All 30 active skills, with bounded tracks and profile-driven installation |
 

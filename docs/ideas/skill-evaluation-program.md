@@ -14,10 +14,11 @@ with explicitly selected Codex runs in disposable repositories. Those runs
 capture traces, workspace changes, verification, model metadata, usage, and the
 final response without treating missing metadata as known.
 
-At closure, six fixture-backed cases exercise red–mutation–green
+The current seven fixture-backed cases exercise red–mutation–green
 implementation, documentation restraint, conditional canonical-model feedback,
-read-only workflow re-entry, focused architecture and class views, and a
-declarative operation contract added to an existing analysis aggregate.
+read-only workflow re-entry, boundary-sensitive Rust refactoring design,
+focused architecture and class views, and a declarative operation contract
+added to an existing analysis aggregate.
 Repeated runs can report mechanical, mutation, environment, duration, and usage
 stability. A separate read-only semantic judge has reviewed controls and
 cross-model comparison, but remains diagnostic and non-gating.

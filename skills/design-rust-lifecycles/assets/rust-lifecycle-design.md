@@ -16,6 +16,17 @@ tags: [design, rust, lifecycle]
 [State the consequential lifecycle design, strongest guarantee, and main
 residual risk before implementation detail.]
 
+## Design Context and Responsibility Inputs
+
+- System boundary: [system under discussion and external participants]
+- Representative vertical scenario: [initiating actor, system operation, and observable outcome]
+- Verification oracle: [integration or end-to-end evidence that must remain]
+- Compatibility obligations: [preserved behavior]
+
+| Native responsibility | Selected owner | Lifecycle consequence |
+|---|---|---|
+| [prepare, coordinate, supervise, release, or report] | [module, type, function, task, handle, adapter, or composition root] | [owned capability or transition] |
+
 ## Design Forces
 
 - [Approved behavior or compatibility obligation]
@@ -104,12 +115,17 @@ the relationship between primary and cleanup failures.]
 
 ## Verification Obligations
 
-- [Invalid and conflicting input]
-- [Partial startup and rollback]
-- [Cancellation at significant await boundaries]
-- [Repeated and concurrent runs]
-- [Cleanup failures and primary-result preservation]
-- [Compatibility and secret-safe reporting]
+- Focused lifecycle: [invalid input, transitions, cancellation, and cleanup]
+- Integration: [collaboration and readiness across owned participants]
+- End-to-end: [representative vertical scenario and observable outcome]
+- Human-owned: [system, hardware, privileged, or unavailable validation]
+- Compatibility: [preserved behavior and secret-safe reporting]
+
+## Completion Boundary
+
+- Result: [parent outcome closed / enabling result / deferred]
+- Evidence: [what this lifecycle proves]
+- Remaining vertical gap: [none, or the scenario still needed]
 
 ## Deferred Abstractions
 

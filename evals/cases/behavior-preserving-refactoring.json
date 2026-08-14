@@ -1,0 +1,56 @@
+{
+  "skill_name": "behavior-preserving-refactoring",
+  "trigger": {
+    "positive": [
+      {
+        "prompt": "Remove this local duplication behind the current passing tests without changing behavior or moving any system boundary",
+        "top_k": 3
+      },
+      {
+        "prompt": "Rename and extract this long private Rust function in small verified steps while preserving ownership, errors, ordering, and concurrency",
+        "top_k": 3
+      },
+      {
+        "prompt": "Move this cohesive calculation to the existing module that already owns its data, then rerun focused and regression checks",
+        "top_k": 3
+      }
+    ],
+    "negative": [
+      {
+        "prompt": "Refactor the Rust validation environment by introducing a backend, composition root, service entrypoints, task supervision, and a new end-to-end test boundary",
+        "owner": "iterative-risk-driven-development"
+      },
+      {
+        "prompt": "Add this approved behavior from its acceptance example and demonstrate a failing test before implementation",
+        "owner": "test-driven-implementation"
+      },
+      {
+        "prompt": "Design exact Rust resource transfer, startup rollback, async cancellation, joining, Drop fallback, and fallible cleanup without implementation",
+        "owner": "design-rust-lifecycles"
+      }
+    ]
+  },
+  "evals": [
+    {
+      "id": "local-verified-transformation",
+      "prompt": "Behind the current green tests, remove one duplicated private calculation through an independently reviewable transformation. Preserve behavior, ownership, errors, ordering, and concurrency; rerun focused and broader checks; and do not create a design artifact unless durable design knowledge changes.",
+      "expected_output": "One local behavior-preserving transformation improves the named structural problem and remains protected by focused and regression evidence.",
+      "expectations": [
+        "The observable invariant and green baseline are explicit",
+        "One local structural problem bounds the transformation",
+        "Focused checks run after the transformation and broader checks remain green",
+        "No boundary-sensitive system redesign is hidden inside the refactoring"
+      ],
+      "prohibitions": [
+        "Do not change required behavior or weaken a valid test",
+        "Do not create a new backend, composition root, runtime owner, or test boundary as a local cleanup",
+        "Do not create a standalone refactoring record without an independent need"
+      ],
+      "allowed_mutations": [
+        "src/**",
+        "tests/**"
+      ],
+      "trust_level": "provisional"
+    }
+  ]
+}

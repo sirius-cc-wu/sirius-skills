@@ -26,7 +26,9 @@ The initial pilot covers:
 - `implementation-slice-briefing`;
 - `iterative-risk-driven-development`;
 - `operation-contracts`;
+- `grasp-responsibility-design`;
 - `design-rust-lifecycles`;
+- `behavior-preserving-refactoring`;
 - `software-design-language-adaptation`;
 - `use-case-modeling`;
 - `behavior-driven-specification`;
@@ -37,15 +39,18 @@ The initial pilot covers:
 - `reconstruct-software-architecture`; and
 - `uml-class-diagram-design`.
 
-The fixture-backed cases distinguish six outcomes. Three implementation cases
-exercise the complete feedback branch: a local fix creates no design document,
-an approved domain rule refines code, tests, and one existing canonical model,
-and conflicting equal-authority policies return to the user without repository
-mutation. Two visual cases select focused component and runtime views for
-cross-module comprehension or a focused class view for justified stateful
-object design. One contract case adds declarative state effects to an existing
-feature-analysis aggregate without creating code, implementation design, or a
-second artifact.
+The fixture-backed cases distinguish seven outcomes. Three implementation
+cases exercise the complete feedback branch: a local fix creates no design
+document, an approved domain rule refines code, tests, and one existing
+canonical model, and conflicting equal-authority policies return to the user
+without repository mutation. One boundary-sensitive Rust refactoring case
+requires the coordinator to retain the system boundary, native
+responsibilities, ownership consequences, verification ownership, and open
+parent outcome before more implementation. Two visual cases select focused
+component and runtime views for cross-module comprehension or a focused class
+view for justified stateful object design. One contract case adds declarative
+state effects to an existing feature-analysis aggregate without creating code,
+implementation design, or a second artifact.
 
 ## Case Format
 

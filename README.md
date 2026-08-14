@@ -28,7 +28,7 @@ Available profiles are defined in [`skill-sets/`](skill-sets/):
 | Profile | Purpose |
 |---|---|
 | `workflow` | Simplification, scoped commits, and pull requests |
-| `iterative-design` | External-input assessment, technical-artifact selection, architecture-decision recording, artifact-layout design, question-driven iterations, optional object design, language adaptation, tested implementation, simplification, and scoped commits |
+| `iterative-design` | External-input assessment, technical-artifact selection, architecture-decision recording, artifact-layout design, question-driven iterations, boundary-sensitive refactoring gates, native responsibility and optional object design, language adaptation, tested implementation, simplification, and scoped commits |
 | `applying-uml-and-patterns` | Compatibility alias for `iterative-design` |
 | `reverse-engineering` | Evidence-driven system survey, behavior and architecture recovery, recorded-decision discovery, recovered-artifact selection, reconciliation, and durable placement |
 | `all` | Every active skill in the catalog |
@@ -170,11 +170,14 @@ one-off incident.
 
 The iterative-design collection uses
 `iterative-risk-driven-development` for approved, risk-sized objectives. It
-selects requirements, analysis, design, language, implementation, verification,
-and optional Rust lifecycle specialists from the current question and
-implementation forces. It evolves canonical artifacts and executes the work.
-When the user requests one commit per iteration, it continues by default until
-the requested work is complete.
+selects requirements, analysis, native responsibility, design, language,
+implementation, verification, and optional Rust lifecycle specialists from the
+current question and implementation forces. For boundary-sensitive
+refactorings, it retains the system boundary, representative vertical scenario,
+native responsibilities, ownership consequences, verification ownership, and
+parent completion boundary before implementation. It evolves canonical
+artifacts and executes the work. When the user requests one commit per
+iteration, it continues by default until the requested work is complete.
 
 Selected use cases, domain models, system sequence diagrams, contracts,
 realizations, design class diagrams, and language-specific designs remain
@@ -191,11 +194,15 @@ reference owned by `iterative-risk-driven-development`, and artifact prose
 uses STE-style.
 
 The optional analysis and object-design skills distill workflows from Craig
-Larman's *Applying UML and Patterns*. General language adaptation covers Rust,
-Python, TypeScript, C#, and C++, while Rust lifecycle design adds
+Larman's *Applying UML and Patterns*. GRASP responsibility design also accepts
+language-native modules, functions, tasks, adapters, resource handles, and
+composition roots without forcing class-shaped owners. General language
+adaptation covers Rust, Python, TypeScript, C#, and C++, while Rust lifecycle
+design realizes established system behavior and responsibilities through
 ownership-driven preparation, resource transfer, rollback, cancellation,
-supervision, and fallible cleanup as the first pressure-specific language
-specialist. Reverse-engineering skills also draw from
+supervision, and fallible cleanup. A local seam can complete an iteration, but
+it remains an enabling result until a representative end-to-end flow proves the
+parent outcome. Reverse-engineering skills also draw from
 software reengineering, architecture reconstruction, architecture
 documentation, and code-reading sources. See the
 [Source Catalog](catalog/sources.md) for provenance.

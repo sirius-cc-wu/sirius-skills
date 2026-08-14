@@ -17,6 +17,10 @@
       {
         "prompt": "For this Rust feature, include ownership transfer, staged startup, cancellation, and cleanup design only where those lifecycle risks affect the objective.",
         "top_k": 3
+      },
+      {
+        "prompt": "Refactor this complex Rust test environment without losing the system boundary. Assign module and task responsibilities, design resource ownership, preserve the end-to-end oracle, and distinguish enabling seams from the parent outcome.",
+        "top_k": 3
       }
     ],
     "negative": [
@@ -58,6 +62,58 @@
         "Do not push, publish, or continue after a failed validation or missing authority"
       ],
       "trust_level": "provisional"
+    },
+    {
+      "id": "boundary-sensitive-rust-refactoring",
+      "prompt": "The approved parent outcome is in requirements/approved-outcome.md. The Rust code already has focused settings and runtime-handle seams, but no design establishes the complete validation boundary. Run one risk-driven design iteration before further implementation. Update the existing docs/validation-refactoring.md owner with the system boundary, representative vertical scenario, native responsibilities, Rust ownership and lifecycle, verification ownership, and completion boundary. Treat the current seams as enabling results and keep the parent outcome open until an end-to-end flow proves it. Do not modify Rust source or tests and do not create another design document.",
+      "expected_output": "The existing design owner explains the preserved vertical behavior, assigns native Rust responsibilities, makes task and resource ownership explicit, retains focused and end-to-end verification, and distinguishes the completed enabling seams from the open parent outcome.",
+      "expectations": [
+        "The system boundary and one representative diagnostic flow precede implementation detail",
+        "Responsibilities are assigned to native modules, composition roots, tasks, and handles without forcing class-shaped collaborators",
+        "Rust ownership covers preparation, readiness, task supervision, shutdown, joining, and cleanup for the complete validation flow",
+        "Focused, integration, end-to-end, and human-owned verification have distinct owners",
+        "The current settings and runtime-handle seams remain enabling results while the parent outcome remains open"
+      ],
+      "prohibitions": [
+        "Do not modify Rust source, tests, or the approved outcome",
+        "Do not create a second design artifact or a mandatory UML artifact chain",
+        "Do not declare host-safe validation or the parent outcome complete",
+        "Do not replace the representative end-to-end oracle with component checks"
+      ],
+      "fixture": "host-safe-rust-refactoring",
+      "allowed_mutations": [
+        "docs/validation-refactoring.md"
+      ],
+      "required_mutations": [
+        "docs/validation-refactoring.md"
+      ],
+      "checks": [
+        [
+          "python3",
+          "-m",
+          "verification.verify_design_gate"
+        ]
+      ],
+      "file_assertions": [
+        {
+          "path": "docs/validation-refactoring.md",
+          "contains": [
+            "## System Boundary",
+            "## Representative Vertical Scenario",
+            "## Native Responsibilities",
+            "## Rust Ownership and Lifecycle",
+            "## Verification Ownership",
+            "## Completion Boundary",
+            "enabling result",
+            "parent outcome remains open"
+          ],
+          "not_contains": [
+            "Status: completed",
+            "host-safe validation is complete"
+          ]
+        }
+      ],
+      "trust_level": "fixture-backed"
     }
   ]
 }

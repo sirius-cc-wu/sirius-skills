@@ -151,7 +151,7 @@ def test_pilot_routing_cases_pass() -> None:
     report = evaluate_repository(REPO_ROOT)
 
     assert report.errors == []
-    assert report.case_files == 19
+    assert report.case_files == 21
     assert report.routing_checks >= 40
 
 
@@ -1639,6 +1639,31 @@ def test_order_submission_fixture_starts_without_operation_contract() -> None:
     assert "OrderSubmitted" in approved_effects
     assert verification.returncode != 0
     assert "missing operation contract" in verification.stdout
+
+
+def test_host_safe_refactoring_fixture_starts_with_an_unresolved_design_gate() -> None:
+    fixture = REPO_ROOT / "evals" / "fixtures" / "host-safe-rust-refactoring"
+    parent_outcome = (fixture / "requirements" / "approved-outcome.md").read_text(
+        encoding="utf-8"
+    )
+    design = (fixture / "docs" / "validation-refactoring.md").read_text(
+        encoding="utf-8"
+    )
+
+    verification = subprocess.run(
+        [sys.executable, "-m", "verification.verify_design_gate"],
+        cwd=fixture,
+        text=True,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.STDOUT,
+    )
+
+    assert "Authority: approved" in parent_outcome
+    assert "representative diagnostic exchange" in " ".join(parent_outcome.split())
+    assert "settings seam" in design
+    assert "runtime-handle seam" in design
+    assert verification.returncode != 0
+    assert "missing design-gate section" in verification.stdout
 
 
 def test_behavioral_runner_checks_required_file_content(tmp_path: Path) -> None:

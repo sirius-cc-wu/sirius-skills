@@ -2,7 +2,7 @@
 type: "Capability Proposal"
 title: "Boundary-Aware Rust Refactoring Design"
 description: "Proposes a risk-driven cooperation contract between system analysis, native responsibility assignment, Rust ownership design, and vertical verification."
-status: "proposed"
+status: "implemented"
 tags: [design, rust, refactoring, responsibilities, ownership, verification]
 ---
 
@@ -105,6 +105,27 @@ The reviewer-facing result may be one embedded section, an update to an
 existing design, or a conversational pre-implementation report. A new document
 is not part of the completion criterion.
 
+## MVP Outcome
+
+The MVP is implemented in the existing skills and workflow guidance:
+
+- `iterative-risk-driven-development` applies a boundary-sensitive refactoring
+  gate and distinguishes enabling results from parent outcomes;
+- `grasp-responsibility-design` retains its compatible name and now treats
+  modules, functions, tasks, adapters, handles, types, and composition roots as
+  first-class responsibility owners;
+- `design-rust-lifecycles` requires an established system boundary,
+  representative scenario, native responsibility map, and verification oracle,
+  and returns ownership feedback to their canonical owners;
+- `behavior-preserving-refactoring` returns boundary-moving work to coordinated
+  design instead of hiding it inside local cleanup; and
+- routing cases and a fixture-backed host-safe Rust refactoring case protect the
+  new handoffs and completion boundary.
+
+Deterministic routing and repository validation cover the implemented contract.
+The model-executed behavioral case remains opt-in, so the broader comprehension
+and reliability assumptions above remain open for empirical validation.
+
 ## Not Doing (and Why)
 
 - Create Rust-specific copies of use-case, domain-model, system-sequence, or
@@ -125,18 +146,13 @@ is not part of the completion criterion.
   delivery of a broader host-safe or end-to-end outcome without vertical
   evidence.
 
-## Open Questions
+## Residual Questions
 
-- Should `grasp-responsibility-design` be broadened in place, or should a new
-  paradigm-neutral responsibility skill own modules, functions, tasks, and
-  handles while GRASP remains an optional method?
-- Which observable triggers are sufficient to classify an iteration as
-  boundary-sensitive without using an arbitrary numeric threshold?
+- Does the model-executed host-safe Rust fixture reliably retain the vertical
+  oracle and open parent outcome across supported agents and models?
 - Should infrastructure startup and shutdown postconditions remain in system
   design, or does Sirius need a small language-neutral runtime-operation
   contract distinct from domain-focused operation contracts?
-- When should the reviewer-facing view become durable: before implementation,
-  only after design stabilization, or only when an existing canonical owner
-  already exists?
-- Which behavioral fixture best distinguishes an enabling seam from a completed
-  vertical outcome while remaining small enough for repeatable evaluation?
+- Does the compact reviewer-facing account provide enough comprehension, or
+  should the separate visual-design direction add a focused component or
+  runtime view for selected refactorings?

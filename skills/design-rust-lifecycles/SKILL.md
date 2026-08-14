@@ -1,6 +1,6 @@
 ---
 name: design-rust-lifecycles
-description: Designs ownership-safe Rust lifecycles for resources, state transitions, staged startup, readiness, rollback, cancellation, concurrency, and fallible cleanup. Use when a Rust feature or service must acquire and transfer capabilities, coordinate tasks or processes, preserve invariants across partial failure, choose between RAII and explicit shutdown, or turn approved behavior and responsibilities into an implementation-facing lifecycle design.
+description: Designs ownership-safe Rust lifecycles for resources, state transitions, staged startup, readiness, rollback, cancellation, concurrency, and fallible cleanup. Use when approved system behavior and native responsibilities must become explicit capability ownership, task supervision, consuming transitions, RAII, or shutdown design without losing the system or verification boundary.
 ---
 
 # Design Rust Lifecycles
@@ -22,19 +22,26 @@ than implementation details.
   shutdown must be selected deliberately.
 - Multiple async or threaded participants need one cancellation and supervision
   policy.
-- Do not use to discover product behavior, assign language-neutral
-  responsibilities, or implement the design.
+- A boundary-sensitive Rust refactoring has an established system scenario and
+  native responsibility assignment but still needs implementation-facing
+  ownership design.
+- Do not use to discover product behavior, choose the system boundary, assign
+  language-neutral responsibilities, or implement the design.
 
 ## Workflow
 
-1. **Fix the input authority.** Identify the approved scenarios, operation
-   contracts, responsibility decisions, compatibility obligations, repository
-   facts, and unresolved intent. Stop rather than invent a missing business or
-   protocol rule.
+1. **Fix the input authority and design context.** Identify the approved or
+   recovered representative scenario, system boundary, externally visible
+   readiness or effects, native responsibility decisions, compatibility
+   obligations, repository facts, verification oracle, and unresolved intent.
+   For a boundary-sensitive objective, return to the owning analysis or
+   responsibility specialist when that context is absent or stale. Stop rather
+   than invent a missing business or protocol rule.
 2. **Inventory resources and capabilities.** Read
    [Ownership and Transitions](references/ownership-and-transitions.md). Record
    creation, prepared ownership, transfer, running ownership, release, and
-   emergency `Drop` behavior for every material resource.
+   emergency `Drop` behavior for every material resource. Map each lifecycle
+   owner to the native software responsibility it realizes.
 3. **Model lifecycle states.** Select the smallest representation that prevents
    consequential invalid transitions: consuming methods first, then a private
    enum, and typestate only when compile-time separation repays its API cost.
@@ -57,9 +64,13 @@ than implementation details.
 8. **Define verification obligations.** Cover invalid inputs, ownership
    uniqueness, transition invariants, partial startup, cancellation, repeated
    and concurrent use, cleanup failure, compatibility, and secret-safe errors.
-9. **Close traceability.** Link each design choice to the behavior, risk,
-   repository fact, or demonstrated variation that requires it. Record a
-   concrete trigger for every deferred abstraction.
+   Retain the representative integration or end-to-end oracle alongside
+   focused lifecycle checks and identify human-owned validation.
+9. **Close traceability and feedback.** Link each design choice to the system
+   behavior, native responsibility, risk, repository fact, or demonstrated
+   variation that requires it. If ownership evidence changes a responsibility,
+   system boundary, or verification obligation, return that change to its
+   canonical owner. Record a concrete trigger for every deferred abstraction.
 
 ## Artifact Output
 
@@ -88,8 +99,12 @@ without copying the lifecycle design into the ADR.
 
 ## Boundaries
 
+- Do not use a Rust lifecycle design as a substitute for a missing system
+  boundary, representative scenario, native responsibility map, or
+  verification boundary.
 - Preserve GRASP responsibilities without creating a struct or trait for every
-  conceptual collaborator.
+  conceptual collaborator. A module, function, task, enum, adapter, resource
+  handle, or composition root may remain the responsibility owner.
 - Do not use typestate merely to mirror a state diagram; use it when callers
   materially benefit from compile-time transition enforcement.
 - Do not claim RAII completes fallible or asynchronous cleanup. Use explicit
@@ -99,9 +114,16 @@ without copying the lifecycle design into the ADR.
   dependency inversion, or an unstable integration boundary is evidenced.
 - Keep requirements and domain models language-neutral. This skill owns the
   implementation-facing lifecycle, not product intent.
+- Completing a lifecycle handle or resource seam may finish the current design
+  objective. It does not prove a broader parent outcome without the retained
+  representative vertical oracle.
 
 ## Verification
 
+- [ ] The system boundary, representative scenario, native responsibilities,
+      compatibility obligations, and verification oracle are current enough to
+      constrain the lifecycle.
+- [ ] Every lifecycle owner maps to an explicit software responsibility.
 - [ ] Every material resource has one owner at each lifecycle point.
 - [ ] Every transfer and consuming transition is explicit.
 - [ ] Validation and reservation precede the first externally visible effect.
@@ -112,5 +134,8 @@ without copying the lifecycle design into the ADR.
 - [ ] `Drop` behavior is safe, bounded, non-blocking, and not overstated.
 - [ ] Concurrency uses the narrowest justified sharing and synchronization.
 - [ ] Traits and typestate correspond to demonstrated design forces.
-- [ ] Verification obligations cover failure, repetition, and concurrency.
+- [ ] Verification obligations cover failure, repetition, concurrency, the
+      representative vertical flow, and human-owned checks.
+- [ ] Ownership discoveries that change responsibilities, boundaries, or
+      verification have been returned to their canonical owners.
 - [ ] Proposed API sketches remain distinguishable from as-built symbols.

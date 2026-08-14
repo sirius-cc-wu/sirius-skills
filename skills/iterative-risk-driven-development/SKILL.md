@@ -1,6 +1,6 @@
 ---
 name: iterative-risk-driven-development
-description: Coordinates one or more approved, risk-sized development iterations across analysis, design, implementation, and verification. Selects only the needed specialists, evolves canonical artifacts, applies Rust ownership design when required, validates each result, and creates at most one authorized commit per iteration. Use when a feature needs risk-driven iterative progress or one commit per iteration until the requested work is complete.
+description: Coordinates approved, risk-sized development iterations across analysis, native responsibility design, implementation, and verification. Preserves system boundaries during complex refactoring, selects Rust ownership design when required, distinguishes enabling seams from parent outcomes, validates each result, and creates at most one authorized commit per iteration. Use when a feature or boundary-sensitive refactoring needs coordinated progress or one commit per iteration until the requested work is complete.
 ---
 
 # Iterative Risk-Driven Development
@@ -20,8 +20,10 @@ mandatory artifact sequence, programming paradigm, or phase checklist.
   the requested outcome is complete.
 - Several specialist skills may apply, but they must serve one objective and one
   coherent change.
-- A design question may require analysis, object design, implementation, or
-  verification in the same risk-sized loop.
+- A design question may require analysis, native responsibility design, object
+  design, implementation, or verification in the same risk-sized loop.
+- A complex refactoring creates or moves a test seam, backend, composition
+  root, entrypoint, runtime owner, readiness condition, or cleanup boundary.
 - Do not use to assess readiness, perform one isolated specialist task, commit
   an existing diff, or publish completed work.
 
@@ -43,50 +45,87 @@ mandatory artifact sequence, programming paradigm, or phase checklist.
    current branch, and unrelated workspace changes. Do not promote candidate
    intent or absorb unrelated work.
 2. **Choose one objective.** State one behavior, decision, risk, or learning
-   question and its exit evidence. Keep the objective small enough for one
-   coherent commit.
+   question and its exit evidence. Name the approved parent outcome and state
+   whether this iteration can close it or only enable later work. Keep the
+   objective small enough for one coherent commit.
 3. **Select the narrowest owners.** Route each material question to an existing
    specialist. Use requirements, recovery, analysis, and design skills for
-   product intent. Use `test-driven-implementation` for bounded behavior and
-   `behavior-preserving-refactoring` for verified structural improvement.
+   product intent and system understanding. Use
+   `grasp-responsibility-design` when native responsibility or dependency
+   placement is unclear. Use `test-driven-implementation` for bounded behavior
+   and `behavior-preserving-refactoring` for verified structural improvement.
    Prefer one localized specialist when no coordination remains.
-4. **Budget artifacts.** Apply
+4. **Apply the boundary-sensitive refactoring gate.** When the change creates
+   or moves a material test seam, composition root, backend, entrypoint,
+   process-global dependency, runtime task, resource owner, readiness
+   condition, or cleanup boundary, establish the system boundary,
+   representative vertical scenario, native responsibilities, ownership
+   consequences, verification ownership, and completion boundary before
+   implementation. Select recovery when current behavior or architecture is
+   unclear. Do not treat the `refactoring` label as evidence that this design
+   context is unnecessary.
+5. **Budget artifacts.** Apply
    [Artifact Selection Budget](../select-technical-artifacts/references/artifact-selection-budget.md).
    Prefer code, tests, configuration, an existing canonical artifact, or an
    embedded section. Create a standalone artifact only when its value, owner,
    and independent lifecycle are clear.
-5. **Select Rust lifecycle design when needed.** If the target is Rust and
+6. **Select Rust lifecycle design when needed.** If the target is Rust and
    ownership, capability transfer, startup, rollback, cancellation,
    supervision, or cleanup affects the objective, use
    [Design Rust Lifecycles](../design-rust-lifecycles/SKILL.md). Treat its result
-   as part of the current iteration. Do not force Rust lifecycle design when
-   those semantics do not affect the objective.
-6. **Execute the selected work.** Read and follow every selected specialist
+   as part of the current iteration. Do not use it as a substitute for missing
+   system-boundary, responsibility, or verification decisions.
+7. **Execute the selected work.** Read and follow every selected specialist
    skill. Keep all work tied to the objective. Stop if missing approval,
-   product rules, compatibility decisions, or a verification oracle would
-   require invention.
-7. **Reconcile durable knowledge.** Feed discoveries back only when they change
+   product rules, compatibility decisions, design context required by the
+   boundary-sensitive gate, or a verification oracle would require invention.
+8. **Reconcile durable knowledge.** Feed discoveries back only when they change
    knowledge owned by a canonical requirement, design, decision, test, schema,
    or configuration artifact. Preserve idea and decision history. Do not
    silently rewrite it. Use `record-architecture-decision` only when one
    authoritative, consequential architecture choice needs an independent
    proposed, accepted, or superseding lifecycle.
-8. **Validate exit evidence.** Run repository-required and changed-scope
-   checks. Distinguish completed evidence from human-owned or unavailable
-   validation. Do not close or commit an iteration when its exit evidence
-   failed.
-9. **Simplify changed code.** If source or test code changed, use
-   [Simplify](../simplify/SKILL.md) within the iteration scope. Rerun the
-   affected validation.
-10. **Commit once per iteration when authorized.** If the user authorized a
+9. **Validate exit evidence.** Run repository-required and changed-scope
+   checks. Retain the representative end-to-end oracle when a local seam or
+   component check is the current result. Distinguish completed evidence from
+   human-owned or unavailable validation. Do not close the parent outcome or
+   commit an iteration when its stated exit evidence failed.
+10. **Simplify changed code.** If source or test code changed, use
+    [Simplify](../simplify/SKILL.md) within the iteration scope. Rerun the
+    affected validation.
+11. **Commit once per iteration when authorized.** If the user authorized a
     commit, use [Commit](../commit/SKILL.md) with scoped staging. Create at most
     one commit for the current iteration. Do not amend, push, or publish without
     matching authority.
-11. **Apply the execution mode.** In single-iteration mode, report the
+12. **Apply the execution mode.** In single-iteration mode, report the
     objective, canonical changes, validation, commit, and residual risk, then
     stop. In continuous mode, report the current result, choose the next
     objective, and continue until the requested work or an explicit stop
     condition ends the run.
+
+## Boundary-Sensitive Refactoring Gate
+
+Apply this gate by material effect, not by an arbitrary count of changed files
+or modules. Answer only the questions that the change makes material:
+
+- **System boundary and preservation oracle:** What system is under discussion?
+  Which representative actor-to-outcome flow and observable behavior must
+  remain protected?
+- **Native responsibilities:** Which crate, module, type, function, task,
+  adapter, resource handle, or composition root should know, create,
+  coordinate, vary, supervise, or clean up? What dependency direction follows?
+- **Ownership and lifecycle:** Which resources and capabilities are owned,
+  borrowed, transferred, cancelled, joined, released, or reported on failure?
+- **Verification ownership:** Which focused, integration, end-to-end, and
+  human-owned checks protect each claim? Do not replace the representative
+  vertical oracle with component checks.
+- **Completion boundary:** Does the iteration prove the approved parent
+  outcome, or does it complete an enabling abstraction boundary for later
+  integration?
+
+Use an existing canonical design, executable evidence, an embedded section, or
+an iteration report when durable context is justified. The gate does not
+require a new document, use case, contract, diagram, or object-design chain.
 
 ## Rust Ownership and Lifecycle Design
 
@@ -100,7 +139,10 @@ pressure. The specialist covers:
 - resource termination and fallible cleanup.
 
 Keep product behavior, requirements, and language-neutral design separate from
-these implementation-facing lifecycle decisions.
+these implementation-facing lifecycle decisions. Map lifecycle owners to the
+selected native responsibilities. If Rust ownership pressure changes a
+responsibility, system boundary, or verification obligation, return that
+feedback to its owning design instead of silently changing it in the API.
 
 ## File Output
 
@@ -133,6 +175,9 @@ tags: [iteration]
 Goal:
 - [Learning, risk reduction, decision, or delivery outcome]
 
+Parent Outcome:
+- [Approved broader outcome and whether this iteration closes or enables it]
+
 Risks Addressed:
 - [Risk]
 
@@ -152,7 +197,10 @@ Decisions to Record:
 - [Decision]: `[canonical path or pending location]`
 
 Trace:
-- [Use case] -> [SSD/contract] -> [design realization/class]
+- [Representative scenario/oracle] -> [system boundary or operation] -> [native responsibility owner] -> [language/lifecycle design] -> [checks]
+
+Completion Boundary:
+- [parent outcome closed / enabling result / deferred]: [evidence and remaining vertical gap]
 
 Exit Criteria:
 - [Evidence that the iteration answered the question]
@@ -177,8 +225,13 @@ deferred or changed after the objective was defined.
 - A standalone document has no durable decision, named consumer, material risk,
   or independent lifecycle.
 - Object design starts from a domain model without behavior or system events.
+- A boundary-sensitive refactoring proceeds without a preserved system
+  scenario, native responsibility assignment, or verification boundary.
 - Rust lifecycle design is added without material ownership or resource
-  pressure.
+  pressure, or substitutes for missing system analysis and responsibility
+  decisions.
+- A local backend, constructor, settings seam, or lifecycle handle is reported
+  as the parent outcome without a representative end-to-end flow.
 - Durable artifacts are copied into iteration records instead of linked.
 - The iteration continues after failed validation or a missing authority.
 - Continuous execution starts without a user request or single mode ignores an
@@ -190,14 +243,20 @@ deferred or changed after the objective was defined.
 - [ ] Authority, source revision, lifecycle state, requested outcome, and
       non-goals are fixed.
 - [ ] One objective and its exit evidence bound each iteration.
+- [ ] The approved parent outcome and current completion boundary are explicit.
 - [ ] Selected specialists match the actual questions or implementation forces.
+- [ ] Boundary-sensitive refactoring retains its system boundary,
+      representative vertical oracle, native responsibilities, ownership
+      consequences, and verification ownership.
 - [ ] Rust lifecycle design was selected only when Rust semantics created
-      material pressure.
+      material pressure and did not substitute for missing design context.
 - [ ] No language, programming paradigm, phase, or artifact chain was assumed.
 - [ ] Every new standalone artifact passes the value, ownership, and lifecycle
       gate.
 - [ ] Durable knowledge changed only in its canonical owner.
 - [ ] Required validation passed, or human-owned checks remain explicit.
+- [ ] Focused checks did not displace a material integration or end-to-end
+      oracle, and enabling results were not reported as the parent outcome.
 - [ ] Changed source and tests received a scoped simplification pass.
 - [ ] Each iteration created at most one authorized, scoped commit.
 - [ ] Continuous mode continued only under the user's request. Single mode

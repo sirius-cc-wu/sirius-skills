@@ -23,19 +23,29 @@
       {
         "prompt": "Specify submitOrder postconditions for created domain objects, new associations, attribute changes, and required non-creations",
         "owner": "operation-contracts"
+      },
+      {
+        "prompt": "Coordinate this complex Rust test-environment refactoring while its system boundary, representative end-to-end oracle, module responsibilities, and parent completion boundary are still unclear",
+        "owner": "iterative-risk-driven-development"
+      },
+      {
+        "prompt": "Assign preparation, coordination, supervision, and cleanup responsibilities to the right modules, functions, tasks, adapters, and composition root before exact ownership design",
+        "owner": "grasp-responsibility-design"
       }
     ]
   },
   "evals": [
     {
       "id": "resource-owned-validation-run",
-      "prompt": "Create an implementation-facing Rust lifecycle design for this approved validation-run behavior. Cover preparation, ownership transfer, readiness, partial-start rollback, async cancellation, explicit completion and abort, emergency Drop behavior, and verification obligations. Prefer one existing design artifact if it already owns this lifecycle.",
-      "expected_output": "One traceable Rust lifecycle design makes ownership, transitions, failure, cancellation, and cleanup explicit without inventing product behavior or speculative abstractions.",
+      "prompt": "Create an implementation-facing Rust lifecycle design for this approved validation-run system boundary, representative scenario, native responsibility map, and verification oracle. Cover preparation, ownership transfer, readiness, partial-start rollback, async cancellation, explicit completion and abort, emergency Drop behavior, and verification obligations. Prefer one existing design artifact if it already owns this lifecycle.",
+      "expected_output": "One traceable Rust lifecycle design realizes established system behavior and native responsibilities through explicit ownership, transitions, failure, cancellation, cleanup, and retained vertical verification without inventing product behavior or speculative abstractions.",
       "expectations": [
+        "The system boundary, representative scenario, native responsibilities, and vertical verification oracle constrain the lifecycle",
         "Every material resource has an owner, transfer point, explicit release, and bounded Drop fallback",
         "Preparation and the externally visible startup boundary are distinct",
         "Partial failure and cancellation preserve the primary result while reporting cleanup failures",
-        "Traits and typestate are selected only for demonstrated variation or transition risk"
+        "Traits and typestate are selected only for demonstrated variation or transition risk",
+        "Ownership evidence that changes responsibilities or verification is returned to its canonical owner"
       ],
       "prohibitions": [
         "Do not invent business, protocol, or compatibility behavior",

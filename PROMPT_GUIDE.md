@@ -103,8 +103,10 @@ to the current repository revision and expose every exclusion and stop condition
 ```text
 Use iterative-risk-driven-development to select one risk-driven objective for
 this feature. Use only the methods, artifacts, and Rust lifecycle design that
-the objective justifies. Implement, validate, and commit one iteration at a
-time until the work is complete.
+the objective justifies. If the work moves a system, test, responsibility,
+runtime, resource, or verification boundary, retain the representative vertical
+scenario and distinguish an enabling seam from the parent outcome. Implement,
+validate, and commit one iteration at a time until the work is complete.
 ```
 
 ```text
@@ -114,10 +116,18 @@ design.
 ```
 
 ```text
-Use design-rust-lifecycles to turn this approved validation-run behavior into
-an ownership-safe Rust lifecycle. Define preparation, resource transfer,
-readiness, partial-start rollback, cancellation, and fallible cleanup without
-introducing speculative traits or typestate.
+Use grasp-responsibility-design to assign this approved scenario's preparation,
+coordination, supervision, and cleanup to native modules, functions, tasks,
+adapters, handles, types, or composition roots. Explain coupling and cohesion
+without forcing class-shaped owners or deciding exact Rust resource ownership.
+```
+
+```text
+Use design-rust-lifecycles to turn this approved validation-run behavior and
+native responsibility map into an ownership-safe Rust lifecycle. Preserve the
+system boundary and end-to-end oracle. Define preparation, resource transfer,
+readiness, partial-start rollback, cancellation, joining, and fallible cleanup
+without introducing speculative traits or typestate.
 ```
 
 ```text
@@ -129,6 +139,9 @@ relevant regression suite.
 ```text
 Use behavior-preserving-refactoring on this module behind the current passing
 tests. Keep behavior changes separate and verify each bounded transformation.
+If the change creates a backend, composition root, runtime owner, test seam, or
+cleanup boundary, return to iterative-risk-driven-development instead of
+hiding a system redesign inside local cleanup.
 ```
 
 See [`catalog/skills.md`](catalog/skills.md) for the complete catalog and

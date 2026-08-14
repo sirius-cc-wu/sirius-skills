@@ -109,9 +109,11 @@ design.
 - Start with **Reverse Engineering** when you must understand an existing
   system.
 - Start with **Iterative Analysis and Design** when an approved change needs a
-  bounded behavior, analysis, design, language, or implementation iteration.
-- Start with **Implementation and Evolution** when the behavior or structural
-  change is sufficiently bounded.
+  bounded behavior, analysis, design, language, or implementation iteration,
+  or when a complex refactoring moves a system, test, responsibility, runtime,
+  resource, or verification boundary.
+- Start with **Implementation and Evolution** when the behavior or local
+  structural change is sufficiently bounded.
 - Use **Repository Workflow** after verification and authorization for cleanup,
   recording, or publication.
 - Use `select-technical-artifacts` across tracks when candidate knowledge needs
@@ -210,11 +212,14 @@ evolves canonical artifacts, validates each iteration, and creates at most one
 authorized commit per iteration. When the user requests one commit per
 iteration, it continues by default until the requested work is complete.
 
-The coordinator can select requirements, analysis, object-design,
-implementation, verification, and Rust lifecycle specialists. It does not
-require a complete object-design chain. It preserves established canonical
-paths and delegates material placement or migration decisions to
-`design-repository-artifact-layout`.
+The coordinator can select requirements, analysis, native responsibility,
+optional object-design, implementation, verification, and Rust lifecycle
+specialists. It does not require a complete object-design chain. For a
+boundary-sensitive refactoring, it retains the system boundary, representative
+vertical scenario, native responsibility assignment, ownership consequences,
+verification ownership, and parent completion boundary before implementation.
+It preserves established canonical paths and delegates material placement or
+migration decisions to `design-repository-artifact-layout`.
 
 ```plantuml
 @startuml iterative-design-skill-relationships
@@ -247,7 +252,7 @@ package "Requirements and analysis" #EEF8EE {
   rectangle "operation-contracts" as contracts
 }
 
-package "Optional object design" #F3EEFF {
+package "Optional responsibility and object design" #F3EEFF {
   rectangle "grasp-responsibility-\ndesign" as grasp
   rectangle "use-case-realization" as realization
   rectangle "uml-class-diagram-\ndesign" as classdiagram
@@ -272,7 +277,7 @@ iterative ..> behavior : selected examples
 iterative ..> domain : selected vocabulary
 iterative ..> ssd : selected system events
 iterative ..> contracts : selected state effects
-iterative ..> grasp : selected object responsibilities
+iterative ..> grasp : selected native responsibilities
 inception --> usecases
 usecases --> behavior
 usecases --> domain
@@ -289,14 +294,21 @@ realization --> classdiagram
 grasp ..> patterns : justified pressure
 classdiagram ..> patterns : justified pressure
 contracts ..> language : state and contracts
-grasp ..> language : responsibilities
+grasp ..> language : native responsibilities
 language ..> rust : Rust lifecycle pressure
+rust ..> grasp : ownership feedback
 @enduml
 ```
 
+A local backend, constructor, settings seam, or lifecycle handle can complete
+one iteration without completing its parent feature. Retain the representative
+end-to-end oracle and report the seam as an enabling result until that vertical
+flow succeeds.
+
 Read the
 [Iterative Analysis and Design track](tracks/iterative-analysis-design.md) for
-artifact boundaries and the iteration rule.
+artifact boundaries, the boundary-sensitive refactoring gate, and the iteration
+rule.
 
 ## Implementation and repository workflow
 

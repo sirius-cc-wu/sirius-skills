@@ -1,0 +1,55 @@
+{
+  "skill_name": "grasp-responsibility-design",
+  "trigger": {
+    "positive": [
+      {
+        "prompt": "Assign the validation setup, readiness, supervision, and cleanup responsibilities to the right Rust modules, tasks, and resource handles using cohesion and coupling reasoning",
+        "top_k": 3
+      },
+      {
+        "prompt": "Decide which software unit should receive this system event, coordinate the use case, and own each non-trivial behavior without assuming every owner is a class",
+        "top_k": 3
+      },
+      {
+        "prompt": "Compare the composition root, module, function, enum, and adapter as responsibility owners and choose the lowest-coupling cohesive design",
+        "top_k": 3
+      }
+    ],
+    "negative": [
+      {
+        "prompt": "Design exact Rust ownership transfer, cancellation at await points, rollback, Drop fallback, and fallible cleanup for these approved responsibilities",
+        "owner": "design-rust-lifecycles"
+      },
+      {
+        "prompt": "Reconstruct the current repository modules, dependencies, runtime collaborations, and state ownership from source evidence",
+        "owner": "reconstruct-software-architecture"
+      },
+      {
+        "prompt": "Apply Adapter or Strategy to this demonstrated integration variation and record the pattern consequences",
+        "owner": "design-pattern-application"
+      }
+    ]
+  },
+  "evals": [
+    {
+      "id": "native-responsibility-assignment",
+      "prompt": "For this approved validation-startup scenario, assign preparation, coordination, readiness, service supervision, client configuration, and cleanup responsibilities among the composition root, modules, functions, tasks, adapters, and resource handles. Explain the Information Expert, Creator, Controller, coupling, cohesion, and protected-variation reasoning. Do not force a class, trait, or service object for each responsibility, and do not design exact Rust ownership transitions.",
+      "expected_output": "A concise responsibility assignment chooses language-native owners, explains GRASP reasoning and dependency direction, and leaves exact Rust ownership and lifecycle mechanics to the Rust specialist.",
+      "expectations": [
+        "Every non-trivial behavior has one explicit language-native owner",
+        "The assignment explains information, creation, coordination, coupling, cohesion, and variation forces where material",
+        "The composition root coordinates the scenario without absorbing unrelated service behavior",
+        "The result distinguishes responsibility ownership from exact Rust resource ownership"
+      ],
+      "prohibitions": [
+        "Do not require every owner to be a class, struct, trait, or service object",
+        "Do not design cancellation, Drop, rollback, or exact ownership transfer",
+        "Do not inventory existing modules without making responsibility decisions"
+      ],
+      "allowed_mutations": [
+        "docs/**"
+      ],
+      "trust_level": "provisional"
+    }
+  ]
+}
