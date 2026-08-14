@@ -66,7 +66,7 @@ with tests when either is a sufficient owner.
 
 When persisting a standalone Markdown model, follow
 [Markdown Artifact Frontmatter](../plan-up-iterations/references/markdown-artifact-frontmatter.md)
-and [Readable Technical Artifacts](../plan-up-iterations/references/readable-technical-artifacts.md).
+and use STE-style.
 The main observed scenario provides the representative scenario; keep its
 evidence status distinct from intended behavior.
 

@@ -76,7 +76,7 @@ when it already owns the question and evidence.
 
 When persisting a standalone Markdown reconstruction, follow
 [Markdown Artifact Frontmatter](../plan-up-iterations/references/markdown-artifact-frontmatter.md)
-and [Readable Technical Artifacts](../plan-up-iterations/references/readable-technical-artifacts.md).
+and use STE-style.
 Use the representative runtime scenario before exhaustive element inventories
 when runtime behavior is the architectural question.
 

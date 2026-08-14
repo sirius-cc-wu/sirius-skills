@@ -84,7 +84,7 @@ Prefer an existing discovery record or aggregate feature artifact.
 
 For a standalone Markdown record, follow
 [Markdown Artifact Frontmatter](../plan-up-iterations/references/markdown-artifact-frontmatter.md)
-and [Readable Technical Artifacts](../plan-up-iterations/references/readable-technical-artifacts.md).
+and use STE-style.
 When a standalone record is justified, read and adapt the
 [Stakeholder Evidence Record Template](references/stakeholder-evidence-record-template.md).
 

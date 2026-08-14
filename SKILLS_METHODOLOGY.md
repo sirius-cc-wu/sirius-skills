@@ -51,9 +51,8 @@ replacement for discovery and specification methods.
    and implementation readiness to their narrow specialists.
 
 `author-software-proposal` is retired because its normal output overlapped the
-confirmed idea one-pager. Existing proposal artifacts remain valid. Use
-`rewrite-technical-artifacts` when their meaning is sound and only their
-reading path needs improvement.
+confirmed idea one-pager. Existing proposal artifacts remain valid. Owning
+artifact skills write reader-facing material in STE-style from the outset.
 
 ### Record a consequential architecture decision
 

@@ -124,7 +124,7 @@ for that placement decision. When a standalone Markdown artifact is justified,
 follow
 [Markdown Artifact Frontmatter](../plan-up-iterations/references/markdown-artifact-frontmatter.md)
 and
-[Readable Technical Artifacts](../plan-up-iterations/references/readable-technical-artifacts.md).
+use STE-style.
 Refine canonical artifacts in place. If a durable execution record is
 justified, adapt the selected-candidate structure from
 [`plan-up-iterations`](../plan-up-iterations/SKILL.md),

@@ -68,7 +68,7 @@ already owns the scope and evidence.
 
 When persisting a standalone Markdown survey, follow
 [Markdown Artifact Frontmatter](../plan-up-iterations/references/markdown-artifact-frontmatter.md)
-and [Readable Technical Artifacts](../plan-up-iterations/references/readable-technical-artifacts.md).
+and use STE-style.
 
 ```markdown
 ---

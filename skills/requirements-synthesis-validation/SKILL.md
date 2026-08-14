@@ -93,7 +93,7 @@ synthesis, validation history, and conflict log change independently.
 
 For standalone Markdown, follow
 [Markdown Artifact Frontmatter](../plan-up-iterations/references/markdown-artifact-frontmatter.md)
-and [Readable Technical Artifacts](../plan-up-iterations/references/readable-technical-artifacts.md).
+and use STE-style.
 When a standalone brief is justified, read and adapt the
 [Requirements Discovery Brief Template](references/requirements-discovery-brief-template.md).
 

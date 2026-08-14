@@ -36,7 +36,7 @@ an independent lifecycle.
 
 For a standalone Markdown file, follow
 [Markdown Artifact Frontmatter](../plan-up-iterations/references/markdown-artifact-frontmatter.md)
-and [Readable Technical Artifacts](../plan-up-iterations/references/readable-technical-artifacts.md),
+and use STE-style,
 then use this shape. The selected use-case scenario normally supplies the
 representative scenario. When embedding the SSD in an aggregate file, omit the
 frontmatter and adjust heading levels.

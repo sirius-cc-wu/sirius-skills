@@ -103,7 +103,7 @@ artifact-selection budget. If a standalone Markdown recommendation is
 justified, follow
 [Markdown Artifact Frontmatter](../plan-up-iterations/references/markdown-artifact-frontmatter.md)
 and
-[Readable Technical Artifacts](../plan-up-iterations/references/readable-technical-artifacts.md).
+use STE-style.
 Do not add placeholder indexes or empty directory trees merely to make a
 recommendation visible.
 

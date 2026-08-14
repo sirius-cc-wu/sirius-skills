@@ -72,7 +72,7 @@ lifecycle. Otherwise, copy and tailor
 For a standalone artifact, follow
 [Markdown Artifact Frontmatter](../plan-up-iterations/references/markdown-artifact-frontmatter.md)
 and
-[Readable Technical Artifacts](../plan-up-iterations/references/readable-technical-artifacts.md).
+use STE-style.
 Use this artifact type:
 
 ```yaml

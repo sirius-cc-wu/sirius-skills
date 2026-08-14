@@ -111,7 +111,7 @@ inside the canonical requirements or use-case artifact:
 
 For a standalone Markdown artifact, follow
 [Markdown Artifact Frontmatter](../plan-up-iterations/references/markdown-artifact-frontmatter.md)
-and [Readable Technical Artifacts](../plan-up-iterations/references/readable-technical-artifacts.md):
+and use STE-style:
 
 ```markdown
 ---

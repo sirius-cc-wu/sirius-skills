@@ -112,11 +112,9 @@ a historical iteration record only when coordination, audit, cross-session
 continuity, or durable unresolved risk justifies it. Never copy canonical
 artifact bodies into the record.
 
+Write reader-facing artifacts in STE-style from the owning skill. Keep the
+artifact's meaning, lifecycle, evidence, identifiers, and traceability intact.
+
 One commit per iteration is an execution boundary, not permission to commit or
 push. Create the commit only when the user authorizes it, keep staging scoped,
 and stop after the commit. Push or publication requires separate authority.
-
-Use
-[`rewrite-technical-artifacts`](../../skills/rewrite-technical-artifacts/SKILL.md)
-when existing knowledge needs progressive disclosure or a clearer reading
-path. Use it only as a semantic-preserving pass.

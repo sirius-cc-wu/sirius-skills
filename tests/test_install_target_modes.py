@@ -32,7 +32,6 @@ ITERATIVE_DESIGN_SKILLS = {
     "commit",
     "simplify",
     "plan-up-iterations",
-    "rewrite-technical-artifacts",
     "stakeholder-requirements-elicitation",
     "requirements-synthesis-validation",
     "implementation-slice-briefing",
@@ -60,7 +59,6 @@ REVERSE_ENGINEERING_SKILLS = {
     "recover-system-behavior",
     "reconstruct-software-architecture",
     "reconcile-recovered-design",
-    "rewrite-technical-artifacts",
 }
 
 
@@ -210,4 +208,4 @@ def test_validation_covers_the_consolidated_catalog() -> None:
     )
 
     assert result.returncode == 0, result.stdout
-    assert "Validated 32 skills" in result.stdout
+    assert "Validated 31 skills" in result.stdout

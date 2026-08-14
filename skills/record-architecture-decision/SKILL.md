@@ -99,7 +99,7 @@ identifiers, repository-local conventions, evidence, and authorization.
 Preserve an established template. Without one, follow
 [Markdown Artifact Frontmatter](../plan-up-iterations/references/markdown-artifact-frontmatter.md)
 and
-[Readable Technical Artifacts](../plan-up-iterations/references/readable-technical-artifacts.md),
+use STE-style,
 then use this proportionate shape. Remove optional fields and empty sections.
 
 ```markdown

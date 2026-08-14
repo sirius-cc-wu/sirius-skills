@@ -90,7 +90,7 @@ traceability gives it a durable owner. Before creating a plan file, apply the
 [Artifact Selection Budget](../select-technical-artifacts/references/artifact-selection-budget.md).
 When persisting standalone Markdown, follow
 [Markdown Artifact Frontmatter](references/markdown-artifact-frontmatter.md)
-and [Readable Technical Artifacts](references/readable-technical-artifacts.md).
+and use STE-style.
 
 ## Multi-Iteration UP Plan
 

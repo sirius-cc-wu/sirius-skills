@@ -47,7 +47,7 @@ adapts when that artifact remains the clear owner.
 
 When persisting a standalone Markdown adaptation note, follow
 [Markdown Artifact Frontmatter](../plan-up-iterations/references/markdown-artifact-frontmatter.md)
-and [Readable Technical Artifacts](../plan-up-iterations/references/readable-technical-artifacts.md).
+and use STE-style.
 Use `type: "Implementation Design Adaptation"`, a `language` field with the
 selected target, and identity, summary, lifecycle, and tags as appropriate.
 When modifying another design artifact, merge the language metadata into that

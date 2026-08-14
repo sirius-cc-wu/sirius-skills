@@ -6,7 +6,6 @@ run-development-iteration
 simplify
 commit
 plan-up-iterations
-rewrite-technical-artifacts
 stakeholder-requirements-elicitation
 requirements-synthesis-validation
 implementation-slice-briefing

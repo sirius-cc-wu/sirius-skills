@@ -27,10 +27,6 @@
       {
         "prompt": "Recover whether the current queue topology came from an accepted decision or merely evolved in code and deployment configuration.",
         "owner": "reconcile-recovered-design"
-      },
-      {
-        "prompt": "Perform a read-only editorial review of this accepted ADR's reading order without changing its decision, status, evidence, or consequences.",
-        "owner": "rewrite-technical-artifacts"
       }
     ]
   },

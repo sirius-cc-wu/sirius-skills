@@ -49,7 +49,7 @@ review, audit, or unresolved risk needs an independent record.
 Use this template when persisting refactoring evidence as a standalone Markdown
 file. Follow
 [Markdown Artifact Frontmatter](../plan-up-iterations/references/markdown-artifact-frontmatter.md)
-and [Readable Technical Artifacts](../plan-up-iterations/references/readable-technical-artifacts.md).
+and use STE-style.
 The preserved behavior and named structural problem should orient the reader
 without adding a summary that repeats the verification record.
 For a conversational report or a section embedded in an aggregate file, omit

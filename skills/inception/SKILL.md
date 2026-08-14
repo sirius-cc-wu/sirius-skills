@@ -40,7 +40,7 @@ artifact when it is a sufficient owner.
 
 When persisting an inception artifact as a standalone Markdown file, follow
 [Markdown Artifact Frontmatter](../plan-up-iterations/references/markdown-artifact-frontmatter.md)
-and [Readable Technical Artifacts](../plan-up-iterations/references/readable-technical-artifacts.md).
+and use STE-style.
 Use the artifact-specific type (`Vision`, `Business Case`, `Risk List`,
 `Development Case`, `Phase Plan`, and so on), not a generic `Inception`
 type. Put identity, summary, and lifecycle metadata in frontmatter while

@@ -93,7 +93,6 @@ The source method or file format never determines the route.
 | Approved Rust behavior has material ownership, startup, rollback, cancellation, or cleanup risk | `design-rust-lifecycles` |
 | A bounded behavior has an independent oracle such as an approved example, invariant, reference, or defect | `test-driven-implementation` |
 | Observable behavior is protected and only internal structure should change | `behavior-preserving-refactoring` |
-| Existing technical knowledge is authoritative but difficult to read | `rewrite-technical-artifacts` |
 
 If one requester's actual intent is unclear, external `interview-me` may provide
 the prerequisite. If a raw candidate direction still needs alternatives,
@@ -145,7 +144,7 @@ sufficient owner.
 When a standalone Markdown assessment is justified, follow
 [Markdown Artifact Frontmatter](../plan-up-iterations/references/markdown-artifact-frontmatter.md)
 and
-[Readable Technical Artifacts](../plan-up-iterations/references/readable-technical-artifacts.md).
+use STE-style.
 Use this frontmatter, giving the record a stable ID only when it will be
 cross-referenced, then place the concise output fields in the body without
 copying the source material:

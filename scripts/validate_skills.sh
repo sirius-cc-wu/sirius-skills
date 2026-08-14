@@ -144,7 +144,6 @@ for name in "${specialist_skills[@]}"; do
   grep -q "artifact-selection-budget.md" "$file" || fail "missing artifact selection budget guidance in $file"
   if [[ "$name" != "select-technical-artifacts" ]]; then
     grep -q "markdown-artifact-frontmatter.md" "$file" || fail "missing Markdown artifact frontmatter guidance in $file"
-    grep -q "readable-technical-artifacts.md" "$file" || fail "missing readable technical artifact guidance in $file"
   fi
   grep -q "^## Verification" "$file" || fail "missing Verification in $file"
 done
@@ -158,12 +157,10 @@ layout_skill="$root/skills/design-repository-artifact-layout/SKILL.md"
 layout_reference="$root/skills/design-repository-artifact-layout/references/artifact-layouts.md"
 budget_reference="$root/skills/select-technical-artifacts/references/artifact-selection-budget.md"
 frontmatter_reference="$root/skills/plan-up-iterations/references/markdown-artifact-frontmatter.md"
-readability_reference="$root/skills/plan-up-iterations/references/readable-technical-artifacts.md"
 
 test -f "$layout_reference" || fail "missing $layout_reference"
 test -f "$budget_reference" || fail "missing $budget_reference"
 test -f "$frontmatter_reference" || fail "missing $frontmatter_reference"
-test -f "$readability_reference" || fail "missing $readability_reference"
 test -f "$up_metadata" || fail "plan-up-iterations missing agents/openai.yaml"
 grep -Fq '$plan-up-iterations' "$up_metadata" || fail "UP planner metadata missing skill invocation"
 grep -q "^## Multi-Iteration UP Plan$" "$up_skill" || fail "UP planner missing multi-iteration plan"
@@ -188,8 +185,6 @@ grep -q "^## Layout Options$" "$layout_reference" || fail "artifact layout refer
 grep -q "^## Proposal Placement$" "$layout_reference" || fail "artifact layout reference missing proposal placement guidance"
 grep -q "^## Linking Rules$" "$layout_reference" || fail "artifact layout reference missing linking rules"
 grep -q '^type: "\[Descriptive artifact type\]"$' "$frontmatter_reference" || fail "frontmatter reference missing base type field"
-grep -q '^## Writing Flow$' "$readability_reference" || fail "readability reference missing writing flow"
-grep -q '^## Preserve Meaning$' "$readability_reference" || fail "readability reference missing meaning-preservation guidance"
 
 layout_metadata="$root/skills/design-repository-artifact-layout/agents/openai.yaml"
 test -f "$layout_metadata" || fail "design-repository-artifact-layout missing agents/openai.yaml"
@@ -235,13 +230,6 @@ for name in "${client_discovery_skills[@]}"; do
   test -f "$metadata" || fail "missing $metadata"
   grep -Fq "\$$name" "$metadata" || fail "$name metadata default prompt missing skill invocation"
 done
-
-rewrite_metadata="$root/skills/rewrite-technical-artifacts/agents/openai.yaml"
-rewrite_skill="$root/skills/rewrite-technical-artifacts/SKILL.md"
-test -f "$rewrite_metadata" || fail "rewrite-technical-artifacts missing agents/openai.yaml"
-grep -Fq '$rewrite-technical-artifacts' "$rewrite_metadata" || fail "rewrite metadata missing skill invocation"
-grep -q '^## Diff-Focused Review Mode$' "$rewrite_skill" || fail "rewrite skill missing diff-focused review mode"
-grep -q '^## Final Editorial Pass$' "$readability_reference" || fail "readability reference missing final editorial handoff"
 
 template_types=(
   "assess-development-input|Development Input Assessment"

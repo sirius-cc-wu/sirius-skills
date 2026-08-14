@@ -25,10 +25,6 @@
         "owner": "record-architecture-decision"
       },
       {
-        "prompt": "Improve this design document's reading order without changing its technical meaning, identifiers, or lifecycle.",
-        "owner": "rewrite-technical-artifacts"
-      },
-      {
         "prompt": "Run one approved implementation iteration, coordinate the needed specialists, validate it, and create one authorized commit.",
         "owner": "run-development-iteration"
       }

@@ -33,8 +33,6 @@ not a fixed document count or a checklist of expected artifact types.
   and only its content must be produced.
 - Use `design-repository-artifact-layout` when justified artifacts need
   canonical paths, indexes, lifecycle-aware organization, or migration.
-- Use `rewrite-technical-artifacts` when the owners and meanings are sound but
-  their reading paths need improvement.
 - Do not invoke this skill mechanically before every artifact. Owning skills
   may apply the budget locally when there is no material selection question.
 
@@ -113,9 +111,7 @@ artifact-budget document merely to record that fewer artifacts should exist.
   `design-repository-artifact-layout` decides canonical homes and migrations
   after selection.
 - **Selection versus content:** requirements, design, ADR, recovery, planning,
-  and verification specialists own artifact meaning and authoring.
-- **Selection versus editing:** `rewrite-technical-artifacts` improves an
-  existing artifact without changing its normative meaning or lifecycle.
+  and verification specialists own artifact meaning and authoring in STE-style.
 - **Selection versus coordination:** `plan-up-iterations` plans an
   explicit multi-iteration UP roadmap, while `run-development-iteration` owns
   one execution. This skill reviews a material artifact-set question without

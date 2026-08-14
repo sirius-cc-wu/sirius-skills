@@ -45,7 +45,7 @@ instead of creating a duplicate responsibility record.
 
 For a standalone Markdown file, follow
 [Markdown Artifact Frontmatter](../plan-up-iterations/references/markdown-artifact-frontmatter.md)
-and [Readable Technical Artifacts](../plan-up-iterations/references/readable-technical-artifacts.md),
+and use STE-style,
 then use this shape. When embedding the decision in an aggregate file, omit the
 frontmatter and adjust heading levels.
 

@@ -58,7 +58,7 @@ review, audit, or unresolved risk needs an independent record.
 Use this template when persisting behavior-slice evidence as a standalone
 Markdown file. Follow
 [Markdown Artifact Frontmatter](../plan-up-iterations/references/markdown-artifact-frontmatter.md)
-and [Readable Technical Artifacts](../plan-up-iterations/references/readable-technical-artifacts.md).
+and use STE-style.
 The behavior title, risk, and oracle should orient the reader without adding a
 second narrative that repeats the evidence.
 For a conversational report or a section embedded in an aggregate file, omit

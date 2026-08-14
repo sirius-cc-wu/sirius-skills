@@ -1,4 +1,0 @@
-interface:
-  display_name: "Rewrite Technical Artifacts"
-  short_description: "Simplify technical artifacts without semantic drift"
-  default_prompt: "Use $rewrite-technical-artifacts to simplify this technical artifact or changed-artifact diff without altering its normative meaning."

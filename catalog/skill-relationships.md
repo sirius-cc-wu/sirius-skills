@@ -6,7 +6,7 @@ reduce the current risk or complete the current behavior slice.
 
 ## Bird's-eye view
 
-This view groups all 32 deployable Sirius skills by responsibility and shows
+This view groups all 31 deployable Sirius skills by responsibility and shows
 two optional external intent-shaping skills at the boundary. It shows only the
 main movement between groups so readers can locate a starting point before
 using the detailed views below. Solid arrows are normal handoffs, not a
@@ -52,7 +52,7 @@ rectangle "**Implementation and Evolution**\ntest-driven-implementation\nbehavio
 
 rectangle "**Repository Workflow**\nsimplify\ncommit\ncreate-pr" as repository #F3EEFF
 
-rectangle "**Cross-cutting Support**\nselect-technical-artifacts\ndesign-repository-artifact-layout\nrecord-architecture-decision\nrewrite-technical-artifacts" as support #FFFBEA
+rectangle "**Cross-cutting Support**\nselect-technical-artifacts\ndesign-repository-artifact-layout\nrecord-architecture-decision" as support #FFFBEA
 
 assess -[hidden]right-> discovery
 discovery -[hidden]right-> reverse
@@ -413,8 +413,6 @@ particular:
 - reconciliation recommends the authoritative next action first—it does not
   automatically turn current code into intended design or authorize a change;
   and
-- `rewrite-technical-artifacts` is not a design-feedback edge because it must
-  preserve normative meaning.
 
 ## Cross-cutting skills
 
@@ -426,7 +424,6 @@ keeps the diagrams readable without changing where they apply.
 | `select-technical-artifacts` | Candidate directions, reverse engineering, iterative analysis and design, implementation evidence, architecture decisions, and durable repository documentation | Candidate knowledge needs a create, update, embed, keep-with-implementation, omit, or defer disposition, or a proposed artifact set needs minimization |
 | `design-repository-artifact-layout` | Candidate directions, reverse engineering, iterative analysis and design, implementation evidence, architecture decisions, and durable repository documentation | A justified artifact lacks a canonical home, artifact lifecycles conflict, or repository migration must preserve links, IDs, indexes, and history |
 | `record-architecture-decision` | Approved requirements, architecture and language design, consequential pattern or responsibility choices, implementation discoveries, and reconciliation | Governing ADRs must be found, or one bounded, cross-cutting, or expensive-to-reverse architecture choice needs proposed review, an accepted historical record, or linked supersession |
-| `rewrite-technical-artifacts` | Recovered artifacts, iterative-design artifacts, behavior-slice evidence, and refactoring records | The knowledge is sound but its reading order or progressive disclosure needs improvement |
 
 ## Client discovery upstream path
 
