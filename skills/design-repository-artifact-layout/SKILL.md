@@ -1,6 +1,6 @@
 ---
 name: design-repository-artifact-layout
-description: Designs or revises the smallest repository-specific layout for durable proposals, requirements, analysis, design, recovery, decision, iteration, and verification artifacts. Use when asked where technical artifacts should live, how canonical paths and indexes should be organized, whether a documentation structure should be split or consolidated, or how to migrate competing artifact homes while preserving links and history; use the artifact's owning skill when its content rather than its repository placement is the primary task.
+description: Designs or revises the smallest repository-specific layout for durable candidate directions, requirements, analysis, design, recovery, decision, iteration, and verification artifacts. Use when asked where technical artifacts should live, how canonical paths and indexes should be organized, whether a documentation structure should be split or consolidated, or how to migrate competing artifact homes while preserving links and history; use the artifact's owning skill when its content rather than its repository placement is the primary task.
 ---
 
 # Design Repository Artifact Layout
@@ -16,8 +16,8 @@ authorizes those repository changes.
 
 ## When to Use
 
-- A proposal, requirement, analysis, design, recovery, decision, iteration, or
-  verification artifact needs a canonical repository location.
+- A candidate direction, requirement, analysis, design, recovery, decision,
+  iteration, or verification artifact needs a canonical repository location.
 - A repository has partial or competing documentation structures and needs a
   lifecycle-aware placement decision.
 - A flat artifact must be evaluated for promotion into independently maintained
@@ -40,9 +40,10 @@ authorizes those repository changes.
    area in scope, the readers whose navigation matters, the concrete ownership
    or navigation problem, and whether the user authorized recommendations,
    file creation, or migration.
-3. **Inventory actual homes.** Locate current proposals, decisions, feature or
-   product knowledge, architecture and recovery views, verification evidence,
-   and iteration history. Distinguish an established layout from an incidental
+3. **Inventory actual homes.** Locate current ideas, legacy proposals,
+   decisions, feature or product knowledge, architecture and recovery views,
+   verification evidence, and iteration history. Distinguish an established
+   layout from an incidental
    directory or one-off file.
 4. **Confirm selection.** Require every artifact in scope to pass the
    [Artifact Selection Budget](../select-technical-artifacts/references/artifact-selection-budget.md)
@@ -51,8 +52,8 @@ authorizes those repository changes.
    `select-technical-artifacts`. Prefer executable evidence, an existing
    canonical owner, or an aggregate section when it is sufficient.
 5. **Separate lifecycles.** Classify current evolving knowledge, historical
-   iteration records, decision-seeking proposals, accepted decisions, and
-   executable or retained verification evidence. Do not co-locate them merely
+   iteration records, candidate ideas, legacy proposals, accepted decisions,
+   and executable or retained verification evidence. Do not co-locate them merely
    because one activity produced them together.
 6. **Identify the navigation axis.** Determine whether readers primarily find
    knowledge by feature, artifact type, product area, or chronology. Resolve
@@ -98,9 +99,9 @@ Alternatives and uncertainty:
 - [credible alternative or unresolved local rule]
 ```
 
-Do not create a layout proposal file unless it independently passes the
-artifact-selection budget. If a standalone Markdown recommendation is
-justified, follow
+Do not create a layout recommendation file unless it independently passes the
+artifact-selection budget. If a standalone Markdown recommendation is justified,
+follow
 [Markdown Artifact Frontmatter](../plan-up-iterations/references/markdown-artifact-frontmatter.md)
 and
 use STE-style.
@@ -114,24 +115,24 @@ recommendation visible.
   owner or independently changing content.
 - Current design knowledge is copied into iteration records or organized by UP
   phase, obscuring its canonical source.
-- One pending idea or proposal is treated as accepted intent or an accepted
-  decision.
-- The same candidate direction is copied into both an idea and a proposal even
-  though their audience, owner, and lifecycle do not differ.
+- One pending idea is treated as accepted intent or an accepted decision.
+- A new proposal artifact is created for a candidate direction instead of an
+  idea.
 - A file is split because it is long rather than because its parts have
   independent ownership or lifecycles.
 - Stable identifiers, inbound links, indexes, or historical records are lost
   during migration.
 - A recommendation silently becomes repository mutation.
 - The layout skill starts authoring requirements, design, recovery findings, or
-  proposal content that belongs to another skill.
+  candidate-direction content that belongs to another skill.
 
 ## Verification
 
 - [ ] Applicable governance, indexes, validators, and neighboring artifacts were inspected.
 - [ ] The scope, navigation problem, primary readers, and mutation authority are explicit.
 - [ ] Every proposed standalone artifact passes the value, ownership, and lifecycle gate.
-- [ ] Current knowledge, proposals, decisions, iteration history, and verification evidence have appropriate lifecycle boundaries.
+- [ ] Current knowledge, ideas, legacy proposals, decisions, iteration history,
+      and verification evidence have appropriate lifecycle boundaries.
 - [ ] The recommendation preserves a coherent established layout or cites a concrete reason to change it.
 - [ ] The selected structure is the smallest one with obvious canonical homes and no speculative directories.
 - [ ] Cross-referenced artifacts retain stable IDs, one canonical path, and valid inbound and outbound links.

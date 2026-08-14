@@ -65,9 +65,10 @@ not a fixed document count or a checklist of expected artifact types.
    consumer, and lifecycle. Split knowledge only when the resulting parts are
    independently maintained or reused. Length, methodology phase, artifact
    type, or template availability alone does not justify a boundary.
-7. **Check lifecycle conflicts.** Keep evolving current knowledge, proposals,
-   accepted decisions, fixed recovery baselines, verification evidence, and
-   historical records distinct when their authority or maintenance differs.
+7. **Check lifecycle conflicts.** Keep evolving current knowledge, ideas,
+   legacy proposals, accepted decisions, fixed recovery baselines, verification
+   evidence, and historical records distinct when their authority or
+   maintenance differs.
    Do not duplicate the same candidate direction or governing fact across
    equivalent homes.
 8. **Route the result.** Send selected content to its narrow owning skill. Send
@@ -125,8 +126,8 @@ artifact-budget document merely to record that fewer artifacts should exist.
 - A new file is selected without searching executable and canonical owners.
 - Two artifacts restate the same knowledge for the same audience and lifecycle.
 - A long file is split without independent ownership or maintenance pressure.
-- Current knowledge, a proposal, an accepted decision, and historical evidence
-  are merged despite different authority or lifecycle.
+- Current knowledge, an idea or legacy proposal, an accepted decision, and
+  historical evidence are merged despite different authority or lifecycle.
 - The recommendation invents a directory, filename, identifier, or template
   before a material placement decision is made.
 - Selection silently proceeds into authoring, moving, implementation, commit,

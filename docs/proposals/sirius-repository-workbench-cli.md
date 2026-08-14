@@ -269,9 +269,10 @@ skill or `plan-up-iterations` obsolete.
 - Use `plan-up-iterations` when planning several risk-sized UP
   iterations, their artifact set, analysis sequence, design work, and one
   separate execution handoff.
-- Use an established ideas, proposals, feature, or decision path when the
-  recommendation needs durable review; do not create duplicate idea and
-  proposal artifacts for the same candidate direction.
+- Use one established ideas, feature, or decision path for a new candidate
+  direction when the recommendation needs durable review. This legacy proposal
+  preserves its own rationale; do not create a second candidate artifact for
+  the same direction.
 
 The human reference and executable rules could drift if maintained
 independently. Implementation must therefore add focused cases for every row in

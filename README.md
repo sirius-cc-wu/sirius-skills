@@ -124,14 +124,16 @@ and
 [`idea-refine`](https://github.com/addyosmani/agent-skills/blob/5a1b82d6445d1e2f0abeea1072851419a50c0e5c/skills/idea-refine/SKILL.md).
 `interview-me` confirms what one requester actually wants; `idea-refine`
 explores alternatives and produces a confirmed candidate-direction one-pager.
-Save that one-pager under an established `docs/ideas/`, `docs/proposals/`, or
-feature path rather than duplicating it under several names. It remains
-candidate input, not organizational approval. Use `assess-development-input`
-only when its next Sirius owner is unclear. These external skills are not
-installed by Sirius profiles.
+Choose one candidate-direction artifact. Use `docs/ideas/` for an idea
+one-pager from `idea-refine`. Use a feature path only when local governance
+defines it. Do not create a new proposal artifact. The result remains candidate
+input, not organizational approval. Use `assess-development-input` only when
+its next Sirius owner is unclear. These external skills are not installed by
+Sirius profiles.
 
-`author-software-proposal` is retired. Existing proposals remain valid at their
-historical paths. Route current-system claims to reverse engineering, scope and
+`author-software-proposal` is retired. Existing legacy proposal artifacts
+remain valid at their historical paths. Use `idea-refine` for new candidate
+directions. Route current-system claims to reverse engineering, scope and
 feasibility to `inception`, stakeholder authority to the client-discovery
 skills, acceptance behavior to `behavior-driven-specification`, and placement
 questions to `design-repository-artifact-layout`.
@@ -234,7 +236,9 @@ and judge calibration are opt-in and never run as part of normal validation.
 - `catalog/sources.md`: intellectual and repository provenance
 - `evals/`: deterministic routing cases and opt-in behavioral evaluation data
 - `docs/shared/`: canonical references copied into self-contained skills
-- `docs/proposals/`: capability proposals, implementation rationale, and
+- `docs/ideas/`: candidate-direction one-pagers from the `idea-refine`
+  workflow
+- `docs/proposals/`: legacy Sirius proposals, implementation rationale, and
   historical iteration records
 - `scripts/validate_skills.sh`: catalog and collection validation
 - `src/sirius_skills/commands/sync_shared_references.py`: packaging helper

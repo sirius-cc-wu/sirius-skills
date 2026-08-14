@@ -12,17 +12,18 @@ Continue only when the input has sufficient authority for the selected work.
 The assessment may instead route to recovery, a localized specialist,
 implementation, or an external prerequisite.
 
-When the upstream request or direction is still vague, optionally use Addy
-Osmani's
+When the upstream request or direction is still vague, optionally use the
+external
 [`interview-me`](https://github.com/addyosmani/agent-skills/blob/5a1b82d6445d1e2f0abeea1072851419a50c0e5c/skills/interview-me/SKILL.md)
 and
 [`idea-refine`](https://github.com/addyosmani/agent-skills/blob/5a1b82d6445d1e2f0abeea1072851419a50c0e5c/skills/idea-refine/SKILL.md)
 before entering this track. Their confirmed idea one-pager remains candidate
-input until the responsible
-authority approves it. Preserve an established ideas, proposals, or feature
-path instead of translating the same direction into a duplicate artifact. Once
-approved, preserve the accepted revision and outcome as the next iteration
-establishes a canonical feature, requirement, decision, or design owner.
+input until the responsible authority approves it. Save the confirmed idea in an
+ideas path or a feature path defined by local governance. Do not create a new
+proposal artifact. Preserve existing legacy proposals at their historical
+paths. Once approved,
+preserve the accepted revision and outcome as the next iteration establishes a
+canonical feature, requirement, decision, or design owner.
 
 ## Run One Iteration
 

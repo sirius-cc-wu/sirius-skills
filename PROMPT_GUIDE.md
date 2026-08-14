@@ -41,7 +41,9 @@ or implement yet.
 ```text
 Use idea-refine to explore alternatives for this confirmed intent, test the key
 assumptions, and converge on one candidate direction with MVP scope and a Not
-Doing list. Preserve this repository's established ideas or proposals path.
+Doing list. Store the confirmed idea in an established ideas path or a
+feature path defined by local governance. Do not create a new proposal artifact.
+Preserve existing legacy proposals at their historical paths.
 ```
 
 ## Reverse engineering

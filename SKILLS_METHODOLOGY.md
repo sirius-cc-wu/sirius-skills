@@ -43,16 +43,18 @@ replacement for discovery and specification methods.
 2. When a raw idea needs alternatives, assumption testing, MVP scope, and an
    explicit not-doing list, optionally use
    [`idea-refine`](https://github.com/addyosmani/agent-skills/blob/5a1b82d6445d1e2f0abeea1072851419a50c0e5c/skills/idea-refine/SKILL.md).
-3. Treat the confirmed idea one-pager as candidate input, not approval. Preserve
-   an established `docs/ideas/`, `docs/proposals/`, or feature location rather
-   than translating the same direction into a second artifact.
+3. Treat the confirmed idea one-pager as candidate input, not approval. Save
+   it in `docs/ideas/` or a feature location defined by local governance. Do not
+   create a new proposal artifact. Preserve existing legacy proposals at their
+   historical paths.
 4. Use `assess-development-input` only when the next Sirius owner is unclear.
    Route evidence, stakeholder authority, scope, acceptance behavior, design,
    and implementation readiness to their narrow specialists.
 
 `author-software-proposal` is retired because its normal output overlapped the
-confirmed idea one-pager. Existing proposal artifacts remain valid. Owning
-artifact skills write reader-facing material in STE-style from the outset.
+confirmed idea one-pager. Existing legacy proposal artifacts remain valid.
+Owning artifact skills write reader-facing material in STE-style from the
+outset.
 
 ### Record a consequential architecture decision
 
@@ -96,8 +98,9 @@ choice is independently consequential and expensive to reverse.
    established structure unless a concrete navigation or ownership problem
    justifies change.
 3. Require justified artifacts before assigning new files or directories, and
-   separate current knowledge, proposals, decisions,
-   verification evidence, and historical iteration records by lifecycle.
+   separate current knowledge, ideas, decisions, verification evidence, and
+   historical iteration records by lifecycle. Preserve legacy proposals at
+   their historical paths.
 4. Keep a recommendation read-only unless the user explicitly authorizes file
    creation or migration. Return content authoring to the artifact's owning
    specialist.

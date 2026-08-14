@@ -182,7 +182,7 @@ grep -q 'authorizes updating an existing artifact budget or plan' "$selection_sk
 grep -q "^## Output$" "$layout_skill" || fail "artifact layout skill missing output guidance"
 grep -q "^## Artifact Lifecycles$" "$layout_reference" || fail "artifact layout reference missing lifecycle guidance"
 grep -q "^## Layout Options$" "$layout_reference" || fail "artifact layout reference missing layout options"
-grep -q "^## Proposal Placement$" "$layout_reference" || fail "artifact layout reference missing proposal placement guidance"
+grep -q "^## Idea Placement$" "$layout_reference" || fail "artifact layout reference missing idea placement guidance"
 grep -q "^## Linking Rules$" "$layout_reference" || fail "artifact layout reference missing linking rules"
 grep -q '^type: "\[Descriptive artifact type\]"$' "$frontmatter_reference" || fail "frontmatter reference missing base type field"
 

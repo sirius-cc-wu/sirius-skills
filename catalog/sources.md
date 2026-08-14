@@ -10,7 +10,7 @@ may distill concepts from several sources.
 |---|---|---|
 | Sirius repository history and accumulated repository workflow practice | `simplify`, `commit`, `create-pr` | Diff-scoped cleanup, intentional staging, and convention-aware change publication |
 | Sirius active skill catalog and workflow boundary guidance | `assess-development-input` | Content-based readiness assessment, preservation of source status and uncertainty, and selection of the narrowest responsible downstream skill |
-| Addy Osmani's `interview-me` and `idea-refine` at revision [`5a1b82d`](https://github.com/addyosmani/agent-skills/tree/5a1b82d6445d1e2f0abeea1072851419a50c0e5c) | `assess-development-input`, `design-repository-artifact-layout` | Optional requester-intent clarification, candidate-direction refinement, and idea/proposal lifecycle equivalence |
+| Addy Osmani's `interview-me` and `idea-refine` at revision [`5a1b82d`](https://github.com/addyosmani/agent-skills/tree/5a1b82d6445d1e2f0abeea1072851419a50c0e5c) | `assess-development-input`, `design-repository-artifact-layout` | Optional requester-intent clarification and candidate-direction refinement; the confirmed idea remains candidate input |
 | Martin Fowler, [*Architecture Decision Record*](https://martinfowler.com/bliki/ArchitectureDecisionRecord.html) | `record-architecture-decision` | Short one-decision records, inverted-pyramid presentation, proposed/accepted/superseded lifecycle, rationale and forces, serious alternatives, consequences, confidence, reconsideration triggers, advice, repository proximity, and linked supersession |
 | Sirius durable-artifact and repository-navigation practice | `select-technical-artifacts`, `design-repository-artifact-layout`, `plan-up-iterations` | Value, ownership, and lifecycle selection gates; executable-first dispositions; repository-first convention discovery; artifact lifecycle separation; minimal layouts; canonical paths; linking; migration; multi-iteration roadmap ownership; and durable current knowledge versus historical execution records |
 | Sirius iterative delivery practice and active specialist boundaries | `run-development-iteration` | One-objective iteration execution, selected-roadmap-candidate revalidation, question-driven specialist selection, artifact budgeting, validation, authorized commit boundaries, and language-neutral extensibility |
@@ -48,5 +48,5 @@ for the implemented boundaries, design rationale, and full reference links.
   filesystem owner of a skill.
 - Mark a source as proposed until at least one implemented skill materially
   distills it.
-- Keep detailed bibliography and design history here or in proposals, not in
-  skill frontmatter.
+- Keep detailed bibliography and design history here or in legacy proposal
+  records, not in skill frontmatter.

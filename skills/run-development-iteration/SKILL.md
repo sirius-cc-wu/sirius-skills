@@ -1,6 +1,6 @@
 ---
 name: run-development-iteration
-description: Runs exactly one risk-sized, language-neutral development iteration from an approved proposal, one selected UP roadmap candidate, or other authoritative input, selecting specialist analysis, design, implementation, and repository skills, controlling artifact creation, validating the result, and creating one authorized commit before stopping. Use when asked to promote an approved proposal, execute the next authorized UP iteration, advance a feature by one iteration, perform iterative analysis and design without prescribing object-oriented artifacts, or work one commit per iteration.
+description: Runs exactly one risk-sized, language-neutral development iteration from an approved idea, one selected UP roadmap candidate, or other authoritative input, selecting specialist analysis, design, implementation, and repository skills, controlling artifact creation, validating the result, and creating one authorized commit before stopping. Use when asked to promote an approved idea, execute the next authorized UP iteration, advance a feature by one iteration, perform iterative analysis and design without prescribing object-oriented artifacts, or work one commit per iteration.
 ---
 
 # Run Development Iteration
@@ -13,9 +13,9 @@ not from a mandatory artifact sequence or programming paradigm.
 
 ## When to Use
 
-- An approved proposal, feature source, or selected candidate from an explicit
-  UP roadmap should advance through one bounded analysis, design, or
-  construction iteration.
+- An approved idea, feature source, or selected candidate from an explicit UP
+  roadmap should advance through one bounded analysis, design, or construction
+  iteration.
 - The user requests one commit per iteration and expects work to stop at that
   boundary.
 - Several specialist skills may apply, but they must serve one shared
@@ -56,8 +56,8 @@ not from a mandatory artifact sequence or programming paradigm.
    oracle would require invention.
 6. **Reconcile durable knowledge.** Feed discoveries back only when they
    change knowledge owned by a canonical requirement, design, decision, test,
-   schema, or configuration artifact. Preserve proposal and decision history
-   rather than silently rewriting it. Use
+   schema, or configuration artifact. Preserve the idea, legacy proposal, and
+   decision history rather than silently rewriting it. Use
    `record-architecture-decision` only when one authoritative, consequential
    architecture choice needs an independent proposed, accepted, or superseding
    lifecycle.
@@ -90,15 +90,15 @@ When executing a candidate planned by `plan-up-iterations`:
 5. Report whether later roadmap candidates remain plausible or need replanning;
    do not update or execute them unless separately authorized.
 
-## Proposal Promotion Mode
+## Idea Promotion Mode
 
-When the iteration promotes a proposal:
+When the iteration promotes an approved idea:
 
 1. Require explicit acceptance or promotion authority and preserve the exact
    accepted revision.
-2. Record the proposal outcome according to repository governance.
+2. Record the idea outcome according to repository governance.
 3. Create or update the smallest canonical feature, requirement, decision, or
-   design owner without copying the whole proposal.
+   design owner without copying the whole idea.
 4. Preserve approved meaning, open questions, non-goals, and traceability.
 5. Treat promotion as the full iteration unless the user explicitly scoped a
    different single objective that remains coherent in the same commit.

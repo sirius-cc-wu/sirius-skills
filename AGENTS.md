@@ -11,7 +11,10 @@ Default guidance for agents working in `sirius-skills`.
 - `catalog/`: skill boundaries, provenance, workflow tracks, and relationship
   guidance. `retired-skills.tsv` is the append-only retirement ledger.
 - `docs/shared/`: canonical shared references copied into consuming skills
-- `docs/proposals/`: proposed capabilities that are not deployable skills
+- `docs/ideas/`: candidate-direction one-pagers from the `idea-refine`
+  workflow
+- `docs/proposals/`: legacy Sirius proposals and their historical iteration
+  records; these are not deployable skills
 - `.github/`: GitHub repository guidance
 - `src/` and `tests/`: shared-reference packaging and repository verification
 - Top-level installation and usage documentation, including `README.md`,

@@ -24,7 +24,7 @@ different role in each system:
   a substantial browser, design, document, memory, and installation runtime.
 
 The consequence is that similarly named `SKILL.md` repositories have very
-different change surfaces. Addy's structure emphasizes parallel host adapters,
+different change surfaces. Addy Osmani's structure emphasizes parallel host adapters,
 while gstack emphasizes generation and runtime coupling.
 
 ## Question, scope, and notation
@@ -234,7 +234,7 @@ gstackChecks --> gstackDaemon
 The following conclusions are inferences from the structures above rather than
 statements of project intent:
 
-1. **Addy's repository favors explicit composition.** Skills, commands,
+1. **Addy Osmani's repository favors explicit composition.** Skills, commands,
    personas, and references can evolve independently, while validators carry
    the cost of keeping mirrored host commands synchronized.
 2. **gstack favors centralized adaptation.** Its generator and typed host

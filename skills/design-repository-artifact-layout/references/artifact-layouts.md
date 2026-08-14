@@ -1,7 +1,7 @@
 # Artifact Durability and Repository Layouts
 
 Use this reference when a repository needs canonical homes for durable
-proposals, requirements, analysis, design, recovery, decisions, verification
+candidate directions, requirements, analysis, design, recovery, decisions, verification
 evidence, and iteration history. Preserve an established documentation
 structure unless it is causing a concrete navigation or ownership problem.
 
@@ -9,7 +9,7 @@ structure unless it is causing a concrete navigation or ownership problem.
 
 | Artifact kind | Examples | Lifecycle |
 |---|---|---|
-| Candidate direction | Confirmed idea one-pager, proposal, scope, alternatives, risks, requested decision | Keep it draft or proposed while review is pending. After a decision, record the outcome and link to the authoritative decision, design, or implementation artifact instead of leaving the idea or proposal as an ambiguous current source of truth. |
+| Candidate direction | Idea one-pager; scope, alternatives, risks, requested decision | Keep the idea in draft or proposed state while review is pending. After a decision, record the outcome and link to the authoritative decision, design, or implementation artifact instead of leaving the idea as an ambiguous current source of truth. |
 | Durable current artifact | Approved requirement, use case, domain model, SSD, operation contract, realization, design class diagram | Refine the canonical artifact in place across iterations; retain a stable ID when other artifacts or iterations reference it. |
 | Recovered knowledge | System survey, recovered behavior, reconstructed architecture, reconciliation | Fix claims to the inspected revision and preserve evidence status. Refine in place only while the artifact continues to describe that baseline; create or supersede it explicitly when a later baseline must remain distinguishable. |
 | Iteration record | Objective, risks, selected scope, exit criteria, results | Create one record per iteration, close it when evidence is known, and retain it as history. |
@@ -26,11 +26,13 @@ Iteration records are historically stable but usually become less important
 after closure. They should point to canonical artifacts instead of containing
 iteration-specific copies of those artifacts.
 
-Idea one-pagers and proposals are candidate-direction artifacts, not substitutes
-for confirmed intent, current requirements or design knowledge, accepted
-decision records, or implementation briefs. Preserve those lifecycle boundaries
-even when one candidate direction supplies source material for the next
-artifact.
+An idea one-pager is the candidate-direction artifact for new work. Use
+it for confirmed intent, scope, alternatives, risks, and a requested decision.
+Existing Sirius proposals remain legacy artifacts. Neither an idea nor a legacy
+proposal substitutes for confirmed intent, current requirements or design
+knowledge, accepted decision records, or implementation briefs. Preserve those
+lifecycle boundaries when a candidate direction supplies source material for a
+later artifact.
 
 ## Selection Workflow
 
@@ -52,28 +54,26 @@ artifact.
 7. Revisit the layout only when growth, shared ownership, or navigation creates
    evidence that the current structure no longer works.
 
-## Proposal Placement
+## Idea Placement
 
-Treat `docs/ideas/` and `docs/proposals/` as alternative homes for a candidate
-direction unless repository governance gives them different audiences, owners,
-or lifecycles. Preserve an established path, index, and naming rule; do not copy
-the same direction from one collection into the other merely to rename its
-artifact type. When no convention exists, use the smallest placement that
-matches how reviewers find pending decisions:
+Use `docs/ideas/` for new idea one-pagers. Preserve `docs/proposals/` for
+existing legacy Sirius proposals. Do not create new proposal artifacts. Preserve
+the established path, index, and naming rule. When no convention exists, use
+the smallest placement that matches how reviewers find pending decisions:
 
-- Prefer `docs/proposals/<topic>.md` when proposals span product areas or
-  readers navigate them by lifecycle or artifact type.
-- Prefer `docs/features/<feature>/proposal.md` or
-  `docs/<product-area>/proposals/<topic>.md` when review ownership and
-  navigation follow that feature or product area.
-- Prefer one proposal file. Create a proposal directory only when supporting
-  evidence has independent value but shares the proposal lifecycle.
+- Prefer `docs/ideas/<topic>.md` when ideas span product areas or readers
+  navigate them by lifecycle or artifact type.
+- Prefer `docs/features/<feature>/idea.md` or
+  `docs/<product-area>/ideas/<topic>.md` when review ownership and navigation
+  follow that feature or product area.
+- Prefer one idea file. Create an idea directory only when supporting evidence
+  has independent value but shares the idea lifecycle.
 
-Keep an idea one-pager or proposal in draft or proposed state until the
-responsible authority decides it. After acceptance, rejection, or supersession,
-preserve the outcome according to repository policy and link to the artifact
-that now owns the decision or intended behavior. Do not silently treat an
-undecided candidate direction as the current design.
+Keep an idea one-pager in draft or proposed state until the responsible
+authority decides it. After acceptance, rejection, or supersession, preserve the
+outcome according to repository policy and link to the artifact that now owns
+the decision or intended behavior. Do not silently treat an undecided candidate
+direction as the current design.
 
 ## Layout Options
 
@@ -81,7 +81,7 @@ undecided candidate direction as the current design.
 
 ```text
 docs/
-  proposals/
+  ideas/
     view-markdown-with-plantuml.md
   features/
     view-markdown-with-plantuml/

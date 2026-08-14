@@ -96,7 +96,8 @@ each repository divides the work:
 | Garry Tan's `gstack` | Roles, reviews, delivery stages, and tool-backed workflows such as product review, engineering review, QA, deployment, and browser work | Follow a delivery spine or invoke a specialist workflow |
 | Sirius | Analysis and design techniques such as use cases, domain models, SSDs, contracts, GRASP, realizations, and class diagrams | Select among the internal stages and artifacts of a design method |
 
-Addy and gstack therefore also divide development into many skills. Their
+Addy Osmani's collection and gstack therefore also divide development into
+many skills. Their
 primary concepts, however, are closer to user-visible outcomes. Sirius exposes
 more of the visual method's internal reasoning structure. That fine-grained
 toolbox is valuable, but presenting it as a single sequence increases routing
