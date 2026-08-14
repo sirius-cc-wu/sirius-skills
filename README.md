@@ -62,20 +62,6 @@ A successful installation also records its skill names in host-local state at
 `~/.local/state/sirius-skills/managed-skills.txt` when `XDG_STATE_HOME` is not
 set.
 
-## Native Pi vision review
-
-This checkout includes an optional Pi extension for creating and reviewing
-`VISION.md` without `gh-axi`, `lavish-axi`, or an external review server:
-
-```bash
-pi -e ./.pi/extensions/vision.ts
-```
-
-Run `/vision` inside Pi. The extension mines evidence through the agent,
-collects structured hypothetical verdicts in a native TUI, and requires
-explicit approval before the agent writes `VISION.md`. See
-[`.pi/extensions/README.md`](.pi/extensions/README.md).
-
 ## Skill lifecycle and retired installations
 
 A deprecated skill remains in the active catalog and profiles until users have
