@@ -1,108 +1,107 @@
 ---
 name: assess-development-input
-description: Assesses requirements-shaped inputs from external or mixed workflows and decides whether their content is ready for system recovery, inception, use-case modeling, architecture-decision recording, iterative design, or tested implementation while preserving source meaning, approval state, and unresolved uncertainty. Use when intent statements, specifications, proposals, BDD scenarios, story maps, brainstorm notes, issue descriptions, or similar material exist but their readiness and correct Sirius entry point are unclear.
+description: Assesses requirements-shaped input from external or mixed workflows and decides whether its content is ready for system recovery, inception, use-case modeling, architecture-decision recording, iterative design, or tested implementation while preserving source meaning, approval state, and unresolved uncertainty. Use when intent statements, specifications, proposals, BDD scenarios, story maps, brainstorm notes, issue descriptions, or similar material exist but their readiness and correct Sirius entry point are unclear.
 ---
 
 # Assess Development Input
 
 ## Overview
 
-Assess an incoming development artifact without assuming that its format proves
-its completeness. Recommend the narrowest Sirius skill that owns the next
-material decision, or stop with an explicit prerequisite when no Sirius skill
-can responsibly proceed.
+Assess an incoming development artifact. Do not treat its format as proof of
+completeness. Recommend the narrowest Sirius skill that owns the next material
+decision. Stop with an explicit prerequisite when no Sirius skill can
+responsibly proceed.
 
 ## When to Use
 
-- Requirements-shaped material was produced by another skill, method, team, or
-  repository and its Sirius entry point is unclear.
-- Several plausible next skills exist and selecting one requires examining the
-  content rather than its label or format.
-- A proposal appears implementation-ready but its approval, evidence,
-  behavioral detail, or verification oracle may be incomplete.
-- Do not use when the user has already selected the correct skill and supplied
-  that skill's entry conditions.
+- Requirements-shaped material came from another skill, method, team, or
+  repository, and its Sirius entry point is unclear.
+- Several next skills appear plausible, and the content must determine the
+  route.
+- A proposal appears ready for implementation, but its approval, evidence,
+  behavior, or verification oracle may be incomplete.
+- Do not use when the user selected the correct skill and supplied its entry
+  conditions.
 - Do not use to conduct discovery, rewrite an artifact, coordinate a full
-  lifecycle, or implement the requested behavior.
+  lifecycle, or implement behavior.
 
 ## Source Discipline
 
-- Treat input names and formats as hints, not readiness evidence. A feature
-  file is not necessarily approved behavior; interview notes are not
-  necessarily requirements; a proposal is not necessarily feasible.
+- Treat input names and formats as hints, not readiness evidence. A feature file
+  is not necessarily approved behavior. Interview notes are not necessarily
+  requirements. A proposal is not necessarily feasible.
 - Preserve source references, revisions, stated approval, non-goals, and open
   questions. Never upgrade candidate, inferred, or contested statements to
   approved decisions.
-- Separate intended behavior from claims about an existing system. Route
-  unevidenced current-state claims to recovery before treating them as facts.
+- Do not treat unsupported claims about the current system as facts. Verify
+  them with the reverse-engineering skills before using them as requirements or
+  design inputs.
 - Judge only the completeness needed for the next decision. Do not require
   every input to contain every possible requirements or design artifact.
 
 ## Workflow
 
-1. **Identify the input and requested outcome.** Name the material being
-   assessed, its known revision or source, the outcome it is meant to support,
-   and any explicit non-goals.
-2. **Inventory decision-relevant content.** Record what the input actually
-   establishes about purpose, actors, system boundary, behavior, examples,
-   rules, constraints, quality attributes, approval, current-system evidence,
-   and verification. Keep missing content distinct from content that is present
-   but contested.
-3. **Find the first material gap.** Ask which unresolved decision would force
-   the next agent to guess, produce invalid design, or create an unreliable
+1. **Identify the input and outcome.** Name the material, its known revision or
+   source, the outcome it should support, and its explicit non-goals.
+2. **Inventory decision-relevant content.** Record what the input establishes
+   about purpose, actors, system boundary, behavior, examples, rules,
+   constraints, quality attributes, approval, current-system evidence, and
+   verification. Keep missing content separate from contested content.
+3. **Find the first material gap.** Identify the unresolved decision that could
+   make the next agent guess, produce invalid design, or create an unreliable
    oracle. Ignore optional detail that does not block the next useful step.
 4. **Select one owner.** Use the routing guide below to choose the narrowest
-   Sirius skill that owns that decision. Prefer a specialist over a coordinator
-   when the gap is already localized. If the requester's intent or candidate
-   direction itself is still unconfirmed, name external clarification or idea
-   refinement as the prerequisite instead of forcing a Sirius owner.
+   Sirius skill that owns the decision. Prefer a specialist over a coordinator
+   when the gap is localized. If requester intent or the candidate direction is
+   unconfirmed, name external clarification or idea refinement as the
+   prerequisite. Do not force a Sirius owner.
 5. **Assess readiness.** Mark the input `ready`, `needs prerequisite`, or
    `blocked` for the selected skill. Base the status on visible content,
-   evidence, and approval rather than a numeric confidence or completeness
+   evidence, and approval. Do not use a numeric confidence or completeness
    score.
 6. **Produce the routing record.** State established decisions, material
    uncertainty, the recommended skill, the rationale, and any stop condition.
-   Do not translate the source into the destination skill's artifact.
-7. **Respect the authority boundary.** Recommend the handoff without invoking
-   the selected skill, creating its artifacts, or changing production state
-   unless the user also authorizes that work.
+   Do not rewrite the input as a requirements, design, decision, or
+   implementation artifact. Preserve the source for the next skill.
+7. **Respect authority.** Recommend the handoff without invoking the selected
+   skill, creating its artifacts, or changing production state unless the user
+   also authorizes that work.
 
 ## Routing Guide
 
-Choose the first row that owns the material decision blocking safe progress.
-The source method or file format never determines the route.
+Choose the first row that owns the decision blocking safe progress. The source
+method or file format never determines the route.
 
 | Content condition | Next Sirius skill |
 |---|---|
-| Claims about current commands, behavior, architecture, or constraints need evidence | `reverse-engineer-software-system` |
-| Candidate technical knowledge needs create, update, embed, keep-with-implementation, omit, or defer dispositions | `select-technical-artifacts` |
-| Justified durable technical artifacts need canonical repository homes, lifecycle separation, or migration | `design-repository-artifact-layout` |
-| One bounded architecture choice has explicit proposed or accepted status and needs a durable ADR | `record-architecture-decision` |
-| Opportunity, vision, business case, feasibility, basic scope, or major risks are unclear | `inception` |
+| Current commands, behavior, architecture, or constraints need evidence | `reverse-engineer-software-system` |
+| Candidate knowledge needs a disposition: create, update, embed, keep-with-implementation, omit, or defer | `select-technical-artifacts` |
+| A justified durable artifact needs a canonical home, lifecycle separation, or migration | `design-repository-artifact-layout` |
+| One bounded architecture choice has proposed or accepted status and needs a durable ADR | `record-architecture-decision` |
+| Opportunity, vision, business case, feasibility, scope, or major risks are unclear | `inception` |
 | Actors, user goals, system boundary, main scenarios, or extensions are unclear | `use-case-modeling` |
-| An approved change or selected UP roadmap candidate needs one coordinated, risk-sized analysis, design, or construction iteration | `run-development-iteration` |
-| A team explicitly needs an advisory multi-iteration UP phase and artifact roadmap | `plan-up-iterations` |
+| An approved change or UP candidate needs one coordinated, risk-sized iteration | `run-development-iteration` |
+| A team needs an advisory multi-iteration UP phase and artifact roadmap | `plan-up-iterations` |
 | Business concepts, vocabulary, associations, or attributes are unclear | `domain-modeling` |
 | Actor-system events or system operations are unclear | `system-sequence-diagrams` |
 | Non-trivial state changes, preconditions, or postconditions are unclear | `operation-contracts` |
 | Object responsibility or ownership is unclear | `grasp-responsibility-design` |
 | Object collaboration for a selected scenario is unclear | `use-case-realization` |
 | Stable software structure needs a class-level summary | `uml-class-diagram-design` |
-| Concrete creation, structural, communication, or variation forces justify pattern selection | `design-pattern-application` |
+| Creation, structural, communication, or variation forces justify pattern selection | `design-pattern-application` |
 | A language-neutral design needs idiomatic language-specific adaptation | `software-design-language-adaptation` |
 | Approved Rust behavior has material ownership, startup, rollback, cancellation, or cleanup risk | `design-rust-lifecycles` |
-| A bounded behavior has an independent oracle such as an approved example, invariant, reference, or defect | `test-driven-implementation` |
+| A bounded behavior has an independent oracle, such as an approved example, invariant, reference, or defect | `test-driven-implementation` |
 | Observable behavior is protected and only internal structure should change | `behavior-preserving-refactoring` |
 
-If one requester's actual intent is unclear, external `interview-me` may provide
-the prerequisite. If a raw candidate direction still needs alternatives,
-assumption testing, and MVP scoping, external `idea-refine` may provide it.
-Neither requester confirmation nor a polished idea document establishes
-organizational approval.
+Use external `interview-me` when one requester's intent is unclear. Use
+external `idea-refine` when a candidate direction needs alternatives,
+assumption testing, or MVP scoping. Neither requester confirmation nor a
+polished idea document establishes organizational approval.
 
 If the blocking decision belongs to a stakeholder, product owner, external
 source owner, or another authority outside Sirius, report `blocked` and name
-that prerequisite. Do not select a Sirius skill merely to avoid returning
+the prerequisite. Do not select a Sirius skill merely to avoid returning
 upstream.
 
 ## Output
@@ -138,16 +137,14 @@ Prerequisite or stop condition:
 Keep the assessment conversational unless it needs a durable cross-session or
 cross-team handoff. Before creating a standalone document, apply the
 [Artifact Selection Budget](../select-technical-artifacts/references/artifact-selection-budget.md).
-Prefer an existing issue, proposal, or aggregate feature artifact when it is a
+Prefer an existing issue, idea, or aggregate feature artifact when it is a
 sufficient owner.
 
 When a standalone Markdown assessment is justified, follow
 [Markdown Artifact Frontmatter](../plan-up-iterations/references/markdown-artifact-frontmatter.md)
-and
-use STE-style.
-Use this frontmatter, giving the record a stable ID only when it will be
-cross-referenced, then place the concise output fields in the body without
-copying the source material:
+and use STE-style. Use this frontmatter. Give the record a stable ID only when
+it will be cross-referenced. Put the concise output fields in the body. Do not
+copy the source material.
 
 ```markdown
 ---
@@ -169,7 +166,7 @@ tags: [intake, routing]
 - Rewriting the input into a preferred Sirius format before choosing its owner.
 - Sending every input to the iterative coordinator when a specialist owns the
   first gap.
-- Treating a confirmed requester intent or refined idea as organizational
+- Treating confirmed requester intent or a refined idea as organizational
   approval.
 - Sending incomplete behavior to implementation because acceptance-language
   syntax is present.
@@ -179,12 +176,18 @@ tags: [intake, routing]
 
 ## Verification
 
-- [ ] The assessment identifies the actual input, source or revision, intended outcome, and non-goals when known.
-- [ ] Readiness is based on content, evidence, approval, and the next decision rather than the originating method or format.
-- [ ] Established decisions remain distinct from gaps, conflicts, inference, and missing approval.
-- [ ] Exactly one next Sirius skill is recommended, unless an external prerequisite blocks responsible routing.
+- [ ] The assessment identifies the input, source or revision, intended outcome,
+      and known non-goals.
+- [ ] Readiness is based on content, evidence, approval, and the next decision,
+      not on the originating method or format.
+- [ ] Established decisions remain distinct from gaps, conflicts, inference,
+      and missing approval.
+- [ ] Exactly one next Sirius skill is recommended, unless an external
+      prerequisite blocks responsible routing.
 - [ ] The rationale names the first material decision owned by that skill.
-- [ ] No requirement, approval, current-system fact, or verification oracle was invented or silently upgraded.
+- [ ] No requirement, approval, current-system fact, or verification oracle was
+      invented or silently upgraded.
 - [ ] The input was not rewritten into the selected skill's artifact.
 - [ ] The selected skill was not executed without separate user authority.
-- [ ] Any standalone assessment passes the artifact selection budget and uses readable Markdown with appropriate frontmatter.
+- [ ] Any standalone assessment passes the artifact selection budget and uses
+      STE-style Markdown with appropriate frontmatter.
