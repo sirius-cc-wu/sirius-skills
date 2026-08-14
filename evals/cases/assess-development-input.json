@@ -26,7 +26,7 @@
       },
       {
         "prompt": "Advance this approved proposal through one risk-sized design iteration, validate it, commit once, and stop.",
-        "owner": "run-development-iteration"
+        "owner": "iterative-risk-driven-development"
       },
       {
         "prompt": "Design the Rust ownership, staged startup, rollback, cancellation, and cleanup lifecycle for this approved behavior.",

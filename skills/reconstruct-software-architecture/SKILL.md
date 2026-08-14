@@ -75,7 +75,7 @@ Prefer adding the smallest necessary view to an existing architecture artifact
 when it already owns the question and evidence.
 
 When persisting a standalone Markdown reconstruction, follow
-[Markdown Artifact Frontmatter](../iterative-risk-driven-analysis-design/references/markdown-artifact-frontmatter.md)
+[Markdown Artifact Frontmatter](../iterative-risk-driven-development/references/markdown-artifact-frontmatter.md)
 and use STE-style.
 Use the representative runtime scenario before exhaustive element inventories
 when runtime behavior is the architectural question.

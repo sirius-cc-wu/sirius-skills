@@ -169,16 +169,12 @@ one-off incident.
 ## Design artifacts and sources
 
 The iterative-design collection uses
-`iterative-risk-driven-analysis-design` for approved, risk-sized analysis and
-design objectives. It selects requirements, analysis, language, and optional
-object-design specialists from the current question and implementation forces.
-It evolves canonical artifacts and hands implementation to
-`run-development-iteration`.
-
-`run-development-iteration` executes approved objectives. When the user requests
-one commit per iteration, it continues by default until the requested work is
-complete. It selects implementation and repository specialists without
-requiring an object-oriented artifact chain.
+`iterative-risk-driven-development` for approved, risk-sized objectives. It
+selects requirements, analysis, design, language, implementation, verification,
+and optional Rust lifecycle specialists from the current question and
+implementation forces. It evolves canonical artifacts and executes the work.
+When the user requests one commit per iteration, it continues by default until
+the requested work is complete.
 
 Selected use cases, domain models, system sequence diagrams, contracts,
 realizations, design class diagrams, and language-specific designs remain
@@ -191,7 +187,7 @@ on canonical changes and its commit instead of creating a separate iteration
 record. Artifact selection and its detailed budget live in
 `select-technical-artifacts`; repository-placement guidance lives in
 `design-repository-artifact-layout`; Markdown frontmatter guidance remains a
-reference owned by `iterative-risk-driven-analysis-design`, and artifact prose
+reference owned by `iterative-risk-driven-development`, and artifact prose
 uses STE-style.
 
 The optional analysis and object-design skills distill workflows from Craig

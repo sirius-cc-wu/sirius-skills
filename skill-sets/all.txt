@@ -10,8 +10,7 @@ select-technical-artifacts
 design-repository-artifact-layout
 assess-development-input
 record-architecture-decision
-run-development-iteration
-iterative-risk-driven-analysis-design
+iterative-risk-driven-development
 stakeholder-requirements-elicitation
 requirements-synthesis-validation
 implementation-slice-briefing

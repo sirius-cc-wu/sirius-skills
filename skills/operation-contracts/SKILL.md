@@ -36,7 +36,7 @@ Prefer refining the owning feature artifact when a contract will not be reused
 or maintained independently.
 
 For a standalone Markdown file, follow
-[Markdown Artifact Frontmatter](../iterative-risk-driven-analysis-design/references/markdown-artifact-frontmatter.md)
+[Markdown Artifact Frontmatter](../iterative-risk-driven-development/references/markdown-artifact-frontmatter.md)
 and use STE-style,
 then use this shape. Link to the discovering scenario rather than restating it
 when the cross-reference provides sufficient context. When embedding the

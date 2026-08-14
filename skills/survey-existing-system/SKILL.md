@@ -67,7 +67,7 @@ Prefer updating an existing system survey or aggregate recovery record when it
 already owns the scope and evidence.
 
 When persisting a standalone Markdown survey, follow
-[Markdown Artifact Frontmatter](../iterative-risk-driven-analysis-design/references/markdown-artifact-frontmatter.md)
+[Markdown Artifact Frontmatter](../iterative-risk-driven-development/references/markdown-artifact-frontmatter.md)
 and use STE-style.
 
 ```markdown

@@ -92,7 +92,7 @@ Prefer existing requirements owners. Create a standalone brief only when its
 synthesis, validation history, and conflict log change independently.
 
 For standalone Markdown, follow
-[Markdown Artifact Frontmatter](../iterative-risk-driven-analysis-design/references/markdown-artifact-frontmatter.md)
+[Markdown Artifact Frontmatter](../iterative-risk-driven-development/references/markdown-artifact-frontmatter.md)
 and use STE-style.
 When a standalone brief is justified, read and adapt the
 [Requirements Discovery Brief Template](references/requirements-discovery-brief-template.md).

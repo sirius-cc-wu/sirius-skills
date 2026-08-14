@@ -1,0 +1,63 @@
+{
+  "skill_name": "iterative-risk-driven-development",
+  "trigger": {
+    "positive": [
+      {
+        "prompt": "Run a risk-driven development iteration for this approved feature. Choose one objective, use only the methods that answer it, validate the result, and make one coherent commit.",
+        "top_k": 3
+      },
+      {
+        "prompt": "Run this feature with one authorized commit per iteration until the requested outcome is complete; stop only for blockers or failed validation.",
+        "top_k": 3
+      },
+      {
+        "prompt": "Run a risk-driven development iteration for an approved feature with an event-ordering risk. Select the smallest analysis, design, implementation, and verification specialists needed, then test and commit the change.",
+        "top_k": 3
+      },
+      {
+        "prompt": "For this Rust feature, include ownership transfer, staged startup, cancellation, and cleanup design only where those lifecycle risks affect the objective.",
+        "top_k": 3
+      }
+    ],
+    "negative": [
+      {
+        "prompt": "Design the Rust ownership transfer, staged startup rollback, async cancellation, and fallible cleanup lifecycle without implementing the feature.",
+        "owner": "design-rust-lifecycles"
+      },
+      {
+        "prompt": "Build the conceptual domain model for these business concepts and associations without designing software objects.",
+        "owner": "domain-modeling"
+      },
+      {
+        "prompt": "Choose the canonical repository paths and indexes for these already-approved artifacts without changing their content.",
+        "owner": "design-repository-artifact-layout"
+      },
+      {
+        "prompt": "Implement this bounded approved behavior from its acceptance example with a failing test first.",
+        "owner": "test-driven-implementation"
+      }
+    ]
+  },
+  "evals": [
+    {
+      "id": "risk-driven-development-iteration",
+      "prompt": "The feature direction is approved, but the event-ordering risk is unresolved. Run a risk-driven iteration. Select only the analysis, design, Rust lifecycle, implementation, and verification methods needed to resolve that risk; preserve canonical ownership, record exit evidence, validate the change, create at most one authorized commit, and continue only if the user requested continuous execution.",
+      "expected_output": "One bounded risk-driven development iteration that states the objective, chooses justified methods, refines or creates only budget-approved canonical artifacts, implements and verifies the approved behavior when required, records evidence and uncertainty, creates at most one scoped commit, and reports why execution continues or stops.",
+      "expectations": [
+        "One risk, learning question, or delivery objective and concrete exit evidence bind each iteration",
+        "Selected methods answer the current risk instead of completing a fixed analysis or object-design sequence",
+        "Rust lifecycle design is selected only when ownership or resource semantics create material pressure",
+        "Canonical artifact ownership, lifecycle, identifiers, and traceability are preserved",
+        "Validation distinguishes completed evidence, human-owned checks, unresolved questions, and residual risk",
+        "Each iteration creates at most one authorized commit and continuous execution follows the user's request"
+      ],
+      "prohibitions": [
+        "Do not invent approval, product behavior, compatibility rules, or verification oracles",
+        "Do not require every use-case, analysis, object-design, or language-lifecycle artifact",
+        "Do not create a standalone artifact without applying the artifact selection budget",
+        "Do not push, publish, or continue after a failed validation or missing authority"
+      ],
+      "trust_level": "provisional"
+    }
+  ]
+}

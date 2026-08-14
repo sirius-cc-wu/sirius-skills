@@ -131,10 +131,10 @@ existing rule owner.
 
 ### Design and implement iteratively
 
-1. Use `run-development-iteration` to execute approved, risk-sized iterations.
-   By default, one commit per iteration continues until the requested work is
-   complete. Request one iteration explicitly when the run must stop after one
-   commit.
+1. Use `iterative-risk-driven-development` to execute approved, risk-sized
+   iterations. By default, one commit per iteration continues until the
+   requested work is complete. Request one iteration explicitly when the run
+   must stop after one commit.
 2. Use `stakeholder-requirements-elicitation` when the affected roles, current
    work, authority, or evidence coverage is unclear.
 3. Use `requirements-synthesis-validation` to turn an identified evidence set
@@ -142,12 +142,11 @@ existing rule owner.
    authority-aware validation states.
 4. Select requirements and analysis skills from the current uncertainty:
    scope, behavior, examples, vocabulary, system events, or state effects.
-5. Use `iterative-risk-driven-analysis-design` when an approved change needs
-   risk-driven analysis or design. Give the objective exit evidence. Select
-   GRASP, realizations, class diagrams, and patterns only when their questions
-   or design forces are present. Hand implementation to
-   `run-development-iteration`, and delegate material repository placement to
-   `design-repository-artifact-layout`.
+5. Use `iterative-risk-driven-development` when an approved change needs
+   risk-driven progress. Give each objective exit evidence. Select GRASP,
+   realizations, class diagrams, patterns, and Rust lifecycle design only when
+   their questions or design forces are present. Delegate material repository
+   placement to `design-repository-artifact-layout`.
 6. Use `software-design-language-adaptation` when implementation-facing design
    must reflect a target language. Use `design-rust-lifecycles` when Rust
    ownership, resource transfer, startup, rollback, cancellation, or fallible

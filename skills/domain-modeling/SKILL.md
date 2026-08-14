@@ -35,7 +35,7 @@ Prefer refining an existing domain model or aggregate feature artifact when it
 already owns the vocabulary.
 
 For a standalone Markdown file, follow
-[Markdown Artifact Frontmatter](../iterative-risk-driven-analysis-design/references/markdown-artifact-frontmatter.md)
+[Markdown Artifact Frontmatter](../iterative-risk-driven-development/references/markdown-artifact-frontmatter.md)
 and use STE-style,
 then use this shape. When embedding the model in an aggregate file, omit the
 frontmatter and adjust heading levels.

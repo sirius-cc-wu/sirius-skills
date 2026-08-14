@@ -76,7 +76,7 @@ Prefer updating an existing recovery record or keeping evidence near its
 executable source when either is a sufficient owner.
 
 When persisting a standalone Markdown record, follow
-[Markdown Artifact Frontmatter](../iterative-risk-driven-analysis-design/references/markdown-artifact-frontmatter.md)
+[Markdown Artifact Frontmatter](../iterative-risk-driven-development/references/markdown-artifact-frontmatter.md)
 and use STE-style.
 The decision and scope normally provide the reader-oriented opening; retain
 evidence status and uncertainty when simplifying later sections.

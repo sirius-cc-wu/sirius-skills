@@ -25,16 +25,16 @@ paths. Once approved,
 preserve the accepted revision and outcome as the next iteration establishes a
 canonical feature, requirement, decision, or design owner.
 
-## Run Iterations
+## Iterative Risk-Driven Development
 
 Use
-[`run-development-iteration`](../../skills/run-development-iteration/SKILL.md)
-to execute one or more approved, risk-sized iterations, including a separately
-authorized analysis/design candidate. By default, a request for one commit per
-iteration continues until the requested work is complete. An explicit request
-for one iteration uses single-iteration mode. Each iteration fixes its source
-revision, selects one objective and exit evidence, coordinates only the needed
+[`iterative-risk-driven-development`](../../skills/iterative-risk-driven-development/SKILL.md)
+to execute one or more approved, risk-sized iterations. It selects one
+objective and exit evidence per iteration, coordinates only the needed
 specialists, validates the result, and creates at most one authorized commit.
+By default, one commit per iteration continues until the requested work is
+complete. Use single-iteration mode when the user explicitly asks for one
+iteration.
 
 Choose the narrowest specialist for each material question:
 
@@ -60,15 +60,10 @@ Several specialists may contribute to one iteration only when they answer the
 same objective. Do not create one artifact merely because another artifact can
 feed it.
 
-## Risk-Driven Analysis and Design
-
-Use
-[`iterative-risk-driven-analysis-design`](../../skills/iterative-risk-driven-analysis-design/SKILL.md)
-when an approved change needs iterative analysis or design. It selects one
-risk, learning, decision, or delivery objective and applies only the methods
-that answer that objective. It evolves canonical artifacts and hands
-implementation to `run-development-iteration`. It does not implement product
-code, create commits, or require a complete object-design chain.
+The coordinator selects the narrowest specialists for each material question.
+It can coordinate requirements, analysis, object design, implementation,
+verification, and Rust lifecycle design in one risk-sized loop. It does not
+require a complete object-design chain.
 
 ## Language Extension Rule
 

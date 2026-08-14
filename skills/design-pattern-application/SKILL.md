@@ -47,7 +47,7 @@ architecture-decision lifecycle, use
 instead of creating a duplicate pattern record.
 
 For a standalone Markdown file, follow
-[Markdown Artifact Frontmatter](../iterative-risk-driven-analysis-design/references/markdown-artifact-frontmatter.md)
+[Markdown Artifact Frontmatter](../iterative-risk-driven-development/references/markdown-artifact-frontmatter.md)
 and use STE-style,
 then use this shape. The force and its consequence normally provide the
 reader-oriented opening; do not add a generic summary that repeats them. When

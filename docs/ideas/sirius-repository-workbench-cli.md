@@ -61,7 +61,7 @@ docs/
 
 The developer wants a stable home for feature requirements, analysis,
 PlantUML views, and iteration history, but should not need to discover or name
-`iterative-risk-driven-analysis-design`. They run:
+`iterative-risk-driven-development`. They run:
 
 ```bash
 sirius layout propose .
@@ -258,17 +258,15 @@ field reinterpretation.
 
 The CLI would provide a deterministic, developer-facing form of the narrow
 result owned by `design-repository-artifact-layout`. It would not make that
-skill or `iterative-risk-driven-analysis-design` obsolete.
+skill or `iterative-risk-driven-development` obsolete.
 
 - Use `design-repository-artifact-layout` when a coding agent should inspect
   context, exercise judgment, recommend placement, or perform an explicitly
   authorized migration.
 - Use the CLI when a developer or tool needs read-only, reproducible layout
   observations in Markdown or versioned JSON without invoking an agent.
-- Use `iterative-risk-driven-analysis-design` when selecting risk-sized
-  analysis and design work, its artifact set, and its implementation handoff.
-  `run-development-iteration` executes the approved objective and one
-  separate execution handoff.
+- Use `iterative-risk-driven-development` when selecting risk-sized analysis
+  and design work, its artifact set, implementation, and verification.
 - Use one established ideas, feature, or decision path for a new candidate
   direction when the recommendation needs durable review. This legacy proposal
   preserves its own rationale; do not create a second candidate artifact for
@@ -393,8 +391,8 @@ Implementation would be acceptable when the following evidence exists:
 
 Behavioral evaluation should then test the key product assumption: given the
 CLI proposal, a coding agent places a requested artifact consistently without
-being told to invoke `iterative-risk-driven-analysis-design`. That result
-should be
+being told to invoke `iterative-risk-driven-development`. That result should
+be
 compared with a control prompt that lacks the proposal before claiming that the
 CLI improves agent behavior.
 

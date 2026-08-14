@@ -70,7 +70,7 @@ lifecycle. Otherwise, copy and tailor
 [Rust Lifecycle Design Template](assets/rust-lifecycle-design.md).
 
 For a standalone artifact, follow
-[Markdown Artifact Frontmatter](../iterative-risk-driven-analysis-design/references/markdown-artifact-frontmatter.md)
+[Markdown Artifact Frontmatter](../iterative-risk-driven-development/references/markdown-artifact-frontmatter.md)
 and
 use STE-style.
 Use this artifact type:

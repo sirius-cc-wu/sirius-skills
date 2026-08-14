@@ -44,7 +44,7 @@ independent architecture-decision lifecycle, use
 instead of creating a duplicate responsibility record.
 
 For a standalone Markdown file, follow
-[Markdown Artifact Frontmatter](../iterative-risk-driven-analysis-design/references/markdown-artifact-frontmatter.md)
+[Markdown Artifact Frontmatter](../iterative-risk-driven-development/references/markdown-artifact-frontmatter.md)
 and use STE-style,
 then use this shape. When embedding the decision in an aggregate file, omit the
 frontmatter and adjust heading levels.

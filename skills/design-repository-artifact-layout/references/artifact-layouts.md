@@ -242,7 +242,7 @@ product-area-oriented architecture, and artifact-oriented shared models.
 ## Markdown Metadata and Reserved Files
 
 - Apply
-  [Markdown Artifact Frontmatter](../../iterative-risk-driven-analysis-design/references/markdown-artifact-frontmatter.md)
+  [Markdown Artifact Frontmatter](../../iterative-risk-driven-development/references/markdown-artifact-frontmatter.md)
   to every standalone Markdown concept artifact created by these layouts.
 - In a flat feature file, describe the feature's aggregate requirements and
   design content once in file-level frontmatter. Do not insert frontmatter

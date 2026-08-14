@@ -97,7 +97,7 @@ Prefer an existing issue, work item, or feature artifact. Create a standalone
 brief only for independent assignment, freshness, and completion.
 
 For standalone Markdown, follow
-[Markdown Artifact Frontmatter](../iterative-risk-driven-analysis-design/references/markdown-artifact-frontmatter.md)
+[Markdown Artifact Frontmatter](../iterative-risk-driven-development/references/markdown-artifact-frontmatter.md)
 and use STE-style.
 When a standalone brief is justified, read and adapt the
 [Implementation Slice Brief Template](references/implementation-slice-brief-template.md).

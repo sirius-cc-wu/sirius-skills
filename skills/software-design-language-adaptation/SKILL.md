@@ -46,7 +46,7 @@ Prefer merging implementation-facing guidance into the design artifact it
 adapts when that artifact remains the clear owner.
 
 When persisting a standalone Markdown adaptation note, follow
-[Markdown Artifact Frontmatter](../iterative-risk-driven-analysis-design/references/markdown-artifact-frontmatter.md)
+[Markdown Artifact Frontmatter](../iterative-risk-driven-development/references/markdown-artifact-frontmatter.md)
 and use STE-style.
 Use `type: "Implementation Design Adaptation"`, a `language` field with the
 selected target, and identity, summary, lifecycle, and tags as appropriate.

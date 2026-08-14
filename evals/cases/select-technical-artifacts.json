@@ -26,7 +26,7 @@
       },
       {
         "prompt": "Run one approved implementation iteration, coordinate the needed specialists, validate it, and create one authorized commit.",
-        "owner": "run-development-iteration"
+        "owner": "iterative-risk-driven-development"
       }
     ]
   },

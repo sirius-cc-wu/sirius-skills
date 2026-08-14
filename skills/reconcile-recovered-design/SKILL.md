@@ -73,7 +73,7 @@ Prefer updating the existing reconciliation when it owns the same baseline,
 scope, and decision.
 
 When persisting a standalone Markdown reconciliation, follow
-[Markdown Artifact Frontmatter](../iterative-risk-driven-analysis-design/references/markdown-artifact-frontmatter.md)
+[Markdown Artifact Frontmatter](../iterative-risk-driven-development/references/markdown-artifact-frontmatter.md)
 and use STE-style.
 State the consequential agreement, drift, gap, or uncertainty before the full
 perspective matrix.

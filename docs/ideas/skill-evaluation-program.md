@@ -283,7 +283,7 @@ risk:
 
 | Skill | Risk exercised |
 |---|---|
-| `iterative-risk-driven-analysis-design` | Selecting risk-driven analysis and design methods without enforcing a lifecycle waterfall or executing implementation |
+| `iterative-risk-driven-development` | Selecting and executing risk-driven analysis, design, implementation, and verification without enforcing a lifecycle waterfall |
 | `use-case-modeling` | Preserving the black-box boundary and avoiding internal design |
 | `test-driven-implementation` | Demonstrating discriminatory verification without changing valid expectations |
 | `recover-system-behavior` | Separating evidenced current behavior from intended requirements |

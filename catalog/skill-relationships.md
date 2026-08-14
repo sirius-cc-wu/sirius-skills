@@ -46,7 +46,7 @@ rectangle "**Client Discovery**\nstakeholder-requirements-elicitation\nrequireme
 
 rectangle "**Reverse Engineering**\nreverse-engineer-software-system\nsurvey-existing-system\nrecover-system-behavior\nreconstruct-software-architecture\nreconcile-recovered-design" as reverse #EAF4FB
 
-rectangle "**Iterative Analysis and Design**\nrun-development-iteration\niterative-risk-driven-analysis-design\ninception\nuse-case-modeling\nbehavior-driven-specification\ndomain-modeling\nsystem-sequence-diagrams\noperation-contracts\ngrasp-responsibility-design\nuse-case-realization\numl-class-diagram-design\ndesign-pattern-application\nsoftware-design-language-adaptation\ndesign-rust-lifecycles" as design #EEF8EE
+rectangle "**Iterative Risk-Driven Development**\niterative-risk-driven-development\ninception\nuse-case-modeling\nbehavior-driven-specification\ndomain-modeling\nsystem-sequence-diagrams\noperation-contracts\ngrasp-responsibility-design\nuse-case-realization\numl-class-diagram-design\ndesign-pattern-application\nsoftware-design-language-adaptation\ndesign-rust-lifecycles" as design #EEF8EE
 
 rectangle "**Implementation and Evolution**\ntest-driven-implementation\nbehavior-preserving-refactoring" as implementation #FFF5EA
 
@@ -204,22 +204,16 @@ evidence rules, stopping conditions, and selection examples.
 
 ## Iterative analysis and design
 
-`run-development-iteration` executes one or more approved, risk-sized
-objectives. When the user requests one commit per iteration, it continues by
-default until the requested work is complete. It validates each iteration and
-creates at most one authorized commit per iteration. It selects the smallest
-specialists that answer the current question.
+`iterative-risk-driven-development` executes one or more approved, risk-sized
+objectives. It selects the smallest specialists for the current question,
+evolves canonical artifacts, validates each iteration, and creates at most one
+authorized commit per iteration. When the user requests one commit per
+iteration, it continues by default until the requested work is complete.
 
-`iterative-risk-driven-analysis-design` coordinates one approved, risk-sized
-analysis or design objective. It selects methods from the current risk and
-question, evolves canonical artifacts, and hands implementation to
-`run-development-iteration`. It does not enforce a complete object-design
-chain, implement product code, or commit.
-
-`run-development-iteration` executes one or more approved objectives. When the
-user requests one commit per iteration, it continues by default until the
-requested work is complete. Both skills preserve established canonical paths
-and delegate material placement or migration decisions to
+The coordinator can select requirements, analysis, object-design,
+implementation, verification, and Rust lifecycle specialists. It does not
+require a complete object-design chain. It preserves established canonical
+paths and delegates material placement or migration decisions to
 `design-repository-artifact-layout`.
 
 ```plantuml
@@ -242,8 +236,7 @@ skinparam rectangle<<coordinator>> {
   BorderColor #2F6690
 }
 
-rectangle "run-development-\niteration" as iterative <<coordinator>>
-rectangle "iterative-risk-driven-\nanalysis-design" as analysisdesign <<coordinator>>
+rectangle "iterative-risk-driven-\ndevelopment" as iterative <<coordinator>>
 
 package "Requirements and analysis" #EEF8EE {
   rectangle "inception" as inception
@@ -274,13 +267,12 @@ iterative ..> ssd : system events
 iterative ..> contracts : state effects
 iterative ..> language : target-language forces
 iterative ..> rust : Rust lifecycle risk
-iterative ..> analysisdesign : analysis/design objective
-analysisdesign ..> usecases : selected scenarios
-analysisdesign ..> behavior : selected examples
-analysisdesign ..> domain : selected vocabulary
-analysisdesign ..> ssd : selected system events
-analysisdesign ..> contracts : selected state effects
-analysisdesign ..> grasp : selected object responsibilities
+iterative ..> usecases : selected scenarios
+iterative ..> behavior : selected examples
+iterative ..> domain : selected vocabulary
+iterative ..> ssd : selected system events
+iterative ..> contracts : selected state effects
+iterative ..> grasp : selected object responsibilities
 inception --> usecases
 usecases --> behavior
 usecases --> domain
@@ -388,8 +380,8 @@ skinparam rectangle<<coordinator>> {
   BorderColor #2F6690
 }
 
-package "Analysis and design knowledge" #EEF8EE {
-  rectangle "run-development-\niteration" as iterative <<coordinator>>
+package "Risk-driven development knowledge" #EEF8EE {
+  rectangle "iterative-risk-driven-\ndevelopment" as iterative <<coordinator>>
   rectangle "domain-modeling" as domain
   rectangle "operation-contracts" as contracts
   rectangle "grasp-responsibility-\ndesign" as grasp

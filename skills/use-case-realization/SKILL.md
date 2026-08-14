@@ -40,7 +40,7 @@ Prefer updating or embedding the realization in its owning feature artifact
 when it does not change independently.
 
 For a standalone Markdown file, follow
-[Markdown Artifact Frontmatter](../iterative-risk-driven-analysis-design/references/markdown-artifact-frontmatter.md)
+[Markdown Artifact Frontmatter](../iterative-risk-driven-development/references/markdown-artifact-frontmatter.md)
 and use STE-style,
 then use this shape. The realized use-case scenario supplies the representative
 scenario; summarize its outcome instead of repeating the black-box steps. When

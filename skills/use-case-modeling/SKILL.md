@@ -37,7 +37,7 @@ Prefer updating an existing use case or embedding the scenario in its
 aggregate feature artifact when either is a sufficient owner.
 
 For a standalone Markdown file, follow
-[Markdown Artifact Frontmatter](../iterative-risk-driven-analysis-design/references/markdown-artifact-frontmatter.md)
+[Markdown Artifact Frontmatter](../iterative-risk-driven-development/references/markdown-artifact-frontmatter.md)
 and use STE-style,
 then use this shape. The main success scenario normally serves as the
 representative scenario. When embedding the use case in an aggregate file,

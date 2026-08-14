@@ -125,15 +125,13 @@ through requirements, analysis, object design, implementation, and
 refactoring.
 
 Sirius now addresses that workflow-level bias with
-[`run-development-iteration`](../../skills/run-development-iteration/SKILL.md).
-The coordinator executes one approved objective, selects specialists from the
-current question and implementation forces, applies the artifact budget,
-creates one authorized commit, and stops. `iterative-risk-driven-analysis-design`
-remains the risk-driven analysis and design specialization; each ready
-candidate executes separately through `run-development-iteration`. The
-language-adaptation skill
-now accepts language-neutral behavior, boundaries, state, and collaborations
-without requiring GRASP or class-design input.
+[`iterative-risk-driven-development`](../../skills/iterative-risk-driven-development/SKILL.md).
+The coordinator executes one risk-sized objective at a time, selects specialists
+from the current question and implementation forces, applies the artifact
+budget, validates the result, and creates at most one authorized commit per
+iteration. The language-adaptation skill now accepts language-neutral behavior,
+boundaries, state, and collaborations without requiring GRASP or class-design
+input.
 
 The remaining proposal is narrower: make rapid human comprehension an explicit
 design outcome and provide question-driven visual routing where existing
@@ -216,11 +214,9 @@ A future visual-design coordinator would ask:
 7. What evidence is sufficient to begin or continue implementation?
 8. Did implementation change knowledge that the durable view owns?
 
-The existing `iterative-risk-driven-analysis-design` capability now remains
-an explicit risk-driven analysis and design specialization for work that
-benefits from its
-full vocabulary and traceability model. It hands one ready candidate to
-`run-development-iteration` rather than executing work itself.
+The existing `iterative-risk-driven-development` capability now remains the
+risk-driven coordinator for work that benefits from its full vocabulary and
+traceability model. It selects and executes one ready objective at a time.
 `reconstruct-software-architecture` remains the specialist for recovering
 as-built views from existing code. A future visual coordinator
 should select between them rather than duplicate their detailed procedures.

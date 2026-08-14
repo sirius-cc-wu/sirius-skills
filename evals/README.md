@@ -24,8 +24,7 @@ The initial pilot covers:
 - `stakeholder-requirements-elicitation`;
 - `requirements-synthesis-validation`;
 - `implementation-slice-briefing`;
-- `run-development-iteration`;
-- `iterative-risk-driven-analysis-design`;
+- `iterative-risk-driven-development`;
 - `operation-contracts`;
 - `design-rust-lifecycles`;
 - `software-design-language-adaptation`;

@@ -101,10 +101,10 @@ to the current repository revision and expose every exclusion and stop condition
 ```
 
 ```text
-Use iterative-risk-driven-analysis-design to select one risk-driven analysis
-or design objective for this feature. Use only the methods and durable
-artifacts that the objective justifies. Hand implementation to
-run-development-iteration.
+Use iterative-risk-driven-development to select one risk-driven objective for
+this feature. Use only the methods, artifacts, and Rust lifecycle design that
+the objective justifies. Implement, validate, and commit one iteration at a
+time until the work is complete.
 ```
 
 ```text

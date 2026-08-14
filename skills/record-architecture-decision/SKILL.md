@@ -97,7 +97,7 @@ identifiers, repository-local conventions, evidence, and authorization.
 ## ADR Shape
 
 Preserve an established template. Without one, follow
-[Markdown Artifact Frontmatter](../iterative-risk-driven-analysis-design/references/markdown-artifact-frontmatter.md)
+[Markdown Artifact Frontmatter](../iterative-risk-driven-development/references/markdown-artifact-frontmatter.md)
 and
 use STE-style,
 then use this proportionate shape. Remove optional fields and empty sections.
