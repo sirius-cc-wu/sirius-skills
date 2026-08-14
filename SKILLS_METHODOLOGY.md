@@ -131,8 +131,10 @@ existing rule owner.
 
 ### Design and implement iteratively
 
-1. Use `run-development-iteration` to execute one approved, risk-sized
-   iteration, validate it, create one authorized commit, and stop.
+1. Use `run-development-iteration` to execute approved, risk-sized iterations.
+   By default, one commit per iteration continues until the requested work is
+   complete. Request one iteration explicitly when the run must stop after one
+   commit.
 2. Use `stakeholder-requirements-elicitation` when the affected roles, current
    work, authority, or evidence coverage is unclear.
 3. Use `requirements-synthesis-validation` to turn an identified evidence set

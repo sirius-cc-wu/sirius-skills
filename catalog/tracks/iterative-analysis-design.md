@@ -25,15 +25,16 @@ paths. Once approved,
 preserve the accepted revision and outcome as the next iteration establishes a
 canonical feature, requirement, decision, or design owner.
 
-## Run One Iteration
+## Run Iterations
 
 Use
 [`run-development-iteration`](../../skills/run-development-iteration/SKILL.md)
-to execute exactly one approved, risk-sized iteration, including one separately
-authorized candidate from a UP roadmap. It fixes the source revision, selects
-one objective and exit evidence, coordinates only the needed specialists,
-validates the result, creates one commit when authorized, and stops before the
-next iteration.
+to execute one or more approved, risk-sized iterations, including a separately
+authorized candidate from a UP roadmap. By default, a request for one commit per
+iteration continues until the requested work is complete. An explicit request
+for one iteration uses single-iteration mode. Each iteration fixes its source
+revision, selects one objective and exit evidence, coordinates only the needed
+specialists, validates the result, and creates at most one authorized commit.
 
 Choose the narrowest specialist for each material question:
 
@@ -67,9 +68,10 @@ when a team explicitly wants an advisory roadmap containing at least two
 Unified Process iterations with phase intent, risk sequencing, exit evidence,
 and use-case-driven dependencies among selected artifacts. It does not execute
 or close an iteration. Hand one separately authorized ready candidate to
-`run-development-iteration`, which rechecks the current baseline and stops
-after that candidate. The roadmap is not blanket execution authority or a
-checklist for every feature or language. When it exposes a material choice
+`run-development-iteration`, which rechecks the current baseline. The roadmap
+is not blanket execution authority or a checklist for every feature or
+language. Use single-iteration mode for this handoff unless continuous execution
+is explicitly authorized. When it exposes a material choice
 among repository layouts, use
 [`design-repository-artifact-layout`](../../skills/design-repository-artifact-layout/SKILL.md)
 rather than coupling the choice to UP phases.
@@ -116,6 +118,7 @@ artifact bodies into the record.
 Write reader-facing artifacts in STE-style from the owning skill. Keep the
 artifact's meaning, lifecycle, evidence, identifiers, and traceability intact.
 
-One commit per iteration is an execution boundary, not permission to commit or
-push. Create the commit only when the user authorizes it, keep staging scoped,
-and stop after the commit. Push or publication requires separate authority.
+One commit per iteration is a commit boundary, not permission to commit or
+push. Create the commit only when the user authorizes it and keep staging scoped.
+In continuous mode, recheck the baseline before the next iteration. Push or
+publication requires separate authority.

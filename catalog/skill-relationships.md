@@ -204,8 +204,10 @@ evidence rules, stopping conditions, and selection examples.
 
 ## Iterative analysis and design
 
-`run-development-iteration` executes one approved, risk-sized objective. It
-stops after validation and one authorized commit. It selects the smallest
+`run-development-iteration` executes one or more approved, risk-sized
+objectives. When the user requests one commit per iteration, it continues by
+default until the requested work is complete. It validates each iteration and
+creates at most one authorized commit per iteration. It selects the smallest
 specialists that answer the current question.
 
 `plan-up-iterations` plans at least two explicitly UP-framed candidates. The

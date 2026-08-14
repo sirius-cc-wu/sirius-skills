@@ -3,7 +3,7 @@
   "trigger": {
     "positive": [
       {
-        "prompt": "Promote this approved proposal revision into the canonical feature brief, complete one risk-sized analysis and design iteration, validate it, commit it, and stop",
+        "prompt": "Promote this approved idea revision into the canonical feature brief, complete one risk-sized analysis and design iteration, validate it, commit it, and stop",
         "top_k": 3
       },
       {
@@ -16,6 +16,10 @@
       },
       {
         "prompt": "Execute only the next authorized elaboration candidate from this UP roadmap, recheck its assumptions, validate it, commit once, and stop.",
+        "top_k": 3
+      },
+      {
+        "prompt": "Run this feature with one authorized commit per iteration until the requested outcome is complete; stop only for blockers or failed validation.",
         "top_k": 3
       }
     ],
@@ -36,11 +40,11 @@
   },
   "evals": [
     {
-      "id": "approved-proposal-single-iteration",
+      "id": "approved-idea-single-iteration",
       "prompt": "The idea at docs/ideas/session-boundary.md is approved at the current revision. Promote it into the canonical feature owner, run one question-driven design iteration suitable for the repository language, create one commit after validation, and stop.",
       "expected_output": "One approved, traceable iteration updates only justified canonical owners, uses specialists selected by the actual question and language forces, validates the result, creates one authorized commit, and stops.",
       "expectations": [
-        "The accepted proposal revision, one objective, non-goals, and exit evidence bound the iteration",
+        "The accepted idea revision, one objective, non-goals, and exit evidence bound the iteration",
         "Artifact and specialist selection follows current questions rather than a mandatory object-oriented sequence",
         "The result stops after one scoped validated commit and names residual risk"
       ],

@@ -1,4 +1,4 @@
 interface:
   display_name: "Run Development Iteration"
-  short_description: "Run one risk-sized development iteration"
-  default_prompt: "Use $run-development-iteration to run one risk-sized iteration and stop after its authorized commit."
+  short_description: "Run risk-sized development iterations"
+  default_prompt: "Use $run-development-iteration to run risk-sized iterations with one authorized commit per iteration and continue until the work is complete unless the user requests one iteration."
