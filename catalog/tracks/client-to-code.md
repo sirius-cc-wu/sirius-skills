@@ -46,5 +46,5 @@ Coding agents receive validated decisions plus visible uncertainty. The
 briefing step must not make unresolved requirements appear settled or invent
 business rules, architecture, or acceptance criteria.
 
-See the [client-discovery proposal](../../docs/proposals/client-discovery-skills.md)
+See the [client-discovery idea](../../docs/ideas/client-discovery-skills.md)
 for the skill-family rationale and reference material.

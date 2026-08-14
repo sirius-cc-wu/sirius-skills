@@ -132,7 +132,7 @@ its next Sirius owner is unclear. These external skills are not installed by
 Sirius profiles.
 
 `author-software-proposal` is retired. Existing legacy proposal artifacts
-remain valid at their historical paths. Use `idea-refine` for new candidate
+remain valid at their migrated paths. Use `idea-refine` for new candidate
 directions. Route current-system claims to reverse engineering, scope and
 feasibility to `inception`, stakeholder authority to the client-discovery
 skills, acceptance behavior to `behavior-driven-specification`, and placement
@@ -236,9 +236,7 @@ and judge calibration are opt-in and never run as part of normal validation.
 - `catalog/sources.md`: intellectual and repository provenance
 - `evals/`: deterministic routing cases and opt-in behavioral evaluation data
 - `docs/shared/`: canonical references copied into self-contained skills
-- `docs/ideas/`: candidate-direction one-pagers from the `idea-refine`
-  workflow
-- `docs/proposals/`: legacy Sirius proposals, implementation rationale, and
+- `docs/ideas/`: candidate-direction documents, implementation rationale, and
   historical iteration records
 - `scripts/validate_skills.sh`: catalog and collection validation
 - `src/sirius_skills/commands/sync_shared_references.py`: packaging helper

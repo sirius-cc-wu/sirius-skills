@@ -42,13 +42,13 @@ handoffs, not a live-client end-to-end acceptance test.
 
 ## Artifact Budget
 
-- create: `docs/proposals/iterations/client-discovery-integration-e4.md` - one
+- create: `docs/ideas/iterations/client-discovery-integration-e4.md` - one
   historical record should own the final comparison baseline, perspective
   matrix, discrepancies, evidence, and residual limits.
-- update: `docs/proposals/client-discovery-skills.md` and
-  `docs/proposals/README.md` - their lifecycle and future-tense language drifted
+- update: `docs/ideas/client-discovery-skills.md` and
+  `docs/ideas/README.md` - their lifecycle and future-tense language drifted
   after the three skills became active.
-- update: `skills/implementation-slice-briefing/SKILL.md` - the proposal's
+- update: `skills/implementation-slice-briefing/SKILL.md` - the idea's
   publication safeguard was only implicit at the final handoff.
 - keep with implementation: `tests/test_client_discovery_handoffs.py` and the
   existing routing and behavioral cases - executable contract checks belong
@@ -66,7 +66,7 @@ handoffs, not a live-client end-to-end acceptance test.
   - `f1dc9a7` - stakeholder evidence elicitation
   - `27f2e04` - requirements synthesis and validation
   - `a533a86` - implementation slice briefing
-- Intended design: `docs/proposals/client-discovery-skills.md`
+- Intended design: `docs/ideas/client-discovery-skills.md`
 - Active composition: `catalog/tracks/client-to-code.md`
 - Catalog and packaging: `catalog/skills.md`, `catalog/sources.md`, and
   `skill-sets/{all,iterative-design,applying-uml-and-patterns}.txt`

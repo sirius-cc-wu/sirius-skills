@@ -57,7 +57,7 @@ claiming sufficient coverage.
 
 ## Artifact Budget
 
-- create: `docs/proposals/iterations/client-discovery-elicitation-e1.md` -
+- create: `docs/ideas/iterations/client-discovery-elicitation-e1.md` -
   future skill authors and reviewers need a historical record of the selected
   risk, scope, exit criteria, and results; the canonical proposal cannot own
   iteration closure independently.
@@ -68,7 +68,7 @@ claiming sufficient coverage.
   `evals/cases/stakeholder-requirements-elicitation.json` and a disposable
   `evals/fixtures/stakeholder-discovery/` fixture - routing and behavioral
   claims belong with executable evaluation evidence.
-- update: `docs/proposals/client-discovery-skills.md` and
+- update: `docs/ideas/client-discovery-skills.md` and
   `catalog/tracks/client-to-code.md` - refine the canonical direction and
   handoff only when iteration evidence changes them.
 - update: `catalog/skills.md`, `skill-sets/all.txt`, the smallest applicable
@@ -96,16 +96,16 @@ claiming sufficient coverage.
 
 ## Artifacts to Refine
 
-- Client discovery proposal:
-  `docs/proposals/client-discovery-skills.md` - refine only when observed skill
+- Client discovery idea:
+  `docs/ideas/client-discovery-skills.md` - refine only when observed skill
   behavior changes a responsibility, evidence field, safeguard, or handoff.
 - Client-to-code track: `catalog/tracks/client-to-code.md` - refine only when the
   normal handoff differs from the proposed sequence.
 
 ## Artifacts Consulted
 
-- Client discovery proposal:
-  `docs/proposals/client-discovery-skills.md`
+- Client discovery idea:
+  `docs/ideas/client-discovery-skills.md`
 - Agent-skill repository comparison:
   `catalog/agent-skill-repository-structures.md`
 - Recovery evidence vocabulary:

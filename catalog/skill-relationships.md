@@ -84,9 +84,10 @@ the direction is already focused.
 
 Use `idea-refine` for a candidate direction. Save the confirmed
 one-pager in `docs/ideas/` or a feature path defined by local governance. Do not
-create a new proposal artifact. Preserve existing legacy proposals at their
-historical paths. Requester confirmation is not organizational approval. Use
-the dashed edge to `assess-development-input` only when the artifact's next
+create a second candidate artifact. Preserve existing migrated candidate
+documents at their paths. Requester confirmation is not organizational
+approval. Use the dashed edge to `assess-development-input` only when the
+artifact's next
 Sirius owner is unclear.
 
 The Sirius groups are navigation aids. They are not installation profiles or
@@ -452,7 +453,7 @@ implementation brief for them.
 
 The [Client to Code track](tracks/client-to-code.md) is the active handoff
 guide. The
-[client-discovery proposal](../docs/proposals/client-discovery-skills.md)
+[client-discovery idea](../docs/ideas/client-discovery-skills.md)
 records the skill-family rationale and implementation history.
 
 The [workflow tracks](tracks/) define when to select each skill.

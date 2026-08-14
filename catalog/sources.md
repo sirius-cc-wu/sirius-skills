@@ -37,7 +37,7 @@ has not been materially distilled into a deployable skill.
 |---|---|---|
 | Teresa Torres, *Continuous Discovery Habits* | A possible future continuous-discovery skill | Outcomes, recurring interviews, opportunities, assumptions, and experiments |
 
-See the [client-discovery proposal](../docs/proposals/client-discovery-skills.md)
+See the [client-discovery idea](../docs/ideas/client-discovery-skills.md)
 for the implemented boundaries, design rationale, and full reference links.
 
 ## Provenance Rules

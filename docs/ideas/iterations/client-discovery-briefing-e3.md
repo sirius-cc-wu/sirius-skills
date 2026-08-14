@@ -56,7 +56,7 @@ The skill should:
 
 ## Artifact Budget
 
-- create: `docs/proposals/iterations/client-discovery-briefing-e3.md` - the
+- create: `docs/ideas/iterations/client-discovery-briefing-e3.md` - the
   selected risk, readiness decisions, and results need a historical owner.
 - create: `skills/implementation-slice-briefing/SKILL.md` - no active skill owns
   slice selection, source-baseline freshness, and coding-agent handoff.
@@ -75,7 +75,7 @@ The skill should:
 
 ## Artifacts Consulted
 
-- Client discovery proposal and completed elicitation and synthesis records
+- Client discovery idea and completed elicitation and synthesis records
 - `requirements-synthesis-validation`, `use-case-modeling`,
   `operation-contracts`, `use-case-realization`, and
   `test-driven-implementation`

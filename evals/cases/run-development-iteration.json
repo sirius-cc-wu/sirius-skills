@@ -37,7 +37,7 @@
   "evals": [
     {
       "id": "approved-proposal-single-iteration",
-      "prompt": "The proposal at docs/proposals/session-boundary.md is approved at the current revision. Promote it into the canonical feature owner, run one question-driven design iteration suitable for the repository language, create one commit after validation, and stop.",
+      "prompt": "The idea at docs/ideas/session-boundary.md is approved at the current revision. Promote it into the canonical feature owner, run one question-driven design iteration suitable for the repository language, create one commit after validation, and stop.",
       "expected_output": "One approved, traceable iteration updates only justified canonical owners, uses specialists selected by the actual question and language forces, validates the result, creates one authorized commit, and stops.",
       "expectations": [
         "The accepted proposal revision, one objective, non-goals, and exit evidence bound the iteration",

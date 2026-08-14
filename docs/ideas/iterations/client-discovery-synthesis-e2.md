@@ -57,7 +57,7 @@ The skill should:
 
 ## Artifact Budget
 
-- create: `docs/proposals/iterations/client-discovery-synthesis-e2.md` - future
+- create: `docs/ideas/iterations/client-discovery-synthesis-e2.md` - future
   maintainers need the selected risk, closure evidence, and disposition history
   without turning the canonical proposal into a status log.
 - create: `skills/requirements-synthesis-validation/SKILL.md` - no active skill
@@ -78,11 +78,11 @@ The skill should:
 
 ## Artifacts Consulted
 
-- Client discovery proposal:
-  `docs/proposals/client-discovery-skills.md`
+- Client discovery idea:
+  `docs/ideas/client-discovery-skills.md`
 - Elicitation skill and iteration record:
   `skills/stakeholder-requirements-elicitation/SKILL.md` and
-  `docs/proposals/iterations/client-discovery-elicitation-e1.md`
+  `docs/ideas/iterations/client-discovery-elicitation-e1.md`
 - Recovery evidence vocabulary:
   `skills/reverse-engineer-software-system/references/recovery-evidence.md`
 - Existing inception, use-case, domain, and artifact-selection guidance

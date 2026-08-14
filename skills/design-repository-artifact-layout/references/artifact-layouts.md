@@ -56,8 +56,8 @@ later artifact.
 
 ## Idea Placement
 
-Use `docs/ideas/` for new idea one-pagers. Preserve `docs/proposals/` for
-existing legacy Sirius proposals. Do not create new proposal artifacts. Preserve
+Use `docs/ideas/` for new and migrated candidate documents. Do not create a
+second candidate artifact for the same direction. Preserve
 the established path, index, and naming rule. When no convention exists, use
 the smallest placement that matches how reviewers find pending decisions:
 
