@@ -54,11 +54,12 @@ names that appear in both the ownership state and the retirement ledger.
 Cleanup by historical name alone requires the explicit legacy migration command.
 Old generic names can collide with skills from another repository.
 
-### Keep shared skills generic
+### Keep installed skills generic
 
-Do not hardcode company trackers, naming rules, or domain logic. Put
-repository-specific conventions in the nearest applicable `AGENTS.md`. Avoid a
-parallel convention-file control plane. Preserve a useful generic default.
+Skills under `skills/` are installed into other repositories. Keep them free of
+company-specific and consumer-repository-specific trackers, naming rules, and
+domain logic. Put those rules in the consuming repository's nearest
+`AGENTS.md`. Do not create a parallel convention-file control plane.
 
 ### Keep documentation aligned
 
