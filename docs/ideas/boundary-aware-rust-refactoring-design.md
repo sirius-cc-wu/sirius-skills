@@ -44,9 +44,10 @@ system boundary and preservation oracle
 
 When Rust ownership makes a proposed responsibility awkward or unsafe, return
 to responsibility design. When implementation changes a boundary or
-collaboration, reconcile the system design. A local seam is an enabling result;
-it is not the parent outcome unless a representative vertical scenario proves
-that outcome.
+collaboration, reconcile the system design. Completing a local abstraction
+boundary may finish the current iteration. Treat it as an enabling result, not
+completion of the parent outcome, until a representative end-to-end flow
+successfully uses that boundary.
 
 Keep `design-rust-lifecycles` as an implementation-facing specialist. Do not
 make it responsible for requirements or system analysis. Broaden responsibility
