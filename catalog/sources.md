@@ -34,7 +34,7 @@ the Sirius active catalog:
 
 | Source | Pinned revision | Installed names | Installation surface |
 |---|---|---|---|
-| Addy Osmani's [`agent-skills`](https://github.com/addyosmani/agent-skills/tree/5a1b82d6445d1e2f0abeea1072851419a50c0e5c) | `5a1b82d6445d1e2f0abeea1072851419a50c0e5c` | `interview-me`, `idea-refine`, `code-review-and-quality` | `just install all` only |
+| Addy Osmani's [`agent-skills`](https://github.com/addyosmani/agent-skills/tree/5a1b82d6445d1e2f0abeea1072851419a50c0e5c) | `5a1b82d6445d1e2f0abeea1072851419a50c0e5c` | `interview-me`, `idea-refine`, `code-review-and-quality` | `just install <target-project> all` or `just install-global all` only |
 
 ## Proposed Sources
 

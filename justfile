@@ -3,14 +3,56 @@
 set shell := ["bash", "-c"]
 
 repo_root := justfile_directory()
-common_flags := "--global --yes --agent github-copilot --agent codex --agent antigravity --agent antigravity-cli"
+agent_flags := "--yes --agent github-copilot --agent codex --agent antigravity --agent antigravity-cli"
 retired_ledger := repo_root / "catalog/retired-skills.tsv"
 addy_source := "https://github.com/addyosmani/agent-skills/archive/5a1b82d6445d1e2f0abeea1072851419a50c0e5c.tar.gz"
 addy_profile := repo_root / "catalog/external-skill-sets/addy-osmani.txt"
+addy_lock_source := "addyosmani/agent-skills"
+source_skills_dir := repo_root / "skills"
 
-# Install the workflow profile by default, or one named profile. The all
-# profile also installs the pinned external Addy add-on set.
-install skill_set="workflow": sync-shared-references
+# Install a source-linked profile into a target project by default.
+install target_dir skill_set="workflow": (install-local target_dir skill_set)
+
+# Install into a target project; all also installs the local Addy add-ons.
+install-local target_dir skill_set="workflow": sync-shared-references
+	#!/usr/bin/env bash
+	set -euo pipefail
+	target_dir={{quote(target_dir)}}
+	skill_set={{quote(skill_set)}}
+	skill_set_file="{{repo_root}}/skill-sets/${skill_set}.txt"
+	if [[ ! "$skill_set" =~ ^[a-z0-9][a-z0-9-]*$ || ! -f "$skill_set_file" ]]; then
+		echo "Unknown skill set: $skill_set" >&2
+		echo "Available skill sets:" >&2
+		find "{{repo_root}}/skill-sets" -maxdepth 1 -type f -name '*.txt' -printf '  %f\n' \
+			| sed 's/\.txt$//' \
+			| sort >&2
+		exit 1
+	fi
+	if [[ ! -d "$target_dir" ]]; then
+		echo "Target project is not a directory: $target_dir" >&2
+		exit 1
+	fi
+	target_dir=$(realpath -e -- "$target_dir")
+	target_skills_dir="$target_dir/.agents/skills"
+	just --justfile "{{repo_root}}/justfile" prune-retired-local "$target_dir"
+
+	env PYTHONPATH="{{repo_root}}/src" python3 -m sirius_skills.commands.manage_installed_skills \
+		link-profile --profile "$skill_set_file" \
+		--source-dir "{{source_skills_dir}}" --target-dir "$target_skills_dir"
+	if [[ "$skill_set" == "all" ]]; then
+		mapfile -t external_skills < <(sed -e '/^[[:space:]]*#/d' -e '/^[[:space:]]*$/d' "{{addy_profile}}")
+		external_skill_flags=()
+		for skill in "${external_skills[@]}"; do
+			external_skill_flags+=(--skill "$skill")
+		done
+		(
+			cd "$target_dir"
+			npx --yes skills add "{{addy_source}}" {{agent_flags}} "${external_skill_flags[@]}"
+		)
+	fi
+
+# Preserve the packaged global installation as an explicit command.
+install-global skill_set="workflow": sync-shared-references
 	#!/usr/bin/env bash
 	set -euo pipefail
 	skill_set={{quote(skill_set)}}
@@ -38,26 +80,40 @@ install skill_set="workflow": sync-shared-references
 	for skill in "${skills[@]}"; do
 		skill_flags+=(--skill "$skill")
 	done
-	npx --yes skills add "{{repo_root}}" {{common_flags}} "${skill_flags[@]}"
+	npx --yes skills add "{{repo_root}}" --global {{agent_flags}} "${skill_flags[@]}"
 	if [[ "$skill_set" == "all" ]]; then
 		mapfile -t external_skills < <(sed -e '/^[[:space:]]*#/d' -e '/^[[:space:]]*$/d' "{{addy_profile}}")
 		external_skill_flags=()
 		for skill in "${external_skills[@]}"; do
 			external_skill_flags+=(--skill "$skill")
 		done
-		npx --yes skills add "{{addy_source}}" {{common_flags}} "${external_skill_flags[@]}"
+		npx --yes skills add "{{addy_source}}" --global {{agent_flags}} "${external_skill_flags[@]}"
 	fi
 	env PYTHONPATH="{{repo_root}}/src" python3 -m sirius_skills.commands.manage_installed_skills \
 		link-profile --profile "$combined_profile"
 	env PYTHONPATH="{{repo_root}}/src" python3 -m sirius_skills.commands.manage_installed_skills \
 		record-installed --profile "$combined_profile"
-
-# Compatibility alias for profile installation.
-install-packaged skill_set="workflow": (install skill_set)
+# Compatibility alias for the packaged global installation.
+install-packaged skill_set="workflow": (install-global skill_set)
 
 # Sync canonical shared references into self-contained skill packages.
 sync-shared-references:
 	env PYTHONPATH="{{repo_root}}/src" python3 -c 'from sirius_skills.commands.sync_shared_references import main; raise SystemExit(main([]))'
+
+# Remove retired target-project links that still point into this checkout.
+prune-retired-local target_dir:
+	#!/usr/bin/env bash
+	set -euo pipefail
+	target_dir={{quote(target_dir)}}
+	if [[ ! -d "$target_dir" ]]; then
+		echo "Target project is not a directory: $target_dir" >&2
+		exit 1
+	fi
+	target_dir=$(realpath -e -- "$target_dir")
+	target_skills_dir="$target_dir/.agents/skills"
+	env PYTHONPATH="{{repo_root}}/src" python3 -m sirius_skills.commands.manage_installed_skills \
+		unlink-retired --ledger "{{retired_ledger}}" --include-unowned \
+		--source-dir "{{source_skills_dir}}" --target-dir "$target_skills_dir"
 
 # Remove retired skills whose installation is recorded as owned by Sirius.
 prune-retired:
@@ -95,8 +151,40 @@ prune-retired-legacy:
 	env PYTHONPATH="{{repo_root}}/src" python3 -m sirius_skills.commands.manage_installed_skills \
 		forget-retired --ledger "{{retired_ledger}}"
 
-# Remove installed skills belonging to the selected profile.
-uninstall skill_set="workflow":
+# Remove a source-linked profile from a target project by default.
+uninstall target_dir skill_set="workflow": (uninstall-local target_dir skill_set)
+
+# Remove from a target project; all also removes the local Addy add-ons.
+uninstall-local target_dir skill_set="workflow":
+	#!/usr/bin/env bash
+	set -euo pipefail
+	target_dir={{quote(target_dir)}}
+	skill_set={{quote(skill_set)}}
+	skill_set_file="{{repo_root}}/skill-sets/${skill_set}.txt"
+	if [[ ! "$skill_set" =~ ^[a-z0-9][a-z0-9-]*$ || ! -f "$skill_set_file" ]]; then
+		echo "Unknown skill set: $skill_set" >&2
+		exit 1
+	fi
+	if [[ ! -d "$target_dir" ]]; then
+		echo "Target project is not a directory: $target_dir" >&2
+		exit 1
+	fi
+	target_dir=$(realpath -e -- "$target_dir")
+	target_skills_dir="$target_dir/.agents/skills"
+	just --justfile "{{repo_root}}/justfile" prune-retired-local "$target_dir"
+
+	if [[ "$skill_set" == "all" ]]; then
+		env PYTHONPATH="{{repo_root}}/src" python3 -m sirius_skills.commands.manage_installed_skills \
+			remove-locked-profile --profile "{{addy_profile}}" \
+			--lock "$target_dir/skills-lock.json" --skills-dir "$target_skills_dir" \
+			--source "{{addy_lock_source}}"
+	fi
+	env PYTHONPATH="{{repo_root}}/src" python3 -m sirius_skills.commands.manage_installed_skills \
+		unlink-profile --profile "$skill_set_file" \
+		--source-dir "{{source_skills_dir}}" --target-dir "$target_skills_dir"
+
+# Preserve owned global removal as an explicit command.
+uninstall-global skill_set="workflow":
 	#!/usr/bin/env bash
 	set -euo pipefail
 	skill_set={{quote(skill_set)}}
@@ -128,9 +216,8 @@ uninstall skill_set="workflow":
 		unlink-profile --profile "$combined_profile"
 	env PYTHONPATH="{{repo_root}}/src" python3 -m sirius_skills.commands.manage_installed_skills \
 		forget-profile --profile "$combined_profile"
-
-# Compatibility alias for profile removal.
-uninstall-packaged skill_set="workflow": (uninstall skill_set)
+# Compatibility alias for packaged global removal.
+uninstall-packaged skill_set="workflow": (uninstall-global skill_set)
 
 # Validate all skills, profiles, catalogs, and collection-specific contracts.
 validate: eval-routing

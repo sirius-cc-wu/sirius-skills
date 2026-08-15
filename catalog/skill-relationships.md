@@ -79,9 +79,10 @@ implementation --> repository
 ```
 
 The gray nodes belong to Addy Osmani's external `agent-skills` collection. They
-are not part of the Sirius catalog or named profiles. `just install all` installs
-the three curated add-ons; other profiles do not. The diagram shows one
-optional composition. `interview-me` confirms one requester's intent.
+are not part of the Sirius catalog or named profiles.
+`just install <target-project> all` or `just install-global all` installs the
+three curated add-ons; other profiles do not. The diagram shows one optional
+composition. `interview-me` confirms one requester's intent.
 `idea-refine` turns that intent into a focused, user-confirmed candidate
 one-pager. Skip `interview-me` when intent is concrete. Skip `idea-refine` when
 the direction is already focused.

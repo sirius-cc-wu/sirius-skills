@@ -48,12 +48,13 @@ erase the tombstone.
 
 Profile files are the source of truth for active installation membership.
 Host-local managed-skill state is only an ownership receipt written after a
-successful installation. Do not treat it as another active profile.
+successful global installation. Do not treat it as another active profile.
 
-Normal install and uninstall operations may automatically remove only installed
-names that appear in both the ownership state and the retirement ledger.
-Cleanup by historical name alone requires the explicit legacy migration command.
-Old generic names can collide with skills from another repository.
+Global install and uninstall operations may automatically remove only installed
+names that appear in both the ownership state and the retirement ledger. Local
+cleanup may remove only links that still point into this checkout. Cleanup by
+historical name alone requires the explicit legacy migration command. Old
+generic names can collide with skills from another repository.
 
 ### Keep installed skills generic
 
@@ -102,15 +103,20 @@ Before changing behavior, read the nearest `README.md`, `SKILL.md`, and nested
 folder should contain its required `SKILL.md` and only the scripts, references,
 or assets that the skill needs.
 
-Use `just install` and `just uninstall` for the default workflow profile. Pass a
-profile name for another collection. `just install-packaged` and
-`just uninstall-packaged` are aliases with the same profile parameter.
+Use `just install <target-project>` and `just uninstall <target-project>` for a
+project-local default workflow profile. Pass a profile name as the second
+argument for another collection. `just install-local` and
+`just uninstall-local` are explicit aliases with the same parameters. Use
+`just install-global` and `just uninstall-global` for global installation.
+`just install-packaged` and `just uninstall-packaged` are compatibility aliases
+for the global commands with the same profile parameter.
 
 Profile files own installation and uninstallation membership. Do not add a
-parallel hard-coded managed-skill list. Use `just prune-retired` for
-ownership-verified cleanup. Use `just prune-retired-legacy` only after reviewing
-reported unowned names on a computer whose Sirius installation predates
-host-local ownership state.
+parallel hard-coded managed-skill list. Use
+`just prune-retired-local <target-project>` for safe project-link cleanup. Use
+`just prune-retired` for ownership-verified global cleanup. Use
+`just prune-retired-legacy` only after reviewing reported unowned names on a
+computer whose Sirius installation predates host-local ownership state.
 
 Use `apply_patch` for file edits. Preserve unrelated work in a dirty tree. Use
 `rg` for searches. Run verification proportional to the changed behavior.

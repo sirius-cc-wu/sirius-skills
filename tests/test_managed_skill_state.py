@@ -198,6 +198,79 @@ def test_unlink_retired_links_respects_ownership_by_default(tmp_path: Path) -> N
     assert not (target_dir / "design").is_symlink()
 
 
+def test_remove_locked_profile_removes_only_the_expected_source(
+    tmp_path: Path,
+) -> None:
+    profile_path = tmp_path / "external-profile.txt"
+    lock_path = tmp_path / "skills-lock.json"
+    skills_dir = tmp_path / ".agents/skills"
+    profile_path.write_text("interview-me\nidea-refine\n", encoding="utf-8")
+    lock_path.write_text(
+        json.dumps(
+            {
+                "version": 1,
+                "skills": {
+                    "interview-me": {"source": "addyosmani/agent-skills"},
+                    "idea-refine": {"source": "another/source"},
+                    "unrelated": {"source": "another/source"},
+                },
+            }
+        ),
+        encoding="utf-8",
+    )
+    for name in ("interview-me", "idea-refine", "unrelated"):
+        (skills_dir / name).mkdir(parents=True)
+        (skills_dir / name / "SKILL.md").write_text(name, encoding="utf-8")
+
+    manage_installed_skills.remove_locked_profile(
+        profile_path,
+        lock_path=lock_path,
+        skills_dir=skills_dir,
+        source="addyosmani/agent-skills",
+    )
+
+    assert not (skills_dir / "interview-me").exists()
+    assert (skills_dir / "idea-refine/SKILL.md").read_text() == "idea-refine"
+    assert (skills_dir / "unrelated/SKILL.md").read_text() == "unrelated"
+    remaining = json.loads(lock_path.read_text(encoding="utf-8"))["skills"]
+    assert set(remaining) == {"idea-refine", "unrelated"}
+
+
+def test_remove_locked_profile_validates_all_targets_before_removal(
+    tmp_path: Path,
+) -> None:
+    profile_path = tmp_path / "external-profile.txt"
+    lock_path = tmp_path / "skills-lock.json"
+    skills_dir = tmp_path / ".agents/skills"
+    profile_path.write_text("interview-me\nidea-refine\n", encoding="utf-8")
+    lock_path.write_text(
+        json.dumps(
+            {
+                "version": 1,
+                "skills": {
+                    "interview-me": {"source": "addyosmani/agent-skills"},
+                    "idea-refine": {"source": "addyosmani/agent-skills"},
+                },
+            }
+        ),
+        encoding="utf-8",
+    )
+    (skills_dir / "interview-me").mkdir(parents=True)
+    (skills_dir / "idea-refine").parent.mkdir(parents=True, exist_ok=True)
+    (skills_dir / "idea-refine").write_text("conflict", encoding="utf-8")
+
+    with pytest.raises(ValueError, match="not a directory or symlink"):
+        manage_installed_skills.remove_locked_profile(
+            profile_path,
+            lock_path=lock_path,
+            skills_dir=skills_dir,
+            source="addyosmani/agent-skills",
+        )
+
+    assert (skills_dir / "interview-me").is_dir()
+    assert (skills_dir / "idea-refine").is_file()
+
+
 @pytest.mark.parametrize(
     "line",
     [

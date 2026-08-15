@@ -9,19 +9,26 @@ catalog into a mandatory lifecycle.
 
 ## Install
 
-Install the three generic repository workflow skills by default:
+Install the three generic repository workflow skills into a target project by
+default:
 
 ```bash
-just install
+just install ~/Projects/sirius-say
 ```
 
-Install a named profile:
+Install a named profile into the same target project:
 
 ```bash
-just install iterative-design
-just install reverse-engineering
-just install all
+just install ~/Projects/sirius-say iterative-design
+just install ~/Projects/sirius-say reverse-engineering
+just install ~/Projects/sirius-say all
 ```
+
+The target project must exist. The default command refreshes shared references
+and creates source links under `<target-project>/.agents/skills/`. Changes in
+this repository's `skills/` directory are therefore available in the target
+without a global reinstall. `just install-local` is an explicit alias with the
+same target-project and optional-profile parameters.
 
 Available profiles are defined in [`skill-sets/`](skill-sets/):
 
@@ -36,31 +43,49 @@ Available profiles are defined in [`skill-sets/`](skill-sets/):
 Remove the default or a named profile later:
 
 ```bash
-just uninstall
-just uninstall iterative-design
+just uninstall ~/Projects/sirius-say
+just uninstall ~/Projects/sirius-say iterative-design
 ```
 
-The `install-packaged` and `uninstall-packaged` aliases accept the same optional
-profile. Installation refreshes shared references from the checkout and uses
-`npx --yes skills` so the CLI can bootstrap noninteractively for GitHub Copilot,
-Codex, Antigravity, and Antigravity CLI. The upstream CLI stores these shared
-global skills in `~/.agents/skills`, while Antigravity CLI discovers global
-skills in `~/.gemini/config/skills`. Installation therefore creates a
-per-skill compatibility symlink in the Antigravity directory without replacing
-unrelated entries already there. Uninstall and retired-skill cleanup remove
-only symlinks that still point to their expected canonical installation.
+`just uninstall-local` is an explicit alias for the default removal.
+Uninstallation removes only target-project links that still point into this
+checkout.
 
-`just install all` also installs the three skills listed in
+Use the explicit global commands when the skills must be available outside
+this project:
+
+```bash
+just install-global
+just install-global iterative-design
+just uninstall-global
+just uninstall-global iterative-design
+```
+
+The `install-packaged` and `uninstall-packaged` compatibility aliases retain
+the global behavior and accept the same optional profile. Global installation
+uses `npx --yes skills` so the CLI can bootstrap noninteractively for GitHub
+Copilot, Codex, Antigravity, and Antigravity CLI. The upstream CLI stores the
+shared global skills in `~/.agents/skills`, while Antigravity CLI discovers
+global skills in `~/.gemini/config/skills`. Global installation therefore
+creates a per-skill compatibility link in the Antigravity directory without
+replacing unrelated entries. Global uninstallation and retired-skill cleanup
+remove only links that still point to their expected canonical installation.
+
+`just install <target-project> all` also installs the three skills listed in
 [`catalog/external-skill-sets/addy-osmani.txt`](catalog/external-skill-sets/addy-osmani.txt)
 from Addy Osmani's pinned agent-skills revision. They remain external to the
 Sirius catalog and are not installed by other profiles. The external install
-uses the same global (`--global`) scope as Sirius skills. `just uninstall all`
-removes and unlinks the same external names.
+uses the target project's scope for `just install <target-project> all` and
+global scope for
+`just install-global all`. The matching uninstall command removes the same
+external names. Local removal requires the target's `skills-lock.json` entry to
+identify `addyosmani/agent-skills`, so a same-named skill from another source
+is preserved.
 
-A successful installation also records its skill names in host-local state at
-`$XDG_STATE_HOME/sirius-skills/managed-skills.txt`, or
+A successful global installation also records its skill names in host-local
+state at `$XDG_STATE_HOME/sirius-skills/managed-skills.txt`, or
 `~/.local/state/sirius-skills/managed-skills.txt` when `XDG_STATE_HOME` is not
-set.
+set. Local source links do not use this global ownership state.
 
 ## Skill lifecycle and retired installations
 
@@ -70,9 +95,16 @@ surfaces and appended to the [retirement ledger](catalog/retired-skills.tsv).
 The ledger records retired local skills recovered from Git history and later
 catalog retirements. External skills installed alongside Sirius are excluded.
 
-Every normal install and uninstall first prunes installed skill names that are
-both in the retirement ledger and in this computer's Sirius ownership state.
-You can run that safe cleanup directly:
+Every local install and uninstall first removes retired links that still point
+into this checkout. Run that cleanup directly with:
+
+```bash
+just prune-retired-local ~/Projects/sirius-say
+```
+
+Every global install and uninstall first prunes installed names that are both
+in the retirement ledger and in this computer's Sirius ownership state. Run
+that safe global cleanup directly with:
 
 ```bash
 just prune-retired
@@ -135,9 +167,9 @@ Choose one candidate-direction artifact. Use `docs/ideas/` for an idea
 one-pager from `idea-refine`. Use a feature path only when local governance
 defines it. Do not create a new proposal artifact. The result remains candidate
 input, not organizational approval. Use `assess-development-input` only when
-its next Sirius owner is unclear. `just install all` provides these two skills
-as external add-ons; they are not Sirius catalog entries or named-profile
-members.
+its next Sirius owner is unclear. `just install <target-project> all` or
+`just install-global all` provides these two skills as external add-ons; they
+are not Sirius catalog entries or named-profile members.
 
 `author-software-proposal` is retired. Existing legacy proposal artifacts
 remain valid at their migrated paths. Use `idea-refine` for new candidate

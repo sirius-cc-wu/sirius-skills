@@ -4,6 +4,7 @@ import argparse
 import json
 import os
 import re
+import shutil
 import sys
 import tempfile
 from dataclasses import dataclass
@@ -163,6 +164,72 @@ def forget_retired(ledger_path: Path, state_path: Path) -> None:
     forget_names((entry.name for entry in read_retirements(ledger_path)), state_path)
 
 
+def remove_locked_profile(
+    profile_path: Path,
+    *,
+    lock_path: Path,
+    skills_dir: Path,
+    source: str,
+) -> None:
+    if not lock_path.exists():
+        return
+    if lock_path.is_symlink():
+        raise ValueError(f"project skill lock must not be a symlink: {lock_path}")
+
+    lock_data = json.loads(lock_path.read_text(encoding="utf-8"))
+    if not isinstance(lock_data, dict) or not isinstance(
+        lock_data.get("skills"), dict
+    ):
+        raise ValueError("project skill lock must contain a skills object")
+
+    entries = lock_data["skills"]
+    selected: list[tuple[str, Path]] = []
+    for name in sorted(read_name_file(profile_path)):
+        entry = entries.get(name)
+        if entry is None:
+            continue
+        if not isinstance(entry, dict):
+            raise ValueError(f"project skill lock entry must be an object: {name}")
+        if entry.get("source") != source:
+            continue
+
+        target = skills_dir / name
+        if target.is_symlink() or target.is_dir() or not target.exists():
+            selected.append((name, target))
+            continue
+        raise ValueError(
+            f"locked target skill is not a directory or symlink: {target}"
+        )
+
+    if not selected:
+        return
+
+    for name, _target in selected:
+        entries.pop(name)
+
+    temporary_path: Path | None = None
+    try:
+        with tempfile.NamedTemporaryFile(
+            mode="w",
+            encoding="utf-8",
+            dir=lock_path.parent,
+            prefix=f".{lock_path.name}.",
+            delete=False,
+        ) as temporary:
+            temporary.write(json.dumps(lock_data, indent=2) + "\n")
+            temporary_path = Path(temporary.name)
+
+        for _name, target in selected:
+            if target.is_symlink():
+                target.unlink()
+            elif target.is_dir():
+                shutil.rmtree(target)
+        temporary_path.replace(lock_path)
+    finally:
+        if temporary_path is not None and temporary_path.exists():
+            temporary_path.unlink()
+
+
 def link_points_to(path: Path, expected_target: Path) -> bool:
     if not path.is_symlink():
         return False
@@ -187,22 +254,22 @@ def link_names(
     if skill_roots_are_equivalent(source_dir, target_dir):
         return
     if target_dir.is_symlink() and not target_dir.is_dir():
-        raise ValueError(f"Antigravity skill directory is a broken link: {target_dir}")
+        raise ValueError(f"target skill directory is a broken link: {target_dir}")
     if target_dir.exists() and not target_dir.is_dir():
-        raise ValueError(f"Antigravity skill directory is not a directory: {target_dir}")
+        raise ValueError(f"target skill directory is not a directory: {target_dir}")
 
     links_to_create: list[tuple[Path, Path]] = []
     for name in normalized:
         source = source_dir / name
         target = target_dir / name
         if not source.is_dir():
-            raise ValueError(f"canonical skill directory is missing: {source}")
+            raise ValueError(f"source skill directory is missing: {source}")
         if target.is_symlink():
             if link_points_to(target, source):
                 continue
-            raise ValueError(f"refusing to replace existing Antigravity skill: {target}")
+            raise ValueError(f"refusing to replace existing target skill: {target}")
         if target.exists():
-            raise ValueError(f"refusing to replace existing Antigravity skill: {target}")
+            raise ValueError(f"refusing to replace existing target skill: {target}")
         links_to_create.append((source, target))
 
     target_dir.mkdir(parents=True, exist_ok=True)
@@ -271,21 +338,21 @@ def add_skill_dir_arguments(parser: argparse.ArgumentParser) -> None:
         "--source-dir",
         type=Path,
         default=default_canonical_skills_dir(),
-        help="canonical global skill directory (default: %(default)s)",
+        help="source skill directory (default: %(default)s)",
     )
     parser.add_argument(
         "--target-dir",
         type=Path,
         default=default_antigravity_skills_dir(),
-        help="Antigravity global skill directory (default: %(default)s)",
+        help="target skill directory (default: %(default)s)",
     )
 
 
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
         description=(
-            "Track Sirius-installed skills, expose them to Antigravity, and select "
-            "retired installations safely."
+            "Track Sirius-installed skills, manage skill-directory links, and "
+            "select retired installations safely."
         )
     )
     parser.add_argument(
@@ -307,20 +374,29 @@ def build_parser() -> argparse.ArgumentParser:
     )
     record_parser.add_argument("--profile", type=Path, required=True)
 
+    remove_locked_parser = subparsers.add_parser(
+        "remove-locked-profile",
+        help="remove project skills owned by one lock-file source",
+    )
+    remove_locked_parser.add_argument("--profile", type=Path, required=True)
+    remove_locked_parser.add_argument("--lock", type=Path, required=True)
+    remove_locked_parser.add_argument("--skills-dir", type=Path, required=True)
+    remove_locked_parser.add_argument("--source", required=True)
+
     link_profile_parser = subparsers.add_parser(
-        "link-profile", help="expose an installed profile to Antigravity"
+        "link-profile", help="link a profile into a target skill directory"
     )
     link_profile_parser.add_argument("--profile", type=Path, required=True)
     add_skill_dir_arguments(link_profile_parser)
 
     unlink_profile_parser = subparsers.add_parser(
-        "unlink-profile", help="remove a profile's Antigravity compatibility links"
+        "unlink-profile", help="remove a profile's managed target links"
     )
     unlink_profile_parser.add_argument("--profile", type=Path, required=True)
     add_skill_dir_arguments(unlink_profile_parser)
 
     unlink_retired_parser = subparsers.add_parser(
-        "unlink-retired", help="remove retired Antigravity compatibility links"
+        "unlink-retired", help="remove retired managed target links"
     )
     unlink_retired_parser.add_argument("--ledger", type=Path, required=True)
     unlink_retired_parser.add_argument("--include-unowned", action="store_true")
@@ -364,6 +440,13 @@ def main(argv: Sequence[str] | None = None) -> int:
                 )
         elif args.command == "record-installed":
             record_installed(args.profile, args.state)
+        elif args.command == "remove-locked-profile":
+            remove_locked_profile(
+                args.profile,
+                lock_path=args.lock,
+                skills_dir=args.skills_dir,
+                source=args.source,
+            )
         elif args.command == "link-profile":
             link_profile(
                 args.profile,
