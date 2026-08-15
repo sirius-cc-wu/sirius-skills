@@ -212,7 +212,11 @@ The iterative-design collection uses
 `iterative-risk-driven-development` for approved, risk-sized objectives. It
 selects requirements, analysis, native responsibility, design, language,
 implementation, verification, and optional Rust lifecycle specialists from the
-current question and implementation forces. For boundary-sensitive
+current question and implementation forces. It rechecks the canonical owner,
+revision, lifecycle status, and authority of material intent when enabling
+evidence gains reuse or a new consumer. Code, tests, observations, and
+historical iteration records remain evidence until an owning requirements or
+design specialist validates their intended status. For boundary-sensitive
 refactorings, it retains the system boundary, representative vertical scenario,
 native responsibilities, ownership consequences, verification ownership, and
 parent completion boundary before implementation. It evolves canonical
@@ -232,6 +236,11 @@ record. Artifact selection and its detailed budget live in
 `design-repository-artifact-layout`; Markdown frontmatter guidance remains a
 reference owned by `iterative-risk-driven-development`, and artifact prose
 uses STE-style.
+
+When a justified standalone artifact lacks a clear home or the repository has
+no usable placement guide, artifact-layout design derives the smallest home
+from local evidence. Missing guidance does not require a layout document,
+generic taxonomy, or empty directory tree.
 
 The optional analysis and object-design skills distill workflows from Craig
 Larman's *Applying UML and Patterns*. GRASP responsibility design also accepts

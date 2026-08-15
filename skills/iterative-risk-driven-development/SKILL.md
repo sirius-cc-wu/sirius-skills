@@ -1,6 +1,6 @@
 ---
 name: iterative-risk-driven-development
-description: Coordinates approved, risk-sized development iterations across analysis, native responsibility design, implementation, and verification. Preserves system boundaries during complex refactoring, selects Rust ownership design when required, distinguishes enabling seams from parent outcomes, validates each result, and creates at most one authorized commit per iteration. Use when a feature or boundary-sensitive refactoring needs coordinated progress or one commit per iteration until the requested work is complete.
+description: Coordinates approved, risk-sized development iterations across analysis, native responsibility design, implementation, and verification. Rechecks canonical knowledge ownership and promotion as enabling evidence gains reuse, preserves system boundaries during complex refactoring, selects Rust ownership design when required, validates each result, and creates at most one authorized commit per iteration. Use when a feature or boundary-sensitive refactoring needs coordinated progress or one commit per iteration until the requested work is complete.
 ---
 
 # Iterative Risk-Driven Development
@@ -44,18 +44,28 @@ mandatory artifact sequence, programming paradigm, or phase checklist.
    approved source, revision, lifecycle state, requested outcome, non-goals,
    current branch, and unrelated workspace changes. Do not promote candidate
    intent or absorb unrelated work.
-2. **Choose one objective.** State one behavior, decision, risk, or learning
+2. **Confirm canonical knowledge ownership.** For every material behavior,
+   rule, constraint, quality, or decision needed by the iteration, identify its
+   current canonical owner, revision, lifecycle status, and approving
+   authority. Treat code, tests, runtime observations, and historical iteration
+   records as evidence, not approved intent. If material input exists only in
+   those sources, an inception or idea is being used beyond its approved
+   boundary, or readiness and the correct owner are unclear, stop and use
+   `assess-development-input`. Use `requirements-synthesis-validation` when a
+   bounded evidence set exists but its implications, conflicts, or decision
+   status need stakeholder-visible validation.
+3. **Choose one objective.** State one behavior, decision, risk, or learning
    question and its exit evidence. Name the approved parent outcome and state
    whether this iteration can close it or only enable later work. Keep the
    objective small enough for one coherent commit.
-3. **Select the narrowest owners.** Route each material question to an existing
+4. **Select the narrowest owners.** Route each material question to an existing
    specialist. Use requirements, recovery, analysis, and design skills for
    product intent and system understanding. Use
    `grasp-responsibility-design` when native responsibility or dependency
    placement is unclear. Use `test-driven-implementation` for bounded behavior
    and `behavior-preserving-refactoring` for verified structural improvement.
    Prefer one localized specialist when no coordination remains.
-4. **Apply the boundary-sensitive refactoring gate.** When the change creates
+5. **Apply the boundary-sensitive refactoring gate.** When the change creates
    or moves a material test seam, composition root, backend, entrypoint,
    process-global dependency, runtime task, resource owner, readiness
    condition, or cleanup boundary, establish the system boundary,
@@ -64,40 +74,51 @@ mandatory artifact sequence, programming paradigm, or phase checklist.
    implementation. Select recovery when current behavior or architecture is
    unclear. Do not treat the `refactoring` label as evidence that this design
    context is unnecessary.
-5. **Budget artifacts.** Apply
+6. **Budget artifacts and locate justified owners.** Apply
    [Artifact Selection Budget](../select-technical-artifacts/references/artifact-selection-budget.md).
    Prefer code, tests, configuration, an existing canonical artifact, or an
    embedded section. Create a standalone artifact only when its value, owner,
-   and independent lifecycle are clear.
-6. **Select Rust lifecycle design when needed.** If the target is Rust and
+   and independent lifecycle are clear. Inspect repository governance and
+   actual artifact homes before assigning a path. When a justified standalone
+   artifact has no clear canonical home, several paths compete, or the
+   repository has no usable placement convention, use
+   `design-repository-artifact-layout`. Do not create a layout document or
+   speculative directory tree merely because no guide exists.
+7. **Select Rust lifecycle design when needed.** If the target is Rust and
    ownership, capability transfer, startup, rollback, cancellation,
    supervision, or cleanup affects the objective, use
    [Design Rust Lifecycles](../design-rust-lifecycles/SKILL.md). Treat its result
    as part of the current iteration. Do not use it as a substitute for missing
    system-boundary, responsibility, or verification decisions.
-7. **Execute the selected work.** Read and follow every selected specialist
+8. **Execute the selected work.** Read and follow every selected specialist
    skill. Keep all work tied to the objective. Stop if missing approval,
    product rules, compatibility decisions, design context required by the
    boundary-sensitive gate, or a verification oracle would require invention.
-8. **Reconcile durable knowledge.** Feed discoveries back only when they change
+9. **Reconcile durable knowledge and promotion pressure.** Feed discoveries
+   back only when they change
    knowledge owned by a canonical requirement, design, decision, test, schema,
    or configuration artifact. Preserve idea and decision history. Do not
-   silently rewrite it. Use `record-architecture-decision` only when one
+   silently rewrite it. Reapply artifact selection and the appropriate owning
+   specialist when a later iteration reuses an enabling behavior, a second
+   consumer appears, durable user-visible rules accumulate in code, tests, or
+   iteration history, or an approved source is stretched beyond its non-goals.
+   Promote evidence into current intended knowledge only with matching
+   authority and validation. Use `record-architecture-decision` only when one
    authoritative, consequential architecture choice needs an independent
    proposed, accepted, or superseding lifecycle.
-9. **Validate exit evidence.** Run repository-required and changed-scope
+10. **Validate exit evidence.** Run repository-required and changed-scope
    checks. Retain the representative end-to-end oracle when a local seam or
    component check is the current result. Distinguish completed evidence from
    human-owned or unavailable validation. Do not close the parent outcome or
    commit an iteration when its stated exit evidence failed.
-10. **Simplify changed code.** If source or test code changed, use
+11. **Simplify changed code.** If source or test code changed, use
     [Simplify](../simplify/SKILL.md) within the iteration scope. Rerun the
     affected validation.
-11. **Commit once per iteration when authorized.** If the user authorized a
+12. **Commit once per iteration when authorized.** If the user authorized a
     commit, use [Commit](../commit/SKILL.md) with scoped staging. Create at most
     one commit for the current iteration. Do not amend, push, or publish without
     matching authority.
-12. **Apply the execution mode.** In single-iteration mode, report the
+13. **Apply the execution mode.** In single-iteration mode, report the
     objective, canonical changes, validation, commit, and residual risk, then
     stop. In continuous mode, report the current result, choose the next
     objective, and continue until the requested work or an explicit stop
@@ -219,11 +240,21 @@ deferred or changed after the objective was defined.
 ## Red Flags
 
 - The iteration starts without approved authority or a fixed source baseline.
+- Material intent has no current canonical owner, revision, lifecycle status,
+  or approving authority.
+- Code, tests, observations, or historical iteration records silently become
+  approved product intent.
+- An inception, idea, or enabling proof is reused beyond its approved boundary
+  without reassessing ownership and promotion pressure.
 - Several objectives are combined into one commit.
 - A mandatory artifact chain or programming paradigm is imposed.
 - All artifacts are created at full detail before risk is understood.
 - A standalone document has no durable decision, named consumer, material risk,
   or independent lifecycle.
+- A new artifact path or directory is invented without inspecting local
+  conventions or routing a material placement gap to artifact-layout design.
+- A missing layout guide triggers a generic taxonomy, empty directory tree, or
+  standalone layout document without a justified artifact and consumer.
 - Object design starts from a domain model without behavior or system events.
 - A boundary-sensitive refactoring proceeds without a preserved system
   scenario, native responsibility assignment, or verification boundary.
@@ -242,6 +273,9 @@ deferred or changed after the objective was defined.
 
 - [ ] Authority, source revision, lifecycle state, requested outcome, and
       non-goals are fixed.
+- [ ] Every material behavior, rule, constraint, quality, and decision has a
+      current canonical owner, revision, lifecycle status, and authority, or
+      the iteration stopped at the correct readiness or validation handoff.
 - [ ] One objective and its exit evidence bound each iteration.
 - [ ] The approved parent outcome and current completion boundary are explicit.
 - [ ] Selected specialists match the actual questions or implementation forces.
@@ -253,7 +287,11 @@ deferred or changed after the objective was defined.
 - [ ] No language, programming paradigm, phase, or artifact chain was assumed.
 - [ ] Every new standalone artifact passes the value, ownership, and lifecycle
       gate.
+- [ ] Justified artifact paths follow repository governance and established
+      homes, or a material placement gap was routed to artifact-layout design.
 - [ ] Durable knowledge changed only in its canonical owner.
+- [ ] Reuse, new consumers, accumulated durable rules, and stretched non-goals
+      triggered a fresh promotion check where material.
 - [ ] Required validation passed, or human-owned checks remain explicit.
 - [ ] Focused checks did not displace a material integration or end-to-end
       oracle, and enabling results were not reported as the parent outcome.

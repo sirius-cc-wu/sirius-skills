@@ -21,6 +21,10 @@
       {
         "prompt": "Refactor this complex Rust test environment without losing the system boundary. Assign module and task responsibilities, design resource ownership, preserve the end-to-end oracle, and distinguish enabling seams from the parent outcome.",
         "top_k": 3
+      },
+      {
+        "prompt": "Continue this approved feature after several enabling iterations. Recheck whether reusable behavior still has a current canonical owner, promote it only with authority, and choose a canonical path only after the artifact is justified.",
+        "top_k": 3
       }
     ],
     "negative": [
@@ -114,6 +118,26 @@
         }
       ],
       "trust_level": "fixture-backed"
+    },
+    {
+      "id": "promote-reused-enabling-behavior",
+      "prompt": "An approved inception authorized one child-process feasibility proof. Several later iterations added reusable worktree safety, write authorization, cancellation, cleanup, and review-boundary behavior, but those rules exist only in tests and historical iteration records. A new task-metadata consumer now depends on them, and the repository has no artifact placement guide. Choose the next risk-driven iteration and explain what must happen before more implementation.",
+      "expected_output": "A bounded requirements-readiness iteration that fixes the original authority boundary, treats executable and historical behavior as evidence rather than approval, selects the smallest current knowledge owner, and invokes artifact-layout design only if a justified standalone artifact lacks a canonical home.",
+      "expectations": [
+        "The original inception revision, approved feasibility boundary, later evidence, new consumer, and unresolved authority are explicit",
+        "Tests and iteration records remain evidence and do not silently become approved requirements",
+        "The coordinator routes unclear readiness to assess-development-input and bounded evidence needing stakeholder-visible decisions to requirements-synthesis-validation",
+        "Reuse, a new consumer, and accumulated durable behavior trigger artifact-selection and promotion reassessment",
+        "Artifact-layout design is selected only after a standalone owner is justified and no usable canonical home exists",
+        "Implementation stops until material product intent and approval are resolved"
+      ],
+      "prohibitions": [
+        "Do not invent approval for the later enabling behaviors",
+        "Do not create a mandatory requirements, design, or iteration-document chain",
+        "Do not create a generic documentation taxonomy or standalone layout guide merely because local guidance is absent",
+        "Do not continue implementation while the canonical intent owner and authority remain unresolved"
+      ],
+      "trust_level": "provisional"
     }
   ]
 }

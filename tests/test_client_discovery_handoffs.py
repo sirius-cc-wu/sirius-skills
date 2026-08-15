@@ -69,3 +69,34 @@ def test_behavioral_fixtures_exercise_adjacent_handoff_shapes() -> None:
     assert "### SRC-SPONSOR-ALPHA" in synthesis_input
     assert 'type: "Requirements Discovery Brief"' in briefing_input
     assert "Source evidence IDs:" in briefing_input
+
+
+def test_iterative_coordinator_preserves_intent_ownership_and_promotion() -> None:
+    iterative = read("skills/iterative-risk-driven-development/SKILL.md")
+    track = read("catalog/tracks/iterative-analysis-design.md")
+    normalized_iterative = " ".join(iterative.split())
+    normalized_track = " ".join(track.split())
+
+    for text in (
+        "Confirm canonical knowledge ownership",
+        "Treat code, tests, runtime observations, and historical iteration",
+        "assess-development-input",
+        "requirements-synthesis-validation",
+        "Reconcile durable knowledge and promotion pressure",
+        "a second consumer appears",
+        "design-repository-artifact-layout",
+        "Do not create a layout document",
+    ):
+        assert text in normalized_iterative
+
+    assert "Treat code, tests, observations, and historical iteration records as" in normalized_track
+    assert "Reapply artifact selection when enabling behavior gains reuse" in normalized_track
+
+
+def test_layout_skill_handles_missing_guidance_without_inventing_taxonomy() -> None:
+    layout = read("skills/design-repository-artifact-layout/SKILL.md")
+    normalized_layout = " ".join(layout.split())
+
+    assert "no explicit artifact guide or established convention" in normalized_layout
+    assert "absence of a layout guide" in normalized_layout
+    assert "generic" in normalized_layout

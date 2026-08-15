@@ -1,4 +1,4 @@
 interface:
   display_name: "Iterative Risk-Driven Development"
   short_description: "Run risk-driven development iterations"
-  default_prompt: "Use $iterative-risk-driven-development to run one risk-sized iteration at a time, select only the needed analysis, design, implementation, verification, and Rust lifecycle specialists, create at most one authorized commit per iteration, and continue until the work is complete unless the user requests one iteration."
+  default_prompt: "Use $iterative-risk-driven-development to run one risk-sized iteration at a time, confirm canonical knowledge ownership and promotion pressure, select only the needed specialists, validate the result, create at most one authorized commit per iteration, and continue until the work is complete unless the user requests one iteration."

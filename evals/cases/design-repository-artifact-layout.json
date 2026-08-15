@@ -13,6 +13,10 @@
       {
         "prompt": "Decide whether this flat feature document should remain one file or become a package of independently maintained requirements, analysis, and design artifacts.",
         "top_k": 3
+      },
+      {
+        "prompt": "This justified requirements brief needs a canonical repository home, but the project has no artifact-layout guide. Infer the smallest placement from repository evidence without creating a speculative taxonomy.",
+        "top_k": 3
       }
     ],
     "negative": [
@@ -34,12 +38,14 @@
       "expectations": [
         "The recommendation cites observed repository paths and distinguishes established conventions from incidental files",
         "Different artifact lifecycles receive clear canonical ownership without unnecessary directories",
+        "When no explicit guide exists, the recommendation derives the smallest layout from actual repository evidence rather than requiring a layout document",
         "One candidate direction uses one established ideas or proposals home unless distinct ownership and lifecycle justify both",
         "Any migration identifies affected links, indexes, stable identifiers, and historical records"
       ],
       "prohibitions": [
         "Do not create directories, move files, or rewrite artifact content",
         "Do not impose a generic taxonomy over a coherent established layout",
+        "Do not treat a missing guide as permission to create empty directories or a standalone layout document",
         "Do not create a standalone layout proposal without an independent owner and lifecycle"
       ],
       "trust_level": "provisional"

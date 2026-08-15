@@ -217,6 +217,12 @@ evolves canonical artifacts, validates each iteration, and creates at most one
 authorized commit per iteration. When the user requests one commit per
 iteration, it continues by default until the requested work is complete.
 
+Before each objective, it confirms the current canonical owner, revision,
+lifecycle status, and authority for material intent. Code, tests, observations,
+and historical iteration records remain evidence. Reuse, a new consumer, or a
+stretched approval boundary triggers a fresh readiness and artifact-promotion
+check before implementation continues.
+
 The coordinator can select requirements, analysis, native responsibility,
 optional object-design, implementation, verification, and Rust lifecycle
 specialists. It does not require a complete object-design chain. For a

@@ -137,14 +137,19 @@ existing rule owner.
    iterations. By default, one commit per iteration continues until the
    requested work is complete. Request one iteration explicitly when the run
    must stop after one commit.
-2. Use `stakeholder-requirements-elicitation` when the affected roles, current
+2. Confirm the canonical owner, revision, lifecycle status, and authority for
+   material behavior, rules, constraints, qualities, and decisions. Treat code,
+   tests, observations, and historical iteration records as evidence rather
+   than approved intent. Reassess promotion when enabling evidence gains reuse
+   or a new consumer.
+3. Use `stakeholder-requirements-elicitation` when the affected roles, current
    work, authority, or evidence coverage is unclear.
-3. Use `requirements-synthesis-validation` to turn an identified evidence set
+4. Use `requirements-synthesis-validation` to turn an identified evidence set
    into source-linked candidate requirements, concrete examples, and
    authority-aware validation states.
-4. Select requirements and analysis skills from the current uncertainty:
+5. Select requirements and analysis skills from the current uncertainty:
    scope, behavior, examples, vocabulary, system events, or state effects.
-5. Use `iterative-risk-driven-development` when an approved change needs
+6. Use `iterative-risk-driven-development` when an approved change needs
    risk-driven progress. Give each objective exit evidence and name whether it
    closes the parent outcome or enables later work. For a boundary-sensitive
    refactoring, retain the system boundary, representative vertical scenario,
@@ -153,7 +158,7 @@ existing rule owner.
    and Rust lifecycle design only when their questions or design forces are
    present. Delegate material repository placement to
    `design-repository-artifact-layout`.
-6. Use `software-design-language-adaptation` when implementation-facing design
+7. Use `software-design-language-adaptation` when implementation-facing design
    must reflect a target language. Use `grasp-responsibility-design` to assign
    behavior to native modules, functions, tasks, adapters, handles, types, or
    composition roots when responsibility or dependency placement is unclear.
@@ -162,10 +167,10 @@ existing rule owner.
    design problem. Do not use lifecycle design to replace missing system or
    responsibility decisions. Add future language specialists by demonstrated
    design pressure, not by completing a language matrix.
-7. Use `implementation-slice-briefing` when an unfamiliar implementer needs one
+8. Use `implementation-slice-briefing` when an unfamiliar implementer needs one
    ready vertical slice assembled from approved requirements, examples, design
    inputs, and revision-fixed repository facts.
-8. Use `test-driven-implementation` for behavior changes and
+9. Use `test-driven-implementation` for behavior changes and
    `behavior-preserving-refactoring` for verified local structural improvement.
    Return to coordinated design when a refactoring creates or moves a material
    test seam, backend, composition root, entrypoint, runtime owner, readiness

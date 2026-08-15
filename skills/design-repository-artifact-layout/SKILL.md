@@ -1,6 +1,6 @@
 ---
 name: design-repository-artifact-layout
-description: Designs or revises the smallest repository-specific layout for durable candidate directions, requirements, analysis, design, recovery, decision, iteration, and verification artifacts. Use when asked where technical artifacts should live, how canonical paths and indexes should be organized, whether a documentation structure should be split or consolidated, or how to migrate competing artifact homes while preserving links and history; use the artifact's owning skill when its content rather than its repository placement is the primary task.
+description: Designs or revises the smallest repository-specific layout for durable candidate directions, requirements, analysis, design, recovery, decision, iteration, and verification artifacts. Use when a justified artifact has no clear home or local placement guide, when asked where technical artifacts should live, how canonical paths and indexes should be organized, whether a documentation structure should be split or consolidated, or how to migrate competing artifact homes while preserving links and history; use the artifact's owning skill when its content rather than its repository placement is the primary task.
 ---
 
 # Design Repository Artifact Layout
@@ -18,6 +18,8 @@ authorizes those repository changes.
 
 - A candidate direction, requirement, analysis, design, recovery, decision,
   iteration, or verification artifact needs a canonical repository location.
+- A justified artifact needs placement but the repository has no explicit
+  artifact guide or established convention.
 - A repository has partial or competing documentation structures and needs a
   lifecycle-aware placement decision.
 - A flat artifact must be evaluated for promotion into independently maintained
@@ -111,6 +113,8 @@ recommendation visible.
 ## Red Flags
 
 - A generic preferred taxonomy replaces a coherent repository convention.
+- The absence of a layout guide is treated as permission to create a generic
+  taxonomy, empty directories, or a standalone layout document.
 - Directories are created for artifact kinds that have no current durable
   owner or independently changing content.
 - Current design knowledge is copied into iteration records or organized by UP
