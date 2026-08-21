@@ -6,7 +6,7 @@ current risk or complete the current behavior slice.
 
 ## Overview
 
-This diagram groups all 30 deployable Sirius skills by responsibility. It also
+This diagram groups all 31 deployable Sirius skills by responsibility. It also
 shows three external Addy add-ons. The diagram shows only
 the main movement between groups. Use the detailed diagrams below for
 conditional routes. Solid arrows show normal handoffs. They do not require a
@@ -51,7 +51,7 @@ rectangle "**Iterative Risk-Driven Development**\niterative-risk-driven-developm
 
 rectangle "**Implementation and Evolution**\ntest-driven-implementation\nbehavior-preserving-refactoring" as implementation #FFF5EA
 
-rectangle "**Repository Workflow**\nsimplify\ncommit\ncreate-pr" as repository #F3EEFF
+rectangle "**Repository Workflow**\nwalkthrough-me\nsimplify\ncommit\ncreate-pr" as repository #F3EEFF
 
 rectangle "**Cross-cutting Support**\nselect-technical-artifacts\ndesign-repository-artifact-layout\nrecord-architecture-decision" as support #FFFBEA
 
@@ -119,7 +119,8 @@ design.
   resource, or verification boundary.
 - Start with **Implementation and Evolution** when the behavior or local
   structural change is sufficiently bounded.
-- Use **Repository Workflow** after verification and authorization for cleanup,
+- Use **Repository Workflow** for a paced tour of a pull request, commit,
+  branch, or local change, or after verification and authorization for cleanup,
   recording, or publication.
 - Use `select-technical-artifacts` across tracks when candidate knowledge needs
   a disposition: `create`, `update`, `embed`, `keep-with-implementation`,
@@ -326,8 +327,9 @@ rule.
 Start implementation from an independent oracle. Examples include an approved
 use case, operation contract, realization, design class diagram, acceptance
 example, invariant, defect report, reconciled change, or implementation brief.
-Start repository workflow only after verification and user authorization for
-its next effect.
+Use the read-only walkthrough path when understanding a pull request, commit,
+branch, or local change. Start effectful repository workflow only after
+verification and user authorization for its next effect.
 
 ```plantuml
 @startuml implementation-repository-skill-relationships
@@ -349,6 +351,8 @@ skinparam rectangle<<input>> {
   BorderColor #888888
 }
 rectangle "Approved behavior or design input" as oracle <<input>>
+rectangle "PR, commit, branch,\nor local change" as incoming <<input>>
+rectangle "Independent review or\nreader decision" as readerNext <<input>>
 
 package "Implementation and Evolution" #FFF5EA {
   rectangle "test-driven-\nimplementation" as implementation
@@ -356,6 +360,7 @@ package "Implementation and Evolution" #FFF5EA {
 }
 
 package "Repository Workflow" #F3EEFF {
+  rectangle "walkthrough-me" as walkthrough
   rectangle "simplify" as simplify
   rectangle "commit" as commit
   rectangle "create-pr" as createpr
@@ -367,8 +372,14 @@ implementation ..> simplify : optional cleanup
 refactoring ..> simplify : optional cleanup
 simplify --> commit
 commit --> createpr
+incoming --> walkthrough
+walkthrough ..> readerNext : context only
 @enduml
 ```
+
+`walkthrough-me` establishes paced comprehension of the selected change. It
+does not provide the independent review or reader decision shown as its
+optional next step.
 
 Read the
 [Implementation and Evolution](tracks/implementation-evolution.md) and

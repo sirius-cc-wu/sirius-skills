@@ -1,0 +1,56 @@
+{
+  "skill_name": "walkthrough-me",
+  "trigger": {
+    "positive": [
+      {
+        "prompt": "Walk me through PR #482 one logical section at a time and wait for me before continuing",
+        "top_k": 3
+      },
+      {
+        "prompt": "Give me a step-by-step tour of commit 4f9c2ab and wait after each logical section",
+        "top_k": 3
+      },
+      {
+        "prompt": "Walk me through my unstaged worktree changes in dependency order without editing or staging them",
+        "top_k": 3
+      }
+    ],
+    "negative": [
+      {
+        "prompt": "Open a draft pull request for my committed branch and publish it for review",
+        "owner": "create-pr"
+      },
+      {
+        "prompt": "Reconstruct and persist the current system's module architecture and runtime collaborations beyond this PR",
+        "owner": "reconstruct-software-architecture"
+      },
+      {
+        "prompt": "Simplify the current PR diff and modify the code while preserving its behavior",
+        "owner": "simplify"
+      },
+      {
+        "prompt": "Stage my intended unstaged files and create a scoped git commit",
+        "owner": "commit"
+      }
+    ]
+  },
+  "evals": [
+    {
+      "id": "paced-change-tour",
+      "prompt": "Walk me through my staged and unstaged changes. Keep those sources distinct. I know the frontend but not the persistence layer. Focus on request flow, state changes, and tests. Start the first section and wait for me.",
+      "expected_output": "A snapshot-fixed tour map followed by only the first logical change section and an explicit checkpoint.",
+      "expectations": [
+        "Staged and unstaged sources remain distinct in the captured snapshot",
+        "The change is grouped into a small dependency-ordered tour rather than listed file by file",
+        "The response explains only the first section with concise code locators and evidence labels",
+        "The response waits at a checkpoint and offers controls for continuing or going deeper"
+      ],
+      "prohibitions": [
+        "Do not explain later sections before the user advances",
+        "Do not modify the repository, index, or remote state",
+        "Do not present comprehension as approval, commit authority, or a code-review verdict"
+      ],
+      "trust_level": "provisional"
+    }
+  ]
+}

@@ -1,13 +1,33 @@
 # Repository Workflow
 
-Use this track to refine, record, and publish an already implemented change.
-The skills remain independently selectable; the sequence is a common handoff,
-not authority to perform later publication steps without the user's request.
+Use this track to understand a pull request, commit, branch, or local change,
+or to refine, record, and publish an already implemented change. The skills
+remain independently selectable; each sequence is a common handoff, not
+authority to perform later review or publication steps without the user's
+request.
 
 When the `all` installation is available, optionally use Addy Osmani's external
 [`code-review-and-quality`](https://github.com/addyosmani/agent-skills/blob/5a1b82d6445d1e2f0abeea1072851419a50c0e5c/skills/code-review-and-quality/SKILL.md)
 before commit or pull-request publication. It remains an external review
 skill, not a Sirius catalog entry or lifecycle gate.
+
+## Interactive code-change tour
+
+1. Use [`walkthrough-me`](../../skills/walkthrough-me/SKILL.md) when a reader
+   needs a paced explanation of a pull request, commit, range, branch diff, or
+   staged, unstaged, or selected untracked worktree changes.
+2. Fix committed sources to their revisions. Capture local changes as a mutable
+   snapshot, keep staged, unstaged, and untracked sources distinct, and recheck
+   the snapshot before advancing.
+3. Inspect the selected change claim, hunks, nearby context, and tests without
+   changing repository, index, PR, or remote state.
+4. Group the change into a few dependency-ordered sections. Show the map and
+   first section, then wait for explicit confirmation before advancing.
+5. End with the end-to-end flow, verification evidence, and open questions.
+   Treat this as comprehension, not approval, commit authority, or a formal
+   code-review verdict.
+6. Invoke `code-review-and-quality` separately when the user requests a
+   correctness, architecture, security, performance, or merge review.
 
 ## Typical change flow
 

@@ -7,6 +7,22 @@ state when they matter.
 ## Repository workflow
 
 ```text
+Use walkthrough-me on PR #123. I understand the frontend but not the
+persistence layer. Build a logical tour, show only the first section, and wait
+for me before continuing. Focus on request flow, state changes, and tests.
+```
+
+```text
+Use walkthrough-me on commit 4f9c2ab. Explain its behavior change in logical
+sections and wait at each checkpoint.
+```
+
+```text
+Use walkthrough-me on my unstaged changes. Keep untracked files separate, show
+only the first section, and do not edit or stage anything.
+```
+
+```text
 Use simplify on the current branch diff. Preserve behavior, keep changes within
 the files already touched, and run the focused test suite afterward.
 ```

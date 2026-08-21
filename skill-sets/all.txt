@@ -1,6 +1,7 @@
 simplify
 create-pr
 commit
+walkthrough-me
 reverse-engineer-software-system
 survey-existing-system
 recover-system-behavior

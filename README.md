@@ -2,14 +2,14 @@
 
 `sirius-skills` is a curated collection of development-input assessment,
 technical-artifact selection, architecture-decision recording, repository
-artifact-layout, repository workflow, software discovery, iterative design,
-implementation, and evolution skills. Skills are independently
-deployable; profiles provide convenient installations without turning the
-catalog into a mandatory lifecycle.
+artifact-layout, interactive code-change comprehension, repository workflow,
+software discovery, iterative design, implementation, and evolution skills.
+Skills are independently deployable; profiles provide convenient installations
+without turning the catalog into a mandatory lifecycle.
 
 ## Install
 
-Install the three generic repository workflow skills into a target project by
+Install the four generic repository workflow skills into a target project by
 default:
 
 ```bash
@@ -34,7 +34,7 @@ Available profiles are defined in [`skill-sets/`](skill-sets/):
 
 | Profile | Purpose |
 |---|---|
-| `workflow` | Simplification, scoped commits, and pull requests |
+| `workflow` | Interactive change walkthroughs, simplification, scoped commits, and pull-request publication |
 | `iterative-design` | External-input assessment, technical-artifact selection, architecture-decision recording, artifact-layout design, question-driven iterations, boundary-sensitive refactoring gates, native responsibility and optional object design, language adaptation, tested implementation, simplification, and scoped commits |
 | `applying-uml-and-patterns` | Compatibility alias for `iterative-design` |
 | `reverse-engineering` | Evidence-driven system survey, behavior and architecture recovery, recorded-decision discovery, recovered-artifact selection, reconciliation, and durable placement |
@@ -177,6 +177,14 @@ directions. Route current-system claims to reverse engineering, scope and
 feasibility to `inception`, stakeholder authority to the client-discovery
 skills, acceptance behavior to `behavior-driven-specification`, and placement
 questions to `design-repository-artifact-layout`.
+
+Use `walkthrough-me` when a reader needs a paced, read-only tour of a pull
+request, commit, commit range, branch diff, or staged, unstaged, or selected
+untracked worktree changes. It keeps local change sources distinct and groups
+the selected diff into a few logical sections. It explains one section with
+concise code locators and
+waits for explicit confirmation before advancing. It establishes understanding
+without approving, committing, or replacing formal code review.
 
 Use `record-architecture-decision` when one consequential architecture choice
 needs a short, discoverable ADR or when maintainers need to find which recorded

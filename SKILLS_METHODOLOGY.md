@@ -9,7 +9,7 @@ following every step in it.
 
 | Need | Profile |
 |---|---|
-| Refine, record, and publish repository changes | `workflow` |
+| Understand pull requests, commits, branches, or local changes, or refine, record, and publish repository changes | `workflow` |
 | Assess external development inputs, select technical artifacts, record architecture decisions, design artifact layouts, and run question-driven analysis, design, implementation, simplification, and scoped-commit iterations | `iterative-design` |
 | Recover current behavior and architecture, find governing ADRs, select durable recovered artifacts, and place them | `reverse-engineering` |
 | Make the entire Sirius catalog available, with the curated Addy add-ons | `all` |
@@ -106,6 +106,22 @@ choice is independently consequential and expensive to reverse.
 4. Keep a recommendation read-only unless the user explicitly authorizes file
    creation or migration. Return content authoring to the artifact's owning
    specialist.
+
+### Understand a code change
+
+1. Use `walkthrough-me` when a reader needs to understand a pull request,
+   commit, range, branch diff, or staged, unstaged, or selected untracked
+   worktree changes without receiving the whole explanation at once.
+2. Fix committed sources to their revisions. Capture local changes as a mutable
+   snapshot, keep staged, unstaged, and untracked sources distinct, and recheck
+   the snapshot before advancing.
+3. Distinguish change claims, diff evidence, test evidence, and unknowns. Group
+   the diff into a few dependency-ordered sections.
+4. Explain one section with concise code locators, then wait for an explicit
+   request to continue or go deeper.
+5. End with the end-to-end flow and open questions. Do not treat comprehension
+   as approval or commit authority, or silently continue into formal code
+   review, modification, or publication.
 
 ### Deliver an existing change
 
