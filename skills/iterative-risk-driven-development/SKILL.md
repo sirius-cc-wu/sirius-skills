@@ -40,6 +40,52 @@ discovery.
   product or compatibility decision, an unavailable verification oracle, or a
   user instruction to stop. Do not push or publish without separate authority.
 
+## In-Iteration Routing
+
+Use this tree after entry routing has selected coordinated work. It is a
+conditional routing index, not a lifecycle or required sequence.
+
+```text
+Approved coordinated objective begins
+├─ Initial owner, readiness, or authority is unclear
+│  └─ return to assess-development-input
+├─ Current behavior, architecture, deployment, or constraints lack evidence
+│  └─ stop for a responsible external recovery process
+├─ Requirements Analysis question
+│  ├─ scope, feasibility, or major risk → inception
+│  └─ actors, goals, boundary, or scenarios → use-case-modeling
+├─ System Analysis question
+│  ├─ domain concepts or vocabulary → domain-modeling
+│  ├─ actor-system events or operations → system-sequence-diagrams
+│  └─ preconditions, postconditions, or state effects → operation-contracts
+├─ Software/System Design question
+│  ├─ responsibility, cohesion, coupling, or dependency → grasp-responsibility-design
+│  ├─ collaboration for one scenario → use-case-realization
+│  ├─ stable object structure summary → uml-class-diagram-design
+│  └─ demonstrated variation or structural force → design-pattern-application
+├─ Detailed Design question
+│  ├─ target-language realization → software-design-language-adaptation
+│  └─ Rust ownership or resource lifecycle → design-rust-lifecycles
+├─ Approved behavior needs implementation and verification
+│  └─ external test-driven-development or repository-native implementation and verification
+├─ Existing structure needs behavior-preserving improvement
+│  ├─ routine clarity → external code-simplification or native cleanup
+│  ├─ established structural ownership → behavior-preserving-refactoring
+│  └─ material boundary change → remain under iterative coordination
+├─ Durable knowledge needs disposition or placement
+│  ├─ create, update, embed, keep, omit, or defer → select-technical-artifacts
+│  └─ justified artifact lacks a canonical home → design-repository-artifact-layout
+├─ A consequential architecture decision needs durable history
+│  └─ external documentation-and-adrs or repository-native ADR guidance
+├─ Several questions serve the same objective
+│  └─ select the smallest necessary specialist set
+└─ No coordination remains
+   └─ return a direct handoff and stop coordinating
+```
+
+External Addy routes require the `all` installation. Otherwise, use the named
+repository-native workflow or return the responsible prerequisite.
+
 ## Workflow
 
 1. **Fix authority and baseline.** Read repository governance. Identify the
@@ -61,11 +107,11 @@ discovery.
    whether this iteration can close it or only enable later work. Keep the
    objective small enough for one coherent commit.
 4. **Select in-iteration owners.** Start from the approved objective and initial
-   route. Apply the owner boundaries in
+   route. Use the in-iteration routing tree and the owner boundaries in
    [Assess Development Input](../assess-development-input/SKILL.md) without
-   treating its routing tree as a phase sequence. Assign each material question
-   to the narrowest requirements analysis, system analysis, software/system
-   design, detailed design, implementation, or verification owner. Select
+   treating either as a phase sequence. Assign each material question to the
+   narrowest requirements analysis, system analysis, software/system design,
+   detailed design, implementation, or verification owner. Select
    several specialists only when they serve the same objective and coherent
    change. Stop for a responsible external recovery or
    authority prerequisite when evidence or approval is missing. If the work no

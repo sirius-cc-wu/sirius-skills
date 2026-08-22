@@ -74,6 +74,10 @@ def test_assessment_owns_entry_routing_without_replacing_iteration_coordination(
     for name in (active_names - {"assess-development-input"}) | external_names:
         assert f"`{name}`" in assessment
 
+    assert "## In-Iteration Routing" in iterative
+    assert "Approved coordinated objective begins" in iterative
+    assert "return to assess-development-input" in iterative
+    assert "No coordination remains" in iterative
     assert "Select in-iteration owners" in iterative
     assert "does not own session-start skill discovery" in iterative
     assert "owns operational entry routing" in relationships

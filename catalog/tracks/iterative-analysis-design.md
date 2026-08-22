@@ -48,8 +48,9 @@ stakeholder-validation prerequisite. Reapply artifact selection when enabling
 behavior gains reuse, a new consumer, or an independent lifecycle.
 
 Within an active iteration, choose the narrowest specialist for each material
-question. `assess-development-input` remains the operational owner of initial
-routing; this table summarizes in-iteration handoffs:
+question. `assess-development-input` owns initial routing, and the coordinator's
+**In-Iteration Routing** tree owns specialist selection after entry. This table
+summarizes those handoffs:
 
 | Group | Current question or force | Candidate owner |
 |---|---|---|

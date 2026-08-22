@@ -297,10 +297,14 @@ and historical iteration records remain evidence. Reuse, a new consumer, or a
 stretched approval boundary triggers a fresh readiness and artifact-promotion
 check before implementation continues.
 
-The coordinator can select requirements analysis, system analysis,
-software/system design, detailed design, implementation, and verification
-methods. It does not require a complete object-design chain. For a
-boundary-sensitive refactoring, it retains the system boundary, representative
+The coordinator's **In-Iteration Routing** tree owns specialist selection after
+entry. It can select requirements analysis, system analysis, software/system
+design, detailed design, implementation, and verification methods without
+requiring a complete object-design chain. The diagram below visualizes those
+conditional handoffs.
+
+For a boundary-sensitive refactoring, it retains the system boundary,
+representative
 vertical scenario, native responsibility assignment, ownership consequences,
 verification ownership, and parent completion boundary before implementation.
 It preserves established canonical paths and delegates material placement or
