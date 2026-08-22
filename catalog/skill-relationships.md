@@ -41,7 +41,7 @@ package "Define" as addyDefine #EAF4FB {
   rectangle "spec-driven-development" as addySpec <<external>>
 }
 
-package "Verify" as addyVerify #FFF5EA {
+package "Implementation and Evolution" as implementationPhase #FFF5EA {
   rectangle "test-driven-development" as addyTdd <<external>>
 }
 
@@ -60,8 +60,6 @@ rectangle "**Sirius: Intake**\nassess-development-input" as assess #FFF4CC
 
 rectangle "**Iterative Risk-Driven Development**\niterative-risk-driven-development\ninception\nuse-case-modeling\ndomain-modeling\nsystem-sequence-diagrams\noperation-contracts\ngrasp-responsibility-design\nuse-case-realization\numl-class-diagram-design\ndesign-pattern-application\nsoftware-design-language-adaptation\ndesign-rust-lifecycles" as design #EEF8EE
 
-rectangle "**Implementation and Evolution**\nrepository-native implementation (process)" as implementation #FFF5EA
-
 rectangle "**Repository Workflow**\nwalkthrough-me\ncreate-pr" as repository #F3EEFF
 
 rectangle "**Cross-cutting Support**\nselect-technical-artifacts\ndesign-repository-artifact-layout" as support #FFFBEA
@@ -76,26 +74,19 @@ addyInterview ..> assess : intent concrete; route unclear
 addySpec ..> assess : implementation-ready input
 addySpec ..> addyTdd : approved behavior
 assess ..> design
-assess ..> implementation
 assess ..> refactoring : bounded structural request
 assess ..> addyTdd : approved oracle
-design --> implementation
 design ..> refactoring : established structural change
-design ..> addyTdd : approved behavior
+design --> addyTdd : approved behavior
 design ..> addyDocs : consequential decision
-implementation ..> design : durable feedback
 refactoring ..> design : durable feedback
 addyTdd ..> design : durable feedback
-implementation --> addyReview : review before merge
 addyTdd --> addyReview : review before merge
-implementation ..> refactoring : direct structural pressure
 addyReview ..> addySimplify : clarity finding
 addyReview ..> refactoring : structural finding
 addyReview ..> design : boundary finding
 addySimplify ..> addyReview : substantive change
 refactoring ..> addyReview : substantive change
-implementation ..> addyGit : git or version guidance
-implementation ..> addyDocs : durable documentation
 addyTdd ..> addyGit : prepared change
 addyReview ..> addyGit : prepared change
 addySimplify ..> addyGit : prepared change
@@ -106,7 +97,6 @@ refactoring --> repository
 addyGit ..> addyDocs : decision or release context
 addyGit --> repository
 addyDocs --> repository
-implementation --> repository
 addyTdd --> repository
 @enduml
 ```
@@ -158,8 +148,9 @@ are not installation profiles or lifecycle gates. The detailed diagrams show
 the conditional choices and feedback that this overview omits. The diagram does
 not connect cross-cutting support to every consumer. Select it for a specific
 artifact-selection or artifact-placement need. It is not a
-required workflow stage. The repository-native implementation labels are
-process markers, not deployable Sirius skills. Language adaptation and Rust
+required workflow stage. Repository-native implementation remains the fallback
+when external `test-driven-development` is unavailable or unnecessary; it is
+prose guidance, not a deployable diagram node. Language adaptation and Rust
 lifecycle design remain in Iterative Analysis and Design because they produce
 implementation-facing design.
 
@@ -406,10 +397,6 @@ rectangle "PR, commit, branch,\nor local change" as incoming <<input>>
 rectangle "Independent review or\nreader decision" as readerNext <<input>>
 
 package "Implementation and Evolution" #FFF5EA {
-  rectangle "Repository-native behavior\nimplementation" as implementation <<process>>
-}
-
-package "Verify" #FFF5EA {
   rectangle "test-driven-\ndevelopment" as addyTdd <<external>>
 }
 
@@ -429,30 +416,26 @@ package "Repository Workflow" #F3EEFF {
   rectangle "create-pr" as createpr
 }
 
-oracle --> implementation
 oracle ..> addyTdd : all profile
 oracle ..> refactoring : bounded structural request
-implementation ..> addyReview : review requested
 addyTdd ..> addyReview : review requested
-implementation ..> refactoring : direct structural pressure
 addyReview ..> addySimplify : clarity finding
 addyReview ..> refactoring : structural finding
 addySimplify ..> addyReview : substantive change
 refactoring ..> addyReview : substantive change
-implementation ..> addyGit : prepared change
-implementation ..> addyDocs : durable documentation
 addyTdd ..> addyGit : prepared change
+addyTdd ..> addyDocs : durable documentation
 refactoring ..> addyGit : prepared change
 addyReview ..> addyGit : prepared change
 addySimplify ..> addyGit : prepared change
 addyGit ..> addyDocs : decision or release context
-implementation ..> createpr : already committed
 addyTdd ..> createpr : already committed
 refactoring ..> createpr : already committed
 addyReview ..> createpr : reviewed, committed work
 addySimplify ..> createpr : verified, committed work
 addyGit ..> createpr : committed work
 addyDocs ..> createpr : documented, committed work
+incoming ..> addyReview : formal review
 incoming --> walkthrough
 walkthrough ..> readerNext : context only
 @enduml
@@ -505,11 +488,6 @@ skinparam rectangle<<coordinator>> {
   BackgroundColor #DCEEFF
   BorderColor #2F6690
 }
-skinparam rectangle<<process>> {
-  BackgroundColor #EAF4FB
-  BorderColor #52606D
-}
-
 package "Risk-driven development knowledge" #EEF8EE {
   rectangle "iterative-risk-driven-\ndevelopment" as iterative <<coordinator>>
   rectangle "domain-modeling" as domain
@@ -520,15 +498,15 @@ package "Risk-driven development knowledge" #EEF8EE {
 }
 
 package "Execution and evidence" #FFF5EA {
-  rectangle "External test-driven-development\nor repository-native implementation" as implementation <<process>>
+  rectangle "Implemented behavior and\nverification evidence" as evidence
   rectangle "behavior-preserving-\nrefactoring" as refactoring
 }
 
 contracts ..> domain : missing concept or association
 patterns ..> designviews : participants or dependencies change
 
-implementation ..> contracts : postcondition changes
-implementation ..> designviews : responsibility, collaboration, or interface changes
+evidence ..> contracts : postcondition changes
+evidence ..> designviews : responsibility, collaboration, or interface changes
 
 refactoring ..> grasp : responsibility or coupling pressure
 refactoring ..> patterns : justified variation pressure
@@ -538,7 +516,8 @@ refactoring ..> designviews : durable structure changes
 ```
 
 The combined `use-case-realization + uml-class-diagram-design` node keeps the
-diagram readable. Implementation and refactoring can refine either view.
+diagram readable. Implementation evidence and refactoring can refine either
+view.
 Apply these rules:
 
 - Contract feedback changes the domain model only when a postcondition exposes
