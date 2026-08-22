@@ -56,13 +56,17 @@ Preserve existing legacy proposals at their historical paths.
 ```text
 Use code-review-and-quality before merging this change. Review correctness,
 readability, architecture, security, and performance; label findings by
-severity and report the verification evidence.
+severity and report verification evidence. Route clarity findings to
+code-simplification, established structural-ownership findings to
+behavior-preserving-refactoring, and material boundary findings to
+iterative-risk-driven-development.
 ```
 
 ```text
-Use code-simplification on the recently changed code after the checks pass.
-Preserve exact behavior, follow local conventions, keep the pass within the
-changed scope, and rerun the affected checks after each simplification.
+The review found readability and local-complexity issues in the recently
+changed code. Use code-simplification after the checks pass. Preserve exact
+behavior, follow local conventions, keep the pass within the changed scope, and
+rerun the affected checks after each simplification.
 ```
 
 ```text
@@ -132,7 +136,8 @@ missing behavior, then run the relevant regression suite.
 ```
 
 ```text
-Use behavior-preserving-refactoring on this module behind the current passing
+Use behavior-preserving-refactoring to move this cohesive responsibility to its
+established owner and correct the dependency direction behind current passing
 tests. Keep behavior changes separate and verify each bounded transformation.
 If the change creates a backend, composition root, runtime owner, test seam, or
 cleanup boundary, return to iterative-risk-driven-development instead of

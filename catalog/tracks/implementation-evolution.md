@@ -49,25 +49,28 @@ when several evidence artifacts compete; otherwise apply its
 [Artifact Selection Budget](../../skills/select-technical-artifacts/references/artifact-selection-budget.md)
 locally before creating a separate behavior-slice or implementation record.
 
-## Improve Existing Structure
+## Review and Improve Existing Structure
 
-1. Establish a passing baseline that protects the behavior to preserve.
-2. Classify boundary impact. If the refactoring creates or moves a material
-   test seam, composition root, backend, entrypoint, process-global dependency,
-   runtime owner, readiness condition, cleanup boundary, or end-to-end
-   verification boundary, use
-   [`iterative-risk-driven-development`](../../skills/iterative-risk-driven-development/SKILL.md)
-   before treating it as a local transformation.
-3. Use
-   [`behavior-preserving-refactoring`](../../skills/behavior-preserving-refactoring/SKILL.md)
-   for independently reviewable local structural transformations.
-4. Return to responsibility design or pattern selection when the refactoring
-   exposes a durable design pressure. Assign responsibilities to native
-   modules, functions, tasks, adapters, handles, types, or composition roots as
-   appropriate.
-5. Retain material integration and end-to-end oracles. Report a new seam as an
-   enabling result until a representative vertical flow proves the parent
-   outcome.
+1. With the `all` installation, use external `code-review-and-quality` after
+   implementation. Otherwise, use repository-native review. A direct,
+   independently bounded structural request may skip this review entry point.
+2. Route each requested change or review finding to one owner:
+   - Use external `code-simplification` for routine naming, extraction,
+     duplication, control-flow, or recent-code clarity work.
+   - Use
+     [`behavior-preserving-refactoring`](../../skills/behavior-preserving-refactoring/SKILL.md)
+     for an established responsibility, dependency, variation, or
+     configuration-ownership change.
+   - Use
+     [`iterative-risk-driven-development`](../../skills/iterative-risk-driven-development/SKILL.md)
+     when the change creates or moves a material test seam, composition root,
+     backend, entrypoint, process-global dependency, runtime owner, readiness
+     condition, cleanup boundary, or end-to-end verification boundary.
+3. Establish a passing baseline before either behavior-preserving change. Keep
+   each transformation independently reviewable and rerun affected checks.
+4. Return substantive changes to review. Retain material integration and
+   end-to-end oracles, and feed durable responsibility or pattern pressure back
+   to its design owner.
 
 Do not use refactoring to conceal intentional behavior changes. Do not let an
 implementation process guess unresolved business rules.

@@ -66,8 +66,10 @@ mandatory artifact sequence, programming paradigm, or phase checklist.
    placement is unclear. With the `all` installation, use external
    `test-driven-development` for bounded approved behavior. Otherwise, follow
    the repository's native implementation and verification workflow. Use
-   `behavior-preserving-refactoring` for verified structural improvement.
-   Prefer a direct repository-native workflow when no coordination remains.
+   `behavior-preserving-refactoring` for verified responsibility, dependency,
+   variation, or configuration-ownership changes. Use external
+   `code-simplification` for routine clarity work when available. Prefer a
+   direct repository-native workflow when no coordination remains.
 5. **Apply the boundary-sensitive refactoring gate.** When the change creates
    or moves a material test seam, composition root, backend, entrypoint,
    process-global dependency, runtime task, resource owner, readiness

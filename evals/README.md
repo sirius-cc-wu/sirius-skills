@@ -49,7 +49,7 @@ Keep one JSON file per evaluated skill at
   "trigger": {
     "positive": [
       {
-        "prompt": "Remove this local duplication without changing behavior",
+        "prompt": "Move this cohesive responsibility to its established owner without changing behavior",
         "top_k": 3
       }
     ],
@@ -63,8 +63,8 @@ Keep one JSON file per evaluated skill at
   "evals": [
     {
       "id": "local-verified-transformation",
-      "prompt": "Remove one duplicated private calculation behind green tests.",
-      "expected_output": "One verified local transformation preserves behavior.",
+      "prompt": "Correct this dependency direction behind green tests.",
+      "expected_output": "One verified structural design transformation preserves behavior.",
       "expectations": [
         "Focused and regression checks remain green"
       ],

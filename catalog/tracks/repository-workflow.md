@@ -7,17 +7,19 @@ perform later review or publication steps without the user's request.
 
 When the `all` installation is available, optionally use Addy Osmani's external
 [`code-review-and-quality`](https://github.com/addyosmani/agent-skills/blob/5a1b82d6445d1e2f0abeea1072851419a50c0e5c/skills/code-review-and-quality/SKILL.md)
-before commit or pull-request publication. Use external
-[`code-simplification`](https://github.com/addyosmani/agent-skills/blob/5a1b82d6445d1e2f0abeea1072851419a50c0e5c/skills/code-simplification/SKILL.md)
-after checks pass when recently changed code needs a behavior-preserving
-clarity pass. Use external
+before commit or pull-request publication. Route readability and
+local-complexity findings to external
+[`code-simplification`](https://github.com/addyosmani/agent-skills/blob/5a1b82d6445d1e2f0abeea1072851419a50c0e5c/skills/code-simplification/SKILL.md).
+Route findings about established structural ownership to
+[`behavior-preserving-refactoring`](../../skills/behavior-preserving-refactoring/SKILL.md).
+Use external
 [`git-workflow-and-versioning`](https://github.com/addyosmani/agent-skills/blob/5a1b82d6445d1e2f0abeea1072851419a50c0e5c/skills/git-workflow-and-versioning/SKILL.md)
 for standalone commit, branch, worktree, release, or semantic-version guidance.
 Use external
 [`documentation-and-adrs`](https://github.com/addyosmani/agent-skills/blob/5a1b82d6445d1e2f0abeea1072851419a50c0e5c/skills/documentation-and-adrs/SKILL.md)
 when a significant technical decision or durable engineering context needs a
-record. All four remain external skills, not Sirius catalog entries or lifecycle
-gates.
+record. These four Addy skills remain external, not Sirius catalog entries or
+lifecycle gates. `behavior-preserving-refactoring` remains a Sirius skill.
 
 ## Interactive code-change tour
 
@@ -42,28 +44,35 @@ gates.
 1. Implement and verify the requested outcome using the repository's own
    guidance. For behavior changes, the
    [implementation and evolution track](implementation-evolution.md) describes
-   external or repository-native behavior implementation and
-   behavior-preserving refactoring.
-2. With the `all` installation, optionally use `code-simplification` on the
-   recently changed scope. Preserve exact behavior and rerun affected checks.
-3. With the `all` installation, use `documentation-and-adrs` when the change
+   external or repository-native implementation.
+2. With the `all` installation, use `code-review-and-quality` for formal review.
+   Otherwise, follow repository-native review guidance.
+3. Route readability and local-complexity findings to `code-simplification`.
+   Route established responsibility, dependency, variation, or configuration
+   ownership findings to
+   [`behavior-preserving-refactoring`](../../skills/behavior-preserving-refactoring/SKILL.md).
+   Route material boundary findings to `iterative-risk-driven-development`.
+   A direct, independently bounded structural request may enter its owner
+   without first passing through review.
+4. Return substantive changes to review, preserve exact behavior, and rerun
+   affected checks.
+5. With the `all` installation, use `documentation-and-adrs` when the change
    makes a significant technical decision or adds durable engineering context.
    Preserve local documentation, identifier, authority, status, and history
    rules.
-4. With the `all` installation, use `git-workflow-and-versioning` when a
+6. With the `all` installation, use `git-workflow-and-versioning` when a
    prepared change needs a standalone commit or broader branch, worktree, or
    version guidance. Otherwise, follow repository guidance directly. Review
    repository state and diffs, run proportional verification, stage only the
    intended paths, and follow local message conventions.
-5. Use [`create-pr`](../../skills/create-pr/SKILL.md) when committed work is
+7. Use [`create-pr`](../../skills/create-pr/SKILL.md) when committed work is
    ready to publish for review. Confirm base, head, push state, duplicate pull
    requests, title conventions, and validation evidence.
 
 Each step requires the authority appropriate to its effects. `simplify` is
-retired. Use
-[`behavior-preserving-refactoring`](../../skills/behavior-preserving-refactoring/SKILL.md)
-for an intentional, verified local structural improvement before returning to
-this track.
+retired. Review findings select between `code-simplification`,
+`behavior-preserving-refactoring`, and coordinated redesign; these are not
+mandatory lifecycle gates.
 
 ## Governance feedback
 

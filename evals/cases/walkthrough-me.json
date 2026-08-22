@@ -21,7 +21,7 @@
         "owner": "create-pr"
       },
       {
-        "prompt": "Refactor duplicated code in the changed module while preserving its verified behavior",
+        "prompt": "Move this cohesive responsibility to the existing module that owns its data while preserving verified behavior",
         "owner": "behavior-preserving-refactoring"
       }
     ]

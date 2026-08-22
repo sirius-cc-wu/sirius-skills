@@ -3,11 +3,11 @@
   "trigger": {
     "positive": [
       {
-        "prompt": "Remove this local duplication behind the current passing tests without changing behavior or moving any system boundary",
+        "prompt": "Consolidate these scattered environment reads into the existing typed configuration owner behind current passing tests without moving a system boundary",
         "top_k": 3
       },
       {
-        "prompt": "Rename and extract this long private Rust function in small verified steps while preserving ownership, errors, ordering, and concurrency",
+        "prompt": "Code review found orchestration in the wrong module; move it to the existing composition owner while preserving behavior, ownership, errors, ordering, and concurrency",
         "top_k": 3
       },
       {
@@ -29,17 +29,18 @@
   "evals": [
     {
       "id": "local-verified-transformation",
-      "prompt": "Behind the current green tests, remove one duplicated private calculation through an independently reviewable transformation. Preserve behavior, ownership, errors, ordering, and concurrency; rerun focused and broader checks; and do not create a design artifact unless durable design knowledge changes.",
-      "expected_output": "One local behavior-preserving transformation improves the named structural problem and remains protected by focused and regression evidence.",
+      "prompt": "Behind the current green tests, move one cohesive calculation to the existing domain module that owns its data and correct the dependency direction. Preserve behavior, ownership, errors, ordering, and concurrency; rerun focused and broader checks; and update durable design knowledge only if its represented ownership changes.",
+      "expected_output": "One behavior-preserving responsibility and dependency transformation improves the named structural design pressure and remains protected by focused and regression evidence.",
       "expectations": [
         "The observable invariant and green baseline are explicit",
-        "One local structural problem bounds the transformation",
+        "One responsibility or dependency pressure bounds the transformation",
         "Focused checks run after the transformation and broader checks remain green",
         "No boundary-sensitive system redesign is hidden inside the refactoring"
       ],
       "prohibitions": [
         "Do not change required behavior or weaken a valid test",
-        "Do not create a new backend, composition root, runtime owner, or test boundary as a local cleanup",
+        "Do not expand into routine naming, extraction, duplication, or control-flow cleanup",
+        "Do not create a new backend, composition root, runtime owner, or test boundary as a local refactoring",
         "Do not create a standalone refactoring record without an independent need"
       ],
       "allowed_mutations": [

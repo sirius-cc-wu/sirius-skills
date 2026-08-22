@@ -92,7 +92,8 @@ method or file format never determines the route.
 | A language-neutral design needs idiomatic language-specific adaptation | `software-design-language-adaptation` |
 | Approved Rust behavior has material ownership, startup, rollback, cancellation, or cleanup risk | `design-rust-lifecycles` |
 | A bounded approved behavior has an independent oracle and needs no Sirius analysis or design coordination | External `test-driven-development` with the `all` installation; otherwise repository-native implementation and verification |
-| Observable behavior is protected and only internal structure should change | `behavior-preserving-refactoring` |
+| Observable behavior is protected and routine naming, extraction, duplication, control-flow, or recent-code clarity should improve | External `code-simplification` with the `all` installation; otherwise repository-native cleanup |
+| Observable behavior is protected and established responsibility, dependency, variation, or configuration ownership should change | `behavior-preserving-refactoring` |
 
 Use external `interview-me` when one requester's intent is unclear. Use
 external `idea-refine` when a candidate direction needs alternatives,

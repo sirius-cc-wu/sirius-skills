@@ -45,9 +45,10 @@ package "Verify" as addyVerify #FFF5EA {
   rectangle "test-driven-development" as addyTdd <<external>>
 }
 
-package "Review" as addyReviewPhase #FFFBEA {
+package "Review" as reviewPhase #FFFBEA {
   rectangle "code-review-and-quality" as addyReview <<external>>
   rectangle "code-simplification" as addySimplify <<external>>
+  rectangle "behavior-preserving-refactoring" as refactoring
 }
 
 package "Integrate and ship" as addyShipPhase #F2F2F2 {
@@ -59,7 +60,7 @@ rectangle "**Sirius: Intake**\nassess-development-input" as assess #FFF4CC
 
 rectangle "**Iterative Risk-Driven Development**\niterative-risk-driven-development\ninception\nuse-case-modeling\ndomain-modeling\nsystem-sequence-diagrams\noperation-contracts\ngrasp-responsibility-design\nuse-case-realization\numl-class-diagram-design\ndesign-pattern-application\nsoftware-design-language-adaptation\ndesign-rust-lifecycles" as design #EEF8EE
 
-rectangle "**Implementation and Evolution**\nrepository-native implementation (process)\nbehavior-preserving-refactoring" as implementation #FFF5EA
+rectangle "**Implementation and Evolution**\nrepository-native implementation (process)" as implementation #FFF5EA
 
 rectangle "**Repository Workflow**\nwalkthrough-me\ncreate-pr" as repository #F3EEFF
 
@@ -76,24 +77,32 @@ addySpec ..> assess : implementation-ready input
 addySpec ..> addyTdd : approved behavior
 assess ..> design
 assess ..> implementation
+assess ..> refactoring : bounded structural request
 assess ..> addyTdd : approved oracle
 design --> implementation
+design ..> refactoring : established structural change
 design ..> addyTdd : approved behavior
 design ..> addyDocs : consequential decision
 implementation ..> design : durable feedback
+refactoring ..> design : durable feedback
 addyTdd ..> design : durable feedback
 implementation --> addyReview : review before merge
 addyTdd --> addyReview : review before merge
-implementation ..> addySimplify : optional clarity pass
-addyTdd ..> addySimplify : optional clarity pass
+implementation ..> refactoring : direct structural pressure
+addyReview ..> addySimplify : clarity finding
+addyReview ..> refactoring : structural finding
+addyReview ..> design : boundary finding
+addySimplify ..> addyReview : substantive change
+refactoring ..> addyReview : substantive change
 implementation ..> addyGit : git or version guidance
 implementation ..> addyDocs : durable documentation
 addyTdd ..> addyGit : prepared change
-addyReview ..> addySimplify : cleanup feedback
 addyReview ..> addyGit : prepared change
 addySimplify ..> addyGit : prepared change
+refactoring ..> addyGit : prepared change
 addyReview --> repository
 addySimplify --> repository
+refactoring --> repository
 addyGit ..> addyDocs : decision or release context
 addyGit --> repository
 addyDocs --> repository
@@ -128,6 +137,13 @@ Use `test-driven-development` with the `all` installation when implementing new
 logic, fixing a bug, or changing behavior. Otherwise, use the consuming
 repository's implementation and verification workflow.
 
+Use `code-review-and-quality` with the `all` installation for formal review.
+Route readability and local-complexity findings to `code-simplification`,
+established structural ownership findings to
+`behavior-preserving-refactoring`, and material boundary findings to iterative
+design. A bounded structural request may enter
+`behavior-preserving-refactoring` directly.
+
 Use `documentation-and-adrs` with the `all` installation when a significant
 technical decision or durable engineering context needs documentation. Preserve
 repository-local ADR conventions, identifier rules, authority, status, and
@@ -158,9 +174,13 @@ implementation-facing design.
   bounded behavior, analysis, design, language, or implementation iteration,
   or when a complex refactoring moves a system, test, responsibility, runtime,
   resource, or verification boundary.
-- Start with **Implementation and Evolution** when the behavior or local
-  structural change is sufficiently bounded. With the `all` installation, use
-  external `test-driven-development` for behavior implementation.
+- Start with **Implementation and Evolution** when the behavior is sufficiently
+  bounded. With the `all` installation, use external
+  `test-driven-development` for behavior implementation.
+- Use **Review** after implementation or when a bounded structural change is
+  already identified. Route clarity findings to external
+  `code-simplification`, established structural ownership findings to
+  `behavior-preserving-refactoring`, and boundary findings to iterative design.
 - Use **Repository Workflow** for a paced tour of a pull request, commit,
   branch, or local change, or after verification and authorization for
   pull-request publication.
@@ -387,13 +407,19 @@ rectangle "Independent review or\nreader decision" as readerNext <<input>>
 
 package "Implementation and Evolution" #FFF5EA {
   rectangle "Repository-native behavior\nimplementation" as implementation <<process>>
+}
+
+package "Verify" #FFF5EA {
+  rectangle "test-driven-\ndevelopment" as addyTdd <<external>>
+}
+
+package "Review" #FFFBEA {
+  rectangle "code-review-and-\nquality" as addyReview <<external>>
+  rectangle "code-simplification" as addySimplify <<external>>
   rectangle "behavior-preserving-refactoring" as refactoring
 }
 
-package "External Addy add-ons" #F2F2F2 {
-  rectangle "test-driven-\ndevelopment" as addyTdd <<external>>
-  rectangle "code-review-and-\nquality" as addyReview <<external>>
-  rectangle "code-simplification" as addySimplify <<external>>
+package "Integrate and ship" #F2F2F2 {
   rectangle "git-workflow-and-\nversioning" as addyGit <<external>>
   rectangle "documentation-and-adrs" as addyDocs <<external>>
 }
@@ -405,15 +431,14 @@ package "Repository Workflow" #F3EEFF {
 
 oracle --> implementation
 oracle ..> addyTdd : all profile
-implementation --> refactoring : green baseline
-addyTdd ..> refactoring : optional larger cleanup
+oracle ..> refactoring : bounded structural request
 implementation ..> addyReview : review requested
 addyTdd ..> addyReview : review requested
-refactoring ..> addyReview : review requested
-implementation ..> addySimplify : optional clarity pass
-addyTdd ..> addySimplify : optional clarity pass
-refactoring ..> addySimplify : optional clarity pass
-addyReview ..> addySimplify : cleanup feedback
+implementation ..> refactoring : direct structural pressure
+addyReview ..> addySimplify : clarity finding
+addyReview ..> refactoring : structural finding
+addySimplify ..> addyReview : substantive change
+refactoring ..> addyReview : substantive change
 implementation ..> addyGit : prepared change
 implementation ..> addyDocs : durable documentation
 addyTdd ..> addyGit : prepared change
@@ -436,13 +461,17 @@ walkthrough ..> readerNext : context only
 `walkthrough-me` establishes paced comprehension of the selected change. It
 does not provide the independent review or reader decision shown as its
 optional next step. With the `all` installation, use `test-driven-development`
-for behavior implementation, `code-review-and-quality` for formal review,
-`code-simplification` for an optional verified clarity pass,
-`documentation-and-adrs` for significant decisions or durable engineering
-context, and `git-workflow-and-versioning` for standalone commit or version
-guidance.
-Otherwise, follow repository guidance directly. None of these optional handoffs
-authorizes a later commit, push, or pull-request publication.
+for behavior implementation and `code-review-and-quality` for formal review.
+Route readability and local-complexity findings to `code-simplification`.
+Route findings about established responsibility, dependency, variation, or
+configuration ownership to `behavior-preserving-refactoring`. Route material
+boundary findings back to iterative design. A bounded structural request may
+enter `behavior-preserving-refactoring` directly; review is not a lifecycle
+gate. Use `documentation-and-adrs` for significant decisions or durable
+engineering context and `git-workflow-and-versioning` for standalone commit or
+version guidance. Otherwise, follow repository guidance directly. None of
+these optional handoffs authorizes a later commit, push, or pull-request
+publication.
 
 Read the
 [Implementation and Evolution](tracks/implementation-evolution.md) and

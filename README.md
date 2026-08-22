@@ -226,11 +226,14 @@ concise code locators and
 waits for explicit confirmation before advancing. It establishes understanding
 without approving, committing, or replacing formal code review.
 
-`simplify` is retired. Use `behavior-preserving-refactoring` for an intentional,
-verified local structural improvement. With the `all` installation, use the
-external `code-simplification` add-on for a behavior-preserving clarity pass on
-recently changed code. Use the external `code-review-and-quality` add-on when a
-formal review is needed.
+`simplify` is retired. With the `all` installation, use external
+`code-review-and-quality` for formal review. Route readability and
+local-complexity findings to external `code-simplification`. Route findings
+about established responsibility, dependency, variation, or configuration
+ownership to `behavior-preserving-refactoring`. Route material boundary
+findings to `iterative-risk-driven-development`. A direct, independently
+bounded structural request may enter its owner without first passing through
+review.
 
 `commit` is retired. With the `all` installation, use the external
 `git-workflow-and-versioning` add-on for standalone commits, branches, worktrees,

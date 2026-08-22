@@ -1,151 +1,128 @@
 ---
 name: behavior-preserving-refactoring
-description: Improves internal code and design through risk-calibrated, verified local transformations without intentionally changing observable behavior. Use when removing duplication, extracting or renaming code, moving a cohesive responsibility to an existing owner, or improving coupling and dependency structure behind adequate focused and regression checks; route boundary-sensitive redesign to iterative coordination.
+description: Improves responsibility, dependency, and configuration structure through risk-calibrated, verified transformations without changing observable behavior. Use when moving a cohesive responsibility to an existing owner, correcting coupling or dependency direction, or consolidating configuration ownership behind adequate checks; route routine clarity cleanup to external code-simplification and boundary-sensitive redesign to iterative coordination.
 ---
 
 # Behavior-Preserving Refactoring
 
 ## Overview
 
-Improve internal structure through one independently reviewable transformation at a time, or through an explicitly bounded batch of homogeneous mechanical edits. Rerun relevant checks after each verified step while preserving public contracts, observable results, state transitions, side effects, and error behavior.
+Improve established design structure without changing observable behavior.
+Preserve public contracts, results, state transitions, side effects, errors,
+ordering, ownership, and concurrency semantics.
 
 Read [Configuration Surface Governance](references/config-surface-governance.md)
-when the refactoring touches configuration, startup, compatibility boundaries,
-environment injection, or test harness inputs. Preserve existing typed owners
-and route a material process-global boundary change to iterative coordination.
+when work touches configuration, startup, compatibility boundaries, environment
+injection, or test harness inputs.
 
 ## When to Use
 
-- Remove duplication, clarify expressions or names, shorten long routines, replace unexplained literals, or simplify control flow.
-- Improve responsibility placement, cohesion, coupling, dependency direction, or variation boundaries without changing required behavior.
-- Prepare code for a later feature by making its structure easier to change safely.
-- Use `iterative-risk-driven-development` instead of treating the work as a
-  localized refactoring when it creates or moves a material test seam,
-  composition root, backend, entrypoint, process-global dependency, runtime
-  owner, readiness condition, or cleanup boundary.
-- Do not mix a refactoring step with an intentional feature, contract, or defect-behavior change.
+- Resolve a review finding or direct request by moving a cohesive
+  responsibility to an existing owner.
+- Correct coupling, dependency direction, or variation ownership when the
+  intended boundaries are already established.
+- Consolidate raw configuration translation into an existing typed owner.
+- Reconcile durable design knowledge after one of these structural changes.
+- Do not use for an intentional behavior, contract, or defect change.
 
-## Design Guidance
+## Related Owners
 
-- With the `all` installation, use external `test-driven-development` to add
-  new behavior or grow the executable safety net. Otherwise, follow
-  repository-native implementation and verification guidance.
+- Use external `code-review-and-quality` with the `all` installation for formal
+  review. Route its routine naming, extraction, duplication, control-flow, or
+  recent-code clarity findings to external `code-simplification`. Otherwise,
+  use repository-native review and cleanup.
+- Use external `test-driven-development` with the `all` installation for new
+  behavior or a larger executable safety net. Otherwise, follow repository
+  implementation and verification guidance.
 - Use [GRASP Responsibility Design](../grasp-responsibility-design/SKILL.md)
-  when a smell indicates misplaced native responsibility, low cohesion, high
-  coupling, or unclear dependency direction. The owner may be a class, module,
-  function, task, adapter, handle, or composition root.
-- Use [Design Pattern Application](../design-pattern-application/SKILL.md) only when a named design force justifies added indirection or variation; do not introduce a pattern merely as cleanup vocabulary.
-- Use [Software Design Language Adaptation](../software-design-language-adaptation/SKILL.md) to choose idiomatic transformations and preserve language-specific ownership, lifecycle, error, and concurrency semantics.
-- Update use-case realizations or design class diagrams when refactoring changes durable responsibilities, collaborations, public interfaces, or dependency direction. Do not update them for private local cleanup they intentionally omit.
+  when the intended responsibility owner is unresolved.
+- Use [Design Pattern Application](../design-pattern-application/SKILL.md) only
+  when a demonstrated force justifies new indirection or variation.
+- Use
+  [Software Design Language Adaptation](../software-design-language-adaptation/SKILL.md)
+  when language semantics constrain a safe transformation.
+- Use `iterative-risk-driven-development` when work creates or moves a material
+  test seam, composition root, backend, entrypoint, process-global dependency,
+  runtime owner, readiness condition, resource lifecycle, or cleanup boundary.
 
 ## Workflow
 
-1. **Define the invariant.** State the observable behavior and public contracts
-   that must remain unchanged. Separate any desired behavior change into
-   another implementation task.
-2. **Inspect the repository and worktree.** Read governance, find established verification commands, and distinguish existing user changes from the intended refactoring.
-3. **Establish a green baseline.** Run the focused tests and other required checks that protect the behavior. If protection is inadequate, add characterization tests for current required behavior before restructuring it.
-4. **Name one structural problem.** Identify concrete evidence such as duplication, a long routine, an unclear expression, a large responsibility cluster, high coupling, or an unstable dependency.
-5. **Classify boundary impact.** Check whether the change creates or moves a
-   material test seam, composition root, backend, entrypoint, process-global
-   dependency, runtime task, resource owner, readiness condition, or cleanup
-   boundary. If it does, return to or use
-   `iterative-risk-driven-development` to establish the preserved vertical
-   scenario, native responsibilities, ownership consequences, verification
-   ownership, and completion boundary. Do not continue as a local refactoring
-   merely because observable behavior should remain unchanged.
-6. **Calibrate the step.** Default to one semantic transformation. Batch only homogeneous mechanical edits that follow one rule, share the same protection, remain easy to review and reverse, and do not alter public interfaces, responsibility placement, ownership, errors, ordering, or concurrency semantics.
-7. **Apply the transformation or bounded batch.** Prefer a local move such as Rename, Extract Function/Method, Extract Constant, Introduce Explaining Variable, simplify a conditional, move one responsibility, or encapsulate one dependency. Preserve behavior instead of redesigning multiple boundaries at once.
-8. **Re-execute focused checks.** Run them immediately after the independently reviewable step. If they fail, repair or undo only that step before continuing; do not edit valid expectations to conceal a regression.
-9. **Inspect the result.** Confirm that the named problem improved and that the change did not introduce unnecessary indirection, duplication, or semantic drift.
-10. **Repeat in small steps.** Chain transformations only while each has a clear purpose and independently verified green state.
-11. **Run broader verification.** Execute the relevant regression suite and repository-required static, formatting, lint, or type checks. Retain a material integration or end-to-end oracle when the refactoring changes an internal boundary.
-12. **Reconcile design artifacts.** Refine durable design records if responsibility, collaboration, interface, dependency, system-boundary, ownership, or verification knowledge changed.
-13. **Report evidence.** Summarize the preserved behavior, structural improvements, verification commands and results, whether the result is enabling or closes its parent outcome, and any intentionally deferred smell.
+1. **Fix the invariant and scope.** State the behavior to preserve. Read
+   repository governance and separate unrelated work.
+2. **Establish a green baseline.** Run focused checks. Add characterization
+   checks for required current behavior when protection is inadequate.
+3. **Name one structural pressure.** Cite evidence of misplaced responsibility,
+   high coupling, unstable dependency direction, a parallel configuration
+   control plane, or a variation boundary with the wrong owner.
+4. **Classify boundary impact.** Route boundary-sensitive work to
+   `iterative-risk-driven-development`. Do not hide system redesign inside a
+   local refactoring.
+5. **Choose one transformation.** Move one responsibility to its established
+   owner, encapsulate a dependency behind an existing boundary, consolidate
+   configuration translation, or align dependency direction with established
+   design. Batch only homogeneous mechanical edits that share one rule and
+   verification boundary.
+6. **Apply and verify.** Run focused checks after each transformation or bounded
+   batch. Repair or undo a failing step without weakening valid expectations.
+7. **Run broader checks.** Execute the relevant regression, static, formatting,
+   lint, and type checks. Retain a material integration or end-to-end oracle.
+8. **Reconcile durable knowledge.** Update existing design artifacts only when
+   represented responsibility, collaboration, interface, dependency, ownership,
+   or verification knowledge changed.
+9. **Report evidence.** Summarize the invariant, structural pressure,
+   transformation, verification, completion boundary, and deferred risk.
 
-## Refactoring Record Template
+## Output
 
-Before creating a separate evidence document, apply
+Keep evidence with the changed code and checks by default. Before creating a
+separate record, apply the
 [Artifact Selection Budget](../select-technical-artifacts/references/artifact-selection-budget.md).
-Keep results with executable checks and the changed code unless a durable
-review, audit, or unresolved risk needs an independent record.
 
-Use this template when persisting refactoring evidence as a standalone Markdown
-file. Follow
+When a standalone record is justified, follow
 [Markdown Artifact Frontmatter](../iterative-risk-driven-development/references/markdown-artifact-frontmatter.md)
-and use STE-style.
-The preserved behavior and named structural problem should orient the reader
-without adding a summary that repeats the verification record.
-For a conversational report or a section embedded in an aggregate file, omit
-the frontmatter and adjust heading levels.
+and use this compact shape:
 
 ```markdown
 ---
 type: "Refactoring Record"
 title: "Refactoring: [Structural outcome]"
-description: "[One sentence summarizing the verified structural improvement]"
-id: "[Stable work-item ID when cross-referenced]"
+description: "[Verified responsibility, dependency, or configuration change]"
 status: "[planned | verified | blocked]"
 tags: [refactoring, verification]
 ---
 
-# Refactoring: [Structural Outcome]
+# Refactoring: [Structural outcome]
 
-## Behavior Preserved
-
-- [Public contract or observable result]
-
-## Baseline
-
-- [Focused test command and passing result]
-
-## Problem
-
-- [Concrete smell or design pressure]
-
-## Transformations
-
-1. [Small transformation or justified mechanical batch] -> [focused check result]
-
-## Batch Rationale
-
-- [not batched, or shared rule, protection, reviewability, and reversibility]
-
-## Broader Verification
-
-- [Command and result]
-
-## Design Feedback
-
-- [none, or artifact/decision refined]
+- Behavior preserved: [invariant]
+- Structural pressure: [evidence]
+- Transformation: [bounded change]
+- Verification: [focused and broader commands and results]
+- Design feedback: [updated owner or none]
 ```
 
 ## Red Flags
 
-- Refactoring begins without a passing baseline or adequate characterization of required behavior.
-- A broad rewrite prevents individual transformations from being verified.
-- Semantic or independently changing edits are hidden inside a mechanical batch.
-- Tests are changed to accept an accidental behavioral difference.
-- A design pattern is introduced before its force and cost are stated.
-- A boundary-sensitive refactoring is treated as local and loses the parent
-  scenario, responsibility assignment, resource owner, or end-to-end oracle.
-- Generated indirection makes the code longer or harder to understand without improving a named pressure.
-- Public interfaces, errors, side effects, ordering, ownership, or concurrency semantics drift unnoticed.
-- UML or responsibility records remain stale after a durable structural design change.
+- Routine clarity cleanup is routed here instead of to `code-simplification` or
+  repository-native cleanup.
+- Work starts without a passing baseline or adequate characterization.
+- A batch combines semantic or independently changing edits.
+- Tests are weakened to accept a behavioral difference.
+- A boundary-sensitive change is treated as local.
+- Configuration gains a second control plane instead of one typed owner.
+- Durable design knowledge remains stale after structural ownership changes.
 
 ## Verification
 
-- [ ] The observable behavior to preserve is explicit.
-- [ ] Relevant tests and required checks passed before the first transformation.
-- [ ] Each transformation or bounded batch addressed one named structural problem.
-- [ ] Boundary-sensitive work re-entered coordinated design instead of being
-      treated as a local transformation.
-- [ ] Every batch contains only homogeneous, mechanical, independently reviewable edits and has an explicit batching rationale.
-- [ ] Focused checks ran after every transformation or justified batch and broader checks passed at the end.
-- [ ] No valid expectation was weakened to hide a regression.
-- [ ] Language-specific behavior such as ownership, errors, ordering, and concurrency remains intact.
-- [ ] A material integration or end-to-end oracle remains visible after local
-      verification, and enabling seams are not reported as the parent outcome.
-- [ ] Durable design artifacts were updated only when their represented design knowledge changed.
-- [ ] The record explains the preserved behavior and structural problem before transformation detail.
-- [ ] Persisted standalone Markdown evidence exposes identity, structural summary, and lifecycle metadata in one frontmatter block.
+- [ ] The preserved behavior and structural pressure are explicit.
+- [ ] Focused checks passed before and after each transformation or bounded
+      batch.
+- [ ] The change follows one established responsibility, dependency, variation,
+      or configuration boundary.
+- [ ] Boundary-sensitive work returned to coordinated development.
+- [ ] No valid expectation or observable behavior changed.
+- [ ] Broader checks and any material end-to-end oracle pass.
+- [ ] Configuration retains one typed owner and control plane.
+- [ ] Durable design artifacts changed only when their represented knowledge
+      changed.
+- [ ] Any standalone record passes the artifact budget and uses the required
+      frontmatter.
