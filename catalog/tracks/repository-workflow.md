@@ -21,6 +21,14 @@ when a significant technical decision or durable engineering context needs a
 record. These four Addy skills remain external, not Sirius catalog entries or
 lifecycle gates. `behavior-preserving-refactoring` remains a Sirius skill.
 
+The `all` installation also provides OpenAI's external
+[`skill-creator`](https://github.com/openai/skills/blob/49f948faa9258a0c61caceaf225e179651397431/skills/.system/skill-creator/SKILL.md)
+for creating or updating reusable Codex-compatible skill packages. It also
+provides HumanLayer's external
+[`show-me`](https://github.com/humanlayer/skills/blob/3c2629142c5d437428269b1b722b08c0b87f574d/plugins/show-me/skills/show-me/SKILL.md)
+for concise visual explanations. These skills are independently selectable;
+they are not required repository lifecycle steps.
+
 ## Interactive code-change tour
 
 1. Use [`walkthrough-me`](../../skills/walkthrough-me/SKILL.md) when a reader
@@ -36,7 +44,10 @@ lifecycle gates. `behavior-preserving-refactoring` remains a Sirius skill.
 5. End with the end-to-end flow, verification evidence, and open questions.
    Treat this as comprehension, not approval, commit authority, or a formal
    code-review verdict.
-6. Invoke `code-review-and-quality` separately when the user requests a
+6. Invoke `show-me` separately when one concise visual would clarify the
+   current topic. It does not replace the walkthrough's fixed source, ordered
+   sections, or reader checkpoints.
+7. Invoke `code-review-and-quality` separately when the user requests a
    correctness, architecture, security, performance, or merge review.
 
 ## Typical change flow
@@ -73,6 +84,14 @@ Each step requires the authority appropriate to its effects. `simplify` is
 retired. Review findings select between `code-simplification`,
 `behavior-preserving-refactoring`, and coordinated redesign; these are not
 mandatory lifecycle gates.
+
+## Skill authoring
+
+Use `skill-creator` when the requested repository work is a new or updated
+Codex-compatible skill package. Start from concrete usage examples. Add only
+resources that support repeated execution. Follow the consuming repository's
+catalog, profile, metadata, documentation, and validation rules. Installing
+`skill-creator` does not make its outputs active Sirius skills automatically.
 
 ## Governance feedback
 

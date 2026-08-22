@@ -14,10 +14,12 @@ PACKAGED_REPO_SOURCE = f'{PACKAGED_ADD}{REPO_ROOT}"'
 SOURCE_SKILLS_DIR = REPO_ROOT / "skills"
 TARGET_PROJECT = Path("/tmp/sirius-say")
 ADDY_EXTERNAL_PROFILE = REPO_ROOT / "catalog/external-skill-sets/addy-osmani.txt"
-ADDY_SOURCE = (
-    "https://github.com/addyosmani/agent-skills/archive/"
-    "5a1b82d6445d1e2f0abeea1072851419a50c0e5c.tar.gz"
-)
+OPENAI_EXTERNAL_PROFILE = REPO_ROOT / "catalog/external-skill-sets/openai.txt"
+HUMANLAYER_EXTERNAL_PROFILE = REPO_ROOT / "catalog/external-skill-sets/humanlayer.txt"
+ADDY_SOURCE = "addyosmani/agent-skills@5a1b82d6445d1e2f0abeea1072851419a50c0e5c"
+OPENAI_SOURCE = "openai/skills@49f948faa9258a0c61caceaf225e179651397431"
+HUMANLAYER_SOURCE = "humanlayer/skills@3c2629142c5d437428269b1b722b08c0b87f574d"
+EXTERNAL_SOURCES = (ADDY_SOURCE, OPENAI_SOURCE, HUMANLAYER_SOURCE)
 ADDY_SKILLS = {
     "interview-me",
     "idea-refine",
@@ -29,6 +31,9 @@ ADDY_SKILLS = {
     "git-workflow-and-versioning",
     "documentation-and-adrs",
 }
+OPENAI_SKILLS = {"skill-creator"}
+HUMANLAYER_SKILLS = {"show-me"}
+EXTERNAL_SKILLS = ADDY_SKILLS | OPENAI_SKILLS | HUMANLAYER_SKILLS
 PROFILE_NAMES = (
     "workflow",
     "iterative-design",
@@ -93,12 +98,13 @@ def read_external_profile(path: Path) -> set[str]:
     }
 
 
-def assert_addy_install_is_guarded_to_all(output: str) -> None:
+def assert_external_installs_are_guarded_to_all(output: str) -> None:
     guard = 'if [[ "$skill_set" == "all" ]]'
-    source_position = output.index(ADDY_SOURCE)
-    guard_start = output.rfind(guard, 0, source_position)
-    guard_end = output.index("\nfi", guard_start)
-    assert guard_start < source_position < guard_end
+    for source in EXTERNAL_SOURCES:
+        source_position = output.index(source)
+        guard_start = output.rfind(guard, 0, source_position)
+        guard_end = output.index("\nfi", guard_start)
+        assert guard_start < source_position < guard_end
 
 
 def npx_commands(output: str, operation: str) -> list[str]:
@@ -117,8 +123,9 @@ def test_install_targets_a_consumer_project_with_the_workflow_profile() -> None:
     assert "sync_shared_skill_runtime.py" not in output
     assert PACKAGED_REPO_SOURCE not in output
     assert len(npx_commands(output, "add")) == 1
-    assert ADDY_SOURCE in npx_commands(output, "add")[0]
-    assert_addy_install_is_guarded_to_all(output)
+    for source in EXTERNAL_SOURCES:
+        assert source in output
+    assert_external_installs_are_guarded_to_all(output)
     assert 'if [[ "$skill_set" == "all" ]]' in output
     assert "prune-retired-local" in output
     assert "link-profile" in output
@@ -156,36 +163,69 @@ def test_install_global_preserves_the_packaged_global_workflow() -> None:
     assert all("--global" in command for command in npx_commands(output, "add"))
 
 
-def test_install_all_adds_only_the_pinned_external_addy_profile_locally() -> None:
+def test_install_all_adds_only_the_pinned_external_profiles_locally() -> None:
     output = render_just("install", str(TARGET_PROJECT), "all")
 
     assert read_external_profile(ADDY_EXTERNAL_PROFILE) == ADDY_SKILLS
-    assert not read_profile("all") & ADDY_SKILLS
-    assert ADDY_SOURCE in output
-    assert str(ADDY_EXTERNAL_PROFILE) in output
-    assert_addy_install_is_guarded_to_all(output)
+    assert read_external_profile(OPENAI_EXTERNAL_PROFILE) == OPENAI_SKILLS
+    assert read_external_profile(HUMANLAYER_EXTERNAL_PROFILE) == HUMANLAYER_SKILLS
+    assert not read_profile("all") & EXTERNAL_SKILLS
+    for source in EXTERNAL_SOURCES:
+        assert source in output
+    for profile in (
+        ADDY_EXTERNAL_PROFILE,
+        OPENAI_EXTERNAL_PROFILE,
+        HUMANLAYER_EXTERNAL_PROFILE,
+    ):
+        assert str(profile) in output
+    assert_external_installs_are_guarded_to_all(output)
     assert output.count(f"{NPX_SKILLS} add") == 1
+    assert output.count('install_external_profile "') == 3
     assert "external_skills" in output
     assert "combined_profile" not in output
     assert "--global" not in npx_commands(output, "add")[0]
 
 
-def test_named_profiles_guard_external_addy_install_to_all() -> None:
+def test_named_profiles_guard_external_install_to_all() -> None:
     output = render_just("install", str(TARGET_PROJECT), "iterative-design")
 
-    assert ADDY_SOURCE in output
-    assert str(ADDY_EXTERNAL_PROFILE) in output
-    assert_addy_install_is_guarded_to_all(output)
+    for source in EXTERNAL_SOURCES:
+        assert source in output
+    assert_external_installs_are_guarded_to_all(output)
     assert output.count(f"{NPX_SKILLS} add") == 1
 
 
-def test_uninstall_all_manages_the_external_addy_profile() -> None:
+@pytest.mark.parametrize("target", ("install-global", "uninstall-global"))
+def test_global_all_combines_every_external_profile(target: str) -> None:
+    output = render_just(target, "all")
+
+    for profile in (
+        ADDY_EXTERNAL_PROFILE,
+        OPENAI_EXTERNAL_PROFILE,
+        HUMANLAYER_EXTERNAL_PROFILE,
+    ):
+        assert str(profile) in output
+    assert 'cat "$skill_set_file"' in output
+    assert '>> "$combined_profile"' in output
+
+
+def test_uninstall_all_manages_every_external_profile() -> None:
     output = render_just("uninstall", str(TARGET_PROJECT), "all")
 
-    assert str(ADDY_EXTERNAL_PROFILE) in output
-    assert "remove-locked-profile" in output
+    for profile in (
+        ADDY_EXTERNAL_PROFILE,
+        OPENAI_EXTERNAL_PROFILE,
+        HUMANLAYER_EXTERNAL_PROFILE,
+    ):
+        assert str(profile) in output
+    assert output.count("remove-locked-profile") == 3
     assert '--lock "$target_dir/skills-lock.json"' in output
-    assert "addyosmani/agent-skills" in output
+    for lock_source in (
+        "addyosmani/agent-skills",
+        "openai/skills",
+        "humanlayer/skills",
+    ):
+        assert lock_source in output
     assert npx_commands(output, "ls") == []
     assert npx_commands(output, "remove") == []
     assert "--global" not in output
@@ -384,3 +424,6 @@ def test_validation_covers_the_consolidated_catalog() -> None:
 
     assert result.returncode == 0, result.stdout
     assert "Validated 19 skills" in result.stdout
+    assert (
+        "Validated 11 external add-on skills across 3 source profiles" in result.stdout
+    )

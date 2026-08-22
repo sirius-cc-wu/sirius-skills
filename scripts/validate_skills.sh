@@ -8,7 +8,11 @@ track_directory="$root/catalog/tracks"
 profile_directory="$root/skill-sets"
 all_profile="$profile_directory/all.txt"
 retired_ledger="$root/catalog/retired-skills.tsv"
-external_addy_profile="$root/catalog/external-skill-sets/addy-osmani.txt"
+external_profiles=(
+  "$root/catalog/external-skill-sets/addy-osmani.txt"
+  "$root/catalog/external-skill-sets/openai.txt"
+  "$root/catalog/external-skill-sets/humanlayer.txt"
+)
 
 fail() {
   echo "$1" >&2
@@ -86,16 +90,22 @@ while IFS= read -r line; do
 done < "$retired_ledger"
 
 test "$retired_count" -gt 0 || fail "retired skill ledger is empty"
-test -f "$external_addy_profile" || fail "missing external Addy skill profile"
-mapfile -t external_addy_skills < <(read_profile "$external_addy_profile")
-test "${#external_addy_skills[@]}" -gt 0 || fail "external Addy skill profile is empty"
-declare -A external_addy_by_name=()
-for name in "${external_addy_skills[@]}"; do
-  [[ "$name" =~ ^[a-z0-9][a-z0-9-]*$ ]] || fail "invalid external skill name: $name"
-  test -z "${external_addy_by_name[$name]:-}" || fail "duplicate external skill: $name"
-  test -z "${managed_by_name[$name]:-}" || fail "external skill is active in Sirius catalog: $name"
-  test -z "${retired_by_name[$name]:-}" || fail "external skill is retired in Sirius ledger: $name"
-  external_addy_by_name["$name"]=1
+declare -A external_by_name=()
+external_count=0
+for external_profile in "${external_profiles[@]}"; do
+  test -f "$external_profile" || fail "missing external skill profile: $external_profile"
+  grep -Eq '^# Source revision: [0-9a-f]{40}$' "$external_profile" ||
+    fail "external skill profile missing pinned source revision: $external_profile"
+  mapfile -t external_skills < <(read_profile "$external_profile")
+  test "${#external_skills[@]}" -gt 0 || fail "external skill profile is empty: $external_profile"
+  for name in "${external_skills[@]}"; do
+    [[ "$name" =~ ^[a-z0-9][a-z0-9-]*$ ]] || fail "invalid external skill name: $name"
+    test -z "${external_by_name[$name]:-}" || fail "duplicate external skill: $name"
+    test -z "${managed_by_name[$name]:-}" || fail "external skill is active in Sirius catalog: $name"
+    test -z "${retired_by_name[$name]:-}" || fail "external skill is retired in Sirius ledger: $name"
+    external_by_name["$name"]=1
+    external_count=$((external_count + 1))
+  done
 done
 
 for profile in "${profiles[@]}"; do
@@ -256,5 +266,5 @@ grep -q "^## Catalog and workflow tracks$" "$root/README.md" || fail "README mis
 grep -q "^## Consolidation history$" "$root/README.md" || fail "README missing consolidation history"
 
 echo "Validated ${#expected[@]} skills across ${#profiles[@]} profiles."
-echo "Validated ${#external_addy_skills[@]} external Addy add-on skills."
+echo "Validated $external_count external add-on skills across ${#external_profiles[@]} source profiles."
 echo "Validated $retired_count retired skill tombstones."

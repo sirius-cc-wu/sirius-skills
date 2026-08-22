@@ -40,6 +40,8 @@ Task arrives
 │  └─ external idea-refine
 ├─ A confirmed direction needs an implementation specification
 │  └─ external spec-driven-development
+├─ A reusable Codex-compatible skill needs creation or update
+│  └─ external skill-creator
 ├─ Current behavior, architecture, deployment, or constraints lack evidence
 │  └─ responsible external current-system recovery process
 ├─ Scope, actors, goals, or scenarios are unclear
@@ -63,6 +65,8 @@ Task arrives
 │     └─ material boundary change → iterative-risk-driven-development
 ├─ A reader needs a paced explanation of a selected change
 │  └─ walkthrough-me
+├─ The current topic needs a concise visual explanation
+│  └─ external show-me
 ├─ Prepared work needs Git or version guidance
 │  └─ external git-workflow-and-versioning or repository-native Git workflow
 ├─ Committed work is ready for pull-request publication
@@ -78,7 +82,7 @@ Task arrives
    └─ iterative-risk-driven-development
 ```
 
-External Addy routes require the `all` installation. Otherwise, select the
+External add-on routes require the `all` installation. Otherwise, select the
 repository-native workflow or report the responsible external prerequisite.
 
 ## Routing Principles
@@ -138,6 +142,8 @@ repository-native workflow or report the responsible external prerequisite.
 | Define | One requester's intended outcome is unclear | External `interview-me` |
 | Define | A candidate direction needs alternatives, assumption testing, or MVP scope | External `idea-refine` |
 | Define | A confirmed direction needs an implementation specification | External `spec-driven-development` |
+| Cross-cutting Support | A reusable Codex-compatible skill needs creation or update | External `skill-creator` |
+| Cross-cutting Support | The current topic needs a concise diagram, code-shape sketch, or focused visual artifact | External `show-me` |
 | Requirements Analysis | Vision, feasibility, project scope, or major business risk is unclear | `inception` |
 | Requirements Analysis | Actors, goals, system boundary, scenarios, or extensions are unclear | `use-case-modeling` |
 | System Analysis | Business concepts, vocabulary, associations, or attributes are unclear | `domain-modeling` |

@@ -1,0 +1,4 @@
+# OpenAI skills installed by the Sirius all profile.
+# Source revision: 49f948faa9258a0c61caceaf225e179651397431
+# This manifest is external to the Sirius active catalog.
+skill-creator

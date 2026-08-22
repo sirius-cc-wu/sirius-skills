@@ -68,7 +68,8 @@ def test_assessment_owns_entry_routing_without_replacing_iteration_coordination(
     }
     external_names = {
         line
-        for line in read("catalog/external-skill-sets/addy-osmani.txt").splitlines()
+        for profile in (REPO_ROOT / "catalog/external-skill-sets").glob("*.txt")
+        for line in profile.read_text(encoding="utf-8").splitlines()
         if line and not line.startswith("#")
     }
     for name in (active_names - {"assess-development-input"}) | external_names:
@@ -81,6 +82,19 @@ def test_assessment_owns_entry_routing_without_replacing_iteration_coordination(
     assert "Select in-iteration owners" in iterative
     assert "does not own session-start skill discovery" in iterative
     assert "owns operational entry routing" in relationships
+
+
+def test_external_authoring_and_visual_routes_keep_narrow_boundaries() -> None:
+    assessment = " ".join(
+        read("skills/assess-development-input/SKILL.md").split()
+    )
+    relationships = " ".join(read("catalog/skill-relationships.md").split())
+    track = " ".join(read("catalog/tracks/repository-workflow.md").split())
+
+    assert "reusable Codex-compatible skill needs creation or update" in assessment
+    assert "current topic needs a concise visual explanation" in assessment
+    assert "does not own a revision-fixed, checkpointed change tour" in relationships
+    assert "does not make its outputs active Sirius skills automatically" in track
 
 
 def test_doubt_driven_addon_challenges_claims_without_claiming_recovery() -> None:

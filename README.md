@@ -39,7 +39,7 @@ Available profiles are defined in [`skill-sets/`](skill-sets/):
 | `iterative-design` | Entry routing, technical-artifact selection, software architecture design, architecture decision documentation, artifact layout design, question-driven iterations, support-envelope and boundary-sensitive refactoring gates, native responsibility and optional object design, language adaptation, tested implementation, and scoped commits |
 | `applying-uml-and-patterns` | Compatibility alias for `iterative-design` |
 | `reverse-engineering` | Compatibility profile for technical-artifact selection, artifact placement, and recorded-decision discovery; it does not perform system recovery |
-| `all` | Every active Sirius skill in the catalog, plus the pinned Addy add-ons |
+| `all` | Every active Sirius skill in the catalog, plus all pinned external add-ons |
 
 Remove the default or a named profile later:
 
@@ -72,16 +72,16 @@ creates a per-skill compatibility link in the Antigravity directory without
 replacing unrelated entries. Global uninstallation and retired-skill cleanup
 remove only links that still point to their expected canonical installation.
 
-`just install <target-project> all` also installs the nine skills listed in
-[`catalog/external-skill-sets/addy-osmani.txt`](catalog/external-skill-sets/addy-osmani.txt)
-from Addy Osmani's pinned agent-skills revision. They remain external to the
-Sirius catalog and are not installed by other profiles. The external install
-uses the target project's scope for `just install <target-project> all` and
-global scope for
+`just install <target-project> all` also installs the pinned skills listed in
+[`catalog/external-skill-sets/`](catalog/external-skill-sets/): nine add-ons from
+Addy Osmani's `agent-skills`, OpenAI's `skill-creator`, and HumanLayer's
+`show-me`. They remain external to the Sirius catalog and are not installed by
+other profiles. The external install uses the target project's scope for
+`just install <target-project> all` and global scope for
 `just install-global all`. The matching uninstall command removes the same
-external names. Local removal requires the target's `skills-lock.json` entry to
-identify `addyosmani/agent-skills`, so a same-named skill from another source
-is preserved.
+external names. Local removal requires each target `skills-lock.json` entry to
+match its upstream repository, so a same-named skill from another source is
+preserved.
 
 A successful global installation also records its skill names in host-local
 state at `$XDG_STATE_HOME/sirius-skills/managed-skills.txt`, or
@@ -183,6 +183,14 @@ its next Sirius owner is unclear. `just install <target-project> all` or
 `just install-global all` provides these two skills as external add-ons; they
 are not Sirius catalog entries or named-profile members.
 
+With the `all` installation, use OpenAI's external
+[`skill-creator`](https://github.com/openai/skills/blob/49f948faa9258a0c61caceaf225e179651397431/skills/.system/skill-creator/SKILL.md)
+when creating or updating a reusable Codex-compatible skill package. It guides
+example discovery, resource selection, initialization, concise instruction
+writing, script testing, validation, and iteration. It does not make the new
+skill part of the Sirius catalog or authorize changes outside the requested
+package.
+
 `author-software-proposal` is retired. Existing legacy proposal artifacts
 remain valid at their migrated paths. Use `idea-refine` for new candidate
 directions. Route unevidenced current-system claims to a responsible external
@@ -243,6 +251,14 @@ the selected diff into a few logical sections. It explains one section with
 concise code locators and
 waits for explicit confirmation before advancing. It establishes understanding
 without approving, committing, or replacing formal code review.
+
+With the `all` installation, use HumanLayer's external
+[`show-me`](https://github.com/humanlayer/skills/blob/3c2629142c5d437428269b1b722b08c0b87f574d/plugins/show-me/skills/show-me/SKILL.md)
+when the current topic needs a concise visual explanation. It selects the
+smallest useful pseudocode, call tree, component or file tree, Mermaid diagram,
+diff, code shape, or focused HTML artifact. It complements `walkthrough-me` but
+does not replace the walkthrough's revision binding, pacing, or user
+checkpoints.
 
 `simplify` is retired. With the `all` installation, use external
 `code-review-and-quality` for formal review. Route readability and
@@ -367,7 +383,7 @@ and judge calibration are opt-in and never run as part of normal validation.
 
 - `skills/*/SKILL.md`: deployable agent workflows
 - `skill-sets/*.txt`: canonical installation profiles
-- `catalog/external-skill-sets/`: pinned membership for external add-ons
+- `catalog/external-skill-sets/`: source-specific pinned membership for external add-ons
 - `catalog/skills.md`: skill responsibilities and boundaries
 - `catalog/retired-skills.tsv`: append-only retired-name tombstones with Git
   evidence revisions

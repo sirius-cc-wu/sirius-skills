@@ -28,6 +28,8 @@ the Sirius active catalog:
 | Source | Pinned revision | Installed names | Installation surface |
 |---|---|---|---|
 | Addy Osmani's [`agent-skills`](https://github.com/addyosmani/agent-skills/tree/5a1b82d6445d1e2f0abeea1072851419a50c0e5c) | `5a1b82d6445d1e2f0abeea1072851419a50c0e5c` | `interview-me`, `idea-refine`, `spec-driven-development`, `doubt-driven-development`, `test-driven-development`, `code-review-and-quality`, `code-simplification`, `git-workflow-and-versioning`, `documentation-and-adrs` | `just install <target-project> all` or `just install-global all` only |
+| OpenAI's [`skills`](https://github.com/openai/skills/tree/49f948faa9258a0c61caceaf225e179651397431/skills/.system/skill-creator) | `49f948faa9258a0c61caceaf225e179651397431` | `skill-creator` | `just install <target-project> all` or `just install-global all` only |
+| HumanLayer's [`skills`](https://github.com/humanlayer/skills/tree/3c2629142c5d437428269b1b722b08c0b87f574d/plugins/show-me/skills/show-me) | `3c2629142c5d437428269b1b722b08c0b87f574d` | `show-me` | `just install <target-project> all` or `just install-global all` only |
 
 ## Proposed Sources
 

@@ -1,0 +1,4 @@
+# HumanLayer skills installed by the Sirius all profile.
+# Source revision: 3c2629142c5d437428269b1b722b08c0b87f574d
+# This manifest is external to the Sirius active catalog.
+show-me

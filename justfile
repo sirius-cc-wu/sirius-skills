@@ -5,15 +5,21 @@ set shell := ["bash", "-c"]
 repo_root := justfile_directory()
 agent_flags := "--yes --agent github-copilot --agent codex --agent antigravity --agent antigravity-cli"
 retired_ledger := repo_root / "catalog/retired-skills.tsv"
-addy_source := "https://github.com/addyosmani/agent-skills/archive/5a1b82d6445d1e2f0abeea1072851419a50c0e5c.tar.gz"
+addy_source := "addyosmani/agent-skills@5a1b82d6445d1e2f0abeea1072851419a50c0e5c"
 addy_profile := repo_root / "catalog/external-skill-sets/addy-osmani.txt"
 addy_lock_source := "addyosmani/agent-skills"
+openai_source := "openai/skills@49f948faa9258a0c61caceaf225e179651397431"
+openai_profile := repo_root / "catalog/external-skill-sets/openai.txt"
+openai_lock_source := "openai/skills"
+humanlayer_source := "humanlayer/skills@3c2629142c5d437428269b1b722b08c0b87f574d"
+humanlayer_profile := repo_root / "catalog/external-skill-sets/humanlayer.txt"
+humanlayer_lock_source := "humanlayer/skills"
 source_skills_dir := repo_root / "skills"
 
 # Install a source-linked profile into a target project by default.
 install target_dir skill_set="workflow": (install-local target_dir skill_set)
 
-# Install into a target project; all also installs the local Addy add-ons.
+# Install into a target project; all also installs the external add-ons.
 install-local target_dir skill_set="workflow": sync-shared-references
 	#!/usr/bin/env bash
 	set -euo pipefail
@@ -40,14 +46,22 @@ install-local target_dir skill_set="workflow": sync-shared-references
 		link-profile --profile "$skill_set_file" \
 		--source-dir "{{source_skills_dir}}" --target-dir "$target_skills_dir"
 	if [[ "$skill_set" == "all" ]]; then
-		mapfile -t external_skills < <(sed -e '/^[[:space:]]*#/d' -e '/^[[:space:]]*$/d' "{{addy_profile}}")
-		external_skill_flags=()
-		for skill in "${external_skills[@]}"; do
-			external_skill_flags+=(--skill "$skill")
-		done
+		install_external_profile() {
+			local source="$1"
+			local profile="$2"
+			local -a external_skills external_skill_flags
+			mapfile -t external_skills < <(sed -e '/^[[:space:]]*#/d' -e '/^[[:space:]]*$/d' "$profile")
+			external_skill_flags=()
+			for skill in "${external_skills[@]}"; do
+				external_skill_flags+=(--skill "$skill")
+			done
+			npx --yes skills add "$source" {{agent_flags}} "${external_skill_flags[@]}"
+		}
 		(
 			cd "$target_dir"
-			npx --yes skills add "{{addy_source}}" {{agent_flags}} "${external_skill_flags[@]}"
+			install_external_profile "{{addy_source}}" "{{addy_profile}}"
+			install_external_profile "{{openai_source}}" "{{openai_profile}}"
+			install_external_profile "{{humanlayer_source}}" "{{humanlayer_profile}}"
 		)
 	fi
 
@@ -72,7 +86,9 @@ install-global skill_set="workflow": sync-shared-references
 	cat "$skill_set_file" > "$combined_profile"
 	if [[ "$skill_set" == "all" ]]; then
 		test -f "{{addy_profile}}"
-		cat "{{addy_profile}}" >> "$combined_profile"
+		test -f "{{openai_profile}}"
+		test -f "{{humanlayer_profile}}"
+		cat "{{addy_profile}}" "{{openai_profile}}" "{{humanlayer_profile}}" >> "$combined_profile"
 	fi
 
 	mapfile -t skills < <(sed -e '/^[[:space:]]*#/d' -e '/^[[:space:]]*$/d' "$skill_set_file")
@@ -82,12 +98,20 @@ install-global skill_set="workflow": sync-shared-references
 	done
 	npx --yes skills add "{{repo_root}}" --global {{agent_flags}} "${skill_flags[@]}"
 	if [[ "$skill_set" == "all" ]]; then
-		mapfile -t external_skills < <(sed -e '/^[[:space:]]*#/d' -e '/^[[:space:]]*$/d' "{{addy_profile}}")
-		external_skill_flags=()
-		for skill in "${external_skills[@]}"; do
-			external_skill_flags+=(--skill "$skill")
-		done
-		npx --yes skills add "{{addy_source}}" --global {{agent_flags}} "${external_skill_flags[@]}"
+		install_external_profile() {
+			local source="$1"
+			local profile="$2"
+			local -a external_skills external_skill_flags
+			mapfile -t external_skills < <(sed -e '/^[[:space:]]*#/d' -e '/^[[:space:]]*$/d' "$profile")
+			external_skill_flags=()
+			for skill in "${external_skills[@]}"; do
+				external_skill_flags+=(--skill "$skill")
+			done
+			npx --yes skills add "$source" --global {{agent_flags}} "${external_skill_flags[@]}"
+		}
+		install_external_profile "{{addy_source}}" "{{addy_profile}}"
+		install_external_profile "{{openai_source}}" "{{openai_profile}}"
+		install_external_profile "{{humanlayer_source}}" "{{humanlayer_profile}}"
 	fi
 	env PYTHONPATH="{{repo_root}}/src" python3 -m sirius_skills.commands.manage_installed_skills \
 		link-profile --profile "$combined_profile"
@@ -154,7 +178,7 @@ prune-retired-legacy:
 # Remove a source-linked profile from a target project by default.
 uninstall target_dir skill_set="workflow": (uninstall-local target_dir skill_set)
 
-# Remove from a target project; all also removes the local Addy add-ons.
+# Remove from a target project; all also removes the external add-ons.
 uninstall-local target_dir skill_set="workflow":
 	#!/usr/bin/env bash
 	set -euo pipefail
@@ -178,6 +202,14 @@ uninstall-local target_dir skill_set="workflow":
 			remove-locked-profile --profile "{{addy_profile}}" \
 			--lock "$target_dir/skills-lock.json" --skills-dir "$target_skills_dir" \
 			--source "{{addy_lock_source}}"
+		env PYTHONPATH="{{repo_root}}/src" python3 -m sirius_skills.commands.manage_installed_skills \
+			remove-locked-profile --profile "{{openai_profile}}" \
+			--lock "$target_dir/skills-lock.json" --skills-dir "$target_skills_dir" \
+			--source "{{openai_lock_source}}"
+		env PYTHONPATH="{{repo_root}}/src" python3 -m sirius_skills.commands.manage_installed_skills \
+			remove-locked-profile --profile "{{humanlayer_profile}}" \
+			--lock "$target_dir/skills-lock.json" --skills-dir "$target_skills_dir" \
+			--source "{{humanlayer_lock_source}}"
 	fi
 	env PYTHONPATH="{{repo_root}}/src" python3 -m sirius_skills.commands.manage_installed_skills \
 		unlink-profile --profile "$skill_set_file" \
@@ -200,7 +232,9 @@ uninstall-global skill_set="workflow":
 	cat "$skill_set_file" > "$combined_profile"
 	if [[ "$skill_set" == "all" ]]; then
 		test -f "{{addy_profile}}"
-		cat "{{addy_profile}}" >> "$combined_profile"
+		test -f "{{openai_profile}}"
+		test -f "{{humanlayer_profile}}"
+		cat "{{addy_profile}}" "{{openai_profile}}" "{{humanlayer_profile}}" >> "$combined_profile"
 	fi
 
 	installed=$(npx --yes skills ls -g --json | python3 -c 'import json, pathlib, sys; managed = {line.strip() for line in pathlib.Path(sys.argv[1]).read_text().splitlines() if line.strip() and not line.lstrip().startswith("#")}; installed = [item["name"] for item in json.load(sys.stdin) if item.get("name") in managed]; print("\n".join(installed))' "$combined_profile")

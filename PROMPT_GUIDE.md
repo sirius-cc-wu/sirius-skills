@@ -44,9 +44,9 @@ existing guidance or codifying a one-off incident.
 
 ## Optional external add-ons
 
-These skills come from Addy Osmani's external `agent-skills` collection. The
-`all` installation provides the curated add-on set; the skills remain outside
-the Sirius catalog and named profiles.
+These skills come from pinned Addy Osmani, OpenAI, and HumanLayer collections.
+The `all` installation provides the curated add-on set; the skills remain
+outside the Sirius catalog and named profiles.
 
 ```text
 Use interview-me to ask one question at a time until my intended outcome, user,
@@ -60,6 +60,21 @@ assumptions, and converge on one candidate direction with MVP scope and a Not
 Doing list. Store the confirmed idea in an established ideas path or a
 feature path defined by local governance. Do not create a new proposal artifact.
 Preserve existing legacy proposals at their historical paths.
+```
+
+```text
+Use skill-creator to create or update this reusable Codex-compatible skill.
+Start from concrete usage examples, include only justified scripts, references,
+and assets, keep SKILL.md concise, test bundled scripts, and run the provided
+validation before reporting completion. Follow this repository's catalog,
+profile, metadata, and documentation rules.
+```
+
+```text
+Use show-me to explain the current topic visually. Choose the smallest useful
+pseudocode, call tree, component or file tree, Mermaid diagram, diff, code
+shape, or focused HTML artifact. Keep prose brief and do not replace formal
+review or an explicitly paced walkthrough.
 ```
 
 ```text
