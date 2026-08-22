@@ -669,7 +669,7 @@ sIterative --> sPr : committed work
 | Reuse mechanism | Phase-specific skills are composed by commands and selected when risk warrants | Skills invoke other skills and shared executable runtimes; plan artifacts are handed to later skills | Skills link to narrow specialists, profiles compose packages, and shared references are packaged into consuming skills |
 | Feedback loops | Debugging returns to regression testing; simplification returns to review | Live design/DevEx review follows planning; QA and canary feed fixes back before or after shipping | Recovery reconciliation, ownership-to-responsibility feedback, parent-outcome checks, design/implementation feedback, and continuous iteration return evidence to canonical artifacts |
 | Relationship authority | Explicit routing and example sequences in the meta-skill and command docs | README sprint model plus orchestration encoded in generated skill templates | Catalog, workflow tracks, skill boundaries, and profile membership |
-| Coverage choice here | All 24 skills | Documented connected workflows plus named independent utilities; not an exhaustive catalog | All 26 active skills, with bounded tracks and profile-driven installation |
+| Coverage choice here | All 24 skills | Documented connected workflows plus named independent utilities; not an exhaustive catalog | All 25 active skills, with bounded tracks and profile-driven installation |
 
 ## Evidence and limits
 

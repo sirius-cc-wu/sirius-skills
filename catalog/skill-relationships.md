@@ -6,7 +6,7 @@ current risk or complete the current behavior slice.
 
 ## Overview
 
-This diagram groups all 26 deployable Sirius skills by responsibility. It also
+This diagram groups all 25 deployable Sirius skills by responsibility. It also
 shows five external Addy add-ons. The diagram shows only
 the main movement between groups. Use the detailed diagrams below for
 conditional routes. Solid arrows show normal handoffs. They do not require a
@@ -47,7 +47,7 @@ rectangle "**Sirius: Intake**\nassess-development-input" as assess #FFF4CC
 
 rectangle "**Reverse Engineering**\nreverse-engineer-software-system\nsurvey-existing-system\nrecover-system-behavior\nreconstruct-software-architecture\nreconcile-recovered-design" as reverse #EAF4FB
 
-rectangle "**Iterative Risk-Driven Development**\niterative-risk-driven-development\ninception\nuse-case-modeling\nbehavior-driven-specification\ndomain-modeling\nsystem-sequence-diagrams\noperation-contracts\ngrasp-responsibility-design\nuse-case-realization\numl-class-diagram-design\ndesign-pattern-application\nsoftware-design-language-adaptation\ndesign-rust-lifecycles" as design #EEF8EE
+rectangle "**Iterative Risk-Driven Development**\niterative-risk-driven-development\ninception\nuse-case-modeling\ndomain-modeling\nsystem-sequence-diagrams\noperation-contracts\ngrasp-responsibility-design\nuse-case-realization\numl-class-diagram-design\ndesign-pattern-application\nsoftware-design-language-adaptation\ndesign-rust-lifecycles" as design #EEF8EE
 
 rectangle "**Implementation and Evolution**\ntest-driven-implementation\nbehavior-preserving-refactoring" as implementation #FFF5EA
 
@@ -166,9 +166,11 @@ Clarifying one requester's intent does not replace a responsible stakeholder
 process when several roles, evidence sources, conflicts, or decision authorities
 matter. Treat missing stakeholder evidence, validation, or approval as an
 external prerequisite. Route current-system claims to recovery. Route scope and
-feasibility to inception. Route approved acceptance behavior to
-behavior-driven specification. Route one independently consequential proposed,
-accepted, or superseding architecture choice to `record-architecture-decision`.
+feasibility to inception. Route approved actor goals and scenario flow to
+use-case modeling, non-trivial state effects to operation contracts, and a
+bounded approved oracle to test-driven implementation. Route one independently
+consequential proposed, accepted, or superseding architecture choice to
+`record-architecture-decision`.
 
 ## Reverse engineering
 

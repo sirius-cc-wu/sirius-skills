@@ -44,7 +44,6 @@ ITERATIVE_DESIGN_SKILLS = {
     "iterative-risk-driven-development",
     "inception",
     "use-case-modeling",
-    "behavior-driven-specification",
     "domain-modeling",
     "system-sequence-diagrams",
     "operation-contracts",
@@ -387,4 +386,4 @@ def test_validation_covers_the_consolidated_catalog() -> None:
     )
 
     assert result.returncode == 0, result.stdout
-    assert "Validated 26 skills" in result.stdout
+    assert "Validated 25 skills" in result.stdout

@@ -55,7 +55,6 @@ Choose the narrowest specialist for each material question:
 | One consequential architecture choice needs proposed review, accepted history, or supersession | [`record-architecture-decision`](../../skills/record-architecture-decision/SKILL.md) |
 | Vision, feasibility, project scope, or major business risk | [`inception`](../../skills/inception/SKILL.md) |
 | Actors, goals, system boundary, or scenario flow | [`use-case-modeling`](../../skills/use-case-modeling/SKILL.md) |
-| Observable examples and boundary cases | [`behavior-driven-specification`](../../skills/behavior-driven-specification/SKILL.md) |
 | Business concepts and shared vocabulary | [`domain-modeling`](../../skills/domain-modeling/SKILL.md) |
 | Actor-system events and operation names | [`system-sequence-diagrams`](../../skills/system-sequence-diagrams/SKILL.md) |
 | Non-trivial state effects and invariants | [`operation-contracts`](../../skills/operation-contracts/SKILL.md) |

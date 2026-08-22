@@ -28,7 +28,6 @@ The initial pilot covers:
 - `behavior-preserving-refactoring`;
 - `software-design-language-adaptation`;
 - `use-case-modeling`;
-- `behavior-driven-specification`;
 - `test-driven-implementation`;
 - `recover-system-behavior`;
 - `reconcile-recovered-design`;

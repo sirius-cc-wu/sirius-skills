@@ -175,8 +175,9 @@ are not Sirius catalog entries or named-profile members.
 remain valid at their migrated paths. Use `idea-refine` for new candidate
 directions. Route current-system claims to reverse engineering, scope and
 feasibility to `inception`, unresolved stakeholder authority to the responsible
-external process, acceptance behavior to `behavior-driven-specification`, and
-placement questions to `design-repository-artifact-layout`.
+external process, approved actor goals and scenario flow to `use-case-modeling`,
+non-trivial state effects to `operation-contracts`, and placement questions to
+`design-repository-artifact-layout`.
 
 `stakeholder-requirements-elicitation`,
 `requirements-synthesis-validation`, and `implementation-slice-briefing` are
@@ -187,6 +188,13 @@ knowledge through the responsible external process. Use
 readiness decision or entry point. Hand approved behavior or design directly to
 the narrowest analysis or implementation skill with its authority, non-goals,
 uncertainty, verification, and stop conditions intact.
+
+`behavior-driven-specification` is retired. Existing behavior specifications
+and scenario sets remain valid at their recorded revisions. Keep new approved
+examples and boundary cases with their canonical requirement, use case,
+contract, or executable test. Use `assess-development-input` when their
+readiness or next Sirius owner is unclear. Use `test-driven-implementation`
+when approved examples already provide an independent oracle.
 
 Use `walkthrough-me` when a reader needs a paced, read-only tour of a pull
 request, commit, commit range, branch diff, or staged, unstaged, or selected

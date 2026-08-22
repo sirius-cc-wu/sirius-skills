@@ -12,27 +12,25 @@ before entering this track.
 ## Add or Change Behavior
 
 1. Start with an approved use case, operation contract, acceptance example,
-   invariant, defect report, or other independent oracle.
-2. If the approved behavior lacks shared examples or has important boundary
-   cases, use
-   [`behavior-driven-specification`](../../skills/behavior-driven-specification/SKILL.md)
-   before implementation.
-3. Use
+   invariant, defect report, or other independent oracle. Preserve source-linked
+   success, failure, and boundary examples. Stop for the responsible owner when
+   material examples or decisions are missing instead of inventing them.
+2. Use
    [`software-design-language-adaptation`](../../skills/software-design-language-adaptation/SKILL.md)
    when language-specific ownership, errors, concurrency, or interface
    conventions affect the design.
-4. Use
+3. Use
    [`design-rust-lifecycles`](../../skills/design-rust-lifecycles/SKILL.md)
    before implementation when Rust resource ownership, startup, rollback,
    cancellation, supervision, or fallible cleanup requires an explicit
    implementation-facing lifecycle. Establish the system boundary,
    representative scenario, native responsibilities, and verification oracle
    first when the change is boundary-sensitive.
-5. Use
+4. Use
    [`test-driven-implementation`](../../skills/test-driven-implementation/SKILL.md)
    to size the behavior slice, demonstrate discriminatory verification, and
    implement the smallest coherent change.
-6. Feed implementation discoveries back into durable requirements or design
+5. Feed implementation discoveries back into durable requirements or design
    artifacts when their represented knowledge changes.
 
 Keep verification evidence with code, tests, schemas, or configuration by
