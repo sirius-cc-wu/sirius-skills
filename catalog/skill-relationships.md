@@ -7,10 +7,9 @@ current risk or complete the current behavior slice.
 ## Overview
 
 This diagram groups all 20 deployable Sirius skills by responsibility. It also
-shows six external Addy add-ons. The diagram shows only
-the main movement between groups. Use the detailed diagrams below for
-conditional routes. Solid arrows show normal handoffs. They do not require a
-fixed sequence. Dashed arrows show optional routing, support, or feedback.
+shows six external Addy add-ons. The diagram shows only the main movement
+between groups. Use the detailed diagrams below for conditional routes. Solid
+arrows show normal handoffs. They do not require a fixed sequence. Dashed arrows show optional routing, support, or feedback.
 
 ```plantuml
 @startuml sirius-skills-birds-eye
@@ -85,8 +84,9 @@ are not part of the Sirius catalog or named profiles.
 six curated add-ons; other profiles do not. The diagram shows one optional
 composition. `interview-me` confirms one requester's intent.
 `idea-refine` turns that intent into a focused, user-confirmed candidate
-one-pager. Skip `interview-me` when intent is concrete. Skip `idea-refine` when
-the direction is already focused.
+one-pager. `spec-driven-development` turns a confirmed direction into a
+human-reviewed implementation specification. Skip any step whose input is
+already sufficiently clear.
 
 Use `idea-refine` for a candidate direction. Save the confirmed
 one-pager in `docs/ideas/` or a feature path defined by local governance. Use
@@ -117,8 +117,9 @@ design.
 
 - Use **Assess Development Input** when requirements-shaped material exists but
   its readiness or Sirius entry point is unclear.
-- Use external `interview-me` or `idea-refine` before Sirius when requester
-  intent or a candidate direction needs interactive refinement.
+- Use external `interview-me`, `idea-refine`, or `spec-driven-development`
+  before Sirius when requester intent, a candidate direction, or an
+  implementation specification needs interactive refinement.
 - Start with **Iterative Analysis and Design** when an approved change needs a
   bounded behavior, analysis, design, language, or implementation iteration,
   or when a complex refactoring moves a system, test, responsibility, runtime,
@@ -148,20 +149,23 @@ external prerequisite. The assessment does not rewrite the source or execute
 the selected skill.
 
 A common cross-repository path uses the external
-[`interview-me`](https://github.com/addyosmani/agent-skills/blob/5a1b82d6445d1e2f0abeea1072851419a50c0e5c/skills/interview-me/SKILL.md)
+[`interview-me`](https://github.com/addyosmani/agent-skills/blob/5a1b82d6445d1e2f0abeea1072851419a50c0e5c/skills/interview-me/SKILL.md),
+[`idea-refine`](https://github.com/addyosmani/agent-skills/blob/5a1b82d6445d1e2f0abeea1072851419a50c0e5c/skills/idea-refine/SKILL.md),
 and
-[`idea-refine`](https://github.com/addyosmani/agent-skills/blob/5a1b82d6445d1e2f0abeea1072851419a50c0e5c/skills/idea-refine/SKILL.md):
+[`spec-driven-development`](https://github.com/addyosmani/agent-skills/blob/5a1b82d6445d1e2f0abeea1072851419a50c0e5c/skills/spec-driven-development/SKILL.md):
 
 ```text
 interview-me, when intent is unclear
   → idea-refine, when the direction needs exploration
-  → assess-development-input, only when the next owner is unclear
+  → spec-driven-development, when an implementation specification is needed
+  → assess-development-input, only when the next Sirius owner is unclear
 ```
 
 These handoffs depend on output meaning, not shared runtime state. Confirmed
-intent can feed idea refinement. The confirmed problem, direction, assumptions,
-MVP scope, non-goals, and open questions then become candidate input to the
-narrowest Sirius owner.
+intent can feed idea refinement. A confirmed direction can feed specification.
+The resulting problem, assumptions, scope, non-goals, constraints, success
+criteria, and open questions become candidate input to the narrowest Sirius
+owner. Preserve the stated review and approval authority at every handoff.
 
 Clarifying one requester's intent does not replace a responsible stakeholder
 process when several roles, evidence sources, conflicts, or decision authorities
@@ -207,7 +211,14 @@ boundary-sensitive refactoring, it retains the system boundary, representative
 vertical scenario, native responsibility assignment, ownership consequences,
 verification ownership, and parent completion boundary before implementation.
 It preserves established canonical paths and delegates material placement or
-migration decisions to `design-repository-artifact-layout`.
+migration decisions to `design-repository-artifact-layout`. The diagram below
+focuses on analysis and design selection. Implementation handoffs appear in the
+next section.
+
+`behavior-driven-specification` is retired. Existing scenario artifacts remain
+valid at their recorded revisions. Keep new observable examples with their use
+cases, operation contracts, or executable tests instead of creating a separate
+BDD artifact by default.
 
 ```plantuml
 @startuml iterative-design-skill-relationships
@@ -234,7 +245,6 @@ rectangle "iterative-risk-driven-\ndevelopment" as iterative <<coordinator>>
 package "Requirements and analysis" #EEF8EE {
   rectangle "inception" as inception
   rectangle "use-case-modeling" as usecases
-  rectangle "behavior-driven-\nspecification" as behavior
   rectangle "domain-modeling" as domain
   rectangle "system-sequence-diagrams" as ssd
   rectangle "operation-contracts" as contracts
@@ -253,24 +263,17 @@ package "Implementation-facing design" #FFFBEA {
 }
 
 iterative ..> inception : scope or feasibility
-iterative ..> usecases : actors or scenarios
-iterative ..> behavior : observable examples
-iterative ..> domain : vocabulary
-iterative ..> ssd : system events
-iterative ..> contracts : state effects
-iterative ..> language : target-language forces
-iterative ..> rust : Rust lifecycle risk
-iterative ..> usecases : selected scenarios
-iterative ..> behavior : selected examples
+iterative ..> usecases : actors or selected scenarios
 iterative ..> domain : selected vocabulary
 iterative ..> ssd : selected system events
 iterative ..> contracts : selected state effects
-iterative ..> grasp : selected native responsibilities
+iterative ..> grasp : native responsibilities
+iterative ..> language : target-language forces
+iterative ..> rust : Rust lifecycle risk
 inception --> usecases
-usecases --> behavior
 usecases --> domain
 usecases --> ssd
-behavior ..> contracts : clarify observable effects
+usecases ..> contracts : approved stateful examples
 domain ..> contracts : refine vocabulary
 ssd --> contracts
 domain --> grasp
@@ -326,6 +329,10 @@ skinparam rectangle<<input>> {
   BackgroundColor #F2F2F2
   BorderColor #888888
 }
+skinparam rectangle<<external>> {
+  BackgroundColor #F2F2F2
+  BorderColor #888888
+}
 rectangle "Approved behavior or design input" as oracle <<input>>
 rectangle "PR, commit, branch,\nor local change" as incoming <<input>>
 rectangle "Independent review or\nreader decision" as readerNext <<input>>
@@ -335,6 +342,12 @@ package "Implementation and Evolution" #FFF5EA {
   rectangle "behavior-preserving-refactoring" as refactoring
 }
 
+package "External Addy add-ons" #F2F2F2 {
+  rectangle "code-review-and-\nquality" as addyReview <<external>>
+  rectangle "code-simplification" as addySimplify <<external>>
+  rectangle "git-workflow-and-\nversioning" as addyGit <<external>>
+}
+
 package "Repository Workflow" #F3EEFF {
   rectangle "walkthrough-me" as walkthrough
   rectangle "create-pr" as createpr
@@ -342,8 +355,20 @@ package "Repository Workflow" #F3EEFF {
 
 oracle --> implementation
 implementation --> refactoring : green baseline
-implementation ..> createpr : verified, committed work
-refactoring ..> createpr : verified, committed work
+implementation ..> addyReview : review requested
+refactoring ..> addyReview : review requested
+implementation ..> addySimplify : optional clarity pass
+refactoring ..> addySimplify : optional clarity pass
+addyReview ..> addySimplify : cleanup feedback
+implementation ..> addyGit : prepared change
+refactoring ..> addyGit : prepared change
+addyReview ..> addyGit : prepared change
+addySimplify ..> addyGit : prepared change
+implementation ..> createpr : already committed
+refactoring ..> createpr : already committed
+addyReview ..> createpr : reviewed, committed work
+addySimplify ..> createpr : verified, committed work
+addyGit ..> createpr : committed work
 incoming --> walkthrough
 walkthrough ..> readerNext : context only
 @enduml
@@ -351,8 +376,11 @@ walkthrough ..> readerNext : context only
 
 `walkthrough-me` establishes paced comprehension of the selected change. It
 does not provide the independent review or reader decision shown as its
-optional next step. For a standalone commit between implementation and
-pull-request publication, follow repository guidance directly.
+optional next step. With the `all` installation, use `code-review-and-quality`
+for formal review, `code-simplification` for an optional verified clarity pass,
+and `git-workflow-and-versioning` for standalone commit or version guidance.
+Otherwise, follow repository guidance directly. None of these optional handoffs
+authorizes a later commit, push, or pull-request publication.
 
 Read the
 [Implementation and Evolution](tracks/implementation-evolution.md) and
