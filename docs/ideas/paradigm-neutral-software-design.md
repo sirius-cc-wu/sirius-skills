@@ -107,8 +107,8 @@ and coordination cost for both the user and the coding agent.
 
 Sirius already contains strong limiting rules:
 
-- The [methodology](../../SKILLS_METHODOLOGY.md) says to choose the smallest
-  skill or combination that addresses the current outcome and risk.
+- The [repository guidance](../../README.md) says to select the smallest set of
+  skills that addresses the current risk or outcome.
 - The [skill relationship guide](../../catalog/skill-relationships.md) says its
   arrows are handoffs rather than a mandatory waterfall.
 - The [artifact selection budget](../../skills/select-technical-artifacts/references/artifact-selection-budget.md)
@@ -120,8 +120,8 @@ Sirius already contains strong limiting rules:
 
 The former coordinator nevertheless instructed the agent to sequence use
 cases, SSDs, domain models, contracts, GRASP decisions, realizations, and design
-class diagrams. The methodology similarly described the profile as moving
-through requirements, analysis, object design, implementation, and
+class diagrams. Earlier top-level guidance similarly described the profile as
+moving through requirements, analysis, object design, implementation, and
 refactoring.
 
 Sirius now addresses that workflow-level bias with

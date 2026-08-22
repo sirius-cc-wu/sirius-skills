@@ -34,7 +34,7 @@ Available profiles are defined in [`skill-sets/`](skill-sets/):
 
 | Profile | Purpose |
 |---|---|
-| `workflow` | Interactive change walkthroughs, simplification, scoped commits, and pull-request publication |
+| `workflow` | Interactive change walkthroughs, integrated change-set simplification, scoped commits, and pull-request publication |
 | `iterative-design` | External-input assessment, technical-artifact selection, architecture-decision recording, artifact-layout design, question-driven iterations, boundary-sensitive refactoring gates, native responsibility and optional object design, language adaptation, tested implementation, simplification, and scoped commits |
 | `applying-uml-and-patterns` | Compatibility alias for `iterative-design` |
 | `reverse-engineering` | Evidence-driven system survey, behavior and architecture recovery, recorded-decision discovery, recovered-artifact selection, reconciliation, and durable placement |
@@ -185,6 +185,13 @@ the selected diff into a few logical sections. It explains one section with
 concise code locators and
 waits for explicit confirmation before advancing. It establishes understanding
 without approving, committing, or replacing formal code review.
+
+Use `simplify` after a coherent implementation, normally once before opening a
+pull request rather than after every commit. It inspects the final integrated
+change across the pull-request diff or the branch delta from its merge base,
+plus intended staged, unstaged, and selected untracked work. It adapts Addy Osmani's
+code-simplification method while retaining Sirius scope, configuration,
+formatter-containment, and authority boundaries.
 
 Use `record-architecture-decision` when one consequential architecture choice
 needs a short, discoverable ADR or when maintainers need to find which recorded

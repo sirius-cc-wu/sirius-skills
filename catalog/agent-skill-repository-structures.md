@@ -267,7 +267,7 @@ package "Distribution" #F3EEFF {
 }
 
 package "Documentation and verification" #FFFBEA {
-  component "README.md + AGENTS.md\nmethodology and prompts" as siriusDocs
+  component "README.md + AGENTS.md + PROMPT_GUIDE.md\nusage, rules, and prompts" as siriusDocs
   component "scripts/validate_skills.sh\nshared-reference checks" as siriusValidator
   component "evals/cases/ + routing runner" as siriusEvals
   component "pytest tests" as siriusTests

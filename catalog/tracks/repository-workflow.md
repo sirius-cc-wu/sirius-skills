@@ -35,11 +35,13 @@ skill, not a Sirius catalog entry or lifecycle gate.
    guidance. For behavior changes, the
    [implementation and evolution track](implementation-evolution.md) can supply
    a test-first implementation or behavior-preserving refactoring workflow.
-2. Use [`simplify`](../../skills/simplify/SKILL.md) for a focused cleanup pass
-   over the branch or pull-request diff while preserving intended behavior.
-3. Use [`commit`](../../skills/commit/SKILL.md) when the change is ready to
-   record. Review repository state, run proportional verification, and stage
-   only the intended files.
+2. Use [`simplify`](../../skills/simplify/SKILL.md) normally once after the
+   implementation is coherent. Inspect the final integrated branch or
+   pull-request change set across commits, plus intended local work, while
+   preserving observable behavior. Per-commit simplification remains optional.
+3. Use [`commit`](../../skills/commit/SKILL.md) when a prepared change still
+   needs to be recorded. Review repository state, run proportional
+   verification, and stage only the intended files.
 4. Use [`create-pr`](../../skills/create-pr/SKILL.md) when committed work is
    ready to publish for review. Confirm base, head, push state, duplicate pull
    requests, title conventions, and validation evidence.

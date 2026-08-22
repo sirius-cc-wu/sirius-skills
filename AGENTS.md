@@ -16,7 +16,7 @@ Default guidance for agents working in `sirius-skills`.
 - `.github/`: GitHub repository guidance
 - `src/` and `tests/`: shared-reference packaging and repository verification
 - Top-level installation and usage documentation, including `README.md`,
-  `SKILLS_METHODOLOGY.md`, `PROMPT_GUIDE.md`, and `justfile`
+  `PROMPT_GUIDE.md`, and `justfile`
 
 ## Core rules
 
