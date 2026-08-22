@@ -36,13 +36,24 @@ skinparam rectangle<<external>> {
 }
 
 package "External Addy add-ons\naddyosmani/agent-skills" as addy #F2F2F2 {
-  rectangle "interview-me" as addyInterview <<external>>
-  rectangle "idea-refine" as addyIdea <<external>>
-  rectangle "spec-driven-development" as addySpec <<external>>
-  rectangle "test-driven-development" as addyTdd <<external>>
-  rectangle "code-review-and-quality" as addyReview <<external>>
-  rectangle "code-simplification" as addySimplify <<external>>
-  rectangle "git-workflow-and-versioning" as addyGit <<external>>
+  package "Define" as addyDefine #EAF4FB {
+    rectangle "interview-me" as addyInterview <<external>>
+    rectangle "idea-refine" as addyIdea <<external>>
+    rectangle "spec-driven-development" as addySpec <<external>>
+  }
+
+  package "Verify" as addyVerify #FFF5EA {
+    rectangle "test-driven-development" as addyTdd <<external>>
+  }
+
+  package "Review" as addyReviewPhase #FFFBEA {
+    rectangle "code-review-and-quality" as addyReview <<external>>
+    rectangle "code-simplification" as addySimplify <<external>>
+  }
+
+  package "Integrate and ship" as addyShipPhase #F2F2F2 {
+    rectangle "git-workflow-and-versioning" as addyGit <<external>>
+  }
 }
 
 rectangle "**Sirius: Intake**\nassess-development-input" as assess #FFF4CC
