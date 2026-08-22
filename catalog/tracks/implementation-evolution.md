@@ -13,9 +13,13 @@ before entering this track.
 remains valid at its recorded revision. With the `all` installation, use
 external
 [`test-driven-development`](https://github.com/addyosmani/agent-skills/blob/5a1b82d6445d1e2f0abeea1072851419a50c0e5c/skills/test-driven-development/SKILL.md)
-for new logic, bug fixes, and behavior changes. Otherwise, follow repository implementation and verification guidance
-directly. Use `iterative-risk-driven-development` when analysis, design,
-implementation, verification, or commit boundaries require coordination.
+for new logic, bug fixes, and behavior changes. Otherwise, follow repository
+implementation and verification guidance directly. Use `iterative-risk-driven-development` when analysis, design,
+implementation, verification, or commit boundaries require coordination. With
+the `all` installation, use external
+[`doubt-driven-development`](https://github.com/addyosmani/agent-skills/blob/5a1b82d6445d1e2f0abeea1072851419a50c0e5c/skills/doubt-driven-development/SKILL.md)
+when a non-trivial in-flight decision or claim needs fresh-context adversarial
+review before it stands.
 
 ## Add or Change Behavior
 
@@ -39,7 +43,13 @@ implementation, verification, or commit boundaries require coordination.
    guidance. Size one coherent behavior change, establish checks that can
    detect an incorrect result, implement the smallest sufficient change, and
    run proportional regression checks.
-5. Feed implementation discoveries back into durable requirements or design
+5. For a non-trivial claim, use external `doubt-driven-development` with the
+   `all` installation. Give its fresh-context reviewer the smallest artifact and
+   explicit contract. Reconcile every finding. If the review exposes an
+   incomplete contract, unsupported current-system assumption, or missing
+   authority, stop for `assess-development-input` or the responsible external
+   process instead of treating adversarial review as design recovery.
+6. Feed implementation discoveries back into durable requirements or design
    artifacts when their represented knowledge changes.
 
 Keep verification evidence with code, tests, schemas, or configuration by

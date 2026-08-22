@@ -22,6 +22,7 @@ ADDY_SKILLS = {
     "interview-me",
     "idea-refine",
     "spec-driven-development",
+    "doubt-driven-development",
     "test-driven-development",
     "code-review-and-quality",
     "code-simplification",

@@ -7,7 +7,7 @@ current risk or complete the current behavior slice.
 ## Overview
 
 This diagram groups all 19 deployable Sirius skills by responsibility. It also
-shows eight external Addy add-ons. The diagram shows only the main movement
+shows nine external Addy add-ons. The diagram shows only the main movement
 between groups. Use the detailed diagrams below for conditional routes. Solid
 arrows show normal handoffs. They do not require a fixed sequence. Dashed
 arrows show optional routing, support, or feedback.
@@ -42,6 +42,7 @@ package "Define" as addyDefine #EAF4FB {
 }
 
 package "Implementation and Evolution" as implementationPhase #FFF5EA {
+  rectangle "doubt-driven-development" as addyDoubt <<external>>
   rectangle "test-driven-development" as addyTdd <<external>>
 }
 
@@ -104,10 +105,12 @@ assess ..> softwareDesign : design question
 assess ..> detailedDesign : implementation-facing design
 assess ..> refactoring : bounded structural request
 assess ..> addyTdd : approved oracle
+assess ..> addyDoubt : non-trivial claim
 iterative ..> requirements : selected scope
 iterative ..> systemAnalysis : selected analysis
 iterative ..> softwareDesign : selected design
 iterative ..> detailedDesign : selected detail
+iterative ..> addyDoubt : adversarial check
 requirements ..> systemAnalysis : selected scenario
 systemAnalysis ..> softwareDesign : analysis evidence
 softwareDesign ..> detailedDesign : implementation forces
@@ -118,6 +121,10 @@ iterative ..> addyDocs : consequential decision
 refactoring ..> softwareDesign : durable design feedback
 refactoring ..> detailedDesign : language or lifecycle feedback
 addyTdd ..> softwareDesign : durable design feedback
+addyTdd ..> addyDoubt : non-trivial claim
+addyDoubt ..> addyTdd : behavioral finding
+addyDoubt ..> iterative : contract or design gap
+addyDoubt ..> addyReview : claim reconciled
 addyTdd --> addyReview : review before merge
 addyReview ..> addySimplify : clarity finding
 addyReview ..> refactoring : structural finding
@@ -141,7 +148,7 @@ addyTdd --> repository
 The gray nodes belong to Addy Osmani's external `agent-skills` collection. They
 are not part of the Sirius catalog or named profiles.
 `just install <target-project> all` or `just install-global all` installs the
-eight curated add-ons; other profiles do not. The diagram shows one optional
+nine curated add-ons; other profiles do not. The diagram shows one optional
 composition. `interview-me` confirms one requester's intent.
 `idea-refine` turns that intent into a focused, user-confirmed candidate
 one-pager. `spec-driven-development` turns a confirmed direction into a
@@ -163,6 +170,12 @@ constraints.
 Use `test-driven-development` with the `all` installation when implementing new
 logic, fixing a bug, or changing behavior. Otherwise, use the consuming
 repository's implementation and verification workflow.
+
+Use `doubt-driven-development` with the `all` installation when a non-trivial
+in-flight decision or claim needs fresh-context adversarial review. It can
+expose an incomplete contract or missing current-system evidence, but it does
+not recover undocumented design. Return those gaps to
+`assess-development-input` or the responsible external process.
 
 Use `code-review-and-quality` with the `all` installation for formal review.
 Route readability and local-complexity findings to `code-simplification`,
@@ -468,6 +481,7 @@ rectangle "PR, commit, branch,\nor local change" as incoming <<input>>
 rectangle "Independent review or\nreader decision" as readerNext <<input>>
 
 package "Implementation and Evolution" #FFF5EA {
+  rectangle "doubt-driven-\ndevelopment" as addyDoubt <<external>>
   rectangle "test-driven-\ndevelopment" as addyTdd <<external>>
 }
 
@@ -489,6 +503,9 @@ package "Repository Workflow" #F3EEFF {
 
 oracle ..> addyTdd : all profile
 oracle ..> refactoring : bounded structural request
+addyTdd ..> addyDoubt : non-trivial claim
+addyDoubt ..> addyTdd : behavioral finding
+addyDoubt ..> addyReview : claim reconciled
 addyTdd ..> addyReview : review requested
 addyReview ..> addySimplify : clarity finding
 addyReview ..> refactoring : structural finding
@@ -515,8 +532,11 @@ walkthrough ..> readerNext : context only
 `walkthrough-me` establishes paced comprehension of the selected change. It
 does not provide the independent review or reader decision shown as its
 optional next step. With the `all` installation, use `test-driven-development`
-for behavior implementation and `code-review-and-quality` for formal review.
-Route readability and local-complexity findings to `code-simplification`.
+for behavior implementation, `doubt-driven-development` for in-flight
+adversarial review of non-trivial claims, and `code-review-and-quality` for
+formal review. Doubt findings can expose missing contracts or evidence; they do
+not recover undocumented design. Route readability and local-complexity
+findings to `code-simplification`.
 Route findings about established responsibility, dependency, variation, or
 configuration ownership to `behavior-preserving-refactoring`. Route material
 boundary findings back to iterative design. A bounded structural request may

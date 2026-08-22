@@ -63,6 +63,14 @@ Preserve existing legacy proposals at their historical paths.
 ```
 
 ```text
+Use doubt-driven-development to challenge the claim that this fix works across
+all supported environments. Give a fresh-context reviewer the smallest artifact
+and its explicit contract, not the author's reasoning. Reconcile every finding.
+If the contract or current-system evidence is incomplete, stop for the
+responsible discovery or authority process instead of inferring the design.
+```
+
+```text
 Use code-review-and-quality before merging this change. Review correctness,
 readability, architecture, security, and performance; label findings by
 severity and report verification evidence. Route clarity findings to

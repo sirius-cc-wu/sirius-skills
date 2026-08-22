@@ -83,6 +83,19 @@ def test_assessment_owns_entry_routing_without_replacing_iteration_coordination(
     assert "owns operational entry routing" in relationships
 
 
+def test_doubt_driven_addon_challenges_claims_without_claiming_recovery() -> None:
+    assessment = " ".join(
+        read("skills/assess-development-input/SKILL.md").split()
+    )
+    relationships = " ".join(read("catalog/skill-relationships.md").split())
+    track = " ".join(read("catalog/tracks/implementation-evolution.md").split())
+
+    assert "doubt-driven-development" in assessment
+    assert "fresh-context adversarial review" in relationships
+    assert "does not recover undocumented design" in relationships
+    assert "instead of treating adversarial review as design recovery" in track
+
+
 def test_iterative_coordinator_preserves_intent_ownership_and_promotion() -> None:
     iterative = read("skills/iterative-risk-driven-development/SKILL.md")
     track = read("catalog/tracks/iterative-analysis-design.md")

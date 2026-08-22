@@ -69,6 +69,8 @@ Approved coordinated objective begins
 │  └─ Rust ownership or resource lifecycle → design-rust-lifecycles
 ├─ Approved behavior needs implementation and verification
 │  └─ external test-driven-development or repository-native implementation and verification
+├─ A non-trivial in-flight claim needs adversarial review before it stands
+│  └─ external doubt-driven-development
 ├─ Existing structure needs behavior-preserving improvement
 │  ├─ routine clarity → external code-simplification or native cleanup
 │  ├─ established structural ownership → behavior-preserving-refactoring

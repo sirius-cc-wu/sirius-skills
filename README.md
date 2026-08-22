@@ -72,7 +72,7 @@ creates a per-skill compatibility link in the Antigravity directory without
 replacing unrelated entries. Global uninstallation and retired-skill cleanup
 remove only links that still point to their expected canonical installation.
 
-`just install <target-project> all` also installs the eight skills listed in
+`just install <target-project> all` also installs the nine skills listed in
 [`catalog/external-skill-sets/addy-osmani.txt`](catalog/external-skill-sets/addy-osmani.txt)
 from Addy Osmani's pinned agent-skills revision. They remain external to the
 Sirius catalog and are not installed by other profiles. The external install
@@ -217,6 +217,13 @@ external `test-driven-development` add-on for new logic, bug fixes, and behavior
 changes. Use `iterative-risk-driven-development` when implementation needs
 coordinated analysis, design, verification, or iteration commits. Otherwise,
 implement the bounded behavior through the consuming repository's own workflow.
+
+With the `all` installation, use external `doubt-driven-development` to subject
+a non-trivial in-flight claim to fresh-context adversarial review. It can expose
+unstated assumptions, hidden coupling, missing environment variation, or an
+incomplete contract before the claim stands. Treat those findings as a trigger
+to stop for evidence or authority when needed; the skill does not recover an
+undocumented current design by itself.
 
 `reverse-engineer-software-system`, `survey-existing-system`,
 `recover-system-behavior`, `reconstruct-software-architecture`, and

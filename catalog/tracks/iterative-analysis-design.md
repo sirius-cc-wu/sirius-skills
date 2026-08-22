@@ -70,6 +70,7 @@ summarizes those handoffs:
 | Detailed Design | General mapping into a target language and runtime | [`software-design-language-adaptation`](../../skills/software-design-language-adaptation/SKILL.md) |
 | Detailed Design | Rust ownership, transfer, startup, rollback, cancellation, or cleanup | [`design-rust-lifecycles`](../../skills/design-rust-lifecycles/SKILL.md) |
 | Implementation and Evolution | A bounded approved behavior with an independent verification oracle and no remaining coordination need | External `test-driven-development` with the `all` installation; otherwise repository-native implementation and verification |
+| Implementation and Evolution | A non-trivial in-flight decision or claim needs fresh-context adversarial review | External `doubt-driven-development` with the `all` installation |
 
 Several specialists may contribute to one iteration only when they answer the
 same objective. Do not create one artifact merely because another artifact can

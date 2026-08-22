@@ -54,6 +54,8 @@ Task arrives
 │  └─ Detailed Design
 ├─ One bounded behavior has an approved independent oracle
 │  └─ external test-driven-development or repository-native implementation
+├─ A non-trivial in-flight claim needs fresh-context adversarial review
+│  └─ external doubt-driven-development
 ├─ A completed change needs formal review
 │  └─ external code-review-and-quality or repository-native review
 │     ├─ readability or local complexity → external code-simplification
@@ -149,6 +151,7 @@ repository-native workflow or report the responsible external prerequisite.
 | Detailed Design | Language-neutral design needs target-language adaptation | `software-design-language-adaptation` |
 | Detailed Design | Approved Rust behavior has material ownership, startup, rollback, cancellation, or cleanup risk | `design-rust-lifecycles` |
 | Implementation and Evolution | Bounded approved behavior has an independent oracle and needs no Sirius coordination | External `test-driven-development` or repository-native implementation and verification |
+| Implementation and Evolution | A non-trivial in-flight decision or claim needs fresh-context adversarial review before it stands | External `doubt-driven-development` |
 | Review | A completed change needs correctness, architecture, security, performance, or merge review | External `code-review-and-quality` or repository-native review |
 | Review | Protected behavior needs routine naming, extraction, duplication, control-flow, or recent-code clarity work | External `code-simplification` or repository-native cleanup |
 | Review | Protected behavior needs an established responsibility, dependency, variation, or configuration-ownership change | `behavior-preserving-refactoring` |
