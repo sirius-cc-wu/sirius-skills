@@ -81,10 +81,10 @@ durable set; do not create or edit files.
 ```
 
 ```text
-Use record-architecture-decision to capture our accepted choice of PostgreSQL
-for transactional services. Preserve local ADR conventions; record authority,
-forces, serious alternatives, consequences, confidence, and reconsideration
-triggers; do not implement or commit anything.
+With the `all` installation, use documentation-and-adrs to capture our accepted
+choice of PostgreSQL for transactional services. Preserve local ADR conventions,
+identifier rules, authority, alternatives, consequences, and supersession; do
+not implement or commit anything.
 ```
 
 ```text

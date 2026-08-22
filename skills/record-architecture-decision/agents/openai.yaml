@@ -1,4 +1,0 @@
-interface:
-  display_name: "Record Architecture Decision"
-  short_description: "Capture one consequential choice as a durable ADR"
-  default_prompt: "Use $record-architecture-decision to record this consequential architecture choice as a short, authority-aware ADR."

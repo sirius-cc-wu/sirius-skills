@@ -6,8 +6,8 @@ current risk or complete the current behavior slice.
 
 ## Overview
 
-This diagram groups all 19 deployable Sirius skills by responsibility. It also
-shows seven external Addy add-ons. The diagram shows only the main movement
+This diagram groups all 18 deployable Sirius skills by responsibility. It also
+shows eight external Addy add-ons. The diagram shows only the main movement
 between groups. Use the detailed diagrams below for conditional routes. Solid
 arrows show normal handoffs. They do not require a fixed sequence. Dashed
 arrows show optional routing, support, or feedback.
@@ -52,6 +52,7 @@ package "Review" as addyReviewPhase #FFFBEA {
 
 package "Integrate and ship" as addyShipPhase #F2F2F2 {
   rectangle "git-workflow-and-versioning" as addyGit <<external>>
+  rectangle "documentation-and-adrs" as addyDocs <<external>>
 }
 
 rectangle "**Sirius: Intake**\nassess-development-input" as assess #FFF4CC
@@ -62,7 +63,7 @@ rectangle "**Implementation and Evolution**\nrepository-native implementation (p
 
 rectangle "**Repository Workflow**\nwalkthrough-me\ncreate-pr" as repository #F3EEFF
 
-rectangle "**Cross-cutting Support**\nselect-technical-artifacts\ndesign-repository-artifact-layout\nrecord-architecture-decision" as support #FFFBEA
+rectangle "**Cross-cutting Support**\nselect-technical-artifacts\ndesign-repository-artifact-layout" as support #FFFBEA
 
 assess -[hidden]right-> design
 design -[hidden]right-> support
@@ -78,6 +79,7 @@ assess ..> implementation
 assess ..> addyTdd : approved oracle
 design --> implementation
 design ..> addyTdd : approved behavior
+design ..> addyDocs : consequential decision
 implementation ..> design : durable feedback
 addyTdd ..> design : durable feedback
 implementation --> addyReview : review before merge
@@ -85,13 +87,16 @@ addyTdd --> addyReview : review before merge
 implementation ..> addySimplify : optional clarity pass
 addyTdd ..> addySimplify : optional clarity pass
 implementation ..> addyGit : git or version guidance
+implementation ..> addyDocs : durable documentation
 addyTdd ..> addyGit : prepared change
 addyReview ..> addySimplify : cleanup feedback
 addyReview ..> addyGit : prepared change
 addySimplify ..> addyGit : prepared change
 addyReview --> repository
 addySimplify --> repository
+addyGit ..> addyDocs : decision or release context
 addyGit --> repository
+addyDocs --> repository
 implementation --> repository
 addyTdd --> repository
 @enduml
@@ -100,7 +105,7 @@ addyTdd --> repository
 The gray nodes belong to Addy Osmani's external `agent-skills` collection. They
 are not part of the Sirius catalog or named profiles.
 `just install <target-project> all` or `just install-global all` installs the
-seven curated add-ons; other profiles do not. The diagram shows one optional
+eight curated add-ons; other profiles do not. The diagram shows one optional
 composition. `interview-me` confirms one requester's intent.
 `idea-refine` turns that intent into a focused, user-confirmed candidate
 one-pager. `spec-driven-development` turns a confirmed direction into a
@@ -123,6 +128,11 @@ Use `test-driven-development` with the `all` installation when implementing new
 logic, fixing a bug, or changing behavior. Otherwise, use the consuming
 repository's implementation and verification workflow.
 
+Use `documentation-and-adrs` with the `all` installation when a significant
+technical decision or durable engineering context needs documentation. Preserve
+repository-local ADR conventions, identifier rules, authority, status, and
+history. Otherwise, follow repository-native documentation and ADR guidance.
+
 Use `git-workflow-and-versioning` when prepared work needs standalone commit,
 branch, worktree, release, or semantic-version guidance. Selection does not
 authorize a commit, push, tag, or release.
@@ -131,7 +141,7 @@ The groups in this diagram help readers navigate the skill collection. They
 are not installation profiles or lifecycle gates. The detailed diagrams show
 the conditional choices and feedback that this overview omits. The diagram does
 not connect cross-cutting support to every consumer. Select it for a specific
-artifact-selection, artifact-placement, or decision-recording need. It is not a
+artifact-selection or artifact-placement need. It is not a
 required workflow stage. The repository-native implementation labels are
 process markers, not deployable Sirius skills. Language adaptation and Rust
 lifecycle design remain in Iterative Analysis and Design because they produce
@@ -159,9 +169,9 @@ implementation-facing design.
   `omit`, or `defer`.
 - Use `design-repository-artifact-layout` across tracks when justified durable
   artifacts need canonical homes, lifecycle separation, or migration.
-- Use `record-architecture-decision` across tracks when one consequential
-  architecture choice needs a proposed, accepted, or superseding ADR, or when
-  you must find the governing recorded decisions.
+- With the `all` installation, use external `documentation-and-adrs` when one
+  consequential architecture choice needs a proposed, accepted, or superseding
+  ADR. Otherwise, follow repository-native ADR guidance.
 
 ## External development inputs
 
@@ -202,7 +212,8 @@ non-trivial state effects to operation contracts, and a bounded approved oracle
 to external `test-driven-development` when the `all` installation is available;
 otherwise, use repository-native implementation. Route one independently
 consequential proposed, accepted, or superseding architecture choice to
-`record-architecture-decision`.
+external `documentation-and-adrs` when available or to repository-native ADR
+guidance.
 
 ## External current-system recovery
 
@@ -384,6 +395,7 @@ package "External Addy add-ons" #F2F2F2 {
   rectangle "code-review-and-\nquality" as addyReview <<external>>
   rectangle "code-simplification" as addySimplify <<external>>
   rectangle "git-workflow-and-\nversioning" as addyGit <<external>>
+  rectangle "documentation-and-adrs" as addyDocs <<external>>
 }
 
 package "Repository Workflow" #F3EEFF {
@@ -403,16 +415,19 @@ addyTdd ..> addySimplify : optional clarity pass
 refactoring ..> addySimplify : optional clarity pass
 addyReview ..> addySimplify : cleanup feedback
 implementation ..> addyGit : prepared change
+implementation ..> addyDocs : durable documentation
 addyTdd ..> addyGit : prepared change
 refactoring ..> addyGit : prepared change
 addyReview ..> addyGit : prepared change
 addySimplify ..> addyGit : prepared change
+addyGit ..> addyDocs : decision or release context
 implementation ..> createpr : already committed
 addyTdd ..> createpr : already committed
 refactoring ..> createpr : already committed
 addyReview ..> createpr : reviewed, committed work
 addySimplify ..> createpr : verified, committed work
 addyGit ..> createpr : committed work
+addyDocs ..> createpr : documented, committed work
 incoming --> walkthrough
 walkthrough ..> readerNext : context only
 @enduml
@@ -422,8 +437,10 @@ walkthrough ..> readerNext : context only
 does not provide the independent review or reader decision shown as its
 optional next step. With the `all` installation, use `test-driven-development`
 for behavior implementation, `code-review-and-quality` for formal review,
-`code-simplification` for an optional verified clarity pass, and
-`git-workflow-and-versioning` for standalone commit or version guidance.
+`code-simplification` for an optional verified clarity pass,
+`documentation-and-adrs` for significant decisions or durable engineering
+context, and `git-workflow-and-versioning` for standalone commit or version
+guidance.
 Otherwise, follow repository guidance directly. None of these optional handoffs
 authorizes a later commit, push, or pull-request publication.
 
@@ -511,7 +528,6 @@ apply.
 |---|---|---|
 | `select-technical-artifacts` | Candidate directions, externally recovered knowledge, iterative analysis and design, implementation evidence, architecture decisions, and durable repository documentation | Use when candidate knowledge needs a disposition: `create`, `update`, `embed`, `keep-with-implementation`, `omit`, or `defer`, or when a proposed artifact set needs minimization |
 | `design-repository-artifact-layout` | Candidate directions, externally recovered knowledge, iterative analysis and design, implementation evidence, architecture decisions, and durable repository documentation | Use when a justified artifact lacks a canonical home, artifact lifecycles conflict, or migration must preserve links, IDs, indexes, and history |
-| `record-architecture-decision` | Approved requirements, architecture and language design, consequential pattern or responsibility choices, implementation discoveries, and reconciliation | Use when you must find governing ADRs, or when one bounded, cross-cutting, or expensive-to-reverse architecture choice needs proposed review, accepted history, or linked supersession |
 
 ## External stakeholder input
 

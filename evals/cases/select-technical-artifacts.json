@@ -21,10 +21,6 @@
         "owner": "design-repository-artifact-layout"
       },
       {
-        "prompt": "Write the accepted PostgreSQL architecture decision with its authority, alternatives, consequences, and supersession links.",
-        "owner": "record-architecture-decision"
-      },
-      {
         "prompt": "Run one approved implementation iteration, coordinate the needed specialists, validate it, and create one authorized commit.",
         "owner": "iterative-risk-driven-development"
       }

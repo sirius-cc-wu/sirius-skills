@@ -93,9 +93,9 @@ language: "rust"
 
 Keep ownership, state, startup, rollback, cancellation, cleanup, API shape,
 and verification in one artifact unless one cross-cutting, expensive-to-reverse
-choice has a genuinely independent lifecycle. In that case, use
-[Record Architecture Decision](../record-architecture-decision/SKILL.md)
-without copying the lifecycle design into the ADR.
+choice has a genuinely independent lifecycle. In that case, use external
+`documentation-and-adrs` with the `all` installation or follow
+repository-native ADR guidance. Do not copy the lifecycle design into the ADR.
 
 ## Boundaries
 

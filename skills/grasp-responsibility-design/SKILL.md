@@ -82,9 +82,10 @@ Before creating a new document, apply
 [Artifact Selection Budget](../select-technical-artifacts/references/artifact-selection-budget.md).
 Prefer recording a local responsibility choice in its realization or design
 model. When the choice is cross-cutting, expensive to reverse, and needs an
-independent architecture-decision lifecycle, use
-[Record Architecture Decision](../record-architecture-decision/SKILL.md)
-instead of creating a duplicate responsibility record.
+independent architecture-decision lifecycle, use external
+`documentation-and-adrs` with the `all` installation or follow
+repository-native ADR guidance. Do not create a duplicate responsibility
+record.
 
 For a standalone Markdown file, follow
 [Markdown Artifact Frontmatter](../iterative-risk-driven-development/references/markdown-artifact-frontmatter.md)

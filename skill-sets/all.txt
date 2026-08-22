@@ -3,7 +3,6 @@ walkthrough-me
 select-technical-artifacts
 design-repository-artifact-layout
 assess-development-input
-record-architecture-decision
 iterative-risk-driven-development
 inception
 use-case-modeling

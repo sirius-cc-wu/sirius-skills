@@ -13,7 +13,10 @@ after checks pass when recently changed code needs a behavior-preserving
 clarity pass. Use external
 [`git-workflow-and-versioning`](https://github.com/addyosmani/agent-skills/blob/5a1b82d6445d1e2f0abeea1072851419a50c0e5c/skills/git-workflow-and-versioning/SKILL.md)
 for standalone commit, branch, worktree, release, or semantic-version guidance.
-All three remain external skills, not Sirius catalog entries or lifecycle
+Use external
+[`documentation-and-adrs`](https://github.com/addyosmani/agent-skills/blob/5a1b82d6445d1e2f0abeea1072851419a50c0e5c/skills/documentation-and-adrs/SKILL.md)
+when a significant technical decision or durable engineering context needs a
+record. All four remain external skills, not Sirius catalog entries or lifecycle
 gates.
 
 ## Interactive code-change tour
@@ -43,12 +46,16 @@ gates.
    behavior-preserving refactoring.
 2. With the `all` installation, optionally use `code-simplification` on the
    recently changed scope. Preserve exact behavior and rerun affected checks.
-3. With the `all` installation, use `git-workflow-and-versioning` when a
+3. With the `all` installation, use `documentation-and-adrs` when the change
+   makes a significant technical decision or adds durable engineering context.
+   Preserve local documentation, identifier, authority, status, and history
+   rules.
+4. With the `all` installation, use `git-workflow-and-versioning` when a
    prepared change needs a standalone commit or broader branch, worktree, or
    version guidance. Otherwise, follow repository guidance directly. Review
    repository state and diffs, run proportional verification, stage only the
    intended paths, and follow local message conventions.
-4. Use [`create-pr`](../../skills/create-pr/SKILL.md) when committed work is
+5. Use [`create-pr`](../../skills/create-pr/SKILL.md) when committed work is
    ready to publish for review. Confirm base, head, push state, duplicate pull
    requests, title conventions, and validation evidence.
 

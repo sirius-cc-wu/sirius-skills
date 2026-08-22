@@ -107,9 +107,10 @@ mandatory artifact sequence, programming paradigm, or phase checklist.
    consumer appears, durable user-visible rules accumulate in code, tests, or
    iteration history, or an approved source is stretched beyond its non-goals.
    Promote evidence into current intended knowledge only with matching
-   authority and validation. Use `record-architecture-decision` only when one
-   authoritative, consequential architecture choice needs an independent
-   proposed, accepted, or superseding lifecycle.
+   authority and validation. When one authoritative, consequential architecture
+   choice needs an independent proposed, accepted, or superseding lifecycle,
+   use external `documentation-and-adrs` with the `all` installation or follow
+   repository-native ADR guidance.
 10. **Validate exit evidence.** Run repository-required and changed-scope
    checks. Retain the representative end-to-end oracle when a local seam or
    component check is the current result. Distinguish completed evidence from

@@ -7,10 +7,9 @@ models, reconstructed architecture, reconciliation records, and fixed-revision
 evidence remain valid at their recorded revisions.
 
 The `reverse-engineering` installation name remains as a compatibility profile.
-It installs `select-technical-artifacts`,
-`design-repository-artifact-layout`, and `record-architecture-decision`. These
-skills can manage justified artifacts and recorded decisions, but they do not
-recover current-system facts.
+It installs `select-technical-artifacts` and
+`design-repository-artifact-layout`. These skills can manage justified
+artifacts, but they do not recover current-system facts or recorded decisions.
 
 ## New Current-System Evidence
 
@@ -37,11 +36,13 @@ external prerequisite when those claims still lack sufficient evidence.
 
 ## Active Support
 
-Use
-[`record-architecture-decision`](../../skills/record-architecture-decision/SKILL.md)
-in read-only mode to identify which ADRs govern a concern. An ADR records a
-choice and rationale at its revision. It does not prove that current code still
-conforms, and missing ADRs do not authorize inferred rationale.
+`record-architecture-decision` is retired. Existing ADRs and decision
+inventories remain valid at their recorded revisions. Use repository-native
+search and governance to identify which ADRs govern a concern. With the `all`
+installation, use external `documentation-and-adrs` when an authoritative,
+significant technical decision needs a durable record. An ADR does not prove
+that current code still conforms, and missing ADRs do not authorize inferred
+rationale.
 
 Use
 [`select-technical-artifacts`](../../skills/select-technical-artifacts/SKILL.md)

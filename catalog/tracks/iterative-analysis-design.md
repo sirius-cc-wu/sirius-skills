@@ -52,7 +52,7 @@ Choose the narrowest specialist for each material question:
 |---|---|
 | Whether candidate knowledge should be created, updated, embedded, kept with implementation, omitted, or deferred | [`select-technical-artifacts`](../../skills/select-technical-artifacts/SKILL.md) |
 | Canonical repository homes, lifecycle separation, or artifact migration | [`design-repository-artifact-layout`](../../skills/design-repository-artifact-layout/SKILL.md) |
-| One consequential architecture choice needs proposed review, accepted history, or supersession | [`record-architecture-decision`](../../skills/record-architecture-decision/SKILL.md) |
+| One consequential architecture choice needs proposed review, accepted history, or supersession | External `documentation-and-adrs` with the `all` installation; otherwise repository-native ADR guidance |
 | Vision, feasibility, project scope, or major business risk | [`inception`](../../skills/inception/SKILL.md) |
 | Actors, goals, system boundary, or scenario flow | [`use-case-modeling`](../../skills/use-case-modeling/SKILL.md) |
 | Business concepts and shared vocabulary | [`domain-modeling`](../../skills/domain-modeling/SKILL.md) |
@@ -133,9 +133,9 @@ to preserve local conventions or select the smallest lifecycle-aware addition.
 Do not create a layout document or speculative directory tree solely because
 the repository lacks explicit guidance.
 When one independently consequential architecture choice needs durable proposed,
-accepted, or superseding history, use
-[`record-architecture-decision`](../../skills/record-architecture-decision/SKILL.md)
-instead of copying the whole design artifact into an ADR.
+accepted, or superseding history, use external `documentation-and-adrs` with the
+`all` installation or follow repository-native ADR guidance. Do not copy the
+whole design artifact into an ADR.
 
 A narrow iteration does not require a Markdown iteration record. Its canonical
 changes, validation, and scoped commit can preserve sufficient history. Create

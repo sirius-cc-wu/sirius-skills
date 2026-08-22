@@ -71,7 +71,7 @@ creates a per-skill compatibility link in the Antigravity directory without
 replacing unrelated entries. Global uninstallation and retired-skill cleanup
 remove only links that still point to their expected canonical installation.
 
-`just install <target-project> all` also installs the seven skills listed in
+`just install <target-project> all` also installs the eight skills listed in
 [`catalog/external-skill-sets/addy-osmani.txt`](catalog/external-skill-sets/addy-osmani.txt)
 from Addy Osmani's pinned agent-skills revision. They remain external to the
 Sirius catalog and are not installed by other profiles. The external install
@@ -215,9 +215,8 @@ valid. Use a responsible external process when current-system behavior or
 architecture needs new evidence. Use `assess-development-input` when material
 that depends on current-system claims needs a Sirius readiness decision. The
 `reverse-engineering` compatibility profile now installs only
-`select-technical-artifacts`, `design-repository-artifact-layout`, and
-`record-architecture-decision` for disposition, placement, and recorded-decision
-discovery.
+`select-technical-artifacts` and `design-repository-artifact-layout` for
+artifact disposition and placement.
 
 Use `walkthrough-me` when a reader needs a paced, read-only tour of a pull
 request, commit, commit range, branch diff, or staged, unstaged, or selected
@@ -241,13 +240,12 @@ intended paths, and create a message that follows local conventions.
 `iterative-risk-driven-development` retains its authorized, scoped commit step
 for work executed as an iteration.
 
-Use `record-architecture-decision` when one consequential architecture choice
-needs a short, discoverable ADR or when maintainers need to find which recorded
-decisions currently govern a concern. It preserves local ADR conventions,
-explicit status and authority, serious alternatives, positive and negative
-consequences,
-confidence, reconsideration triggers, and linked supersession. It does not
-choose unresolved design or infer rationale from code. Keep local pattern and
+`record-architecture-decision` is retired. Existing ADRs and decision
+inventories remain valid at their recorded revisions. With the `all`
+installation, use external `documentation-and-adrs` for significant technical
+decisions and durable documentation. Preserve repository ADR conventions,
+identifier rules, authority, status, history, and supersession. For other
+profiles, follow repository-native ADR guidance. Keep local pattern and
 responsibility choices in their owning design artifacts unless they need an
 independent architecture-decision lifecycle.
 

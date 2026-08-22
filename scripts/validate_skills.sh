@@ -212,19 +212,8 @@ layout_metadata="$root/skills/design-repository-artifact-layout/agents/openai.ya
 test -f "$layout_metadata" || fail "design-repository-artifact-layout missing agents/openai.yaml"
 grep -Fq '$design-repository-artifact-layout' "$layout_metadata" || fail "artifact layout metadata missing skill invocation"
 
-adr_skill="$root/skills/record-architecture-decision/SKILL.md"
-adr_metadata="$root/skills/record-architecture-decision/agents/openai.yaml"
-test -f "$adr_metadata" || fail "record-architecture-decision missing agents/openai.yaml"
-grep -Fq '$record-architecture-decision' "$adr_metadata" || fail "architecture decision metadata missing skill invocation"
-grep -q '^## ADR Shape$' "$adr_skill" || fail "architecture decision skill missing ADR shape"
-grep -q '^## Decision Discovery Mode$' "$adr_skill" || fail "architecture decision skill missing read-only discovery mode"
-grep -q '^## Discovery and Indexing$' "$adr_skill" || fail "architecture decision skill missing discovery guidance"
-grep -q '^## Confidence and Reconsideration$' "$adr_skill" || fail "architecture decision template missing reconsideration guidance"
-grep -q 'substantively rewrite an accepted ADR' "$adr_skill" || fail "architecture decision skill missing supersession safeguard"
-
 template_types=(
   "assess-development-input|Development Input Assessment"
-  "record-architecture-decision|Architecture Decision"
   "iterative-risk-driven-development|Iteration Record"
   "use-case-modeling|Use Case"
   "domain-modeling|Domain Model"
