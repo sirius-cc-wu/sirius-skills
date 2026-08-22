@@ -14,14 +14,12 @@ with explicitly selected Codex runs in disposable repositories. Those runs
 capture traces, workspace changes, verification, model metadata, usage, and the
 final response without treating missing metadata as known.
 
-The current six fixture-backed cases exercise red–mutation–green
-implementation, documentation restraint, conditional canonical-model feedback,
-read-only workflow re-entry, boundary-sensitive Rust refactoring design, a
-focused class view, and a declarative operation contract
-added to an existing analysis aggregate.
-Repeated runs can report mechanical, mutation, environment, duration, and usage
-stability. A separate read-only semantic judge has reviewed controls and
-cross-model comparison, but remains diagnostic and non-gating.
+The current three fixture-backed cases exercise boundary-sensitive Rust
+refactoring design, a focused class view, and a declarative operation contract
+added to an existing analysis aggregate. Repeated runs can report mechanical,
+mutation, environment, duration, and usage stability. The separate read-only
+semantic judge remains available for future reviewed rubric cases, but remains
+diagnostic and non-gating.
 
 ## At a Glance
 
@@ -60,11 +58,12 @@ variance.
 
 ## Representative Scenario
 
-A user asks for a small, well-specified bug fix. The coding agent should use an
-existing test or `test-driven-implementation`, change only code and tests, and
-avoid starting an analysis-and-design workflow or producing new documents.
+The initial representative scenario used a small, well-specified bug fix. The
+coding agent had to use an existing test and the repository-native
+implementation workflow, change only code and tests, and avoid starting an
+analysis-and-design workflow or producing new documents.
 
-An eval should fail if the agent:
+That implementation eval failed if the agent:
 
 - routes the task through the complete iterative-design track;
 - invents missing business intent;
@@ -72,15 +71,17 @@ An eval should fail if the agent:
 - changes valid tests to accept the defect; or
 - mutates files outside the authorized fixture scope.
 
-A complementary scenario confirms that feedback is not suppressed: when an
-approved cancellation policy introduces the durable `CancellationReason`
-concept, the agent should refine the existing canonical domain model rather
+A complementary scenario confirmed that feedback was not suppressed: when an
+approved cancellation policy introduced the durable `CancellationReason`
+concept, the agent had to refine the existing canonical domain model rather
 than ignore the discrepancy or create a competing model.
 
-The third scenario supplies two incompatible approved policies with equal
-authority. The agent should preserve the repository, report the conflict, and
-ask which policy governs rather than converting uncertainty into code, tests,
-or a new decision document.
+The third scenario supplied two incompatible approved policies with equal
+authority. The agent had to preserve the repository, report the conflict, and
+ask which policy governed rather than converting uncertainty into code, tests,
+or a new decision document. These three implementation scenarios were retired
+with their owning skill package. They remain part of the pilot rationale, not
+current runnable cases.
 
 The contract scenario supplies approved effects for a non-trivial system
 operation. The agent should add one declarative operation contract to the
@@ -93,28 +94,29 @@ changes it.
 
 ## Pilot Evidence and Remaining Limits
 
-The implemented checks establish more than packaging consistency:
+At initial closure, the implemented checks established more than packaging
+consistency:
 
-- 12 routing case files at closure exercise 60 positive and owned-negative
-  routes across the 26-skill catalog;
-- disposable fixtures enforce mutation allowlists, required changes,
+- 12 routing case files exercised 60 positive and owned-negative routes across
+  the then-active 26-skill catalog;
+- disposable fixtures enforced mutation allowlists, required changes,
   verification commands, output fragments, and selected trace ordering;
-- the red–mutation–green fixture proves its seeded initial failure before an
-  agent changes production code;
-- the composition fixtures distinguish local correction, canonical
+- a red–mutation–green fixture proved its seeded initial failure before an
+  agent changed production code;
+- composition fixtures distinguished local correction, canonical
   reconciliation, workflow re-entry, focused visual design, and contract-driven
   analysis without artifact proliferation; and
-- reviewed semantic controls exercise both passing and failing rubric polarity,
+- reviewed semantic controls exercised passing and failing rubric polarity,
   repetition, and cross-model disagreement reporting.
 
-The evidence remains bounded. Lexical routing is only a description tripwire,
-14 skills have no dedicated routing case at closure, and behavioral coverage is
-selective.
-The live pilot uses one agent host; repeated agreement cannot prove semantic
-correctness, cross-host portability, or freedom from shared model bias. Only
-the workflow-reentry response has a semantic rubric. Mechanical assertions can
-verify required concepts and boundaries, but not whether prose or diagrams are
-maximally clear. Usage reporting does not estimate price, and local ignored
+The current pilot retains 13 routing case files with 75 checks across the
+19-skill catalog and three fixture-backed behavioral cases. Six active skills
+have no dedicated routing case. Lexical routing remains only a description
+tripwire, and behavioral coverage remains selective. The live pilot uses one
+agent host; repeated agreement cannot prove semantic correctness, cross-host
+portability, or freedom from shared model bias. No active case has a semantic
+rubric. Mechanical assertions can verify required concepts and boundaries, but
+not whether prose or diagrams are maximally clear. Usage reporting does not estimate price, and local ignored
 results are not a permanent reviewed baseline.
 
 The [repository comparison](../../catalog/agent-skill-repository-structures.md)
@@ -220,26 +222,19 @@ The case shape includes:
 
 ```json
 {
-  "skill_name": "test-driven-implementation",
+  "skill_name": "example-skill",
   "evals": [
     {
-      "id": "bug-fix-discrimination",
-      "prompt": "Fix the reported invoice rounding defect.",
-      "fixture": "invoice-rounding",
-      "expected_output": "The defect is reproduced, minimally fixed, and regression-tested.",
+      "id": "bounded-change",
+      "prompt": "Complete the bounded change in this fixture.",
+      "fixture": "example-fixture",
+      "expected_output": "The requested outcome is verified.",
       "expectations": [
-        "A check discriminates the defect before the production fix",
-        "Focused and regression checks pass after the fix"
+        "The expected repository state is present",
+        "The declared verification command passes"
       ],
       "prohibitions": [
-        "Do not weaken an existing valid expectation",
-        "Do not create a separate design document"
-      ],
-      "semantic_rubric": [
-        {
-          "id": "explains-outcome",
-          "criterion": "The response explains the verified outcome without overstating the evidence."
-        }
+        "Do not mutate files outside the authorized scope"
       ],
       "allowed_mutations": ["src/**", "tests/**"]
     }
@@ -277,7 +272,7 @@ These cases should distinguish three outcomes:
 
 ## Pilot Scope
 
-The active pilot retains four original skill areas that represent distinct
+The active pilot retains three original skill areas that represent distinct
 failure risks, plus the later-added `operation-contracts` coverage for the
 remaining contract-driven composition risk:
 
@@ -285,7 +280,6 @@ remaining contract-driven composition risk:
 |---|---|
 | `iterative-risk-driven-development` | Selecting and executing risk-driven analysis, design, implementation, and verification without enforcing a lifecycle waterfall |
 | `use-case-modeling` | Preserving the black-box boundary and avoiding internal design |
-| `test-driven-implementation` | Demonstrating discriminatory verification without changing valid expectations |
 | `uml-class-diagram-design` | Producing a focused class view only when type responsibilities and relationships justify it |
 | `operation-contracts` | Refining one canonical analysis aggregate with declarative state effects without adding implementation design or duplicate artifacts |
 
@@ -331,9 +325,9 @@ definitions, evaluator code, and deliberately reviewed baselines.
 
 ### Stage 3: Composition — Completed for the Pilot
 
-- Paired documentation restraint with conditional canonical design feedback.
-- Added read-only workflow re-entry for conflicting authority.
-- Added focused visual-design cases and a contract-driven case that refines a
+- Retired implementation-feedback and authority-reentry cases with their owning
+  skill package.
+- Retained focused visual-design cases and a contract-driven case that refines a
   canonical aggregate without implementation or artifact proliferation.
 
 ### Stage 4: Expansion Decision — Keep Coverage Risk-Driven
@@ -353,7 +347,7 @@ real usage failures and consequential boundary changes.
 | Model variance creates flaky gates | Keep paid runs out of required CI; repeat and report distributions |
 | Lexical routing is mistaken for agent behavior | Label it as a description tripwire and do not claim that it observes host selection |
 | Fixtures encode one repository's conventions | Use small generic repositories and state every fixture assumption |
-| The suite reinforces documentation micromanagement | Include explicit no-document and read-only re-entry cases |
+| The suite reinforces documentation micromanagement | Add explicit no-document or read-only re-entry cases when the evaluated boundary requires them |
 | A judge approves unauthorized changes | Enforce mutation allowlists mechanically |
 | Cost grows with catalog coverage | Use affected-case selection, staged coverage, and explicit budgets |
 | Multi-host support delays useful evidence | Start with one recorded host and add another only after the harness proves useful |
@@ -380,9 +374,8 @@ real usage failures and consequential boundary changes.
 
 The exit criteria are met: the repository has a bounded representative pilot,
 free routing checks in normal validation, one-host opt-in behavioral execution,
-trace and diff evidence as the primary oracle, explicit feedback-restraint and
-workflow-reentry scenarios, a contract-driven composition case, and
-evidence-based expansion rules. Active behavior is authoritative in
+trace and diff evidence as the primary oracle, a contract-driven composition
+case, and evidence-based expansion rules. Active behavior is authoritative in
 [`evals/`](../../evals/README.md), its case files, runner code, and tests. This
 proposal remains as the rationale, staged delivery record, and statement of the
 pilot's limits.

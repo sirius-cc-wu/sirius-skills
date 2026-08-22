@@ -15,7 +15,7 @@ skill's frontmatter, evaluates the cases in `evals/cases/`, reports missing
 coverage as warnings, and exits nonzero for schema, routing, owner, or severe
 description-collision failures.
 
-The initial pilot covers:
+The active pilot covers:
 
 - `assess-development-input`;
 - `select-technical-artifacts`;
@@ -28,22 +28,16 @@ The initial pilot covers:
 - `behavior-preserving-refactoring`;
 - `software-design-language-adaptation`;
 - `use-case-modeling`;
-- `test-driven-implementation`;
 - `walkthrough-me`; and
 - `uml-class-diagram-design`.
 
-The fixture-backed cases distinguish six outcomes. Three implementation
-cases exercise the complete feedback branch: a local fix creates no design
-document, an approved domain rule refines code, tests, and one existing
-canonical model, and conflicting equal-authority policies return to the user
-without repository mutation. One boundary-sensitive Rust refactoring case
-requires the coordinator to retain the system boundary, native
-responsibilities, ownership consequences, verification ownership, and open
-parent outcome before more implementation. One visual case selects a focused
-class view for justified stateful object design. One contract case adds
+The fixture-backed cases distinguish three outcomes. One boundary-sensitive
+Rust refactoring case requires the coordinator to retain the system boundary,
+native responsibilities, ownership consequences, verification ownership, and
+open parent outcome before more implementation. One visual case selects a
+focused class view for justified stateful object design. One contract case adds
 declarative state effects to an existing feature-analysis aggregate without
-creating code,
-implementation design, or a second artifact.
+creating code, implementation design, or a second artifact.
 
 ## Case Format
 
@@ -52,31 +46,31 @@ Keep one JSON file per evaluated skill at
 
 ```json
 {
-  "skill_name": "test-driven-implementation",
+  "skill_name": "behavior-preserving-refactoring",
   "trigger": {
     "positive": [
       {
-        "prompt": "Reproduce this bug with a failing test before fixing it",
+        "prompt": "Remove this local duplication without changing behavior",
         "top_k": 3
       }
     ],
     "negative": [
       {
-        "prompt": "Refactor this duplication without changing behavior",
-        "owner": "behavior-preserving-refactoring"
+        "prompt": "Design exact Rust resource ownership and cleanup",
+        "owner": "design-rust-lifecycles"
       }
     ]
   },
   "evals": [
     {
-      "id": "bug-fix-discrimination",
-      "prompt": "Fix the reported invoice rounding defect.",
-      "expected_output": "The defect is reproduced, minimally fixed, and regression-tested.",
+      "id": "local-verified-transformation",
+      "prompt": "Remove one duplicated private calculation behind green tests.",
+      "expected_output": "One verified local transformation preserves behavior.",
       "expectations": [
-        "A check discriminates the defect before the production fix"
+        "Focused and regression checks remain green"
       ],
       "prohibitions": [
-        "Do not weaken an existing valid expectation"
+        "Do not change required behavior"
       ],
       "allowed_mutations": [
         "src/**",
@@ -165,9 +159,8 @@ with stable opaque IDs:
 
 Use it only for response qualities that deterministic workspace, command,
 file, or trace evidence cannot establish. IDs must be unique within the case.
-The first rubric pilot belongs to the read-only workflow-reentry case, where
-the agent must explain an equal-authority conflict and request the missing
-decision.
+The initial rubric pilot used a read-only workflow-reentry case. No active
+pilot case currently declares a semantic rubric.
 
 `semantic_controls` provide reviewed candidate responses with an expected
 boolean for every rubric criterion. Each control repeats the rubric IDs in
@@ -200,27 +193,35 @@ that should not; across the controls, every criterion must exercise both
 Inspect the plan before spending model tokens:
 
 ```bash
-just eval-behavior-dry-run test-driven-implementation bug-fix-discrimination
+just eval-behavior-dry-run \
+  iterative-risk-driven-development \
+  boundary-sensitive-rust-refactoring
 ```
 
 Then run that explicitly selected case through the locally authenticated Codex
 CLI:
 
 ```bash
-just eval-behavior test-driven-implementation bug-fix-discrimination
+just eval-behavior \
+  iterative-risk-driven-development \
+  boundary-sensitive-rust-refactoring
 ```
 
 Pass a repetition count to measure stability without overwriting earlier
 evidence:
 
 ```bash
-just eval-behavior test-driven-implementation bug-fix-discrimination 3
+just eval-behavior \
+  iterative-risk-driven-development \
+  boundary-sensitive-rust-refactoring \
+  3
 ```
 
-Cases with a `semantic_rubric` can run an additional opt-in judge:
+Cases with a `semantic_rubric` can run an additional opt-in judge. No active
+pilot case currently declares one. After adding such a case, use:
 
 ```bash
-just eval-behavior-judged test-driven-implementation conflicting-policy-reentry
+just eval-behavior-judged SKILL CASE
 ```
 
 The judge runs as a separate ephemeral Codex invocation in an empty temporary
@@ -233,7 +234,7 @@ Before relying on a rubric diagnostically, run its controls without invoking
 the coding agent:
 
 ```bash
-just eval-judge-calibration test-driven-implementation conflicting-policy-reentry 3
+just eval-judge-calibration SKILL CASE 3
 ```
 
 Each control uses the same isolated judge prompt and receives its own trace.
@@ -257,8 +258,8 @@ is material:
 
 ```bash
 just eval-judge-comparison \
-  test-driven-implementation \
-  conflicting-policy-reentry \
+  SKILL \
+  CASE \
   BASE_MODEL \
   COMPARISON_MODEL
 ```
@@ -299,11 +300,9 @@ workspace is needed:
 
 ```bash
 PYTHONPATH=src python3 -m sirius_skills.commands.run_evals \
-  --behavioral test-driven-implementation \
-  --case conflicting-policy-reentry \
+  --behavioral iterative-risk-driven-development \
+  --case boundary-sensitive-rust-refactoring \
   --model MODEL \
-  --judge \
-  --judge-model JUDGE_MODEL \
   --repeat 3 \
   --timeout 900 \
   --keep-workspace
@@ -313,8 +312,8 @@ Inspect a calibration plan without running either model:
 
 ```bash
 PYTHONPATH=src python3 -m sirius_skills.commands.run_evals \
-  --behavioral test-driven-implementation \
-  --case conflicting-policy-reentry \
+  --behavioral SKILL \
+  --case CASE \
   --calibrate-judge \
   --judge-model JUDGE_MODEL \
   --repeat 3 \

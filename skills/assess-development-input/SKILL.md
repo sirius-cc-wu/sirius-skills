@@ -1,6 +1,6 @@
 ---
 name: assess-development-input
-description: Assesses requirements-shaped input from external or mixed workflows and decides whether its content is ready for inception, use-case modeling, architecture-decision recording, iterative design, or tested implementation, or still needs external current-system recovery, while preserving source meaning, approval state, and unresolved uncertainty. Use when intent statements, specifications, proposals, BDD scenarios, story maps, brainstorm notes, issue descriptions, or similar material exist but their readiness and correct Sirius entry point are unclear.
+description: Assesses requirements-shaped input from external or mixed workflows and decides whether its content is ready for inception, use-case modeling, architecture-decision recording, iterative design, or repository-native implementation, or still needs external current-system recovery, while preserving source meaning, approval state, and unresolved uncertainty. Use when intent statements, specifications, proposals, BDD scenarios, story maps, brainstorm notes, issue descriptions, or similar material exist but their readiness and correct Sirius entry point are unclear.
 ---
 
 # Assess Development Input
@@ -9,8 +9,8 @@ description: Assesses requirements-shaped input from external or mixed workflows
 
 Assess an incoming development artifact. Do not treat its format as proof of
 completeness. Recommend the narrowest Sirius skill that owns the next material
-decision. Stop with an explicit prerequisite when no Sirius skill can
-responsibly proceed.
+decision, or name the responsible repository-native or external process. Stop
+with an explicit prerequisite when no route can responsibly proceed.
 
 ## When to Use
 
@@ -52,19 +52,20 @@ responsibly proceed.
    oracle. Ignore optional detail that does not block the next useful step.
 4. **Select one owner.** Use the routing guide below to choose the narrowest
    Sirius skill that owns the decision. Prefer a specialist over a coordinator
-   when the gap is localized. If requester intent or the candidate direction is
-   unconfirmed, name external clarification or idea refinement as the
-   prerequisite. Do not force a Sirius owner.
+   when the gap is localized. When no active Sirius specialist is needed, name
+   the repository-native implementation process. If requester intent or the
+   candidate direction is unconfirmed, name external clarification or idea
+   refinement as the prerequisite. Do not force a Sirius owner.
 5. **Assess readiness.** Mark the input `ready`, `needs prerequisite`, or
-   `blocked` for the selected skill. Base the status on visible content,
+   `blocked` for the selected route. Base the status on visible content,
    evidence, and approval. Do not use a numeric confidence or completeness
    score.
 6. **Produce the routing record.** State established decisions, material
-   uncertainty, the recommended skill, the rationale, and any stop condition.
+   uncertainty, the recommended route, the rationale, and any stop condition.
    Do not rewrite the input as a requirements, design, decision, or
    implementation artifact. Preserve the source for the next skill.
-7. **Respect authority.** Recommend the handoff without invoking the selected
-   skill, creating its artifacts, or changing production state unless the user
+7. **Respect authority.** Recommend the handoff without executing the selected
+   route, creating its artifacts, or changing production state unless the user
    also authorizes that work.
 
 ## Routing Guide
@@ -72,7 +73,7 @@ responsibly proceed.
 Choose the first row that owns the decision blocking safe progress. The source
 method or file format never determines the route.
 
-| Content condition | Next Sirius skill |
+| Content condition | Next skill or process |
 |---|---|
 | Current commands, behavior, architecture, or constraints need evidence | External current-system recovery prerequisite |
 | Candidate knowledge needs a disposition: create, update, embed, keep-with-implementation, omit, or defer | `select-technical-artifacts` |
@@ -90,7 +91,7 @@ method or file format never determines the route.
 | Creation, structural, communication, or variation forces justify pattern selection | `design-pattern-application` |
 | A language-neutral design needs idiomatic language-specific adaptation | `software-design-language-adaptation` |
 | Approved Rust behavior has material ownership, startup, rollback, cancellation, or cleanup risk | `design-rust-lifecycles` |
-| A bounded behavior has an independent oracle, such as an approved example, invariant, reference, or defect | `test-driven-implementation` |
+| A bounded approved behavior has an independent oracle and needs no Sirius analysis or design coordination | Repository-native implementation and verification |
 | Observable behavior is protected and only internal structure should change | `behavior-preserving-refactoring` |
 
 Use external `interview-me` when one requester's intent is unclear. Use
@@ -122,7 +123,7 @@ Established:
 Material uncertainty:
 - [gap, conflict, missing approval, or none]
 
-Recommended next skill: `[one Sirius skill, or none while blocked]`
+Recommended next route: `[one Sirius skill, repository-native process, or none while blocked]`
 
 Rationale:
 - [why that owner matches the first material gap]
@@ -171,7 +172,7 @@ tags: [intake, routing]
   syntax is present.
 - Producing a roadmap of many downstream skills instead of choosing the next
   responsible owner.
-- Automatically continuing into the selected skill without user authority.
+- Automatically continuing into the selected route without user authority.
 
 ## Verification
 
@@ -181,12 +182,12 @@ tags: [intake, routing]
       not on the originating method or format.
 - [ ] Established decisions remain distinct from gaps, conflicts, inference,
       and missing approval.
-- [ ] Exactly one next Sirius skill is recommended, unless an external
-      prerequisite blocks responsible routing.
-- [ ] The rationale names the first material decision owned by that skill.
+- [ ] Exactly one next Sirius skill, repository-native process, or external
+      prerequisite is recommended.
+- [ ] The rationale names the first material decision owned by that route.
 - [ ] No requirement, approval, current-system fact, or verification oracle was
       invented or silently upgraded.
-- [ ] The input was not rewritten into the selected skill's artifact.
-- [ ] The selected skill was not executed without separate user authority.
+- [ ] The input was not rewritten into an artifact for the selected route.
+- [ ] The selected route was not executed without separate user authority.
 - [ ] Any standalone assessment passes the artifact selection budget and uses
       STE-style Markdown with appropriate frontmatter.

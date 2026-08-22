@@ -188,15 +188,23 @@ briefs remain valid at their recorded revisions. Gather and validate stakeholder
 knowledge through the responsible external process. Use
 `assess-development-input` when externally produced material needs a Sirius
 readiness decision or entry point. Hand approved behavior or design directly to
-the narrowest analysis or implementation skill with its authority, non-goals,
-uncertainty, verification, and stop conditions intact.
+the narrowest active analysis skill or repository-native implementation process
+with its authority, non-goals, uncertainty, verification, and stop conditions
+intact.
 
 `behavior-driven-specification` is retired. Existing behavior specifications
 and scenario sets remain valid at their recorded revisions. Keep new approved
 examples and boundary cases with their canonical requirement, use case,
 contract, or executable test. Use `assess-development-input` when their
-readiness or next Sirius owner is unclear. Use `test-driven-implementation`
-when approved examples already provide an independent oracle.
+readiness or next Sirius owner is unclear. When approved examples already
+provide an independent oracle, follow repository-native implementation and
+verification guidance.
+
+`test-driven-implementation` is retired. Existing behavior-slice evidence
+remains valid at its recorded revision. Use
+`iterative-risk-driven-development` when implementation needs coordinated
+analysis, design, verification, or iteration commits. Otherwise, implement the
+bounded behavior through the consuming repository's own workflow.
 
 `reverse-engineer-software-system`, `survey-existing-system`,
 `recover-system-behavior`, `reconstruct-software-architecture`, and

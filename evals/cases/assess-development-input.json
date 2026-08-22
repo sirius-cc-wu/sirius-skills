@@ -11,7 +11,7 @@
         "top_k": 3
       },
       {
-        "prompt": "Given this externally produced specification, decide whether it needs inception, use cases, system recovery, or can go straight to tested implementation.",
+        "prompt": "Given this externally produced specification, decide whether it needs inception, use cases, system recovery, or can go straight to repository-native implementation.",
         "top_k": 3
       }
     ],
@@ -19,10 +19,6 @@
       {
         "prompt": "Identify the actors, their goals, and the main and alternate use-case scenarios for this feature.",
         "owner": "use-case-modeling"
-      },
-      {
-        "prompt": "Implement this approved behavior from its acceptance examples using a test-first feedback loop.",
-        "owner": "test-driven-implementation"
       },
       {
         "prompt": "Advance this approved proposal through one risk-sized design iteration, validate it, commit once, and stop.",

@@ -63,9 +63,10 @@ mandatory artifact sequence, programming paradigm, or phase checklist.
    and forward design. Stop for a responsible external recovery process when
    current-system understanding lacks evidence. Use
    `grasp-responsibility-design` when native responsibility or dependency
-   placement is unclear. Use `test-driven-implementation` for bounded behavior
-   and `behavior-preserving-refactoring` for verified structural improvement.
-   Prefer one localized specialist when no coordination remains.
+   placement is unclear. Implement bounded approved behavior with the
+   repository's native verification workflow. Use
+   `behavior-preserving-refactoring` for verified structural improvement.
+   Prefer a direct repository-native workflow when no coordination remains.
 5. **Apply the boundary-sensitive refactoring gate.** When the change creates
    or moves a material test seam, composition root, backend, entrypoint,
    process-global dependency, runtime task, resource owner, readiness
@@ -92,7 +93,8 @@ mandatory artifact sequence, programming paradigm, or phase checklist.
    as part of the current iteration. Do not use it as a substitute for missing
    system-boundary, responsibility, or verification decisions.
 8. **Execute the selected work.** Read and follow every selected specialist
-   skill. Keep all work tied to the objective. Stop if missing approval,
+   skill and the repository's implementation and verification guidance. Keep
+   all work tied to the objective. Stop if missing approval,
    product rules, compatibility decisions, design context required by the
    boundary-sensitive gate, or a verification oracle would require invention.
 9. **Reconcile durable knowledge and promotion pressure.** Feed discoveries

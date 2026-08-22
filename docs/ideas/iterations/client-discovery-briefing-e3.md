@@ -77,7 +77,7 @@ The skill should:
 
 - Client discovery idea and completed elicitation and synthesis records
 - `requirements-synthesis-validation`, `use-case-modeling`,
-  `operation-contracts`, `use-case-realization`, and
+  `operation-contracts`, `use-case-realization`, and the then-active
   `test-driven-implementation`
 - Artifact-selection, frontmatter, and readability guidance
 - Skill evaluation contract: `evals/README.md`

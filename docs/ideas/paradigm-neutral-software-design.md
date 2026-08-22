@@ -114,7 +114,7 @@ Sirius already contains strong limiting rules:
 - The [artifact selection budget](../../skills/select-technical-artifacts/references/artifact-selection-budget.md)
   prefers code, tests, configuration, or an existing canonical artifact over a
   new document.
-- [`test-driven-implementation`](../../skills/test-driven-implementation/SKILL.md)
+- The [implementation and evolution track](../../catalog/tracks/implementation-evolution.md)
   permits a bounded implementation to begin from a bug report, approved
   example, invariant, or other independent oracle.
 

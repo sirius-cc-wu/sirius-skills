@@ -6,10 +6,11 @@ current risk or complete the current behavior slice.
 
 ## Overview
 
-This diagram groups all 20 deployable Sirius skills by responsibility. It also
+This diagram groups all 19 deployable Sirius skills by responsibility. It also
 shows six external Addy add-ons. The diagram shows only the main movement
 between groups. Use the detailed diagrams below for conditional routes. Solid
-arrows show normal handoffs. They do not require a fixed sequence. Dashed arrows show optional routing, support, or feedback.
+arrows show normal handoffs. They do not require a fixed sequence. Dashed
+arrows show optional routing, support, or feedback.
 
 ```plantuml
 @startuml sirius-skills-birds-eye
@@ -47,7 +48,7 @@ rectangle "**Sirius: Intake**\nassess-development-input" as assess #FFF4CC
 
 rectangle "**Iterative Risk-Driven Development**\niterative-risk-driven-development\ninception\nuse-case-modeling\ndomain-modeling\nsystem-sequence-diagrams\noperation-contracts\ngrasp-responsibility-design\nuse-case-realization\numl-class-diagram-design\ndesign-pattern-application\nsoftware-design-language-adaptation\ndesign-rust-lifecycles" as design #EEF8EE
 
-rectangle "**Implementation and Evolution**\ntest-driven-implementation\nbehavior-preserving-refactoring" as implementation #FFF5EA
+rectangle "**Implementation and Evolution**\nrepository-native implementation (process)\nbehavior-preserving-refactoring" as implementation #FFF5EA
 
 rectangle "**Repository Workflow**\nwalkthrough-me\ncreate-pr" as repository #F3EEFF
 
@@ -109,9 +110,10 @@ are not installation profiles or lifecycle gates. The detailed diagrams show
 the conditional choices and feedback that this overview omits. The diagram does
 not connect cross-cutting support to every consumer. Select it for a specific
 artifact-selection, artifact-placement, or decision-recording need. It is not a
-required workflow stage. Language adaptation and Rust lifecycle design remain
-in Iterative Analysis and Design because they produce implementation-facing
-design.
+required workflow stage. The repository-native implementation labels are
+process markers, not deployable Sirius skills. Language adaptation and Rust
+lifecycle design remain in Iterative Analysis and Design because they produce
+implementation-facing design.
 
 ## Choose a track
 
@@ -173,8 +175,8 @@ matter. Treat missing stakeholder evidence, validation, or approval as an
 external prerequisite. Route current-system claims that lack evidence to a
 responsible external recovery process. Route scope and feasibility to
 inception. Route approved actor goals and scenario flow to use-case modeling,
-non-trivial state effects to operation contracts, and a
-bounded approved oracle to test-driven implementation. Route one independently
+non-trivial state effects to operation contracts, and a bounded approved oracle
+to repository-native implementation. Route one independently
 consequential proposed, accepted, or superseding architecture choice to
 `record-architecture-decision`.
 
@@ -206,7 +208,7 @@ check before implementation continues.
 
 The coordinator can select requirements, analysis, native responsibility,
 optional object-design, implementation, verification, and Rust lifecycle
-specialists. It does not require a complete object-design chain. For a
+methods. It does not require a complete object-design chain. For a
 boundary-sensitive refactoring, it retains the system boundary, representative
 vertical scenario, native responsibility assignment, ownership consequences,
 verification ownership, and parent completion boundary before implementation.
@@ -310,6 +312,12 @@ Use the read-only walkthrough path when understanding a pull request, commit,
 branch, or local change. Start effectful repository workflow only after
 verification and user authorization for its next effect.
 
+`test-driven-implementation` is retired. Existing behavior-slice evidence
+remains valid. Apply the consuming repository's implementation and verification
+guidance for new behavior. Use `iterative-risk-driven-development` when that
+work still needs Sirius analysis, design, verification, or iteration
+coordination.
+
 ```plantuml
 @startuml implementation-repository-skill-relationships
 top to bottom direction
@@ -333,12 +341,16 @@ skinparam rectangle<<external>> {
   BackgroundColor #F2F2F2
   BorderColor #888888
 }
+skinparam rectangle<<process>> {
+  BackgroundColor #EAF4FB
+  BorderColor #52606D
+}
 rectangle "Approved behavior or design input" as oracle <<input>>
 rectangle "PR, commit, branch,\nor local change" as incoming <<input>>
 rectangle "Independent review or\nreader decision" as readerNext <<input>>
 
 package "Implementation and Evolution" #FFF5EA {
-  rectangle "test-driven-\nimplementation" as implementation
+  rectangle "Repository-native behavior\nimplementation" as implementation <<process>>
   rectangle "behavior-preserving-refactoring" as refactoring
 }
 
@@ -414,6 +426,10 @@ skinparam rectangle<<coordinator>> {
   BackgroundColor #DCEEFF
   BorderColor #2F6690
 }
+skinparam rectangle<<process>> {
+  BackgroundColor #EAF4FB
+  BorderColor #52606D
+}
 
 package "Risk-driven development knowledge" #EEF8EE {
   rectangle "iterative-risk-driven-\ndevelopment" as iterative <<coordinator>>
@@ -425,7 +441,7 @@ package "Risk-driven development knowledge" #EEF8EE {
 }
 
 package "Execution and evidence" #FFF5EA {
-  rectangle "test-driven-\nimplementation" as implementation
+  rectangle "Repository-native behavior\nimplementation" as implementation <<process>>
   rectangle "behavior-preserving-\nrefactoring" as refactoring
 }
 

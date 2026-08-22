@@ -64,7 +64,7 @@ Choose the narrowest specialist for each material question:
 | Demonstrated creation, structural, communication, or variation pressure | [`design-pattern-application`](../../skills/design-pattern-application/SKILL.md) |
 | General mapping into a target language and runtime | [`software-design-language-adaptation`](../../skills/software-design-language-adaptation/SKILL.md) |
 | Rust ownership, transfer, startup, rollback, cancellation, or cleanup | [`design-rust-lifecycles`](../../skills/design-rust-lifecycles/SKILL.md) |
-| A bounded behavior with an independent verification oracle | [`test-driven-implementation`](../../skills/test-driven-implementation/SKILL.md) |
+| A bounded approved behavior with an independent verification oracle and no remaining coordination need | Repository-native implementation and verification |
 
 Several specialists may contribute to one iteration only when they answer the
 same objective. Do not create one artifact merely because another artifact can

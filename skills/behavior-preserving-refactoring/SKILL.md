@@ -27,7 +27,8 @@ and route a material process-global boundary change to iterative coordination.
 
 ## Design Guidance
 
-- Use [Test-Driven Implementation](../test-driven-implementation/SKILL.md) to add new behavior and to grow the executable safety net.
+- Follow repository-native implementation and verification guidance to add new
+  behavior or grow the executable safety net.
 - Use [GRASP Responsibility Design](../grasp-responsibility-design/SKILL.md)
   when a smell indicates misplaced native responsibility, low cohesion, high
   coupling, or unclear dependency direction. The owner may be a class, module,
@@ -38,7 +39,9 @@ and route a material process-global boundary change to iterative coordination.
 
 ## Workflow
 
-1. **Define the invariant.** State the observable behavior and public contracts that must remain unchanged. Separate any desired behavior change into another task or test-driven increment.
+1. **Define the invariant.** State the observable behavior and public contracts
+   that must remain unchanged. Separate any desired behavior change into
+   another implementation task.
 2. **Inspect the repository and worktree.** Read governance, find established verification commands, and distinguish existing user changes from the intended refactoring.
 3. **Establish a green baseline.** Run the focused tests and other required checks that protect the behavior. If protection is inadequate, add characterization tests for current required behavior before restructuring it.
 4. **Name one structural problem.** Identify concrete evidence such as duplication, a long routine, an unclear expression, a large responsibility cluster, high coupling, or an unstable dependency.

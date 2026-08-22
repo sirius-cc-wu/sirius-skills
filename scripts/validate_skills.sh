@@ -235,7 +235,6 @@ template_types=(
   "uml-class-diagram-design|Design Class Diagram"
   "design-pattern-application|Pattern Decision"
   "design-rust-lifecycles|Rust Lifecycle Design"
-  "test-driven-implementation|Behavior Slice Evidence"
   "behavior-preserving-refactoring|Refactoring Record"
 )
 

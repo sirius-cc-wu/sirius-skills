@@ -125,9 +125,9 @@ without introducing speculative traits or typestate.
 ```
 
 ```text
-Use test-driven-implementation to add this behavior from the approved examples.
-Demonstrate that the focused checks detect the missing behavior, then run the
-relevant regression suite.
+Add this behavior from the approved examples by following the repository's
+implementation and verification guidance. Demonstrate that the focused checks
+detect the missing behavior, then run the relevant regression suite.
 ```
 
 ```text

@@ -17,12 +17,12 @@
     ],
     "negative": [
       {
-        "prompt": "Implement the approved submit-order contract with a failing test and the smallest production change",
-        "owner": "test-driven-implementation"
-      },
-      {
         "prompt": "Draw the actor-system event sequence and name the submit-order system operation",
         "owner": "system-sequence-diagrams"
+      },
+      {
+        "prompt": "Assign the submit-order controller and collaborators to cohesive native responsibility owners",
+        "owner": "grasp-responsibility-design"
       }
     ]
   },

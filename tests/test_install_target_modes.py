@@ -54,7 +54,6 @@ ITERATIVE_DESIGN_SKILLS = {
     "design-pattern-application",
     "software-design-language-adaptation",
     "design-rust-lifecycles",
-    "test-driven-implementation",
     "behavior-preserving-refactoring",
 }
 REVERSE_ENGINEERING_SKILLS = {
@@ -382,4 +381,4 @@ def test_validation_covers_the_consolidated_catalog() -> None:
     )
 
     assert result.returncode == 0, result.stdout
-    assert "Validated 20 skills" in result.stdout
+    assert "Validated 19 skills" in result.stdout

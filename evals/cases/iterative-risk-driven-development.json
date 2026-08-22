@@ -39,10 +39,6 @@
       {
         "prompt": "Choose the canonical repository paths and indexes for these already-approved artifacts without changing their content.",
         "owner": "design-repository-artifact-layout"
-      },
-      {
-        "prompt": "Implement this bounded approved behavior from its acceptance example with a failing test first.",
-        "owner": "test-driven-implementation"
       }
     ]
   },

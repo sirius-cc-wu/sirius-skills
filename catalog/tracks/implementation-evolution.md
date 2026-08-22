@@ -9,6 +9,12 @@ use
 [`assess-development-input`](../../skills/assess-development-input/SKILL.md)
 before entering this track.
 
+`test-driven-implementation` is retired. Existing behavior-slice evidence
+remains valid at its recorded revision. For new behavior, follow repository
+implementation and verification guidance directly. Use
+`iterative-risk-driven-development` when analysis, design, implementation,
+verification, or commit boundaries require coordination.
+
 ## Add or Change Behavior
 
 1. Start with an approved use case, operation contract, acceptance example,
@@ -26,10 +32,10 @@ before entering this track.
    implementation-facing lifecycle. Establish the system boundary,
    representative scenario, native responsibilities, and verification oracle
    first when the change is boundary-sensitive.
-4. Use
-   [`test-driven-implementation`](../../skills/test-driven-implementation/SKILL.md)
-   to size the behavior slice, demonstrate discriminatory verification, and
-   implement the smallest coherent change.
+4. Follow repository-native implementation and verification guidance. Size one
+   coherent behavior change, establish checks that can detect an incorrect
+   result, implement the smallest sufficient change, and run proportional
+   regression checks.
 5. Feed implementation discoveries back into durable requirements or design
    artifacts when their represented knowledge changes.
 
@@ -60,5 +66,5 @@ locally before creating a separate behavior-slice or implementation record.
    enabling result until a representative vertical flow proves the parent
    outcome.
 
-Do not use refactoring to conceal intentional behavior changes, and do not ask
-the implementation skill to guess unresolved business rules.
+Do not use refactoring to conceal intentional behavior changes. Do not let an
+implementation process guess unresolved business rules.

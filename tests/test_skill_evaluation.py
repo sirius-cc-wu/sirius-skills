@@ -151,7 +151,7 @@ def test_pilot_routing_cases_pass() -> None:
     report = evaluate_repository(REPO_ROOT)
 
     assert report.errors == []
-    assert report.case_files == 14
+    assert report.case_files == 13
     assert report.routing_checks >= 40
 
 
@@ -1536,84 +1536,6 @@ def test_behavioral_cli_dry_run_describes_cross_model_calibration(
         "skill_name": "implementation",
     }
     assert not (tmp_path / "evals" / "results").exists()
-
-
-def test_invoice_fixture_seeds_the_expected_rounding_failure() -> None:
-    fixture = REPO_ROOT / "evals" / "fixtures" / "invoice-rounding"
-
-    completed = subprocess.run(
-        [sys.executable, "-m", "pytest", "-q"],
-        cwd=fixture,
-        text=True,
-        stdout=subprocess.PIPE,
-        stderr=subprocess.STDOUT,
-    )
-
-    assert completed.returncode == 1
-    assert "assert '2.67' == '2.68'" in completed.stdout
-
-
-def test_order_cancellation_fixture_starts_green_without_approved_policy() -> None:
-    fixture = REPO_ROOT / "evals" / "fixtures" / "order-cancellation-feedback"
-
-    regression = subprocess.run(
-        [sys.executable, "-m", "pytest", "-q"],
-        cwd=fixture,
-        text=True,
-        stdout=subprocess.PIPE,
-        stderr=subprocess.STDOUT,
-    )
-    missing_policy = subprocess.run(
-        [
-            sys.executable,
-            "-c",
-            (
-                "from src.order import Order; "
-                "order = Order('order-1'); "
-                "order.cancel(); "
-                "assert order.cancellation_reason is None"
-            ),
-        ],
-        cwd=fixture,
-        text=True,
-        stdout=subprocess.PIPE,
-        stderr=subprocess.STDOUT,
-    )
-    independent_oracle = subprocess.run(
-        [sys.executable, "-m", "verification.verify_cancellation_policy"],
-        cwd=fixture,
-        text=True,
-        stdout=subprocess.PIPE,
-        stderr=subprocess.STDOUT,
-    )
-
-    assert regression.returncode == 0, regression.stdout
-    assert missing_policy.returncode == 0, missing_policy.stdout
-    assert independent_oracle.returncode != 0
-    assert "cancel" in independent_oracle.stdout
-
-
-def test_conflicting_policy_fixture_preserves_an_unresolved_decision() -> None:
-    fixture = REPO_ROOT / "evals" / "fixtures" / "conflicting-cancellation-policy"
-    product_policy = (fixture / "requirements" / "product-policy.md").read_text(
-        encoding="utf-8"
-    )
-    risk_policy = (fixture / "requirements" / "risk-policy.md").read_text(
-        encoding="utf-8"
-    )
-    regression = subprocess.run(
-        [sys.executable, "-m", "pytest", "-q"],
-        cwd=fixture,
-        text=True,
-        stdout=subprocess.PIPE,
-        stderr=subprocess.STDOUT,
-    )
-
-    assert "Authority: approved" in product_policy
-    assert "submitted order may be cancelled" in product_policy
-    assert "Authority: approved" in risk_policy
-    assert "submitted order cannot be cancelled" in risk_policy
-    assert regression.returncode == 0, regression.stdout
 
 
 def test_order_submission_fixture_starts_without_operation_contract() -> None:

@@ -21,10 +21,6 @@
         "owner": "iterative-risk-driven-development"
       },
       {
-        "prompt": "Add this approved behavior from its acceptance example and demonstrate a failing test before implementation",
-        "owner": "test-driven-implementation"
-      },
-      {
         "prompt": "Design exact Rust resource transfer, startup rollback, async cancellation, joining, Drop fallback, and fallible cleanup without implementation",
         "owner": "design-rust-lifecycles"
       }
