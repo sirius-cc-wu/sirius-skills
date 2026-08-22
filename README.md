@@ -9,7 +9,7 @@ without turning the catalog into a mandatory lifecycle.
 
 ## Install
 
-Install the three generic repository workflow skills into a target project by
+Install the two generic repository workflow skills into a target project by
 default:
 
 ```bash
@@ -34,7 +34,7 @@ Available profiles are defined in [`skill-sets/`](skill-sets/):
 
 | Profile | Purpose |
 |---|---|
-| `workflow` | Interactive change walkthroughs, scoped commits, and pull-request publication |
+| `workflow` | Interactive change walkthroughs and pull-request publication |
 | `iterative-design` | External-input assessment, technical-artifact selection, architecture-decision recording, artifact-layout design, question-driven iterations, boundary-sensitive refactoring gates, native responsibility and optional object design, language adaptation, tested implementation, and scoped commits |
 | `applying-uml-and-patterns` | Compatibility alias for `iterative-design` |
 | `reverse-engineering` | Evidence-driven system survey, behavior and architecture recovery, recorded-decision discovery, recovered-artifact selection, reconciliation, and durable placement |
@@ -71,7 +71,7 @@ creates a per-skill compatibility link in the Antigravity directory without
 replacing unrelated entries. Global uninstallation and retired-skill cleanup
 remove only links that still point to their expected canonical installation.
 
-`just install <target-project> all` also installs the four skills listed in
+`just install <target-project> all` also installs the five skills listed in
 [`catalog/external-skill-sets/addy-osmani.txt`](catalog/external-skill-sets/addy-osmani.txt)
 from Addy Osmani's pinned agent-skills revision. They remain external to the
 Sirius catalog and are not installed by other profiles. The external install
@@ -189,9 +189,16 @@ without approving, committing, or replacing formal code review.
 `simplify` is retired. Use `behavior-preserving-refactoring` for an intentional,
 verified local structural improvement. With the `all` installation, use the
 external `code-simplification` add-on for a behavior-preserving clarity pass on
-recently changed code. For an already prepared change, run the repository's
-formatting and validation commands directly before using `commit`. Use the
-external `code-review-and-quality` add-on when a formal review is needed.
+recently changed code. Use the external `code-review-and-quality` add-on when a
+formal review is needed.
+
+`commit` is retired. With the `all` installation, use the external
+`git-workflow-and-versioning` add-on for standalone commits, branches, worktrees,
+releases, and semantic versioning. Otherwise, follow repository instructions
+directly: review the state and diffs, run proportional checks, stage only
+intended paths, and create a message that follows local conventions.
+`iterative-risk-driven-development` retains its authorized, scoped commit step
+for work executed as an iteration.
 
 Use `record-architecture-decision` when one consequential architecture choice
 needs a short, discoverable ADR or when maintainers need to find which recorded
@@ -210,9 +217,9 @@ handoffs.
 
 ## Repository conventions
 
-`commit` and `create-pr` follow explicit repository-specific message, title,
-identifier, and tracker rules from the nearest applicable `AGENTS.md`. Without
-such rules, both skills use their documented generic defaults. Shared skills
+`create-pr` follows explicit repository-specific title, identifier, and tracker
+rules from the nearest applicable `AGENTS.md`. Standalone Git commits must also
+follow the nearest applicable repository instructions directly. Shared skills
 remain generic; consuming repositories own their local conventions in
 `AGENTS.md`.
 

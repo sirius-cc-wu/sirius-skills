@@ -264,7 +264,6 @@ Composition cases should target Sirius's highest-risk orchestration claims:
 | Durable responsibility or interface change | Refine the owning realization or design model | Leave canonical design knowledge stale |
 | Recovered surprising behavior | Preserve the distinction between current behavior and intended requirements | Declare current code authoritative for intent |
 | Reconciliation with unknown intent | Recommend the smallest authoritative next action | Silently change code, tests, or documentation |
-| Dirty worktree commit | Stage only the authorized change | Include unrelated user work |
 
 These cases should distinguish three outcomes:
 
@@ -278,7 +277,7 @@ These cases should distinguish three outcomes:
 
 ## Pilot Scope
 
-The pilot began with eight skills that represent distinct failure risks and
+The pilot began with seven skills that represent distinct failure risks and
 later added `operation-contracts` for the remaining contract-driven composition
 risk:
 
@@ -289,7 +288,6 @@ risk:
 | `test-driven-implementation` | Demonstrating discriminatory verification without changing valid expectations |
 | `recover-system-behavior` | Separating evidenced current behavior from intended requirements |
 | `reconcile-recovered-design` | Respecting authority and avoiding silent mutation |
-| `commit` | Scoping staged changes in a dirty worktree |
 | `reconstruct-software-architecture` | Selecting focused component and runtime views from as-built evidence instead of producing an exhaustive inventory |
 | `uml-class-diagram-design` | Producing a focused class view only when type responsibilities and relationships justify it |
 | `operation-contracts` | Refining one canonical analysis aggregate with declarative state effects without adding implementation design or duplicate artifacts |

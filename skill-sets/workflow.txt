@@ -1,3 +1,2 @@
 create-pr
-commit
 walkthrough-me

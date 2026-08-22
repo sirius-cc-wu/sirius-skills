@@ -68,13 +68,15 @@ def test_record_install_and_removal_maintain_host_local_ownership(
 ) -> None:
     state_path = tmp_path / "state" / "managed-skills.txt"
     profile_path = tmp_path / "profile.txt"
-    profile_path.write_text("# selected profile\ncommit\nexample-skill\n", encoding="utf-8")
+    profile_path.write_text(
+        "# selected profile\ncurrent-skill\nexample-skill\n", encoding="utf-8"
+    )
 
     manage_installed_skills.record_installed(profile_path, state_path)
     manage_installed_skills.record_names(["another-skill"], state_path)
     manage_installed_skills.forget_names(["example-skill"], state_path)
 
-    assert state_path.read_text(encoding="utf-8") == "another-skill\ncommit\n"
+    assert state_path.read_text(encoding="utf-8") == "another-skill\ncurrent-skill\n"
 
 
 def test_forget_retired_cleans_stale_ownership_entries(tmp_path: Path) -> None:
@@ -94,8 +96,8 @@ def test_link_profile_exposes_canonical_skills_and_is_idempotent(
     profile_path = tmp_path / "profile.txt"
     source_dir = tmp_path / ".agents" / "skills"
     target_dir = tmp_path / ".gemini" / "config" / "skills"
-    profile_path.write_text("commit\nexample-skill\n", encoding="utf-8")
-    for name in ("commit", "example-skill"):
+    profile_path.write_text("current-skill\nexample-skill\n", encoding="utf-8")
+    for name in ("current-skill", "example-skill"):
         (source_dir / name).mkdir(parents=True)
     target_dir.mkdir(parents=True)
     (target_dir / "external-skill").mkdir()
@@ -111,8 +113,8 @@ def test_link_profile_exposes_canonical_skills_and_is_idempotent(
         target_dir=target_dir,
     )
 
-    assert (target_dir / "commit").is_symlink()
-    assert (target_dir / "commit").resolve() == source_dir / "commit"
+    assert (target_dir / "current-skill").is_symlink()
+    assert (target_dir / "current-skill").resolve() == source_dir / "current-skill"
     assert (target_dir / "example-skill").resolve() == source_dir / "example-skill"
     assert (target_dir / "external-skill").is_dir()
 
@@ -123,8 +125,8 @@ def test_link_profile_rejects_conflicts_before_creating_any_links(
     profile_path = tmp_path / "profile.txt"
     source_dir = tmp_path / ".agents" / "skills"
     target_dir = tmp_path / ".gemini" / "config" / "skills"
-    profile_path.write_text("commit\nexample-skill\n", encoding="utf-8")
-    for name in ("commit", "example-skill"):
+    profile_path.write_text("current-skill\nexample-skill\n", encoding="utf-8")
+    for name in ("current-skill", "example-skill"):
         (source_dir / name).mkdir(parents=True)
     (target_dir / "example-skill").mkdir(parents=True)
 
@@ -135,7 +137,7 @@ def test_link_profile_rejects_conflicts_before_creating_any_links(
             target_dir=target_dir,
         )
 
-    assert not (target_dir / "commit").exists()
+    assert not (target_dir / "current-skill").exists()
     assert (target_dir / "example-skill").is_dir()
 
 
@@ -146,12 +148,14 @@ def test_unlink_profile_removes_only_links_to_expected_canonical_skills(
     source_dir = tmp_path / ".agents" / "skills"
     target_dir = tmp_path / ".gemini" / "config" / "skills"
     foreign_dir = tmp_path / "foreign"
-    profile_path.write_text("commit\nexample-skill\n", encoding="utf-8")
-    for name in ("commit", "example-skill"):
+    profile_path.write_text("current-skill\nexample-skill\n", encoding="utf-8")
+    for name in ("current-skill", "example-skill"):
         (source_dir / name).mkdir(parents=True)
     target_dir.mkdir(parents=True)
     foreign_dir.mkdir()
-    (target_dir / "commit").symlink_to(source_dir / "commit", target_is_directory=True)
+    (target_dir / "current-skill").symlink_to(
+        source_dir / "current-skill", target_is_directory=True
+    )
     (target_dir / "example-skill").symlink_to(foreign_dir, target_is_directory=True)
 
     manage_installed_skills.unlink_profile(
@@ -160,7 +164,7 @@ def test_unlink_profile_removes_only_links_to_expected_canonical_skills(
         target_dir=target_dir,
     )
 
-    assert not (target_dir / "commit").exists()
+    assert not (target_dir / "current-skill").exists()
     assert (target_dir / "example-skill").is_symlink()
     assert (target_dir / "example-skill").resolve() == foreign_dir
 
@@ -310,10 +314,11 @@ def test_repository_retirement_ledger_is_disjoint_from_active_skills() -> None:
         path.parent.name for path in (REPO_ROOT / "skills").glob("*/SKILL.md")
     }
 
-    assert len(retirements) == 58
+    assert len(retirements) == 59
     assert not retired_names & active_names
     assert {
         "author-software-proposal",
+        "commit",
         "design",
         "dioxus-ui-ux",
         "execute-all-slices",

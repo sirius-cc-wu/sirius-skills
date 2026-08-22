@@ -17,7 +17,7 @@
     ],
     "negative": [
       {
-        "prompt": "Open a draft pull request for my committed branch and publish it for review",
+        "prompt": "Verify the base and head branches, check for duplicates, and open a draft GitHub pull request with a convention-aware title and validation evidence",
         "owner": "create-pr"
       },
       {
@@ -27,10 +27,6 @@
       {
         "prompt": "Refactor duplicated code in the changed module while preserving its verified behavior",
         "owner": "behavior-preserving-refactoring"
-      },
-      {
-        "prompt": "Stage my intended unstaged files and create a scoped git commit",
-        "owner": "commit"
       }
     ]
   },

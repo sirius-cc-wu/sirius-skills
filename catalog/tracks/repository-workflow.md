@@ -1,18 +1,20 @@
 # Repository Workflow
 
 Use this track to understand a pull request, commit, branch, or local change,
-or to record and publish an already implemented change. The skills
-remain independently selectable; each sequence is a common handoff, not
-authority to perform later review or publication steps without the user's
-request.
+or to record and publish an already implemented change. The skills remain
+independently selectable; each sequence is a common handoff, not authority to
+perform later review or publication steps without the user's request.
 
 When the `all` installation is available, optionally use Addy Osmani's external
 [`code-review-and-quality`](https://github.com/addyosmani/agent-skills/blob/5a1b82d6445d1e2f0abeea1072851419a50c0e5c/skills/code-review-and-quality/SKILL.md)
 before commit or pull-request publication. Use external
 [`code-simplification`](https://github.com/addyosmani/agent-skills/blob/5a1b82d6445d1e2f0abeea1072851419a50c0e5c/skills/code-simplification/SKILL.md)
 after checks pass when recently changed code needs a behavior-preserving
-clarity pass. Both remain external skills, not Sirius catalog entries or
-lifecycle gates.
+clarity pass. Use external
+[`git-workflow-and-versioning`](https://github.com/addyosmani/agent-skills/blob/5a1b82d6445d1e2f0abeea1072851419a50c0e5c/skills/git-workflow-and-versioning/SKILL.md)
+for standalone commit, branch, worktree, release, or semantic-version guidance.
+All three remain external skills, not Sirius catalog entries or lifecycle
+gates.
 
 ## Interactive code-change tour
 
@@ -40,9 +42,11 @@ lifecycle gates.
    a test-first implementation or behavior-preserving refactoring workflow.
 2. With the `all` installation, optionally use `code-simplification` on the
    recently changed scope. Preserve exact behavior and rerun affected checks.
-3. Use [`commit`](../../skills/commit/SKILL.md) when a prepared change still
-   needs to be recorded. Review repository state, run proportional
-   verification, and stage only the intended files.
+3. With the `all` installation, use `git-workflow-and-versioning` when a
+   prepared change needs a standalone commit or broader branch, worktree, or
+   version guidance. Otherwise, follow repository guidance directly. Review
+   repository state and diffs, run proportional verification, stage only the
+   intended paths, and follow local message conventions.
 4. Use [`create-pr`](../../skills/create-pr/SKILL.md) when committed work is
    ready to publish for review. Confirm base, head, push state, duplicate pull
    requests, title conventions, and validation evidence.

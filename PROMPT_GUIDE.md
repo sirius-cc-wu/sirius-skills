@@ -23,11 +23,6 @@ only the first section, and do not edit or stage anything.
 ```
 
 ```text
-Use commit to review and commit only the retry fix. Follow this repository's
-configured commit format and exclude unrelated working-tree changes.
-```
-
-```text
 Use create-pr to open a draft pull request against the default branch. Include
 the checks that passed and avoid creating a duplicate PR.
 ```
@@ -68,6 +63,12 @@ severity and report the verification evidence.
 Use code-simplification on the recently changed code after the checks pass.
 Preserve exact behavior, follow local conventions, keep the pass within the
 changed scope, and rerun the affected checks after each simplification.
+```
+
+```text
+Use git-workflow-and-versioning to review and commit only the retry fix. Follow
+this repository's commit conventions, exclude unrelated working-tree changes,
+and do not push.
 ```
 
 ## Reverse engineering

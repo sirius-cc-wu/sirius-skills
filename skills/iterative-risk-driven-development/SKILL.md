@@ -112,9 +112,10 @@ mandatory artifact sequence, programming paradigm, or phase checklist.
    human-owned or unavailable validation. Do not close the parent outcome or
    commit an iteration when its stated exit evidence failed.
 11. **Commit once per iteration when authorized.** If the user authorized a
-    commit, use [Commit](../commit/SKILL.md) with scoped staging. Create at most
-    one commit for the current iteration. Do not amend, push, or publish without
-    matching authority.
+    commit, review repository state and diffs, follow local message conventions,
+    and stage only the current iteration's intended paths. Create at most one
+    commit for the iteration. Do not amend, push, or publish without matching
+    authority.
 12. **Apply the execution mode.** In single-iteration mode, report the
     objective, canonical changes, validation, commit, and residual risk, then
     stop. In continuous mode, report the current result, choose the next

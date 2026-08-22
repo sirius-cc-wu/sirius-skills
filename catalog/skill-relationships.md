@@ -6,8 +6,8 @@ current risk or complete the current behavior slice.
 
 ## Overview
 
-This diagram groups all 30 deployable Sirius skills by responsibility. It also
-shows four external Addy add-ons. The diagram shows only
+This diagram groups all 29 deployable Sirius skills by responsibility. It also
+shows five external Addy add-ons. The diagram shows only
 the main movement between groups. Use the detailed diagrams below for
 conditional routes. Solid arrows show normal handoffs. They do not require a
 fixed sequence. Dashed arrows show optional routing, support, or feedback.
@@ -40,6 +40,7 @@ package "External Addy add-ons\naddyosmani/agent-skills" as addy #F2F2F2 {
   rectangle "idea-refine" as addyIdea <<external>>
   rectangle "code-review-and-quality" as addyReview <<external>>
   rectangle "code-simplification" as addySimplify <<external>>
+  rectangle "git-workflow-and-versioning" as addyGit <<external>>
 }
 
 rectangle "**Sirius: Intake**\nassess-development-input" as assess #FFF4CC
@@ -52,7 +53,7 @@ rectangle "**Iterative Risk-Driven Development**\niterative-risk-driven-developm
 
 rectangle "**Implementation and Evolution**\ntest-driven-implementation\nbehavior-preserving-refactoring" as implementation #FFF5EA
 
-rectangle "**Repository Workflow**\nwalkthrough-me\ncommit\ncreate-pr" as repository #F3EEFF
+rectangle "**Repository Workflow**\nwalkthrough-me\ncreate-pr" as repository #F3EEFF
 
 rectangle "**Cross-cutting Support**\nselect-technical-artifacts\ndesign-repository-artifact-layout\nrecord-architecture-decision" as support #FFFBEA
 
@@ -75,9 +76,13 @@ design --> implementation
 implementation ..> design : durable feedback
 implementation --> addyReview : review before merge
 implementation ..> addySimplify : optional clarity pass
+implementation ..> addyGit : git or version guidance
 addyReview ..> addySimplify : cleanup feedback
+addyReview ..> addyGit : prepared change
+addySimplify ..> addyGit : prepared change
 addyReview --> repository
 addySimplify --> repository
+addyGit --> repository
 implementation --> repository
 @enduml
 ```
@@ -85,7 +90,7 @@ implementation --> repository
 The gray nodes belong to Addy Osmani's external `agent-skills` collection. They
 are not part of the Sirius catalog or named profiles.
 `just install <target-project> all` or `just install-global all` installs the
-four curated add-ons; other profiles do not. The diagram shows one optional
+five curated add-ons; other profiles do not. The diagram shows one optional
 composition. `interview-me` confirms one requester's intent.
 `idea-refine` turns that intent into a focused, user-confirmed candidate
 one-pager. Skip `interview-me` when intent is concrete. Skip `idea-refine` when
@@ -97,6 +102,10 @@ one canonical idea document for each candidate direction. Do not create a second
 document for a direction that already has one. Requester confirmation is not
 organizational approval. Use the dashed edge to `assess-development-input` only
 when the artifact's next Sirius owner is unclear.
+
+Use `git-workflow-and-versioning` when prepared work needs standalone commit,
+branch, worktree, release, or semantic-version guidance. Selection does not
+authorize a commit, push, tag, or release.
 
 The groups in this diagram help readers navigate the skill collection. They
 are not installation profiles or lifecycle gates. The detailed diagrams show
@@ -125,7 +134,7 @@ design.
   structural change is sufficiently bounded.
 - Use **Repository Workflow** for a paced tour of a pull request, commit,
   branch, or local change, or after verification and authorization for
-  recording or publication.
+  pull-request publication.
 - Use `select-technical-artifacts` across tracks when candidate knowledge needs
   a disposition: `create`, `update`, `embed`, `keep-with-implementation`,
   `omit`, or `defer`.
@@ -365,15 +374,13 @@ package "Implementation and Evolution" #FFF5EA {
 
 package "Repository Workflow" #F3EEFF {
   rectangle "walkthrough-me" as walkthrough
-  rectangle "commit" as commit
   rectangle "create-pr" as createpr
 }
 
 oracle --> implementation
 implementation --> refactoring : green baseline
-implementation --> commit : prepared change
-refactoring --> commit : prepared change
-commit --> createpr
+implementation ..> createpr : verified, committed work
+refactoring ..> createpr : verified, committed work
 incoming --> walkthrough
 walkthrough ..> readerNext : context only
 @enduml
@@ -381,7 +388,8 @@ walkthrough ..> readerNext : context only
 
 `walkthrough-me` establishes paced comprehension of the selected change. It
 does not provide the independent review or reader decision shown as its
-optional next step.
+optional next step. For a standalone commit between implementation and
+pull-request publication, follow repository guidance directly.
 
 Read the
 [Implementation and Evolution](tracks/implementation-evolution.md) and

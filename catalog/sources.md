@@ -8,7 +8,7 @@ may distill concepts from several sources.
 
 | Source | Skills informed | Concepts distilled |
 |---|---|---|
-| Sirius repository history and accumulated repository workflow practice | `behavior-preserving-refactoring`, `commit`, `create-pr`, `walkthrough-me` | Configuration ownership, verified structural improvement, intentional staging, convention-aware change publication, and revision- or snapshot-fixed code-change comprehension |
+| Sirius repository history and accumulated repository workflow practice | `behavior-preserving-refactoring`, `create-pr`, `walkthrough-me` | Configuration ownership, verified structural improvement, convention-aware change publication, and revision- or snapshot-fixed code-change comprehension |
 | Matt Pocock's [`grilling`](https://github.com/mattpocock/skills/blob/8b78b531ab965735c5dc74f6f7a219e1e37326df/skills/productivity/grilling/SKILL.md) at revision `8b78b531` | `walkthrough-me` | Agent-owned fact finding, explicit user checkpoints, and user-controlled interactive pacing, adapted from decision interviewing to a section-by-section code-change tour |
 | Sirius active skill catalog and workflow boundary guidance | `assess-development-input` | Content-based readiness assessment, preservation of source status and uncertainty, and selection of the narrowest responsible downstream skill |
 | Addy Osmani's `interview-me` and `idea-refine` at revision [`5a1b82d`](https://github.com/addyosmani/agent-skills/tree/5a1b82d6445d1e2f0abeea1072851419a50c0e5c) | `assess-development-input`, `design-repository-artifact-layout` | Optional requester-intent clarification and candidate-direction refinement; the confirmed idea remains candidate input |
@@ -35,7 +35,7 @@ the Sirius active catalog:
 
 | Source | Pinned revision | Installed names | Installation surface |
 |---|---|---|---|
-| Addy Osmani's [`agent-skills`](https://github.com/addyosmani/agent-skills/tree/5a1b82d6445d1e2f0abeea1072851419a50c0e5c) | `5a1b82d6445d1e2f0abeea1072851419a50c0e5c` | `interview-me`, `idea-refine`, `code-review-and-quality`, `code-simplification` | `just install <target-project> all` or `just install-global all` only |
+| Addy Osmani's [`agent-skills`](https://github.com/addyosmani/agent-skills/tree/5a1b82d6445d1e2f0abeea1072851419a50c0e5c) | `5a1b82d6445d1e2f0abeea1072851419a50c0e5c` | `interview-me`, `idea-refine`, `code-review-and-quality`, `code-simplification`, `git-workflow-and-versioning` | `just install <target-project> all` or `just install-global all` only |
 
 ## Proposed Sources
 

@@ -36,7 +36,7 @@ def test_rank_skills_uses_names_and_descriptions() -> None:
     ranking = rank_skills(
         "Reconstruct the deployed components and runtime dependencies",
         {
-            "commit": "Commit changes with scoped staging.",
+            "publish-change": "Publish a prepared repository change.",
             "reconstruct-software-architecture": (
                 "Recover components, runtime collaborations, deployment, and dependencies."
             ),
@@ -151,7 +151,7 @@ def test_pilot_routing_cases_pass() -> None:
     report = evaluate_repository(REPO_ROOT)
 
     assert report.errors == []
-    assert report.case_files == 22
+    assert report.case_files == 21
     assert report.routing_checks >= 40
 
 

@@ -35,7 +35,6 @@ The initial pilot covers:
 - `test-driven-implementation`;
 - `recover-system-behavior`;
 - `reconcile-recovered-design`;
-- `commit`;
 - `walkthrough-me`;
 - `reconstruct-software-architecture`; and
 - `uml-class-diagram-design`.
