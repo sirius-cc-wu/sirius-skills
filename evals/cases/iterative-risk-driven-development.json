@@ -25,6 +25,10 @@
       {
         "prompt": "Continue this approved feature after several enabling iterations. Recheck whether reusable behavior still has a current canonical owner, promote it only with authority, and choose a canonical path only after the artifact is justified.",
         "top_k": 3
+      },
+      {
+        "prompt": "Coordinate this approved compatibility fix. One customer's model exposed the problem, but the system also has sibling versions, pattern-matched registrations, dynamic fallbacks, and offline behavior. Establish the supported population and representative coverage without claiming broad completion from one model.",
+        "top_k": 3
       }
     ],
     "negative": [
@@ -136,6 +140,26 @@
         "Do not create a mandatory requirements, design, or iteration-document chain",
         "Do not create a generic documentation taxonomy or standalone layout guide merely because local guidance is absent",
         "Do not continue implementation while the canonical intent owner and authority remain unresolved"
+      ],
+      "trust_level": "provisional"
+    },
+    {
+      "id": "support-envelope-before-specialized-change",
+      "prompt": "An approved recovery feature says every supported adapter must keep its configured capability shape while the live runtime is unavailable. A defect report covers one customer model, and the proposed fix hardcodes that model. The repository also contains named sibling models, revision-pattern matching, a generic runtime-discovery fallback, persisted identity-only configuration, and tests only for the reported model. Choose the next risk-driven iteration and state what must be established before implementation can claim the feature is complete.",
+      "expected_output": "A bounded support-envelope iteration that fixes the approved claim and supported population, checks sibling and dynamic fallback paths, compares live and offline capability sources, routes missing authority or evidence correctly, and defines representative verification without generalizing from one customer model.",
+      "expectations": [
+        "The approved claim and supported population distinguish one exact model, a family, a closed catalog, pattern-matched support, and dynamically extensible support",
+        "Named siblings, revisions, registrations, generic or dynamic fallbacks, and unknown paths are checked only around the selected capability",
+        "Live, startup, degraded, offline, persisted, and cached capability sources remain distinct, and identity sufficiency is explicit",
+        "Missing support authority returns to the responsible requirements or external owner, missing current behavior stops for external recovery, and cross-component source ownership routes to software architecture design",
+        "Verification covers the reported model plus justified included, boundary, fallback, unknown, and cross-mode cases",
+        "A model-specific slice may proceed within approved scope, but it does not close the broader parent outcome"
+      ],
+      "prohibitions": [
+        "Do not infer the supported population from one customer topology, a product constant, or an existing test",
+        "Do not guess offline capability from live or cached runtime data",
+        "Do not recover unrelated system scope or require a standalone support matrix",
+        "Do not declare the broad feature complete while material variants, authority, or evidence remain unresolved"
       ],
       "trust_level": "provisional"
     }

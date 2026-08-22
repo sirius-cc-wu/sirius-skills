@@ -36,7 +36,7 @@ Available profiles are defined in [`skill-sets/`](skill-sets/):
 | Profile | Purpose |
 |---|---|
 | `workflow` | Interactive change walkthroughs and pull-request publication |
-| `iterative-design` | Entry routing, technical-artifact selection, software architecture design, architecture decision documentation, artifact layout design, question-driven iterations, boundary-sensitive refactoring gates, native responsibility and optional object design, language adaptation, tested implementation, and scoped commits |
+| `iterative-design` | Entry routing, technical-artifact selection, software architecture design, architecture decision documentation, artifact layout design, question-driven iterations, support-envelope and boundary-sensitive refactoring gates, native responsibility and optional object design, language adaptation, tested implementation, and scoped commits |
 | `applying-uml-and-patterns` | Compatibility alias for `iterative-design` |
 | `reverse-engineering` | Compatibility profile for technical-artifact selection, artifact placement, and recorded-decision discovery; it does not perform system recovery |
 | `all` | Every active Sirius skill in the catalog, plus the pinned Addy add-ons |
@@ -298,8 +298,14 @@ current question and implementation forces. It rechecks the canonical owner,
 revision, lifecycle status, and authority of material intent when enabling
 evidence gains reuse or a new consumer. Code, tests, observations, and
 historical iteration records remain evidence until an owning requirements or
-design specialist validates their intended status. For boundary-sensitive
-refactorings, it retains the system boundary, representative vertical scenario,
+design specialist validates their intended status. When behavior varies by
+identity, type, version, platform, provider, capability, or operating mode, the
+support-envelope gate distinguishes one variant, a family, a closed catalog,
+pattern-matched support, and dynamically extensible support. It checks sibling
+and fallback paths, cross-mode capability sources, explicit exclusions,
+representative coverage, and the parent completion boundary without guessing
+or requiring a standalone matrix. For boundary-sensitive refactorings, the
+coordinator retains the system boundary, representative vertical scenario,
 native responsibilities, ownership consequences, verification ownership, and
 parent completion boundary before implementation. It evolves canonical
 artifacts and executes the work. When the user requests one commit per

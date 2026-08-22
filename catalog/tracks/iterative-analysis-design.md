@@ -82,6 +82,39 @@ requirements analysis, system analysis, software/system design, detailed
 design, implementation, and verification in one risk-sized loop. These groups
 classify responsibility; they do not require a complete design chain.
 
+## Support-Envelope Gate
+
+Apply the coordinator's support-envelope gate when an approved coordinated
+change selects or derives behavior by identity, type, model, version, platform,
+provider, capability, operating mode, or another material variation axis. The
+gate distinguishes one exact variant, one family, a closed catalog, a
+pattern-matched set, and a dynamically extensible population. It does not turn
+every conditional into coordinated work.
+
+Before implementation, establish only the material parts of:
+
+- the approved support claim, population, exclusions, and compatibility
+  authority;
+- named siblings, aliases, revisions, registrations, pattern matches, generic
+  or dynamic fallbacks, and unknown paths;
+- the capability source in normal, startup, degraded, offline, persisted,
+  cached, or replayed modes, including whether available identity and
+  configuration are sufficient without live evidence;
+- the canonical requirement, catalog, schema, registry, configuration, or
+  component that owns the rule and any consumers that duplicate it;
+- representative reported, included, boundary, fallback, unknown, and
+  cross-mode verification; and
+- whether the iteration proves the approved population or only one bounded
+  slice of the parent outcome.
+
+Keep a narrow change narrow when broader intent lacks approval. Stop for the
+responsible authority when the supported population or compatibility policy is
+unclear. Stop for a responsible external recovery process when current sibling,
+fallback, or mode behavior lacks evidence. Route non-trivial expected state
+effects to `operation-contracts` and material cross-component capability-source
+ownership to `design-software-architecture`. Do not guess unavailable facts,
+recover the whole system, or require a standalone support matrix.
+
 ## Boundary-Sensitive Refactoring
 
 Do not assume that a refactoring is local merely because observable behavior

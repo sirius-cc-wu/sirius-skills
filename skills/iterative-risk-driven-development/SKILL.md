@@ -1,6 +1,6 @@
 ---
 name: iterative-risk-driven-development
-description: Coordinates an already selected, approved development objective through risk-sized iterations across system analysis, software architecture, native responsibility and Rust lifecycle design, implementation, and verification. Rechecks canonical knowledge ownership; preserves system, resource-ownership, end-to-end verification, and parent-completion boundaries during complex refactoring; validates each result; and creates at most one authorized commit per iteration. Use after initial routing when a feature or boundary-sensitive refactoring needs coordinated progress or one commit per iteration until the requested work is complete; do not use for session-start discovery or one isolated specialist task.
+description: Coordinates an already selected, approved development objective through risk-sized iterations across system analysis, software architecture, native responsibility and Rust lifecycle design, implementation, and verification. Rechecks canonical knowledge ownership; applies support-envelope and boundary-sensitive refactoring gates; preserves system, resource-ownership, end-to-end verification, and parent-completion boundaries; validates each result; and creates at most one authorized commit per iteration. Use after initial routing when a feature, support-sensitive change, or boundary-sensitive refactoring needs coordinated progress or one commit per iteration until the requested work is complete; do not use for session-start discovery or one isolated specialist task.
 ---
 
 # Iterative Risk-Driven Development
@@ -26,6 +26,9 @@ discovery.
   design, implementation, or verification in the same risk-sized loop.
 - A complex refactoring creates or moves a test seam, backend, composition
   root, entrypoint, runtime owner, readiness condition, or cleanup boundary.
+- An approved coordinated change specializes behavior by identity, type, model,
+  version, platform, provider, capability, or operating mode, and its supported
+  population or fallback behavior is material.
 - Do not use to assess readiness, perform one isolated specialist task, commit
   an existing diff, or publish completed work.
 
@@ -121,7 +124,17 @@ repository-native workflow or return the responsible prerequisite.
    longer requires coordination, return a direct handoff instead of using this
    skill as a general router. Return to `assess-development-input` when the
    initial owner or readiness must be reconsidered.
-5. **Apply the boundary-sensitive refactoring gate.** When the change creates
+5. **Apply the support-envelope gate.** When behavior is selected or derived by
+   identity, type, model, version, platform, provider, capability, operating
+   mode, or another variation axis, determine whether the approved claim covers
+   one exact variant, one family, a closed catalog, a pattern-matched set, or a
+   dynamically extensible population. Inspect sibling, fallback, unknown, and
+   cross-mode behavior only as far as the selected capability requires. Confirm
+   the authoritative support boundary, capability source, explicit exclusions,
+   and representative verification before implementation. Keep a narrow fix
+   narrow when broader intent lacks approval. Do not report one observed variant
+   as proof of a broader parent outcome.
+6. **Apply the boundary-sensitive refactoring gate.** When the change creates
    or moves a material test seam, composition root, backend, entrypoint,
    process-global dependency, runtime task, resource owner, readiness
    condition, or cleanup boundary, establish the system boundary,
@@ -130,7 +143,7 @@ repository-native workflow or return the responsible prerequisite.
    implementation. Stop for a responsible external recovery process when
    current behavior or architecture is unclear. Do not treat the `refactoring`
    label as evidence that this design context is unnecessary.
-6. **Budget artifacts and locate justified owners.** Apply
+7. **Budget artifacts and locate justified owners.** Apply
    [Artifact Selection Budget](../select-technical-artifacts/references/artifact-selection-budget.md).
    Prefer code, tests, configuration, an existing canonical artifact, or an
    embedded section. Create a standalone artifact only when its value, owner,
@@ -140,18 +153,19 @@ repository-native workflow or return the responsible prerequisite.
    repository has no usable placement convention, use
    `design-repository-artifact-layout`. Do not create a layout document or
    speculative directory tree merely because no guide exists.
-7. **Select Rust lifecycle design when needed.** If the target is Rust and
+8. **Select Rust lifecycle design when needed.** If the target is Rust and
    ownership, capability transfer, startup, rollback, cancellation,
    supervision, or cleanup affects the objective, use
    [Design Rust Lifecycles](../design-rust-lifecycles/SKILL.md). Treat its result
    as part of the current iteration. Do not use it as a substitute for missing
    system-boundary, responsibility, or verification decisions.
-8. **Execute the selected work.** Read and follow every selected specialist
+9. **Execute the selected work.** Read and follow every selected specialist
    skill and the repository's implementation and verification guidance. Keep
-   all work tied to the objective. Stop if missing approval,
-   product rules, compatibility decisions, design context required by the
-   boundary-sensitive gate, or a verification oracle would require invention.
-9. **Reconcile durable knowledge and promotion pressure.** Feed discoveries
+   all work tied to the objective. Stop if missing approval, support-population
+   authority, product rules, compatibility decisions, capability-source
+   evidence, design context required by either gate, or a verification oracle
+   would require invention.
+10. **Reconcile durable knowledge and promotion pressure.** Feed discoveries
    back only when they change
    knowledge owned by a canonical requirement, design, decision, test, schema,
    or configuration artifact. Preserve idea and decision history. Do not
@@ -164,21 +178,60 @@ repository-native workflow or return the responsible prerequisite.
    choice needs an independent proposed, accepted, or superseding lifecycle,
    use external `documentation-and-adrs` with the `all` installation or follow
    repository-native ADR guidance.
-10. **Validate exit evidence.** Run repository-required and changed-scope
-   checks. Retain the representative end-to-end oracle when a local seam or
-   component check is the current result. Distinguish completed evidence from
-   human-owned or unavailable validation. Do not close the parent outcome or
-   commit an iteration when its stated exit evidence failed.
-11. **Commit once per iteration when authorized.** If the user authorized a
+11. **Validate exit evidence.** Run repository-required and changed-scope
+   checks. For a material support envelope, verify the reported variant plus
+   representative included, boundary, fallback, unknown, and cross-mode cases
+   justified by the claim. Retain the representative end-to-end oracle when a
+   local seam or component check is the current result. Distinguish completed
+   evidence from human-owned or unavailable validation. Do not close the parent
+   outcome or commit an iteration when its stated exit evidence failed.
+12. **Commit once per iteration when authorized.** If the user authorized a
     commit, review repository state and diffs, follow local message conventions,
     and stage only the current iteration's intended paths. Create at most one
     commit for the iteration. Do not amend, push, or publish without matching
     authority.
-12. **Apply the execution mode.** In single-iteration mode, report the
+13. **Apply the execution mode.** In single-iteration mode, report the
     objective, canonical changes, validation, commit, and residual risk, then
     stop. In continuous mode, report the current result, choose the next
     objective, and continue until the requested work or an explicit stop
     condition ends the run.
+
+## Support-Envelope Gate
+
+Apply this gate when a change makes behavior depend on a variation axis and the
+approved claim may extend beyond the reported example. Do not apply it merely
+because code contains a conditional. Answer only the questions material to the
+selected capability:
+
+- **Claim and population:** Does the approved outcome cover one exact variant,
+  one family, a closed catalog, a pattern-matched set, or a dynamically
+  extensible population? Which authority defines inclusion, exclusion, and
+  compatibility?
+- **Variation and negative space:** Which named siblings, aliases, revisions,
+  pattern matches, registrations, generic fallbacks, dynamic extensions, and
+  unknown paths share or bypass the changed behavior?
+- **Source sufficiency across modes:** Which source determines the capability in
+  normal, startup, degraded, offline, persisted, cached, or replayed modes? Can
+  the available identity and configuration determine it without live evidence?
+  Do not guess or silently treat one mode's source as authoritative in another.
+- **Ownership and consistency:** Which requirement, product catalog, schema,
+  registry, configuration, or component owns the support rule? Which consumers
+  duplicate or derive it? Route a material cross-component source or boundary
+  choice to `design-software-architecture`.
+- **Verification coverage:** Which reported, representative included, boundary,
+  fallback, unknown, and cross-mode cases are needed to support the claim? A
+  single customer, fixture, platform, model, or revision proves only its bounded
+  case unless approved evidence establishes more.
+- **Completion boundary:** Does the iteration prove the approved support claim,
+  or only one bounded slice? Keep excluded or unevidenced variants and the
+  broader parent outcome explicit.
+
+Route intended scope or compatibility authority to the responsible requirements
+or external owner. Route non-trivial expected state effects to
+`operation-contracts`. Stop for a responsible external recovery process when
+current variant, fallback, or mode behavior lacks evidence. The gate is a
+bounded change-impact check. It does not recover the whole system, require a
+standalone support matrix, or authorize broadening a narrowly approved change.
 
 ## Boundary-Sensitive Refactoring Gate
 
@@ -314,6 +367,11 @@ deferred or changed after the objective was defined.
 - A missing layout guide triggers a generic taxonomy, empty directory tree, or
   standalone layout document without a justified artifact and consumer.
 - Object design starts from a domain model without behavior or system events.
+- A change generalizes from one observed variant without an approved support
+  population, sibling and fallback review, cross-mode source check, or coverage
+  argument.
+- A runtime-derived, cached, or observed capability is guessed in a mode where
+  its authoritative source is unavailable.
 - A boundary-sensitive refactoring proceeds without a preserved system
   scenario, native responsibility assignment, or verification boundary.
 - Rust lifecycle design is added without material ownership or resource
@@ -338,6 +396,11 @@ deferred or changed after the objective was defined.
 - [ ] The approved parent outcome and current completion boundary are explicit.
 - [ ] Initial routing was already known, and selected in-iteration specialists
       match the objective's actual questions or implementation forces.
+- [ ] A material support envelope names the approved claim and population,
+      variation and fallback paths, cross-mode capability sources, explicit
+      exclusions, representative coverage, and completion boundary.
+- [ ] A bounded variant fix is not reported as broader support, and no missing
+      capability or compatibility rule was guessed.
 - [ ] Boundary-sensitive refactoring retains its system boundary,
       representative vertical oracle, native responsibilities, ownership
       consequences, and verification ownership.

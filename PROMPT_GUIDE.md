@@ -118,10 +118,14 @@ conventions and do not move files.
 ```text
 Use iterative-risk-driven-development to select one risk-driven objective for
 this feature. Use only the methods, artifacts, and Rust lifecycle design that
-the objective justifies. If the work moves a system, test, responsibility,
-runtime, resource, or verification boundary, retain the representative vertical
-scenario and distinguish an enabling seam from the parent outcome. Implement,
-validate, and commit one iteration at a time until the work is complete.
+the objective justifies. If behavior varies by identity, type, version,
+platform, provider, capability, or operating mode, establish the approved
+support population, sibling and fallback paths, cross-mode capability sources,
+explicit exclusions, representative coverage, and completion boundary before
+implementation. If the work moves a system, test, responsibility, runtime,
+resource, or verification boundary, retain the representative vertical scenario
+and distinguish an enabling seam from the parent outcome. Implement, validate,
+and commit one iteration at a time until the work is complete.
 ```
 
 ```text

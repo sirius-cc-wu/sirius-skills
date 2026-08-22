@@ -37,7 +37,10 @@ native responsibilities, ownership consequences, verification ownership, and
 open parent outcome before more implementation. One visual case selects a
 focused class view for justified stateful object design. One contract case adds
 declarative state effects to an existing feature-analysis aggregate without
-creating code, implementation design, or a second artifact.
+creating code, implementation design, or a second artifact. A provisional
+support-envelope case checks that one reported model does not silently define a
+broader supported population, capability source, verification set, or parent
+completion claim.
 
 ## Case Format
 

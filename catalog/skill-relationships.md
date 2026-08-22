@@ -312,6 +312,16 @@ and historical iteration records remain evidence. Reuse, a new consumer, or a
 stretched approval boundary triggers a fresh readiness and artifact-promotion
 check before implementation continues.
 
+When behavior depends on identity, type, version, platform, provider,
+capability, operating mode, or another material variation axis, the coordinator
+applies its support-envelope gate. It fixes the approved support population,
+checks sibling and fallback paths, compares capability sources across modes,
+keeps exclusions and representative coverage explicit, and does not claim a
+broad parent outcome from one observed variant. Missing scope authority returns
+to the responsible requirements or external owner. Missing current-system
+evidence stops for a responsible external recovery process, while material
+cross-component capability ownership routes to `design-software-architecture`.
+
 The coordinator's **In-Iteration Routing** tree owns specialist selection after
 entry. It can select requirements analysis, system analysis, software/system
 design, detailed design, implementation, and verification methods without
@@ -430,8 +440,8 @@ flow succeeds.
 
 Read the
 [Iterative Analysis and Design track](tracks/iterative-analysis-design.md) for
-artifact boundaries, the boundary-sensitive refactoring gate, and the iteration
-rule.
+artifact boundaries, the support-envelope and boundary-sensitive refactoring
+gates, and the iteration rule.
 
 ## Implementation and repository workflow
 
