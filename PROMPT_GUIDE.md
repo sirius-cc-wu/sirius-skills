@@ -4,6 +4,15 @@ Name the skill and provide the repository outcome you want. Include constraints
 such as scope, revision, validation command, intended files, or publication
 state when they matter.
 
+When the owner is unclear, start with routing instead of guessing:
+
+```text
+Use assess-development-input to route this request. Select exactly one initial
+Sirius skill, external add-on, repository-native process, or responsible
+prerequisite from its content, authority, uncertainty, and risk. Explain the
+choice, preserve stated approval and non-goals, and do not execute the handoff.
+```
+
 ## Repository workflow
 
 ```text

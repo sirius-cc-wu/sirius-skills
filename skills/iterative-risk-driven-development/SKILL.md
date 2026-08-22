@@ -1,16 +1,18 @@
 ---
 name: iterative-risk-driven-development
-description: Coordinates approved, risk-sized development iterations across analysis, native responsibility design, implementation, and verification. Rechecks canonical knowledge ownership and promotion as enabling evidence gains reuse, preserves system boundaries during complex refactoring, selects Rust ownership design when required, validates each result, and creates at most one authorized commit per iteration. Use when a feature or boundary-sensitive refactoring needs coordinated progress or one commit per iteration until the requested work is complete.
+description: Coordinates an already selected, approved development objective through risk-sized iterations across system analysis, native responsibility and Rust lifecycle design, implementation, and verification. Rechecks canonical knowledge ownership; preserves system, resource-ownership, end-to-end verification, and parent-completion boundaries during complex refactoring; validates each result; and creates at most one authorized commit per iteration. Use after initial routing when a feature or boundary-sensitive refactoring needs coordinated progress or one commit per iteration until the requested work is complete; do not use for session-start discovery or one isolated specialist task.
 ---
 
 # Iterative Risk-Driven Development
 
 ## Overview
 
-Advance an approved change through one or more risk-sized iterations. Each
-iteration answers one decision, learning, design, or delivery question. Select
-methods from the current question and implementation forces. Do not follow a
-mandatory artifact sequence, programming paradigm, or phase checklist.
+Advance an approved change through one or more risk-sized iterations after the
+initial route is known. Each iteration answers one decision, learning, design,
+or delivery question. Select in-iteration methods from the current question
+and implementation forces. Entry routing belongs to
+`assess-development-input`; this coordinator does not own session-start skill
+discovery.
 
 ## When to Use
 
@@ -58,18 +60,18 @@ mandatory artifact sequence, programming paradigm, or phase checklist.
    question and its exit evidence. Name the approved parent outcome and state
    whether this iteration can close it or only enable later work. Keep the
    objective small enough for one coherent commit.
-4. **Select the narrowest owners.** Route each material question to an existing
-   specialist. Use requirements, analysis, and design skills for product intent
-   and forward design. Stop for a responsible external recovery process when
-   current-system understanding lacks evidence. Use
-   `grasp-responsibility-design` when native responsibility or dependency
-   placement is unclear. With the `all` installation, use external
-   `test-driven-development` for bounded approved behavior. Otherwise, follow
-   the repository's native implementation and verification workflow. Use
-   `behavior-preserving-refactoring` for verified responsibility, dependency,
-   variation, or configuration-ownership changes. Use external
-   `code-simplification` for routine clarity work when available. Prefer a
-   direct repository-native workflow when no coordination remains.
+4. **Select in-iteration owners.** Start from the approved objective and initial
+   route. Apply the owner boundaries in
+   [Assess Development Input](../assess-development-input/SKILL.md) without
+   treating its routing tree as a phase sequence. Assign each material question
+   to the narrowest requirements analysis, system analysis, software/system
+   design, detailed design, implementation, or verification owner. Select
+   several specialists only when they serve the same objective and coherent
+   change. Stop for a responsible external recovery or
+   authority prerequisite when evidence or approval is missing. If the work no
+   longer requires coordination, return a direct handoff instead of using this
+   skill as a general router. Return to `assess-development-input` when the
+   initial owner or readiness must be reconsidered.
 5. **Apply the boundary-sensitive refactoring gate.** When the change creates
    or moves a material test seam, composition root, backend, entrypoint,
    process-global dependency, runtime task, resource owner, readiness
@@ -251,6 +253,8 @@ deferred or changed after the objective was defined.
   approved product intent.
 - An inception, idea, or enabling proof is reused beyond its approved boundary
   without reassessing ownership and promotion pressure.
+- The coordinator is used for session-start discovery or one isolated
+  specialist task.
 - Several objectives are combined into one commit.
 - A mandatory artifact chain or programming paradigm is imposed.
 - All artifacts are created at full detail before risk is understood.
@@ -283,7 +287,8 @@ deferred or changed after the objective was defined.
       the iteration stopped at the correct readiness or validation handoff.
 - [ ] One objective and its exit evidence bound each iteration.
 - [ ] The approved parent outcome and current completion boundary are explicit.
-- [ ] Selected specialists match the actual questions or implementation forces.
+- [ ] Initial routing was already known, and selected in-iteration specialists
+      match the objective's actual questions or implementation forces.
 - [ ] Boundary-sensitive refactoring retains its system boundary,
       representative vertical oracle, native responsibilities, ownership
       consequences, and verification ownership.

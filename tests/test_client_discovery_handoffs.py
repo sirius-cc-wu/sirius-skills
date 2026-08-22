@@ -36,6 +36,49 @@ def test_client_to_code_track_routes_retired_capabilities_to_active_owners() -> 
     assert "implementation-evolution.md" in track
 
 
+def test_assessment_owns_entry_routing_without_replacing_iteration_coordination() -> None:
+    assessment = " ".join(
+        read("skills/assess-development-input/SKILL.md").split()
+    )
+    iterative = " ".join(
+        read("skills/iterative-risk-driven-development/SKILL.md").split()
+    )
+    relationships = " ".join(read("catalog/skill-relationships.md").split())
+
+    assert "This skill owns entry routing" in assessment
+    assert "select one initial route without executing it" in assessment
+    for group in (
+        "Requirements Analysis",
+        "System Analysis",
+        "Software/System Design",
+        "Detailed Design",
+        "Implementation and Evolution",
+        "Review",
+        "Repository Workflow",
+        "Integrate and ship",
+        "Cross-cutting Support",
+        "Iterative Coordination",
+    ):
+        assert group in assessment
+
+    active_names = {
+        line
+        for line in read("skill-sets/all.txt").splitlines()
+        if line and not line.startswith("#")
+    }
+    external_names = {
+        line
+        for line in read("catalog/external-skill-sets/addy-osmani.txt").splitlines()
+        if line and not line.startswith("#")
+    }
+    for name in (active_names - {"assess-development-input"}) | external_names:
+        assert f"`{name}`" in assessment
+
+    assert "Select in-iteration owners" in iterative
+    assert "does not own session-start skill discovery" in iterative
+    assert "owns operational entry routing" in relationships
+
+
 def test_iterative_coordinator_preserves_intent_ownership_and_promotion() -> None:
     iterative = read("skills/iterative-risk-driven-development/SKILL.md")
     track = read("catalog/tracks/iterative-analysis-design.md")

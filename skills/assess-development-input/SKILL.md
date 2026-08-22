@@ -1,133 +1,187 @@
 ---
 name: assess-development-input
-description: Assesses requirements-shaped input from external or mixed workflows and decides whether its content is ready for inception, use-case modeling, external decision documentation, iterative design, or an external or repository-native implementation process, or still needs external current-system recovery, while preserving source meaning, approval state, and unresolved uncertainty. Use when intent statements, specifications, proposals, BDD scenarios, story maps, brainstorm notes, issue descriptions, or similar material exist but their readiness and correct Sirius entry point are unclear.
+description: Routes an incoming development request or artifact to the narrowest responsible Sirius skill, external add-on, repository-native process, or prerequisite. Use at task intake when the correct owner is unclear, several skills appear plausible, authority or readiness may block progress, or coordinated work must be distinguished from one localized specialist task. Preserve source meaning and select one initial route without executing it.
 ---
 
-# Assess Development Input
+# Assess and Route Development Input
 
 ## Overview
 
-Assess an incoming development artifact. Do not treat its format as proof of
-completeness. Recommend the narrowest Sirius skill that owns the next material
-decision, or name the responsible repository-native or external process. Stop
-with an explicit prerequisite when no route can responsibly proceed.
+Route an incoming development request or artifact to one initial owner. Base the
+decision on content, authority, current uncertainty, and material risk. Do not
+route by file name, lifecycle phase, or a mandatory skill sequence.
+
+This skill owns entry routing. It does not execute the selected route.
+`iterative-risk-driven-development` owns specialist selection after coordinated
+iteration work begins.
 
 ## When to Use
 
-- Requirements-shaped material came from another skill, method, team, or
-  repository, and its Sirius entry point is unclear.
-- Several next skills appear plausible, and the content must determine the
-  route.
-- A proposal appears ready for implementation, but its approval, evidence,
-  behavior, or verification oracle may be incomplete.
-- Do not use when the user selected the correct skill and supplied its entry
+- A task starts and its correct skill or process is unclear.
+- Several skills appear plausible, but one owns the first material question.
+- Requirements-shaped input may lack approval, evidence, behavior, or an
+  independent verification oracle.
+- It is unclear whether work needs one specialist, repository-native execution,
+  or coordinated iteration across several boundaries.
+- Do not use when the user selected a valid skill and supplied its entry
   conditions.
-- Do not use to conduct discovery, rewrite an artifact, coordinate a full
-  lifecycle, or implement behavior.
+- Do not use to execute a handoff, rewrite source material, or coordinate an
+  iteration.
 
-## Source Discipline
+## Task Discovery
 
-- Treat input names and formats as hints, not readiness evidence. A feature file
-  is not necessarily approved behavior. Interview notes are not necessarily
-  requirements. A proposal is not necessarily feasible.
-- Preserve source references, revisions, stated approval, non-goals, and open
-  questions. Never upgrade candidate, inferred, or contested statements to
-  approved decisions.
-- Do not treat unsupported claims about the current system as facts. Require a
-  responsible external recovery process before using them as requirements or
-  design inputs.
-- Judge only the completeness needed for the next decision. Do not require
-  every input to contain every possible requirements or design artifact.
+Use this tree as a routing index, not a required lifecycle:
+
+```text
+Task arrives
+├─ Requester intent is unclear
+│  └─ external interview-me
+├─ A candidate direction needs alternatives or MVP scope
+│  └─ external idea-refine
+├─ A confirmed direction needs an implementation specification
+│  └─ external spec-driven-development
+├─ Current behavior, architecture, deployment, or constraints lack evidence
+│  └─ responsible external current-system recovery process
+├─ Scope, actors, goals, or scenarios are unclear
+│  └─ Requirements Analysis
+├─ Domain vocabulary, system events, or state effects are unclear
+│  └─ System Analysis
+├─ Responsibilities, collaborations, software structure, or variation are unclear
+│  └─ Software/System Design
+├─ Target-language or runtime realization is unclear
+│  └─ Detailed Design
+├─ One bounded behavior has an approved independent oracle
+│  └─ external test-driven-development or repository-native implementation
+├─ A completed change needs formal review
+│  └─ external code-review-and-quality or repository-native review
+│     ├─ readability or local complexity → external code-simplification
+│     ├─ established structural ownership → behavior-preserving-refactoring
+│     └─ material boundary change → iterative-risk-driven-development
+├─ A reader needs a paced explanation of a selected change
+│  └─ walkthrough-me
+├─ Prepared work needs Git or version guidance
+│  └─ external git-workflow-and-versioning or repository-native Git workflow
+├─ Committed work is ready for pull-request publication
+│  └─ create-pr
+├─ A consequential decision or durable context needs documentation
+│  └─ external documentation-and-adrs or repository-native documentation
+├─ Artifact existence or disposition is unclear
+│  └─ select-technical-artifacts
+├─ A justified artifact lacks a canonical home
+│  └─ design-repository-artifact-layout
+└─ Several analysis, design, implementation, verification, or commit boundaries
+   require one coordinated objective
+   └─ iterative-risk-driven-development
+```
+
+External Addy routes require the `all` installation. Otherwise, select the
+repository-native workflow or report the responsible external prerequisite.
+
+## Routing Principles
+
+1. **Prefer the narrowest owner.** Select a specialist when one localized
+   question blocks progress. Select the coordinator only when several material
+   boundaries must advance together.
+2. **Choose by meaning.** A specification, issue, feature file, pull request, or
+   test does not prove readiness or determine its owner.
+3. **Preserve authority.** Keep source references, revisions, approval state,
+   non-goals, and open questions. Never upgrade candidate or inferred material
+   into an approved decision.
+4. **Surface uncertainty.** Keep missing information, conflicting information,
+   and missing authority distinct. Stop instead of routing around a material
+   prerequisite.
+5. **Select one initial route.** Do not prescribe a full lifecycle. The selected
+   owner may route feedback or request coordination after it begins.
+6. **Do not execute implicitly.** Routing does not authorize artifact creation,
+   implementation, commits, pushes, publication, or production changes.
+
+## Assessment Modes
+
+- **Direct task routing:** Classify an explicit request whose desired outcome is
+  clear but whose owner is not. Return the route without demanding an input
+  artifact or producing a readiness inventory.
+- **Input readiness assessment:** Inspect an existing artifact or evidence set.
+  Record what it establishes, the first material gap, and whether the selected
+  route is ready.
+- **Coordination decision:** Select `iterative-risk-driven-development` only
+  when one approved objective requires several specialist questions, a
+  boundary-sensitive change, or an iteration commit boundary.
 
 ## Workflow
 
-1. **Identify the input and outcome.** Name the material, its known revision or
-   source, the outcome it should support, and its explicit non-goals.
-2. **Inventory decision-relevant content.** Record what the input establishes
-   about purpose, actors, system boundary, behavior, examples, rules,
-   constraints, quality attributes, approval, current-system evidence, and
-   verification. Keep missing content separate from contested content.
-3. **Find the first material gap.** Identify the unresolved decision that could
-   make the next agent guess, produce invalid design, or create an unreliable
-   oracle. Ignore optional detail that does not block the next useful step.
-4. **Select one owner.** Use the routing guide below to choose the narrowest
-   Sirius skill that owns the decision. Prefer a specialist over a coordinator
-   when the gap is localized. When no active Sirius specialist is needed, name
-   the available external or repository-native implementation process. If
-   requester intent or the candidate direction is unconfirmed, name external
-   clarification or idea refinement as the prerequisite. Do not force a Sirius owner.
-5. **Assess readiness.** Mark the input `ready`, `needs prerequisite`, or
-   `blocked` for the selected route. Base the status on visible content,
-   evidence, and approval. Do not use a numeric confidence or completeness
-   score.
-6. **Produce the routing record.** State established decisions, material
-   uncertainty, the recommended route, the rationale, and any stop condition.
-   Do not rewrite the input as a requirements, design, decision, or
-   implementation artifact. Preserve the source for the next skill.
-7. **Respect authority.** Recommend the handoff without executing the selected
-   route, creating its artifacts, or changing production state unless the user
-   also authorizes that work.
+1. **Identify the request.** State the requested outcome, source or selected
+   change, explicit non-goals, and requested repository effects.
+2. **Confirm authority.** Identify what is approved, candidate, inferred,
+   contested, or unsupported. Treat code, tests, and observations as evidence,
+   not automatically as intended behavior.
+3. **Find the first material question.** Name the earliest unresolved question
+   that would make the next owner guess or cross an unauthorized boundary.
+4. **Check for a direct owner.** Use the discovery tree and quick reference.
+   Prefer a specialist or repository-native process over coordination.
+5. **Assess readiness.** For an existing input, mark the route `ready`,
+   `needs prerequisite`, or `blocked`. For a direct task, report only material
+   assumptions or stop conditions.
+6. **Return one route.** Name one Sirius skill, external add-on,
+   repository-native process, or responsible external prerequisite and explain
+   why it owns the current question.
+7. **Stop at the handoff.** Do not invoke the route or create its output unless
+   the user separately requests that work.
 
-## Routing Guide
+## Quick Reference
 
-Choose the first row that owns the decision blocking safe progress. The source
-method or file format never determines the route.
-
-| Content condition | Next skill or process |
-|---|---|
-| Current commands, behavior, architecture, or constraints need evidence | External current-system recovery prerequisite |
-| Candidate knowledge needs a disposition: create, update, embed, keep-with-implementation, omit, or defer | `select-technical-artifacts` |
-| A justified durable artifact needs a canonical home, lifecycle separation, or migration | `design-repository-artifact-layout` |
-| One bounded architecture choice has proposed or accepted status and needs a durable ADR | External `documentation-and-adrs` with the `all` installation; otherwise repository-native ADR guidance |
-| Opportunity, vision, business case, feasibility, scope, or major risks are unclear | `inception` |
-| Actors, user goals, system boundary, main scenarios, or extensions are unclear | `use-case-modeling` |
-| An approved change needs risk-driven iterative analysis, design, implementation, or verification | `iterative-risk-driven-development` |
-| Business concepts, vocabulary, associations, or attributes are unclear | `domain-modeling` |
-| Actor-system events or system operations are unclear | `system-sequence-diagrams` |
-| Non-trivial state changes, preconditions, or postconditions are unclear | `operation-contracts` |
-| Object responsibility or ownership is unclear | `grasp-responsibility-design` |
-| Object collaboration for a selected scenario is unclear | `use-case-realization` |
-| Stable software structure needs a class-level summary | `uml-class-diagram-design` |
-| Creation, structural, communication, or variation forces justify pattern selection | `design-pattern-application` |
-| A language-neutral design needs idiomatic language-specific adaptation | `software-design-language-adaptation` |
-| Approved Rust behavior has material ownership, startup, rollback, cancellation, or cleanup risk | `design-rust-lifecycles` |
-| A bounded approved behavior has an independent oracle and needs no Sirius analysis or design coordination | External `test-driven-development` with the `all` installation; otherwise repository-native implementation and verification |
-| Observable behavior is protected and routine naming, extraction, duplication, control-flow, or recent-code clarity should improve | External `code-simplification` with the `all` installation; otherwise repository-native cleanup |
-| Observable behavior is protected and established responsibility, dependency, variation, or configuration ownership should change | `behavior-preserving-refactoring` |
-
-Use external `interview-me` when one requester's intent is unclear. Use
-external `idea-refine` when a candidate direction needs alternatives,
-assumption testing, or MVP scoping. Neither requester confirmation nor a
-polished idea document establishes organizational approval.
-
-If the blocking decision belongs to a stakeholder, product owner, external
-source owner, or another authority outside Sirius, report `blocked` and name
-the prerequisite. Do not select a Sirius skill merely to avoid returning
-upstream.
+| Group | Condition | Initial owner |
+|---|---|---|
+| Define | One requester's intended outcome is unclear | External `interview-me` |
+| Define | A candidate direction needs alternatives, assumption testing, or MVP scope | External `idea-refine` |
+| Define | A confirmed direction needs an implementation specification | External `spec-driven-development` |
+| Requirements Analysis | Vision, feasibility, project scope, or major business risk is unclear | `inception` |
+| Requirements Analysis | Actors, goals, system boundary, scenarios, or extensions are unclear | `use-case-modeling` |
+| System Analysis | Business concepts, vocabulary, associations, or attributes are unclear | `domain-modeling` |
+| System Analysis | Actor-system events or system operations are unclear | `system-sequence-diagrams` |
+| System Analysis | Non-trivial state changes, preconditions, or postconditions are unclear | `operation-contracts` |
+| Software/System Design | Native responsibility, cohesion, coupling, coordination, or dependency direction is unclear | `grasp-responsibility-design` |
+| Software/System Design | Internal collaboration for one selected scenario is unclear | `use-case-realization` |
+| Software/System Design | Stable object-oriented structure needs a summary | `uml-class-diagram-design` |
+| Software/System Design | Demonstrated creation, structural, communication, or variation pressure needs a pattern decision | `design-pattern-application` |
+| Detailed Design | Language-neutral design needs target-language adaptation | `software-design-language-adaptation` |
+| Detailed Design | Approved Rust behavior has material ownership, startup, rollback, cancellation, or cleanup risk | `design-rust-lifecycles` |
+| Implementation and Evolution | Bounded approved behavior has an independent oracle and needs no Sirius coordination | External `test-driven-development` or repository-native implementation and verification |
+| Review | A completed change needs correctness, architecture, security, performance, or merge review | External `code-review-and-quality` or repository-native review |
+| Review | Protected behavior needs routine naming, extraction, duplication, control-flow, or recent-code clarity work | External `code-simplification` or repository-native cleanup |
+| Review | Protected behavior needs an established responsibility, dependency, variation, or configuration-ownership change | `behavior-preserving-refactoring` |
+| Repository Workflow | A reader needs a paced, read-only change tour | `walkthrough-me` |
+| Integrate and ship | Prepared work needs standalone Git, branch, worktree, release, or version guidance | External `git-workflow-and-versioning` or repository-native Git workflow |
+| Integrate and ship | Committed work is ready for pull-request publication | `create-pr` |
+| Integrate and ship | A consequential architecture choice or durable engineering context needs documentation | External `documentation-and-adrs` or repository-native documentation |
+| Cross-cutting Support | Candidate knowledge needs create, update, embed, keep, omit, or defer disposition | `select-technical-artifacts` |
+| Cross-cutting Support | A justified artifact needs a canonical home, lifecycle separation, or migration | `design-repository-artifact-layout` |
+| Iterative Coordination | One approved objective crosses several analysis, design, implementation, verification, or commit boundaries | `iterative-risk-driven-development` |
+| External prerequisite | Current-system claims lack sufficient evidence | Responsible external recovery process |
+| External prerequisite | Stakeholder evidence, validation, approval, or another authority is missing | Responsible external owner |
 
 ## Output
 
-Use this concise conversational form by default:
+Use this concise conversational form:
 
 ```markdown
-Input:
-- [source, artifact, or revision]
+Request or input:
+- [task, source, artifact, selected change, or revision]
 
 Intended outcome:
-- [what this material is meant to enable]
+- [what the route should enable]
 
 Readiness: [ready | needs prerequisite | blocked]
 
 Established:
-- [decision, evidence, or approved behavior]
+- [material approved fact, evidence, or none needed for direct routing]
 
 Material uncertainty:
-- [gap, conflict, missing approval, or none]
+- [gap, conflict, missing authority, assumption, or none]
 
-Recommended next route: `[one Sirius skill, external add-on, repository-native process, or none while blocked]`
+Recommended initial route: `[one owner]`
 
 Rationale:
-- [why that owner matches the first material gap]
+- [why this owner matches the first material question]
 
 Prerequisite or stop condition:
 - [what must be resolved before proceeding, or none]
@@ -135,24 +189,18 @@ Prerequisite or stop condition:
 
 ## File Output
 
-Keep the assessment conversational unless it needs a durable cross-session or
-cross-team handoff. Before creating a standalone document, apply the
+Keep routing conversational unless a durable cross-session or cross-team
+handoff is justified. Before creating a standalone record, apply the
 [Artifact Selection Budget](../select-technical-artifacts/references/artifact-selection-budget.md).
-Prefer an existing issue, idea, or aggregate feature artifact when it is a
-sufficient owner.
-
-When a standalone Markdown assessment is justified, follow
+Follow
 [Markdown Artifact Frontmatter](../iterative-risk-driven-development/references/markdown-artifact-frontmatter.md)
-and use STE-style. Use this frontmatter. Give the record a stable ID only when
-it will be cross-referenced. Put the concise output fields in the body. Do not
-copy the source material.
+and use STE-style.
 
 ```markdown
 ---
 type: "Development Input Assessment"
-title: "Assessment: [Input name]"
-description: "[Readiness and recommended next owner in one sentence]"
-id: "[Stable assessment ID when cross-referenced]"
+title: "Assessment: [Request or input]"
+description: "[Readiness and recommended initial owner]"
 status: "[active | blocked | completed]"
 tags: [intake, routing]
 ---
@@ -160,35 +208,31 @@ tags: [intake, routing]
 
 ## Red Flags
 
-- Routing by whether the input is called a specification, story map, feature,
-  proposal, interview, or brainstorm.
-- Converting raw evidence, candidate requirements, or examples into approved
-  decisions during assessment.
-- Rewriting the input into a preferred Sirius format before choosing its owner.
-- Sending every input to the iterative coordinator when a specialist owns the
-  first gap.
-- Treating confirmed requester intent or a refined idea as organizational
-  approval.
-- Sending incomplete behavior to implementation because acceptance-language
-  syntax is present.
-- Producing a roadmap of many downstream skills instead of choosing the next
-  responsible owner.
-- Automatically continuing into the selected route without user authority.
+- Routing every task through a fixed lifecycle or mandatory artifact sequence.
+- Selecting by a file name, tool, syntax, or development phase instead of the
+  first material question.
+- Sending every task to `iterative-risk-driven-development` when one specialist
+  or repository-native process is sufficient.
+- Using this skill after the user already selected a valid direct owner.
+- Inventing requirements, approval, current-system facts, or verification
+  evidence to make a route appear ready.
+- Returning a roadmap of many skills instead of one initial owner.
+- Executing the selected route without separate authority.
 
 ## Verification
 
-- [ ] The assessment identifies the input, source or revision, intended outcome,
-      and known non-goals.
-- [ ] Readiness is based on content, evidence, approval, and the next decision,
-      not on the originating method or format.
-- [ ] Established decisions remain distinct from gaps, conflicts, inference,
-      and missing approval.
-- [ ] Exactly one next Sirius skill, external add-on, repository-native process,
-      or external prerequisite is recommended.
-- [ ] The rationale names the first material decision owned by that route.
-- [ ] No requirement, approval, current-system fact, or verification oracle was
-      invented or silently upgraded.
-- [ ] The input was not rewritten into an artifact for the selected route.
-- [ ] The selected route was not executed without separate user authority.
-- [ ] Any standalone assessment passes the artifact selection budget and uses
-      STE-style Markdown with appropriate frontmatter.
+- [ ] The requested outcome, source or selected change, and requested effects
+      are explicit.
+- [ ] The route follows content, authority, uncertainty, and risk rather than a
+      mandatory phase sequence.
+- [ ] The first material question and exactly one initial owner are named.
+- [ ] A specialist is preferred over coordination when one localized question
+      owns the gap.
+- [ ] Established information remains distinct from assumptions, conflicts,
+      unsupported claims, and missing authority.
+- [ ] External add-on availability and repository-native fallback are explicit
+      when relevant.
+- [ ] No route was executed and no effect was implied without separate user
+      authority.
+- [ ] Any standalone assessment passes the artifact budget and uses the
+      required frontmatter.

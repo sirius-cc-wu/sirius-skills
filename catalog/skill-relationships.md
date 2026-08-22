@@ -192,8 +192,9 @@ implementation-facing design.
 
 ## Choose a track
 
-- Use **Assess Development Input** when requirements-shaped material exists but
-  its readiness or Sirius entry point is unclear.
+- Use **Assess Development Input** when an incoming task or artifact has no
+  clear owner, several routes appear plausible, or readiness and authority are
+  uncertain.
 - Use external `interview-me`, `idea-refine`, or `spec-driven-development`
   before Sirius when requester intent, a candidate direction, or an
   implementation specification needs interactive refinement.
@@ -226,15 +227,16 @@ implementation-facing design.
   consequential architecture choice needs a proposed, accepted, or superseding
   ADR. Otherwise, follow repository-native ADR guidance.
 
-## External development inputs
+## Development routing
 
-`assess-development-input` is an optional, content-based gateway. It accepts
-intent statements, specifications, proposals, BDD scenarios, story maps,
-brainstorm notes, and similar material. It does not depend on the tool or method
-that produced the material. It selects the narrowest skill that owns the first
-material gap. If no Sirius skill can responsibly proceed, it reports an
-external prerequisite. The assessment does not rewrite the source or execute
-the selected skill.
+`assess-development-input` owns operational entry routing. Use it when an
+incoming task or artifact has no clear owner, when several skills appear
+plausible, or when readiness and authority may block progress. It selects one
+initial Sirius skill, external add-on, repository-native process, or responsible
+prerequisite from the first material question. It does not impose a lifecycle,
+rewrite source material, execute the handoff, or replace specialist selection
+inside an active iteration. The diagrams in this document visualize that
+routing; they are not its executable owner.
 
 A common cross-repository path uses the external
 [`interview-me`](https://github.com/addyosmani/agent-skills/blob/5a1b82d6445d1e2f0abeea1072851419a50c0e5c/skills/interview-me/SKILL.md),
@@ -273,8 +275,8 @@ guidance.
 The five Sirius recovery skills are retired. Existing fixed-revision recovery
 artifacts remain valid. Use a responsible external process when current
 behavior, architecture, deployment, state, or constraints need new evidence.
-`assess-development-input` returns that external prerequisite when
-requirements-shaped input depends on unsupported current-system claims.
+`assess-development-input` returns that external prerequisite when an incoming
+task or artifact depends on unsupported current-system claims.
 
 Read the [Reverse Engineering track](tracks/reverse-engineering.md) for
 compatibility-profile behavior, evidence safeguards, artifact disposition, and
@@ -282,11 +284,12 @@ migration guidance.
 
 ## Iterative analysis and design
 
-`iterative-risk-driven-development` executes one or more approved, risk-sized
-objectives. It selects the smallest specialists for the current question,
-evolves canonical artifacts, validates each iteration, and creates at most one
-authorized commit per iteration. When the user requests one commit per
-iteration, it continues by default until the requested work is complete.
+After initial routing, `iterative-risk-driven-development` executes one or more
+approved, risk-sized objectives. It selects the smallest in-iteration
+specialists for the current question, evolves canonical artifacts, validates
+each iteration, and creates at most one authorized commit per iteration. When
+the user requests one commit per iteration, it continues by default until the
+requested work is complete.
 
 Before each objective, it confirms the current canonical owner, revision,
 lifecycle status, and authority for material intent. Code, tests, observations,

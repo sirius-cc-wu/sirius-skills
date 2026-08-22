@@ -141,10 +141,13 @@ The [Skill Relationships](catalog/skill-relationships.md) views summarize
 normal handoffs and optional feedback paths. Select the smallest set of skills
 that addresses the current risk or outcome.
 
-Use `assess-development-input` when requirements-shaped material comes from an
-external or mixed workflow and its Sirius entry point is unclear. It evaluates
-the content and recommends one next Sirius skill without rewriting the source
-or automatically executing the handoff.
+Use `assess-development-input` at task intake when the correct owner is unclear,
+several skills appear plausible, or an existing input may not be ready. It
+routes the first material question to one Sirius skill, external add-on,
+repository-native process, or responsible prerequisite without imposing a
+lifecycle or executing the handoff. Use `iterative-risk-driven-development`
+only after the initial route is known and one approved objective requires
+coordinated specialist work.
 
 Use `select-technical-artifacts` when the primary question is whether technical
 knowledge should become a standalone artifact, update or embed in an existing

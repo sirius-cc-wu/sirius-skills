@@ -7,7 +7,7 @@
         "top_k": 3
       },
       {
-        "prompt": "Assess whether this reviewed feature proposal is ready for its next Sirius owner, expose unresolved assumptions, and route it without rewriting or executing it.",
+        "prompt": "I have a completed change but do not know whether it needs a walkthrough, formal review, structural refactoring, or publication. Route it to one initial owner without executing the handoff.",
         "top_k": 3
       },
       {
@@ -44,6 +44,22 @@
         "Do not rewrite the input into a new specification format",
         "Do not invent missing requirements or silently claim approval",
         "Do not create a standalone document unless durable handoff value justifies it"
+      ],
+      "trust_level": "provisional"
+    },
+    {
+      "id": "route-unclear-development-task",
+      "prompt": "Route this request to one owner: I have a commit I do not understand and want a paced, section-by-section explanation without review, edits, staging, or publication.",
+      "expected_output": "A concise initial route to walkthrough-me based on the requested comprehension outcome and read-only authority boundary.",
+      "expectations": [
+        "The route selects walkthrough-me as the single initial owner",
+        "The rationale distinguishes paced comprehension from formal review or publication",
+        "The direct task does not require a requirements artifact or readiness inventory"
+      ],
+      "prohibitions": [
+        "Do not execute the walkthrough",
+        "Do not route to iterative-risk-driven-development merely because code is involved",
+        "Do not imply authority to review, edit, stage, commit, or publish"
       ],
       "trust_level": "provisional"
     }

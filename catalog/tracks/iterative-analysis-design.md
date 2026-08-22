@@ -6,12 +6,13 @@ complex refactoring moves a system, test, responsibility, runtime, or resource
 boundary. Select work from the current question and implementation forces
 rather than following a mandatory artifact or object-design sequence.
 
-When requirements-shaped input was produced outside Sirius and the correct
-entry point is unclear, first use
+When the initial owner is unclear, several routes appear plausible, or an input
+may lack sufficient authority, first use
 [`assess-development-input`](../../skills/assess-development-input/SKILL.md).
-Continue only when the input has sufficient authority for the selected work.
-The assessment may instead route to a localized specialist, implementation, or
-an external recovery, stakeholder, or authority prerequisite.
+The assessment may route directly to a localized specialist, implementation,
+review, repository workflow, or an external prerequisite. Enter this track only
+when the selected objective requires coordinated analysis, design,
+implementation, verification, or iteration boundaries.
 
 When the upstream request or direction is still vague, optionally use the
 external
@@ -46,7 +47,9 @@ implications, conflicts, or decision status, stop for the responsible external
 stakeholder-validation prerequisite. Reapply artifact selection when enabling
 behavior gains reuse, a new consumer, or an independent lifecycle.
 
-Choose the narrowest specialist for each material question:
+Within an active iteration, choose the narrowest specialist for each material
+question. `assess-development-input` remains the operational owner of initial
+routing; this table summarizes in-iteration handoffs:
 
 | Group | Current question or force | Candidate owner |
 |---|---|---|
@@ -70,11 +73,11 @@ Several specialists may contribute to one iteration only when they answer the
 same objective. Do not create one artifact merely because another artifact can
 feed it.
 
-The coordinator selects the narrowest specialists for each material question.
-It can coordinate requirements analysis, system analysis, software/system
-design, detailed design, implementation, and verification in one risk-sized
-loop. These groups classify responsibility; they do not require a complete
-design chain.
+After entry routing selects coordinated work, the coordinator chooses the
+narrowest in-iteration specialists for each material question. It can coordinate
+requirements analysis, system analysis, software/system design, detailed
+design, implementation, and verification in one risk-sized loop. These groups
+classify responsibility; they do not require a complete design chain.
 
 ## Boundary-Sensitive Refactoring
 

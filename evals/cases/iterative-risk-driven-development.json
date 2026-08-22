@@ -29,6 +29,10 @@
     ],
     "negative": [
       {
+        "prompt": "I have a development request but do not know whether it needs analysis, design, implementation, review, or repository workflow. Route it to one initial owner without executing the handoff.",
+        "owner": "assess-development-input"
+      },
+      {
         "prompt": "Design the Rust ownership transfer, staged startup rollback, async cancellation, and fallible cleanup lifecycle without implementing the feature.",
         "owner": "design-rust-lifecycles"
       },

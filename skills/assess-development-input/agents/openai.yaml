@@ -1,4 +1,4 @@
 interface:
-  display_name: "Assess Development Input"
-  short_description: "Assess external inputs and route them into Sirius"
-  default_prompt: "Use $assess-development-input to assess this requirements-shaped input and recommend the next Sirius skill."
+  display_name: "Assess and Route Development Input"
+  short_description: "Route development work to one initial owner"
+  default_prompt: "Use $assess-development-input to route this request to one Sirius skill, external add-on, repository-native process, or responsible prerequisite without executing the handoff."
