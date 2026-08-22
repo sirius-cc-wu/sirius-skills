@@ -123,6 +123,14 @@ design.
 ```
 
 ```text
+Use design-software-architecture to decide the smallest major component, data
+ownership, interface, failure boundary, and deployment structure needed for the
+approved scenarios and measurable quality targets. Compare viable candidates,
+select only views that answer the current question, define verification, and do
+not descend into classes, exact language APIs, or Rust resource ownership.
+```
+
+```text
 Use grasp-responsibility-design to assign this approved scenario's preparation,
 coordination, supervision, and cleanup to native modules, functions, tasks,
 adapters, handles, types, or composition roots. Explain coupling and cohesion

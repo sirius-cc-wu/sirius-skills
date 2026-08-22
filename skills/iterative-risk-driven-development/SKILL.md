@@ -1,6 +1,6 @@
 ---
 name: iterative-risk-driven-development
-description: Coordinates an already selected, approved development objective through risk-sized iterations across system analysis, native responsibility and Rust lifecycle design, implementation, and verification. Rechecks canonical knowledge ownership; preserves system, resource-ownership, end-to-end verification, and parent-completion boundaries during complex refactoring; validates each result; and creates at most one authorized commit per iteration. Use after initial routing when a feature or boundary-sensitive refactoring needs coordinated progress or one commit per iteration until the requested work is complete; do not use for session-start discovery or one isolated specialist task.
+description: Coordinates an already selected, approved development objective through risk-sized iterations across system analysis, software architecture, native responsibility and Rust lifecycle design, implementation, and verification. Rechecks canonical knowledge ownership; preserves system, resource-ownership, end-to-end verification, and parent-completion boundaries during complex refactoring; validates each result; and creates at most one authorized commit per iteration. Use after initial routing when a feature or boundary-sensitive refactoring needs coordinated progress or one commit per iteration until the requested work is complete; do not use for session-start discovery or one isolated specialist task.
 ---
 
 # Iterative Risk-Driven Development
@@ -59,6 +59,7 @@ Approved coordinated objective begins
 │  ├─ actor-system events or operations → system-sequence-diagrams
 │  └─ preconditions, postconditions, or state effects → operation-contracts
 ├─ Software/System Design question
+│  ├─ components, boundaries, deployment, or quality trade-offs → design-software-architecture
 │  ├─ responsibility, cohesion, coupling, or dependency → grasp-responsibility-design
 │  ├─ collaboration for one scenario → use-case-realization
 │  ├─ stable object structure summary → uml-class-diagram-design

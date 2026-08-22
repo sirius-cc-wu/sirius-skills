@@ -71,6 +71,7 @@ stable values across this collection:
 | Domain model | `Domain Model` |
 | System sequence diagram | `System Sequence Diagram` |
 | Operation contract | `Operation Contract` |
+| Software architecture design | `Software Architecture Design` |
 | GRASP responsibility decision | `Responsibility Decision` |
 | Use-case realization | `Use-Case Realization` |
 | Design class diagram | `Design Class Diagram` |

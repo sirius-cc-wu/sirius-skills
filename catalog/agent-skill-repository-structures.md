@@ -588,10 +588,11 @@ gDiagram --> gMakePdf : render source
 
 ### Sirius: intake to risk-driven delivery
 
-Sirius uses content-based intake and a single risk-driven coordinator that
-selects the needed specialists, including native responsibility design and the
-Rust lifecycle specialist when ownership or
-resource semantics create material pressure. For boundary-sensitive
+Sirius uses `assess-development-input` for content-based entry routing and a
+risk-driven coordinator for specialist selection after entry. The coordinator
+can select software-architecture design, native responsibility design, and the
+Rust lifecycle specialist when component, quality, ownership, or resource
+semantics create material pressure. For boundary-sensitive
 refactorings, the coordinator retains the system boundary, representative
 vertical oracle, responsibility assignment, ownership consequences,
 verification ownership, and parent completion boundary. The same coordinator
@@ -620,7 +621,8 @@ package "Intake" #FFF2CC {
 
 package "Risk-driven development" #EEF8EE {
   component "iterative-risk-driven-development" as sIterative
-  component "analysis, responsibility,\nand design specialists" as sDesign
+  component "analysis, responsibility,\nand detailed-design specialists" as sDesign
+  component "design-software-architecture\ncomponents and quality trade-offs" as sArchitecture
   component "design-rust-lifecycles\nwhen Rust pressure is material" as sRust
 }
 
@@ -636,7 +638,9 @@ package "Cross-cutting support" #FFFBEA {
 sAssess ..> sIterative : approved change needs progress
 sIterative ..> sSelect : artifact choice
 sIterative ..> sLayout : placement choice
-sIterative ..> sDesign : boundary and responsibilities
+sIterative ..> sDesign : analysis or detailed design
+sIterative ..> sArchitecture : components, boundaries, or quality
+sArchitecture ..> sDesign : responsibility and realization handoff
 sIterative ..> sRust : Rust lifecycle pressure
 sRust ..> sDesign : ownership feedback
 sIterative --> sPr : committed work
@@ -648,11 +652,11 @@ sIterative --> sPr : committed work
 | Dimension | `addyosmani/agent-skills` | `garrytan/gstack` | `sirius-skills` |
 |---|---|---|---|
 | Primary router | `using-agent-skills` selects a lifecycle skill | `autoplan` sequences planning reviewers; several other skills orchestrate specialist clusters | `assess-development-input` routes by content; tracks and the risk-driven coordinator manage handoffs |
-| Main delivery shape | A mostly linear define-plan-build-verify-review-ship spine with optional specializations | A product-delivery spine surrounded by tool-backed design, browser, safety, deployment, and platform loops | Intake, risk-driven development, and repository workflow; each risk-sized iteration can continue until the requested work is complete |
+| Main delivery shape | A mostly linear define-plan-build-verify-review-ship spine with optional specializations | A product-delivery spine surrounded by tool-backed design, browser, safety, deployment, and platform loops | Entry routing, risk-driven development, and repository workflow; each risk-sized iteration can continue until the requested work is complete |
 | Reuse mechanism | Phase-specific skills are composed by commands and selected when risk warrants | Skills invoke other skills and shared executable runtimes; plan artifacts are handed to later skills | Skills link to narrow specialists, profiles compose packages, and shared references are packaged into consuming skills |
 | Feedback loops | Debugging returns to regression testing; simplification returns to review | Live design/DevEx review follows planning; QA and canary feed fixes back before or after shipping | Ownership-to-responsibility feedback, parent-outcome checks, design/implementation feedback, and continuous iteration return evidence to canonical artifacts |
-| Relationship authority | Explicit routing and example sequences in the meta-skill and command docs | README sprint model plus orchestration encoded in generated skill templates | Catalog, workflow tracks, skill boundaries, and profile membership |
-| Coverage choice here | All 24 skills | Documented connected workflows plus named independent utilities; not an exhaustive catalog | All 18 active skills, with bounded tracks and profile-driven installation |
+| Relationship authority | Explicit routing and example sequences in the meta-skill and command docs | README sprint model plus orchestration encoded in generated skill templates | Entry routing in `assess-development-input`, in-iteration routing in the coordinator, plus catalog, workflow tracks, skill boundaries, and profile membership |
+| Coverage choice here | All 24 skills | Documented connected workflows plus named independent utilities; not an exhaustive catalog | All 19 active skills, with bounded tracks and profile-driven installation |
 
 ## Evidence and limits
 

@@ -6,7 +6,7 @@ current risk or complete the current behavior slice.
 
 ## Overview
 
-This diagram groups all 18 deployable Sirius skills by responsibility. It also
+This diagram groups all 19 deployable Sirius skills by responsibility. It also
 shows eight external Addy add-ons. The diagram shows only the main movement
 between groups. Use the detailed diagrams below for conditional routes. Solid
 arrows show normal handoffs. They do not require a fixed sequence. Dashed
@@ -72,6 +72,7 @@ package "System Analysis" as systemAnalysis #EEF8EE {
 }
 
 package "Software/System Design" as softwareDesign #F3EEFF {
+  rectangle "design-software-architecture" as architecture
   rectangle "grasp-responsibility-design" as grasp
   rectangle "use-case-realization" as realization
   rectangle "uml-class-diagram-design" as classdiagram
@@ -205,8 +206,9 @@ implementation-facing design.
   - use **Requirements Analysis** for scope, actors, goals, and scenarios;
   - use **System Analysis** for domain concepts, system events, and state
     effects;
-  - use **Software/System Design** for responsibilities, collaborations,
-    software structure, and justified patterns; and
+  - use **Software/System Design** for major components, architecture
+    boundaries, deployment and quality trade-offs, responsibilities,
+    collaborations, software structure, and justified patterns; and
   - use **Detailed Design** for target-language and runtime realization.
 - Start with **Implementation and Evolution** when the behavior is sufficiently
   bounded. With the `all` installation, use external
@@ -351,6 +353,7 @@ package "System Analysis" #EEF8EE {
 }
 
 package "Software/System Design" #F3EEFF {
+  rectangle "design-software-\narchitecture" as architecture
   rectangle "grasp-responsibility-\ndesign" as grasp
   rectangle "use-case-realization" as realization
   rectangle "uml-class-diagram-\ndesign" as classdiagram
@@ -367,6 +370,7 @@ iterative ..> usecases : actors or selected scenarios
 iterative ..> domain : selected vocabulary
 iterative ..> ssd : selected system events
 iterative ..> contracts : selected state effects
+iterative ..> architecture : components or quality risk
 iterative ..> grasp : native responsibilities
 iterative ..> language : target-language forces
 iterative ..> rust : Rust lifecycle risk
@@ -376,6 +380,12 @@ usecases --> ssd
 usecases ..> contracts : approved stateful examples
 domain ..> contracts : refine vocabulary
 ssd --> contracts
+domain ..> architecture : data ownership
+ssd ..> architecture : critical scenarios
+contracts ..> architecture : state and consistency
+architecture --> grasp : internal responsibilities
+architecture ..> realization : critical runtime path
+architecture ..> language : implementation constraints
 domain --> grasp
 contracts --> grasp
 ssd --> realization
@@ -394,10 +404,11 @@ rust ..> grasp : ownership feedback
 The groups classify knowledge ownership, not mandatory phases. Requirements
 Analysis defines approved scope and observable scenarios. System Analysis
 models domain vocabulary, system events, and state effects. Software/System
-Design assigns technology-neutral responsibilities, collaborations, structure,
-and variation. Detailed Design maps that intent into target-language and
-runtime semantics. The current Software/System Design group does not claim a
-general architecture specialist.
+Design defines the smallest sufficient major architecture, then assigns
+technology-neutral responsibilities, collaborations, structure, and variation.
+Detailed Design maps that intent into target-language and runtime semantics.
+Architecture views remain question-driven and optional; the group does not
+require a complete C4, UML, deployment, or ADR set.
 
 A local backend, constructor, settings seam, or lifecycle handle can complete
 one iteration without completing its parent feature. Retain the representative
@@ -556,6 +567,7 @@ package "System Analysis" #EEF8EE {
 }
 
 package "Software/System Design" #F3EEFF {
+  rectangle "design-software-\narchitecture" as architecture
   rectangle "grasp-responsibility-\ndesign" as grasp
   rectangle "use-case-realization +\numl-class-diagram-design" as designviews
   rectangle "design-pattern-\napplication" as patterns
@@ -570,8 +582,10 @@ contracts ..> domain : missing concept or association
 patterns ..> designviews : participants or dependencies change
 
 evidence ..> contracts : postcondition changes
+evidence ..> architecture : component, boundary, or quality evidence
 evidence ..> designviews : responsibility, collaboration, or interface changes
 
+architecture ..> designviews : responsibilities or interfaces change
 refactoring ..> iterative : boundary change
 refactoring ..> grasp : responsibility or coupling pressure
 refactoring ..> patterns : justified variation pressure
@@ -581,8 +595,10 @@ refactoring ..> designviews : durable structure changes
 ```
 
 The combined `use-case-realization + uml-class-diagram-design` node keeps the
-diagram readable. Implementation evidence and refactoring can refine either
-view.
+diagram readable. Implementation evidence can refine architecture or detailed
+design views. Boundary-changing refactoring returns through iterative
+coordination before architecture changes.
+
 Apply these rules:
 
 - Contract feedback changes the domain model only when a postcondition exposes

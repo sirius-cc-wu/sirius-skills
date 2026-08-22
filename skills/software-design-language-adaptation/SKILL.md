@@ -1,6 +1,6 @@
 ---
 name: software-design-language-adaptation
-description: Adapts language-neutral behavior, boundaries, state, responsibilities, collaborations, patterns, and diagrams to idiomatic Rust, Python, TypeScript, C#, or C++. Use when implementation-facing design must account for a target language's native data, interface, ownership, error, concurrency, lifecycle, or runtime semantics without forcing object-oriented structure.
+description: Adapts language-neutral architecture, behavior, boundaries, state, responsibilities, collaborations, patterns, and diagrams to idiomatic Rust, Python, TypeScript, C#, or C++. Use when implementation-facing design must account for a target language's native data, interface, ownership, error, concurrency, lifecycle, or runtime semantics without forcing object-oriented structure.
 ---
 
 # Software Design Language Adaptation
@@ -14,8 +14,9 @@ not a reason to force every concept into a class, type, method, or module.
 
 ## When to Use
 
-- Language-neutral behavior, contracts, responsibilities, boundaries, state
-  transitions, or collaborations need an implementation-facing shape.
+- Language-neutral architecture, behavior, contracts, responsibilities,
+  boundaries, state transitions, or collaborations need an
+  implementation-facing shape.
 - GRASP assignments or use-case realizations are being translated when an
   object-oriented route was deliberately selected.
 - Design patterns need to be evaluated against native language mechanisms.

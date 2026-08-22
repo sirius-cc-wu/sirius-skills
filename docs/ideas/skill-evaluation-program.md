@@ -109,7 +109,7 @@ consistency:
 - reviewed semantic controls exercised passing and failing rubric polarity,
   repetition, and cross-model disagreement reporting.
 
-The current pilot retains 12 routing case files across the 18-skill catalog
+The current pilot retains 13 routing case files across the 19-skill catalog
 and three fixture-backed behavioral cases. Six active skills
 have no dedicated routing case. Lexical routing remains only a description
 tripwire, and behavioral coverage remains selective. The live pilot uses one

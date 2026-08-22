@@ -22,6 +22,7 @@ The active pilot covers:
 - `design-repository-artifact-layout`;
 - `iterative-risk-driven-development`;
 - `operation-contracts`;
+- `design-software-architecture`;
 - `grasp-responsibility-design`;
 - `design-rust-lifecycles`;
 - `behavior-preserving-refactoring`;

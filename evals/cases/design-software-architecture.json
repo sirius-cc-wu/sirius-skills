@@ -1,0 +1,55 @@
+{
+  "skill_name": "design-software-architecture",
+  "trigger": {
+    "positive": [
+      {
+        "prompt": "Design the smallest software architecture for these approved checkout scenarios and measurable availability, latency, and security targets. Decide major components, data owners, interfaces, and trust and failure boundaries without descending into classes.",
+        "top_k": 3
+      },
+      {
+        "prompt": "Compare a modular monolith and service decomposition for this approved system under explicit consistency, operability, team, and delivery constraints, then select only the architecture views needed to explain the trade-off.",
+        "top_k": 3
+      },
+      {
+        "prompt": "Design the runtime and deployment architecture for this regional-outage scenario, including process placement, redundancy, queues, authoritative data stores, failure propagation, and verification evidence.",
+        "top_k": 3
+      }
+    ],
+    "negative": [
+      {
+        "prompt": "Assign this validation responsibility to the best existing module or task using coupling, cohesion, Information Expert, and Controller reasoning.",
+        "owner": "grasp-responsibility-design"
+      },
+      {
+        "prompt": "Design exact Rust ownership transfer, staged startup, rollback, cancellation, joining, and fallible cleanup for these already established component boundaries.",
+        "owner": "design-rust-lifecycles"
+      },
+      {
+        "prompt": "Advance this approved cross-boundary architecture change through analysis, design, implementation, verification, and one authorized commit.",
+        "owner": "iterative-risk-driven-development"
+      }
+    ]
+  },
+  "evals": [
+    {
+      "id": "minimal-architecture-design",
+      "prompt": "The approved checkout scenario must survive one availability-zone failure, prevent duplicate payment, meet a measured latency target, and preserve an existing payment-provider contract. Compare viable component and deployment structures, select the smallest architecture views needed, define data and failure ownership, state trade-offs and decision authority, and identify proportional verification. Do not design classes, exact language APIs, or Rust resource lifecycles.",
+      "expected_output": "A bounded software architecture design ties major components, interfaces, data and failure boundaries, and any material deployment topology to approved behavior and measurable quality scenarios while omitting unnecessary views and handing detailed design to existing specialists.",
+      "expectations": [
+        "The architecture question, approved behavior, constraints, authority, and non-goals are explicit",
+        "Availability and latency are expressed as measurable quality scenarios rather than adjectives",
+        "Candidate components have cohesive responsibilities, explicit interfaces, data ownership, dependency direction, and failure behavior",
+        "Only views that answer named questions are selected",
+        "Candidate trade-offs, uncertainty, verification evidence, and detailed-design handoffs remain visible"
+      ],
+      "prohibitions": [
+        "Do not infer undocumented current architecture from repository layout",
+        "Do not require complete C4, UML, deployment, and ADR sets",
+        "Do not descend into class assignment, exact language APIs, or Rust ownership mechanics",
+        "Do not present a proposed architecture as approved or implemented",
+        "Do not duplicate the architecture design into an ADR"
+      ],
+      "trust_level": "provisional"
+    }
+  ]
+}

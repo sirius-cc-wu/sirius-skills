@@ -15,8 +15,9 @@ or composition root.
 
 ## When to Use
 
-- You have scenarios, system events, contracts, recovered collaborations, or
-  domain concepts and need software responsibility decisions.
+- You have scenarios, system events, contracts, established architecture
+  boundaries, recovered collaborations, or domain concepts and need software
+  responsibility decisions.
 - Multiple classes or language-native units could plausibly own the same
   behavior.
 - A boundary-sensitive refactoring moves coordination, supervision, cleanup,
@@ -125,6 +126,10 @@ tags: [design, grasp]
 
 ## Boundaries
 
+- Use `design-software-architecture` when major components, services, processes,
+  data owners, deployment topology, or system-level quality trade-offs are
+  unresolved. GRASP assigns responsibilities within established architecture
+  boundaries.
 - Use a responsible external recovery process when the question is which
   modules or runtime participants exist today. This skill decides who should
   own behavior.

@@ -134,8 +134,10 @@ boundaries, state, and collaborations without requiring GRASP or class-design
 input.
 
 The remaining proposal is narrower: make rapid human comprehension an explicit
-design outcome and provide question-driven visual routing where existing
-design and architecture-recovery specialists do not already own the view.
+design outcome and provide question-driven visual routing where
+[`design-software-architecture`](../../skills/design-software-architecture/SKILL.md),
+detailed-design specialists, or a responsible external current-system recovery
+process do not already own the view.
 
 ## Is Object-Oriented Design Outdated?
 

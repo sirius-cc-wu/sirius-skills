@@ -46,8 +46,10 @@ Task arrives
 │  └─ Requirements Analysis
 ├─ Domain vocabulary, system events, or state effects are unclear
 │  └─ System Analysis
-├─ Responsibilities, collaborations, software structure, or variation are unclear
-│  └─ Software/System Design
+├─ Components, data owners, deployment, or quality trade-offs are unclear
+│  └─ design-software-architecture
+├─ Internal responsibilities, collaborations, structure, or variation are unclear
+│  └─ Software/System Design specialists
 ├─ Target-language or runtime realization is unclear
 │  └─ Detailed Design
 ├─ One bounded behavior has an approved independent oracle
@@ -139,6 +141,7 @@ repository-native workflow or report the responsible external prerequisite.
 | System Analysis | Business concepts, vocabulary, associations, or attributes are unclear | `domain-modeling` |
 | System Analysis | Actor-system events or system operations are unclear | `system-sequence-diagrams` |
 | System Analysis | Non-trivial state changes, preconditions, or postconditions are unclear | `operation-contracts` |
+| Software/System Design | Major components, services, processes, data owners, architectural boundaries, deployment topology, or quality trade-offs are unclear | `design-software-architecture` |
 | Software/System Design | Native responsibility, cohesion, coupling, coordination, or dependency direction is unclear | `grasp-responsibility-design` |
 | Software/System Design | Internal collaboration for one selected scenario is unclear | `use-case-realization` |
 | Software/System Design | Stable object-oriented structure needs a summary | `uml-class-diagram-design` |

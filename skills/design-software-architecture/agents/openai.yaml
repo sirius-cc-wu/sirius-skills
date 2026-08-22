@@ -1,0 +1,4 @@
+interface:
+  display_name: "Design Software Architecture"
+  short_description: "Design minimal system architecture and trade-offs"
+  default_prompt: "Use $design-software-architecture to design the smallest architecture that satisfies the approved behavior, quality scenarios, constraints, and verification needs."

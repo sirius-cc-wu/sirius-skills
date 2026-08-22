@@ -1,9 +1,10 @@
 # sirius-skills
 
 `sirius-skills` is a curated collection of development-input assessment,
-technical-artifact selection, architecture-decision recording, repository
-artifact-layout, interactive code-change comprehension, repository workflow,
-iterative design, implementation, and evolution skills.
+technical-artifact selection, software architecture and detailed design,
+architecture decision documentation, repository artifact layout, interactive
+code-change comprehension, repository workflow, iterative implementation, and
+evolution skills.
 Skills are independently deployable; profiles provide convenient installations
 without turning the catalog into a mandatory lifecycle.
 
@@ -35,7 +36,7 @@ Available profiles are defined in [`skill-sets/`](skill-sets/):
 | Profile | Purpose |
 |---|---|
 | `workflow` | Interactive change walkthroughs and pull-request publication |
-| `iterative-design` | External-input assessment, technical-artifact selection, architecture-decision recording, artifact-layout design, question-driven iterations, boundary-sensitive refactoring gates, native responsibility and optional object design, language adaptation, tested implementation, and scoped commits |
+| `iterative-design` | Entry routing, technical-artifact selection, software architecture design, architecture decision documentation, artifact layout design, question-driven iterations, boundary-sensitive refactoring gates, native responsibility and optional object design, language adaptation, tested implementation, and scoped commits |
 | `applying-uml-and-patterns` | Compatibility alias for `iterative-design` |
 | `reverse-engineering` | Compatibility profile for technical-artifact selection, artifact placement, and recorded-decision discovery; it does not perform system recovery |
 | `all` | Every active Sirius skill in the catalog, plus the pinned Addy add-ons |
@@ -148,6 +149,13 @@ repository-native process, or responsible prerequisite without imposing a
 lifecycle or executing the handoff. Use `iterative-risk-driven-development`
 only after the initial route is known and one approved objective requires
 coordinated specialist work.
+
+Use `design-software-architecture` when approved behavior, constraints, and
+measurable quality scenarios require decisions about major components, data
+owners, interfaces, trust or failure boundaries, deployment, or architecture
+trade-offs. Select only the views needed for the current question. Leave
+internal responsibility, language, and resource-lifecycle design to their
+existing specialists.
 
 Use `select-technical-artifacts` when the primary question is whether technical
 knowledge should become a standalone artifact, update or embed in an existing

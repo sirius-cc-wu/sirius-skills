@@ -62,6 +62,7 @@ summarizes those handoffs:
 | System Analysis | Business concepts and shared vocabulary | [`domain-modeling`](../../skills/domain-modeling/SKILL.md) |
 | System Analysis | Actor-system events and operation names | [`system-sequence-diagrams`](../../skills/system-sequence-diagrams/SKILL.md) |
 | System Analysis | Non-trivial state effects and invariants | [`operation-contracts`](../../skills/operation-contracts/SKILL.md) |
+| Software/System Design | Major components, services, processes, data owners, architectural boundaries, deployment topology, or measurable quality trade-offs | [`design-software-architecture`](../../skills/design-software-architecture/SKILL.md) |
 | Software/System Design | Native software responsibility, cohesion, coupling, coordination, or dependency direction | [`grasp-responsibility-design`](../../skills/grasp-responsibility-design/SKILL.md) |
 | Software/System Design | Detailed internal collaboration for one selected scenario | [`use-case-realization`](../../skills/use-case-realization/SKILL.md) |
 | Software/System Design | Stable object-oriented structure that needs a summary | [`uml-class-diagram-design`](../../skills/uml-class-diagram-design/SKILL.md) |
@@ -100,9 +101,11 @@ Before implementation, retain the smallest sufficient account of:
   enabling boundary for later integration.
 
 Stop for a responsible external recovery process when current behavior or
-architecture is unclear. Use `grasp-responsibility-design` for intended
-responsibility placement and
-`design-rust-lifecycles` for exact Rust ownership realization. Let ownership
+architecture is unclear. Use `design-software-architecture` when intended major
+components, data ownership, trust or failure boundaries, deployment, or quality
+trade-offs are unresolved. Use `grasp-responsibility-design` for responsibility
+placement within those boundaries and `design-rust-lifecycles` for exact Rust
+ownership realization. Let ownership
 pressure feed back into responsibility design. Do not require a standalone
 artifact for these answers or report a local seam as the parent outcome without
 a representative end-to-end flow.

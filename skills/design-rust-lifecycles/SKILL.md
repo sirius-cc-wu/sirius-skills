@@ -31,9 +31,10 @@ than implementation details.
 ## Workflow
 
 1. **Fix the input authority and design context.** Identify the approved or
-   recovered representative scenario, system boundary, externally visible
-   readiness or effects, native responsibility decisions, compatibility
-   obligations, repository facts, verification oracle, and unresolved intent.
+   recovered representative scenario, system and architecture boundaries,
+   externally visible readiness or effects, native responsibility decisions,
+   compatibility obligations, repository facts, verification oracle, and
+   unresolved intent.
    For a boundary-sensitive objective, return to the owning analysis or
    responsibility specialist when that context is absent or stale. Stop rather
    than invent a missing business or protocol rule.
