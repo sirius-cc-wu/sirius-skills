@@ -1,4 +1,0 @@
-interface:
-  display_name: "Reconstruct Software Architecture"
-  short_description: "Reconstruct as-built structure and collaborations"
-  default_prompt: "Use $reconstruct-software-architecture to reconstruct the current architecture of this repository."

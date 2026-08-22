@@ -10,8 +10,8 @@ When requirements-shaped input was produced outside Sirius and the correct
 entry point is unclear, first use
 [`assess-development-input`](../../skills/assess-development-input/SKILL.md).
 Continue only when the input has sufficient authority for the selected work.
-The assessment may instead route to recovery, a localized specialist,
-implementation, or an external prerequisite.
+The assessment may instead route to a localized specialist, implementation, or
+an external recovery, stakeholder, or authority prerequisite.
 
 When the upstream request or direction is still vague, optionally use the
 external
@@ -94,8 +94,9 @@ Before implementation, retain the smallest sufficient account of:
 - whether the iteration closes the approved parent outcome or completes an
   enabling boundary for later integration.
 
-Select recovery skills when current behavior or architecture is unclear. Use
-`grasp-responsibility-design` for intended responsibility placement and
+Stop for a responsible external recovery process when current behavior or
+architecture is unclear. Use `grasp-responsibility-design` for intended
+responsibility placement and
 `design-rust-lifecycles` for exact Rust ownership realization. Let ownership
 pressure feed back into responsibility design. Do not require a standalone
 artifact for these answers or report a local seam as the parent outcome without

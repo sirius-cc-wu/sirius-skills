@@ -59,8 +59,9 @@ mandatory artifact sequence, programming paradigm, or phase checklist.
    whether this iteration can close it or only enable later work. Keep the
    objective small enough for one coherent commit.
 4. **Select the narrowest owners.** Route each material question to an existing
-   specialist. Use requirements, recovery, analysis, and design skills for
-   product intent and system understanding. Use
+   specialist. Use requirements, analysis, and design skills for product intent
+   and forward design. Stop for a responsible external recovery process when
+   current-system understanding lacks evidence. Use
    `grasp-responsibility-design` when native responsibility or dependency
    placement is unclear. Use `test-driven-implementation` for bounded behavior
    and `behavior-preserving-refactoring` for verified structural improvement.
@@ -71,9 +72,9 @@ mandatory artifact sequence, programming paradigm, or phase checklist.
    condition, or cleanup boundary, establish the system boundary,
    representative vertical scenario, native responsibilities, ownership
    consequences, verification ownership, and completion boundary before
-   implementation. Select recovery when current behavior or architecture is
-   unclear. Do not treat the `refactoring` label as evidence that this design
-   context is unnecessary.
+   implementation. Stop for a responsible external recovery process when
+   current behavior or architecture is unclear. Do not treat the `refactoring`
+   label as evidence that this design context is unnecessary.
 6. **Budget artifacts and locate justified owners.** Apply
    [Artifact Selection Budget](../select-technical-artifacts/references/artifact-selection-budget.md).
    Prefer code, tests, configuration, an existing canonical artifact, or an

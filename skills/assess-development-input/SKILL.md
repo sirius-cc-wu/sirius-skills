@@ -1,6 +1,6 @@
 ---
 name: assess-development-input
-description: Assesses requirements-shaped input from external or mixed workflows and decides whether its content is ready for system recovery, inception, use-case modeling, architecture-decision recording, iterative design, or tested implementation while preserving source meaning, approval state, and unresolved uncertainty. Use when intent statements, specifications, proposals, BDD scenarios, story maps, brainstorm notes, issue descriptions, or similar material exist but their readiness and correct Sirius entry point are unclear.
+description: Assesses requirements-shaped input from external or mixed workflows and decides whether its content is ready for inception, use-case modeling, architecture-decision recording, iterative design, or tested implementation, or still needs external current-system recovery, while preserving source meaning, approval state, and unresolved uncertainty. Use when intent statements, specifications, proposals, BDD scenarios, story maps, brainstorm notes, issue descriptions, or similar material exist but their readiness and correct Sirius entry point are unclear.
 ---
 
 # Assess Development Input
@@ -33,8 +33,8 @@ responsibly proceed.
 - Preserve source references, revisions, stated approval, non-goals, and open
   questions. Never upgrade candidate, inferred, or contested statements to
   approved decisions.
-- Do not treat unsupported claims about the current system as facts. Verify
-  them with the reverse-engineering skills before using them as requirements or
+- Do not treat unsupported claims about the current system as facts. Require a
+  responsible external recovery process before using them as requirements or
   design inputs.
 - Judge only the completeness needed for the next decision. Do not require
   every input to contain every possible requirements or design artifact.
@@ -74,7 +74,7 @@ method or file format never determines the route.
 
 | Content condition | Next Sirius skill |
 |---|---|
-| Current commands, behavior, architecture, or constraints need evidence | `reverse-engineer-software-system` |
+| Current commands, behavior, architecture, or constraints need evidence | External current-system recovery prerequisite |
 | Candidate knowledge needs a disposition: create, update, embed, keep-with-implementation, omit, or defer | `select-technical-artifacts` |
 | A justified durable artifact needs a canonical home, lifecycle separation, or migration | `design-repository-artifact-layout` |
 | One bounded architecture choice has proposed or accepted status and needs a durable ADR | `record-architecture-decision` |

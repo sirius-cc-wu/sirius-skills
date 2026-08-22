@@ -222,33 +222,9 @@ grep -q '^## Discovery and Indexing$' "$adr_skill" || fail "architecture decisio
 grep -q '^## Confidence and Reconsideration$' "$adr_skill" || fail "architecture decision template missing reconsideration guidance"
 grep -q 'substantively rewrite an accepted ADR' "$adr_skill" || fail "architecture decision skill missing supersession safeguard"
 
-recovery_evidence_reference="$root/skills/reverse-engineer-software-system/references/recovery-evidence.md"
-test -f "$recovery_evidence_reference" || fail "missing $recovery_evidence_reference"
-
-recovery_skills=(
-  reverse-engineer-software-system
-  survey-existing-system
-  recover-system-behavior
-  reconstruct-software-architecture
-  reconcile-recovered-design
-)
-
-for name in "${recovery_skills[@]}"; do
-  file="$root/skills/$name/SKILL.md"
-  metadata="$root/skills/$name/agents/openai.yaml"
-  test -f "$metadata" || fail "missing $metadata"
-  grep -q "recovery-evidence.md" "$file" || fail "$name missing recovery evidence guidance"
-  grep -Fq "\$$name" "$metadata" || fail "$name metadata default prompt missing skill invocation"
-done
-
 template_types=(
   "assess-development-input|Development Input Assessment"
   "record-architecture-decision|Architecture Decision"
-  "reverse-engineer-software-system|Reverse Engineering Record"
-  "survey-existing-system|System Survey"
-  "recover-system-behavior|Recovered Behavior Model"
-  "reconstruct-software-architecture|Recovered Architecture"
-  "reconcile-recovered-design|Design Reconciliation"
   "iterative-risk-driven-development|Iteration Record"
   "use-case-modeling|Use Case"
   "domain-modeling|Domain Model"

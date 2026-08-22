@@ -37,13 +37,13 @@ def test_rank_skills_uses_names_and_descriptions() -> None:
         "Reconstruct the deployed components and runtime dependencies",
         {
             "publish-change": "Publish a prepared repository change.",
-            "reconstruct-software-architecture": (
-                "Recover components, runtime collaborations, deployment, and dependencies."
+            "architecture-map": (
+                "Map components, runtime collaborations, deployment, and dependencies."
             ),
         },
     )
 
-    assert ranking[0].name == "reconstruct-software-architecture"
+    assert ranking[0].name == "architecture-map"
     assert ranking[0].score > 0
 
 
@@ -151,7 +151,7 @@ def test_pilot_routing_cases_pass() -> None:
     report = evaluate_repository(REPO_ROOT)
 
     assert report.errors == []
-    assert report.case_files == 17
+    assert report.case_files == 14
     assert report.routing_checks >= 40
 
 

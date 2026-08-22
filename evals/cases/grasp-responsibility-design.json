@@ -21,10 +21,6 @@
         "owner": "design-rust-lifecycles"
       },
       {
-        "prompt": "Reconstruct the current repository modules, dependencies, runtime collaborations, and state ownership from source evidence",
-        "owner": "reconstruct-software-architecture"
-      },
-      {
         "prompt": "Apply Adapter or Strategy to this demonstrated integration variation and record the pattern consequences",
         "owner": "design-pattern-application"
       }

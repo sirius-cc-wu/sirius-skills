@@ -3,7 +3,7 @@
 `sirius-skills` is a curated collection of development-input assessment,
 technical-artifact selection, architecture-decision recording, repository
 artifact-layout, interactive code-change comprehension, repository workflow,
-software discovery, iterative design, implementation, and evolution skills.
+iterative design, implementation, and evolution skills.
 Skills are independently deployable; profiles provide convenient installations
 without turning the catalog into a mandatory lifecycle.
 
@@ -37,7 +37,7 @@ Available profiles are defined in [`skill-sets/`](skill-sets/):
 | `workflow` | Interactive change walkthroughs and pull-request publication |
 | `iterative-design` | External-input assessment, technical-artifact selection, architecture-decision recording, artifact-layout design, question-driven iterations, boundary-sensitive refactoring gates, native responsibility and optional object design, language adaptation, tested implementation, and scoped commits |
 | `applying-uml-and-patterns` | Compatibility alias for `iterative-design` |
-| `reverse-engineering` | Evidence-driven system survey, behavior and architecture recovery, recorded-decision discovery, recovered-artifact selection, reconciliation, and durable placement |
+| `reverse-engineering` | Compatibility profile for technical-artifact selection, artifact placement, and recorded-decision discovery; it does not perform system recovery |
 | `all` | Every active Sirius skill in the catalog, plus the pinned Addy add-ons |
 
 Remove the default or a named profile later:
@@ -71,7 +71,7 @@ creates a per-skill compatibility link in the Antigravity directory without
 replacing unrelated entries. Global uninstallation and retired-skill cleanup
 remove only links that still point to their expected canonical installation.
 
-`just install <target-project> all` also installs the five skills listed in
+`just install <target-project> all` also installs the six skills listed in
 [`catalog/external-skill-sets/addy-osmani.txt`](catalog/external-skill-sets/addy-osmani.txt)
 from Addy Osmani's pinned agent-skills revision. They remain external to the
 Sirius catalog and are not installed by other profiles. The external install
@@ -130,7 +130,8 @@ The [Skill Catalog](catalog/skills.md) describes every skill's responsibility
 and boundary. Common compositions are documented as workflow tracks:
 
 - [Repository Workflow](catalog/tracks/repository-workflow.md)
-- [Reverse Engineering](catalog/tracks/reverse-engineering.md)
+- [Reverse Engineering](catalog/tracks/reverse-engineering.md), for
+  compatibility and migration guidance after recovery-skill retirement
 - [Iterative Analysis and Design](catalog/tracks/iterative-analysis-design.md)
 - [Implementation and Evolution](catalog/tracks/implementation-evolution.md)
 - [Client to Code](catalog/tracks/client-to-code.md), from externally validated
@@ -173,8 +174,9 @@ are not Sirius catalog entries or named-profile members.
 
 `author-software-proposal` is retired. Existing legacy proposal artifacts
 remain valid at their migrated paths. Use `idea-refine` for new candidate
-directions. Route current-system claims to reverse engineering, scope and
-feasibility to `inception`, unresolved stakeholder authority to the responsible
+directions. Route unevidenced current-system claims to a responsible external
+recovery process, scope and feasibility to `inception`, unresolved stakeholder
+authority to the responsible
 external process, approved actor goals and scenario flow to `use-case-modeling`,
 non-trivial state effects to `operation-contracts`, and placement questions to
 `design-repository-artifact-layout`.
@@ -195,6 +197,18 @@ examples and boundary cases with their canonical requirement, use case,
 contract, or executable test. Use `assess-development-input` when their
 readiness or next Sirius owner is unclear. Use `test-driven-implementation`
 when approved examples already provide an independent oracle.
+
+`reverse-engineer-software-system`, `survey-existing-system`,
+`recover-system-behavior`, `reconstruct-software-architecture`, and
+`reconcile-recovered-design` are retired. Existing surveys, recovered behavior
+and architecture, reconciliation records, and fixed-revision evidence remain
+valid. Use a responsible external process when current-system behavior or
+architecture needs new evidence. Use `assess-development-input` when material
+that depends on current-system claims needs a Sirius readiness decision. The
+`reverse-engineering` compatibility profile now installs only
+`select-technical-artifacts`, `design-repository-artifact-layout`, and
+`record-architecture-decision` for disposition, placement, and recorded-decision
+discovery.
 
 Use `walkthrough-me` when a reader needs a paced, read-only tour of a pull
 request, commit, commit range, branch diff, or staged, unstaged, or selected
@@ -291,10 +305,7 @@ design realizes established system behavior and responsibilities through
 ownership-driven preparation, resource transfer, rollback, cancellation,
 supervision, and fallible cleanup. A local seam can complete an iteration, but
 it remains an enabling result until a representative end-to-end flow proves the
-parent outcome. Reverse-engineering skills also draw from
-software reengineering, architecture reconstruction, architecture
-documentation, and code-reading sources. See the
-[Source Catalog](catalog/sources.md) for provenance.
+parent outcome. See the [Source Catalog](catalog/sources.md) for provenance.
 
 ## Validation
 

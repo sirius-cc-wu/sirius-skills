@@ -6,8 +6,8 @@ current risk or complete the current behavior slice.
 
 ## Overview
 
-This diagram groups all 25 deployable Sirius skills by responsibility. It also
-shows five external Addy add-ons. The diagram shows only
+This diagram groups all 20 deployable Sirius skills by responsibility. It also
+shows six external Addy add-ons. The diagram shows only
 the main movement between groups. Use the detailed diagrams below for
 conditional routes. Solid arrows show normal handoffs. They do not require a
 fixed sequence. Dashed arrows show optional routing, support, or feedback.
@@ -38,14 +38,13 @@ skinparam rectangle<<external>> {
 package "External Addy add-ons\naddyosmani/agent-skills" as addy #F2F2F2 {
   rectangle "interview-me" as addyInterview <<external>>
   rectangle "idea-refine" as addyIdea <<external>>
+  rectangle "spec-driven-development" as addySpec <<external>>
   rectangle "code-review-and-quality" as addyReview <<external>>
   rectangle "code-simplification" as addySimplify <<external>>
   rectangle "git-workflow-and-versioning" as addyGit <<external>>
 }
 
 rectangle "**Sirius: Intake**\nassess-development-input" as assess #FFF4CC
-
-rectangle "**Reverse Engineering**\nreverse-engineer-software-system\nsurvey-existing-system\nrecover-system-behavior\nreconstruct-software-architecture\nreconcile-recovered-design" as reverse #EAF4FB
 
 rectangle "**Iterative Risk-Driven Development**\niterative-risk-driven-development\ninception\nuse-case-modeling\ndomain-modeling\nsystem-sequence-diagrams\noperation-contracts\ngrasp-responsibility-design\nuse-case-realization\numl-class-diagram-design\ndesign-pattern-application\nsoftware-design-language-adaptation\ndesign-rust-lifecycles" as design #EEF8EE
 
@@ -55,17 +54,16 @@ rectangle "**Repository Workflow**\nwalkthrough-me\ncreate-pr" as repository #F3
 
 rectangle "**Cross-cutting Support**\nselect-technical-artifacts\ndesign-repository-artifact-layout\nrecord-architecture-decision" as support #FFFBEA
 
-assess -[hidden]right-> reverse
+assess -[hidden]right-> design
 design -[hidden]right-> support
 
 addyInterview --> addyIdea : confirmed intent
+addyIdea --> addySpec : confirmed direction
 addyIdea ..> assess : refined input; route unclear
 addyInterview ..> assess : intent concrete; route unclear
-assess ..> reverse
+addySpec ..> assess : implementation-ready input
 assess ..> design
 assess ..> implementation
-reverse --> design
-reverse ..> implementation
 design --> implementation
 implementation ..> design : durable feedback
 implementation --> addyReview : review before merge
@@ -84,7 +82,7 @@ implementation --> repository
 The gray nodes belong to Addy Osmani's external `agent-skills` collection. They
 are not part of the Sirius catalog or named profiles.
 `just install <target-project> all` or `just install-global all` installs the
-five curated add-ons; other profiles do not. The diagram shows one optional
+six curated add-ons; other profiles do not. The diagram shows one optional
 composition. `interview-me` confirms one requester's intent.
 `idea-refine` turns that intent into a focused, user-confirmed candidate
 one-pager. Skip `interview-me` when intent is concrete. Skip `idea-refine` when
@@ -96,6 +94,11 @@ one canonical idea document for each candidate direction. Do not create a second
 document for a direction that already has one. Requester confirmation is not
 organizational approval. Use the dashed edge to `assess-development-input` only
 when the artifact's next Sirius owner is unclear.
+
+Use `spec-driven-development` when a confirmed direction needs an
+implementation-ready specification before Sirius intake and execution. Skip it
+when the existing development input already defines the required behavior and
+constraints.
 
 Use `git-workflow-and-versioning` when prepared work needs standalone commit,
 branch, worktree, release, or semantic-version guidance. Selection does not
@@ -116,8 +119,6 @@ design.
   its readiness or Sirius entry point is unclear.
 - Use external `interview-me` or `idea-refine` before Sirius when requester
   intent or a candidate direction needs interactive refinement.
-- Start with **Reverse Engineering** when you must understand an existing
-  system.
 - Start with **Iterative Analysis and Design** when an approved change needs a
   bounded behavior, analysis, design, language, or implementation iteration,
   or when a complex refactoring moves a system, test, responsibility, runtime,
@@ -165,57 +166,25 @@ narrowest Sirius owner.
 Clarifying one requester's intent does not replace a responsible stakeholder
 process when several roles, evidence sources, conflicts, or decision authorities
 matter. Treat missing stakeholder evidence, validation, or approval as an
-external prerequisite. Route current-system claims to recovery. Route scope and
-feasibility to inception. Route approved actor goals and scenario flow to
-use-case modeling, non-trivial state effects to operation contracts, and a
+external prerequisite. Route current-system claims that lack evidence to a
+responsible external recovery process. Route scope and feasibility to
+inception. Route approved actor goals and scenario flow to use-case modeling,
+non-trivial state effects to operation contracts, and a
 bounded approved oracle to test-driven implementation. Route one independently
 consequential proposed, accepted, or superseding architecture choice to
 `record-architecture-decision`.
 
-## Reverse engineering
+## External current-system recovery
 
-`reverse-engineer-software-system` coordinates recovery. Use
-`survey-existing-system` to create the first map. Select behavior recovery and
-architecture reconstruction only when the decision needs them. Use
-reconciliation when recovered evidence may disagree with tests, observations,
-documentation, decisions, or history. Stop when the original decision has
-enough evidence.
-
-```plantuml
-@startuml reverse-engineering-skill-relationships
-top to bottom direction
-
-skinparam backgroundColor #FFFFFF
-skinparam shadowing false
-skinparam linetype ortho
-skinparam defaultFontName Arial
-skinparam ArrowColor #52606D
-skinparam rectangle {
-  BackgroundColor #FFFFFF
-  BorderColor #52606D
-  RoundCorner 12
-}
-skinparam rectangle<<coordinator>> {
-  BackgroundColor #DCEEFF
-  BorderColor #2F6690
-}
-
-rectangle "reverse-engineer-\nsoftware-system" as reverse <<coordinator>>
-rectangle "survey-existing-system" as survey
-rectangle "recover-system-behavior" as behavior
-rectangle "reconstruct-software-architecture" as architecture
-rectangle "reconcile-recovered-design" as reconcile
-
-reverse --> survey
-survey ..> behavior : observable behavior needed
-survey ..> architecture : internal structure needed
-behavior ..> reconcile : perspectives may disagree
-architecture ..> reconcile : perspectives may disagree
-@enduml
-```
+The five Sirius recovery skills are retired. Existing fixed-revision recovery
+artifacts remain valid. Use a responsible external process when current
+behavior, architecture, deployment, state, or constraints need new evidence.
+`assess-development-input` returns that external prerequisite when
+requirements-shaped input depends on unsupported current-system claims.
 
 Read the [Reverse Engineering track](tracks/reverse-engineering.md) for
-evidence rules, stopping conditions, and selection examples.
+compatibility-profile behavior, evidence safeguards, artifact disposition, and
+migration guidance.
 
 ## Iterative analysis and design
 
@@ -430,7 +399,6 @@ package "Risk-driven development knowledge" #EEF8EE {
 package "Execution and evidence" #FFF5EA {
   rectangle "test-driven-\nimplementation" as implementation
   rectangle "behavior-preserving-\nrefactoring" as refactoring
-  rectangle "reconcile-recovered-\ndesign" as reconcile
 }
 
 contracts ..> domain : missing concept or association
@@ -443,8 +411,6 @@ refactoring ..> grasp : responsibility or coupling pressure
 refactoring ..> patterns : justified variation pressure
 refactoring ..> designviews : durable structure changes
 
-reconcile ..> iterative : stakeholder-validated knowledge
-reconcile ..> implementation : authorized bounded correction
 @enduml
 ```
 
@@ -457,8 +423,6 @@ Apply these rules:
 - Implementation and refactoring update design artifacts only when durable
   postconditions, responsibilities, collaborations, interfaces, or dependency
   direction change.
-- Reconciliation recommends the authoritative next action first. It does not
-  automatically turn current code into intended design or authorize a change.
 
 ## Cross-cutting skills
 
@@ -468,8 +432,8 @@ apply.
 
 | Skill | Use with | Selection trigger |
 |---|---|---|
-| `select-technical-artifacts` | Candidate directions, reverse engineering, iterative analysis and design, implementation evidence, architecture decisions, and durable repository documentation | Use when candidate knowledge needs a disposition: `create`, `update`, `embed`, `keep-with-implementation`, `omit`, or `defer`, or when a proposed artifact set needs minimization |
-| `design-repository-artifact-layout` | Candidate directions, reverse engineering, iterative analysis and design, implementation evidence, architecture decisions, and durable repository documentation | Use when a justified artifact lacks a canonical home, artifact lifecycles conflict, or migration must preserve links, IDs, indexes, and history |
+| `select-technical-artifacts` | Candidate directions, externally recovered knowledge, iterative analysis and design, implementation evidence, architecture decisions, and durable repository documentation | Use when candidate knowledge needs a disposition: `create`, `update`, `embed`, `keep-with-implementation`, `omit`, or `defer`, or when a proposed artifact set needs minimization |
+| `design-repository-artifact-layout` | Candidate directions, externally recovered knowledge, iterative analysis and design, implementation evidence, architecture decisions, and durable repository documentation | Use when a justified artifact lacks a canonical home, artifact lifecycles conflict, or migration must preserve links, IDs, indexes, and history |
 | `record-architecture-decision` | Approved requirements, architecture and language design, consequential pattern or responsibility choices, implementation discoveries, and reconciliation | Use when you must find governing ADRs, or when one bounded, cross-cutting, or expensive-to-reverse architecture choice needs proposed review, accepted history, or linked supersession |
 
 ## External stakeholder input

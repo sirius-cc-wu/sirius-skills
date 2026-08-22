@@ -3,6 +3,7 @@
 # This manifest is external to the Sirius active catalog.
 interview-me
 idea-refine
+spec-driven-development
 code-review-and-quality
 code-simplification
 git-workflow-and-versioning

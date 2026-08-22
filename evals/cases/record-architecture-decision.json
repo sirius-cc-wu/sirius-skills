@@ -25,8 +25,8 @@
         "owner": "design-pattern-application"
       },
       {
-        "prompt": "Recover whether the current queue topology came from an accepted decision or merely evolved in code and deployment configuration.",
-        "owner": "reconcile-recovered-design"
+        "prompt": "Assess this externally prepared claim about the current queue topology, expose missing evidence and approval, and route it without writing an ADR.",
+        "owner": "assess-development-input"
       }
     ]
   },

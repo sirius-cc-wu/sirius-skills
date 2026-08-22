@@ -1,8 +1,3 @@
-reverse-engineer-software-system
 select-technical-artifacts
 design-repository-artifact-layout
 record-architecture-decision
-survey-existing-system
-recover-system-behavior
-reconstruct-software-architecture
-reconcile-recovered-design

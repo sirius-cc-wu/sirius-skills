@@ -29,23 +29,20 @@ The initial pilot covers:
 - `software-design-language-adaptation`;
 - `use-case-modeling`;
 - `test-driven-implementation`;
-- `recover-system-behavior`;
-- `reconcile-recovered-design`;
-- `walkthrough-me`;
-- `reconstruct-software-architecture`; and
+- `walkthrough-me`; and
 - `uml-class-diagram-design`.
 
-The fixture-backed cases distinguish seven outcomes. Three implementation
+The fixture-backed cases distinguish six outcomes. Three implementation
 cases exercise the complete feedback branch: a local fix creates no design
 document, an approved domain rule refines code, tests, and one existing
 canonical model, and conflicting equal-authority policies return to the user
 without repository mutation. One boundary-sensitive Rust refactoring case
 requires the coordinator to retain the system boundary, native
 responsibilities, ownership consequences, verification ownership, and open
-parent outcome before more implementation. Two visual cases select focused
-component and runtime views for cross-module comprehension or a focused class
-view for justified stateful object design. One contract case adds declarative
-state effects to an existing feature-analysis aggregate without creating code,
+parent outcome before more implementation. One visual case selects a focused
+class view for justified stateful object design. One contract case adds
+declarative state effects to an existing feature-analysis aggregate without
+creating code,
 implementation design, or a second artifact.
 
 ## Case Format

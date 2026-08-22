@@ -1,4 +1,0 @@
-interface:
-  display_name: "Recover System Behavior"
-  short_description: "Recover behavior with traceable evidence"
-  default_prompt: "Use $recover-system-behavior to recover observable behavior from this codebase and its tests."

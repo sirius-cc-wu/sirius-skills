@@ -21,10 +21,6 @@
         "owner": "create-pr"
       },
       {
-        "prompt": "Reconstruct and persist the current system's module architecture and runtime collaborations beyond this PR",
-        "owner": "reconstruct-software-architecture"
-      },
-      {
         "prompt": "Refactor duplicated code in the changed module while preserving its verified behavior",
         "owner": "behavior-preserving-refactoring"
       }

@@ -199,8 +199,8 @@ Next section: [name]
   review instead of expanding the tour into one.
 - Do not equate user comprehension with agreement about the design.
 - Use a formal review skill such as `code-review-and-quality`, when available,
-  when a multi-axis review is requested. Use the reverse-engineering skills
-  when the required context grows beyond the selected change.
+  when a multi-axis review is requested. Stop for a responsible external
+  recovery process when the required context grows beyond the selected change.
 
 ## Verification
 

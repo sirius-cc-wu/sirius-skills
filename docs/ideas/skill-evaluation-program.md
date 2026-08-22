@@ -14,10 +14,10 @@ with explicitly selected Codex runs in disposable repositories. Those runs
 capture traces, workspace changes, verification, model metadata, usage, and the
 final response without treating missing metadata as known.
 
-The current seven fixture-backed cases exercise red–mutation–green
+The current six fixture-backed cases exercise red–mutation–green
 implementation, documentation restraint, conditional canonical-model feedback,
-read-only workflow re-entry, boundary-sensitive Rust refactoring design,
-focused architecture and class views, and a declarative operation contract
+read-only workflow re-entry, boundary-sensitive Rust refactoring design, a
+focused class view, and a declarative operation contract
 added to an existing analysis aggregate.
 Repeated runs can report mechanical, mutation, environment, duration, and usage
 stability. A separate read-only semantic judge has reviewed controls and
@@ -277,18 +277,15 @@ These cases should distinguish three outcomes:
 
 ## Pilot Scope
 
-The pilot began with seven skills that represent distinct failure risks and
-later added `operation-contracts` for the remaining contract-driven composition
-risk:
+The active pilot retains four original skill areas that represent distinct
+failure risks, plus the later-added `operation-contracts` coverage for the
+remaining contract-driven composition risk:
 
 | Skill | Risk exercised |
 |---|---|
 | `iterative-risk-driven-development` | Selecting and executing risk-driven analysis, design, implementation, and verification without enforcing a lifecycle waterfall |
 | `use-case-modeling` | Preserving the black-box boundary and avoiding internal design |
 | `test-driven-implementation` | Demonstrating discriminatory verification without changing valid expectations |
-| `recover-system-behavior` | Separating evidenced current behavior from intended requirements |
-| `reconcile-recovered-design` | Respecting authority and avoiding silent mutation |
-| `reconstruct-software-architecture` | Selecting focused component and runtime views from as-built evidence instead of producing an exhaustive inventory |
 | `uml-class-diagram-design` | Producing a focused class view only when type responsibilities and relationships justify it |
 | `operation-contracts` | Refining one canonical analysis aggregate with declarative state effects without adding implementation design or duplicate artifacts |
 

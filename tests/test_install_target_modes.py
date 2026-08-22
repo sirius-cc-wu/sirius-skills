@@ -21,6 +21,7 @@ ADDY_SOURCE = (
 ADDY_SKILLS = {
     "interview-me",
     "idea-refine",
+    "spec-driven-development",
     "code-review-and-quality",
     "code-simplification",
     "git-workflow-and-versioning",
@@ -57,14 +58,9 @@ ITERATIVE_DESIGN_SKILLS = {
     "behavior-preserving-refactoring",
 }
 REVERSE_ENGINEERING_SKILLS = {
-    "reverse-engineer-software-system",
     "select-technical-artifacts",
     "design-repository-artifact-layout",
     "record-architecture-decision",
-    "survey-existing-system",
-    "recover-system-behavior",
-    "reconstruct-software-architecture",
-    "reconcile-recovered-design",
 }
 
 
@@ -386,4 +382,4 @@ def test_validation_covers_the_consolidated_catalog() -> None:
     )
 
     assert result.returncode == 0, result.stdout
-    assert "Validated 25 skills" in result.stdout
+    assert "Validated 20 skills" in result.stdout

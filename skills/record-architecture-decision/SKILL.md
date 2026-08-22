@@ -1,6 +1,6 @@
 ---
 name: record-architecture-decision
-description: Records or supersedes one consequential architecture decision as a short Architecture Decision Record (ADR) with explicit status, authority, context, forces, serious alternatives, consequences, uncertainty, and reconsideration triggers. Use when asked to write, create, capture, update, supersede, or list the governing ADR for a database, API, integration, deployment, security, runtime, dependency, or other cross-cutting technical choice; use the relevant design skill to make an unresolved design choice and reverse engineering to recover undocumented rationale.
+description: Records or supersedes one consequential architecture decision as a short Architecture Decision Record (ADR) with explicit status, authority, context, forces, serious alternatives, consequences, uncertainty, and reconsideration triggers. Use when asked to write, create, capture, update, supersede, or list the governing ADR for a database, API, integration, deployment, security, runtime, dependency, or other cross-cutting technical choice; use the relevant design skill to make an unresolved design choice and an external evidence-recovery process for undocumented rationale.
 ---
 
 # Record Architecture Decision
@@ -34,9 +34,9 @@ identifiers, repository-local conventions, evidence, and authorization.
   they independently pass the artifact-selection budget.
 - Do not use an ADR to choose an unresolved pattern, responsibility, lifecycle,
   or language design; use the corresponding specialist first.
-- Do not reconstruct an undocumented decision or rationale from code alone;
-  use reverse engineering and reconciliation, then obtain authoritative
-  confirmation before recording intended architecture.
+- Do not reconstruct an undocumented decision or rationale from code alone.
+  Use a responsible external evidence-recovery process, then obtain
+  authoritative confirmation before recording intended architecture.
 
 ## Workflow
 
@@ -60,8 +60,8 @@ identifiers, repository-local conventions, evidence, and authorization.
 5. **Establish the evidence baseline.** Identify the problem, relevant
    requirements, constraints, forces, advice, observations, and source
    revisions. Separate verified current-system facts, stakeholder intent,
-   inference, and uncertainty. Route unsupported current-state claims to
-   `reverse-engineer-software-system`.
+   inference, and uncertainty. Stop for a responsible external recovery
+   prerequisite when current-state claims lack evidence.
 6. **Record serious alternatives.** Include only credible alternatives that
    materially affected the choice, with their important benefits, costs, and
    reason they were not selected. Do not invent rejected options after the

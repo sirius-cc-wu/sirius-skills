@@ -1,75 +1,64 @@
 # Reverse Engineering
 
-Use this track when an existing system must be understood before maintenance,
-migration, modernization, audit, onboarding, resumed development, or
-redocumentation.
+`reverse-engineer-software-system`, `survey-existing-system`,
+`recover-system-behavior`, `reconstruct-software-architecture`, and
+`reconcile-recovered-design` are retired. Existing surveys, recovered behavior
+models, reconstructed architecture, reconciliation records, and fixed-revision
+evidence remain valid at their recorded revisions.
 
-When externally prepared requirements or proposals contain unevidenced claims
-about the current system,
+The `reverse-engineering` installation name remains as a compatibility profile.
+It installs `select-technical-artifacts`,
+`design-repository-artifact-layout`, and `record-architecture-decision`. These
+skills can manage justified artifacts and recorded decisions, but they do not
+recover current-system facts.
+
+## New Current-System Evidence
+
+Use a responsible external recovery process when maintenance, migration,
+modernization, audit, onboarding, or resumed development needs new evidence
+about current commands, behavior, architecture, deployment, state, or
+constraints.
+
+The external process must:
+
+- fix the repository revision, runtime build, or other baseline under study;
+- state the decision, bounded scope, exclusions, and authority for probes;
+- distinguish as-built, as-tested, as-observed, as-documented, intended, and
+  historical claims;
+- attach locators and calibrated confidence to material claims;
+- preserve contradictions, lifecycle state, and residual uncertainty; and
+- avoid converting current implementation or tests into approved intent.
+
+Use
 [`assess-development-input`](../../skills/assess-development-input/SKILL.md)
-may route them here before those claims are used as intended behavior or
-implementation inputs.
+when requirements-shaped material depends on current-system claims and its
+Sirius readiness or next owner is unclear. The assessment must return an
+external prerequisite when those claims still lack sufficient evidence.
 
-## Sequence
-
-1. [`reverse-engineer-software-system`](../../skills/reverse-engineer-software-system/SKILL.md)
-   states the decision, fixes the revision and scope, selects evidence
-   perspectives, and coordinates a risk-sized recovery iteration.
-2. [`survey-existing-system`](../../skills/survey-existing-system/SKILL.md)
-   maps governance, manifests, entry points, interfaces, dependencies, state,
-   verification surfaces, documentation, and priority recovery slices.
-3. [`recover-system-behavior`](../../skills/recover-system-behavior/SKILL.md)
-   recovers black-box scenarios, failures, effects, and externally visible
-   constraints when the decision depends on current behavior.
-4. [`reconstruct-software-architecture`](../../skills/reconstruct-software-architecture/SKILL.md)
-   reconstructs only the module, component, runtime, state, deployment, data,
-   or trust-boundary views required by the decision.
-5. [`reconcile-recovered-design`](../../skills/reconcile-recovered-design/SKILL.md)
-   compares the recovered account with executed tests, runtime observations,
-   documentation, accepted decisions, and history when those perspectives may
-   disagree.
-6. Feed stakeholder-validated behavior and design knowledge into the
-   [iterative analysis and design track](iterative-analysis-design.md), or use
-   the [implementation and evolution track](implementation-evolution.md) when
-   a safely bounded change is already justified.
-
-## Recorded Decision Discovery
+## Active Support
 
 Use
 [`record-architecture-decision`](../../skills/record-architecture-decision/SKILL.md)
-in read-only mode when the investigation needs to identify which ADRs currently
-govern a product, subsystem, or concern. Follow supersession links and preserve
-proposed, accepted, and historical states. An ADR is evidence of a recorded
-choice and rationale at its revision; it does not prove that current code still
-conforms. Missing ADRs do not authorize inferring undocumented decisions from
-implementation.
+in read-only mode to identify which ADRs govern a concern. An ADR records a
+choice and rationale at its revision. It does not prove that current code still
+conforms, and missing ADRs do not authorize inferred rationale.
 
-## Evidence Rule
-
-Every material claim identifies its perspective, status, confidence, temporal
-status, and locator using the shared
-[Recovery Evidence and Confidence](../../skills/reverse-engineer-software-system/references/recovery-evidence.md)
-vocabulary.
-
-Recovered artifacts describe a fixed revision. They do not become intended
-requirements merely because they match current code or tests.
-
-Write recovered artifacts in STE-style from the owning recovery skill while
-preserving evidence, confidence, temporal status, and residual uncertainty.
-
-## Selection Rule
-
-Do not execute every skill at full depth. A first-contact onboarding question
-may stop after the survey. A behavior-preserving migration may require behavior
-recovery and architecture reconstruction. Documentation drift requires
-reconciliation. Use
+Use
 [`select-technical-artifacts`](../../skills/select-technical-artifacts/SKILL.md)
-when the recovered artifact set itself is a material question. Apply its
-[Artifact Selection Budget](../../skills/select-technical-artifacts/references/artifact-selection-budget.md)
-locally before splitting recovered evidence into another standalone document.
-When a
-justified recovered artifact has no obvious home, several paths compete, or a
-migration must preserve links and history, use
+when externally recovered knowledge needs a disposition such as updating an
+existing owner, staying with executable evidence, becoming a justified
+standalone artifact, being deferred, or being omitted.
+
+Use
 [`design-repository-artifact-layout`](../../skills/design-repository-artifact-layout/SKILL.md)
-for that placement decision. Close each iteration when the original decision
-has enough evidence, and expose any residual uncertainty.
+when a justified recovered artifact lacks a canonical home or when migration
+must preserve links, identifiers, indexes, and history. Placement authority does
+not authorize new recovery claims or content changes.
+
+## Handoff Rule
+
+Feed only externally validated current-system knowledge into the
+[iterative analysis and design track](iterative-analysis-design.md) or the
+[implementation and evolution track](implementation-evolution.md). Preserve the
+source baseline, evidence status, confidence, authority, uncertainty, and
+lifecycle. Stop when missing evidence would require invention.

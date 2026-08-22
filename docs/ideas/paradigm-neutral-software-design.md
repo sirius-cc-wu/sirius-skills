@@ -217,9 +217,10 @@ A future visual-design coordinator would ask:
 The existing `iterative-risk-driven-development` capability now remains the
 risk-driven coordinator for work that benefits from its full vocabulary and
 traceability model. It selects and executes one ready objective at a time.
-`reconstruct-software-architecture` remains the specialist for recovering
-as-built views from existing code. A future visual coordinator
-should select between them rather than duplicate their detailed procedures.
+`reconstruct-software-architecture` is retired. A future visual coordinator
+must stop for a responsible external recovery process when as-built views lack
+sufficient current evidence rather than duplicating or silently replacing that
+retired procedure.
 
 ## Diagram Trust and Lifecycle
 

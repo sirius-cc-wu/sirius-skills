@@ -1,4 +1,0 @@
-interface:
-  display_name: "Survey Existing System"
-  short_description: "Map entry points, interfaces, and dependencies"
-  default_prompt: "Use $survey-existing-system to map this repository’s entry points, interfaces, dependencies, and risks."

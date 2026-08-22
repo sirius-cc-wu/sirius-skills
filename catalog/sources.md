@@ -16,10 +16,6 @@ may distill concepts from several sources.
 | Sirius durable-artifact and risk-driven delivery practice | `select-technical-artifacts`, `design-repository-artifact-layout`, `iterative-risk-driven-development` | Value, ownership, and lifecycle selection gates; executable-first dispositions; repository-first convention discovery; artifact lifecycle separation; minimal layouts; canonical paths; linking; migration; risk-driven objective selection; boundary-sensitive refactoring gates; native responsibility, ownership, and verification coordination; parent-outcome reconciliation; validation; Rust lifecycle pressure; and authorized commit boundaries |
 | Craig Larman, *Applying UML and Patterns* | Larman-derived analysis and object-design skills in [`applying-uml-and-patterns.txt`](../skill-sets/applying-uml-and-patterns.txt) | Iterative phase framing, inception, use cases, domain models, system sequence diagrams, operation contracts, GRASP responsibility reasoning adapted to language-native owners, use-case realizations, design class diagrams, patterns, implementation, testing, and refactoring |
 | Rust ownership conventions and accumulated Sirius Rust design practice | `software-design-language-adaptation`, `design-rust-lifecycles` | Native responsibility realization, ownership and capability transfer, consuming transitions, RAII and explicit shutdown, staged startup, rollback, async cancellation, supervision, vertical verification retention, and evidence-driven abstraction |
-| Serge Demeyer, Stéphane Ducasse, and Oscar Nierstrasz, *Object-Oriented Reengineering Patterns* | All reverse-engineering skills | Question-driven reengineering, first contact, initial understanding, detailed model capture, tests as evidence, and bounded recovery |
-| Rick Kazman, Liam O'Brien, and Chris Verhoef, *Architecture Reconstruction Guidelines, Third Edition* | `reverse-engineer-software-system`, `reconstruct-software-architecture`, `reconcile-recovered-design` | Extracting implementation facts, building successive abstractions, recovering as-built views, and checking as-built against as-designed |
-| Paul Clements et al., *Documenting Software Architectures: Views and Beyond* | `reconstruct-software-architecture`, `reconcile-recovered-design` | Question-driven view selection, module and component-and-connector views, deployment, interfaces, behavior, and architecture review |
-| Diomidis Spinellis, *Code Reading: The Open Source Perspective* | `survey-existing-system`, `recover-system-behavior`, `reconstruct-software-architecture` | Code-reading attack plans, project organization, control and data structures, mixed-language systems, search, and runtime tools |
 
 The detailed concept-to-skill mapping is maintained in the
 [Skill Catalog](skills.md).
@@ -31,7 +27,7 @@ the Sirius active catalog:
 
 | Source | Pinned revision | Installed names | Installation surface |
 |---|---|---|---|
-| Addy Osmani's [`agent-skills`](https://github.com/addyosmani/agent-skills/tree/5a1b82d6445d1e2f0abeea1072851419a50c0e5c) | `5a1b82d6445d1e2f0abeea1072851419a50c0e5c` | `interview-me`, `idea-refine`, `code-review-and-quality`, `code-simplification`, `git-workflow-and-versioning` | `just install <target-project> all` or `just install-global all` only |
+| Addy Osmani's [`agent-skills`](https://github.com/addyosmani/agent-skills/tree/5a1b82d6445d1e2f0abeea1072851419a50c0e5c) | `5a1b82d6445d1e2f0abeea1072851419a50c0e5c` | `interview-me`, `idea-refine`, `spec-driven-development`, `code-review-and-quality`, `code-simplification`, `git-workflow-and-versioning` | `just install <target-project> all` or `just install-global all` only |
 
 ## Proposed Sources
 

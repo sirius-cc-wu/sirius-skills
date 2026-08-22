@@ -142,9 +142,9 @@ until actual usage demonstrates the need.
 The skills use a small compatible model so that information does not lose its
 origin as it moves toward implementation. Identifiers are opaque and may be
 assigned manually; their format must follow repository conventions rather than
-assuming dates or sequence numbers. Evidence claims should reuse
-[Recovery Evidence and Confidence](../../skills/reverse-engineer-software-system/references/recovery-evidence.md)
-where its vocabulary fits instead of creating a competing confidence model.
+assuming dates or sequence numbers. Evidence claims reused the then-active
+[Recovery Evidence and Confidence](https://github.com/sirius-cc-wu/sirius-skills/blob/f544d48bf5e1b0d836e0cb39f8122a767bdbae0f/skills/reverse-engineer-software-system/references/recovery-evidence.md)
+vocabulary where it fit instead of creating a competing confidence model.
 
 This compatibility contract does not require a separately packaged shared
 reference. Each owning skill defines the fields it produces or consumes, and

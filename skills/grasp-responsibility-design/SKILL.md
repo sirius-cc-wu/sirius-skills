@@ -124,8 +124,9 @@ tags: [design, grasp]
 
 ## Boundaries
 
-- Use `reconstruct-software-architecture` when the question is which modules or
-  runtime participants exist today. This skill decides who should own behavior.
+- Use a responsible external recovery process when the question is which
+  modules or runtime participants exist today. This skill decides who should
+  own behavior.
 - Use `design-rust-lifecycles` for exact ownership transfer, borrowing,
   cancellation, joining, rollback, `Drop`, and fallible cleanup after the
   native responsibilities are explicit.

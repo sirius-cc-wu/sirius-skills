@@ -21,8 +21,8 @@
         "owner": "domain-modeling"
       },
       {
-        "prompt": "Recover as-built modules, components, runtime collaborations, state ownership, and deployment",
-        "owner": "reconstruct-software-architecture"
+        "prompt": "Assign behavior to the lowest-coupling classes, modules, functions, and adapters before summarizing stable software structure",
+        "owner": "grasp-responsibility-design"
       }
     ]
   },

@@ -71,19 +71,6 @@ this repository's commit conventions, exclude unrelated working-tree changes,
 and do not push.
 ```
 
-## Reverse engineering
-
-```text
-Use reverse-engineer-software-system to recover the behavior and architecture
-needed to plan this migration. Fix the analysis to the current revision and
-separate observed facts from inferences.
-```
-
-```text
-Use survey-existing-system to map this repository's entry points, interfaces,
-state, side effects, verification surfaces, and highest-risk follow-up slices.
-```
-
 ## Iterative design and implementation
 
 ```text
