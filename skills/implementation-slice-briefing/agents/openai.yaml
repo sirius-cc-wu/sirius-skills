@@ -1,4 +1,0 @@
-interface:
-  display_name: "Implementation Slice Briefing"
-  short_description: "Package an approved traceable behavior slice"
-  default_prompt: "Use $implementation-slice-briefing to assemble a bounded coding-agent brief from approved requirements and design inputs without inventing missing decisions."

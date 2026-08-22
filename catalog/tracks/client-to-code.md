@@ -1,50 +1,54 @@
 # Client to Code
 
-This track covers the path from stakeholder evidence to a bounded, traceable
-coding-agent brief. Its discovery, synthesis, and briefing skills are active and
-remain independently selectable.
+This track starts after a responsible external process has gathered stakeholder
+evidence and validated the decisions needed for development. Sirius does not
+currently provide stakeholder elicitation, requirements synthesis and
+validation, or implementation-slice briefing skills.
 
-The deployed
-[`assess-development-input`](../../skills/assess-development-input/SKILL.md)
-provides a smaller, method-independent alternative when requirements-shaped
-material already exists. It assesses that material and selects a Sirius entry
-point; it does not perform the stakeholder discovery, validation, or briefing
-performed by this track.
+`stakeholder-requirements-elicitation`,
+`requirements-synthesis-validation`, and `implementation-slice-briefing` are
+retired. Existing evidence records, requirements briefs, and implementation
+briefs remain valid at their recorded revisions. Do not recreate or rename
+those historical artifact types merely because their skills are retired.
 
 ## Sequence
 
-1. [`stakeholder-requirements-elicitation`](../../skills/stakeholder-requirements-elicitation/SKILL.md)
-   identifies relevant stakeholders and collects evidence through interviews,
-   observation, workshops, documents, and prototypes.
-2. [`requirements-synthesis-validation`](../../skills/requirements-synthesis-validation/SKILL.md)
-   turns the evidence into candidate goals, workflows, rules, constraints,
-   quality attributes, scenarios, assumptions, and decisions, then plays them
-   back to stakeholders.
-3. [`inception`](../../skills/inception/SKILL.md) frames the validated business
-   case, scope, feasibility, and major risks.
-4. [`use-case-modeling`](../../skills/use-case-modeling/SKILL.md) expresses
-   validated actor goals and black-box behavior.
-5. [`behavior-driven-specification`](../../skills/behavior-driven-specification/SKILL.md)
-   makes selected behavior concrete through shared examples and acceptance
-   scenarios.
-6. The
-   [iterative analysis and design track](iterative-analysis-design.md) supplies
-   only the downstream artifacts needed for the selected risk and behavior
-   slice.
-7. [`implementation-slice-briefing`](../../skills/implementation-slice-briefing/SKILL.md)
-   assembles approved decisions, visible uncertainty, acceptance examples,
-   non-goals, trace links, and verification expectations.
-8. The
-   [implementation and evolution track](implementation-evolution.md) turns the
-   brief into verified production behavior.
-9. Delivery evidence and stakeholder feedback refine the canonical
-   requirements and design artifacts.
+1. Gather stakeholder evidence and validate requirements through the responsible
+   external process. Preserve sources, authority, approval state, conflicts,
+   confidentiality, and unresolved decisions.
+2. Use
+   [`assess-development-input`](../../skills/assess-development-input/SKILL.md)
+   when the externally produced material's readiness or Sirius entry point is
+   unclear. It may return another external prerequisite instead of forcing a
+   Sirius owner.
+3. Use [`inception`](../../skills/inception/SKILL.md) when vision, business
+   case, scope, feasibility, or major risks remain unclear.
+4. Use [`use-case-modeling`](../../skills/use-case-modeling/SKILL.md) to express
+   approved actor goals and black-box behavior.
+5. Use
+   [`behavior-driven-specification`](../../skills/behavior-driven-specification/SKILL.md)
+   to make bounded behavior concrete through source-linked examples and
+   acceptance scenarios.
+6. Use the
+   [iterative analysis and design track](iterative-analysis-design.md) for only
+   the analysis, design, implementation, and verification needed by the current
+   risk-sized objective.
+7. Use the
+   [implementation and evolution track](implementation-evolution.md) directly
+   when approved behavior or design provides an independent oracle. Carry
+   source revisions, authority, non-goals, exclusions, verification, and stop
+   conditions into the implementation request without creating a separate
+   briefing artifact by default.
+8. Return delivery evidence and new uncertainty to the canonical external
+   requirements owner or the responsible decision authority. Do not promote
+   implementation discoveries into approved intent.
 
 ## Handoff Rule
 
-Coding agents receive validated decisions plus visible uncertainty. The
-briefing step must not make unresolved requirements appear settled or invent
-business rules, architecture, or acceptance criteria.
+Coding agents receive approved decisions plus visible uncertainty. Stop when
+missing stakeholder evidence, validation, approval, business rules,
+architecture, access, or an independent oracle would require invention.
 
-See the [client-discovery idea](../../docs/ideas/client-discovery-skills.md)
-for the skill-family rationale and reference material.
+See the
+[client-discovery idea](../../docs/ideas/client-discovery-skills.md) for the
+retired skill family's rationale and implementation history.

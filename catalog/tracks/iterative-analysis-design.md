@@ -41,10 +41,10 @@ At each baseline, identify the canonical owner, revision, lifecycle status,
 and authority for every material behavior, rule, constraint, quality, and
 decision. Treat code, tests, observations, and historical iteration records as
 evidence rather than approved intent. Return unclear readiness to
-`assess-development-input`; route a bounded evidence set with unresolved
-implications or status to `requirements-synthesis-validation`. Reapply artifact
-selection when enabling behavior gains reuse, a new consumer, or an independent
-lifecycle.
+`assess-development-input`. When a bounded evidence set has unresolved
+implications, conflicts, or decision status, stop for the responsible external
+stakeholder-validation prerequisite. Reapply artifact selection when enabling
+behavior gains reuse, a new consumer, or an independent lifecycle.
 
 Choose the narrowest specialist for each material question:
 

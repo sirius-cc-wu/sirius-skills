@@ -51,9 +51,9 @@ mandatory artifact sequence, programming paradigm, or phase checklist.
    records as evidence, not approved intent. If material input exists only in
    those sources, an inception or idea is being used beyond its approved
    boundary, or readiness and the correct owner are unclear, stop and use
-   `assess-development-input`. Use `requirements-synthesis-validation` when a
-   bounded evidence set exists but its implications, conflicts, or decision
-   status need stakeholder-visible validation.
+   `assess-development-input`. When evidence implications, conflicts, or
+   decision status still need stakeholder validation, stop and name that
+   external prerequisite instead of inventing approval.
 3. **Choose one objective.** State one behavior, decision, risk, or learning
    question and its exit evidence. Name the approved parent outcome and state
    whether this iteration can close it or only enable later work. Keep the

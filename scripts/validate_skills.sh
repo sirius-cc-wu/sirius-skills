@@ -241,24 +241,9 @@ for name in "${recovery_skills[@]}"; do
   grep -Fq "\$$name" "$metadata" || fail "$name metadata default prompt missing skill invocation"
 done
 
-client_discovery_skills=(
-  stakeholder-requirements-elicitation
-  requirements-synthesis-validation
-  implementation-slice-briefing
-)
-
-for name in "${client_discovery_skills[@]}"; do
-  metadata="$root/skills/$name/agents/openai.yaml"
-  test -f "$metadata" || fail "missing $metadata"
-  grep -Fq "\$$name" "$metadata" || fail "$name metadata default prompt missing skill invocation"
-done
-
 template_types=(
   "assess-development-input|Development Input Assessment"
   "record-architecture-decision|Architecture Decision"
-  "stakeholder-requirements-elicitation|Stakeholder Evidence Record"
-  "requirements-synthesis-validation|Requirements Discovery Brief"
-  "implementation-slice-briefing|Implementation Slice Brief"
   "reverse-engineer-software-system|Reverse Engineering Record"
   "survey-existing-system|System Survey"
   "recover-system-behavior|Recovered Behavior Model"

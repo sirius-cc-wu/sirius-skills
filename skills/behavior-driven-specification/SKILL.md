@@ -28,9 +28,9 @@ framework.
 - A testable acceptance boundary needs to be separated from implementation
   details.
 - Do not use when stakeholder evidence, authority, or conflicting policies
-  still need discovery or validation; use
-  [`requirements-synthesis-validation`](../requirements-synthesis-validation/SKILL.md)
-  or [`stakeholder-requirements-elicitation`](../stakeholder-requirements-elicitation/SKILL.md).
+  still need discovery or validation. Stop and name the responsible external
+  prerequisite. Use `assess-development-input` only when the next Sirius owner
+  is unclear after that prerequisite is satisfied.
 - Do not use when actors, goals, or the system boundary are missing; use
   [`use-case-modeling`](../use-case-modeling/SKILL.md).
 - Do not use to specify non-trivial state effects; use
@@ -85,11 +85,12 @@ framework.
    Prefer the existing requirements brief, use case, acceptance section, or
    test file. Create a standalone scenario artifact only when it has distinct
    ownership, review value, and lifecycle.
-9. **Hand off without overreaching.** Send approved scenarios to
-   [`implementation-slice-briefing`](../implementation-slice-briefing/SKILL.md)
-   or [`test-driven-implementation`](../test-driven-implementation/SKILL.md).
-   Use [`operation-contracts`](../operation-contracts/SKILL.md) when examples
-   reveal effects that require a precise contract.
+9. **Hand off without overreaching.** Send approved scenarios with their source
+   status, authority, non-goals, and open questions directly to
+   [`test-driven-implementation`](../test-driven-implementation/SKILL.md) when
+   its entry conditions hold. Use
+   [`operation-contracts`](../operation-contracts/SKILL.md) when examples reveal
+   effects that require a precise contract.
 
 ## Scenario Template
 

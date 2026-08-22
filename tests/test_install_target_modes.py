@@ -42,9 +42,6 @@ ITERATIVE_DESIGN_SKILLS = {
     "design-repository-artifact-layout",
     "record-architecture-decision",
     "iterative-risk-driven-development",
-    "stakeholder-requirements-elicitation",
-    "requirements-synthesis-validation",
-    "implementation-slice-briefing",
     "inception",
     "use-case-modeling",
     "behavior-driven-specification",
@@ -390,4 +387,4 @@ def test_validation_covers_the_consolidated_catalog() -> None:
     )
 
     assert result.returncode == 0, result.stdout
-    assert "Validated 29 skills" in result.stdout
+    assert "Validated 26 skills" in result.stdout

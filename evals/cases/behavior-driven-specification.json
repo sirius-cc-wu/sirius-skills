@@ -23,10 +23,6 @@
       {
         "prompt": "Implement the approved scenarios with failing tests, the smallest production change, and regression verification",
         "owner": "test-driven-implementation"
-      },
-      {
-        "prompt": "Resolve conflicting stakeholder policies and validate which requirement has authority",
-        "owner": "requirements-synthesis-validation"
       }
     ]
   },

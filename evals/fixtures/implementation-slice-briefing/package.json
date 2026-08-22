@@ -1,9 +1,0 @@
-{
-  "name": "reconciliation-matcher-fixture",
-  "private": true,
-  "type": "module",
-  "scripts": {
-    "test": "node --test",
-    "test:matcher": "node --test tests/reconciliation/matcher.test.js"
-  }
-}

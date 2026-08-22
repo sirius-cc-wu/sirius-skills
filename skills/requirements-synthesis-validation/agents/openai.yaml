@@ -1,4 +1,0 @@
-interface:
-  display_name: "Requirements Synthesis Validation"
-  short_description: "Synthesize and validate traceable requirements"
-  default_prompt: "Use $requirements-synthesis-validation to turn stakeholder evidence into candidate requirements and validate them without designing software."

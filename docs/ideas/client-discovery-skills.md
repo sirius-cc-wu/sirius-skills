@@ -1,12 +1,11 @@
 # Client Discovery Skills for Coding-Agent Handoffs
 
-This capability is implemented by
-[`stakeholder-requirements-elicitation`](../../skills/stakeholder-requirements-elicitation/SKILL.md),
-[`requirements-synthesis-validation`](../../skills/requirements-synthesis-validation/SKILL.md),
-and
-[`implementation-slice-briefing`](../../skills/implementation-slice-briefing/SKILL.md).
-The active handoff is documented in the
-[Client to Code track](../../catalog/tracks/client-to-code.md); this document
+This historical record describes the retired
+`stakeholder-requirements-elicitation`, `requirements-synthesis-validation`, and
+`implementation-slice-briefing` capabilities as they existed at revision
+`f544d48bf5e1b0d836e0cb39f8122a767bdbae0f`. Existing artifacts remain valid at
+their recorded revisions. The active migration is documented in the
+[Client to Code track](../../catalog/tracks/client-to-code.md). This document
 preserves the problem, design rationale, safeguards, and delivery history.
 
 The gap they fill is best described as **stakeholder-driven requirements

@@ -6,7 +6,7 @@ current risk or complete the current behavior slice.
 
 ## Overview
 
-This diagram groups all 29 deployable Sirius skills by responsibility. It also
+This diagram groups all 26 deployable Sirius skills by responsibility. It also
 shows five external Addy add-ons. The diagram shows only
 the main movement between groups. Use the detailed diagrams below for
 conditional routes. Solid arrows show normal handoffs. They do not require a
@@ -45,8 +45,6 @@ package "External Addy add-ons\naddyosmani/agent-skills" as addy #F2F2F2 {
 
 rectangle "**Sirius: Intake**\nassess-development-input" as assess #FFF4CC
 
-rectangle "**Client Discovery**\nstakeholder-requirements-elicitation\nrequirements-synthesis-validation\nimplementation-slice-briefing" as discovery #E8F5E9
-
 rectangle "**Reverse Engineering**\nreverse-engineer-software-system\nsurvey-existing-system\nrecover-system-behavior\nreconstruct-software-architecture\nreconcile-recovered-design" as reverse #EAF4FB
 
 rectangle "**Iterative Risk-Driven Development**\niterative-risk-driven-development\ninception\nuse-case-modeling\nbehavior-driven-specification\ndomain-modeling\nsystem-sequence-diagrams\noperation-contracts\ngrasp-responsibility-design\nuse-case-realization\numl-class-diagram-design\ndesign-pattern-application\nsoftware-design-language-adaptation\ndesign-rust-lifecycles" as design #EEF8EE
@@ -57,19 +55,15 @@ rectangle "**Repository Workflow**\nwalkthrough-me\ncreate-pr" as repository #F3
 
 rectangle "**Cross-cutting Support**\nselect-technical-artifacts\ndesign-repository-artifact-layout\nrecord-architecture-decision" as support #FFFBEA
 
-assess -[hidden]right-> discovery
-discovery -[hidden]right-> reverse
+assess -[hidden]right-> reverse
 design -[hidden]right-> support
 
 addyInterview --> addyIdea : confirmed intent
 addyIdea ..> assess : refined input; route unclear
 addyInterview ..> assess : intent concrete; route unclear
-assess ..> discovery : stakeholder evidence needed
 assess ..> reverse
 assess ..> design
 assess ..> implementation
-discovery --> design
-discovery --> implementation
 reverse --> design
 reverse ..> implementation
 design --> implementation
@@ -122,8 +116,6 @@ design.
   its readiness or Sirius entry point is unclear.
 - Use external `interview-me` or `idea-refine` before Sirius when requester
   intent or a candidate direction needs interactive refinement.
-- Start with **Client Discovery** when stakeholder evidence must be gathered,
-  synthesized, and validated before a coding handoff.
 - Start with **Reverse Engineering** when you must understand an existing
   system.
 - Start with **Iterative Analysis and Design** when an approved change needs a
@@ -170,13 +162,13 @@ intent can feed idea refinement. The confirmed problem, direction, assumptions,
 MVP scope, non-goals, and open questions then become candidate input to the
 narrowest Sirius owner.
 
-Clarifying one requester's intent does not replace client discovery when several
-stakeholder roles, evidence sources, conflicts, or decision authorities matter.
-Route current-system claims to recovery. Route scope and feasibility to
-inception. Route stakeholder authority to client discovery. Route acceptance
-behavior to behavior-driven specification. Route one independently
-consequential proposed, accepted, or superseding architecture choice to
-`record-architecture-decision`.
+Clarifying one requester's intent does not replace a responsible stakeholder
+process when several roles, evidence sources, conflicts, or decision authorities
+matter. Treat missing stakeholder evidence, validation, or approval as an
+external prerequisite. Route current-system claims to recovery. Route scope and
+feasibility to inception. Route approved acceptance behavior to
+behavior-driven specification. Route one independently consequential proposed,
+accepted, or superseding architecture choice to `record-architecture-decision`.
 
 ## Reverse engineering
 
@@ -478,28 +470,21 @@ apply.
 | `design-repository-artifact-layout` | Candidate directions, reverse engineering, iterative analysis and design, implementation evidence, architecture decisions, and durable repository documentation | Use when a justified artifact lacks a canonical home, artifact lifecycles conflict, or migration must preserve links, IDs, indexes, and history |
 | `record-architecture-decision` | Approved requirements, architecture and language design, consequential pattern or responsibility choices, implementation discoveries, and reconciliation | Use when you must find governing ADRs, or when one bounded, cross-cutting, or expensive-to-reverse architecture choice needs proposed review, accepted history, or linked supersession |
 
-## Client discovery upstream path
+## External stakeholder input
 
-All three skills in this optional client-discovery handoff are deployable:
+`stakeholder-requirements-elicitation`,
+`requirements-synthesis-validation`, and `implementation-slice-briefing` are
+retired. Sirius now enters this path after the responsible external process has
+gathered evidence and validated the needed decisions.
 
-```text
-stakeholder-requirements-elicitation
-  → requirements-synthesis-validation
-  → inception, use-case modeling, behavior-driven-specification when examples
-    are needed, and selected analysis/design
-  → implementation-slice-briefing
-  → test-driven-implementation
-```
+`assess-development-input` can assess externally produced requirements-shaped
+material and select one Sirius entry point. It cannot gather stakeholder
+evidence, validate requirements, or invent a missing handoff. When those gaps
+block progress, it returns an external prerequisite.
 
-`assess-development-input` provides a smaller, method-independent entry point
-when requirements-shaped material already exists. It can assess outputs from
-these skills or any other external discovery and specification method. It
-cannot gather stakeholder evidence, validate requirements, or prepare an
-implementation brief for them.
-
-The [Client to Code track](tracks/client-to-code.md) is the active handoff
-guide. The
-[client-discovery idea](../docs/ideas/client-discovery-skills.md)
-records the skill-family rationale and implementation history.
+The [Client to Code track](tracks/client-to-code.md) documents the active route
+from externally validated input to analysis and implementation. The
+[client-discovery idea](../docs/ideas/client-discovery-skills.md) preserves the
+retired skill-family rationale and implementation history.
 
 The [workflow tracks](tracks/) define when to select each skill.

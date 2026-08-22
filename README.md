@@ -133,8 +133,8 @@ and boundary. Common compositions are documented as workflow tracks:
 - [Reverse Engineering](catalog/tracks/reverse-engineering.md)
 - [Iterative Analysis and Design](catalog/tracks/iterative-analysis-design.md)
 - [Implementation and Evolution](catalog/tracks/implementation-evolution.md)
-- [Client to Code](catalog/tracks/client-to-code.md), from stakeholder evidence
-  through validated requirements to a traceable implementation slice brief
+- [Client to Code](catalog/tracks/client-to-code.md), from externally validated
+  stakeholder input to bounded analysis and implementation
 
 The [Skill Relationships](catalog/skill-relationships.md) views summarize
 normal handoffs and optional feedback paths. Select the smallest set of skills
@@ -174,9 +174,19 @@ are not Sirius catalog entries or named-profile members.
 `author-software-proposal` is retired. Existing legacy proposal artifacts
 remain valid at their migrated paths. Use `idea-refine` for new candidate
 directions. Route current-system claims to reverse engineering, scope and
-feasibility to `inception`, stakeholder authority to the client-discovery
-skills, acceptance behavior to `behavior-driven-specification`, and placement
-questions to `design-repository-artifact-layout`.
+feasibility to `inception`, unresolved stakeholder authority to the responsible
+external process, acceptance behavior to `behavior-driven-specification`, and
+placement questions to `design-repository-artifact-layout`.
+
+`stakeholder-requirements-elicitation`,
+`requirements-synthesis-validation`, and `implementation-slice-briefing` are
+retired. Existing evidence records, requirements briefs, and implementation
+briefs remain valid at their recorded revisions. Gather and validate stakeholder
+knowledge through the responsible external process. Use
+`assess-development-input` when externally produced material needs a Sirius
+readiness decision or entry point. Hand approved behavior or design directly to
+the narrowest analysis or implementation skill with its authority, non-goals,
+uncertainty, verification, and stop conditions intact.
 
 Use `walkthrough-me` when a reader needs a paced, read-only tour of a pull
 request, commit, commit range, branch diff, or staged, unstaged, or selected

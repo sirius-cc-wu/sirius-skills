@@ -151,7 +151,7 @@ def test_pilot_routing_cases_pass() -> None:
     report = evaluate_repository(REPO_ROOT)
 
     assert report.errors == []
-    assert report.case_files == 21
+    assert report.case_files == 18
     assert report.routing_checks >= 40
 
 

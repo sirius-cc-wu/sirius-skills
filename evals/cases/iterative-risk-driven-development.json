@@ -126,7 +126,7 @@
       "expectations": [
         "The original inception revision, approved feasibility boundary, later evidence, new consumer, and unresolved authority are explicit",
         "Tests and iteration records remain evidence and do not silently become approved requirements",
-        "The coordinator routes unclear readiness to assess-development-input and bounded evidence needing stakeholder-visible decisions to requirements-synthesis-validation",
+        "The coordinator routes unclear readiness to assess-development-input and stops for an external prerequisite when evidence needs stakeholder-visible decisions",
         "Reuse, a new consumer, and accumulated durable behavior trigger artifact-selection and promotion reassessment",
         "Artifact-layout design is selected only after a standalone owner is justified and no usable canonical home exists",
         "Implementation stops until material product intent and approval are resolved"

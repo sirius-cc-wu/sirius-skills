@@ -21,9 +21,6 @@ The initial pilot covers:
 - `select-technical-artifacts`;
 - `design-repository-artifact-layout`;
 - `record-architecture-decision`;
-- `stakeholder-requirements-elicitation`;
-- `requirements-synthesis-validation`;
-- `implementation-slice-briefing`;
 - `iterative-risk-driven-development`;
 - `operation-contracts`;
 - `grasp-responsibility-design`;
