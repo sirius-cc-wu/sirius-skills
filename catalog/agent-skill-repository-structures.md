@@ -639,7 +639,6 @@ package "Risk-driven development" #EEF8EE {
 }
 
 package "Repository workflow" #F3EEFF {
-  component "simplify" as sSimplify
   component "commit" as sCommit
   component "create-pr" as sPr
 }
@@ -668,8 +667,7 @@ sIterative ..> sAdr : consequential decision
 sIterative ..> sDesign : boundary and responsibilities
 sIterative ..> sRust : Rust lifecycle pressure
 sRust ..> sDesign : ownership feedback
-sIterative --> sSimplify : changed code
-sSimplify --> sCommit
+sIterative --> sCommit : prepared change
 sCommit --> sPr
 @enduml
 ```

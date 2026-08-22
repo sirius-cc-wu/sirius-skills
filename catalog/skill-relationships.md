@@ -51,7 +51,7 @@ rectangle "**Iterative Risk-Driven Development**\niterative-risk-driven-developm
 
 rectangle "**Implementation and Evolution**\ntest-driven-implementation\nbehavior-preserving-refactoring" as implementation #FFF5EA
 
-rectangle "**Repository Workflow**\nwalkthrough-me\nsimplify\ncommit\ncreate-pr" as repository #F3EEFF
+rectangle "**Repository Workflow**\nwalkthrough-me\ncommit\ncreate-pr" as repository #F3EEFF
 
 rectangle "**Cross-cutting Support**\nselect-technical-artifacts\ndesign-repository-artifact-layout\nrecord-architecture-decision" as support #FFFBEA
 
@@ -120,8 +120,8 @@ design.
 - Start with **Implementation and Evolution** when the behavior or local
   structural change is sufficiently bounded.
 - Use **Repository Workflow** for a paced tour of a pull request, commit,
-  branch, or local change, or after verification and authorization for cleanup,
-  recording, or publication.
+  branch, or local change, or after verification and authorization for
+  recording or publication.
 - Use `select-technical-artifacts` across tracks when candidate knowledge needs
   a disposition: `create`, `update`, `embed`, `keep-with-implementation`,
   `omit`, or `defer`.
@@ -361,16 +361,14 @@ package "Implementation and Evolution" #FFF5EA {
 
 package "Repository Workflow" #F3EEFF {
   rectangle "walkthrough-me" as walkthrough
-  rectangle "simplify" as simplify
   rectangle "commit" as commit
   rectangle "create-pr" as createpr
 }
 
 oracle --> implementation
 implementation --> refactoring : green baseline
-implementation ..> simplify : optional cleanup
-refactoring ..> simplify : optional cleanup
-simplify --> commit
+implementation --> commit : prepared change
+refactoring --> commit : prepared change
 commit --> createpr
 incoming --> walkthrough
 walkthrough ..> readerNext : context only

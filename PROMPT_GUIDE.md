@@ -23,11 +23,6 @@ only the first section, and do not edit or stage anything.
 ```
 
 ```text
-Use simplify on the current branch diff. Preserve behavior, keep changes within
-the files already touched, and run the focused test suite afterward.
-```
-
-```text
 Use commit to review and commit only the retry fix. Follow this repository's
 configured commit format and exclude unrelated working-tree changes.
 ```

@@ -9,6 +9,11 @@ description: Improves internal code and design through risk-calibrated, verified
 
 Improve internal structure through one independently reviewable transformation at a time, or through an explicitly bounded batch of homogeneous mechanical edits. Rerun relevant checks after each verified step while preserving public contracts, observable results, state transitions, side effects, and error behavior.
 
+Read [Configuration Surface Governance](references/config-surface-governance.md)
+when the refactoring touches configuration, startup, compatibility boundaries,
+environment injection, or test harness inputs. Preserve existing typed owners
+and route a material process-global boundary change to iterative coordination.
+
 ## When to Use
 
 - Remove duplication, clarify expressions or names, shorten long routines, replace unexplained literals, or simplify control flow.

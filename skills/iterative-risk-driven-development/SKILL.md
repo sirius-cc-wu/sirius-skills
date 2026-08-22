@@ -111,14 +111,11 @@ mandatory artifact sequence, programming paradigm, or phase checklist.
    component check is the current result. Distinguish completed evidence from
    human-owned or unavailable validation. Do not close the parent outcome or
    commit an iteration when its stated exit evidence failed.
-11. **Simplify changed code.** If source or test code changed, use
-    [Simplify](../simplify/SKILL.md) within the iteration scope. Rerun the
-    affected validation.
-12. **Commit once per iteration when authorized.** If the user authorized a
+11. **Commit once per iteration when authorized.** If the user authorized a
     commit, use [Commit](../commit/SKILL.md) with scoped staging. Create at most
     one commit for the current iteration. Do not amend, push, or publish without
     matching authority.
-13. **Apply the execution mode.** In single-iteration mode, report the
+12. **Apply the execution mode.** In single-iteration mode, report the
     objective, canonical changes, validation, commit, and residual risk, then
     stop. In continuous mode, report the current result, choose the next
     objective, and continue until the requested work or an explicit stop
@@ -295,7 +292,6 @@ deferred or changed after the objective was defined.
 - [ ] Required validation passed, or human-owned checks remain explicit.
 - [ ] Focused checks did not displace a material integration or end-to-end
       oracle, and enabling results were not reported as the parent outcome.
-- [ ] Changed source and tests received a scoped simplification pass.
 - [ ] Each iteration created at most one authorized, scoped commit.
 - [ ] Continuous mode continued only under the user's request. Single mode
       stopped after one commit.

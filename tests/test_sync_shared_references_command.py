@@ -16,7 +16,7 @@ def test_sync_updates_only_supported_skill_consumers(
     assert sync_shared_references.main([]) == 0
 
     expected_targets = {
-        tmp_path / "skills/simplify/references/config-surface-governance.md"
+        tmp_path / "skills/behavior-preserving-refactoring/references/config-surface-governance.md"
     }
     assert {path for path in tmp_path.rglob("config-surface-governance.md")} == {
         source,

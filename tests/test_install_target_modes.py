@@ -31,7 +31,6 @@ PROFILE_NAMES = (
     "all",
 )
 WORKFLOW_SKILLS = {
-    "simplify",
     "create-pr",
     "commit",
     "walkthrough-me",
@@ -42,7 +41,6 @@ ITERATIVE_DESIGN_SKILLS = {
     "design-repository-artifact-layout",
     "record-architecture-decision",
     "commit",
-    "simplify",
     "iterative-risk-driven-development",
     "stakeholder-requirements-elicitation",
     "requirements-synthesis-validation",
@@ -392,4 +390,4 @@ def test_validation_covers_the_consolidated_catalog() -> None:
     )
 
     assert result.returncode == 0, result.stdout
-    assert "Validated 31 skills" in result.stdout
+    assert "Validated 30 skills" in result.stdout

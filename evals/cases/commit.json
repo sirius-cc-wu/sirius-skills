@@ -21,8 +21,8 @@
         "owner": "create-pr"
       },
       {
-        "prompt": "Simplify this branch diff while preserving behavior before review",
-        "owner": "simplify"
+        "prompt": "Refactor this module in verified steps while preserving behavior",
+        "owner": "behavior-preserving-refactoring"
       }
     ]
   },

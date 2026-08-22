@@ -1,6 +1,6 @@
 # Configuration Surface Governance
 
-Read this reference when planning, reviewing, or simplifying work that touches
+Read this reference when planning, reviewing, or refactoring work that touches
 configuration, startup, compatibility boundaries, environment injection, or
 test harness inputs.
 

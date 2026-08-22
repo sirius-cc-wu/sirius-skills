@@ -25,8 +25,8 @@
         "owner": "reconstruct-software-architecture"
       },
       {
-        "prompt": "Simplify the current PR diff and modify the code while preserving its behavior",
-        "owner": "simplify"
+        "prompt": "Refactor duplicated code in the changed module while preserving its verified behavior",
+        "owner": "behavior-preserving-refactoring"
       },
       {
         "prompt": "Stage my intended unstaged files and create a scoped git commit",

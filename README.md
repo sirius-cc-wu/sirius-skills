@@ -9,7 +9,7 @@ without turning the catalog into a mandatory lifecycle.
 
 ## Install
 
-Install the four generic repository workflow skills into a target project by
+Install the three generic repository workflow skills into a target project by
 default:
 
 ```bash
@@ -34,8 +34,8 @@ Available profiles are defined in [`skill-sets/`](skill-sets/):
 
 | Profile | Purpose |
 |---|---|
-| `workflow` | Interactive change walkthroughs, integrated change-set simplification, scoped commits, and pull-request publication |
-| `iterative-design` | External-input assessment, technical-artifact selection, architecture-decision recording, artifact-layout design, question-driven iterations, boundary-sensitive refactoring gates, native responsibility and optional object design, language adaptation, tested implementation, simplification, and scoped commits |
+| `workflow` | Interactive change walkthroughs, scoped commits, and pull-request publication |
+| `iterative-design` | External-input assessment, technical-artifact selection, architecture-decision recording, artifact-layout design, question-driven iterations, boundary-sensitive refactoring gates, native responsibility and optional object design, language adaptation, tested implementation, and scoped commits |
 | `applying-uml-and-patterns` | Compatibility alias for `iterative-design` |
 | `reverse-engineering` | Evidence-driven system survey, behavior and architecture recovery, recorded-decision discovery, recovered-artifact selection, reconciliation, and durable placement |
 | `all` | Every active Sirius skill in the catalog, plus the pinned Addy add-ons |
@@ -186,12 +186,11 @@ concise code locators and
 waits for explicit confirmation before advancing. It establishes understanding
 without approving, committing, or replacing formal code review.
 
-Use `simplify` after a coherent implementation, normally once before opening a
-pull request rather than after every commit. It inspects the final integrated
-change across the pull-request diff or the branch delta from its merge base,
-plus intended staged, unstaged, and selected untracked work. It adapts Addy Osmani's
-code-simplification method while retaining Sirius scope, configuration,
-formatter-containment, and authority boundaries.
+`simplify` is retired. Use `behavior-preserving-refactoring` for an intentional,
+verified local structural improvement. For an already prepared change, run the
+repository's formatting and validation commands directly before using `commit`.
+Use the external `code-review-and-quality` add-on when a formal review is
+needed.
 
 Use `record-architecture-decision` when one consequential architecture choice
 needs a short, discoverable ADR or when maintainers need to find which recorded

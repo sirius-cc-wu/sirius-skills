@@ -1,7 +1,7 @@
 # Repository Workflow
 
 Use this track to understand a pull request, commit, branch, or local change,
-or to refine, record, and publish an already implemented change. The skills
+or to record and publish an already implemented change. The skills
 remain independently selectable; each sequence is a common handoff, not
 authority to perform later review or publication steps without the user's
 request.
@@ -35,19 +35,18 @@ skill, not a Sirius catalog entry or lifecycle gate.
    guidance. For behavior changes, the
    [implementation and evolution track](implementation-evolution.md) can supply
    a test-first implementation or behavior-preserving refactoring workflow.
-2. Use [`simplify`](../../skills/simplify/SKILL.md) normally once after the
-   implementation is coherent. Inspect the final integrated branch or
-   pull-request change set across commits, plus intended local work, while
-   preserving observable behavior. Per-commit simplification remains optional.
-3. Use [`commit`](../../skills/commit/SKILL.md) when a prepared change still
+2. Use [`commit`](../../skills/commit/SKILL.md) when a prepared change still
    needs to be recorded. Review repository state, run proportional
    verification, and stage only the intended files.
-4. Use [`create-pr`](../../skills/create-pr/SKILL.md) when committed work is
+3. Use [`create-pr`](../../skills/create-pr/SKILL.md) when committed work is
    ready to publish for review. Confirm base, head, push state, duplicate pull
    requests, title conventions, and validation evidence.
 
-Each step requires the authority appropriate to its effects. Selecting
-`simplify` does not implicitly authorize a commit, push, or pull request.
+Each step requires the authority appropriate to its effects. `simplify` is
+retired. Use
+[`behavior-preserving-refactoring`](../../skills/behavior-preserving-refactoring/SKILL.md)
+for an intentional, verified local structural improvement before returning to
+this track.
 
 ## Governance feedback
 
