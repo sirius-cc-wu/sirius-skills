@@ -58,14 +58,37 @@ package "Integrate and ship" as addyShipPhase #F2F2F2 {
 
 rectangle "**Sirius: Intake**\nassess-development-input" as assess #FFF4CC
 
-rectangle "**Iterative Risk-Driven Development**\niterative-risk-driven-development\ninception\nuse-case-modeling\ndomain-modeling\nsystem-sequence-diagrams\noperation-contracts\ngrasp-responsibility-design\nuse-case-realization\numl-class-diagram-design\ndesign-pattern-application\nsoftware-design-language-adaptation\ndesign-rust-lifecycles" as design #EEF8EE
+rectangle "**Iterative Coordination**\niterative-risk-driven-development" as iterative #DCEEFF
+
+package "Requirements Analysis" as requirements #EAF4FB {
+  rectangle "inception" as inception
+  rectangle "use-case-modeling" as usecases
+}
+
+package "System Analysis" as systemAnalysis #EEF8EE {
+  rectangle "domain-modeling" as domain
+  rectangle "system-sequence-diagrams" as ssd
+  rectangle "operation-contracts" as contracts
+}
+
+package "Software/System Design" as softwareDesign #F3EEFF {
+  rectangle "grasp-responsibility-design" as grasp
+  rectangle "use-case-realization" as realization
+  rectangle "uml-class-diagram-design" as classdiagram
+  rectangle "design-pattern-application" as patterns
+}
+
+package "Detailed Design" as detailedDesign #FFFBEA {
+  rectangle "software-design-language-adaptation" as language
+  rectangle "design-rust-lifecycles" as rust
+}
 
 rectangle "**Repository Workflow**\nwalkthrough-me\ncreate-pr" as repository #F3EEFF
 
 rectangle "**Cross-cutting Support**\nselect-technical-artifacts\ndesign-repository-artifact-layout" as support #FFFBEA
 
-assess -[hidden]right-> design
-design -[hidden]right-> support
+assess -[hidden]right-> iterative
+iterative -[hidden]right-> support
 
 addyInterview --> addyIdea : confirmed intent
 addyIdea --> addySpec : confirmed direction
@@ -73,18 +96,31 @@ addyIdea ..> assess : refined input; route unclear
 addyInterview ..> assess : intent concrete; route unclear
 addySpec ..> assess : implementation-ready input
 addySpec ..> addyTdd : approved behavior
-assess ..> design
+assess ..> iterative : coordination needed
+assess ..> requirements : scope or behavior
+assess ..> systemAnalysis : analysis question
+assess ..> softwareDesign : design question
+assess ..> detailedDesign : implementation-facing design
 assess ..> refactoring : bounded structural request
 assess ..> addyTdd : approved oracle
-design ..> refactoring : established structural change
-design --> addyTdd : approved behavior
-design ..> addyDocs : consequential decision
-refactoring ..> design : durable feedback
-addyTdd ..> design : durable feedback
+iterative ..> requirements : selected scope
+iterative ..> systemAnalysis : selected analysis
+iterative ..> softwareDesign : selected design
+iterative ..> detailedDesign : selected detail
+requirements ..> systemAnalysis : selected scenario
+systemAnalysis ..> softwareDesign : analysis evidence
+softwareDesign ..> detailedDesign : implementation forces
+softwareDesign ..> refactoring : established structural change
+softwareDesign ..> addyTdd : approved design
+detailedDesign ..> addyTdd : adapted design
+iterative ..> addyDocs : consequential decision
+refactoring ..> softwareDesign : durable design feedback
+refactoring ..> detailedDesign : language or lifecycle feedback
+addyTdd ..> softwareDesign : durable design feedback
 addyTdd --> addyReview : review before merge
 addyReview ..> addySimplify : clarity finding
 addyReview ..> refactoring : structural finding
-addyReview ..> design : boundary finding
+addyReview ..> iterative : boundary finding
 addySimplify ..> addyReview : substantive change
 refactoring ..> addyReview : substantive change
 addyTdd ..> addyGit : prepared change
@@ -164,7 +200,13 @@ implementation-facing design.
 - Start with **Iterative Analysis and Design** when an approved change needs a
   bounded behavior, analysis, design, language, or implementation iteration,
   or when a complex refactoring moves a system, test, responsibility, runtime,
-  resource, or verification boundary.
+  resource, or verification boundary. Within that route:
+  - use **Requirements Analysis** for scope, actors, goals, and scenarios;
+  - use **System Analysis** for domain concepts, system events, and state
+    effects;
+  - use **Software/System Design** for responsibilities, collaborations,
+    software structure, and justified patterns; and
+  - use **Detailed Design** for target-language and runtime realization.
 - Start with **Implementation and Evolution** when the behavior is sufficiently
   bounded. With the `all` installation, use external
   `test-driven-development` for behavior implementation.
@@ -252,8 +294,8 @@ and historical iteration records remain evidence. Reuse, a new consumer, or a
 stretched approval boundary triggers a fresh readiness and artifact-promotion
 check before implementation continues.
 
-The coordinator can select requirements, analysis, native responsibility,
-optional object-design, implementation, verification, and Rust lifecycle
+The coordinator can select requirements analysis, system analysis,
+software/system design, detailed design, implementation, and verification
 methods. It does not require a complete object-design chain. For a
 boundary-sensitive refactoring, it retains the system boundary, representative
 vertical scenario, native responsibility assignment, ownership consequences,
@@ -290,22 +332,25 @@ skinparam rectangle<<coordinator>> {
 
 rectangle "iterative-risk-driven-\ndevelopment" as iterative <<coordinator>>
 
-package "Requirements and analysis" #EEF8EE {
+package "Requirements Analysis" #EAF4FB {
   rectangle "inception" as inception
   rectangle "use-case-modeling" as usecases
+}
+
+package "System Analysis" #EEF8EE {
   rectangle "domain-modeling" as domain
   rectangle "system-sequence-diagrams" as ssd
   rectangle "operation-contracts" as contracts
 }
 
-package "Optional responsibility and object design" #F3EEFF {
+package "Software/System Design" #F3EEFF {
   rectangle "grasp-responsibility-\ndesign" as grasp
   rectangle "use-case-realization" as realization
   rectangle "uml-class-diagram-\ndesign" as classdiagram
   rectangle "design-pattern-\napplication" as patterns
 }
 
-package "Implementation-facing design" #FFFBEA {
+package "Detailed Design" #FFFBEA {
   rectangle "software-design-language-\nadaptation" as language
   rectangle "design-rust-\nlifecycles" as rust
 }
@@ -338,6 +383,14 @@ language ..> rust : Rust lifecycle pressure
 rust ..> grasp : ownership feedback
 @enduml
 ```
+
+The groups classify knowledge ownership, not mandatory phases. Requirements
+Analysis defines approved scope and observable scenarios. System Analysis
+models domain vocabulary, system events, and state effects. Software/System
+Design assigns technology-neutral responsibilities, collaborations, structure,
+and variation. Detailed Design maps that intent into target-language and
+runtime semantics. The current Software/System Design group does not claim a
+general architecture specialist.
 
 A local backend, constructor, settings seam, or lifecycle handle can complete
 one iteration without completing its parent feature. Retain the representative
@@ -488,10 +541,14 @@ skinparam rectangle<<coordinator>> {
   BackgroundColor #DCEEFF
   BorderColor #2F6690
 }
-package "Risk-driven development knowledge" #EEF8EE {
-  rectangle "iterative-risk-driven-\ndevelopment" as iterative <<coordinator>>
+rectangle "iterative-risk-driven-\ndevelopment" as iterative <<coordinator>>
+
+package "System Analysis" #EEF8EE {
   rectangle "domain-modeling" as domain
   rectangle "operation-contracts" as contracts
+}
+
+package "Software/System Design" #F3EEFF {
   rectangle "grasp-responsibility-\ndesign" as grasp
   rectangle "use-case-realization +\numl-class-diagram-design" as designviews
   rectangle "design-pattern-\napplication" as patterns
@@ -508,6 +565,7 @@ patterns ..> designviews : participants or dependencies change
 evidence ..> contracts : postcondition changes
 evidence ..> designviews : responsibility, collaboration, or interface changes
 
+refactoring ..> iterative : boundary change
 refactoring ..> grasp : responsibility or coupling pressure
 refactoring ..> patterns : justified variation pressure
 refactoring ..> designviews : durable structure changes

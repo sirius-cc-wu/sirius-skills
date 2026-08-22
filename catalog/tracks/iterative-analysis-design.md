@@ -48,32 +48,33 @@ behavior gains reuse, a new consumer, or an independent lifecycle.
 
 Choose the narrowest specialist for each material question:
 
-| Current question or force | Candidate owner |
-|---|---|
-| Whether candidate knowledge should be created, updated, embedded, kept with implementation, omitted, or deferred | [`select-technical-artifacts`](../../skills/select-technical-artifacts/SKILL.md) |
-| Canonical repository homes, lifecycle separation, or artifact migration | [`design-repository-artifact-layout`](../../skills/design-repository-artifact-layout/SKILL.md) |
-| One consequential architecture choice needs proposed review, accepted history, or supersession | External `documentation-and-adrs` with the `all` installation; otherwise repository-native ADR guidance |
-| Vision, feasibility, project scope, or major business risk | [`inception`](../../skills/inception/SKILL.md) |
-| Actors, goals, system boundary, or scenario flow | [`use-case-modeling`](../../skills/use-case-modeling/SKILL.md) |
-| Business concepts and shared vocabulary | [`domain-modeling`](../../skills/domain-modeling/SKILL.md) |
-| Actor-system events and operation names | [`system-sequence-diagrams`](../../skills/system-sequence-diagrams/SKILL.md) |
-| Non-trivial state effects and invariants | [`operation-contracts`](../../skills/operation-contracts/SKILL.md) |
-| Native software responsibility, cohesion, coupling, coordination, or dependency direction | [`grasp-responsibility-design`](../../skills/grasp-responsibility-design/SKILL.md) |
-| Detailed internal collaboration for one selected scenario | [`use-case-realization`](../../skills/use-case-realization/SKILL.md) |
-| Stable object-oriented structure that needs a summary | [`uml-class-diagram-design`](../../skills/uml-class-diagram-design/SKILL.md) |
-| Demonstrated creation, structural, communication, or variation pressure | [`design-pattern-application`](../../skills/design-pattern-application/SKILL.md) |
-| General mapping into a target language and runtime | [`software-design-language-adaptation`](../../skills/software-design-language-adaptation/SKILL.md) |
-| Rust ownership, transfer, startup, rollback, cancellation, or cleanup | [`design-rust-lifecycles`](../../skills/design-rust-lifecycles/SKILL.md) |
-| A bounded approved behavior with an independent verification oracle and no remaining coordination need | External `test-driven-development` with the `all` installation; otherwise repository-native implementation and verification |
+| Group | Current question or force | Candidate owner |
+|---|---|---|
+| Cross-cutting Support | Whether candidate knowledge should be created, updated, embedded, kept with implementation, omitted, or deferred | [`select-technical-artifacts`](../../skills/select-technical-artifacts/SKILL.md) |
+| Cross-cutting Support | Canonical repository homes, lifecycle separation, or artifact migration | [`design-repository-artifact-layout`](../../skills/design-repository-artifact-layout/SKILL.md) |
+| Cross-cutting Support | One consequential architecture choice needs proposed review, accepted history, or supersession | External `documentation-and-adrs` with the `all` installation; otherwise repository-native ADR guidance |
+| Requirements Analysis | Vision, feasibility, project scope, or major business risk | [`inception`](../../skills/inception/SKILL.md) |
+| Requirements Analysis | Actors, goals, system boundary, or scenario flow | [`use-case-modeling`](../../skills/use-case-modeling/SKILL.md) |
+| System Analysis | Business concepts and shared vocabulary | [`domain-modeling`](../../skills/domain-modeling/SKILL.md) |
+| System Analysis | Actor-system events and operation names | [`system-sequence-diagrams`](../../skills/system-sequence-diagrams/SKILL.md) |
+| System Analysis | Non-trivial state effects and invariants | [`operation-contracts`](../../skills/operation-contracts/SKILL.md) |
+| Software/System Design | Native software responsibility, cohesion, coupling, coordination, or dependency direction | [`grasp-responsibility-design`](../../skills/grasp-responsibility-design/SKILL.md) |
+| Software/System Design | Detailed internal collaboration for one selected scenario | [`use-case-realization`](../../skills/use-case-realization/SKILL.md) |
+| Software/System Design | Stable object-oriented structure that needs a summary | [`uml-class-diagram-design`](../../skills/uml-class-diagram-design/SKILL.md) |
+| Software/System Design | Demonstrated creation, structural, communication, or variation pressure | [`design-pattern-application`](../../skills/design-pattern-application/SKILL.md) |
+| Detailed Design | General mapping into a target language and runtime | [`software-design-language-adaptation`](../../skills/software-design-language-adaptation/SKILL.md) |
+| Detailed Design | Rust ownership, transfer, startup, rollback, cancellation, or cleanup | [`design-rust-lifecycles`](../../skills/design-rust-lifecycles/SKILL.md) |
+| Implementation and Evolution | A bounded approved behavior with an independent verification oracle and no remaining coordination need | External `test-driven-development` with the `all` installation; otherwise repository-native implementation and verification |
 
 Several specialists may contribute to one iteration only when they answer the
 same objective. Do not create one artifact merely because another artifact can
 feed it.
 
 The coordinator selects the narrowest specialists for each material question.
-It can coordinate requirements, analysis, native responsibility design,
-optional object design, implementation, verification, and Rust lifecycle design
-in one risk-sized loop. It does not require a complete object-design chain.
+It can coordinate requirements analysis, system analysis, software/system
+design, detailed design, implementation, and verification in one risk-sized
+loop. These groups classify responsibility; they do not require a complete
+design chain.
 
 ## Boundary-Sensitive Refactoring
 
