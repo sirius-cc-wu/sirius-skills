@@ -11,7 +11,7 @@
         "top_k": 3
       },
       {
-        "prompt": "Given this externally produced specification, decide whether it needs inception, use cases, system recovery, or can go straight to repository-native implementation.",
+        "prompt": "Given this externally produced specification, decide whether it needs inception, use cases, system recovery, or can go straight to an external or repository-native implementation process.",
         "top_k": 3
       }
     ],

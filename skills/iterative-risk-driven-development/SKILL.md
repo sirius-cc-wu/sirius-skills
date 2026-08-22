@@ -63,8 +63,9 @@ mandatory artifact sequence, programming paradigm, or phase checklist.
    and forward design. Stop for a responsible external recovery process when
    current-system understanding lacks evidence. Use
    `grasp-responsibility-design` when native responsibility or dependency
-   placement is unclear. Implement bounded approved behavior with the
-   repository's native verification workflow. Use
+   placement is unclear. With the `all` installation, use external
+   `test-driven-development` for bounded approved behavior. Otherwise, follow
+   the repository's native implementation and verification workflow. Use
    `behavior-preserving-refactoring` for verified structural improvement.
    Prefer a direct repository-native workflow when no coordination remains.
 5. **Apply the boundary-sensitive refactoring gate.** When the change creates

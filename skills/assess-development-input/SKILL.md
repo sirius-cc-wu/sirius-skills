@@ -1,6 +1,6 @@
 ---
 name: assess-development-input
-description: Assesses requirements-shaped input from external or mixed workflows and decides whether its content is ready for inception, use-case modeling, architecture-decision recording, iterative design, or repository-native implementation, or still needs external current-system recovery, while preserving source meaning, approval state, and unresolved uncertainty. Use when intent statements, specifications, proposals, BDD scenarios, story maps, brainstorm notes, issue descriptions, or similar material exist but their readiness and correct Sirius entry point are unclear.
+description: Assesses requirements-shaped input from external or mixed workflows and decides whether its content is ready for inception, use-case modeling, architecture-decision recording, iterative design, or an external or repository-native implementation process, or still needs external current-system recovery, while preserving source meaning, approval state, and unresolved uncertainty. Use when intent statements, specifications, proposals, BDD scenarios, story maps, brainstorm notes, issue descriptions, or similar material exist but their readiness and correct Sirius entry point are unclear.
 ---
 
 # Assess Development Input
@@ -53,9 +53,9 @@ with an explicit prerequisite when no route can responsibly proceed.
 4. **Select one owner.** Use the routing guide below to choose the narrowest
    Sirius skill that owns the decision. Prefer a specialist over a coordinator
    when the gap is localized. When no active Sirius specialist is needed, name
-   the repository-native implementation process. If requester intent or the
-   candidate direction is unconfirmed, name external clarification or idea
-   refinement as the prerequisite. Do not force a Sirius owner.
+   the available external or repository-native implementation process. If
+   requester intent or the candidate direction is unconfirmed, name external
+   clarification or idea refinement as the prerequisite. Do not force a Sirius owner.
 5. **Assess readiness.** Mark the input `ready`, `needs prerequisite`, or
    `blocked` for the selected route. Base the status on visible content,
    evidence, and approval. Do not use a numeric confidence or completeness
@@ -91,7 +91,7 @@ method or file format never determines the route.
 | Creation, structural, communication, or variation forces justify pattern selection | `design-pattern-application` |
 | A language-neutral design needs idiomatic language-specific adaptation | `software-design-language-adaptation` |
 | Approved Rust behavior has material ownership, startup, rollback, cancellation, or cleanup risk | `design-rust-lifecycles` |
-| A bounded approved behavior has an independent oracle and needs no Sirius analysis or design coordination | Repository-native implementation and verification |
+| A bounded approved behavior has an independent oracle and needs no Sirius analysis or design coordination | External `test-driven-development` with the `all` installation; otherwise repository-native implementation and verification |
 | Observable behavior is protected and only internal structure should change | `behavior-preserving-refactoring` |
 
 Use external `interview-me` when one requester's intent is unclear. Use
@@ -123,7 +123,7 @@ Established:
 Material uncertainty:
 - [gap, conflict, missing approval, or none]
 
-Recommended next route: `[one Sirius skill, repository-native process, or none while blocked]`
+Recommended next route: `[one Sirius skill, external add-on, repository-native process, or none while blocked]`
 
 Rationale:
 - [why that owner matches the first material gap]
@@ -182,8 +182,8 @@ tags: [intake, routing]
       not on the originating method or format.
 - [ ] Established decisions remain distinct from gaps, conflicts, inference,
       and missing approval.
-- [ ] Exactly one next Sirius skill, repository-native process, or external
-      prerequisite is recommended.
+- [ ] Exactly one next Sirius skill, external add-on, repository-native process,
+      or external prerequisite is recommended.
 - [ ] The rationale names the first material decision owned by that route.
 - [ ] No requirement, approval, current-system fact, or verification oracle was
       invented or silently upgraded.

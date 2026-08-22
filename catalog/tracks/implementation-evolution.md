@@ -10,10 +10,12 @@ use
 before entering this track.
 
 `test-driven-implementation` is retired. Existing behavior-slice evidence
-remains valid at its recorded revision. For new behavior, follow repository
-implementation and verification guidance directly. Use
-`iterative-risk-driven-development` when analysis, design, implementation,
-verification, or commit boundaries require coordination.
+remains valid at its recorded revision. With the `all` installation, use
+external
+[`test-driven-development`](https://github.com/addyosmani/agent-skills/blob/5a1b82d6445d1e2f0abeea1072851419a50c0e5c/skills/test-driven-development/SKILL.md)
+for new logic, bug fixes, and behavior changes. Otherwise, follow repository implementation and verification guidance
+directly. Use `iterative-risk-driven-development` when analysis, design,
+implementation, verification, or commit boundaries require coordination.
 
 ## Add or Change Behavior
 
@@ -32,10 +34,11 @@ verification, or commit boundaries require coordination.
    implementation-facing lifecycle. Establish the system boundary,
    representative scenario, native responsibilities, and verification oracle
    first when the change is boundary-sensitive.
-4. Follow repository-native implementation and verification guidance. Size one
-   coherent behavior change, establish checks that can detect an incorrect
-   result, implement the smallest sufficient change, and run proportional
-   regression checks.
+4. With the `all` installation, use external `test-driven-development`.
+   Otherwise, follow repository-native implementation and verification
+   guidance. Size one coherent behavior change, establish checks that can
+   detect an incorrect result, implement the smallest sufficient change, and
+   run proportional regression checks.
 5. Feed implementation discoveries back into durable requirements or design
    artifacts when their represented knowledge changes.
 

@@ -17,8 +17,8 @@ The existing pipeline starts after useful client knowledge already exists:
   and risks.
 - [`use-case-modeling`](../../skills/use-case-modeling/SKILL.md) expresses actor goals
   and system behavior.
-- Repository-native implementation starts from approved examples, requirements,
-  or contracts and must not guess missing business rules.
+- External or repository-native implementation starts from approved examples,
+  requirements, or contracts and must not guess missing business rules.
 
 The implemented loop is:
 

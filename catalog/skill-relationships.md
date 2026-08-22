@@ -7,7 +7,7 @@ current risk or complete the current behavior slice.
 ## Overview
 
 This diagram groups all 19 deployable Sirius skills by responsibility. It also
-shows six external Addy add-ons. The diagram shows only the main movement
+shows seven external Addy add-ons. The diagram shows only the main movement
 between groups. Use the detailed diagrams below for conditional routes. Solid
 arrows show normal handoffs. They do not require a fixed sequence. Dashed
 arrows show optional routing, support, or feedback.
@@ -39,6 +39,7 @@ package "External Addy add-ons\naddyosmani/agent-skills" as addy #F2F2F2 {
   rectangle "interview-me" as addyInterview <<external>>
   rectangle "idea-refine" as addyIdea <<external>>
   rectangle "spec-driven-development" as addySpec <<external>>
+  rectangle "test-driven-development" as addyTdd <<external>>
   rectangle "code-review-and-quality" as addyReview <<external>>
   rectangle "code-simplification" as addySimplify <<external>>
   rectangle "git-workflow-and-versioning" as addyGit <<external>>
@@ -62,13 +63,20 @@ addyIdea --> addySpec : confirmed direction
 addyIdea ..> assess : refined input; route unclear
 addyInterview ..> assess : intent concrete; route unclear
 addySpec ..> assess : implementation-ready input
+addySpec ..> addyTdd : approved behavior
 assess ..> design
 assess ..> implementation
+assess ..> addyTdd : approved oracle
 design --> implementation
+design ..> addyTdd : approved behavior
 implementation ..> design : durable feedback
+addyTdd ..> design : durable feedback
 implementation --> addyReview : review before merge
+addyTdd --> addyReview : review before merge
 implementation ..> addySimplify : optional clarity pass
+addyTdd ..> addySimplify : optional clarity pass
 implementation ..> addyGit : git or version guidance
+addyTdd ..> addyGit : prepared change
 addyReview ..> addySimplify : cleanup feedback
 addyReview ..> addyGit : prepared change
 addySimplify ..> addyGit : prepared change
@@ -76,13 +84,14 @@ addyReview --> repository
 addySimplify --> repository
 addyGit --> repository
 implementation --> repository
+addyTdd --> repository
 @enduml
 ```
 
 The gray nodes belong to Addy Osmani's external `agent-skills` collection. They
 are not part of the Sirius catalog or named profiles.
 `just install <target-project> all` or `just install-global all` installs the
-six curated add-ons; other profiles do not. The diagram shows one optional
+seven curated add-ons; other profiles do not. The diagram shows one optional
 composition. `interview-me` confirms one requester's intent.
 `idea-refine` turns that intent into a focused, user-confirmed candidate
 one-pager. `spec-driven-development` turns a confirmed direction into a
@@ -100,6 +109,10 @@ Use `spec-driven-development` when a confirmed direction needs an
 implementation-ready specification before Sirius intake and execution. Skip it
 when the existing development input already defines the required behavior and
 constraints.
+
+Use `test-driven-development` with the `all` installation when implementing new
+logic, fixing a bug, or changing behavior. Otherwise, use the consuming
+repository's implementation and verification workflow.
 
 Use `git-workflow-and-versioning` when prepared work needs standalone commit,
 branch, worktree, release, or semantic-version guidance. Selection does not
@@ -127,7 +140,8 @@ implementation-facing design.
   or when a complex refactoring moves a system, test, responsibility, runtime,
   resource, or verification boundary.
 - Start with **Implementation and Evolution** when the behavior or local
-  structural change is sufficiently bounded.
+  structural change is sufficiently bounded. With the `all` installation, use
+  external `test-driven-development` for behavior implementation.
 - Use **Repository Workflow** for a paced tour of a pull request, commit,
   branch, or local change, or after verification and authorization for
   pull-request publication.
@@ -176,7 +190,8 @@ external prerequisite. Route current-system claims that lack evidence to a
 responsible external recovery process. Route scope and feasibility to
 inception. Route approved actor goals and scenario flow to use-case modeling,
 non-trivial state effects to operation contracts, and a bounded approved oracle
-to repository-native implementation. Route one independently
+to external `test-driven-development` when the `all` installation is available;
+otherwise, use repository-native implementation. Route one independently
 consequential proposed, accepted, or superseding architecture choice to
 `record-architecture-decision`.
 
@@ -313,10 +328,11 @@ branch, or local change. Start effectful repository workflow only after
 verification and user authorization for its next effect.
 
 `test-driven-implementation` is retired. Existing behavior-slice evidence
-remains valid. Apply the consuming repository's implementation and verification
-guidance for new behavior. Use `iterative-risk-driven-development` when that
-work still needs Sirius analysis, design, verification, or iteration
-coordination.
+remains valid. With the `all` installation, use external
+`test-driven-development` for new behavior. Otherwise, apply the consuming
+repository's implementation and verification guidance. Use
+`iterative-risk-driven-development` when that work still needs Sirius analysis,
+design, verification, or iteration coordination.
 
 ```plantuml
 @startuml implementation-repository-skill-relationships
@@ -355,6 +371,7 @@ package "Implementation and Evolution" #FFF5EA {
 }
 
 package "External Addy add-ons" #F2F2F2 {
+  rectangle "test-driven-\ndevelopment" as addyTdd <<external>>
   rectangle "code-review-and-\nquality" as addyReview <<external>>
   rectangle "code-simplification" as addySimplify <<external>>
   rectangle "git-workflow-and-\nversioning" as addyGit <<external>>
@@ -366,17 +383,23 @@ package "Repository Workflow" #F3EEFF {
 }
 
 oracle --> implementation
+oracle ..> addyTdd : all profile
 implementation --> refactoring : green baseline
+addyTdd ..> refactoring : optional larger cleanup
 implementation ..> addyReview : review requested
+addyTdd ..> addyReview : review requested
 refactoring ..> addyReview : review requested
 implementation ..> addySimplify : optional clarity pass
+addyTdd ..> addySimplify : optional clarity pass
 refactoring ..> addySimplify : optional clarity pass
 addyReview ..> addySimplify : cleanup feedback
 implementation ..> addyGit : prepared change
+addyTdd ..> addyGit : prepared change
 refactoring ..> addyGit : prepared change
 addyReview ..> addyGit : prepared change
 addySimplify ..> addyGit : prepared change
 implementation ..> createpr : already committed
+addyTdd ..> createpr : already committed
 refactoring ..> createpr : already committed
 addyReview ..> createpr : reviewed, committed work
 addySimplify ..> createpr : verified, committed work
@@ -388,9 +411,10 @@ walkthrough ..> readerNext : context only
 
 `walkthrough-me` establishes paced comprehension of the selected change. It
 does not provide the independent review or reader decision shown as its
-optional next step. With the `all` installation, use `code-review-and-quality`
-for formal review, `code-simplification` for an optional verified clarity pass,
-and `git-workflow-and-versioning` for standalone commit or version guidance.
+optional next step. With the `all` installation, use `test-driven-development`
+for behavior implementation, `code-review-and-quality` for formal review,
+`code-simplification` for an optional verified clarity pass, and
+`git-workflow-and-versioning` for standalone commit or version guidance.
 Otherwise, follow repository guidance directly. None of these optional handoffs
 authorizes a later commit, push, or pull-request publication.
 
@@ -441,7 +465,7 @@ package "Risk-driven development knowledge" #EEF8EE {
 }
 
 package "Execution and evidence" #FFF5EA {
-  rectangle "Repository-native behavior\nimplementation" as implementation <<process>>
+  rectangle "External test-driven-development\nor repository-native implementation" as implementation <<process>>
   rectangle "behavior-preserving-\nrefactoring" as refactoring
 }
 

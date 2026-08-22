@@ -125,9 +125,10 @@ without introducing speculative traits or typestate.
 ```
 
 ```text
-Add this behavior from the approved examples by following the repository's
-implementation and verification guidance. Demonstrate that the focused checks
-detect the missing behavior, then run the relevant regression suite.
+With the `all` installation, use test-driven-development to add this behavior
+from the approved examples. Otherwise, follow the repository's implementation
+and verification guidance. Demonstrate that the focused checks detect the
+missing behavior, then run the relevant regression suite.
 ```
 
 ```text

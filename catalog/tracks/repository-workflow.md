@@ -39,8 +39,8 @@ gates.
 1. Implement and verify the requested outcome using the repository's own
    guidance. For behavior changes, the
    [implementation and evolution track](implementation-evolution.md) describes
-   repository-native behavior implementation and behavior-preserving
-   refactoring.
+   external or repository-native behavior implementation and
+   behavior-preserving refactoring.
 2. With the `all` installation, optionally use `code-simplification` on the
    recently changed scope. Preserve exact behavior and rerun affected checks.
 3. With the `all` installation, use `git-workflow-and-versioning` when a

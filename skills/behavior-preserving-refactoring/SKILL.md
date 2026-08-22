@@ -27,8 +27,9 @@ and route a material process-global boundary change to iterative coordination.
 
 ## Design Guidance
 
-- Follow repository-native implementation and verification guidance to add new
-  behavior or grow the executable safety net.
+- With the `all` installation, use external `test-driven-development` to add
+  new behavior or grow the executable safety net. Otherwise, follow
+  repository-native implementation and verification guidance.
 - Use [GRASP Responsibility Design](../grasp-responsibility-design/SKILL.md)
   when a smell indicates misplaced native responsibility, low cohesion, high
   coupling, or unclear dependency direction. The owner may be a class, module,
