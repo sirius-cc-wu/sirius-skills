@@ -8,8 +8,11 @@ request.
 
 When the `all` installation is available, optionally use Addy Osmani's external
 [`code-review-and-quality`](https://github.com/addyosmani/agent-skills/blob/5a1b82d6445d1e2f0abeea1072851419a50c0e5c/skills/code-review-and-quality/SKILL.md)
-before commit or pull-request publication. It remains an external review
-skill, not a Sirius catalog entry or lifecycle gate.
+before commit or pull-request publication. Use external
+[`code-simplification`](https://github.com/addyosmani/agent-skills/blob/5a1b82d6445d1e2f0abeea1072851419a50c0e5c/skills/code-simplification/SKILL.md)
+after checks pass when recently changed code needs a behavior-preserving
+clarity pass. Both remain external skills, not Sirius catalog entries or
+lifecycle gates.
 
 ## Interactive code-change tour
 
@@ -35,10 +38,12 @@ skill, not a Sirius catalog entry or lifecycle gate.
    guidance. For behavior changes, the
    [implementation and evolution track](implementation-evolution.md) can supply
    a test-first implementation or behavior-preserving refactoring workflow.
-2. Use [`commit`](../../skills/commit/SKILL.md) when a prepared change still
+2. With the `all` installation, optionally use `code-simplification` on the
+   recently changed scope. Preserve exact behavior and rerun affected checks.
+3. Use [`commit`](../../skills/commit/SKILL.md) when a prepared change still
    needs to be recorded. Review repository state, run proportional
    verification, and stage only the intended files.
-3. Use [`create-pr`](../../skills/create-pr/SKILL.md) when committed work is
+4. Use [`create-pr`](../../skills/create-pr/SKILL.md) when committed work is
    ready to publish for review. Confirm base, head, push state, duplicate pull
    requests, title conventions, and validation evidence.
 

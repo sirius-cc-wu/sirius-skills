@@ -38,7 +38,7 @@ applicable AGENTS.md with the narrowest enforceable rule. Avoid duplicating
 existing guidance or codifying a one-off incident.
 ```
 
-## Optional upstream intent and idea refinement
+## Optional external add-ons
 
 These skills come from Addy Osmani's external `agent-skills` collection. The
 `all` installation provides the curated add-on set; the skills remain outside
@@ -62,6 +62,12 @@ Preserve existing legacy proposals at their historical paths.
 Use code-review-and-quality before merging this change. Review correctness,
 readability, architecture, security, and performance; label findings by
 severity and report the verification evidence.
+```
+
+```text
+Use code-simplification on the recently changed code after the checks pass.
+Preserve exact behavior, follow local conventions, keep the pass within the
+changed scope, and rerun the affected checks after each simplification.
 ```
 
 ## Reverse engineering

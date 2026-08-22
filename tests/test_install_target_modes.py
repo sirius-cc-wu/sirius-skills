@@ -22,6 +22,7 @@ ADDY_SKILLS = {
     "interview-me",
     "idea-refine",
     "code-review-and-quality",
+    "code-simplification",
 }
 PROFILE_NAMES = (
     "workflow",

@@ -71,7 +71,7 @@ creates a per-skill compatibility link in the Antigravity directory without
 replacing unrelated entries. Global uninstallation and retired-skill cleanup
 remove only links that still point to their expected canonical installation.
 
-`just install <target-project> all` also installs the three skills listed in
+`just install <target-project> all` also installs the four skills listed in
 [`catalog/external-skill-sets/addy-osmani.txt`](catalog/external-skill-sets/addy-osmani.txt)
 from Addy Osmani's pinned agent-skills revision. They remain external to the
 Sirius catalog and are not installed by other profiles. The external install
@@ -187,10 +187,11 @@ waits for explicit confirmation before advancing. It establishes understanding
 without approving, committing, or replacing formal code review.
 
 `simplify` is retired. Use `behavior-preserving-refactoring` for an intentional,
-verified local structural improvement. For an already prepared change, run the
-repository's formatting and validation commands directly before using `commit`.
-Use the external `code-review-and-quality` add-on when a formal review is
-needed.
+verified local structural improvement. With the `all` installation, use the
+external `code-simplification` add-on for a behavior-preserving clarity pass on
+recently changed code. For an already prepared change, run the repository's
+formatting and validation commands directly before using `commit`. Use the
+external `code-review-and-quality` add-on when a formal review is needed.
 
 Use `record-architecture-decision` when one consequential architecture choice
 needs a short, discoverable ADR or when maintainers need to find which recorded
