@@ -6,11 +6,11 @@ current risk or complete the current behavior slice.
 
 ## Overview
 
-This diagram groups all 19 deployable Sirius skills by responsibility. It also
-shows 11 external add-ons from Addy Osmani, OpenAI, and HumanLayer. The diagram
-shows only the main movement between groups. Use the detailed diagrams below
-for conditional routes. Solid arrows show normal handoffs. They do not require a fixed sequence. Dashed
-arrows show optional routing, support, or feedback.
+This overview groups all 19 deployable Sirius skills and 11 external add-ons by
+responsibility. It uses group-level routes to keep the map readable. The
+detailed diagrams below preserve specialist handoffs and feedback. Solid arrows
+show common handoffs. Dashed arrows show conditional routing or support. Neither
+arrow style requires a fixed sequence.
 
 ```plantuml
 @startuml sirius-skills-birds-eye
@@ -23,8 +23,9 @@ skinparam linetype ortho
 skinparam defaultFontName Arial
 skinparam defaultTextAlignment center
 skinparam ArrowColor #52606D
-skinparam nodesep 35
-skinparam ranksep 45
+skinparam nodesep 30
+skinparam ranksep 40
+hide stereotype
 skinparam rectangle {
   BackgroundColor #FFFFFF
   BorderColor #52606D
@@ -34,124 +35,121 @@ skinparam rectangle<<external>> {
   BackgroundColor #F2F2F2
   BorderColor #888888
 }
-
-package "Define" as addyDefine #EAF4FB {
-  rectangle "interview-me" as addyInterview <<external>>
-  rectangle "idea-refine" as addyIdea <<external>>
-  rectangle "spec-driven-development" as addySpec <<external>>
+skinparam rectangle<<coordinator>> {
+  BackgroundColor #DCEEFF
+  BorderColor #2F6690
 }
 
-package "Implementation and Evolution" as implementationPhase #FFF5EA {
-  rectangle "doubt-driven-development" as addyDoubt <<external>>
-  rectangle "test-driven-development" as addyTdd <<external>>
+rectangle define <<external>> [
+**External · Define**
+interview-me
+idea-refine
+spec-driven-development
+]
+rectangle assess #FFF4CC [
+**Sirius · Intake**
+assess-development-input
+]
+rectangle iterative <<coordinator>> [
+**Sirius · Iterative Coordination**
+iterative-risk-driven-development
+]
+
+package "Question-Selected Analysis and Design" as analysis {
+  rectangle specialist [
+  Select only the specialist(s)
+  needed by the current question
+  ]
+  rectangle requirements #EAF4FB [
+  **Requirements Analysis**
+  inception
+  use-case-modeling
+  ]
+  rectangle systemAnalysis #EEF8EE [
+  **System Analysis**
+  domain-modeling
+  system-sequence-diagrams
+  operation-contracts
+  ]
+  rectangle softwareDesign #F3EEFF [
+  **Software/System Design**
+  design-software-architecture
+  grasp-responsibility-design
+  use-case-realization
+  uml-class-diagram-design
+  design-pattern-application
+  ]
+  rectangle detailedDesign #FFFBEA [
+  **Detailed Design**
+  software-design-language-adaptation
+  design-rust-lifecycles
+  ]
+
+  specialist -[hidden]down-> requirements
+  requirements -[hidden]right-> systemAnalysis
+  requirements -[hidden]down-> softwareDesign
+  softwareDesign -[hidden]right-> detailedDesign
 }
 
-package "Review" as reviewPhase #FFFBEA {
-  rectangle "code-review-and-quality" as addyReview <<external>>
-  rectangle "code-simplification" as addySimplify <<external>>
-  rectangle "behavior-preserving-refactoring" as refactoring
+package "Implementation, Review, and Repository Workflow" as delivery {
+  rectangle implementation <<external>> [
+  **External · Implementation and Evolution**
+  test-driven-development
+  doubt-driven-development
+  ]
+  rectangle review #FFFBEA [
+  **Review**
+  code-review-and-quality [external]
+  code-simplification [external]
+  behavior-preserving-refactoring [Sirius]
+  ]
+  rectangle integrate <<external>> [
+  **External · Integrate and Ship**
+  git-workflow-and-versioning
+  documentation-and-adrs
+  ]
+  rectangle repository #F3EEFF [
+  **Sirius · Repository Workflow**
+  walkthrough-me
+  create-pr
+  ]
+
+  implementation --> review : review when requested
+  review ..> integrate : prepared change
+  integrate ..> repository : publish when authorized
 }
 
-package "Integrate and ship" as addyShipPhase #F2F2F2 {
-  rectangle "git-workflow-and-versioning" as addyGit <<external>>
-  rectangle "documentation-and-adrs" as addyDocs <<external>>
+package "Independent Cross-Cutting Routes" as crosscutting {
+  rectangle support #FFFBEA [
+  **Sirius · Artifact Support**
+  select-technical-artifacts
+  design-repository-artifact-layout
+  ]
+  rectangle authoring <<external>> [
+  **External · Skill Authoring**
+  skill-creator
+  ]
+  rectangle visual <<external>> [
+  **External · Visual Explanation**
+  show-me
+  ]
+
+  support -[hidden]right-> authoring
+  authoring -[hidden]right-> visual
 }
 
-package "Skill Authoring" as openaiAuthoring #F2F2F2 {
-  rectangle "skill-creator" as openaiSkillCreator <<external>>
-}
+define --> assess : refined input
+assess ..> iterative : multi-boundary objective
+assess ..> specialist
+iterative ..> specialist
+specialist ..> implementation : approved behavior or design
+repository -[hidden]down-> support
 
-package "Visual Explanation" as humanlayerExplanation #F2F2F2 {
-  rectangle "show-me" as humanlayerShowMe <<external>>
-}
-
-rectangle "**Sirius: Intake**\nassess-development-input" as assess #FFF4CC
-
-rectangle "**Iterative Coordination**\niterative-risk-driven-development" as iterative #DCEEFF
-
-package "Requirements Analysis" as requirements #EAF4FB {
-  rectangle "inception" as inception
-  rectangle "use-case-modeling" as usecases
-}
-
-package "System Analysis" as systemAnalysis #EEF8EE {
-  rectangle "domain-modeling" as domain
-  rectangle "system-sequence-diagrams" as ssd
-  rectangle "operation-contracts" as contracts
-}
-
-package "Software/System Design" as softwareDesign #F3EEFF {
-  rectangle "design-software-architecture" as architecture
-  rectangle "grasp-responsibility-design" as grasp
-  rectangle "use-case-realization" as realization
-  rectangle "uml-class-diagram-design" as classdiagram
-  rectangle "design-pattern-application" as patterns
-}
-
-package "Detailed Design" as detailedDesign #FFFBEA {
-  rectangle "software-design-language-adaptation" as language
-  rectangle "design-rust-lifecycles" as rust
-}
-
-rectangle "**Repository Workflow**\nwalkthrough-me\ncreate-pr" as repository #F3EEFF
-
-rectangle "**Cross-cutting Support**\nselect-technical-artifacts\ndesign-repository-artifact-layout" as support #FFFBEA
-
-assess -[hidden]right-> iterative
-iterative -[hidden]right-> support
-
-addyInterview --> addyIdea : confirmed intent
-addyIdea --> addySpec : confirmed direction
-addyIdea ..> assess : refined input; route unclear
-addyInterview ..> assess : intent concrete; route unclear
-addySpec ..> assess : implementation-ready input
-addySpec ..> addyTdd : approved behavior
-assess ..> iterative : coordination needed
-assess ..> requirements : scope or behavior
-assess ..> systemAnalysis : analysis question
-assess ..> softwareDesign : design question
-assess ..> detailedDesign : implementation-facing design
-assess ..> refactoring : bounded structural request
-assess ..> addyTdd : approved oracle
-assess ..> addyDoubt : non-trivial claim
-assess ..> openaiSkillCreator : skill creation
-assess ..> humanlayerShowMe : visual explanation
-iterative ..> requirements : selected scope
-iterative ..> systemAnalysis : selected analysis
-iterative ..> softwareDesign : selected design
-iterative ..> detailedDesign : selected detail
-iterative ..> addyDoubt : adversarial check
-requirements ..> systemAnalysis : selected scenario
-systemAnalysis ..> softwareDesign : analysis evidence
-softwareDesign ..> detailedDesign : implementation forces
-softwareDesign ..> refactoring : established structural change
-softwareDesign ..> addyTdd : approved design
-detailedDesign ..> addyTdd : adapted design
-iterative ..> addyDocs : consequential decision
-refactoring ..> softwareDesign : durable design feedback
-refactoring ..> detailedDesign : language or lifecycle feedback
-addyTdd ..> softwareDesign : durable design feedback
-addyTdd ..> addyDoubt : non-trivial claim
-addyDoubt ..> addyTdd : behavioral finding
-addyDoubt ..> iterative : contract or design gap
-addyDoubt ..> addyReview : claim reconciled
-addyTdd --> addyReview : review before merge
-addyReview ..> addySimplify : clarity finding
-addyReview ..> refactoring : structural finding
-addyReview ..> iterative : boundary finding
-addySimplify ..> addyReview : substantive change
-refactoring ..> addyReview : substantive change
-addyTdd ..> addyGit : prepared change
-addyReview ..> addyGit : prepared change
-addySimplify ..> addyGit : prepared change
-refactoring ..> addyGit : prepared change
-addyReview --> repository
-addySimplify --> repository
-refactoring --> repository
-addyGit ..> addyDocs : decision or release context
-addyGit --> repository
-addyDocs --> repository
-addyTdd --> repository
+legend bottom
+  Dashed arrows are conditional routes.
+  Solid arrows are common handoffs.
+  No route is a required lifecycle.
+endlegend
 @enduml
 ```
 

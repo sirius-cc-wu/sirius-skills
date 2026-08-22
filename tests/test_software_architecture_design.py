@@ -52,5 +52,33 @@ def test_entry_and_iteration_routers_include_architecture_design() -> None:
 
     assert "design-software-architecture" in assessment
     assert "design-software-architecture" in iterative
-    assert 'rectangle "design-software-architecture" as architecture' in relationships
-    assert 'rectangle "design-software-\\narchitecture" as architecture' in relationships
+    assert "rectangle softwareDesign #F3EEFF [" in relationships
+    assert "design-software-architecture" in relationships
+    assert (
+        'rectangle "design-software-\\narchitecture" as architecture' in relationships
+    )
+
+
+def test_relationship_overview_stays_embedded_compact_and_rendered() -> None:
+    relationships = read("catalog/skill-relationships.md")
+    readme = read("README.md")
+    rendered_overview = read("catalog/skill-relationships.svg")
+    overview = relationships.split("@startuml sirius-skills-birds-eye", maxsplit=1)[
+        1
+    ].split("@enduml", maxsplit=1)[0]
+    external_names = {
+        line
+        for profile in (REPO_ROOT / "catalog/external-skill-sets").glob("*.txt")
+        for line in profile.read_text(encoding="utf-8").splitlines()
+        if line and not line.startswith("#")
+    }
+
+    assert relationships.count("```plantuml") == 4
+    assert overview.count("-->") + overview.count("..>") <= 10
+    assert "catalog/skill-relationships.svg" in readme
+    assert "embedded PlantUML remains its canonical source" in readme
+    assert "<svg " in rendered_overview
+
+    for name in profile_names("skill-sets/all.txt") | external_names:
+        assert name in overview
+        assert name in rendered_overview

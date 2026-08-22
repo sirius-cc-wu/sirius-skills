@@ -138,9 +138,12 @@ and boundary. Common compositions are documented as workflow tracks:
 - [Client to Code](catalog/tracks/client-to-code.md), from externally validated
   stakeholder input to bounded analysis and implementation
 
+[![Sirius skill relationship map](catalog/skill-relationships.svg)](catalog/skill-relationships.md)
+
 The [Skill Relationships](catalog/skill-relationships.md) views summarize
-normal handoffs and optional feedback paths. Select the smallest set of skills
-that addresses the current risk or outcome.
+normal handoffs and optional feedback paths. The README image renders the
+overview; the embedded PlantUML remains its canonical source. Select the
+smallest set of skills that addresses the current risk or outcome.
 
 Use `assess-development-input` at task intake when the correct owner is unclear,
 several skills appear plausible, or an existing input may not be ready. It
@@ -385,6 +388,8 @@ and judge calibration are opt-in and never run as part of normal validation.
 - `skill-sets/*.txt`: canonical installation profiles
 - `catalog/external-skill-sets/`: source-specific pinned membership for external add-ons
 - `catalog/skills.md`: skill responsibilities and boundaries
+- `catalog/skill-relationships.svg`: README overview rendered from the
+  canonical embedded PlantUML
 - `catalog/retired-skills.tsv`: append-only retired-name tombstones with Git
   evidence revisions
 - `catalog/agent-skill-repository-structures.md`: comparative PlantUML views of

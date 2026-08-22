@@ -1,0 +1,189 @@
+<?xml version="1.0"?>
+<!-- Rendered from the overview PlantUML in catalog/skill-relationships.md. -->
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" data-diagram-type="CLASS" style="width:1465px;height:1142px;background:#FFFFFF;" width="1465px" height="1142px" viewBox="0 0 1465 1142" zoomAndPan="magnify" preserveAspectRatio="none" contentStyleType="text/css">
+  <?plantuml 1.2026.7beta11?>
+  <defs/>
+  <g font-family="sans-serif" lengthAdjust="spacing">
+    <!--cluster analysis-->
+    <g class="cluster" data-qualified-name="analysis" id="ent0004" data-source-line="42">
+      <rect x="7" y="293.37" width="568" height="389.42" fill="none" style="stroke:#000;stroke-width:1.5;" rx="2.5" ry="2.5"/>
+      <text x="136.552" y="308.365" fill="#000" font-size="14" textLength="308.896" font-weight="700" font-family="Arial">Question-Selected Analysis and Design</text>
+    </g>
+    <!--cluster delivery-->
+    <g class="cluster" data-qualified-name="delivery" id="ent0014" data-source-line="78">
+      <rect x="599" y="396.97" width="417" height="503.6" fill="none" style="stroke:#000;stroke-width:1.5;" rx="2.5" ry="2.5"/>
+      <text x="606.66" y="411.965" fill="#000" font-size="14" textLength="401.68" font-weight="700" font-family="Arial">Implementation, Review, and Repository Workflow</text>
+    </g>
+    <!--cluster crosscutting-->
+    <g class="cluster" data-qualified-name="crosscutting" id="ent0022" data-source-line="106">
+      <rect x="646" y="924.57" width="805" height="119.89" fill="none" style="stroke:#000;stroke-width:1.5;" rx="2.5" ry="2.5"/>
+      <text x="912.164" y="939.565" fill="#000" font-size="14" textLength="272.672" font-weight="700" font-family="Arial">Independent Cross-Cutting Routes</text>
+    </g>
+    <!--entity specialist-->
+    <g class="entity" data-qualified-name="analysis.specialist" id="ent0005" data-source-line="43">
+      <rect x="170.01" y="328.37" width="241.977" height="52.594" fill="#FFF" style="stroke:#52606D;stroke-width:0.5;" rx="6" ry="6"/>
+      <text x="194.564" y="351.365" fill="#000" font-size="14" textLength="192.869" font-family="Arial">Select only the specialist(s)</text>
+      <text x="180.01" y="367.662" fill="#000" font-size="14" textLength="221.977" font-family="Arial">needed by the current question</text>
+    </g>
+    <!--entity requirements-->
+    <g class="entity" data-qualified-name="analysis.requirements" id="ent0006" data-source-line="47">
+      <rect x="73.48" y="431.97" width="201.05" height="68.891" fill="#EAF4FB" style="stroke:#52606D;stroke-width:0.5;" rx="6" ry="6"/>
+      <text x="83.48" y="454.965" fill="#000" font-size="14" textLength="181.05" font-weight="700" font-family="Arial">Requirements Analysis</text>
+      <text x="141.616" y="471.262" fill="#000" font-size="14" textLength="64.777" font-family="Arial">inception</text>
+      <text x="107.85" y="487.559" fill="#000" font-size="14" textLength="132.31" font-family="Arial">use-case-modeling</text>
+    </g>
+    <!--entity systemAnalysis-->
+    <g class="entity" data-qualified-name="analysis.systemAnalysis" id="ent0007" data-source-line="52">
+      <rect x="304.16" y="423.82" width="213.689" height="85.188" fill="#EEF8EE" style="stroke:#52606D;stroke-width:0.5;" rx="6" ry="6"/>
+      <text x="346.59" y="446.815" fill="#000" font-size="14" textLength="128.83" font-weight="700" font-family="Arial">System Analysis</text>
+      <text x="349.642" y="463.112" fill="#000" font-size="14" textLength="122.726" font-family="Arial">domain-modeling</text>
+      <text x="314.16" y="479.409" fill="#000" font-size="14" textLength="193.689" font-family="Arial">system-sequence-diagrams</text>
+      <text x="342.15" y="495.706" fill="#000" font-size="14" textLength="137.71" font-family="Arial">operation-contracts</text>
+    </g>
+    <!--entity softwareDesign-->
+    <g class="entity" data-qualified-name="analysis.softwareDesign" id="ent0008" data-source-line="58">
+      <rect x="22.73" y="549.01" width="222.549" height="117.781" fill="#F3EEFF" style="stroke:#52606D;stroke-width:0.5;" rx="6" ry="6"/>
+      <text x="37.102" y="572.005" fill="#000" font-size="14" textLength="193.806" font-weight="700" font-family="Arial">Software/System Design</text>
+      <text x="32.73" y="588.302" fill="#000" font-size="14" textLength="202.549" font-family="Arial">design-software-architecture</text>
+      <text x="39.279" y="604.599" fill="#000" font-size="14" textLength="189.451" font-family="Arial">grasp-responsibility-design</text>
+      <text x="63.734" y="620.896" fill="#000" font-size="14" textLength="140.54" font-family="Arial">use-case-realization</text>
+      <text x="43.521" y="637.193" fill="#000" font-size="14" textLength="180.968" font-family="Arial">uml-class-diagram-design</text>
+      <text x="41.275" y="653.489" fill="#000" font-size="14" textLength="185.459" font-family="Arial">design-pattern-application</text>
+    </g>
+    <!--entity detailedDesign-->
+    <g class="entity" data-qualified-name="analysis.detailedDesign" id="ent0009" data-source-line="66">
+      <rect x="275.36" y="573.45" width="283.272" height="68.891" fill="#FFFBEA" style="stroke:#52606D;stroke-width:0.5;" rx="6" ry="6"/>
+      <text x="354.256" y="596.445" fill="#000" font-size="14" textLength="125.48" font-weight="700" font-family="Arial">Detailed Design</text>
+      <text x="285.36" y="612.742" fill="#000" font-size="14" textLength="263.272" font-family="Arial">software-design-language-adaptation</text>
+      <text x="342.618" y="629.039" fill="#000" font-size="14" textLength="148.757" font-family="Arial">design-rust-lifecycles</text>
+    </g>
+    <!--entity implementation-->
+    <g class="entity" data-qualified-name="delivery.implementation" id="ent0015" data-source-line="79">
+      <rect x="615.16" y="431.97" width="339.676" height="68.891" fill="#F2F2F2" style="stroke:#888;stroke-width:0.5;" rx="6" ry="6"/>
+      <text x="625.16" y="454.965" fill="#000" font-size="14" textLength="319.676" font-weight="700" font-family="Arial">External &#xB7; Implementation and Evolution</text>
+      <text x="698.175" y="471.262" fill="#000" font-size="14" textLength="173.646" font-family="Arial">test-driven-development</text>
+      <text x="691.267" y="487.559" fill="#000" font-size="14" textLength="187.462" font-family="Arial">doubt-driven-development</text>
+    </g>
+    <!--entity review-->
+    <g class="entity" data-qualified-name="delivery.review" id="ent0016" data-source-line="84">
+      <rect x="636.3" y="565.3" width="297.402" height="85.188" fill="#FFFBEA" style="stroke:#52606D;stroke-width:0.5;" rx="6" ry="6"/>
+      <text x="756.687" y="588.295" fill="#000" font-size="14" textLength="56.629" font-weight="700" font-family="Arial">Review</text>
+      <text x="663.386" y="604.592" fill="#000" font-size="14" textLength="243.229" font-family="Arial">code-review-and-quality [external]</text>
+      <text x="682.158" y="620.889" fill="#000" font-size="14" textLength="205.687" font-family="Arial">code-simplification [external]</text>
+      <text x="646.3" y="637.186" fill="#000" font-size="14" textLength="277.402" font-family="Arial">behavior-preserving-refactoring [Sirius]</text>
+    </g>
+    <!--entity integrate-->
+    <g class="entity" data-qualified-name="delivery.integrate" id="ent0017" data-source-line="90">
+      <rect x="660.53" y="706.79" width="248.942" height="68.891" fill="#F2F2F2" style="stroke:#888;stroke-width:0.5;" rx="6" ry="6"/>
+      <text x="670.53" y="729.785" fill="#000" font-size="14" textLength="228.942" font-weight="700" font-family="Arial">External &#xB7; Integrate and Ship</text>
+      <text x="687.302" y="746.082" fill="#000" font-size="14" textLength="195.398" font-family="Arial">git-workflow-and-versioning</text>
+      <text x="698.506" y="762.379" fill="#000" font-size="14" textLength="172.99" font-family="Arial">documentation-and-adrs</text>
+    </g>
+    <!--entity repository-->
+    <g class="entity" data-qualified-name="delivery.repository" id="ent0018" data-source-line="95">
+      <rect x="662.54" y="815.68" width="244.93" height="68.891" fill="#F3EEFF" style="stroke:#52606D;stroke-width:0.5;" rx="6" ry="6"/>
+      <text x="672.54" y="838.675" fill="#000" font-size="14" textLength="224.93" font-weight="700" font-family="Arial">Sirius &#xB7; Repository Workflow</text>
+      <text x="727.682" y="854.972" fill="#000" font-size="14" textLength="114.646" font-family="Arial">walkthrough-me</text>
+      <text x="752.784" y="871.269" fill="#000" font-size="14" textLength="64.442" font-family="Arial">create-pr</text>
+    </g>
+    <!--entity support-->
+    <g class="entity" data-qualified-name="crosscutting.support" id="ent0023" data-source-line="107">
+      <rect x="661.61" y="959.57" width="246.789" height="68.891" fill="#FFFBEA" style="stroke:#52606D;stroke-width:0.5;" rx="6" ry="6"/>
+      <text x="691.058" y="982.565" fill="#000" font-size="14" textLength="187.893" font-weight="700" font-family="Arial">Sirius &#xB7; Artifact Support</text>
+      <text x="698.503" y="998.862" fill="#000" font-size="14" textLength="173.004" font-family="Arial">select-technical-artifacts</text>
+      <text x="671.61" y="1015.159" fill="#000" font-size="14" textLength="226.789" font-family="Arial">design-repository-artifact-layout</text>
+    </g>
+    <!--entity authoring-->
+    <g class="entity" data-qualified-name="crosscutting.authoring" id="ent0024" data-source-line="112">
+      <rect x="938.8" y="967.72" width="218.399" height="52.594" fill="#F2F2F2" style="stroke:#888;stroke-width:0.5;" rx="6" ry="6"/>
+      <text x="948.8" y="990.715" fill="#000" font-size="14" textLength="198.399" font-weight="700" font-family="Arial">External &#xB7; Skill Authoring</text>
+      <text x="1006.711" y="1007.012" fill="#000" font-size="14" textLength="82.578" font-family="Arial">skill-creator</text>
+    </g>
+    <!--entity visual-->
+    <g class="entity" data-qualified-name="crosscutting.visual" id="ent0025" data-source-line="116">
+      <rect x="1187.31" y="967.72" width="247.37" height="52.594" fill="#F2F2F2" style="stroke:#888;stroke-width:0.5;" rx="6" ry="6"/>
+      <text x="1197.31" y="990.715" fill="#000" font-size="14" textLength="227.37" font-weight="700" font-family="Arial">External &#xB7; Visual Explanation</text>
+      <text x="1279.252" y="1007.012" fill="#000" font-size="14" textLength="63.485" font-family="Arial">show-me</text>
+    </g>
+    <!--entity define-->
+    <g class="entity" data-qualified-name="define" id="ent0001" data-source-line="27">
+      <rect x="191.37" y="7" width="199.252" height="85.188" fill="#F2F2F2" style="stroke:#888;stroke-width:0.5;" rx="6" ry="6"/>
+      <text x="224.78" y="29.995" fill="#000" font-size="14" textLength="132.433" font-weight="700" font-family="Arial">External &#xB7; Define</text>
+      <text x="244.915" y="46.292" fill="#000" font-size="14" textLength="92.162" font-family="Arial">interview-me</text>
+      <text x="253.149" y="62.589" fill="#000" font-size="14" textLength="75.694" font-family="Arial">idea-refine</text>
+      <text x="201.37" y="78.886" fill="#000" font-size="14" textLength="179.252" font-family="Arial">spec-driven-development</text>
+    </g>
+    <!--entity assess-->
+    <g class="entity" data-qualified-name="assess" id="ent0002" data-source-line="33">
+      <rect x="188.58" y="132.19" width="204.837" height="52.594" fill="#FFF4CC" style="stroke:#52606D;stroke-width:0.5;" rx="6" ry="6"/>
+      <text x="235.962" y="155.185" fill="#000" font-size="14" textLength="110.072" font-weight="700" font-family="Arial">Sirius &#xB7; Intake</text>
+      <text x="198.58" y="171.482" fill="#000" font-size="14" textLength="184.837" font-family="Arial">assess-development-input</text>
+    </g>
+    <!--entity iterative-->
+    <g class="entity" data-qualified-name="iterative" id="ent0003" data-source-line="37">
+      <rect x="76.27" y="224.78" width="255.464" height="52.594" fill="#DCEEFF" style="stroke:#2F6690;stroke-width:0.5;" rx="6" ry="6"/>
+      <text x="86.796" y="247.775" fill="#000" font-size="14" textLength="234.411" font-weight="700" font-family="Arial">Sirius &#xB7; Iterative Coordination</text>
+      <text x="86.27" y="264.072" fill="#000" font-size="14" textLength="235.464" font-family="Arial">iterative-risk-driven-development</text>
+    </g>
+    <!--link specialist to requirements-->
+    <!--link requirements to systemAnalysis-->
+    <!--link requirements to softwareDesign-->
+    <!--link softwareDesign to detailedDesign-->
+    <!--link implementation to review-->
+    <g class="link" data-entity-1="ent0015" data-entity-2="ent0016" id="lnk19" data-source-line="101" data-link-type="dependency">
+      <path d="M785,501.02 C785,520.33 785,539.55 785,560.04" style="stroke:#52606D;stroke-width:1;" fill="none" id="implementation-to-review" codeLine="101"/>
+      <polygon points="785,565.04,789,556.04,785,560.04,781,556.04,785,565.04" fill="#52606D" style="stroke:#52606D;stroke-width:1;stroke-linejoin:miter;stroke-miterlimit:10;"/>
+      <text x="632" y="529.097" fill="#000" font-size="13" textLength="152.604" font-family="Arial">review when requested</text>
+    </g>
+    <!--link review to integrate-->
+    <g class="link" data-entity-1="ent0016" data-entity-2="ent0017" id="lnk20" data-source-line="102" data-link-type="dependency">
+      <path d="M785,650.82 C785,668.79 785,684.4 785,701.4" style="stroke:#52606D;stroke-width:1;stroke-dasharray:7,7;" fill="none" id="review-to-integrate" codeLine="102"/>
+      <polygon points="785,706.4,789,697.4,785,701.4,781,697.4,785,706.4" fill="#52606D" style="stroke:#52606D;stroke-width:1;stroke-linejoin:miter;stroke-miterlimit:10;"/>
+      <text x="673" y="674.677" fill="#000" font-size="13" textLength="111.382" font-family="Arial">prepared change</text>
+    </g>
+    <!--link integrate to repository-->
+    <g class="link" data-entity-1="ent0017" data-entity-2="ent0018" id="lnk21" data-source-line="103" data-link-type="dependency">
+      <path d="M785,775.99 C785,788.56 785,797.75 785,810.33" style="stroke:#52606D;stroke-width:1;stroke-dasharray:7,7;" fill="none" id="integrate-to-repository" codeLine="103"/>
+      <polygon points="785,815.33,789,806.33,785,810.33,781,806.33,785,815.33" fill="#52606D" style="stroke:#52606D;stroke-width:1;stroke-linejoin:miter;stroke-miterlimit:10;"/>
+      <text x="625" y="791.727" fill="#000" font-size="13" textLength="159.878" font-family="Arial">publish when authorized</text>
+    </g>
+    <!--link support to authoring-->
+    <!--link authoring to visual-->
+    <!--link define to assess-->
+    <g class="link" data-entity-1="ent0001" data-entity-2="ent0002" id="lnk28" data-source-line="125" data-link-type="dependency">
+      <path d="M291,92.63 C291,105.83 291,114.96 291,126.74" style="stroke:#52606D;stroke-width:1;" fill="none" id="define-to-assess" codeLine="125"/>
+      <polygon points="291,131.74,295,122.74,291,126.74,287,122.74,291,131.74" fill="#52606D" style="stroke:#52606D;stroke-width:1;stroke-linejoin:miter;stroke-miterlimit:10;"/>
+      <text x="207" y="108.247" fill="#000" font-size="13" textLength="83.592" font-family="Arial">refined input</text>
+    </g>
+    <!--link assess to iterative-->
+    <g class="link" data-entity-1="ent0002" data-entity-2="ent0003" id="lnk29" data-source-line="126" data-link-type="dependency">
+      <path d="M260.16,185.27 C260.16,197.55 260.16,207.08 260.16,219.36" style="stroke:#52606D;stroke-width:1;stroke-dasharray:7,7;" fill="none" id="assess-to-iterative" codeLine="126"/>
+      <polygon points="260.16,224.36,264.16,215.36,260.16,219.36,256.16,215.36,260.16,224.36" fill="#52606D" style="stroke:#52606D;stroke-width:1;stroke-linejoin:miter;stroke-miterlimit:10;"/>
+      <text x="96.16" y="200.877" fill="#000" font-size="13" textLength="163.351" font-family="Arial">multi-boundary objective</text>
+    </g>
+    <!--link assess to specialist-->
+    <g class="link" data-entity-1="ent0002" data-entity-2="ent0005" id="lnk30" data-source-line="127" data-link-type="dependency">
+      <path d="M362.58,184.94 C362.58,222.39 362.58,285.45 362.58,323" style="stroke:#52606D;stroke-width:1;stroke-dasharray:7,7;" fill="none" id="assess-to-specialist" codeLine="127"/>
+      <polygon points="362.58,328,366.58,319,362.58,323,358.58,319,362.58,328" fill="#52606D" style="stroke:#52606D;stroke-width:1;stroke-linejoin:miter;stroke-miterlimit:10;"/>
+    </g>
+    <!--link iterative to specialist-->
+    <g class="link" data-entity-1="ent0003" data-entity-2="ent0005" id="lnk31" data-source-line="128" data-link-type="dependency">
+      <path d="M250.87,277.76 C250.87,293.22 250.87,307.63 250.87,323.08" style="stroke:#52606D;stroke-width:1;stroke-dasharray:7,7;" fill="none" id="iterative-to-specialist" codeLine="128"/>
+      <polygon points="250.87,328.08,254.87,319.08,250.87,323.08,246.87,319.08,250.87,328.08" fill="#52606D" style="stroke:#52606D;stroke-width:1;stroke-linejoin:miter;stroke-miterlimit:10;"/>
+    </g>
+    <!--link specialist to implementation-->
+    <g class="link" data-entity-1="ent0005" data-entity-2="ent0015" id="lnk32" data-source-line="129" data-link-type="dependency">
+      <path d="M412.48,355.46 C558.75,355.46 785,355.46 785,355.46 C785,355.46 785,394.07 785,426.61" style="stroke:#52606D;stroke-width:1;stroke-dasharray:7,7;" fill="none" id="specialist-to-implementation" codeLine="129"/>
+      <polygon points="785,431.61,789,422.61,785,426.61,781,422.61,785,431.61" fill="#52606D" style="stroke:#52606D;stroke-width:1;stroke-linejoin:miter;stroke-miterlimit:10;"/>
+      <text x="448.81" y="351.527" fill="#000" font-size="13" textLength="187.592" font-family="Arial">approved behavior or design</text>
+    </g>
+    <!--link repository to support-->
+    <g class="legend" data-source-line="132">
+      <rect x="590.292" y="1064.46" width="277.415" height="58.891" fill="none" style="stroke:#000;stroke-width:1;" rx="7.5" ry="7.5"/>
+      <text x="595.292" y="1082.455" fill="#000" font-size="14" textLength="267.415" font-family="Arial">Dashed arrows are conditional routes.</text>
+      <text x="604.688" y="1098.752" fill="#000" font-size="14" textLength="248.623" font-family="Arial">Solid arrows are common handoffs.</text>
+      <text x="619.211" y="1115.049" fill="#000" font-size="14" textLength="219.577" font-family="Arial">No route is a required lifecycle.</text>
+    </g>
+    <?plantuml-src XLTDRnit4Btlho2IIsk4hkkaHce41XHP0d89KAje3uOFrEv8oueYDoHNYbBqT_NUNzR7ZrtjIZOY0mk9CplpPkRDSEnDmxnXI-EzsR9AMYgzDBeet4RgHbYnPKjHRjRMjBgQ6cKiUpsFdu66gqLbzbAlsKeeHmD9WtV5cXR-e8W5sqAlrL11IKt-q10prjTc8AXe9LhbvqRxps9BR6AbKEVot-chdoYvrblIdfLua1reJQmr-mpxb-kRgvlxWL2RYXmrxEtLuD0AlGc7xwwAMbR470oI2H27IbqaxE-2iOyl90WIOokoO_-CFIHLgycodw-BVvup_E430YEhXRgxUy79TVWxTV8-VbwoMHheIYsyiI-PlP_EPkVOh-StDxzUmMnn31qLGF7O2EbZSN4nop_PV_-o-wXpSL78K9YTf3tVKe6y2cwZg70DbRooSaUQLxGZPPfGok9fu4auHyx5lBwRJgEJXRIoTS759-t59hX8MaCZ72benwOaO0WFR-mq6oTMUxrffuMs285q0cwbspoFlCYqPwz-Qyc55_c2531GnIR8pC59nuIka1u7whv2WFYPpqDLZdX3Ua1ywJm0CfRCCAFLWVbwAFx1_GYv9ghWP9caPMjjQ8il6GKKdaRMBNrfqV81Dj8xcypVpJz6FnSN3qDH1nhnCoPrIKqsrphYfS1ZYrv2Bw_FNBW3EcZRH_qQx7e_csKdYoWScw_CLaWzD9XCS0T41D-yac8DOZk8J1EhWGIN61HMbDwT8p0hlnUMKhB1ehU1uHs2BFmfGqbA2KZyohlNkR1bZUgNlhK4CI2u1YnsZT5EBgMI_i3JEyF4M49vleakNrl5IoK2JLCGnpUokqRuq3vSD8sIfNYsR1Lv8HLLVKJp-SVP94TqduN3KFeOiXC5Eoq8oaKb6jyvoKBREi-LN55vA1MbV0ORHoRoHup6YlGJfhxcToCQHQ03wlIwLgvh3-Kn8LvKpwR7nHk4acC_Cp_EJPXOVJD-sZOgkea1ls4F50RIczY93zGO9p493knFOpShPVQnBGC9TuJJSLlAaQdJ6HZAC9o2OyVHtsndL9j72cCU_VdSA0dTq2vV49ssSWZcX0ifmkYYH3_nfCG1W7zfHM0iU-oGFtLABWGdLvbyOuKbrM8dZUKDY1y6kbw7GOw-CpRS_uzfWZwTmGlp7tptzDrSzOeXJOjQDX7-Mdg-puM9-54K1tXfGbIcRFlyHh6eh7icHtsHJwP0F_UVuK7qlnTgusjSbEiwt6185HhR4_BGzSS99NZiYrYJs-xBlYOTwOvoKnMXnVFBoxj1WcuPaekh6orSrW1ESUPsqg0xY0FAxH9DMIVZeiKMPUKtM1ynNrVK41wu3ARMOFnCM-z3mR2BW7oHwcKGbFdyv1PgcmOBsWcxZbcRM2y32TWYAQQX4-ygZebPQv19OO0cBJUODNqalHJ3wG1GPyNBeG7RTnYqs4YbsAHJJrZ26OyrC_RCz4uwTCFtxFwHj6PV6unFqVUkgyq-KIADoPogiy7KuuVICPOpjOGbL2_lLu58UG4AH0fd5KkBJJwEzEdtbLksnLui-J8iTG8KCSk_mbA_ew7-SPeVDvfJmM3YHnTZWjyoN57MxCAwaQS2blXSs690qREHdZ9K58hMu6J-tmDPkHUkXZKHTdOiH1OBZD6L3DwGTnkPUXcM8AFaYTfs2qHebigiLb7diqaliB1fTLTCnVfhxRA0wmJWVm00?>
+  </g>
+</svg>
