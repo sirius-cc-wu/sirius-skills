@@ -8,9 +8,9 @@ current risk or complete the current behavior slice.
 
 This overview groups all 19 deployable Sirius skills and 11 external add-ons by
 responsibility. It uses group-level routes to keep the map readable. The
-detailed diagrams below preserve specialist handoffs and feedback. Solid arrows
-show common handoffs. Dashed arrows show conditional routing or support. Neither
-arrow style requires a fixed sequence.
+detailed diagrams below preserve conditional specialist routing and feedback.
+Solid arrows show common handoffs. Dashed arrows show conditional routing or
+support. Neither arrow style requires a fixed sequence.
 
 ```plantuml
 @startuml sirius-skills-birds-eye
@@ -54,6 +54,11 @@ rectangle iterative <<coordinator>> [
 **Sirius · Iterative Coordination**
 iterative-risk-driven-development
 ]
+
+note right of assess
+  Direct entry can also select implementation,
+  review, repository workflow, or a cross-cutting route.
+end note
 
 package "Question-Selected Analysis and Design" as analysis {
   rectangle specialist [
@@ -138,7 +143,7 @@ package "Independent Cross-Cutting Routes" as crosscutting {
   authoring -[hidden]right-> visual
 }
 
-define --> assess : refined input
+define ..> assess : route unclear
 assess ..> iterative : multi-boundary objective
 assess ..> specialist
 iterative ..> specialist
@@ -369,7 +374,11 @@ skinparam shadowing false
 skinparam packageStyle rectangle
 skinparam linetype ortho
 skinparam defaultFontName Arial
+skinparam defaultTextAlignment left
 skinparam ArrowColor #52606D
+skinparam nodesep 30
+skinparam ranksep 40
+hide stereotype
 skinparam rectangle {
   BackgroundColor #FFFFFF
   BorderColor #52606D
@@ -380,65 +389,52 @@ skinparam rectangle<<coordinator>> {
   BorderColor #2F6690
 }
 
-rectangle "iterative-risk-driven-\ndevelopment" as iterative <<coordinator>>
+rectangle iterative <<coordinator>> [
+**iterative-risk-driven-development**
+Select only the owners needed by the current objective.
+]
 
-package "Requirements Analysis" #EAF4FB {
-  rectangle "inception" as inception
-  rectangle "use-case-modeling" as usecases
-}
+rectangle requirements #EAF4FB [
+**Requirements Analysis**
+scope, feasibility, or major risk → inception
+actors, goals, boundary, or scenarios → use-case-modeling
+]
 
-package "System Analysis" #EEF8EE {
-  rectangle "domain-modeling" as domain
-  rectangle "system-sequence-diagrams" as ssd
-  rectangle "operation-contracts" as contracts
-}
+rectangle systemAnalysis #EEF8EE [
+**System Analysis**
+domain concepts or vocabulary → domain-modeling
+actor-system events or operations → system-sequence-diagrams
+preconditions, postconditions, or state effects → operation-contracts
+]
 
-package "Software/System Design" #F3EEFF {
-  rectangle "design-software-\narchitecture" as architecture
-  rectangle "grasp-responsibility-\ndesign" as grasp
-  rectangle "use-case-realization" as realization
-  rectangle "uml-class-diagram-\ndesign" as classdiagram
-  rectangle "design-pattern-\napplication" as patterns
-}
+rectangle softwareDesign #F3EEFF [
+**Software/System Design**
+components, boundaries, deployment, or quality trade-offs → design-software-architecture
+responsibility, cohesion, coupling, or dependency → grasp-responsibility-design
+collaboration for one scenario → use-case-realization
+stable object structure summary → uml-class-diagram-design
+demonstrated variation or structural force → design-pattern-application
+]
 
-package "Detailed Design" #FFFBEA {
-  rectangle "software-design-language-\nadaptation" as language
-  rectangle "design-rust-\nlifecycles" as rust
-}
+rectangle detailedDesign #FFFBEA [
+**Detailed Design**
+target-language realization → software-design-language-adaptation
+Rust ownership or resource lifecycle → design-rust-lifecycles
+]
 
-iterative ..> inception : scope or feasibility
-iterative ..> usecases : actors or selected scenarios
-iterative ..> domain : selected vocabulary
-iterative ..> ssd : selected system events
-iterative ..> contracts : selected state effects
-iterative ..> architecture : components or quality risk
-iterative ..> grasp : native responsibilities
-iterative ..> language : target-language forces
-iterative ..> rust : Rust lifecycle risk
-inception --> usecases
-usecases --> domain
-usecases --> ssd
-usecases ..> contracts : approved stateful examples
-domain ..> contracts : refine vocabulary
-ssd --> contracts
-domain ..> architecture : data ownership
-ssd ..> architecture : critical scenarios
-contracts ..> architecture : state and consistency
-architecture --> grasp : internal responsibilities
-architecture ..> realization : critical runtime path
-architecture ..> language : implementation constraints
-domain --> grasp
-contracts --> grasp
-ssd --> realization
-contracts --> realization
-grasp --> realization
-realization --> classdiagram
-grasp ..> patterns : justified pressure
-classdiagram ..> patterns : justified pressure
-contracts ..> language : state and contracts
-grasp ..> language : native responsibilities
-language ..> rust : Rust lifecycle pressure
-rust ..> grasp : ownership feedback
+iterative ..> requirements
+iterative ..> systemAnalysis
+iterative ..> softwareDesign
+iterative ..> detailedDesign
+
+requirements -[hidden]right-> systemAnalysis
+requirements -[hidden]down-> softwareDesign
+softwareDesign -[hidden]right-> detailedDesign
+
+legend bottom
+  Routes are conditional. The groups are not phases.
+  Several owners may serve one coherent objective.
+endlegend
 @enduml
 ```
 
@@ -486,7 +482,11 @@ skinparam shadowing false
 skinparam packageStyle rectangle
 skinparam linetype ortho
 skinparam defaultFontName Arial
+skinparam defaultTextAlignment left
 skinparam ArrowColor #52606D
+skinparam nodesep 30
+skinparam ranksep 40
+hide stereotype
 skinparam rectangle {
   BackgroundColor #FFFFFF
   BorderColor #52606D
@@ -496,64 +496,54 @@ skinparam rectangle<<input>> {
   BackgroundColor #F2F2F2
   BorderColor #888888
 }
-skinparam rectangle<<external>> {
-  BackgroundColor #F2F2F2
-  BorderColor #888888
-}
-skinparam rectangle<<process>> {
-  BackgroundColor #EAF4FB
-  BorderColor #52606D
-}
-rectangle "Approved behavior or design input" as oracle <<input>>
-rectangle "PR, commit, branch,\nor local change" as incoming <<input>>
-rectangle "Independent review or\nreader decision" as readerNext <<input>>
 
-package "Implementation and Evolution" #FFF5EA {
-  rectangle "doubt-driven-\ndevelopment" as addyDoubt <<external>>
-  rectangle "test-driven-\ndevelopment" as addyTdd <<external>>
-}
+rectangle selected <<input>> [
+**Selected direct task or prepared change**
+Enter the narrowest owner whose conditions are satisfied.
+]
 
-package "Review" #FFFBEA {
-  rectangle "code-review-and-\nquality" as addyReview <<external>>
-  rectangle "code-simplification" as addySimplify <<external>>
-  rectangle "behavior-preserving-refactoring" as refactoring
-}
+rectangle implementation #FFF5EA [
+**Implementation and Evolution**
+approved independent oracle → test-driven-development [external]
+or repository-native implementation and verification
+non-trivial in-flight claim → doubt-driven-development [external]
+]
 
-package "Integrate and ship" #F2F2F2 {
-  rectangle "git-workflow-and-\nversioning" as addyGit <<external>>
-  rectangle "documentation-and-adrs" as addyDocs <<external>>
-}
+rectangle review #FFFBEA [
+**Review**
+completed change → code-review-and-quality [external] or repository-native review
+routine clarity → code-simplification [external] or repository-native cleanup
+established structural ownership → behavior-preserving-refactoring [Sirius]
+material boundary change → iterative-risk-driven-development [Sirius]
+]
 
-package "Repository Workflow" #F3EEFF {
-  rectangle "walkthrough-me" as walkthrough
-  rectangle "create-pr" as createpr
-}
+rectangle integrate #F2F2F2 [
+**Integrate and Ship**
+Git, branch, worktree, release, or version guidance
+→ git-workflow-and-versioning [external] or repository-native Git workflow
+consequential decision or durable context
+→ documentation-and-adrs [external] or repository-native documentation
+]
 
-oracle ..> addyTdd : all profile
-oracle ..> refactoring : bounded structural request
-addyTdd ..> addyDoubt : non-trivial claim
-addyDoubt ..> addyTdd : behavioral finding
-addyDoubt ..> addyReview : claim reconciled
-addyTdd ..> addyReview : review requested
-addyReview ..> addySimplify : clarity finding
-addyReview ..> refactoring : structural finding
-addySimplify ..> addyReview : substantive change
-refactoring ..> addyReview : substantive change
-addyTdd ..> addyGit : prepared change
-addyTdd ..> addyDocs : durable documentation
-refactoring ..> addyGit : prepared change
-addyReview ..> addyGit : prepared change
-addySimplify ..> addyGit : prepared change
-addyGit ..> addyDocs : decision or release context
-addyTdd ..> createpr : already committed
-refactoring ..> createpr : already committed
-addyReview ..> createpr : reviewed, committed work
-addySimplify ..> createpr : verified, committed work
-addyGit ..> createpr : committed work
-addyDocs ..> createpr : documented, committed work
-incoming ..> addyReview : formal review
-incoming --> walkthrough
-walkthrough ..> readerNext : context only
+rectangle repository #F3EEFF [
+**Repository Workflow**
+revision-fixed or snapshot-fixed change tour → walkthrough-me [Sirius]
+committed work ready for pull-request publication → create-pr [Sirius]
+]
+
+selected ..> implementation
+selected ..> review
+selected ..> integrate
+selected ..> repository
+
+implementation -[hidden]right-> review
+implementation -[hidden]down-> integrate
+integrate -[hidden]right-> repository
+
+legend bottom
+  External add-ons require the all installation.
+  Each route is conditional and separately authorized.
+endlegend
 @enduml
 ```
 
@@ -596,8 +586,11 @@ skinparam shadowing false
 skinparam packageStyle rectangle
 skinparam linetype ortho
 skinparam defaultFontName Arial
-skinparam defaultTextAlignment center
+skinparam defaultTextAlignment left
 skinparam ArrowColor #A15C38
+skinparam nodesep 30
+skinparam ranksep 40
+hide stereotype
 skinparam rectangle {
   BackgroundColor #FFFFFF
   BorderColor #52606D
@@ -607,45 +600,63 @@ skinparam rectangle<<coordinator>> {
   BackgroundColor #DCEEFF
   BorderColor #2F6690
 }
-rectangle "iterative-risk-driven-\ndevelopment" as iterative <<coordinator>>
 
-package "System Analysis" #EEF8EE {
-  rectangle "domain-modeling" as domain
-  rectangle "operation-contracts" as contracts
-}
+rectangle evidence #FFF5EA [
+**Implemented behavior and verification evidence**
+]
+rectangle refactoring #FFF5EA [
+**behavior-preserving-refactoring**
+]
 
-package "Software/System Design" #F3EEFF {
-  rectangle "design-software-\narchitecture" as architecture
-  rectangle "grasp-responsibility-\ndesign" as grasp
-  rectangle "use-case-realization +\numl-class-diagram-design" as designviews
-  rectangle "design-pattern-\napplication" as patterns
-}
+rectangle systemAnalysis #EEF8EE [
+**System Analysis feedback**
+postcondition changes → operation-contracts
+missing concepts or associations → domain-modeling
+]
+rectangle architecture #F3EEFF [
+**Architecture feedback**
+component, boundary, deployment, data, or quality evidence
+→ design-software-architecture
+]
+rectangle responsibilityDesign #F3EEFF [
+**Responsibility and structure feedback**
+responsibility or coupling → grasp-responsibility-design
+collaboration or interface → use-case-realization / uml-class-diagram-design
+variation pressure → design-pattern-application
+]
+rectangle detailedDesign #FFFBEA [
+**Detailed Design feedback**
+language realization → software-design-language-adaptation
+ownership or lifecycle → design-rust-lifecycles
+]
+rectangle iterative <<coordinator>> [
+**Boundary change**
+iterative-risk-driven-development
+]
 
-package "Execution and evidence" #FFF5EA {
-  rectangle "Implemented behavior and\nverification evidence" as evidence
-  rectangle "behavior-preserving-\nrefactoring" as refactoring
-}
+evidence ..> systemAnalysis
+evidence ..> architecture
+evidence ..> responsibilityDesign
+evidence ..> detailedDesign
+refactoring ..> responsibilityDesign
+refactoring ..> detailedDesign
+refactoring ..> iterative
 
-contracts ..> domain : missing concept or association
-patterns ..> designviews : participants or dependencies change
+systemAnalysis -[hidden]right-> architecture
+systemAnalysis -[hidden]down-> responsibilityDesign
+responsibilityDesign -[hidden]right-> detailedDesign
+detailedDesign -[hidden]right-> iterative
 
-evidence ..> contracts : postcondition changes
-evidence ..> architecture : component, boundary, or quality evidence
-evidence ..> designviews : responsibility, collaboration, or interface changes
-
-architecture ..> designviews : responsibilities or interfaces change
-refactoring ..> iterative : boundary change
-refactoring ..> grasp : responsibility or coupling pressure
-refactoring ..> patterns : justified variation pressure
-refactoring ..> designviews : durable structure changes
-
+legend bottom
+  Re-enter an owner only when evidence changes its canonical knowledge.
+endlegend
 @enduml
 ```
 
-The combined `use-case-realization + uml-class-diagram-design` node keeps the
-diagram readable. Implementation evidence can refine architecture or detailed
-design views. Boundary-changing refactoring returns through iterative
-coordination before architecture changes.
+The group-level feedback nodes keep the diagram readable. Implementation
+evidence can refine architecture, collaboration, structure, language
+adaptation, or Rust lifecycle design. Boundary-changing refactoring returns
+through iterative coordination before architecture changes.
 
 Apply these rules:
 
