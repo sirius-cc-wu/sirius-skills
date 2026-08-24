@@ -64,6 +64,27 @@ review role that commands such as `/ship` can fan out to. Plugin manifests and
 plain-directory integrations expose the same underlying content to several
 agent hosts.
 
+### Lifecycle commands
+
+The upstream repository exposes eight lifecycle command families. The Claude
+Code adapter uses `/plan`; the Gemini CLI and Antigravity CLI adapters expose
+that same command as `/planning`.
+
+| Purpose | Claude Code | Gemini CLI | Antigravity CLI |
+|---|---|---|---|
+| Define the specification | `/spec` | `/spec` | `/spec` |
+| Plan verifiable tasks | `/plan` | `/planning` | `/planning` |
+| Build incrementally | `/build` or `/build auto` | `/build` or `/build auto` | `/build` or `/build auto` |
+| Run tests and debug defects | `/test` | `/test` | `/test` |
+| Review before merge | `/review` | `/review` | `/review` |
+| Audit web performance | `/webperf` | `/webperf` | `/webperf` |
+| Simplify code | `/code-simplify` | `/code-simplify` | `/code-simplify` |
+| Ship to production | `/ship` | `/ship` | `/ship` |
+
+The adapters are stored in `.claude/commands/*.md`, `.gemini/commands/*.toml`,
+and `commands/*.toml`, respectively. These commands compose the upstream
+skills; they are separate from Sirius's profile-managed skill names.
+
 ```plantuml
 @startuml addyosmani-agent-skills-structure
 left to right direction
