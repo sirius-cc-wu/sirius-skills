@@ -371,6 +371,7 @@ package "Plan" as addyPlanPhase #EEF8EE {
 
 package "Build" as addyBuild #F3EEFF {
   component "incremental-implementation" as addyIncremental
+  component "test-driven-development" as addyTdd
   component "context-engineering" as addyContext
   component "source-driven-development" as addySource
   component "doubt-driven-development" as addyDoubt
@@ -379,7 +380,6 @@ package "Build" as addyBuild #F3EEFF {
 }
 
 package "Verify" as addyVerify #FFF5EA {
-  component "test-driven-development" as addyTdd
   component "browser-testing-with-devtools" as addyBrowser
   component "debugging-and-error-recovery" as addyDebug
 }
