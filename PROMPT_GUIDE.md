@@ -180,6 +180,14 @@ missing behavior, then run the relevant regression suite.
 ```
 
 ```text
+With the `all` installation, use browser-testing-with-devtools when browser
+behavior needs real runtime, DOM, console, network, performance, or visual
+evidence. Use debugging-and-error-recovery when tests fail, builds break,
+behavior does not match expectations, or another unexpected error needs
+systematic root-cause analysis. Add or update a regression test after the fix.
+```
+
+```text
 Use behavior-preserving-refactoring to move this cohesive responsibility to its
 established owner and correct the dependency direction behind current passing
 tests. Keep behavior changes separate and verify each bounded transformation.

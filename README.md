@@ -73,7 +73,7 @@ replacing unrelated entries. Global uninstallation and retired-skill cleanup
 remove only links that still point to their expected canonical installation.
 
 `just install <target-project> all` also installs the pinned skills listed in
-[`catalog/external-skill-sets/`](catalog/external-skill-sets/): nine add-ons from
+[`catalog/external-skill-sets/`](catalog/external-skill-sets/): 11 add-ons from
 Addy Osmani's `agent-skills`, OpenAI's `skill-creator`, and HumanLayer's
 `show-me`. They remain external to the Sirius catalog and are not installed by
 other profiles. The external install uses the target project's scope for
@@ -225,9 +225,14 @@ verification guidance.
 `test-driven-implementation` is retired. Existing behavior-slice evidence
 remains valid at its recorded revision. With the `all` installation, use the
 external `test-driven-development` add-on for new logic, bug fixes, and behavior
-changes. Use `iterative-risk-driven-development` when implementation needs
-coordinated analysis, design, verification, or iteration commits. Otherwise,
-implement the bounded behavior through the consuming repository's own workflow.
+changes. Use external `browser-testing-with-devtools` when browser behavior
+needs real runtime, DOM, console, network, performance, or visual evidence. Use
+external `debugging-and-error-recovery` when tests fail, builds break, behavior
+does not match expectations, or another unexpected error needs systematic
+root-cause analysis. Use `iterative-risk-driven-development` when implementation
+needs coordinated analysis, design, verification, or iteration commits.
+Otherwise, implement the bounded behavior through the consuming repository's
+own workflow.
 
 With the `all` installation, use external `doubt-driven-development` to subject
 a non-trivial in-flight claim to fresh-context adversarial review. It can expose

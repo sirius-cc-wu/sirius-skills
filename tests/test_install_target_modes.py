@@ -26,6 +26,8 @@ ADDY_SKILLS = {
     "spec-driven-development",
     "doubt-driven-development",
     "test-driven-development",
+    "browser-testing-with-devtools",
+    "debugging-and-error-recovery",
     "code-review-and-quality",
     "code-simplification",
     "git-workflow-and-versioning",
@@ -425,5 +427,5 @@ def test_validation_covers_the_consolidated_catalog() -> None:
     assert result.returncode == 0, result.stdout
     assert "Validated 19 skills" in result.stdout
     assert (
-        "Validated 11 external add-on skills across 3 source profiles" in result.stdout
+        "Validated 13 external add-on skills across 3 source profiles" in result.stdout
     )

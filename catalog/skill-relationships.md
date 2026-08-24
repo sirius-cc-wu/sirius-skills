@@ -6,7 +6,7 @@ current risk or complete the current behavior slice.
 
 ## Overview
 
-This overview groups all 19 deployable Sirius skills and 11 external add-ons by
+This overview groups all 19 deployable Sirius skills and 13 external add-ons by
 responsibility. It uses group-level routes to keep the map readable. The
 detailed diagrams below preserve conditional specialist routing and feedback.
 Solid arrows show common handoffs. Dashed arrows show conditional routing or
@@ -57,7 +57,7 @@ iterative-risk-driven-development
 
 note right of assess
   Direct entry can also select implementation,
-  review, repository workflow, or a cross-cutting route.
+  verification, review, repository workflow, or a cross-cutting route.
 end note
 
 package "Question-Selected Analysis and Design" as analysis {
@@ -96,11 +96,16 @@ package "Question-Selected Analysis and Design" as analysis {
   softwareDesign -[hidden]right-> detailedDesign
 }
 
-package "Implementation, Review, and Repository Workflow" as delivery {
+package "Implementation, Verify, Review, and Repository Workflow" as delivery {
   rectangle implementation <<external>> [
   **External · Implementation and Evolution**
   test-driven-development
   doubt-driven-development
+  ]
+  rectangle verify <<external>> [
+  **Verify**
+  browser-testing-with-devtools
+  debugging-and-error-recovery
   ]
   rectangle review #FFFBEA [
   **Review**
@@ -119,7 +124,8 @@ package "Implementation, Review, and Repository Workflow" as delivery {
   create-pr
   ]
 
-  implementation --> review : review when requested
+  implementation --> verify : verify when requested
+  verify --> review : review when requested
   review ..> integrate : prepared change
   integrate ..> repository : publish when authorized
 }
@@ -161,7 +167,7 @@ endlegend
 The gray nodes belong to pinned Addy Osmani, OpenAI, and HumanLayer external
 collections. They are not part of the Sirius catalog or named profiles.
 `just install <target-project> all` or `just install-global all` installs the
-11 curated add-ons; other profiles do not. The diagram shows one optional
+13 curated add-ons; other profiles do not. The diagram shows one optional
 composition. `interview-me` confirms one requester's intent.
 `idea-refine` turns that intent into a focused, user-confirmed candidate
 one-pager. `spec-driven-development` turns a confirmed direction into a
@@ -183,6 +189,14 @@ constraints.
 Use `test-driven-development` with the `all` installation when implementing new
 logic, fixing a bug, or changing behavior. Otherwise, use the consuming
 repository's implementation and verification workflow.
+
+Use `browser-testing-with-devtools` with the `all` installation when browser
+behavior needs real runtime, DOM, console, network, performance, or visual
+evidence. Use `debugging-and-error-recovery` with the `all` installation when
+tests fail, builds break, behavior does not match expectations, or another
+unexpected error needs systematic root-cause analysis. Add a regression test
+through `test-driven-development` after the fix when the all installation is
+available.
 
 Use `doubt-driven-development` with the `all` installation when a non-trivial
 in-flight decision or claim needs fresh-context adversarial review. It can
@@ -249,7 +263,11 @@ implementation-facing design.
 - Start with **Implementation and Evolution** when the behavior is sufficiently
   bounded. With the `all` installation, use external
   `test-driven-development` for behavior implementation.
-- Use **Review** after implementation or when a bounded structural change is
+- Use **Verify** after implementation when browser runtime evidence or
+  systematic failure recovery is needed. With the `all` installation, use
+  external `browser-testing-with-devtools` or
+  `debugging-and-error-recovery` as applicable.
+- Use **Review** after verification or when a bounded structural change is
   already identified. Route clarity findings to external
   `code-simplification`, established structural ownership findings to
   `behavior-preserving-refactoring`, and boundary findings to iterative design.
@@ -303,10 +321,13 @@ responsible external recovery process. Route scope and feasibility to
 inception. Route approved actor goals and scenario flow to use-case modeling,
 non-trivial state effects to operation contracts, and a bounded approved oracle
 to external `test-driven-development` when the `all` installation is available;
-otherwise, use repository-native implementation. Route one independently
-consequential proposed, accepted, or superseding architecture choice to
-external `documentation-and-adrs` when available or to repository-native ADR
-guidance.
+otherwise, use repository-native implementation. Route browser runtime evidence
+to external `browser-testing-with-devtools` and unexpected test, build, or
+behavior failures to external `debugging-and-error-recovery` when available;
+otherwise, use repository-native verification and debugging. Route one
+independently consequential proposed, accepted, or superseding architecture
+choice to external `documentation-and-adrs` when available or to
+repository-native ADR guidance.
 
 ## External current-system recovery
 
@@ -550,11 +571,13 @@ endlegend
 `walkthrough-me` establishes paced comprehension of the selected change. It
 does not provide the independent review or reader decision shown as its
 optional next step. With the `all` installation, use `test-driven-development`
-for behavior implementation, `doubt-driven-development` for in-flight
-adversarial review of non-trivial claims, and `code-review-and-quality` for
-formal review. Doubt findings can expose missing contracts or evidence; they do
-not recover undocumented design. Route readability and local-complexity
-findings to `code-simplification`.
+for behavior implementation, `browser-testing-with-devtools` for browser
+runtime evidence, `debugging-and-error-recovery` for systematic failure
+recovery, `doubt-driven-development` for in-flight adversarial review of
+non-trivial claims, and `code-review-and-quality` for formal review. Doubt
+findings can expose missing contracts or evidence; they do not recover
+undocumented design. Route readability and local-complexity findings to
+`code-simplification`.
 Route findings about established responsibility, dependency, variation, or
 configuration ownership to `behavior-preserving-refactoring`. Route material
 boundary findings back to iterative design. A bounded structural request may

@@ -72,6 +72,10 @@ Approved coordinated objective begins
 │  └─ Rust ownership or resource lifecycle → design-rust-lifecycles
 ├─ Approved behavior needs implementation and verification
 │  └─ external test-driven-development or repository-native implementation and verification
+├─ Browser behavior needs real runtime evidence
+│  └─ external browser-testing-with-devtools or repository-native verification
+├─ Tests, builds, or behavior fail unexpectedly
+│  └─ external debugging-and-error-recovery or repository-native debugging
 ├─ A non-trivial in-flight claim needs adversarial review before it stands
 │  └─ external doubt-driven-development
 ├─ Existing structure needs behavior-preserving improvement
