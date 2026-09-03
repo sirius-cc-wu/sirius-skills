@@ -66,8 +66,9 @@ def test_iteration_relationship_view_matches_current_routing_groups() -> None:
         "@startuml iterative-design-skill-relationships", maxsplit=1
     )[1].split("@enduml", maxsplit=1)[0]
     routed_names = {
-        "inception",
+        "define-project-vision",
         "use-case-modeling",
+        "specify-quality-constraints",
         "domain-modeling",
         "system-sequence-diagrams",
         "operation-contracts",
@@ -82,7 +83,7 @@ def test_iteration_relationship_view_matches_current_routing_groups() -> None:
 
     assert iteration_view.count("iterative ..>") == 4
     assert "The groups are not phases" in iteration_view
-    assert "inception --> usecases" not in iteration_view
+    assert "requirements --> usecases" not in iteration_view
     assert "architecture --> grasp" not in iteration_view
     for name in routed_names:
         assert name in iteration_view

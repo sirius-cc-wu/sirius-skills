@@ -21,8 +21,8 @@
     ],
     "negative": [
       {
-        "prompt": "Clarify the product vision, business case, feasibility, scope, and major risks for this candidate change before design.",
-        "owner": "inception"
+        "prompt": "Define the measurable performance, privacy, accessibility, and retention constraints for this approved feature before architecture design.",
+        "owner": "specify-quality-constraints"
       },
       {
         "prompt": "Select risk-driven UP analysis and design methods for this approved change without implementing it.",

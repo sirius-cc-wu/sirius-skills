@@ -21,26 +21,33 @@ those historical artifact types merely because their skills are retired.
    when the externally produced material's readiness or Sirius entry point is
    unclear. It may return another external prerequisite instead of forcing a
    Sirius owner.
-3. Use [`inception`](../../skills/inception/SKILL.md) when project- or
-   independently sponsored initiative-level vision, business case, scope,
-   feasibility, or major risks remain unclear. Do not use it merely to frame a
-   release, implementation phase, component, or completed milestone.
-4. Use [`use-case-modeling`](../../skills/use-case-modeling/SKILL.md) to express
+3. Use external `idea-refine` to prepare a candidate direction or business-case
+   hypothesis when needed. It does not approve the direction.
+4. Use [`define-project-vision`](../../skills/define-project-vision/SKILL.md)
+   when the project needs an evidence-backed identity, non-goals, or
+   contribution-acceptance policy. It may use the candidate direction and
+   repository history as evidence, but it does not approve a business decision.
+5. Obtain an approved business case, feasibility commitment, or investment
+   decision from the responsible external product or portfolio process.
+6. Use [`use-case-modeling`](../../skills/use-case-modeling/SKILL.md) to express
    approved actor goals and black-box behavior. Keep approved examples and
    boundary cases with the canonical requirements or use case. Use
+   [`specify-quality-constraints`](../../skills/specify-quality-constraints/SKILL.md)
+   when measurable quality requirements, binding constraints, or their
+   acceptance evidence need a canonical owner. Use
    [`operation-contracts`](../../skills/operation-contracts/SKILL.md) when
    non-trivial state effects need precise preconditions and postconditions.
-5. Use the
+7. Use the
    [iterative analysis and design track](iterative-analysis-design.md) for only
    the analysis, design, implementation, and verification needed by the current
    risk-sized objective.
-6. Use the
+8. Use the
    [implementation and evolution track](implementation-evolution.md) directly
    when approved behavior or design provides an independent oracle. Carry
    source revisions, authority, non-goals, exclusions, verification, and stop
    conditions into the implementation request without creating a separate
    briefing artifact by default.
-7. Return delivery evidence and new uncertainty to the canonical external
+9. Return delivery evidence and new uncertainty to the canonical external
    requirements owner or the responsible decision authority. Do not promote
    implementation discoveries into approved intent.
 

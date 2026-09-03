@@ -57,8 +57,10 @@ summarizes those handoffs:
 | Cross-cutting Support | Whether candidate knowledge should be created, updated, embedded, kept with implementation, omitted, or deferred | [`select-technical-artifacts`](../../skills/select-technical-artifacts/SKILL.md) |
 | Cross-cutting Support | Canonical repository homes, lifecycle separation, or artifact migration | [`design-repository-artifact-layout`](../../skills/design-repository-artifact-layout/SKILL.md) |
 | Cross-cutting Support | One consequential architecture choice needs proposed review, accepted history, or supersession | External `documentation-and-adrs` with the `all` installation; otherwise repository-native ADR guidance |
-| Requirements Analysis | Vision, feasibility, project or independently sponsored initiative scope, or major business risk | [`inception`](../../skills/inception/SKILL.md) |
+| Requirements Analysis | A durable project vision, non-goals, or contribution-acceptance policy | [`define-project-vision`](../../skills/define-project-vision/SKILL.md) |
+| External prerequisite | A business case, feasibility commitment, or investment decision needs authority | Responsible external product or portfolio process; external `idea-refine` may prepare candidate input |
 | Requirements Analysis | Actors, goals, system boundary, or scenario flow | [`use-case-modeling`](../../skills/use-case-modeling/SKILL.md) |
+| Requirements Analysis | Measurable quality requirements, binding constraints, cross-cutting special requirements, or acceptance evidence | [`specify-quality-constraints`](../../skills/specify-quality-constraints/SKILL.md) |
 | System Analysis | Business concepts and shared vocabulary | [`domain-modeling`](../../skills/domain-modeling/SKILL.md) |
 | System Analysis | Actor-system events and operation names | [`system-sequence-diagrams`](../../skills/system-sequence-diagrams/SKILL.md) |
 | System Analysis | Non-trivial state effects and invariants | [`operation-contracts`](../../skills/operation-contracts/SKILL.md) |

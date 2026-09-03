@@ -13,10 +13,15 @@ discovery**, not merely prompt writing.
 
 The existing pipeline starts after useful client knowledge already exists:
 
-- [`inception`](../../skills/inception/SKILL.md) frames vision, scope, feasibility,
-  and risks.
+- External `idea-refine` prepares a candidate direction or business-case
+  hypothesis. [`define-project-vision`](../../skills/define-project-vision/SKILL.md)
+  guides grounded input toward an authority-approved project vision; the
+  responsible external product or portfolio process owns feasibility and
+  investment decisions.
 - [`use-case-modeling`](../../skills/use-case-modeling/SKILL.md) expresses actor goals
-  and system behavior.
+  and system behavior, while
+  [`specify-quality-constraints`](../../skills/specify-quality-constraints/SKILL.md)
+  owns measurable quality requirements and binding constraints.
 - External or repository-native implementation starts from approved examples,
   requirements, or contracts and must not guess missing business rules.
 
@@ -129,7 +134,7 @@ The active family contains three independently deployable skills.
 | Skill | Responsibility | Main output | Important boundary |
 |---|---|---|---|
 | `stakeholder-requirements-elicitation` | Identify the right participants and learn how their work actually operates through interviews, observation, workshops, document review, and prototypes | Stakeholder Evidence Record with coverage, plan, sources, conflicts, and open questions | Records evidence; does not silently convert every client statement into a requirement |
-| `requirements-synthesis-validation` | Turn evidence into goals, workflows, rules, constraints, quality attributes, scenarios, assumptions, and decisions; play these back to stakeholders | Requirements Discovery Brief with candidates, validated examples, and decision/conflict log | Routes results into inception, use cases, domain models, and supplementary requirements; does not design software |
+| `requirements-synthesis-validation` | Turn evidence into goals, workflows, rules, constraints, quality attributes, scenarios, assumptions, and decisions; play these back to stakeholders | Requirements Discovery Brief with candidates, validated examples, and decision/conflict log | Routes candidate direction to external `idea-refine`, durable project vision to `define-project-vision`, business decisions to the responsible external owner, and technical knowledge to use cases, domain models, and supplementary requirements; does not design software |
 | `implementation-slice-briefing` | Select a sufficiently understood behavior slice and assemble its approved sources into a coding-agent-ready brief | Implementation Slice Brief with approved examples, traceability, verification, and stop conditions | Packages existing decisions; never invents missing business rules or architecture |
 
 If the first skill becomes too large, it could later split into
@@ -213,7 +218,9 @@ The skill should:
   or correct;
 - play the synthesis back to the relevant stakeholders and record validation,
   rejection, approval, abstention, and unresolved conflict; and
-- route accepted results into inception, use cases, domain models,
+- route candidate direction to external `idea-refine`, durable project vision
+  to `define-project-vision`, business decisions to the responsible external
+  owner, and accepted technical knowledge to use cases, domain models,
   supplementary requirements, or other owning artifacts.
 
 Exit with a discovery brief whose statements have explicit status and source
@@ -235,10 +242,12 @@ The skill should:
 - make every remaining uncertainty and coding-agent stop condition visible.
 
 Exit with a bounded brief that an unfamiliar implementer can follow and trace.
-Route missing business rules back to synthesis, missing scope or feasibility
-decisions to inception, missing behavioral detail to use cases or contracts,
-and missing architecture to the relevant design workflow. Never fill those
-gaps merely to make the brief appear executable.
+Route missing business rules back to synthesis, candidate direction to external
+`idea-refine`, missing project vision to `define-project-vision`, missing
+business-case or feasibility decisions to the responsible external product or
+portfolio process, missing behavioral detail to use cases or contracts, and
+missing architecture to the relevant design workflow. Never fill those gaps
+merely to make the brief appear executable.
 
 ## What an Agent-Ready Brief Should Contain
 

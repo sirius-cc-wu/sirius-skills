@@ -1,0 +1,52 @@
+{
+  "skill_name": "define-project-vision",
+  "trigger": {
+    "positive": [
+      {
+        "prompt": "Draft a durable project vision with explicit non-goals and accept-or-resist criteria for future contributions.",
+        "top_k": 3
+      },
+      {
+        "prompt": "Mine the repository history and existing documentation to propose an evidence-backed delta to VISION.md, then identify the authority that must approve it.",
+        "top_k": 3
+      },
+      {
+        "prompt": "What does this project refuse to become? Create a reviewable vision policy from approved direction and meaningful commit history.",
+        "top_k": 3
+      }
+    ],
+    "negative": [
+      {
+        "prompt": "Identify the actors, their goals, and the main and alternate black-box scenarios for this approved feature.",
+        "owner": "use-case-modeling"
+      },
+      {
+        "prompt": "Define measurable privacy, accessibility, retention, and availability requirements for this approved customer portal.",
+        "owner": "specify-quality-constraints"
+      }
+    ]
+  },
+  "evals": [
+    {
+      "id": "draft-vision-from-history-without-inventing-approval",
+      "prompt": "The Atlas repository has five years of commits, a README that calls it a local-first note tool, an old release that added cloud collaboration, and recent commits that simplify offline synchronization. There is no VISION.md, the original project owner has left, and the current maintainer has not stated whether cloud collaboration remains in scope. Define the smallest read-only vision process without creating files.",
+      "expected_output": "A read-only vision assessment that preserves history as evidence, identifies the missing authority and cloud-scope conflict, proposes a candidate acceptance policy only where supported, and stops before claiming approval.",
+      "expectations": [
+        "The response fixes the Atlas project boundary and identifies the current vision authority as a prerequisite",
+        "The response treats the README, releases, and commits as evidence rather than approved current intent",
+        "The response identifies local-first behavior and cloud collaboration as a non-trivial boundary case for authority review",
+        "The response proposes identity, non-goal, and accept-or-resist content only as a draft or delta with source references",
+        "The response routes business decisions and detailed requirements to their separate owners"
+      ],
+      "prohibitions": [
+        "Do not claim that commit history, the README, or the former owner approves the current vision",
+        "Do not decide whether cloud collaboration is in scope",
+        "Do not create or modify repository artifacts"
+      ],
+      "workspace_mode": "read-only",
+      "allowed_mutations": [],
+      "required_mutations": [],
+      "trust_level": "provisional"
+    }
+  ]
+}

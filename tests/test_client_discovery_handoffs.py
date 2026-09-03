@@ -26,8 +26,9 @@ def test_client_to_code_track_routes_retired_capabilities_to_active_owners() -> 
 
     skill_links = [
         "../../skills/assess-development-input/SKILL.md",
-        "../../skills/inception/SKILL.md",
+        "../../skills/define-project-vision/SKILL.md",
         "../../skills/use-case-modeling/SKILL.md",
+        "../../skills/specify-quality-constraints/SKILL.md",
         "../../skills/operation-contracts/SKILL.md",
     ]
     positions = [track.index(link) for link in skill_links]

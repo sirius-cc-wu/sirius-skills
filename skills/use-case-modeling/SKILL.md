@@ -25,7 +25,7 @@ Use cases capture how actors achieve goals with the system as a black box. They 
 5. **Orient the reader.** State the actor's problem, intended outcome, and the most important behavioral boundary in plain language.
 6. **Write black-box scenarios.** Describe actor intent and system responsibilities without UI widgets or internal classes.
 7. **Separate main success from extensions.** Keep the successful representative scenario readable, then add alternate and failure flows.
-8. **Attach related requirements.** Link non-functional requirements, business rules, data requirements, and constraints to the relevant use cases.
+8. **Attach related requirements.** Link business rules, data requirements, and the canonical quality requirements and constraints to relevant use cases. Do not copy cross-cutting requirements into each scenario; use `specify-quality-constraints` when their definition, measure, or conflict is unclear.
 9. **Use diagrams only as an index.** Create a use-case diagram when it helps show actors and use-case names.
 10. **Mark detail level by risk.** Fully dress architecturally significant or risky use cases; keep low-risk cases brief or casual.
 
@@ -74,7 +74,7 @@ boundary in plain language.]
 
 ## Special Requirements
 
-- [Quality attribute, rule, constraint]
+- [Rule, data requirement, or link to a canonical quality requirement or constraint]
 
 ## Open Questions
 
@@ -95,5 +95,5 @@ boundary in plain language.]
 - [ ] The goal orients the reader before detailed scenarios and requirements.
 - [ ] Main success scenarios are black-box and actor-goal oriented.
 - [ ] Important extensions and failure paths are captured.
-- [ ] Non-functional requirements and business rules are linked to affected use cases.
+- [ ] Business rules and canonical quality requirements or constraints are linked to affected use cases without duplicating cross-cutting definitions.
 - [ ] A standalone Markdown use case exposes identity, summary, actor, scope, level, and lifecycle metadata in one frontmatter block.

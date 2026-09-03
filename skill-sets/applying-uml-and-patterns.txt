@@ -2,8 +2,9 @@ assess-development-input
 select-technical-artifacts
 design-repository-artifact-layout
 iterative-risk-driven-development
-inception
+define-project-vision
 use-case-modeling
+specify-quality-constraints
 domain-modeling
 system-sequence-diagrams
 operation-contracts

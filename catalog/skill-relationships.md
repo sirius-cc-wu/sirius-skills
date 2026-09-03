@@ -6,7 +6,7 @@ current risk or complete the current behavior slice.
 
 ## Overview
 
-This overview groups all 19 deployable Sirius skills and 13 external add-ons by
+This overview groups all 20 deployable Sirius skills and 13 external add-ons by
 responsibility. It uses group-level routes to keep the map readable. The
 detailed diagrams below preserve conditional specialist routing and feedback.
 Solid arrows show common handoffs. Dashed arrows show conditional routing or
@@ -67,8 +67,9 @@ package "Question-Selected Analysis and Design" as analysis {
   ]
   rectangle requirements #EAF4FB [
   **Requirements Analysis**
-  inception
+  define-project-vision
   use-case-modeling
+  specify-quality-constraints
   ]
   rectangle systemAnalysis #EEF8EE [
   **System Analysis**
@@ -170,16 +171,23 @@ collections. They are not part of the Sirius catalog or named profiles.
 13 curated add-ons; other profiles do not. The diagram shows one optional
 composition. `interview-me` confirms one requester's intent.
 `idea-refine` turns that intent into a focused, user-confirmed candidate
-one-pager. `spec-driven-development` turns a confirmed direction into a
-human-reviewed implementation specification. Skip any step whose input is
-already sufficiently clear.
+one-pager. It can prepare a candidate direction or business-case hypothesis,
+but it cannot approve an investment decision. `define-project-vision` guides
+sufficiently grounded input toward an authority-approved project acceptance policy.
+`spec-driven-development` turns a confirmed direction into a human-reviewed
+implementation specification. Skip any step whose input is already sufficiently
+clear.
 
-Use `idea-refine` for a candidate direction. Save the confirmed
-one-pager in `docs/ideas/` or a feature path defined by local governance. Use
-one canonical idea document for each candidate direction. Do not create a second
-document for a direction that already has one. Requester confirmation is not
-organizational approval. Use the dashed edge to `assess-development-input` only
-when the artifact's next Sirius owner is unclear.
+Use `idea-refine` for a candidate direction or business-case hypothesis. Save
+the confirmed one-pager in `docs/ideas/` or a feature path defined by local
+governance. Use one canonical idea document for each candidate direction. Do not
+create a second document for a direction that already has one. Requester
+confirmation is not organizational approval. Use `define-project-vision` when
+the project needs a durable vision, non-goals, or accept-or-resist policy. Route
+a business case, feasibility commitment, or investment decision to the
+responsible external product or portfolio process. Use the dashed edge to
+`assess-development-input` only when the artifact's next Sirius owner is
+unclear.
 
 Use `spec-driven-development` when a confirmed direction needs an
 implementation-ready specification before Sirius intake and execution. Skip it
@@ -253,7 +261,7 @@ implementation-facing design.
   bounded behavior, analysis, design, language, or implementation iteration,
   or when a complex refactoring moves a system, test, responsibility, runtime,
   resource, or verification boundary. Within that route:
-  - use **Requirements Analysis** for scope, actors, goals, and scenarios;
+  - use **Requirements Analysis** for project vision, actors, goals, scenarios, measurable quality requirements, and binding constraints;
   - use **System Analysis** for domain concepts, system events, and state
     effects;
   - use **Software/System Design** for major components, architecture
@@ -317,18 +325,21 @@ Clarifying one requester's intent does not replace a responsible stakeholder
 process when several roles, evidence sources, conflicts, or decision authorities
 matter. Treat missing stakeholder evidence, validation, or approval as an
 external prerequisite. Route current-system claims that lack evidence to a
-responsible external recovery process. Route project or independent-initiative
-scope and feasibility to inception. Route approved actor goals and scenario flow
-to use-case modeling,
-non-trivial state effects to operation contracts, and a bounded approved oracle
-to external `test-driven-development` when the `all` installation is available;
-otherwise, use repository-native implementation. Route browser runtime evidence
-to external `browser-testing-with-devtools` and unexpected test, build, or
-behavior failures to external `debugging-and-error-recovery` when available;
-otherwise, use repository-native verification and debugging. Route one
-independently consequential proposed, accepted, or superseding architecture
-choice to external `documentation-and-adrs` when available or to
-repository-native ADR guidance.
+responsible external recovery process. Use external `idea-refine` for a
+candidate direction or business-case hypothesis. Route durable project vision,
+non-goals, or contribution-acceptance policy to `define-project-vision`. Route
+a business case, feasibility commitment, or investment decision to the
+responsible external product or portfolio process. Route approved actor goals
+and scenario flow to use-case modeling, measurable quality requirements and binding
+constraints to `specify-quality-constraints`, non-trivial state effects to
+operation contracts, and a bounded approved oracle to external
+`test-driven-development` when the `all` installation is available; otherwise,
+use repository-native implementation. Route browser runtime evidence to external
+`browser-testing-with-devtools` and unexpected test, build, or behavior failures
+to external `debugging-and-error-recovery` when available; otherwise, use
+repository-native verification and debugging. Route one independently
+consequential proposed, accepted, or superseding architecture choice to external
+`documentation-and-adrs` when available or to repository-native ADR guidance.
 
 ## External current-system recovery
 
@@ -418,8 +429,10 @@ Select only the owners needed by the current objective.
 
 rectangle requirements #EAF4FB [
 **Requirements Analysis**
-project or independent-initiative scope, feasibility, or major risk → inception
+durable project vision, non-goals, or contribution policy → define-project-vision
 actors, goals, boundary, or scenarios → use-case-modeling
+quality requirements, binding constraints, or acceptance evidence → specify-quality-constraints
+business case, feasibility, or investment → responsible external product or portfolio process
 ]
 
 rectangle systemAnalysis #EEF8EE [

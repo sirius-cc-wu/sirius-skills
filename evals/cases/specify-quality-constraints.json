@@ -1,0 +1,51 @@
+{
+  "skill_name": "specify-quality-constraints",
+  "trigger": {
+    "positive": [
+      {
+        "prompt": "Turn the vague requirement that checkout must be fast and reliable into measurable quality requirements and acceptance evidence.",
+        "top_k": 3
+      },
+      {
+        "prompt": "Define the privacy, accessibility, retention, and supported-browser constraints that apply across this approved customer portal.",
+        "top_k": 3
+      },
+      {
+        "prompt": "Our use cases refer to secure audit logging but do not define the event conditions, retention obligation, or how to verify it. Specify the shared requirement.",
+        "top_k": 3
+      }
+    ],
+    "negative": [
+      {
+        "prompt": "Identify the actors, their goals, and the main and alternate black-box scenarios for this approved feature.",
+        "owner": "use-case-modeling"
+      },
+      {
+        "prompt": "Given approved latency, availability, and privacy requirements, select the major components, data ownership, and deployment trade-offs.",
+        "owner": "design-software-architecture"
+      }
+    ]
+  },
+  "evals": [
+    {
+      "id": "make-cross-cutting-quality-requirements-measurable",
+      "prompt": "The approved customer-portal scope includes account updates and document download. Stakeholders say the portal must be fast, accessible, and retain audit records according to policy, but provide no targets, supported assistive technology, policy revision, or decision authority. Define the smallest supplementary-requirements disposition without writing files yet.",
+      "expected_output": "A read-only supplementary-requirements assessment that separates candidate quality requirements and constraints from missing authority, identifies measurable fields and affected behavior, and stops before architecture design.",
+      "expectations": [
+        "The response distinguishes the quality requirements from binding constraints and identifies the missing policy revision and decision authority",
+        "The response defines the stimulus, condition, scope, response, and measure needed for each quality requirement without inventing targets",
+        "The response links the shared requirements to account updates and document download and names proportional verification evidence",
+        "The response routes architecture design only after approved requirements exist"
+      ],
+      "prohibitions": [
+        "Do not invent a latency target, retention duration, accessibility standard, or approving authority",
+        "Do not select components, deployment topology, or architecture style",
+        "Do not create or modify repository artifacts"
+      ],
+      "workspace_mode": "read-only",
+      "allowed_mutations": [],
+      "required_mutations": [],
+      "trust_level": "provisional"
+    }
+  ]
+}

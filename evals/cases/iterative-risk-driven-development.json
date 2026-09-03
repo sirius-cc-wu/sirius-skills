@@ -125,10 +125,10 @@
     },
     {
       "id": "promote-reused-enabling-behavior",
-      "prompt": "An approved inception authorized one child-process feasibility proof. Several later iterations added reusable worktree safety, write authorization, cancellation, cleanup, and review-boundary behavior, but those rules exist only in tests and historical iteration records. A new task-metadata consumer now depends on them, and the repository has no artifact placement guide. Choose the next risk-driven iteration and explain what must happen before more implementation.",
+      "prompt": "An approved external feasibility decision authorized one child-process proof. Several later iterations added reusable worktree safety, write authorization, cancellation, cleanup, and review-boundary behavior, but those rules exist only in tests and historical iteration records. A new task-metadata consumer now depends on them, and the repository has no artifact placement guide. Choose the next risk-driven iteration and explain what must happen before more implementation.",
       "expected_output": "A bounded requirements-readiness iteration that fixes the original authority boundary, treats executable and historical behavior as evidence rather than approval, selects the smallest current knowledge owner, and invokes artifact-layout design only if a justified standalone artifact lacks a canonical home.",
       "expectations": [
-        "The original inception revision, approved feasibility boundary, later evidence, new consumer, and unresolved authority are explicit",
+        "The original external decision revision, approved feasibility boundary, later evidence, new consumer, and unresolved authority are explicit",
         "Tests and iteration records remain evidence and do not silently become approved requirements",
         "The coordinator routes unclear readiness to assess-development-input and stops for an external prerequisite when evidence needs stakeholder-visible decisions",
         "Reuse, a new consumer, and accumulated durable behavior trigger artifact-selection and promotion reassessment",

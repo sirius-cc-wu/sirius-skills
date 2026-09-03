@@ -1,0 +1,4 @@
+interface:
+  display_name: "Specify Quality Constraints"
+  short_description: "Define measurable quality needs and constraints"
+  default_prompt: "Use $specify-quality-constraints to define measurable quality requirements, binding constraints, and their acceptance evidence."

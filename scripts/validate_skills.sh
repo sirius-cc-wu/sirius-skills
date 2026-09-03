@@ -239,7 +239,9 @@ grep -Fq '$design-repository-artifact-layout' "$layout_metadata" || fail "artifa
 template_types=(
   "assess-development-input|Development Input Assessment"
   "iterative-risk-driven-development|Iteration Record"
+  "define-project-vision|Vision"
   "use-case-modeling|Use Case"
+  "specify-quality-constraints|Supplementary Specification"
   "domain-modeling|Domain Model"
   "system-sequence-diagrams|System Sequence Diagram"
   "operation-contracts|Operation Contract"

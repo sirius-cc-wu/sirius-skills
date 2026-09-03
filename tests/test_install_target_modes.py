@@ -52,8 +52,9 @@ ITERATIVE_DESIGN_SKILLS = {
     "select-technical-artifacts",
     "design-repository-artifact-layout",
     "iterative-risk-driven-development",
-    "inception",
+    "define-project-vision",
     "use-case-modeling",
+    "specify-quality-constraints",
     "domain-modeling",
     "system-sequence-diagrams",
     "operation-contracts",
@@ -425,7 +426,7 @@ def test_validation_covers_the_consolidated_catalog() -> None:
     )
 
     assert result.returncode == 0, result.stdout
-    assert "Validated 19 skills" in result.stdout
+    assert "Validated 20 skills" in result.stdout
     assert (
         "Validated 13 external add-on skills across 3 source profiles" in result.stdout
     )

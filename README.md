@@ -200,14 +200,18 @@ writing, script testing, validation, and iteration. It does not make the new
 skill part of the Sirius catalog or authorize changes outside the requested
 package.
 
-`author-software-proposal` is retired. Existing legacy proposal artifacts
-remain valid at their migrated paths. Use `idea-refine` for new candidate
-directions. Route unevidenced current-system claims to a responsible external
-recovery process, project- or independently sponsored initiative-level scope
-and feasibility to `inception`, unresolved stakeholder
-authority to the responsible
-external process, approved actor goals and scenario flow to `use-case-modeling`,
-non-trivial state effects to `operation-contracts`, and placement questions to
+`author-software-proposal` and `inception` are retired. Existing proposal and
+inception artifacts remain valid at their recorded revisions. Use external
+`idea-refine` for a new candidate direction or business-case hypothesis. It
+produces candidate input, not organizational approval. Use
+`define-project-vision` for an evidence-backed project vision, non-goals, and
+contribution-acceptance policy. Route a business case, feasibility commitment,
+or investment decision to the responsible external product or portfolio process.
+Route unevidenced current-system claims to a responsible external recovery
+process, approved actor goals and scenario flow to `use-case-modeling`,
+measurable quality requirements and binding constraints to
+`specify-quality-constraints`, non-trivial state effects to
+`operation-contracts`, and placement questions to
 `design-repository-artifact-layout`.
 
 `stakeholder-requirements-elicitation`,

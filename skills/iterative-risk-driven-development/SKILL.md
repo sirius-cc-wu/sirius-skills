@@ -55,8 +55,10 @@ Approved coordinated objective begins
 ├─ Current behavior, architecture, deployment, or constraints lack evidence
 │  └─ stop for a responsible external recovery process
 ├─ Requirements Analysis question
-│  ├─ project or independent-initiative vision, scope, feasibility, or major risk → inception
-│  └─ actors, goals, boundary, or scenarios → use-case-modeling
+│  ├─ durable project vision, non-goals, or contribution-acceptance policy → define-project-vision
+│  ├─ actors, goals, boundary, or scenarios → use-case-modeling
+│  ├─ quality requirements, binding constraints, or acceptance evidence → specify-quality-constraints
+│  └─ business case, feasibility commitment, or investment decision → responsible external product or portfolio process; external idea-refine may prepare candidate input
 ├─ System Analysis question
 │  ├─ domain concepts or vocabulary → domain-modeling
 │  ├─ actor-system events or operations → system-sequence-diagrams
@@ -107,8 +109,8 @@ repository-native workflow or return the responsible prerequisite.
    current canonical owner, revision, lifecycle status, and approving
    authority. Treat code, tests, runtime observations, and historical iteration
    records as evidence, not approved intent. If material input exists only in
-   those sources, an inception or idea is being used beyond its approved
-   boundary, or readiness and the correct owner are unclear, stop and use
+   those sources, a candidate direction or enabling proof is being used beyond
+   its approved boundary, or readiness and the correct owner are unclear, stop and use
    `assess-development-input`. When evidence implications, conflicts, or
    decision status still need stakeholder validation, stop and name that
    external prerequisite instead of inventing approval.
@@ -357,7 +359,7 @@ deferred or changed after the objective was defined.
   or approving authority.
 - Code, tests, observations, or historical iteration records silently become
   approved product intent.
-- An inception, idea, or enabling proof is reused beyond its approved boundary
+- A candidate direction or enabling proof is reused beyond its approved boundary
   without reassessing ownership and promotion pressure.
 - The coordinator is used for session-start discovery or one isolated
   specialist task.

@@ -1,0 +1,4 @@
+interface:
+  display_name: "Define Project Vision"
+  short_description: "Create an evidence-backed project acceptance policy"
+  default_prompt: "Use $define-project-vision to draft and approve an evidence-backed project vision with explicit non-goals and acceptance criteria."
