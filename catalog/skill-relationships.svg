@@ -1,209 +1,240 @@
 <?xml version="1.0"?>
 <!-- Rendered from the overview PlantUML in catalog/skill-relationships.md. -->
-<?plantuml 1.2026.2?>
-<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" contentStyleType="text/css" data-diagram-type="CLASS" height="1265px" preserveAspectRatio="none" style="width:1457px;height:1265px;background:#FFFFFF;" version="1.1" viewBox="0 0 1457 1265" width="1457px" zoomAndPan="magnify">
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" data-diagram-type="CLASS" style="width:1568px;height:1267px;background:#FFFFFF;" width="1568px" height="1267px" viewBox="0 0 1568 1267" zoomAndPan="magnify" preserveAspectRatio="none" contentStyleType="text/css">
+  <?plantuml 1.2026.8beta1?>
   <defs/>
-  <g>
+  <g font-family="sans-serif" lengthAdjust="spacing">
     <!--cluster analysis-->
-    <g class="cluster" data-qualified-name="analysis" data-source-line="47" id="ent0008">
-      <rect fill="none" height="389.41" rx="2.5" ry="2.5" style="stroke:#000000;stroke-width:1.5;" width="568" x="7" y="293.38"/>
-      <text fill="#000000" font-family="Arial" font-size="14" font-weight="bold" lengthAdjust="spacing" textLength="308.8955" x="136.5522" y="308.3751">Question-Selected Analysis and Design</text>
+    <g class="cluster" data-qualified-name="analysis" id="ent0007" data-source-line="47">
+      <rect x="506" y="293.38" width="1048" height="389.41" fill="none" style="stroke:#000;stroke-width:1.5;" rx="2.5" ry="2.5"/>
+      <text x="875.552" y="308.375" fill="#000" font-size="14" textLength="308.896" font-weight="700" font-family="Arial">Question-Selected Analysis and Design</text>
     </g>
     <!--cluster delivery-->
-    <g class="cluster" data-qualified-name="delivery" data-source-line="84" id="ent0018">
-      <rect fill="none" height="628.79" rx="2.5" ry="2.5" style="stroke:#000000;stroke-width:1.5;" width="475" x="599" y="396.97"/>
-      <text fill="#000000" font-family="Arial" font-size="14" font-weight="bold" lengthAdjust="spacing" textLength="459.1221" x="606.939" y="411.9651">Implementation, Verify, Review, and Repository Workflow</text>
+    <g class="cluster" data-qualified-name="delivery" id="ent0020" data-source-line="89">
+      <rect x="7" y="396.97" width="475" height="628.79" fill="none" style="stroke:#000;stroke-width:1.5;" rx="2.5" ry="2.5"/>
+      <text x="14.939" y="411.965" fill="#000" font-size="14" textLength="459.122" font-weight="700" font-family="Arial">Implementation, Verify, Review, and Repository Workflow</text>
     </g>
     <!--cluster crosscutting-->
-    <g class="cluster" data-qualified-name="crosscutting" data-source-line="118" id="ent0028">
-      <rect fill="none" height="119.89" rx="2.5" ry="2.5" style="stroke:#000000;stroke-width:1.5;" width="805" x="646" y="1049.76"/>
-      <text fill="#000000" font-family="Arial" font-size="14" font-weight="bold" lengthAdjust="spacing" textLength="272.6719" x="912.1641" y="1064.7551">Independent Cross-Cutting Routes</text>
+    <g class="cluster" data-qualified-name="crosscutting" id="ent0030" data-source-line="123">
+      <rect x="157" y="1049.76" width="805" height="119.89" fill="none" style="stroke:#000;stroke-width:1.5;" rx="2.5" ry="2.5"/>
+      <text x="423.164" y="1064.755" fill="#000" font-size="14" textLength="272.672" font-weight="700" font-family="Arial">Independent Cross-Cutting Routes</text>
     </g>
     <!--entity specialist-->
-    <g class="entity" data-qualified-name="analysis.specialist" data-source-line="48" id="ent0009">
-      <rect fill="#FFFFFF" height="52.5938" rx="6" ry="6" style="stroke:#52606D;stroke-width:0.5;" width="241.9766" x="170.01" y="328.38"/>
-      <text fill="#000000" font-family="Arial" font-size="14" lengthAdjust="spacing" textLength="192.8691" x="194.5637" y="351.3751">Select only the specialist(s)</text>
-      <text fill="#000000" font-family="Arial" font-size="14" lengthAdjust="spacing" textLength="221.9766" x="180.01" y="367.672">needed by the current question</text>
+    <g class="entity" data-qualified-name="analysis.specialist" id="ent0008" data-source-line="48">
+      <rect x="522.01" y="328.38" width="241.977" height="52.594" fill="#FFF" style="stroke:#52606D;stroke-width:0.5;" rx="6" ry="6"/>
+      <text x="546.564" y="351.375" fill="#000" font-size="14" textLength="192.869" font-family="Arial">Select only the specialist(s)</text>
+      <text x="532.01" y="367.672" fill="#000" font-size="14" textLength="221.977" font-family="Arial">needed by the current question</text>
+    </g>
+    <!--entity vision-->
+    <g class="entity" data-qualified-name="analysis.vision" id="ent0009" data-source-line="52">
+      <rect x="522.3" y="440.12" width="325.409" height="52.594" fill="#EAF4FB" style="stroke:#52606D;stroke-width:0.5;" rx="6" ry="6"/>
+      <text x="532.3" y="463.115" fill="#000" font-size="14" textLength="305.409" font-weight="700" font-family="Arial">Requirements Analysis &#xB7; Project Vision</text>
+      <text x="613.203" y="479.412" fill="#000" font-size="14" textLength="143.603" font-family="Arial">define-project-vision</text>
     </g>
     <!--entity requirements-->
-    <g class="entity" data-qualified-name="analysis.requirements" data-source-line="52" id="ent0010">
-      <rect fill="#EAF4FB" height="85.1875" rx="6" ry="6" style="stroke:#52606D;stroke-width:0.5;" width="205.3906" x="70.3" y="423.82"/>
-      <text fill="#000000" font-family="Arial" font-size="14" font-weight="bold" lengthAdjust="spacing" textLength="181.0498" x="82.4704" y="446.8151">Requirements Analysis</text>
-      <text fill="#000000" font-family="Arial" font-size="14" lengthAdjust="spacing" textLength="143.6025" x="101.194" y="463.112">define-project-vision</text>
-      <text fill="#000000" font-family="Arial" font-size="14" lengthAdjust="spacing" textLength="132.3096" x="106.8405" y="479.4089">use-case-modeling</text>
-      <text fill="#000000" font-family="Arial" font-size="14" lengthAdjust="spacing" textLength="185.3906" x="80.3" y="495.7057">specify-quality-constraints</text>
+    <g class="entity" data-qualified-name="analysis.requirements" id="ent0010" data-source-line="56">
+      <rect x="877.82" y="431.97" width="416.354" height="68.891" fill="#EAF4FB" style="stroke:#52606D;stroke-width:0.5;" rx="6" ry="6"/>
+      <text x="887.82" y="454.965" fill="#000" font-size="14" textLength="396.354" font-weight="700" font-family="Arial">Requirements Analysis &#xB7; Behavior and Constraints</text>
+      <text x="1019.842" y="471.262" fill="#000" font-size="14" textLength="132.31" font-family="Arial">use-case-modeling</text>
+      <text x="993.302" y="487.559" fill="#000" font-size="14" textLength="185.391" font-family="Arial">specify-quality-constraints</text>
     </g>
     <!--entity systemAnalysis-->
-    <g class="entity" data-qualified-name="analysis.systemAnalysis" data-source-line="58" id="ent0011">
-      <rect fill="#EEF8EE" height="85.1875" rx="6" ry="6" style="stroke:#52606D;stroke-width:0.5;" width="213.6895" x="306.16" y="423.82"/>
-      <text fill="#000000" font-family="Arial" font-size="14" font-weight="bold" lengthAdjust="spacing" textLength="128.8301" x="348.5897" y="446.8151">System Analysis</text>
-      <text fill="#000000" font-family="Arial" font-size="14" lengthAdjust="spacing" textLength="122.7256" x="351.6419" y="463.112">domain-modeling</text>
-      <text fill="#000000" font-family="Arial" font-size="14" lengthAdjust="spacing" textLength="193.6895" x="316.16" y="479.4089">system-sequence-diagrams</text>
-      <text fill="#000000" font-family="Arial" font-size="14" lengthAdjust="spacing" textLength="137.71" x="344.1497" y="495.7057">operation-contracts</text>
+    <g class="entity" data-qualified-name="analysis.systemAnalysis" id="ent0011" data-source-line="61">
+      <rect x="1324.16" y="423.82" width="213.689" height="85.188" fill="#EEF8EE" style="stroke:#52606D;stroke-width:0.5;" rx="6" ry="6"/>
+      <text x="1366.59" y="446.815" fill="#000" font-size="14" textLength="128.83" font-weight="700" font-family="Arial">System Analysis</text>
+      <text x="1369.642" y="463.112" fill="#000" font-size="14" textLength="122.726" font-family="Arial">domain-modeling</text>
+      <text x="1334.16" y="479.409" fill="#000" font-size="14" textLength="193.689" font-family="Arial">system-sequence-diagrams</text>
+      <text x="1362.15" y="495.706" fill="#000" font-size="14" textLength="137.71" font-family="Arial">operation-contracts</text>
     </g>
     <!--entity softwareDesign-->
-    <g class="entity" data-qualified-name="analysis.softwareDesign" data-source-line="64" id="ent0012">
-      <rect fill="#F3EEFF" height="117.7813" rx="6" ry="6" style="stroke:#52606D;stroke-width:0.5;" width="222.5488" x="22.73" y="549.01"/>
-      <text fill="#000000" font-family="Arial" font-size="14" font-weight="bold" lengthAdjust="spacing" textLength="193.8057" x="37.1016" y="572.0051">Software/System Design</text>
-      <text fill="#000000" font-family="Arial" font-size="14" lengthAdjust="spacing" textLength="202.5488" x="32.73" y="588.302">design-software-architecture</text>
-      <text fill="#000000" font-family="Arial" font-size="14" lengthAdjust="spacing" textLength="189.4512" x="39.2788" y="604.5989">grasp-responsibility-design</text>
-      <text fill="#000000" font-family="Arial" font-size="14" lengthAdjust="spacing" textLength="140.54" x="63.7344" y="620.8957">use-case-realization</text>
-      <text fill="#000000" font-family="Arial" font-size="14" lengthAdjust="spacing" textLength="180.9678" x="43.5205" y="637.1926">uml-class-diagram-design</text>
-      <text fill="#000000" font-family="Arial" font-size="14" lengthAdjust="spacing" textLength="185.459" x="41.2749" y="653.4895">design-pattern-application</text>
+    <g class="entity" data-qualified-name="analysis.softwareDesign" id="ent0012" data-source-line="67">
+      <rect x="773.73" y="549.01" width="222.549" height="117.781" fill="#F3EEFF" style="stroke:#52606D;stroke-width:0.5;" rx="6" ry="6"/>
+      <text x="788.102" y="572.005" fill="#000" font-size="14" textLength="193.806" font-weight="700" font-family="Arial">Software/System Design</text>
+      <text x="783.73" y="588.302" fill="#000" font-size="14" textLength="202.549" font-family="Arial">design-software-architecture</text>
+      <text x="790.279" y="604.599" fill="#000" font-size="14" textLength="189.451" font-family="Arial">grasp-responsibility-design</text>
+      <text x="814.734" y="620.896" fill="#000" font-size="14" textLength="140.54" font-family="Arial">use-case-realization</text>
+      <text x="794.521" y="637.193" fill="#000" font-size="14" textLength="180.968" font-family="Arial">uml-class-diagram-design</text>
+      <text x="792.275" y="653.489" fill="#000" font-size="14" textLength="185.459" font-family="Arial">design-pattern-application</text>
     </g>
     <!--entity detailedDesign-->
-    <g class="entity" data-qualified-name="analysis.detailedDesign" data-source-line="72" id="ent0013">
-      <rect fill="#FFFBEA" height="68.8906" rx="6" ry="6" style="stroke:#52606D;stroke-width:0.5;" width="283.2725" x="275.36" y="573.45"/>
-      <text fill="#000000" font-family="Arial" font-size="14" font-weight="bold" lengthAdjust="spacing" textLength="125.4805" x="354.256" y="596.4451">Detailed Design</text>
-      <text fill="#000000" font-family="Arial" font-size="14" lengthAdjust="spacing" textLength="263.2725" x="285.36" y="612.742">software-design-language-adaptation</text>
-      <text fill="#000000" font-family="Arial" font-size="14" lengthAdjust="spacing" textLength="148.7568" x="342.6178" y="629.0389">design-rust-lifecycles</text>
+    <g class="entity" data-qualified-name="analysis.detailedDesign" id="ent0013" data-source-line="75">
+      <rect x="1026.36" y="573.45" width="283.272" height="68.891" fill="#FFFBEA" style="stroke:#52606D;stroke-width:0.5;" rx="6" ry="6"/>
+      <text x="1105.256" y="596.445" fill="#000" font-size="14" textLength="125.48" font-weight="700" font-family="Arial">Detailed Design</text>
+      <text x="1036.36" y="612.742" fill="#000" font-size="14" textLength="263.272" font-family="Arial">software-design-language-adaptation</text>
+      <text x="1093.618" y="629.039" fill="#000" font-size="14" textLength="148.757" font-family="Arial">design-rust-lifecycles</text>
     </g>
     <!--entity implementation-->
-    <g class="entity" data-qualified-name="delivery.implementation" data-source-line="85" id="ent0019">
-      <rect fill="#F2F2F2" height="68.8906" rx="6" ry="6" style="stroke:#888888;stroke-width:0.5;" width="339.6758" x="615.16" y="431.97"/>
-      <text fill="#000000" font-family="Arial" font-size="14" font-weight="bold" lengthAdjust="spacing" textLength="319.6758" x="625.16" y="454.9651">External &#xB7; Implementation and Evolution</text>
-      <text fill="#000000" font-family="Arial" font-size="14" lengthAdjust="spacing" textLength="173.6465" x="698.1746" y="471.262">test-driven-development</text>
-      <text fill="#000000" font-family="Arial" font-size="14" lengthAdjust="spacing" textLength="187.4619" x="691.2669" y="487.5589">doubt-driven-development</text>
+    <g class="entity" data-qualified-name="delivery.implementation" id="ent0021" data-source-line="90">
+      <rect x="126.16" y="431.97" width="339.676" height="68.891" fill="#F2F2F2" style="stroke:#888;stroke-width:0.5;" rx="6" ry="6"/>
+      <text x="136.16" y="454.965" fill="#000" font-size="14" textLength="319.676" font-weight="700" font-family="Arial">External &#xB7; Implementation and Evolution</text>
+      <text x="209.175" y="471.262" fill="#000" font-size="14" textLength="173.646" font-family="Arial">test-driven-development</text>
+      <text x="202.267" y="487.559" fill="#000" font-size="14" textLength="187.462" font-family="Arial">doubt-driven-development</text>
     </g>
     <!--entity verify-->
-    <g class="entity" data-qualified-name="delivery.verify" data-source-line="90" id="ent0020">
-      <rect fill="#F2F2F2" height="68.8906" rx="6" ry="6" style="stroke:#888888;stroke-width:0.5;" width="232.1943" x="668.9" y="573.45"/>
-      <text fill="#000000" font-family="Arial" font-size="14" font-weight="bold" lengthAdjust="spacing" textLength="47.25" x="761.3722" y="596.4451">Verify</text>
-      <text fill="#000000" font-family="Arial" font-size="14" lengthAdjust="spacing" textLength="209.3027" x="680.3458" y="612.742">browser-testing-with-devtools</text>
-      <text fill="#000000" font-family="Arial" font-size="14" lengthAdjust="spacing" textLength="212.1943" x="678.9" y="629.0389">debugging-and-error-recovery</text>
+    <g class="entity" data-qualified-name="delivery.verify" id="ent0022" data-source-line="95">
+      <rect x="179.9" y="573.45" width="232.194" height="68.891" fill="#F2F2F2" style="stroke:#888;stroke-width:0.5;" rx="6" ry="6"/>
+      <text x="272.372" y="596.445" fill="#000" font-size="14" textLength="47.25" font-weight="700" font-family="Arial">Verify</text>
+      <text x="191.346" y="612.742" fill="#000" font-size="14" textLength="209.303" font-family="Arial">browser-testing-with-devtools</text>
+      <text x="189.9" y="629.039" fill="#000" font-size="14" textLength="212.194" font-family="Arial">debugging-and-error-recovery</text>
     </g>
     <!--entity review-->
-    <g class="entity" data-qualified-name="delivery.review" data-source-line="95" id="ent0021">
-      <rect fill="#FFFBEA" height="85.1875" rx="6" ry="6" style="stroke:#52606D;stroke-width:0.5;" width="297.4023" x="636.3" y="706.79"/>
-      <text fill="#000000" font-family="Arial" font-size="14" font-weight="bold" lengthAdjust="spacing" textLength="56.6289" x="756.6867" y="729.7851">Review</text>
-      <text fill="#000000" font-family="Arial" font-size="14" lengthAdjust="spacing" textLength="243.2295" x="663.3864" y="746.082">code-review-and-quality [external]</text>
-      <text fill="#000000" font-family="Arial" font-size="14" lengthAdjust="spacing" textLength="205.6865" x="682.1579" y="762.3789">code-simplification [external]</text>
-      <text fill="#000000" font-family="Arial" font-size="14" lengthAdjust="spacing" textLength="277.4023" x="646.3" y="778.6757">behavior-preserving-refactoring [Sirius]</text>
+    <g class="entity" data-qualified-name="delivery.review" id="ent0023" data-source-line="100">
+      <rect x="147.3" y="706.79" width="297.402" height="85.188" fill="#FFFBEA" style="stroke:#52606D;stroke-width:0.5;" rx="6" ry="6"/>
+      <text x="267.687" y="729.785" fill="#000" font-size="14" textLength="56.629" font-weight="700" font-family="Arial">Review</text>
+      <text x="174.386" y="746.082" fill="#000" font-size="14" textLength="243.229" font-family="Arial">code-review-and-quality [external]</text>
+      <text x="193.158" y="762.379" fill="#000" font-size="14" textLength="205.687" font-family="Arial">code-simplification [external]</text>
+      <text x="157.3" y="778.676" fill="#000" font-size="14" textLength="277.402" font-family="Arial">behavior-preserving-refactoring [Sirius]</text>
     </g>
     <!--entity integrate-->
-    <g class="entity" data-qualified-name="delivery.integrate" data-source-line="101" id="ent0022">
-      <rect fill="#F2F2F2" height="68.8906" rx="6" ry="6" style="stroke:#888888;stroke-width:0.5;" width="248.9424" x="660.53" y="831.98"/>
-      <text fill="#000000" font-family="Arial" font-size="14" font-weight="bold" lengthAdjust="spacing" textLength="228.9424" x="670.53" y="854.9751">External &#xB7; Integrate and Ship</text>
-      <text fill="#000000" font-family="Arial" font-size="14" lengthAdjust="spacing" textLength="195.3984" x="687.302" y="871.272">git-workflow-and-versioning</text>
-      <text fill="#000000" font-family="Arial" font-size="14" lengthAdjust="spacing" textLength="172.9902" x="698.5061" y="887.5689">documentation-and-adrs</text>
+    <g class="entity" data-qualified-name="delivery.integrate" id="ent0024" data-source-line="106">
+      <rect x="171.53" y="831.98" width="248.942" height="68.891" fill="#F2F2F2" style="stroke:#888;stroke-width:0.5;" rx="6" ry="6"/>
+      <text x="181.53" y="854.975" fill="#000" font-size="14" textLength="228.942" font-weight="700" font-family="Arial">External &#xB7; Integrate and Ship</text>
+      <text x="198.302" y="871.272" fill="#000" font-size="14" textLength="195.398" font-family="Arial">git-workflow-and-versioning</text>
+      <text x="209.506" y="887.569" fill="#000" font-size="14" textLength="172.99" font-family="Arial">documentation-and-adrs</text>
     </g>
     <!--entity repository-->
-    <g class="entity" data-qualified-name="delivery.repository" data-source-line="106" id="ent0023">
-      <rect fill="#F3EEFF" height="68.8906" rx="6" ry="6" style="stroke:#52606D;stroke-width:0.5;" width="244.9297" x="662.54" y="940.87"/>
-      <text fill="#000000" font-family="Arial" font-size="14" font-weight="bold" lengthAdjust="spacing" textLength="224.9297" x="672.54" y="963.8651">Sirius &#xB7; Repository Workflow</text>
-      <text fill="#000000" font-family="Arial" font-size="14" lengthAdjust="spacing" textLength="114.6455" x="727.6821" y="980.162">walkthrough-me</text>
-      <text fill="#000000" font-family="Arial" font-size="14" lengthAdjust="spacing" textLength="64.4424" x="752.7837" y="996.4589">create-pr</text>
+    <g class="entity" data-qualified-name="delivery.repository" id="ent0025" data-source-line="111">
+      <rect x="173.54" y="940.87" width="244.93" height="68.891" fill="#F3EEFF" style="stroke:#52606D;stroke-width:0.5;" rx="6" ry="6"/>
+      <text x="183.54" y="963.865" fill="#000" font-size="14" textLength="224.93" font-weight="700" font-family="Arial">Sirius &#xB7; Repository Workflow</text>
+      <text x="238.682" y="980.162" fill="#000" font-size="14" textLength="114.646" font-family="Arial">walkthrough-me</text>
+      <text x="263.784" y="996.459" fill="#000" font-size="14" textLength="64.442" font-family="Arial">create-pr</text>
     </g>
     <!--entity support-->
-    <g class="entity" data-qualified-name="crosscutting.support" data-source-line="119" id="ent0029">
-      <rect fill="#FFFBEA" height="68.8906" rx="6" ry="6" style="stroke:#52606D;stroke-width:0.5;" width="246.7891" x="661.61" y="1084.76"/>
-      <text fill="#000000" font-family="Arial" font-size="14" font-weight="bold" lengthAdjust="spacing" textLength="187.8926" x="691.0582" y="1107.7551">Sirius &#xB7; Artifact Support</text>
-      <text fill="#000000" font-family="Arial" font-size="14" lengthAdjust="spacing" textLength="173.0039" x="698.5026" y="1124.052">select-technical-artifacts</text>
-      <text fill="#000000" font-family="Arial" font-size="14" lengthAdjust="spacing" textLength="226.7891" x="671.61" y="1140.3489">design-repository-artifact-layout</text>
+    <g class="entity" data-qualified-name="crosscutting.support" id="ent0031" data-source-line="124">
+      <rect x="172.61" y="1084.76" width="246.789" height="68.891" fill="#FFFBEA" style="stroke:#52606D;stroke-width:0.5;" rx="6" ry="6"/>
+      <text x="202.058" y="1107.755" fill="#000" font-size="14" textLength="187.893" font-weight="700" font-family="Arial">Sirius &#xB7; Artifact Support</text>
+      <text x="209.503" y="1124.052" fill="#000" font-size="14" textLength="173.004" font-family="Arial">select-technical-artifacts</text>
+      <text x="182.61" y="1140.349" fill="#000" font-size="14" textLength="226.789" font-family="Arial">design-repository-artifact-layout</text>
     </g>
     <!--entity authoring-->
-    <g class="entity" data-qualified-name="crosscutting.authoring" data-source-line="124" id="ent0030">
-      <rect fill="#F2F2F2" height="52.5938" rx="6" ry="6" style="stroke:#888888;stroke-width:0.5;" width="218.3994" x="938.8" y="1092.91"/>
-      <text fill="#000000" font-family="Arial" font-size="14" font-weight="bold" lengthAdjust="spacing" textLength="198.3994" x="948.8" y="1115.9051">External &#xB7; Skill Authoring</text>
-      <text fill="#000000" font-family="Arial" font-size="14" lengthAdjust="spacing" textLength="82.5781" x="1006.7106" y="1132.202">skill-creator</text>
+    <g class="entity" data-qualified-name="crosscutting.authoring" id="ent0032" data-source-line="129">
+      <rect x="449.8" y="1092.91" width="218.399" height="52.594" fill="#F2F2F2" style="stroke:#888;stroke-width:0.5;" rx="6" ry="6"/>
+      <text x="459.8" y="1115.905" fill="#000" font-size="14" textLength="198.399" font-weight="700" font-family="Arial">External &#xB7; Skill Authoring</text>
+      <text x="517.711" y="1132.202" fill="#000" font-size="14" textLength="82.578" font-family="Arial">skill-creator</text>
     </g>
     <!--entity visual-->
-    <g class="entity" data-qualified-name="crosscutting.visual" data-source-line="128" id="ent0031">
-      <rect fill="#F2F2F2" height="52.5938" rx="6" ry="6" style="stroke:#888888;stroke-width:0.5;" width="247.3701" x="1187.31" y="1092.91"/>
-      <text fill="#000000" font-family="Arial" font-size="14" font-weight="bold" lengthAdjust="spacing" textLength="227.3701" x="1197.31" y="1115.9051">External &#xB7; Visual Explanation</text>
-      <text fill="#000000" font-family="Arial" font-size="14" lengthAdjust="spacing" textLength="63.4854" x="1279.2524" y="1132.202">show-me</text>
+    <g class="entity" data-qualified-name="crosscutting.visual" id="ent0033" data-source-line="133">
+      <rect x="698.31" y="1092.91" width="247.37" height="52.594" fill="#F2F2F2" style="stroke:#888;stroke-width:0.5;" rx="6" ry="6"/>
+      <text x="708.31" y="1115.905" fill="#000" font-size="14" textLength="227.37" font-weight="700" font-family="Arial">External &#xB7; Visual Explanation</text>
+      <text x="790.252" y="1132.202" fill="#000" font-size="14" textLength="63.485" font-family="Arial">show-me</text>
     </g>
     <!--entity define-->
-    <g class="entity" data-qualified-name="define" data-source-line="27" id="ent0002">
-      <rect fill="#F2F2F2" height="85.1875" rx="6" ry="6" style="stroke:#888888;stroke-width:0.5;" width="199.252" x="191.37" y="7"/>
-      <text fill="#000000" font-family="Arial" font-size="14" font-weight="bold" lengthAdjust="spacing" textLength="132.4326" x="224.7797" y="29.9951">External &#xB7; Define</text>
-      <text fill="#000000" font-family="Arial" font-size="14" lengthAdjust="spacing" textLength="92.1621" x="244.9149" y="46.292">interview-me</text>
-      <text fill="#000000" font-family="Arial" font-size="14" lengthAdjust="spacing" textLength="75.6943" x="253.1488" y="62.5889">idea-refine</text>
-      <text fill="#000000" font-family="Arial" font-size="14" lengthAdjust="spacing" textLength="179.252" x="201.37" y="78.8857">spec-driven-development</text>
+    <g class="entity" data-qualified-name="define" id="ent0001" data-source-line="27">
+      <rect x="760.37" y="7" width="199.252" height="85.188" fill="#F2F2F2" style="stroke:#888;stroke-width:0.5;" rx="6" ry="6"/>
+      <text x="793.78" y="29.995" fill="#000" font-size="14" textLength="132.433" font-weight="700" font-family="Arial">External &#xB7; Define</text>
+      <text x="813.915" y="46.292" fill="#000" font-size="14" textLength="92.162" font-family="Arial">interview-me</text>
+      <text x="822.149" y="62.589" fill="#000" font-size="14" textLength="75.694" font-family="Arial">idea-refine</text>
+      <text x="770.37" y="78.886" fill="#000" font-size="14" textLength="179.252" font-family="Arial">spec-driven-development</text>
     </g>
     <!--entity assess-->
-    <g class="entity" data-qualified-name="assess" data-source-line="33" id="ent0003">
-      <rect fill="#FFF4CC" height="52.5938" rx="6" ry="6" style="stroke:#52606D;stroke-width:0.5;" width="204.8369" x="188.58" y="132.19"/>
-      <text fill="#000000" font-family="Arial" font-size="14" font-weight="bold" lengthAdjust="spacing" textLength="110.0723" x="235.9623" y="155.1851">Sirius &#xB7; Intake</text>
-      <text fill="#000000" font-family="Arial" font-size="14" lengthAdjust="spacing" textLength="184.8369" x="198.58" y="171.482">assess-development-input</text>
+    <g class="entity" data-qualified-name="assess" id="ent0002" data-source-line="33">
+      <rect x="683.58" y="132.19" width="204.837" height="52.594" fill="#FFF4CC" style="stroke:#52606D;stroke-width:0.5;" rx="6" ry="6"/>
+      <text x="730.962" y="155.185" fill="#000" font-size="14" textLength="110.072" font-weight="700" font-family="Arial">Sirius &#xB7; Intake</text>
+      <text x="693.58" y="171.482" fill="#000" font-size="14" textLength="184.837" font-family="Arial">assess-development-input</text>
     </g>
     <!--entity iterative-->
-    <g class="entity" data-qualified-name="iterative" data-source-line="37" id="ent0004">
-      <rect fill="#DCEEFF" height="52.5938" rx="6" ry="6" style="stroke:#2F6690;stroke-width:0.5;" width="255.4639" x="76.27" y="224.78"/>
-      <text fill="#000000" font-family="Arial" font-size="14" font-weight="bold" lengthAdjust="spacing" textLength="234.4111" x="86.7964" y="247.7751">Sirius &#xB7; Iterative Coordination</text>
-      <text fill="#000000" font-family="Arial" font-size="14" lengthAdjust="spacing" textLength="235.4639" x="86.27" y="264.072">iterative-risk-driven-development</text>
+    <g class="entity" data-qualified-name="iterative" id="ent0003" data-source-line="37">
+      <rect x="570.27" y="224.78" width="255.464" height="52.594" fill="#DCEEFF" style="stroke:#2F6690;stroke-width:0.5;" rx="6" ry="6"/>
+      <text x="580.796" y="247.775" fill="#000" font-size="14" textLength="234.411" font-weight="700" font-family="Arial">Sirius &#xB7; Iterative Coordination</text>
+      <text x="580.27" y="264.072" fill="#000" font-size="14" textLength="235.464" font-family="Arial">iterative-risk-driven-development</text>
     </g>
-    <g class="entity" data-qualified-name="GMN5" data-source-line="43" id="ent0006">
-      <path d="M423.45,138.35 L423.45,154.65 L393.49,158.65 L423.45,162.65 L423.45,178.6156 A0,0 0 0 0 423.45,178.6156 L870.5555,178.6156 A0,0 0 0 0 870.5555,178.6156 L870.5555,148.35 L860.5555,138.35 L423.45,138.35 A0,0 0 0 0 423.45,138.35" fill="#FEFFDD" style="stroke:#181818;stroke-width:0.5;"/>
-      <path d="M860.5555,138.35 L860.5555,148.35 L870.5555,148.35 L860.5555,138.35" fill="#FEFFDD" style="stroke:#181818;stroke-width:0.5;"/>
-      <text fill="#000000" font-family="Arial" font-size="13" lengthAdjust="spacing" textLength="289.6626" x="497.6714" y="155.4169">Direct entry can also select implementation,</text>
-      <text fill="#000000" font-family="Arial" font-size="13" lengthAdjust="spacing" textLength="426.1055" x="429.45" y="170.5497">verification, review, repository workflow, or a cross-cutting route.</text>
+    <g class="entity" data-qualified-name="GMN4" id="ent0005" data-source-line="43">
+      <path d="M980.45,138.35 L980.45,154.65 L888.79,158.65 L980.45,162.65 L980.45,178.616 A0,0 0 0 0 980.45,178.616 L1427.555,178.616 A0,0 0 0 0 1427.555,178.616 L1427.555,148.35 L1417.555,138.35 L980.45,138.35 A0,0 0 0 0 980.45,138.35" style="stroke:#181818;stroke-width:0.5;" fill="#FEFFDD"/>
+      <path d="M1417.555,138.35 L1417.555,148.35 L1427.555,148.35 L1417.555,138.35" style="stroke:#181818;stroke-width:0.5;" fill="#FEFFDD"/>
+      <text x="1054.671" y="155.417" fill="#000" font-size="13" textLength="289.663" font-family="Arial">Direct entry can also select implementation,</text>
+      <text x="986.45" y="170.55" fill="#000" font-size="13" textLength="426.105" font-family="Arial">verification, review, repository workflow, or a cross-cutting route.</text>
     </g>
-    <!--link specialist to requirements-->
+    <!--link specialist to vision-->
+    <!--link vision to requirements-->
+    <!--link vision to requirements-->
+    <g class="link" data-entity-1="ent0009" data-entity-2="ent0010" id="lnk43" data-source-line="149" data-link-type="dependency">
+      <path d="M848.1,457.65 C857.86,457.65 862.74,457.65 872.65,457.65" style="stroke:#52606D;stroke-width:1;stroke-dasharray:7,7;" fill="none" id="vision-to-requirements-1" codeLine="149"/>
+      <polygon points="877.65,457.65,868.65,453.65,872.65,457.65,868.65,461.65,877.65,457.65" fill="#52606D" style="stroke:#52606D;stroke-width:1;stroke-linejoin:miter;stroke-miterlimit:10;"/>
+      <text x="785.37" y="470.717" fill="#000" font-size="13" textLength="155.556" font-family="Arial">accepted policy informs</text>
+    </g>
+    <!--link vision to softwareDesign-->
     <!--link requirements to systemAnalysis-->
     <!--link requirements to softwareDesign-->
     <!--link softwareDesign to detailedDesign-->
     <!--link implementation to verify-->
-    <g class="link" data-entity-1="ent0019" data-entity-2="ent0020" data-link-type="dependency" data-source-line="112" id="lnk24">
-      <path codeLine="112" d="M785,501.03 C785,522.95 785,545.21 785,567.16" fill="none" id="implementation-to-verify" style="stroke:#52606D;stroke-width:1;"/>
-      <polygon fill="#52606D" points="785,573.16,789,564.16,785,568.16,781,564.16,785,573.16" style="stroke:#52606D;stroke-width:1;"/>
-      <text fill="#000000" font-family="Arial" font-size="13" lengthAdjust="spacing" textLength="146.2437" x="638" y="533.1569">verify when requested</text>
+    <g class="link" data-entity-1="ent0021" data-entity-2="ent0022" id="lnk26" data-source-line="117" data-link-type="dependency">
+      <path d="M296,501.03 C296,522.95 296,546.21 296,568.16" style="stroke:#52606D;stroke-width:1;" fill="none" id="implementation-to-verify" codeLine="117"/>
+      <polygon points="296,573.16,300,564.16,296,568.16,292,564.16,296,573.16" fill="#52606D" style="stroke:#52606D;stroke-width:1;stroke-linejoin:miter;stroke-miterlimit:10;"/>
+      <text x="149" y="533.157" fill="#000" font-size="13" textLength="146.244" font-family="Arial">verify when requested</text>
     </g>
     <!--link verify to review-->
-    <g class="link" data-entity-1="ent0020" data-entity-2="ent0021" data-link-type="dependency" data-source-line="113" id="lnk25">
-      <path codeLine="113" d="M785,642.51 C785,661.82 785,680.03 785,700.53" fill="none" id="verify-to-review" style="stroke:#52606D;stroke-width:1;"/>
-      <polygon fill="#52606D" points="785,706.53,789,697.53,785,701.53,781,697.53,785,706.53" style="stroke:#52606D;stroke-width:1;"/>
-      <text fill="#000000" font-family="Arial" font-size="13" lengthAdjust="spacing" textLength="152.604" x="632" y="670.5869">review when requested</text>
+    <g class="link" data-entity-1="ent0022" data-entity-2="ent0023" id="lnk27" data-source-line="118" data-link-type="dependency">
+      <path d="M296,642.51 C296,661.82 296,681.03 296,701.53" style="stroke:#52606D;stroke-width:1;" fill="none" id="verify-to-review" codeLine="118"/>
+      <polygon points="296,706.53,300,697.53,296,701.53,292,697.53,296,706.53" fill="#52606D" style="stroke:#52606D;stroke-width:1;stroke-linejoin:miter;stroke-miterlimit:10;"/>
+      <text x="143" y="670.587" fill="#000" font-size="13" textLength="152.604" font-family="Arial">review when requested</text>
     </g>
     <!--link review to integrate-->
-    <g class="link" data-entity-1="ent0021" data-entity-2="ent0022" data-link-type="dependency" data-source-line="114" id="lnk26">
-      <path codeLine="114" d="M785,792.3 C785,805.22 785,813.23 785,825.56" fill="none" id="review-to-integrate" style="stroke:#52606D;stroke-width:1;stroke-dasharray:7,7;"/>
-      <polygon fill="#52606D" points="785,831.56,789,822.56,785,826.56,781,822.56,785,831.56" style="stroke:#52606D;stroke-width:1;"/>
-      <text fill="#000000" font-family="Arial" font-size="13" lengthAdjust="spacing" textLength="111.3823" x="673" y="807.9969">prepared change</text>
+    <g class="link" data-entity-1="ent0023" data-entity-2="ent0024" id="lnk28" data-source-line="119" data-link-type="dependency">
+      <path d="M296,792.3 C296,805.22 296,814.23 296,826.56" style="stroke:#52606D;stroke-width:1;stroke-dasharray:7,7;" fill="none" id="review-to-integrate" codeLine="119"/>
+      <polygon points="296,831.56,300,822.56,296,826.56,292,822.56,296,831.56" fill="#52606D" style="stroke:#52606D;stroke-width:1;stroke-linejoin:miter;stroke-miterlimit:10;"/>
+      <text x="184" y="807.997" fill="#000" font-size="13" textLength="111.382" font-family="Arial">prepared change</text>
     </g>
     <!--link integrate to repository-->
-    <g class="link" data-entity-1="ent0022" data-entity-2="ent0023" data-link-type="dependency" data-source-line="115" id="lnk27">
-      <path codeLine="115" d="M785,901.18 C785,913.75 785,921.94 785,934.52" fill="none" id="integrate-to-repository" style="stroke:#52606D;stroke-width:1;stroke-dasharray:7,7;"/>
-      <polygon fill="#52606D" points="785,940.52,789,931.52,785,935.52,781,931.52,785,940.52" style="stroke:#52606D;stroke-width:1;"/>
-      <text fill="#000000" font-family="Arial" font-size="13" lengthAdjust="spacing" textLength="159.8784" x="625" y="916.9169">publish when authorized</text>
+    <g class="link" data-entity-1="ent0024" data-entity-2="ent0025" id="lnk29" data-source-line="120" data-link-type="dependency">
+      <path d="M296,901.18 C296,913.75 296,922.94 296,935.52" style="stroke:#52606D;stroke-width:1;stroke-dasharray:7,7;" fill="none" id="integrate-to-repository" codeLine="120"/>
+      <polygon points="296,940.52,300,931.52,296,935.52,292,931.52,296,940.52" fill="#52606D" style="stroke:#52606D;stroke-width:1;stroke-linejoin:miter;stroke-miterlimit:10;"/>
+      <text x="136" y="916.917" fill="#000" font-size="13" textLength="159.878" font-family="Arial">publish when authorized</text>
     </g>
     <!--link support to authoring-->
     <!--link authoring to visual-->
     <!--link define to assess-->
-    <g class="link" data-entity-1="ent0002" data-entity-2="ent0003" data-link-type="dependency" data-source-line="137" id="lnk34">
-      <path codeLine="137" d="M291,92.63 C291,105.83 291,113.96 291,125.74" fill="none" id="define-to-assess" style="stroke:#52606D;stroke-width:1;stroke-dasharray:7,7;"/>
-      <polygon fill="#52606D" points="291,131.74,295,122.74,291,126.74,287,122.74,291,131.74" style="stroke:#52606D;stroke-width:1;"/>
-      <text fill="#000000" font-family="Arial" font-size="13" lengthAdjust="spacing" textLength="87.312" x="203" y="108.2569">route unclear</text>
+    <g class="link" data-entity-1="ent0001" data-entity-2="ent0002" id="lnk36" data-source-line="142" data-link-type="dependency">
+      <path d="M824.4,92.63 C824.4,105.83 824.4,114.96 824.4,126.74" style="stroke:#52606D;stroke-width:1;stroke-dasharray:7,7;" fill="none" id="define-to-assess" codeLine="142"/>
+      <polygon points="824.4,131.74,828.4,122.74,824.4,126.74,820.4,122.74,824.4,131.74" fill="#52606D" style="stroke:#52606D;stroke-width:1;stroke-linejoin:miter;stroke-miterlimit:10;"/>
+      <text x="736.4" y="108.257" fill="#000" font-size="13" textLength="87.312" font-family="Arial">route unclear</text>
+    </g>
+    <!--link define to vision-->
+    <g class="link" data-entity-1="ent0001" data-entity-2="ent0009" id="lnk37" data-source-line="143" data-link-type="dependency">
+      <path d="M924.02,92.65 C924.02,138.84 924.02,205.65 924.02,205.65 C924.02,205.65 842.21,205.65 842.21,205.65 C842.21,205.65 842.21,368.68 842.21,434.98" style="stroke:#52606D;stroke-width:1;stroke-dasharray:7,7;" fill="none" id="define-to-vision" codeLine="143"/>
+      <polygon points="842.21,439.98,846.21,430.98,842.21,434.98,838.21,430.98,842.21,439.98" fill="#52606D" style="stroke:#52606D;stroke-width:1;stroke-linejoin:miter;stroke-miterlimit:10;"/>
+      <text x="668.21" y="221.477" fill="#000" font-size="13" textLength="173.354" font-family="Arial">clarified direction or intent</text>
     </g>
     <!--link assess to iterative-->
-    <g class="link" data-entity-1="ent0003" data-entity-2="ent0004" data-link-type="dependency" data-source-line="138" id="lnk35">
-      <path codeLine="138" d="M260.16,185.27 C260.16,197.55 260.16,206.08 260.16,218.36" fill="none" id="assess-to-iterative" style="stroke:#52606D;stroke-width:1;stroke-dasharray:7,7;"/>
-      <polygon fill="#52606D" points="260.16,224.36,264.16,215.36,260.16,219.36,256.16,215.36,260.16,224.36" style="stroke:#52606D;stroke-width:1;"/>
-      <text fill="#000000" font-family="Arial" font-size="13" lengthAdjust="spacing" textLength="163.3506" x="96.16" y="200.8769">multi-boundary objective</text>
+    <g class="link" data-entity-1="ent0002" data-entity-2="ent0003" id="lnk38" data-source-line="144" data-link-type="dependency">
+      <path d="M754.66,185.27 C754.66,197.55 754.66,207.08 754.66,219.36" style="stroke:#52606D;stroke-width:1;stroke-dasharray:7,7;" fill="none" id="assess-to-iterative" codeLine="144"/>
+      <polygon points="754.66,224.36,758.66,215.36,754.66,219.36,750.66,215.36,754.66,224.36" fill="#52606D" style="stroke:#52606D;stroke-width:1;stroke-linejoin:miter;stroke-miterlimit:10;"/>
+      <text x="590.66" y="200.877" fill="#000" font-size="13" textLength="163.351" font-family="Arial">multi-boundary objective</text>
     </g>
     <!--link assess to specialist-->
-    <g class="link" data-entity-1="ent0003" data-entity-2="ent0009" data-link-type="dependency" data-source-line="139" id="lnk36">
-      <path codeLine="139" d="M362.58,184.94 C362.58,222.39 362.58,284.45 362.58,322.01" fill="none" id="assess-to-specialist" style="stroke:#52606D;stroke-width:1;stroke-dasharray:7,7;"/>
-      <polygon fill="#52606D" points="362.58,328.01,366.58,319.01,362.58,323.01,358.58,319.01,362.58,328.01" style="stroke:#52606D;stroke-width:1;"/>
+    <g class="link" data-entity-1="ent0002" data-entity-2="ent0008" id="lnk39" data-source-line="145" data-link-type="dependency">
+      <path d="M831.23,185.08 C831.23,238.89 831.23,355.65 831.23,355.65 C831.23,355.65 805.76,355.65 769.33,355.65" style="stroke:#52606D;stroke-width:1;stroke-dasharray:7,7;" fill="none" id="assess-to-specialist" codeLine="145"/>
+      <polygon points="764.33,355.65,773.33,359.65,769.33,355.65,773.33,351.65,764.33,355.65" fill="#52606D" style="stroke:#52606D;stroke-width:1;stroke-linejoin:miter;stroke-miterlimit:10;"/>
+    </g>
+    <!--link assess to vision-->
+    <g class="link" data-entity-1="ent0002" data-entity-2="ent0009" id="lnk40" data-source-line="146" data-link-type="dependency">
+      <path d="M836.72,185.27 C836.72,243.66 836.72,376.78 836.72,434.91" style="stroke:#52606D;stroke-width:1;stroke-dasharray:7,7;" fill="none" id="assess-to-vision" codeLine="146"/>
+      <polygon points="836.72,439.91,840.72,430.91,836.72,434.91,832.72,430.91,836.72,439.91" fill="#52606D" style="stroke:#52606D;stroke-width:1;stroke-linejoin:miter;stroke-miterlimit:10;"/>
+      <text x="737.72" y="308.657" fill="#000" font-size="13" textLength="98.179" font-family="Arial">vision question</text>
     </g>
     <!--link iterative to specialist-->
-    <g class="link" data-entity-1="ent0004" data-entity-2="ent0009" data-link-type="dependency" data-source-line="140" id="lnk37">
-      <path codeLine="140" d="M250.87,277.76 C250.87,293.22 250.87,306.63 250.87,322.09" fill="none" id="iterative-to-specialist" style="stroke:#52606D;stroke-width:1;stroke-dasharray:7,7;"/>
-      <polygon fill="#52606D" points="250.87,328.09,254.87,319.09,250.87,323.09,246.87,319.09,250.87,328.09" style="stroke:#52606D;stroke-width:1;"/>
+    <g class="link" data-entity-1="ent0003" data-entity-2="ent0008" id="lnk41" data-source-line="147" data-link-type="dependency">
+      <path d="M667.13,277.76 C667.13,293.22 667.13,307.63 667.13,323.09" style="stroke:#52606D;stroke-width:1;stroke-dasharray:7,7;" fill="none" id="iterative-to-specialist" codeLine="147"/>
+      <polygon points="667.13,328.09,671.13,319.09,667.13,323.09,663.13,319.09,667.13,328.09" fill="#52606D" style="stroke:#52606D;stroke-width:1;stroke-linejoin:miter;stroke-miterlimit:10;"/>
+    </g>
+    <!--link iterative to vision-->
+    <g class="link" data-entity-1="ent0003" data-entity-2="ent0009" id="lnk42" data-source-line="148" data-link-type="dependency">
+      <path d="M794.86,277.48 C794.86,318.81 794.86,393.33 794.86,434.8" style="stroke:#52606D;stroke-width:1;stroke-dasharray:7,7;" fill="none" id="iterative-to-vision" codeLine="148"/>
+      <polygon points="794.86,439.8,798.86,430.8,794.86,434.8,790.86,430.8,794.86,439.8" fill="#52606D" style="stroke:#52606D;stroke-width:1;stroke-linejoin:miter;stroke-miterlimit:10;"/>
+      <text x="795.86" y="354.707" fill="#000" font-size="13" textLength="93.241" font-family="Arial">vision revision</text>
     </g>
     <!--link specialist to implementation-->
-    <g class="link" data-entity-1="ent0009" data-entity-2="ent0019" data-link-type="dependency" data-source-line="141" id="lnk38">
-      <path codeLine="141" d="M412.39,354.65 C546.23,354.65 742.86,354.65 742.86,354.65 C742.86,354.65 742.86,392.86 742.86,425.66" fill="none" id="specialist-to-implementation" style="stroke:#52606D;stroke-width:1;stroke-dasharray:7,7;"/>
-      <polygon fill="#52606D" points="742.86,431.66,746.86,422.66,742.86,426.66,738.86,422.66,742.86,431.66" style="stroke:#52606D;stroke-width:1;"/>
-      <text fill="#000000" font-family="Arial" font-size="13" lengthAdjust="spacing" textLength="187.5923" x="428.13" y="350.7169">approved behavior or design</text>
+    <g class="link" data-entity-1="ent0008" data-entity-2="ent0021" id="lnk44" data-source-line="150" data-link-type="dependency">
+      <path d="M602.86,381.06 C602.86,405.03 602.86,436.65 602.86,436.65 C602.86,436.65 541.83,436.65 471.03,436.65" style="stroke:#52606D;stroke-width:1;stroke-dasharray:7,7;" fill="none" id="specialist-to-implementation" codeLine="150"/>
+      <polygon points="466.03,436.65,475.03,440.65,471.03,436.65,475.03,432.65,466.03,436.65" fill="#52606D" style="stroke:#52606D;stroke-width:1;stroke-linejoin:miter;stroke-miterlimit:10;"/>
+      <text x="563.24" y="432.717" fill="#000" font-size="13" textLength="187.592" font-family="Arial">approved behavior or design</text>
     </g>
     <!--link repository to support-->
-    <g class="legend" data-source-line="144">
-      <rect fill="none" height="58.8906" rx="7.5" ry="7.5" style="stroke:#000000;stroke-width:1;" width="277.415" x="582.7925" y="1186.65"/>
-      <text fill="#000000" font-family="Arial" font-size="14" lengthAdjust="spacing" textLength="267.415" x="587.7925" y="1204.6451">Dashed arrows are conditional routes.</text>
-      <text fill="#000000" font-family="Arial" font-size="14" lengthAdjust="spacing" textLength="248.623" x="597.1885" y="1220.942">Solid arrows are common handoffs.</text>
-      <text fill="#000000" font-family="Arial" font-size="14" lengthAdjust="spacing" textLength="219.5771" x="611.7114" y="1237.2389">No route is a required lifecycle.</text>
+    <g class="legend" data-source-line="153">
+      <rect x="641.792" y="1189.65" width="277.415" height="58.891" fill="none" style="stroke:#000;stroke-width:1;" rx="7.5" ry="7.5"/>
+      <text x="646.792" y="1207.645" fill="#000" font-size="14" textLength="267.415" font-family="Arial">Dashed arrows are conditional routes.</text>
+      <text x="656.188" y="1223.942" fill="#000" font-size="14" textLength="248.623" font-family="Arial">Solid arrows are common handoffs.</text>
+      <text x="670.711" y="1240.239" fill="#000" font-size="14" textLength="219.577" font-family="Arial">No route is a required lifecycle.</text>
     </g>
-    <?plantuml-src XLTDRnit4Btlho2IIsk4hkkcHce41XHR1d89KAj83uOFr2wbPKMH6v9hPLFqT_NUNzOt97UrAyc83TZIpcZcpSUR6GNRi63PqePWjwnIJfP1MLCKVgDC8vpOigKeDsjdMrFTMcqTUtqVVqOQlXQLtIcpPYkXlHn96dnMhEKYT5eoiYtCMeyLj38oT8rareNQZWILN8bMXtjhmYUnbMpcbD37yZ_arp3JQcssqWHMuezq8wsPStQNOVzwUNLnTJSI6bj9BnlsoyNeeHDcGm_VNXIrgYJpC2WjGHmhzP6mlml6FhoG84YigwIR-cVi8Qaw8ntx-RBuvvJXz-yHc7H6w9kR5vnSqk-XatVnvoMRfOMkCY9OzvBPkzlv_1ZxvVtLrMyNC5liGqS5K3msGVfOd9tDyrlstx_iBkgSdHMA2lEiv8vlPO6y2kwYgF2DB7dbrBCql9BFKjk6IbayZJm9xwNtCQzlRs-ZauLoglNaugC9OaCkajRO24SAsgaf1HWYm1ixpCQ1rK7ljjS2BIYGNi2TyflJo0jZ0zfThUl0x2h3Hqhl8hqOb5p7Ic4Os6APbvgUgcsZ9Hc8djv0_LawjL9bUeyoKlheVsEz0kQExQpRhBJ5GzH8iD9Pn5-s8H0LKTGWpmjfAaPmYY9paRtwlPMURF95z2mhDaEvEgyy4z2-anvyUWNOU9kVKwliaqWr0nkL3yWQOyaCiqPtBDHZyG_-HyYDb1MSB9EqR9qZhdx9AA3mDB7kv9SMYQ9KeERpsVtR-m_HpzdPmrZKWqPHM6v6tZZx5mpnP-MJwTPBNWhysOBi63PhF8luLXt_qW9aw7XfZGzEe4Nz4HZVOG1iX_oy1ZdUpUSPpY8A3u3OBInDt4Kjxe5TcbBoIearU4c-R1ER2QK01a0eJo6mgx0JJgQoW0I_445x15duKuQIb796w2NlFyw5AsiqRnbQ9o461D-0XBv1z6gfOYRIPyPfSn8v-YPoeTgjvgKMnB8KnFuJsLqZ0h6VYwRHkNMF8gfa44hBQeZe_lx3V9OZkil2SIX33Dc9XfqMhSn59PhGEyb2r_h0jLh9iYkrJFdiYvvwbZzYibVIF65f6NupQRW8TDHaWsvaCvId3V6YUZOzBTueb1pxaVbfRcZW3hJzE1qGx3EDX-uDUyY3WRZxi1yEV-RX48bCpOXnqXqGUJfp3aSvbMCypAS0eh_vizLjdeoC1J3wr4GaLhJB5qJJteWphpk598KR_IonrBrqdFo1OtodGarMWxNQnqvOjkirIO2HIzm03erSMih0YN53wJlemfJJwAm4atbIYkRor62FFSAdNibJEeU9FLLOobeyA-1eG3dQX0273GZ6MqVJ-Z6jdgSZUBGumRGWlrkTGP4AiwXL4-6lLU3zdeZuaGIQZMasLRPiXuf6iQYSFv6ZeQqEvi-mC4zqNlI_4teJQYoZTKsh7wd2I0aqgNjc7ZGX1mjo5rptBtQrD95eABYi-jNOHTrSl-l-nP5kVdv-VZDAvZL38N0VOT2KDO8aP7ifwOvYXdAxnEYeat7HubHrwXkiJ_XfAjbWtT9okush-3QluWTQnJuICUxeVaKVRDMsQN057tJYFiCp5nGr35ianJGQu-u54yhQeF4qndpIygE9E4GoI352Eu0wAdGE3TY-qssBZTAQpNhrX8MUyLXVwuwPhJoOypsxdvFM_6k38I-6oU9hkqljauPvJjNH-1pmGsaVov5QmaBLoqSi5JnVcTVfScAjmVeGBf-LgNs6e_2QRV7bG_4bNSu2BMANT7T0DDRVxvpzsNWe6Esbw69AXck6HUemkAfXWj2jbxVkg4MF5a_AK55ekQOJC7t1enjK-1hM17qnme7dS91PKodoXhp7qFqv7NLMgmErxHQ8G9RAhbPHvvFDkQBBiL-45HkMRxm-4u3_0G00?>
+    <?plantuml-src ZLVTRjis5BxNKn3jpHQKMPPrGHSK0Hp70NfJRCdGNGIve2NQuYoJAadPLOSzr-xtPFiEIScIxA1B0aVcEJp_Fv-ygPatR6cyDrjMA2jphupEChTHkXPMRDbIv9krDOqkvgOobhs-3py33bUAmkoLNhELg9mSK6hS5MlvwDjACf8jzBeQCbHAIz_MaXdhIpCW578bcihV6-q_YgraCwj4TKp_NNxniqgjzLPgpt9yI3lWcbbhzidido-lBgxk1aHj2kbapNww61nQeJTq-FOYArKXcOD0QSZ48LFd2VihO-psXG21OcmXxLW_Om-HrMffsO-NsT-d1Bz_3yUarQAwkNb1oINzJfMy2pyloSmDU9KMtjYNnDxD5ujZso_lhwv-kO3OxE0wCe3aiP6bJzdPsI9zPV_-m-u2pzbPfYWnEoNtV2ipn5Lm6qYPgsNE2wjsKlD2xcHbQafbzZpG99oJpeMulftFWv97PLNZICK7xSM6L4IkeH2E43HZKGfc20zjR1gDYTIURzvneIt8aOx0hNARqvPdsdYKkrgNdfbLCXyXlGljnS1aMvOBpT0jXZbPqQdQrfKa0K7J6x3lf5KhbSVlI2E5Z_xNnYdOtBAziPjLPN2870cMMmF_yyPxQaKarSlpJEg2aJbPbdgHlVgjaOvayiUWMHPiXdIrJZacm7qd7Vhf5Sp6rtHEfN888kKCtQYSHzGOYsAOqLNBV3aaV-U-1rrBMK39CbBpnbhgrS_92Z0yZwJlbCCnUxsOtR-zlmqQpiuUvES6qQFuk8EvIDIlrln9sZ-5MqWGIuN9wqZXKTwH6ZkK-3-LtSfIx1G56t6Q6-sy5QXi5zGsJl9Su6EBkOAvjiPP2CMgvPyRnCEtF3_SEJB8jPWrsrxTQ_JXkyKYcVGOYBqnqK-pXQIHki357UoNEfUyK6AD4K2wJ1tg5bc73J0XFsM1MVczi39M0Fhj9ve5dGM9-4Co9JAbWDCZxwvpOVCIVPBxnagGOOAhqU-kXlTggK8aufrXsAn4ZBwAL1FDjk9v9QYXenE76qbTBJmD6YxgkafTSkHH8RrGbInwZ-xlRnUpvD5T8WvTwNr8IYh8QT0rN1IYzfsIHBIDyxnIAvctUILZFBkan_RWJrWYXTJFs8-Qtx2-5bEHz_GmBC0mhCeJR4dCE571uq757WaTLzQBx2y9dvJ5aVXna6b9zAFcmtYeiKyqqjetx24DC-gZXyD0-oCDj31ygAen0jl9y1dFoUdweRmE5z3OWA1liJDLuxjXuJ65JarnQgzc-G9fCh22KwSiYUu6FKi04ISj9treLhvNlYIftfZAXP9QDkirKM0Zby0j5XsH6uh0YTb5uPkKSunfK9PZ9F385CIbySEUEWkVEoP7uUotp9XXcQOT9Ybm4hOtZCFMnkWmbZRCKroNpqVcqR97othvpUpqZ9IOnrBLmVoryhpRRS5-187w80wvmkHDdz505eLr9sBKbzLaaFLB_aJb1VrxKMryYGMwBWck85IOJPusIjVYaoBarDgn2gwxXtqfTMWq95mMtJfl0s_AttNtSCIRpi_FRmR1l6P8130T9bPUmacox40bte7FO6wMc45b52uQm6khlaBwg3zr8Mj015h8ym0VvWa-F11ySA4H0wxeOCK42JHr3UG-gSH3X6VMAoeOzXWPuumDU06Ta9SQXLTXNqGkDnYjlISz5REuXL57YKwkmRPlLDlZHbKLctNiqHOwuo6_nfw28kYSRydz5BaMNsfi2z5F5bUQVIoVk1LIg8x6Psy_c0w-7B55MoXx2NXJmXColeveZpKQUqZO8KVQ8DSCovJW98gdVyiZs4W5X9cM18M2ww7lDTlY5Kln9RqV21ILMHAY0cd8VrXtmzDURtheuTv1_EJoc32zJnqHTcVw7ijziCQkcSXpMHEShGq0GGlNLiO2_0psSV1ltBkuLmCgxWYXTl0EVmbj33hgQ4_6X6PP9TU4ikCxDC5yuKf84_Jk2GnjWNcDBXHfGvc4JBbpmiqmSyAstS8Yz7PXLgl0yz6ar18uxnmkM0yw0i2F1lm7?>
   </g>
 </svg>

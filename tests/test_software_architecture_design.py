@@ -143,7 +143,13 @@ def test_relationship_overview_stays_embedded_compact_and_rendered() -> None:
     }
 
     assert relationships.count("```plantuml") == 4
-    assert overview.count("-->") + overview.count("..>") <= 10
+    assert overview.count("-->") + overview.count("..>") <= 13
+    assert "rectangle vision #EAF4FB [" in overview
+    assert "define-project-vision" in overview
+    assert "define ..> vision : clarified direction or intent" in overview
+    assert "assess ..> vision : vision question" in overview
+    assert "iterative ..> vision : vision revision" in overview
+    assert "vision ..> requirements : accepted policy informs" in overview
     assert "catalog/skill-relationships.svg" in readme
     assert "embedded PlantUML remains its canonical source" in readme
     assert "<svg " in rendered_overview

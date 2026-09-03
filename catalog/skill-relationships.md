@@ -65,9 +65,12 @@ package "Question-Selected Analysis and Design" as analysis {
   Select only the specialist(s)
   needed by the current question
   ]
-  rectangle requirements #EAF4FB [
-  **Requirements Analysis**
+  rectangle vision #EAF4FB [
+  **Requirements Analysis · Project Vision**
   define-project-vision
+  ]
+  rectangle requirements #EAF4FB [
+  **Requirements Analysis · Behavior and Constraints**
   use-case-modeling
   specify-quality-constraints
   ]
@@ -91,7 +94,9 @@ package "Question-Selected Analysis and Design" as analysis {
   design-rust-lifecycles
   ]
 
-  specialist -[hidden]down-> requirements
+  specialist -[hidden]down-> vision
+  vision -[hidden]right-> requirements
+  vision -[hidden]down-> softwareDesign
   requirements -[hidden]right-> systemAnalysis
   requirements -[hidden]down-> softwareDesign
   softwareDesign -[hidden]right-> detailedDesign
@@ -151,9 +156,13 @@ package "Independent Cross-Cutting Routes" as crosscutting {
 }
 
 define ..> assess : route unclear
+define ..> vision : clarified direction or intent
 assess ..> iterative : multi-boundary objective
 assess ..> specialist
+assess ..> vision : vision question
 iterative ..> specialist
+iterative ..> vision : vision revision
+vision ..> requirements : accepted policy informs
 specialist ..> implementation : approved behavior or design
 repository -[hidden]down-> support
 
@@ -174,6 +183,9 @@ composition. `interview-me` confirms one requester's intent.
 one-pager. It can prepare a candidate direction or business-case hypothesis,
 but it cannot approve an investment decision. `define-project-vision` guides
 sufficiently grounded input toward an authority-approved project acceptance policy.
+The dashed **External Define → Project Vision** edge applies only when
+`interview-me` supplies clarification or `idea-refine` supplies candidate input.
+It does not route `spec-driven-development` through vision.
 `spec-driven-development` turns a confirmed direction into a human-reviewed
 implementation specification. Skip any step whose input is already sufficiently
 clear.
