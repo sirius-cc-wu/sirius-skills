@@ -145,11 +145,11 @@ normal handoffs and optional feedback paths. The README image renders the
 overview; the embedded PlantUML remains its canonical source. Select the
 smallest set of skills that addresses the current risk or outcome.
 
-The [Pi subagent review-fix loop](docs/subagent-review-fix-loop.md) shows how a
-controller starts read-only review agents, sends only merge-required findings
-to a fixer, starts a fresh review after each fix, and preserves human control
-of publication and merge actions. Its PlantUML diagrams show the role boundaries
-and iterative handoffs.
+The [subagent review-fix loop](docs/subagent-review-fix-loop.md) shows how a
+controller in Pi or Antigravity CLI starts read-only review agents, sends only
+merge-required findings to a fixer, starts a fresh review after each fix, and
+preserves human control of publication and merge actions. Its PlantUML diagrams
+show the role boundaries and iterative handoffs.
 
 Use `assess-development-input` at task intake when the correct owner is unclear,
 several skills appear plausible, or an existing input may not be ready. It

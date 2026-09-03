@@ -1,28 +1,53 @@
-# Run a Review-Fix Subagent Loop in Pi
+# Run a Review-Fix Subagent Loop in Pi and Antigravity CLI
 
 Use this guide to coordinate a read-only reviewer and a write-enabled fixer in
-separate Pi subprocesses. The controller is the main Pi agent. It owns the
-finding ledger, filters each handoff, and decides when to start another review.
+separate subagent processes or contexts. The controller is the main agent
+session (in Pi or Antigravity CLI). It owns the finding ledger, filters each
+handoff, and decides when to start another review.
 
-Pi does not include built-in subagents. Use the example subagent extension or a
-trusted extension with equivalent isolation and tool controls.
+Both harnesses use the same specialist agent personas:
+
+- **Reviewer**: Addy Osmani's `code-reviewer` persona (`code-reviewer.md` from
+  `addyosmani/agent-skills`).
+- **Fixer**: The scoped `fixer` persona provided by Sirius (`agents/fixer.md`
+  from `sirius-skills`).
+
+Pi executes subagents via its subagent extension in separate Pi subprocesses.
+Antigravity CLI (`agy`) runs subagents natively in background sessions using its
+built-in orchestration tools (`invoke_subagent`, `manage_subagents`,
+`send_message`).
+
+## Harness comparison
+
+| Capability | Pi | Antigravity CLI (`agy`) |
+| --- | --- | --- |
+| Subagent runtime | Subprocess extension (`@earendil-works/pi-coding-agent`) | Built-in native subagent runtime |
+| Controller tool | `subagent` extension tool | Built-in `invoke_subagent` and `manage_subagents` |
+| Reviewer persona | Addy Osmani's `code-reviewer` (`~/.pi/agent/agents/code-reviewer.md`) | Addy Osmani's `code-reviewer` (`TypeName: "code-reviewer"`) |
+| Fixer persona | Sirius `fixer` (`~/.pi/agent/agents/fixer.md`) | Sirius `fixer` (`TypeName: "fixer"`) |
+| Execution model | Synchronous call or static `chain` | Reactive background execution with automatic wakeup |
+| Workspace scope | Shared working directory (`cwd`) | `Workspace: "inherit"` (shared worktree), `"branch"`, or `"share"` |
+| Standalone CLI run | Interactive `pi` session | Interactive `agy` or non-interactive `agy --agent <name> -p "<prompt>"` |
 
 ## Roles and boundaries
 
-| Role | Responsibility | Allowed effects |
-| --- | --- | --- |
-| Human | Defines the review scope and approves publication or merge actions | Explicitly authorizes remote writes and final decisions |
-| Controller | Starts subagents, filters findings, tracks rounds, and enforces stop conditions | Does not infer permission to commit, push, publish, or merge |
-| Reviewer | Reviews the complete current change and verifies previous findings | Reads files and Git state only |
-| Fixer | Applies selected required fixes and runs relevant validation | Changes only the authorized worktree scope |
+| Role | Responsibility | Allowed effects | Pi agent | Antigravity CLI agent |
+| --- | --- | --- | --- | --- |
+| Human | Defines the review scope and approves publication or merge actions | Explicitly authorizes remote writes and final decisions | Terminal user | Terminal user |
+| Controller | Starts subagents, filters findings, tracks rounds, and enforces stop conditions | Does not infer permission to commit, push, publish, or merge | Main Pi agent | Main `agy` agent |
+| Reviewer | Reviews the complete current change and verifies previous findings | Reads files and Git state only | `code-reviewer` | `code-reviewer` |
+| Fixer | Applies selected required fixes and runs relevant validation | Changes only the authorized worktree scope | `fixer` | `fixer` |
 
-All subagents use isolated model context. They still use the same working
-directory unless the controller supplies another `cwd`. Run reviewer and fixer
-steps sequentially. Do not let two write-enabled agents edit the same worktree
-at the same time.
+All subagents use isolated model context. In a shared worktree setup, subagents
+operate in the same working directory (or use `Workspace: "inherit"` in
+Antigravity CLI). Run reviewer and fixer steps sequentially. Do not let two
+write-enabled agents edit the same worktree at the same time. If isolated
+worktrees are required, Antigravity CLI supports `Workspace: "branch"` or
+`Workspace: "share"`, while Pi can point subagents to a separate Git worktree
+directory via `cwd`.
 
 ```plantuml
-@startuml pi-subagent-review-fix-roles
+@startuml subagent-review-fix-roles
 top to bottom direction
 
 skinparam backgroundColor #FFFFFF
@@ -66,108 +91,94 @@ endlegend
 @enduml
 ```
 
-## Install the example extension
+### Fixer engineering skills
 
-Install Pi through npm first. Then copy the example extension, agents, and
-prompt templates into the user-level Pi directories:
+The `fixer` persona applies specialized engineering skills from
+`addyosmani/agent-skills` during remediation:
 
-```bash
-PI_PACKAGE="$(npm root -g)/@earendil-works/pi-coding-agent"
+| Skill | Remediation phase | Key responsibility |
+| --- | --- | --- |
+| `debugging-and-error-recovery` | Triage & diagnosis | Isolate root causes systematically and apply the Stop-the-Line rule instead of guessing |
+| `test-driven-development` | Defect reproduction | Write a failing test proving the defect before editing (Prove-It pattern) |
+| `code-simplification` | Implementation | Implement minimal, readable fixes without accidental complexity |
+| `incremental-implementation` | Multi-file changes | Partition complex fixes into verifiable vertical slices |
+| `security-and-hardening` | Vulnerability fixes | Enforce input sanitization, query parameterization, and least privilege |
+| `doubt-driven-development` | Pre-handoff verification | Adversarially probe the fix for regressions, boundary conditions, and edge cases |
 
-mkdir -p \
-  ~/.pi/agent/extensions/subagent \
-  ~/.pi/agent/agents \
-  ~/.pi/agent/prompts
+## Setup and prerequisites
 
-cp "$PI_PACKAGE/examples/extensions/subagent/index.ts" \
-   "$PI_PACKAGE/examples/extensions/subagent/agents.ts" \
-   ~/.pi/agent/extensions/subagent/
+### Pi setup
 
-cp "$PI_PACKAGE/examples/extensions/subagent/agents/"*.md \
-   ~/.pi/agent/agents/
+1. **Install Pi**: Install Pi globally through npm:
 
-cp "$PI_PACKAGE/examples/extensions/subagent/prompts/"*.md \
-   ~/.pi/agent/prompts/
-```
+   ```bash
+   npm install -g @earendil-works/pi-coding-agent
+   ```
 
-Run `/reload` in Pi after installation.
+2. **Install the subagent extension**: Copy the extension TypeScript files into
+   the user-level extension directory:
 
-The subagent configuration requires two agent personas:
+   ```bash
+   PI_PACKAGE="$(npm root -g)/@earendil-works/pi-coding-agent"
 
-- **Reviewer (`code-reviewer` or `reviewer`):** Scoped to read-only tools
-  (`read`, `grep`, `find`, `ls`, `bash`).
-- **Fixer (`fixer` or `worker`):** Requires write capabilities (`read`,
-  `write`, `edit`, `bash`, `grep`, `find`, `ls`) to apply fixes and run tests.
+   mkdir -p \
+     ~/.pi/agent/extensions/subagent \
+     ~/.pi/agent/agents
 
-Create a dedicated `~/.pi/agent/agents/fixer.md` definition:
+   cp "$PI_PACKAGE/examples/extensions/subagent/index.ts" \
+      "$PI_PACKAGE/examples/extensions/subagent/agents.ts" \
+      ~/.pi/agent/extensions/subagent/
+   ```
 
-```markdown
----
-name: fixer
-description: Implementation engineer specialized in resolving review findings, applying code fixes, following test-driven development, and running verification.
-tools: read, grep, find, ls, bash, edit, write
----
+3. **Install the aligned personas**: Link or copy Addy Osmani's `code-reviewer`
+   and the Sirius `fixer` into `~/.pi/agent/agents/`:
 
-# Fixer
+   ```bash
+   # Addy Osmani's code-reviewer
+   ln -sf /path/to/addyosmani-agent-skills/agents/code-reviewer.md ~/.pi/agent/agents/code-reviewer.md
 
-You are an experienced Software Engineer acting as the fixer in a review-fix loop. Your role is to resolve required review findings, apply precise code fixes within the authorized scope, reproduce defects using test-driven development, and verify changes with repository test suites.
+   # Sirius fixer
+   ln -sf /path/to/sirius-skills/agents/fixer.md ~/.pi/agent/agents/fixer.md
 
-## Approach
+   # Remove obsolete sample agents if present
+   rm -f ~/.pi/agent/agents/planner.md ~/.pi/agent/agents/reviewer.md ~/.pi/agent/agents/scout.md ~/.pi/agent/agents/worker.md
+   ```
 
-### 1. Scope and Ledger Preservation
-- Read assigned finding IDs (e.g. `R1`, `R2`) and review comments carefully.
-- Modify only files and behavior within the authorized scope.
-- Preserve every finding ID throughout remediation.
+4. **Reload**: Run `/reload` in an active Pi session.
 
-### 2. Test-Driven Fixes (Prove-It Pattern)
-For reported bugs, broken functionality, or missing edge cases:
-1. **RED:** Write a test that reproduces the issue (must FAIL against current code).
-2. **GREEN:** Implement the minimal code fix to make the test pass.
-3. **REFACTOR:** Clean up the implementation while keeping tests green.
+### Antigravity CLI setup
 
-For non-behavioral fixes (refactoring, typing, formatting):
-- Apply required changes and verify that existing test suites continue to pass.
+Antigravity CLI (`agy`) requires no external extension installation. Subagent
+orchestration tools (`invoke_subagent`, `manage_subagents`, and `send_message`)
+are built directly into the runtime.
 
-### 3. Verification and Regression Prevention
-- Run focused tests while iterating on individual findings.
-- Run the full test suite and build verification before concluding.
-- Never mark a finding as fixed without verification evidence.
+1. **Install the aligned personas**:
+   - **`code-reviewer`**: Discovered automatically when `addyosmani/agent-skills`
+     is installed as a plugin (e.g. `~/.gemini/config/plugins/agent-skills/agents/code-reviewer.md`)
+     or configured in project `.agents/agents/`.
+   - **`fixer`**: Link the Sirius fixer persona into Antigravity's global agent
+     directory:
 
-### 4. Handling Disputes and Blockers
-- Mark findings as `disputed` with technical rationale if they are invalid, contradictory, or require human authority.
+     ```bash
+     mkdir -p ~/.gemini/config/agents
+     ln -sf /path/to/sirius-skills/agents/fixer.md ~/.gemini/config/agents/fixer.md
+     ```
 
-## Output Format
+2. **Verify available agents**: Run `agy agents` from your shell:
 
-```markdown
-## Fix Summary
+   ```bash
+   agy agents
+   ```
 
-### Resolved Findings
-- **[ID]** `[path/to/file:line]` — `fixed`
-  - Fix: [Description of code change]
-  - Test proof: [Test added or existing test verified]
+   Confirm that both `code-reviewer` and `fixer` appear in the output list.
 
-### Unresolved or Disputed Findings
-- **[ID]** `[path/to/file:line]` — `disputed` | `not fixed`
-  - Reason: [Technical justification or missing prerequisite]
+3. **Choose workspace mode**: By default, `invoke_subagent` uses
+   `Workspace: "inherit"`, which operates directly in the shared worktree. Set
+   `Workspace: "branch"` or `"share"` if file changes must remain in an
+   isolated Git branch or worktree until reviewed.
 
-### Files Changed
-- `path/to/file`
-
-### Verification Evidence
-- Commands run: [e.g. `npm test`, `cargo test`, `pytest`]
-- Result: PASS | FAIL
-```
-```
-
-The sample agent files can name models that are not available in the current
-Pi installation. Remove a `model:` field to inherit the controller's active
-model and thinking level, or set it to an available `provider/model` value.
-
-Only enable project-local agents with `agentScope: "project"` or `"both"` for
-a trusted repository. Project-local agent files are repository-controlled
-instructions. Tool lists and agent prompts are not an operating-system security
-boundary. Keep reviewer shell commands read-only. Use a sandbox or a separate
-worktree when stronger enforcement is required.
+4. **Choose model tier**: Set `Model: "inherit"` to match the controller, or
+   select `"flash"` for fast targeted fixes and `"pro"` for complex reviews.
 
 ## Define the review contract
 
@@ -214,7 +225,7 @@ Use separate subagent calls instead of one static chain when the workflow must
 filter findings or stop conditionally.
 
 ```plantuml
-@startuml pi-subagent-review-fix-sequence
+@startuml subagent-review-fix-sequence
 skinparam backgroundColor #FFFFFF
 skinparam shadowing false
 skinparam defaultFontName Arial
@@ -226,7 +237,7 @@ skinparam LifeLineBackgroundColor #FFFFFF
 
 actor Human
 participant Controller
-participant "Fresh reviewer" as Reviewer
+participant "Fresh code-reviewer" as Reviewer
 participant "Fresh fixer" as Fixer
 database Worktree
 
@@ -276,6 +287,80 @@ Run a review-fix loop on the current change.
     request changes, or merge without separate authorization.
 ```
 
+## Tool invocations by harness
+
+### Pi subagent invocations
+
+The Pi controller calls the `subagent` tool sequentially.
+
+Starting `code-reviewer`:
+
+```json
+{
+  "agent": "code-reviewer",
+  "task": "Review the complete bounded change in git diff HEAD~1. Separate 'Must fix before merge' from 'Non-blocking' findings using stable IDs (R1, R2, ...)."
+}
+```
+
+Starting `fixer`:
+
+```json
+{
+  "agent": "fixer",
+  "task": "Act as the fixer. Apply only the must-fix findings below. Preserve each finding ID and run relevant validation.\n\nMust-fix findings:\n- R1 [critical] path/to/file.rs:42: ..."
+}
+```
+
+### Antigravity CLI subagent invocations
+
+The Antigravity CLI controller calls `invoke_subagent` to start subagents in
+the background. Execution is reactive: the controller automatically wakes when
+the subagent completes and receives the full response.
+
+Starting `code-reviewer`:
+
+```json
+{
+  "Subagents": [
+    {
+      "TypeName": "code-reviewer",
+      "Role": "Code Reviewer",
+      "Prompt": "Review the complete bounded change in git diff HEAD~1. Separate 'Must fix before merge' from 'Non-blocking' findings using stable IDs (R1, R2, ...). Verify prior IDs if provided.",
+      "Model": "inherit",
+      "Workspace": "inherit"
+    }
+  ]
+}
+```
+
+Starting `fixer`:
+
+```json
+{
+  "Subagents": [
+    {
+      "TypeName": "fixer",
+      "Role": "Fixer",
+      "Prompt": "Act as the fixer. Apply only the following unresolved must-fix findings:\n\n- R1 [critical] path/to/file.rs:42: ...\n\nPreserve each finding ID, apply scoped fixes, and run relevant validation. Do not address non-blocking findings.",
+      "Workspace": "inherit"
+    }
+  ]
+}
+```
+
+Monitoring and managing subagents:
+
+The controller can check subagent status using `manage_subagents`:
+
+```json
+{
+  "Action": "list"
+}
+```
+
+The controller can send clarifying instructions by conversation ID using
+`send_message`, or cancel a stuck task with `Action: "kill"`.
+
 ## Preserve the review scope
 
 Record the baseline before the first reviewer starts. State whether the scope
@@ -294,17 +379,24 @@ The fixer receives only the required-finding subset. It can inspect the shared
 worktree for implementation context. Its final response must preserve each
 finding ID so that the controller can reconcile the next review.
 
-## Understand static chains
+Worktree synchronization depends on the harness:
 
-The example extension supports a sequential `chain` and replaces
+- In Pi, subagents share the controller process working directory.
+- In Antigravity CLI, `Workspace: "inherit"` shares the controller's active
+  workspace. When using `Workspace: "branch"`, the controller must reconcile or
+  merge the branch before launching the next review round.
+
+## Understand static chains vs reactive loops
+
+The Pi example extension supports a sequential `chain` and replaces
 `{previous}` with the immediately preceding subagent's final output. A fixed
-`reviewer -> fixer -> reviewer` chain can work for one predetermined round.
-It has two limits:
+`code-reviewer -> fixer -> code-reviewer` chain can work for one predetermined
+round. It has two limits:
 
 - It cannot stop before the fixer step when the first review is clean.
 - It passes only the immediately previous output, not a durable finding ledger.
 
-Use the main controller for conditional loops. If one fixed round is
+Use the main controller for conditional loops. If one fixed round in Pi is
 sufficient, the controller can call the subagent tool with this shape:
 
 ```json
@@ -334,6 +426,17 @@ handoff itself must contain only required findings.
 The final reviewer receives only the fixer's output through `{previous}`. The
 fixer must therefore preserve the required finding IDs and dispositions. The
 shared worktree contains the implementation changes.
+
+In Antigravity CLI, orchestration is naturally turn-based and reactive. The
+controller receives the subagent response, updates the finding ledger, and
+decides whether to stop or dispatch the next subagent.
+
+For non-interactive single-round reviews in Antigravity CLI using the
+`code-reviewer` persona:
+
+```bash
+agy --agent code-reviewer -p "Review git diff HEAD~1 and report blocker findings."
+```
 
 ## Completion and stop conditions
 
