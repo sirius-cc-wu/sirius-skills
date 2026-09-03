@@ -21,8 +21,10 @@ those historical artifact types merely because their skills are retired.
    when the externally produced material's readiness or Sirius entry point is
    unclear. It may return another external prerequisite instead of forcing a
    Sirius owner.
-3. Use [`inception`](../../skills/inception/SKILL.md) when vision, business
-   case, scope, feasibility, or major risks remain unclear.
+3. Use [`inception`](../../skills/inception/SKILL.md) when project- or
+   independently sponsored initiative-level vision, business case, scope,
+   feasibility, or major risks remain unclear. Do not use it merely to frame a
+   release, implementation phase, component, or completed milestone.
 4. Use [`use-case-modeling`](../../skills/use-case-modeling/SKILL.md) to express
    approved actor goals and black-box behavior. Keep approved examples and
    boundary cases with the canonical requirements or use case. Use

@@ -55,7 +55,7 @@ Approved coordinated objective begins
 ├─ Current behavior, architecture, deployment, or constraints lack evidence
 │  └─ stop for a responsible external recovery process
 ├─ Requirements Analysis question
-│  ├─ scope, feasibility, or major risk → inception
+│  ├─ project or independent-initiative vision, scope, feasibility, or major risk → inception
 │  └─ actors, goals, boundary, or scenarios → use-case-modeling
 ├─ System Analysis question
 │  ├─ domain concepts or vocabulary → domain-modeling

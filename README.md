@@ -203,7 +203,8 @@ package.
 `author-software-proposal` is retired. Existing legacy proposal artifacts
 remain valid at their migrated paths. Use `idea-refine` for new candidate
 directions. Route unevidenced current-system claims to a responsible external
-recovery process, scope and feasibility to `inception`, unresolved stakeholder
+recovery process, project- or independently sponsored initiative-level scope
+and feasibility to `inception`, unresolved stakeholder
 authority to the responsible
 external process, approved actor goals and scenario flow to `use-case-modeling`,
 non-trivial state effects to `operation-contracts`, and placement questions to

@@ -148,7 +148,7 @@ repository-native workflow or report the responsible external prerequisite.
 | Define | A confirmed direction needs an implementation specification | External `spec-driven-development` |
 | Cross-cutting Support | A reusable Codex-compatible skill needs creation or update | External `skill-creator` |
 | Cross-cutting Support | The current topic needs a concise diagram, code-shape sketch, or focused visual artifact | External `show-me` |
-| Requirements Analysis | Vision, feasibility, project scope, or major business risk is unclear | `inception` |
+| Requirements Analysis | Project or independently sponsored initiative vision, feasibility, scope, or major business risk is unclear | `inception` |
 | Requirements Analysis | Actors, goals, system boundary, scenarios, or extensions are unclear | `use-case-modeling` |
 | System Analysis | Business concepts, vocabulary, associations, or attributes are unclear | `domain-modeling` |
 | System Analysis | Actor-system events or system operations are unclear | `system-sequence-diagrams` |

@@ -317,8 +317,9 @@ Clarifying one requester's intent does not replace a responsible stakeholder
 process when several roles, evidence sources, conflicts, or decision authorities
 matter. Treat missing stakeholder evidence, validation, or approval as an
 external prerequisite. Route current-system claims that lack evidence to a
-responsible external recovery process. Route scope and feasibility to
-inception. Route approved actor goals and scenario flow to use-case modeling,
+responsible external recovery process. Route project or independent-initiative
+scope and feasibility to inception. Route approved actor goals and scenario flow
+to use-case modeling,
 non-trivial state effects to operation contracts, and a bounded approved oracle
 to external `test-driven-development` when the `all` installation is available;
 otherwise, use repository-native implementation. Route browser runtime evidence
@@ -417,7 +418,7 @@ Select only the owners needed by the current objective.
 
 rectangle requirements #EAF4FB [
 **Requirements Analysis**
-scope, feasibility, or major risk → inception
+project or independent-initiative scope, feasibility, or major risk → inception
 actors, goals, boundary, or scenarios → use-case-modeling
 ]
 
