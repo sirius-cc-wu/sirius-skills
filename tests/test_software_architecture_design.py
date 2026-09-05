@@ -98,6 +98,7 @@ def test_implementation_relationship_view_matches_current_direct_routes() -> Non
     for text in (
         "approved independent oracle → test-driven-development",
         "non-trivial in-flight claim → doubt-driven-development",
+        "bounded artifact and explicit current authorization → agy-second-opinion",
         "completed change → code-review-and-quality",
         "routine clarity → code-simplification",
         "established structural ownership → behavior-preserving-refactoring",

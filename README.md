@@ -252,6 +252,13 @@ incomplete contract before the claim stands. Treat those findings as a trigger
 to stop for evidence or authority when needed; the skill does not recover an
 undocumented current design by itself.
 
+Use `agy-second-opinion` when a bounded primary review or claim needs one
+explicitly authorized Antigravity CLI opinion. It requires a fixed artifact and
+review contract, provider-disclosure approval, and separate per-run approval for
+headless dangerous permissions. It is installed only by the `all` profile. It
+returns an attributed report for the caller to reconcile; it does not replace the
+primary review or authorize changes.
+
 `reverse-engineer-software-system`, `survey-existing-system`,
 `recover-system-behavior`, `reconstruct-software-architecture`, and
 `reconcile-recovered-design` are retired. Existing surveys, recovered behavior

@@ -62,7 +62,11 @@ review before it stands.
    incomplete contract, unsupported current-system assumption, or missing
    authority, stop for `assess-development-input` or the responsible external
    process instead of treating adversarial review as design recovery.
-7. Feed implementation discoveries back into durable requirements or design
+7. When a bounded artifact needs one explicitly authorized Antigravity CLI
+   opinion, use `agy-second-opinion` with the `all` installation. Preserve its
+   report as attributed review input and reconcile it against the primary review;
+   do not let it authorize implementation or replace the review contract.
+8. Feed implementation discoveries back into durable requirements or design
    artifacts when their represented knowledge changes.
 
 Keep verification evidence with code, tests, schemas, or configuration by

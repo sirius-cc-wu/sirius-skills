@@ -80,6 +80,8 @@ Approved coordinated objective begins
 │  └─ external debugging-and-error-recovery or repository-native debugging
 ├─ A non-trivial in-flight claim needs adversarial review before it stands
 │  └─ external doubt-driven-development
+├─ A bounded artifact needs one explicitly authorized Antigravity CLI opinion
+│  └─ agy-second-opinion (all installation only)
 ├─ Existing structure needs behavior-preserving improvement
 │  ├─ routine clarity → external code-simplification or native cleanup
 │  ├─ established structural ownership → behavior-preserving-refactoring
@@ -95,8 +97,9 @@ Approved coordinated objective begins
    └─ return a direct handoff and stop coordinating
 ```
 
-External Addy routes require the `all` installation. Otherwise, use the named
-repository-native workflow or return the responsible prerequisite.
+External Addy routes and `agy-second-opinion` require the `all` installation.
+Otherwise, use the named repository-native workflow or return the responsible
+prerequisite.
 
 ## Workflow
 

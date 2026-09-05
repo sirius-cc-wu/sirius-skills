@@ -71,6 +71,7 @@ REVERSE_ENGINEERING_SKILLS = {
     "select-technical-artifacts",
     "design-repository-artifact-layout",
 }
+ALL_ONLY_SKILLS = {"agy-second-opinion"}
 
 
 def render_just(target: str, *args: str) -> str:
@@ -285,7 +286,10 @@ def test_profiles_partition_the_active_catalog() -> None:
     assert read_profile("applying-uml-and-patterns") == ITERATIVE_DESIGN_SKILLS
     assert read_profile("reverse-engineering") == REVERSE_ENGINEERING_SKILLS
     assert read_profile("all") == (
-        WORKFLOW_SKILLS | ITERATIVE_DESIGN_SKILLS | REVERSE_ENGINEERING_SKILLS
+        WORKFLOW_SKILLS
+        | ITERATIVE_DESIGN_SKILLS
+        | REVERSE_ENGINEERING_SKILLS
+        | ALL_ONLY_SKILLS
     )
 
 
@@ -426,7 +430,7 @@ def test_validation_covers_the_consolidated_catalog() -> None:
     )
 
     assert result.returncode == 0, result.stdout
-    assert "Validated 20 skills" in result.stdout
+    assert "Validated 21 skills" in result.stdout
     assert (
         "Validated 13 external add-on skills across 3 source profiles" in result.stdout
     )
