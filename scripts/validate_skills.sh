@@ -12,8 +12,6 @@ all_profile="$profile_directory/all.txt"
 retired_ledger="$root/catalog/retired-skills.tsv"
 external_profiles=(
   "$root/catalog/external-skill-sets/addy-osmani.txt"
-  "$root/catalog/external-skill-sets/openai.txt"
-  "$root/catalog/external-skill-sets/humanlayer.txt"
 )
 
 fail() {

@@ -143,17 +143,6 @@ package "Independent Cross-Cutting Routes" as crosscutting {
   select-technical-artifacts
   design-repository-artifact-layout
   ]
-  rectangle authoring <<external>> [
-  **External · Skill Authoring**
-  skill-creator
-  ]
-  rectangle visual <<external>> [
-  **External · Visual Explanation**
-  show-me
-  ]
-
-  support -[hidden]right-> authoring
-  authoring -[hidden]right-> visual
 }
 
 define ..> assess : route unclear
@@ -175,10 +164,10 @@ endlegend
 @enduml
 ```
 
-The gray nodes belong to pinned Addy Osmani, OpenAI, and HumanLayer external
-collections. They are not part of the Sirius catalog or named profiles.
+The gray nodes belong to the pinned Addy Osmani external
+collection. They are not part of the Sirius catalog or named profiles.
 `just install <target-project> all` or `just install-global all` installs the
-13 curated add-ons; other profiles do not. The diagram shows one optional
+11 curated add-ons; other profiles do not. The diagram shows one optional
 composition. `interview-me` confirms one requester's intent.
 `idea-refine` turns that intent into a focused, user-confirmed candidate
 one-pager. It can prepare a candidate direction or business-case hypothesis,
@@ -241,12 +230,6 @@ Use `git-workflow-and-versioning` when prepared work needs standalone commit,
 branch, worktree, release, or semantic-version guidance. Selection does not
 authorize a commit, push, tag, or release.
 
-Use OpenAI's `skill-creator` when concrete examples must become a new or updated
-Codex-compatible skill package with justified resources and validation. Use
-HumanLayer's `show-me` when the current topic needs the smallest useful visual
-explanation. `show-me` can complement `walkthrough-me`, but it does not own a
-revision-fixed, checkpointed change tour.
-
 The groups in this diagram help readers navigate the skill collection. They
 are not installation profiles or lifecycle gates. The detailed diagrams show
 the conditional choices and feedback that this overview omits. The diagram does
@@ -266,10 +249,6 @@ implementation-facing design.
 - Use external `interview-me`, `idea-refine`, or `spec-driven-development`
   before Sirius when requester intent, a candidate direction, or an
   implementation specification needs interactive refinement.
-- Use external `skill-creator` when creating or updating a reusable
-  Codex-compatible skill package.
-- Use external `show-me` when the current topic needs a concise visual
-  explanation rather than a paced, revision-bound change tour.
 - Start with **Iterative Analysis and Design** when an approved change needs a
   bounded behavior, analysis, design, language, or implementation iteration,
   or when a complex refactoring moves a system, test, responsibility, runtime,
@@ -728,8 +707,6 @@ apply.
 |---|---|---|
 | `select-technical-artifacts` | Candidate directions, externally recovered knowledge, iterative analysis and design, implementation evidence, architecture decisions, and durable repository documentation | Use when candidate knowledge needs a disposition: `create`, `update`, `embed`, `keep-with-implementation`, `omit`, or `defer`, or when a proposed artifact set needs minimization |
 | `design-repository-artifact-layout` | Candidate directions, externally recovered knowledge, iterative analysis and design, implementation evidence, architecture decisions, and durable repository documentation | Use when a justified artifact lacks a canonical home, artifact lifecycles conflict, or migration must preserve links, IDs, indexes, and history |
-| External `skill-creator` | New or existing Codex-compatible skill packages | Use when concrete examples must become concise instructions and only the reusable scripts, references, assets, and metadata that the package needs |
-| External `show-me` | Any current discussion that benefits from a visual explanation | Use when a small pseudocode, tree, diagram, diff, code-shape sketch, or focused HTML artifact communicates the point better than prose |
 
 ## External stakeholder input
 

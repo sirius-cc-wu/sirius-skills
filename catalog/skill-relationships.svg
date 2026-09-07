@@ -15,8 +15,8 @@
     </g>
     <!--cluster crosscutting-->
     <g class="cluster" data-qualified-name="crosscutting" data-source-line="124" id="ent0031">
-      <rect fill="none" height="119.89" rx="2.5" ry="2.5" style="stroke:#000000;stroke-width:1.5;" width="826" x="152" y="1066.06"/>
-      <text fill="#000000" font-family="Arial" font-size="14" font-weight="bold" lengthAdjust="spacing" textLength="272.6719" x="428.6641" y="1081.0551">Independent Cross-Cutting Routes</text>
+      <rect fill="none" height="119.89" rx="2.5" ry="2.5" style="stroke:#000000;stroke-width:1.5;" width="285" x="152" y="1066.06"/>
+      <text fill="#000000" font-family="Arial" font-size="14" font-weight="bold" lengthAdjust="spacing" textLength="272.6719" x="158.16" y="1081.0551">Independent Cross-Cutting Routes</text>
     </g>
     <!--entity specialist-->
     <g class="entity" data-qualified-name="analysis.specialist" data-source-line="48" id="ent0009">
@@ -106,18 +106,6 @@
       <text fill="#000000" font-family="Arial" font-size="14" lengthAdjust="spacing" textLength="173.0039" x="204.5026" y="1140.352">select-technical-artifacts</text>
       <text fill="#000000" font-family="Arial" font-size="14" lengthAdjust="spacing" textLength="226.7891" x="177.61" y="1156.6489">design-repository-artifact-layout</text>
     </g>
-    <!--entity authoring-->
-    <g class="entity" data-qualified-name="crosscutting.authoring" data-source-line="130" id="ent0033">
-      <rect fill="#F2F2F2" height="52.5938" rx="6" ry="6" style="stroke:#888888;stroke-width:0.5;" width="229.2344" x="444.38" y="1109.21"/>
-      <text fill="#000000" font-family="Arial" font-size="14" font-weight="bold" lengthAdjust="spacing" textLength="209.2344" x="454.38" y="1132.2051">External &#xC2;&#xB7; Skill Authoring</text>
-      <text fill="#000000" font-family="Arial" font-size="14" lengthAdjust="spacing" textLength="82.5781" x="517.7081" y="1148.502">skill-creator</text>
-    </g>
-    <!--entity visual-->
-    <g class="entity" data-qualified-name="crosscutting.visual" data-source-line="134" id="ent0034">
-      <rect fill="#F2F2F2" height="52.5938" rx="6" ry="6" style="stroke:#888888;stroke-width:0.5;" width="258.2051" x="703.9" y="1109.21"/>
-      <text fill="#000000" font-family="Arial" font-size="14" font-weight="bold" lengthAdjust="spacing" textLength="238.2051" x="713.9" y="1132.2051">External &#xC2;&#xB7; Visual Explanation</text>
-      <text fill="#000000" font-family="Arial" font-size="14" lengthAdjust="spacing" textLength="63.4854" x="801.2599" y="1148.502">show-me</text>
-    </g>
     <!--entity define-->
     <g class="entity" data-qualified-name="define" data-source-line="27" id="ent0002">
       <rect fill="#F2F2F2" height="85.1875" rx="6" ry="6" style="stroke:#888888;stroke-width:0.5;" width="199.252" x="760.37" y="7"/>
@@ -180,8 +168,6 @@
       <polygon fill="#52606D" points="291,956.82,295,947.82,291,951.82,287,947.82,291,956.82" style="stroke:#52606D;stroke-width:1;"/>
       <text fill="#000000" font-family="Arial" font-size="13" lengthAdjust="spacing" textLength="159.8784" x="131" y="933.2169">publish when authorized</text>
     </g>
-    <!--link support to authoring-->
-    <!--link authoring to visual-->
     <!--link define to assess-->
     <g class="link" data-entity-1="ent0002" data-entity-2="ent0003" data-link-type="dependency" data-source-line="143" id="lnk37">
       <path codeLine="143" d="M824.4,92.63 C824.4,105.83 824.4,113.97 824.4,125.74" fill="none" id="define-to-assess" style="stroke:#52606D;stroke-width:1;stroke-dasharray:7,7;"/>

@@ -74,9 +74,8 @@ remove only links that still point to their expected canonical installation.
 
 `just install <target-project> all` also installs the pinned skills listed in
 [`catalog/external-skill-sets/`](catalog/external-skill-sets/): 11 add-ons from
-Addy Osmani's `agent-skills`, OpenAI's `skill-creator`, and HumanLayer's
-`show-me`. They remain external to the Sirius catalog and are not installed by
-other profiles. The external install uses the target project's scope for
+Addy Osmani's `agent-skills`. They remain external to the Sirius catalog and
+are not installed by other profiles. The external install uses the target project's scope for
 `just install <target-project> all` and global scope for
 `just install-global all`. The matching uninstall command removes the same
 external names. Local removal requires each target `skills-lock.json` entry to
@@ -192,14 +191,6 @@ its next Sirius owner is unclear. `just install <target-project> all` or
 `just install-global all` provides these two skills as external add-ons; they
 are not Sirius catalog entries or named-profile members.
 
-With the `all` installation, use OpenAI's external
-[`skill-creator`](https://github.com/openai/skills/blob/49f948faa9258a0c61caceaf225e179651397431/skills/.system/skill-creator/SKILL.md)
-when creating or updating a reusable Codex-compatible skill package. It guides
-example discovery, resource selection, initialization, concise instruction
-writing, script testing, validation, and iteration. It does not make the new
-skill part of the Sirius catalog or authorize changes outside the requested
-package.
-
 `author-software-proposal` and `inception` are retired. Existing proposal and
 inception artifacts remain valid at their recorded revisions. Use external
 `idea-refine` for a new candidate direction or business-case hypothesis. It
@@ -277,14 +268,6 @@ the selected diff into a few logical sections. It explains one section with
 concise code locators and
 waits for explicit confirmation before advancing. It establishes understanding
 without approving, committing, or replacing formal code review.
-
-With the `all` installation, use HumanLayer's external
-[`show-me`](https://github.com/humanlayer/skills/blob/3c2629142c5d437428269b1b722b08c0b87f574d/plugins/show-me/skills/show-me/SKILL.md)
-when the current topic needs a concise visual explanation. It selects the
-smallest useful pseudocode, call tree, component or file tree, Mermaid diagram,
-diff, code shape, or focused HTML artifact. It complements `walkthrough-me` but
-does not replace the walkthrough's revision binding, pacing, or user
-checkpoints.
 
 `simplify` is retired. With the `all` installation, use external
 `code-review-and-quality` for formal review. Route readability and

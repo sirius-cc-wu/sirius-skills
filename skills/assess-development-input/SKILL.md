@@ -44,8 +44,6 @@ Task arrives
 │  └─ responsible external product or portfolio process
 ├─ A confirmed direction needs an implementation specification
 │  └─ external spec-driven-development
-├─ A reusable Codex-compatible skill needs creation or update
-│  └─ external skill-creator
 ├─ Current behavior, architecture, deployment, or constraints lack evidence
 │  └─ responsible external current-system recovery process
 ├─ Scope, actors, goals, scenarios, quality requirements, or constraints are unclear
@@ -75,8 +73,6 @@ Task arrives
 │     └─ material boundary change → iterative-risk-driven-development
 ├─ A reader needs a paced explanation of a selected change
 │  └─ walkthrough-me
-├─ The current topic needs a concise visual explanation
-│  └─ external show-me
 ├─ Prepared work needs Git or version guidance
 │  └─ external git-workflow-and-versioning or repository-native Git workflow
 ├─ Committed work is ready for pull-request publication
@@ -154,8 +150,6 @@ external prerequisite.
 | Define | A candidate direction or business-case hypothesis needs alternatives, assumption testing, or MVP scope | External `idea-refine` |
 | Requirements Analysis | A durable project vision, non-goals, or contribution-acceptance policy is unclear | `define-project-vision` |
 | Define | A confirmed direction needs an implementation specification | External `spec-driven-development` |
-| Cross-cutting Support | A reusable Codex-compatible skill needs creation or update | External `skill-creator` |
-| Cross-cutting Support | The current topic needs a concise diagram, code-shape sketch, or focused visual artifact | External `show-me` |
 | Requirements Analysis | Actors, goals, system boundary, scenarios, or extensions are unclear | `use-case-modeling` |
 | Requirements Analysis | Measurable quality requirements, binding constraints, cross-cutting special requirements, or acceptance evidence are unclear | `specify-quality-constraints` |
 | System Analysis | Business concepts, vocabulary, associations, or attributes are unclear | `domain-modeling` |

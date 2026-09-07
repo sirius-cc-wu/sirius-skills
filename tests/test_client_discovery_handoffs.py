@@ -85,19 +85,6 @@ def test_assessment_owns_entry_routing_without_replacing_iteration_coordination(
     assert "owns operational entry routing" in relationships
 
 
-def test_external_authoring_and_visual_routes_keep_narrow_boundaries() -> None:
-    assessment = " ".join(
-        read("skills/assess-development-input/SKILL.md").split()
-    )
-    relationships = " ".join(read("catalog/skill-relationships.md").split())
-    track = " ".join(read("catalog/tracks/repository-workflow.md").split())
-
-    assert "reusable Codex-compatible skill needs creation or update" in assessment
-    assert "current topic needs a concise visual explanation" in assessment
-    assert "does not own a revision-fixed, checkpointed change tour" in relationships
-    assert "does not make its outputs active Sirius skills automatically" in track
-
-
 def test_doubt_driven_addon_challenges_claims_without_claiming_recovery() -> None:
     assessment = " ".join(
         read("skills/assess-development-input/SKILL.md").split()
