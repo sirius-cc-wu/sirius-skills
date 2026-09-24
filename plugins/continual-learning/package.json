@@ -1,0 +1,14 @@
+{
+  "name": "@sirius-skills/plugin-continual-learning",
+  "version": "1.0.0",
+  "description": "Multi-harness Continual Learning Plugin for Antigravity CLI and Copilot CLI",
+  "type": "module",
+  "scripts": {
+    "test": "node --experimental-strip-types --test tests/**/*.test.ts",
+    "typecheck": "tsc --noEmit"
+  },
+  "devDependencies": {
+    "@types/node": "^24.0.0",
+    "typescript": "^5.8.2"
+  }
+}

@@ -1,0 +1,4 @@
+node_modules/
+.gemini/
+.copilot/
+*.log
