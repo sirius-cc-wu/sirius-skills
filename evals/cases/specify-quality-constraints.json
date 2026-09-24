@@ -17,12 +17,12 @@
     ],
     "negative": [
       {
-        "prompt": "Identify the actors, their goals, and the main and alternate black-box scenarios for this approved feature.",
-        "owner": "use-case-modeling"
+        "prompt": "Establish the project vision, core principles, and non-goals to guide future contribution decisions.",
+        "owner": "define-project-vision"
       },
       {
-        "prompt": "Given approved latency, availability, and privacy requirements, select the major components, data ownership, and deployment trade-offs.",
-        "owner": "design-software-architecture"
+        "prompt": "Design the ownership, cleanup, and task supervision lifecycles for these concurrency and memory constraints in Rust.",
+        "owner": "design-rust-lifecycles"
       }
     ]
   },

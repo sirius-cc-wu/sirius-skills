@@ -25,8 +25,8 @@
         "owner": "specify-quality-constraints"
       },
       {
-        "prompt": "Select risk-driven UP analysis and design methods for this approved change without implementing it.",
-        "owner": "iterative-risk-driven-development"
+        "prompt": "Evaluate whether an independent durable technical artifact is justified for this API design decision.",
+        "owner": "select-technical-artifacts"
       }
     ]
   },

@@ -21,8 +21,8 @@
         "owner": "design-rust-lifecycles"
       },
       {
-        "prompt": "Specify the language-neutral postconditions and invariant-preserving state changes of this system operation",
-        "owner": "operation-contracts"
+        "prompt": "Specify the measurable performance and security constraints for this queue processing service",
+        "owner": "specify-quality-constraints"
       }
     ]
   },

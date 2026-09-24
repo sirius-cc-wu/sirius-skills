@@ -21,8 +21,8 @@
         "owner": "design-repository-artifact-layout"
       },
       {
-        "prompt": "Run one approved implementation iteration, coordinate the needed specialists, validate it, and create one authorized commit.",
-        "owner": "iterative-risk-driven-development"
+        "prompt": "Evaluate whether this user input is ready for development or needs further analysis and review.",
+        "owner": "assess-development-input"
       }
     ]
   },

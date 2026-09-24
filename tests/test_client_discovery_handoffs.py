@@ -41,9 +41,6 @@ def test_assessment_owns_entry_routing_without_replacing_iteration_coordination(
     assessment = " ".join(
         read("skills/assess-development-input/SKILL.md").split()
     )
-    iterative = " ".join(
-        read("skills/iterative-risk-driven-development/SKILL.md").split()
-    )
     relationships = " ".join(read("catalog/skill-relationships.md").split())
 
     assert "This skill owns entry routing" in assessment
@@ -76,12 +73,6 @@ def test_assessment_owns_entry_routing_without_replacing_iteration_coordination(
     for name in (active_names - {"assess-development-input"}) | external_names:
         assert f"`{name}`" in assessment
 
-    assert "## In-Iteration Routing" in iterative
-    assert "Approved coordinated objective begins" in iterative
-    assert "return to assess-development-input" in iterative
-    assert "No coordination remains" in iterative
-    assert "Select in-iteration owners" in iterative
-    assert "does not own session-start skill discovery" in iterative
     assert "owns operational entry routing" in relationships
 
 
@@ -96,34 +87,6 @@ def test_doubt_driven_addon_challenges_claims_without_claiming_recovery() -> Non
     assert "fresh-context adversarial review" in relationships
     assert "does not recover undocumented design" in relationships
     assert "instead of treating adversarial review as design recovery" in track
-
-
-def test_iterative_coordinator_preserves_intent_ownership_and_promotion() -> None:
-    iterative = read("skills/iterative-risk-driven-development/SKILL.md")
-    track = read("catalog/tracks/iterative-analysis-design.md")
-    normalized_iterative = " ".join(iterative.split())
-    normalized_track = " ".join(track.split())
-
-    for text in (
-        "Confirm canonical knowledge ownership",
-        "Treat code, tests, runtime observations, and historical iteration",
-        "assess-development-input",
-        "external prerequisite",
-        "Reconcile durable knowledge and promotion pressure",
-        "a second consumer appears",
-        "design-repository-artifact-layout",
-        "Do not create a layout document",
-    ):
-        assert text in normalized_iterative
-
-    assert (
-        "Treat code, tests, observations, and historical iteration records as"
-        in normalized_track
-    )
-    assert (
-        "Reapply artifact selection when enabling behavior gains reuse"
-        in normalized_track
-    )
 
 
 def test_layout_skill_handles_missing_guidance_without_inventing_taxonomy() -> None:

@@ -17,8 +17,8 @@
     ],
     "negative": [
       {
-        "prompt": "Refactor the Rust validation environment by introducing a backend, composition root, service entrypoints, task supervision, and a new end-to-end test boundary",
-        "owner": "iterative-risk-driven-development"
+        "prompt": "Adapt this language-neutral queue design to native TypeScript types, errors, and async primitives.",
+        "owner": "software-design-language-adaptation"
       },
       {
         "prompt": "Design exact Rust resource transfer, startup rollback, async cancellation, joining, Drop fallback, and fallible cleanup without implementation",

@@ -17,12 +17,12 @@
     ],
     "negative": [
       {
-        "prompt": "Identify the actors, their goals, and the main and alternate use-case scenarios for this feature.",
-        "owner": "use-case-modeling"
+        "prompt": "Define the project identity, durable principles, and contribution acceptance policy from repository history.",
+        "owner": "define-project-vision"
       },
       {
-        "prompt": "Advance this approved proposal through one risk-sized design iteration, validate it, commit once, and stop.",
-        "owner": "iterative-risk-driven-development"
+        "prompt": "Audit whether this proposed component boundary change preserves observable behavior across passing checks.",
+        "owner": "behavior-preserving-refactoring"
       },
       {
         "prompt": "Design the Rust ownership, staged startup, rollback, cancellation, and cleanup lifecycle for this approved behavior.",

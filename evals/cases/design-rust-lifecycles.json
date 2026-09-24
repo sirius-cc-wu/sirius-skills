@@ -17,20 +17,16 @@
     ],
     "negative": [
       {
-        "prompt": "Translate this GRASP controller and strategy design into idiomatic TypeScript constructs",
+        "prompt": "Translate this controller and strategy design into idiomatic TypeScript constructs",
         "owner": "software-design-language-adaptation"
       },
       {
-        "prompt": "Specify submitOrder postconditions for created domain objects, new associations, attribute changes, and required non-creations",
-        "owner": "operation-contracts"
+        "prompt": "Specify measurable latency, memory, and concurrency throughput limits for this network service",
+        "owner": "specify-quality-constraints"
       },
       {
-        "prompt": "Coordinate this complex Rust test-environment refactoring while its system boundary, representative end-to-end oracle, module responsibilities, and parent completion boundary are still unclear",
-        "owner": "iterative-risk-driven-development"
-      },
-      {
-        "prompt": "Assign preparation, coordination, supervision, and cleanup responsibilities to the right modules, functions, tasks, adapters, and composition root before exact ownership design",
-        "owner": "grasp-responsibility-design"
+        "prompt": "Assess whether this complex test-environment refactoring proposal has adequate boundary clarity and readiness before proceeding",
+        "owner": "assess-development-input"
       }
     ]
   },

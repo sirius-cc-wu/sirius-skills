@@ -17,8 +17,8 @@
     ],
     "negative": [
       {
-        "prompt": "Identify the actors, their goals, and the main and alternate black-box scenarios for this approved feature.",
-        "owner": "use-case-modeling"
+        "prompt": "Assess whether this customer input has clear readiness, decision authority, and technical constraints.",
+        "owner": "assess-development-input"
       },
       {
         "prompt": "Define measurable privacy, accessibility, retention, and availability requirements for this approved customer portal.",

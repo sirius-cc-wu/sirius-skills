@@ -45,7 +45,6 @@ def test_quality_constraint_skill_is_active_and_routable() -> None:
 
     for relative_path in (
         "skills/assess-development-input/SKILL.md",
-        "skills/iterative-risk-driven-development/SKILL.md",
         "catalog/skill-relationships.md",
     ):
         assert name in read(relative_path)
