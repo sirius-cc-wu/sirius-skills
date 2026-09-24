@@ -1,5 +1,10 @@
 create-pr
 walkthrough-me
+github-issue-creation
+github-issue-workflow
+review-pr
+spec-qualification
+audit-vestigial-contracts
 select-technical-artifacts
 design-repository-artifact-layout
 assess-development-input
@@ -8,3 +13,5 @@ specify-quality-constraints
 software-design-language-adaptation
 design-rust-lifecycles
 behavior-preserving-refactoring
+architecture-decision-records
+type-anchored-spec

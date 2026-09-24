@@ -1,0 +1,47 @@
+{
+  "skill_name": "review-pr",
+  "trigger": {
+    "positive": [
+      {
+        "prompt": "Review GitHub pull request #142 with structured five-axis review and present findings before publishing.",
+        "top_k": 3
+      },
+      {
+        "prompt": "Orchestrate a read-only review of PR #55 and ask me which review comments to post.",
+        "top_k": 3
+      },
+      {
+        "prompt": "Perform a five-axis review on this pull request and format findings with severity and file locators.",
+        "top_k": 3
+      }
+    ],
+    "negative": [
+      {
+        "prompt": "Walk me through PR #482 one logical section at a time and wait for me before continuing.",
+        "owner": "walkthrough-me"
+      },
+      {
+        "prompt": "Verify the base and head branches, check for duplicates, and open a draft GitHub pull request with a convention-aware title.",
+        "owner": "create-pr"
+      }
+    ]
+  },
+  "evals": [
+    {
+      "id": "review-pull-request",
+      "prompt": "Review PR #99 in read-only mode, evaluate correctness and security, and present findings with IDs for my selection.",
+      "expected_output": "Structured five-axis review findings with R-prefixed IDs, severity, target line locators, and a publication prompt.",
+      "expectations": [
+        "Fetches PR context in read-only mode",
+        "Evaluates across five review dimensions",
+        "Presents structured findings with IDs before publishing",
+        "Prompts the user to select which comments to post"
+      ],
+      "prohibitions": [
+        "Do not modify the worktree or branch",
+        "Do not post comments without explicit user selection"
+      ],
+      "trust_level": "provisional"
+    }
+  ]
+}

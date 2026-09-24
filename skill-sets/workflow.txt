@@ -1,2 +1,7 @@
 create-pr
 walkthrough-me
+github-issue-creation
+github-issue-workflow
+review-pr
+spec-qualification
+audit-vestigial-contracts

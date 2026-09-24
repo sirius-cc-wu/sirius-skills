@@ -40,6 +40,11 @@ PROFILE_NAMES = (
 WORKFLOW_SKILLS = {
     "create-pr",
     "walkthrough-me",
+    "github-issue-creation",
+    "github-issue-workflow",
+    "review-pr",
+    "spec-qualification",
+    "audit-vestigial-contracts",
 }
 ITERATIVE_DESIGN_SKILLS = {
     "assess-development-input",
@@ -50,6 +55,8 @@ ITERATIVE_DESIGN_SKILLS = {
     "software-design-language-adaptation",
     "design-rust-lifecycles",
     "behavior-preserving-refactoring",
+    "architecture-decision-records",
+    "type-anchored-spec",
 }
 REVERSE_ENGINEERING_SKILLS = {
     "select-technical-artifacts",
@@ -396,7 +403,7 @@ def test_validation_covers_the_consolidated_catalog() -> None:
     )
 
     assert result.returncode == 0, result.stdout
-    assert "Validated 10 skills" in result.stdout
+    assert "Validated 17 skills" in result.stdout
     assert (
         "Validated 11 external add-on skills across 1 source profiles" in result.stdout
     )

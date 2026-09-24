@@ -158,16 +158,23 @@ external prerequisite.
 | Software/System Design | Internal collaboration for one selected scenario is unclear | `use-case-realization` |
 | Software/System Design | Stable object-oriented structure needs a summary | `uml-class-diagram-design` |
 | Software/System Design | Demonstrated creation, structural, communication, or variation pressure needs a pattern decision | `design-pattern-application` |
+| Software/System Design | A significant technical decision, interface boundary, protocol, or system invariant needs an authoritative record | `architecture-decision-records` |
 | Detailed Design | Language-neutral design needs target-language adaptation | `software-design-language-adaptation` |
 | Detailed Design | Approved Rust behavior has material ownership, startup, rollback, cancellation, or cleanup risk | `design-rust-lifecycles` |
+| Detailed Design | Business rules, ordered transitions, or module boundaries need compile-time Rust type enforcement | `type-anchored-spec` |
 | Implementation and Evolution | Bounded approved behavior has an independent oracle and needs no Sirius coordination | External `test-driven-development` or repository-native implementation and verification |
 | Verify | Browser behavior needs real runtime evidence | External `browser-testing-with-devtools` or repository-native browser verification |
 | Verify | Tests, builds, or behavior fail unexpectedly and need systematic root-cause analysis | External `debugging-and-error-recovery` or repository-native debugging |
 | Implementation and Evolution | A non-trivial in-flight decision or claim needs fresh-context adversarial review before it stands | External `doubt-driven-development` |
 | Review | A completed change needs correctness, architecture, security, performance, or merge review | External `code-review-and-quality` or repository-native review |
+| Review | A GitHub pull request needs structured read-only analysis and user-authorized comment publication | `review-pr` |
+| Review | A task slice needs qualification against normative behavioral contracts and ADR invariants | `spec-qualification` |
+| Review | Dead wrappers, orphaned parameters, or vestigial test scaffolding need pruning audit | `audit-vestigial-contracts` |
 | Review | Protected behavior needs routine naming, extraction, duplication, control-flow, or recent-code clarity work | External `code-simplification` or repository-native cleanup |
 | Review | Protected behavior needs an established responsibility, dependency, variation, or configuration-ownership change | `behavior-preserving-refactoring` |
 | Repository Workflow | A reader needs a paced, read-only change tour | `walkthrough-me` |
+| Repository Workflow | An observable problem, intake request, or non-duplicative issue needs filing | `github-issue-creation` |
+| Repository Workflow | An existing issue needs triage, spec linking, clarification, or evidence-based closure | `github-issue-workflow` |
 | Integrate and ship | Prepared work needs standalone Git, branch, worktree, release, or version guidance | External `git-workflow-and-versioning` or repository-native Git workflow |
 | Integrate and ship | Committed work is ready for pull-request publication | `create-pr` |
 | Integrate and ship | A consequential architecture choice or durable engineering context needs documentation | External `documentation-and-adrs` or repository-native documentation |

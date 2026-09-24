@@ -1,0 +1,46 @@
+{
+  "skill_name": "audit-vestigial-contracts",
+  "trigger": {
+    "positive": [
+      {
+        "prompt": "Audit this PR diff where a feature was removed to find dead passthroughs, orphaned parameters, and vestigial test scaffolding.",
+        "top_k": 3
+      },
+      {
+        "prompt": "Scan for vestigial contracts and orphaned parameters left behind after removing this legacy config token.",
+        "top_k": 3
+      },
+      {
+        "prompt": "Scan code changes and diffs for residual passthroughs, orphaned parameters, and vestigial test scaffolding after removing an API parameter.",
+        "top_k": 3
+      }
+    ],
+    "negative": [
+      {
+        "prompt": "Review GitHub pull request #142 with structured five-axis review and present findings before publishing.",
+        "owner": "review-pr"
+      },
+      {
+        "prompt": "Move this cohesive responsibility to the existing module that owns its data while preserving verified behavior.",
+        "owner": "behavior-preserving-refactoring"
+      }
+    ]
+  },
+  "evals": [
+    {
+      "id": "audit-removed-flag",
+      "prompt": "We removed the ENABLE_V2_PROTOCOL flag in PR #104. Scan the changes for degraded passthrough functions, unvaried parameters, and ignored-token tests.",
+      "expected_output": "An audit report identifying degraded helpers, orphaned parameters, vestigial tests, and a human-approved pruning proposal.",
+      "expectations": [
+        "Identifies functions that degraded into trivial passthroughs",
+        "Traces call sites to detect unvaried parameters",
+        "Flags tests asserting legacy token behavior or plumbing mocks",
+        "Requires human approval before proposing a dedicated cleanup PR"
+      ],
+      "prohibitions": [
+        "Do not delete or modify tests autonomously"
+      ],
+      "trust_level": "provisional"
+    }
+  ]
+}

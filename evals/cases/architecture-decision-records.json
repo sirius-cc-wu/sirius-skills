@@ -1,0 +1,46 @@
+{
+  "skill_name": "architecture-decision-records",
+  "trigger": {
+    "positive": [
+      {
+        "prompt": "Author an Architecture Decision Record (ADR) capturing our accepted persistence model and system invariants upfront.",
+        "top_k": 3
+      },
+      {
+        "prompt": "Draft an upfront ADR for our new IPC protocol decision and record binding constraints.",
+        "top_k": 3
+      },
+      {
+        "prompt": "Create an architectural decision record under docs/decisions/ for this irreversible concurrency model choice.",
+        "top_k": 3
+      }
+    ],
+    "negative": [
+      {
+        "prompt": "Translate these approved business rules into Rust phantom types and typestate transitions.",
+        "owner": "type-anchored-spec"
+      },
+      {
+        "prompt": "Qualify this delivered task slice against the governing specification and ADR invariants.",
+        "owner": "spec-qualification"
+      }
+    ]
+  },
+  "evals": [
+    {
+      "id": "author-upfront-adr",
+      "prompt": "We decided to adopt an append-only event log for storage. Author ADR-005 capturing this decision, its context, consequences, and invariants.",
+      "expected_output": "An authoritative ADR capturing only the accepted final decision and its invariants upfront, omitting debate history and pros/cons tables.",
+      "expectations": [
+        "The ADR records solely the final decision and accepted rationale",
+        "The ADR establishes concrete consequences and invariants",
+        "The ADR avoids debate transcripts, pros/cons comparison tables, and alternatives matrices"
+      ],
+      "prohibitions": [
+        "Do not include chronological journals or pros/cons debate matrices",
+        "Do not implement code"
+      ],
+      "trust_level": "provisional"
+    }
+  ]
+}

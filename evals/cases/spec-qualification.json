@@ -1,0 +1,47 @@
+{
+  "skill_name": "spec-qualification",
+  "trigger": {
+    "positive": [
+      {
+        "prompt": "Qualify this implemented task slice against its governing specification and Architecture Decision Record (ADR).",
+        "top_k": 3
+      },
+      {
+        "prompt": "Audit this Worker Execution Report and git diff across behavioral contract, ADR compliance, and anti-phantom call paths.",
+        "top_k": 3
+      },
+      {
+        "prompt": "Run the Phase 6 spec qualification gate on this completed feature slice and issue a binary VERIFIED or UNVERIFIED verdict.",
+        "top_k": 3
+      }
+    ],
+    "negative": [
+      {
+        "prompt": "Walk me through PR #482 one logical section at a time and wait for me before continuing.",
+        "owner": "walkthrough-me"
+      },
+      {
+        "prompt": "Review a GitHub pull request with structured five-axis review and present actionable findings for human approval.",
+        "owner": "review-pr"
+      }
+    ]
+  },
+  "evals": [
+    {
+      "id": "qualify-task-slice",
+      "prompt": "Audit this Worker Execution Report and git diff against the SSD contract and Example Mapping rules R1-R3. Check for anti-phantom call paths and ADR layering.",
+      "expected_output": "A qualification report evaluating behavioral compliance, ADR invariants, and code health, ending with a binary VERIFIED or UNVERIFIED verdict.",
+      "expectations": [
+        "Traces each Example Mapping rule to test evidence",
+        "Audits test assertions for authentic verification",
+        "Checks for phantom functions without production callers",
+        "Issues a clear binary VERIFIED or UNVERIFIED verdict"
+      ],
+      "prohibitions": [
+        "Do not execute build or test commands directly",
+        "Do not implement feature code"
+      ],
+      "trust_level": "provisional"
+    }
+  ]
+}

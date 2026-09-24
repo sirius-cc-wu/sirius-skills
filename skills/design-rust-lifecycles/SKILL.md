@@ -77,14 +77,14 @@ than implementation details.
 
 Before creating a file, apply
 [Artifact Selection Budget](../select-technical-artifacts/references/artifact-selection-budget.md).
-Prefer refining an existing implementation-facing design when it owns the same
-lifecycle. Otherwise, copy and tailor
+Prefer refining an existing implementation-facing design or detailed design artifact
+(`detailed-design.md` beside `architecture.md` under `## Resource & Memory Lifecycle`)
+when it owns the same lifecycle. Otherwise, copy and tailor
 [Rust Lifecycle Design Template](assets/rust-lifecycle-design.md).
 
 For a standalone artifact, follow
-[Markdown Artifact Frontmatter](../iterative-risk-driven-development/references/markdown-artifact-frontmatter.md)
-and
-use STE-style.
+[Markdown Artifact Frontmatter](../design-repository-artifact-layout/references/markdown-artifact-frontmatter.md)
+and use STE-style.
 Use this artifact type:
 
 ```yaml
@@ -94,9 +94,9 @@ language: "rust"
 
 Keep ownership, state, startup, rollback, cancellation, cleanup, API shape,
 and verification in one artifact unless one cross-cutting, expensive-to-reverse
-choice has a genuinely independent lifecycle. In that case, use external
-`documentation-and-adrs` with the `all` installation or follow
-repository-native ADR guidance. Do not copy the lifecycle design into the ADR.
+choice has a genuinely independent lifecycle. In that case, use
+`architecture-decision-records` or follow repository-native ADR guidance. Do
+not copy the lifecycle design into the ADR.
 
 ## Boundaries
 

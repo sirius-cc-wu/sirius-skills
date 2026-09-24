@@ -1,0 +1,46 @@
+{
+  "skill_name": "type-anchored-spec",
+  "trigger": {
+    "positive": [
+      {
+        "prompt": "Translate these approved business rules into Rust phantom types, sealed traits, and typestate transitions to enforce spec compliance at compile time.",
+        "top_k": 3
+      },
+      {
+        "prompt": "Anchor our state machine transitions into Rust typestate so the compiler prevents illegal workflow steps.",
+        "top_k": 3
+      },
+      {
+        "prompt": "Create a type-anchored spec with sealed traits and opaque newtypes for this sensitive domain value.",
+        "top_k": 3
+      }
+    ],
+    "negative": [
+      {
+        "prompt": "Author an Architecture Decision Record (ADR) capturing our accepted persistence model and system invariants upfront.",
+        "owner": "architecture-decision-records"
+      },
+      {
+        "prompt": "Design ownership-safe Rust lifecycles for resources, state transitions, staged startup, and fallible cleanup.",
+        "owner": "design-rust-lifecycles"
+      }
+    ]
+  },
+  "evals": [
+    {
+      "id": "type-anchor-rules",
+      "prompt": "Given our approved order flow (Draft -> Validated -> Paid -> Shipped), design a Rust type-layer specification using typestate and phantom types.",
+      "expected_output": "A type-anchored specification template defining state types, consuming transition methods, sealed traits, and closed domain error enums.",
+      "expectations": [
+        "Uses phantom types or typestate for ordered state transitions",
+        "Enforces transitions via consuming methods without public bypass constructors",
+        "Keeps application logic out of the spec-layer design"
+      ],
+      "prohibitions": [
+        "Do not implement full runtime application logic",
+        "Do not call unwrap() or expect() in spec definitions"
+      ],
+      "trust_level": "provisional"
+    }
+  ]
+}

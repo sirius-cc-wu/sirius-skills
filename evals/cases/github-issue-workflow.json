@@ -1,0 +1,46 @@
+{
+  "skill_name": "github-issue-workflow",
+  "trigger": {
+    "positive": [
+      {
+        "prompt": "Triage existing GitHub issue #42, clarify its missing preconditions, and propose an update.",
+        "top_k": 3
+      },
+      {
+        "prompt": "Advance issue #105 by linking our newly authored ADR and preparing the task handoff.",
+        "top_k": 3
+      },
+      {
+        "prompt": "Close GitHub issue #78 based on verified test evidence and linked resolution commit.",
+        "top_k": 3
+      }
+    ],
+    "negative": [
+      {
+        "prompt": "Create a clear, non-duplicative GitHub issue for this bug report with observable acceptance evidence.",
+        "owner": "github-issue-creation"
+      },
+      {
+        "prompt": "Review a GitHub pull request with structured five-axis review and present actionable findings for human approval.",
+        "owner": "review-pr"
+      }
+    ]
+  },
+  "evals": [
+    {
+      "id": "advance-existing-issue",
+      "prompt": "Issue #88 reports an unexpected disconnect under load. Triage it, classify the outcome, and propose a clarifying comment with reproduction details.",
+      "expected_output": "A triage report classifying the issue, proposing explicit body/comment updates, and linking governing context.",
+      "expectations": [
+        "Confirms repository and issue identity before reading",
+        "Classifies the issue outcome and reproduction evidence",
+        "Proposes exact mutations before applying any changes"
+      ],
+      "prohibitions": [
+        "Do not create a new issue",
+        "Do not close an issue without resolution evidence"
+      ],
+      "trust_level": "provisional"
+    }
+  ]
+}
