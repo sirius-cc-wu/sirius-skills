@@ -9,6 +9,7 @@ addy_source := "addyosmani/agent-skills@5a1b82d6445d1e2f0abeea1072851419a50c0e5c
 addy_profile := repo_root / "catalog/external-skill-sets/addy-osmani.txt"
 addy_lock_source := "addyosmani/agent-skills"
 source_skills_dir := repo_root / "skills"
+continual_learning_plugin_dir := repo_root / "plugins/continual-learning"
 
 # Install a source-linked profile into a target project by default.
 install target_dir skill_set="workflow": (install-local target_dir skill_set)
@@ -107,6 +108,29 @@ install-global skill_set="workflow": sync-shared-references
 		record-installed --profile "$combined_profile"
 # Compatibility alias for the packaged global installation.
 install-packaged skill_set="workflow": (install-global skill_set)
+
+# Install continual learning plugin for Antigravity CLI globally.
+install-antigravity-continual-learning:
+	#!/usr/bin/env bash
+	set -euo pipefail
+	target="$HOME/.gemini/config/plugins/continual-learning"
+	mkdir -p "$(dirname "$target")"
+	ln -sfn "{{continual_learning_plugin_dir}}" "$target"
+	echo "Installed continual-learning plugin for Antigravity at $target"
+
+# Install continual learning plugin for Copilot CLI globally.
+install-copilot-continual-learning:
+	#!/usr/bin/env bash
+	set -euo pipefail
+	target="$HOME/.copilot/installed-plugins/continual-learning"
+	mkdir -p "$(dirname "$target")"
+	ln -sfn "{{continual_learning_plugin_dir}}" "$target"
+	mkdir -p "$HOME/.copilot/plugins"
+	ln -sfn "{{continual_learning_plugin_dir}}" "$HOME/.copilot/plugins/continual-learning"
+	echo "Installed continual-learning plugin for Copilot at $target"
+
+# Install continual learning plugin across both Antigravity and Copilot CLI harnesses.
+install-continual-learning: install-antigravity-continual-learning install-copilot-continual-learning
 
 # Sync canonical shared references into self-contained skill packages.
 sync-shared-references:

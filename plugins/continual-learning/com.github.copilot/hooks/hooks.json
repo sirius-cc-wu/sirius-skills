@@ -1,0 +1,11 @@
+{
+  "version": 1,
+  "hooks": {
+    "sessionEnd": [
+      {
+        "type": "command",
+        "command": "node --experimental-strip-types src/copilot-hook.ts"
+      }
+    ]
+  }
+}

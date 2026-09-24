@@ -1,0 +1,10 @@
+{
+  "continual-learning": {
+    "Stop": [
+      {
+        "type": "command",
+        "command": "node --experimental-strip-types src/antigravity-hook.ts"
+      }
+    ]
+  }
+}
