@@ -64,8 +64,6 @@ Task arrives
 │  └─ external debugging-and-error-recovery or repository-native debugging
 ├─ A non-trivial in-flight claim needs fresh-context adversarial review
 │  └─ external doubt-driven-development
-├─ A bounded artifact needs one explicitly authorized Antigravity CLI opinion
-│  └─ agy-second-opinion (all installation only)
 ├─ A completed change needs formal review
 │  └─ external code-review-and-quality or repository-native review
 │     ├─ readability or local complexity → external code-simplification
@@ -88,7 +86,7 @@ Task arrives
    └─ iterative-risk-driven-development
 ```
 
-External add-on routes and `agy-second-opinion` require the `all` installation.
+External add-on routes require the `all` installation.
 Otherwise, select the repository-native workflow or report the responsible
 external prerequisite.
 
@@ -166,7 +164,6 @@ external prerequisite.
 | Verify | Browser behavior needs real runtime evidence | External `browser-testing-with-devtools` or repository-native browser verification |
 | Verify | Tests, builds, or behavior fail unexpectedly and need systematic root-cause analysis | External `debugging-and-error-recovery` or repository-native debugging |
 | Implementation and Evolution | A non-trivial in-flight decision or claim needs fresh-context adversarial review before it stands | External `doubt-driven-development` |
-| Review | A bounded artifact needs one explicitly authorized Antigravity CLI opinion | `agy-second-opinion` (`all` installation only) |
 | Review | A completed change needs correctness, architecture, security, performance, or merge review | External `code-review-and-quality` or repository-native review |
 | Review | Protected behavior needs routine naming, extraction, duplication, control-flow, or recent-code clarity work | External `code-simplification` or repository-native cleanup |
 | Review | Protected behavior needs an established responsibility, dependency, variation, or configuration-ownership change | `behavior-preserving-refactoring` |

@@ -117,7 +117,6 @@ package "Implementation, Verify, Review, and Repository Workflow" as delivery {
   **Review**
   code-review-and-quality [external]
   code-simplification [external]
-  agy-second-opinion [Sirius; all only]
   behavior-preserving-refactoring [Sirius]
   ]
   rectangle integrate <<external>> [
@@ -538,7 +537,6 @@ non-trivial in-flight claim → doubt-driven-development [external]
 
 rectangle review #FFFBEA [
 **Review**
-bounded artifact and explicit current authorization → agy-second-opinion [Sirius; all only]
 completed change → code-review-and-quality [external] or repository-native review
 routine clarity → code-simplification [external] or repository-native cleanup
 established structural ownership → behavior-preserving-refactoring [Sirius]
@@ -581,10 +579,9 @@ optional next step. With the `all` installation, use `test-driven-development`
 for behavior implementation, `browser-testing-with-devtools` for browser
 runtime evidence, `debugging-and-error-recovery` for systematic failure
 recovery, `doubt-driven-development` for in-flight adversarial review of
-non-trivial claims, `agy-second-opinion` for one explicitly authorized
-Antigravity CLI opinion of a bounded artifact, and `code-review-and-quality`
-for formal review. Doubt findings can expose missing contracts or evidence; they
-do not recover undocumented design. Route readability and local-complexity findings to
+non-trivial claims, and `code-review-and-quality` for formal review. Doubt
+findings can expose missing contracts or evidence; they do not recover undocumented
+design. Route readability and local-complexity findings to
 `code-simplification`.
 Route findings about established responsibility, dependency, variation, or
 configuration ownership to `behavior-preserving-refactoring`. Route material

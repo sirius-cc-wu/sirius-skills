@@ -314,9 +314,10 @@ def test_repository_retirement_ledger_is_disjoint_from_active_skills() -> None:
         path.parent.name for path in (REPO_ROOT / "skills").glob("*/SKILL.md")
     }
 
-    assert len(retirements) == 81
+    assert len(retirements) == 82
     assert not retired_names & active_names
     assert {
+        "agy-second-opinion",
         "author-software-proposal",
         "behavior-driven-specification",
         "commit",

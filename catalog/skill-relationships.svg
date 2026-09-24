@@ -82,8 +82,7 @@
       <text fill="#000000" font-family="Arial" font-size="14" font-weight="bold" lengthAdjust="spacing" textLength="56.6289" x="262.6867" y="729.7851">Review</text>
       <text fill="#000000" font-family="Arial" font-size="14" lengthAdjust="spacing" textLength="243.2295" x="169.3864" y="746.082">code-review-and-quality [external]</text>
       <text fill="#000000" font-family="Arial" font-size="14" lengthAdjust="spacing" textLength="205.6865" x="188.1579" y="762.3789">code-simplification [external]</text>
-      <text fill="#000000" font-family="Arial" font-size="14" lengthAdjust="spacing" textLength="250.8789" x="165.5617" y="778.6757">agy-second-opinion [Sirius; all only]</text>
-      <text fill="#000000" font-family="Arial" font-size="14" lengthAdjust="spacing" textLength="277.4023" x="152.3" y="794.9726">behavior-preserving-refactoring [Sirius]</text>
+      <text fill="#000000" font-family="Arial" font-size="14" lengthAdjust="spacing" textLength="277.4023" x="152.3" y="778.6757">behavior-preserving-refactoring [Sirius]</text>
     </g>
     <!--entity integrate-->
     <g class="entity" data-qualified-name="delivery.integrate" data-source-line="107" id="ent0025">

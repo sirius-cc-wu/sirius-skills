@@ -55,7 +55,7 @@ REVERSE_ENGINEERING_SKILLS = {
     "select-technical-artifacts",
     "design-repository-artifact-layout",
 }
-ALL_ONLY_SKILLS = {"agy-second-opinion"}
+ALL_ONLY_SKILLS: set[str] = set()
 
 
 def render_just(target: str, *args: str) -> str:
@@ -396,7 +396,7 @@ def test_validation_covers_the_consolidated_catalog() -> None:
     )
 
     assert result.returncode == 0, result.stdout
-    assert "Validated 11 skills" in result.stdout
+    assert "Validated 10 skills" in result.stdout
     assert (
         "Validated 11 external add-on skills across 1 source profiles" in result.stdout
     )
