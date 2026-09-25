@@ -3,6 +3,14 @@
   "trigger": {
     "positive": [
       {
+        "prompt": "Create a clear, non-duplicative GitHub issue for this bug report with observable acceptance evidence.",
+        "top_k": 3
+      },
+      {
+        "prompt": "Open a new GitHub issue proposing this capability and check for existing duplicate reports first.",
+        "top_k": 3
+      },
+      {
         "prompt": "Triage existing GitHub issue #42, clarify its missing preconditions, and propose an update.",
         "top_k": 3
       },
@@ -17,12 +25,12 @@
     ],
     "negative": [
       {
-        "prompt": "Create a clear, non-duplicative GitHub issue for this bug report with observable acceptance evidence.",
-        "owner": "github-issue-creation"
-      },
-      {
         "prompt": "Review a GitHub pull request with structured five-axis review and present actionable findings for human approval.",
         "owner": "review-pr"
+      },
+      {
+        "prompt": "Verify the base and head branches, check for duplicates, and open a draft GitHub pull request with a convention-aware title.",
+        "owner": "create-pr"
       }
     ]
   },
@@ -37,8 +45,23 @@
         "Proposes exact mutations before applying any changes"
       ],
       "prohibitions": [
-        "Do not create a new issue",
-        "Do not close an issue without resolution evidence"
+        "Do not close an issue without resolution evidence",
+        "Do not publish credentials or unredacted secrets"
+      ],
+      "trust_level": "provisional"
+    },
+    {
+      "id": "create-new-issue",
+      "prompt": "Open a GitHub issue for the CLI silent-failure when the config file has trailing comments. Check for duplicates first.",
+      "expected_output": "A structured GitHub issue proposal with Goal, Context, Scope, Acceptance Evidence, and Open Questions.",
+      "expectations": [
+        "Checks repository context and duplicate issues first",
+        "Proposes structured issue body before creating",
+        "Keeps facts, assumptions, and acceptance evidence distinct"
+      ],
+      "prohibitions": [
+        "Do not create unauthorized labels or milestones",
+        "Do not publish credentials or unredacted secrets"
       ],
       "trust_level": "provisional"
     }

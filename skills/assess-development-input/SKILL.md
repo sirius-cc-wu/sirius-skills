@@ -173,8 +173,7 @@ external prerequisite.
 | Review | Protected behavior needs routine naming, extraction, duplication, control-flow, or recent-code clarity work | External `code-simplification` or repository-native cleanup |
 | Review | Protected behavior needs an established responsibility, dependency, variation, or configuration-ownership change | `behavior-preserving-refactoring` |
 | Repository Workflow | A reader needs a paced, read-only change tour | `walkthrough-me` |
-| Repository Workflow | An observable problem, intake request, or non-duplicative issue needs filing | `github-issue-creation` |
-| Repository Workflow | An existing issue needs triage, spec linking, clarification, or evidence-based closure | `github-issue-workflow` |
+| Repository Workflow | An issue needs filing, duplicate triage, spec linking, mutation proposal, or evidence-based closure | `github-issue-workflow` |
 | Integrate and ship | Prepared work needs standalone Git, branch, worktree, release, or version guidance | External `git-workflow-and-versioning` or repository-native Git workflow |
 | Integrate and ship | Committed work is ready for pull-request publication | `create-pr` |
 | Integrate and ship | A consequential architecture choice or durable engineering context needs documentation | External `documentation-and-adrs` or repository-native documentation |
