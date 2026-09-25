@@ -4,6 +4,7 @@ github-issue-workflow
 review-pr
 spec-qualification
 audit-vestigial-contracts
+audit-pr-scope
 select-technical-artifacts
 design-repository-artifact-layout
 assess-development-input

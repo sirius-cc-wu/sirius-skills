@@ -74,6 +74,12 @@ retired. Review findings select between `code-simplification`,
 `behavior-preserving-refactoring`, and coordinated redesign; these are not
 mandatory lifecycle gates.
 
+## Pull request scope and quality audit
+
+1. Use [`audit-pr-scope`](../../skills/audit-pr-scope/SKILL.md) when evaluating whether a PR's size, diff noise, and engineering depth match its motivating problem. It concurrently checks for over-engineering (excessive ceremony, concurrency, speculative mocks) and under-engineering (violated real-time safety, untruthful telemetry, missed early drops), proposing actionable vertical re-scoping slices.
+2. Use [`audit-vestigial-contracts`](../../skills/audit-vestigial-contracts/SKILL.md) when a PR or commit range removes a configuration, token, or feature to find dead passthroughs and orphaned test scaffolding.
+3. Use [`spec-qualification`](../../skills/spec-qualification/SKILL.md) to qualify delivered tasks against governing specifications and ADRs without running compilers.
+
 ## Governance feedback
 
 When multiple examples expose a durable policy gap, directly update the

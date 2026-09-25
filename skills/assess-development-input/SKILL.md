@@ -170,6 +170,7 @@ external prerequisite.
 | Review | A GitHub pull request needs structured read-only analysis and user-authorized comment publication | `review-pr` |
 | Review | A task slice needs qualification against normative behavioral contracts and ADR invariants | `spec-qualification` |
 | Review | Dead wrappers, orphaned parameters, or vestigial test scaffolding need pruning audit | `audit-vestigial-contracts` |
+| Review | A pull request needs audit for scope alignment, diff noise, over-engineering, or vertical re-scoping | `audit-pr-scope` |
 | Review | Protected behavior needs routine naming, extraction, duplication, control-flow, or recent-code clarity work | External `code-simplification` or repository-native cleanup |
 | Review | Protected behavior needs an established responsibility, dependency, variation, or configuration-ownership change | `behavior-preserving-refactoring` |
 | Repository Workflow | A reader needs a paced, read-only change tour | `walkthrough-me` |

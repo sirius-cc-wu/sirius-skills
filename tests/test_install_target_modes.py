@@ -44,6 +44,7 @@ WORKFLOW_SKILLS = {
     "review-pr",
     "spec-qualification",
     "audit-vestigial-contracts",
+    "audit-pr-scope",
 }
 ITERATIVE_DESIGN_SKILLS = {
     "assess-development-input",
@@ -402,7 +403,7 @@ def test_validation_covers_the_consolidated_catalog() -> None:
     )
 
     assert result.returncode == 0, result.stdout
-    assert "Validated 16 skills" in result.stdout
+    assert "Validated 17 skills" in result.stdout
     assert (
         "Validated 11 external add-on skills across 1 source profiles" in result.stdout
     )

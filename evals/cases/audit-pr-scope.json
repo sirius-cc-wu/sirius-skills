@@ -1,0 +1,51 @@
+{
+  "skill_name": "audit-pr-scope",
+  "trigger": {
+    "positive": [
+      {
+        "prompt": "Does the scope of this PR match the problem it's trying to solve? Is it a case of overengineering or underengineering?",
+        "top_k": 3
+      },
+      {
+        "prompt": "Audit this pull request for scope creep, diff noise, and over-engineering.",
+        "top_k": 3
+      },
+      {
+        "prompt": "Evaluate PR #185 to see if its scope fits the root problem and recommend re-scoping slices.",
+        "top_k": 3
+      }
+    ],
+    "negative": [
+      {
+        "prompt": "Review GitHub pull request #142 with structured five-axis review and present findings before publishing.",
+        "owner": "review-pr"
+      },
+      {
+        "prompt": "Walk me through PR #482 one logical section at a time and wait for me before continuing.",
+        "owner": "walkthrough-me"
+      },
+      {
+        "prompt": "Scan code changes and diffs for residual passthroughs, orphaned parameters, and vestigial test scaffolding after removing an API parameter.",
+        "owner": "audit-vestigial-contracts"
+      }
+    ]
+  },
+  "evals": [
+    {
+      "id": "audit-pr-scope-mismatch",
+      "prompt": "Audit PR #185: does its scope match the motivating problem, and is it over-engineered or under-engineered?",
+      "expected_output": "A structured scope audit with motivating problem vs delivered scope, over-engineering table, under-engineering analysis, and vertical re-scoping slices.",
+      "expectations": [
+        "Isolates the motivating problem from PR description or issue context",
+        "Distinguishes core problem resolution from diff churn and secondary features",
+        "Audits for over-engineering and under-engineering simultaneously",
+        "Recommends vertical re-scoping slices with a Mermaid diagram"
+      ],
+      "prohibitions": [
+        "Do not perform style or syntax nitpicking",
+        "Do not mutate PR or repository state"
+      ],
+      "trust_level": "provisional"
+    }
+  ]
+}

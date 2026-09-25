@@ -4,3 +4,4 @@ github-issue-workflow
 review-pr
 spec-qualification
 audit-vestigial-contracts
+audit-pr-scope
