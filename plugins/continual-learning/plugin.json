@@ -1,0 +1,28 @@
+{
+  "name": "continual-learning",
+  "displayName": "Continual Learning",
+  "version": "1.0.0",
+  "description": "Incrementally learns durable user preferences and workspace facts from transcript changes and keeps AGENTS.md up to date with plain bullet points across Antigravity CLI and Copilot CLI.",
+  "author": {
+    "name": "Sirius"
+  },
+  "license": "MIT",
+  "keywords": [
+    "continual-learning",
+    "agent-memory",
+    "transcripts",
+    "hooks",
+    "incremental",
+    "antigravity",
+    "copilot"
+  ],
+  "category": "developer-tools",
+  "tags": [
+    "automation",
+    "memory",
+    "transcripts"
+  ],
+  "agents": "./agents/",
+  "skills": "./skills/",
+  "hooks": "./hooks.json"
+}
