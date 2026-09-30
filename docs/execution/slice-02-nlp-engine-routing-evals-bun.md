@@ -1,7 +1,7 @@
 ---
 title: "Execution Plan: Slice 02 — NLP TF-IDF Routing Engine & Routing Evals Migration to TypeScript with Bun"
 adr: "ADR-001"
-status: "planned"
+status: "completed"
 date: "2026-10-01"
 ---
 
@@ -39,7 +39,7 @@ Port the deterministic tokenization, suffix stemmer, TF-IDF vectorizer, and cosi
    - Run `just validate` to confirm end-to-end green status.
 
 ## 4. Acceptance Criteria
-- [ ] `bun scripts/run_evals.ts` passes all 96 routing checks with 96% rank-one rate.
-- [ ] `just eval-routing` and `just validate` run cleanly under Bun without Python.
-- [ ] All unit tests pass in `bun test`.
-- [ ] Zero external runtime npm dependencies.
+- [x] `bun scripts/run_evals.ts` passes all 96 routing checks with 96% rank-one rate.
+- [x] `just eval-routing` and `just validate` run cleanly under Bun without Python.
+- [x] All unit tests pass in `bun test`.
+- [x] Zero external runtime npm dependencies.

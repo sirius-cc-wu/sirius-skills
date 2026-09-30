@@ -242,7 +242,7 @@ validate: eval-routing
 
 # Run free, deterministic skill-description routing checks.
 eval-routing:
-	env PYTHONPATH="{{repo_root}}/src" python3 -m sirius_skills.commands.run_evals --root "{{repo_root}}"
+	bun "{{repo_root}}/scripts/run_evals.ts" --root "{{repo_root}}"
 
 # Print a behavioral eval plan without invoking Codex or spending tokens.
 eval-behavior-dry-run skill case repeat="1":
