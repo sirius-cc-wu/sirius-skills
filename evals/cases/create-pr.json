@@ -1,0 +1,47 @@
+{
+  "skill_name": "create-pr",
+  "trigger": {
+    "positive": [
+      {
+        "prompt": "Create a pull request with a formatted title and submit changes for review.",
+        "top_k": 3
+      },
+      {
+        "prompt": "Open and create a GitHub pull request for this branch following title rules.",
+        "top_k": 3
+      },
+      {
+        "prompt": "I need to submit my changes; please create a pull request with an approved title.",
+        "top_k": 3
+      }
+    ],
+    "negative": [
+      {
+        "prompt": "Review GitHub pull request #142 with structured five-axis review and present findings before publishing.",
+        "owner": "review-pr"
+      },
+      {
+        "prompt": "Does the scope of this PR match the problem it's trying to solve? Is it a case of overengineering or underengineering?",
+        "owner": "audit-pr-scope"
+      }
+    ]
+  },
+  "evals": [
+    {
+      "id": "open-pull-request-cleanly",
+      "prompt": "Create a pull request for current branch feat/user-auth against main, using repository commit conventions for the title.",
+      "expected_output": "Inspects git state, resolves default base branch, checks for duplicate PRs, formats title per repository rules, and invokes gh pr create.",
+      "expectations": [
+        "Inspects git status to ensure worktree is clean before creating PR",
+        "Resolves base branch and upstream remote correctly",
+        "Checks for existing open PRs for the branch to prevent duplicates",
+        "Constructs title per repository guidance"
+      ],
+      "prohibitions": [
+        "Do not create PR from dirty worktree without confirming with user",
+        "Do not use shell heredocs inside PR body"
+      ],
+      "trust_level": "provisional"
+    }
+  ]
+}

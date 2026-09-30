@@ -13,6 +13,14 @@
       {
         "prompt": "Evaluate PR #185 to see if its scope fits the root problem and recommend re-scoping slices.",
         "top_k": 3
+      },
+      {
+        "prompt": "Evaluate scope creep on this pull request and plan vertical re-scoping slices.",
+        "top_k": 3
+      },
+      {
+        "prompt": "Is this PR overengineered or underengineered? Audit the diff signal to noise ratio and scope.",
+        "top_k": 3
       }
     ],
     "negative": [
@@ -27,6 +35,10 @@
       {
         "prompt": "Scan code changes and diffs for residual passthroughs, orphaned parameters, and vestigial test scaffolding after removing an API parameter.",
         "owner": "audit-vestigial-contracts"
+      },
+      {
+        "prompt": "Create a pull request with a formatted title and submit changes for review.",
+        "owner": "create-pr"
       }
     ]
   },

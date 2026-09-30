@@ -28,6 +28,11 @@ def test_vision_skill_preserves_evidence_and_approval_boundaries() -> None:
         "External `idea-refine` owns candidate-direction exploration.",
         "business-case, feasibility, funding, and investment approval",
         "type: \"Vision\"",
+        "Intended Users",
+        "Scope",
+        "Integration Boundary",
+        "Boundary Cases",
+        "Source revision",
     ):
         assert text in skill
 
