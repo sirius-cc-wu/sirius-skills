@@ -28,7 +28,7 @@
     <g class="entity" data-qualified-name="analysis.vision" data-source-line="52" id="ent0010">
       <rect fill="#EAF4FB" height="52.5938" rx="6" ry="6" style="stroke:#52606D;stroke-width:0.5;" width="336.2441" x="521.88" y="440.12"/>
       <text fill="#000000" font-family="Arial" font-size="14" font-weight="bold" lengthAdjust="spacing" textLength="316.2441" x="531.88" y="463.1151">Requirements Analysis &#xC2;&#xB7; Project Vision</text>
-      <text fill="#000000" font-family="Arial" font-size="14" lengthAdjust="spacing" textLength="143.6025" x="618.2008" y="479.412">define-project-vision</text>
+      <text fill="#000000" font-family="Arial" font-size="14" lengthAdjust="spacing" textLength="37.33" x="671.33" y="479.412">vision</text>
     </g>
     <!--entity requirements-->
     <g class="entity" data-qualified-name="analysis.requirements" data-source-line="56" id="ent0011">

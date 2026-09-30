@@ -1,5 +1,5 @@
 ---
-name: define-project-vision
+name: vision
 description: Defines or refines an evidence-backed project vision with explicit identity, principles, non-goals, and accept-or-resist criteria. Use when a repository or independently sponsored initiative needs a durable vision, contribution policy, or vision revision; clarify candidate directions with external idea-refine or interview-me, mine repository history only as evidence, and obtain approval from the responsible vision authority.
 ---
 

@@ -21,7 +21,7 @@ The active pilot covers:
 - `select-technical-artifacts`;
 - `design-repository-artifact-layout`;
 - `iterative-risk-driven-development`;
-- `define-project-vision`;
+- `vision`;
 - `specify-quality-constraints`;
 - `operation-contracts`;
 - `design-software-architecture`;

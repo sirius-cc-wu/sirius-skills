@@ -57,7 +57,7 @@ summarizes those handoffs:
 | Cross-cutting Support | Whether candidate knowledge should be created, updated, embedded, kept with implementation, omitted, or deferred | [`select-technical-artifacts`](../../skills/select-technical-artifacts/SKILL.md) |
 | Cross-cutting Support | Canonical repository homes, lifecycle separation, or artifact migration | [`design-repository-artifact-layout`](../../skills/design-repository-artifact-layout/SKILL.md) |
 | Cross-cutting Support | One consequential architecture choice needs proposed review, accepted history, or supersession | External `documentation-and-adrs` with the `all` installation; otherwise repository-native ADR guidance |
-| Requirements Analysis | A durable project vision, non-goals, or contribution-acceptance policy | [`define-project-vision`](../../skills/define-project-vision/SKILL.md) |
+| Requirements Analysis | A durable project vision, non-goals, or contribution-acceptance policy | [`vision`](../../skills/vision/SKILL.md) |
 | External prerequisite | A business case, feasibility commitment, or investment decision needs authority | Responsible external product or portfolio process; external `idea-refine` may prepare candidate input |
 | Requirements Analysis | Actors, goals, system boundary, or scenario flow | [`use-case-modeling`](../../skills/use-case-modeling/SKILL.md) |
 | Requirements Analysis | Measurable quality requirements, binding constraints, cross-cutting special requirements, or acceptance evidence | [`specify-quality-constraints`](../../skills/specify-quality-constraints/SKILL.md) |

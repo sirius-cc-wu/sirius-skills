@@ -67,7 +67,7 @@ package "Question-Selected Analysis and Design" as analysis {
   ]
   rectangle vision #EAF4FB [
   **Requirements Analysis · Project Vision**
-  define-project-vision
+  vision
   ]
   rectangle requirements #EAF4FB [
   **Requirements Analysis · Behavior and Constraints**
@@ -170,7 +170,7 @@ collection. They are not part of the Sirius catalog or named profiles.
 composition. `interview-me` confirms one requester's intent.
 `idea-refine` turns that intent into a focused, user-confirmed candidate
 one-pager. It can prepare a candidate direction or business-case hypothesis,
-but it cannot approve an investment decision. `define-project-vision` guides
+but it cannot approve an investment decision. `vision` guides
 sufficiently grounded input toward an authority-approved project acceptance policy.
 The dashed **External Define → Project Vision** edge applies only when
 `interview-me` supplies clarification or `idea-refine` supplies candidate input.
@@ -183,7 +183,7 @@ Use `idea-refine` for a candidate direction or business-case hypothesis. Save
 the confirmed one-pager in `docs/ideas/` or a feature path defined by local
 governance. Use one canonical idea document for each candidate direction. Do not
 create a second document for a direction that already has one. Requester
-confirmation is not organizational approval. Use `define-project-vision` when
+confirmation is not organizational approval. Use `vision` when
 the project needs a durable vision, non-goals, or accept-or-resist policy. Route
 a business case, feasibility commitment, or investment decision to the
 responsible external product or portfolio process. Use the dashed edge to
@@ -318,7 +318,7 @@ matter. Treat missing stakeholder evidence, validation, or approval as an
 external prerequisite. Route current-system claims that lack evidence to a
 responsible external recovery process. Use external `idea-refine` for a
 candidate direction or business-case hypothesis. Route durable project vision,
-non-goals, or contribution-acceptance policy to `define-project-vision`. Route
+non-goals, or contribution-acceptance policy to `vision`. Route
 a business case, feasibility commitment, or investment decision to the
 responsible external product or portfolio process. Route approved actor goals
 and scenario flow to use-case modeling, measurable quality requirements and binding
@@ -420,7 +420,7 @@ Select only the owners needed by the current objective.
 
 rectangle requirements #EAF4FB [
 **Requirements Analysis**
-durable project vision, non-goals, or contribution policy → define-project-vision
+durable project vision, non-goals, or contribution policy → vision
 actors, goals, boundary, or scenarios → use-case-modeling
 quality requirements, binding constraints, or acceptance evidence → specify-quality-constraints
 business case, feasibility, or investment → responsible external product or portfolio process

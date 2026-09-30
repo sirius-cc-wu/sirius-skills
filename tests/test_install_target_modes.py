@@ -50,7 +50,7 @@ ITERATIVE_DESIGN_SKILLS = {
     "assess-development-input",
     "select-technical-artifacts",
     "design-repository-artifact-layout",
-    "define-project-vision",
+    "vision",
     "specify-quality-constraints",
     "software-design-language-adaptation",
     "design-rust-lifecycles",

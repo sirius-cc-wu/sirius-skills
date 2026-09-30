@@ -23,7 +23,7 @@ those historical artifact types merely because their skills are retired.
    Sirius owner.
 3. Use external `idea-refine` to prepare a candidate direction or business-case
    hypothesis when needed. It does not approve the direction.
-4. Use [`define-project-vision`](../../skills/define-project-vision/SKILL.md)
+4. Use [`vision`](../../skills/vision/SKILL.md)
    when the project needs an evidence-backed identity, non-goals, or
    contribution-acceptance policy. It may use the candidate direction and
    repository history as evidence, but it does not approve a business decision.

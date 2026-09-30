@@ -18,8 +18,8 @@ def profile_names(relative_path: str) -> set[str]:
     }
 
 
-def test_project_vision_skill_preserves_evidence_and_approval_boundaries() -> None:
-    skill = " ".join(read("skills/define-project-vision/SKILL.md").split())
+def test_vision_skill_preserves_evidence_and_approval_boundaries() -> None:
+    skill = " ".join(read("skills/vision/SKILL.md").split())
 
     for text in (
         "Treat history as evidence, not approval.",
@@ -32,8 +32,8 @@ def test_project_vision_skill_preserves_evidence_and_approval_boundaries() -> No
         assert text in skill
 
 
-def test_project_vision_skill_is_active_and_routable() -> None:
-    name = "define-project-vision"
+def test_vision_skill_is_active_and_routable() -> None:
+    name = "vision"
 
     assert name in profile_names("skill-sets/all.txt")
     assert name in profile_names("skill-sets/iterative-design.txt")

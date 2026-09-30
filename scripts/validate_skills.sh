@@ -213,7 +213,7 @@ grep -Fq '$design-repository-artifact-layout' "$layout_metadata" || fail "artifa
 
 template_types=(
   "assess-development-input|Development Input Assessment"
-  "define-project-vision|Vision"
+  "vision|Vision"
   "specify-quality-constraints|Supplementary Specification"
   "design-rust-lifecycles|Rust Lifecycle Design"
   "behavior-preserving-refactoring|Refactoring Record"
