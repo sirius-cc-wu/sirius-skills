@@ -195,7 +195,7 @@ are not Sirius catalog entries or named-profile members.
 inception artifacts remain valid at their recorded revisions. Use external
 `idea-refine` for a new candidate direction or business-case hypothesis. It
 produces candidate input, not organizational approval. Use
-`define-project-vision` for an evidence-backed project vision, non-goals, and
+`vision` for an evidence-backed project vision, non-goals, and
 contribution-acceptance policy. Route a business case, feasibility commitment,
 or investment decision to the responsible external product or portfolio process.
 Route unevidenced current-system claims to a responsible external recovery

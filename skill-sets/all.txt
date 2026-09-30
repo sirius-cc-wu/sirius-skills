@@ -8,7 +8,7 @@ audit-pr-scope
 select-technical-artifacts
 design-repository-artifact-layout
 assess-development-input
-define-project-vision
+vision
 specify-quality-constraints
 software-design-language-adaptation
 design-rust-lifecycles

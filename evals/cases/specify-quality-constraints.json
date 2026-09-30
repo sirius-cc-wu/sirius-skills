@@ -18,7 +18,7 @@
     "negative": [
       {
         "prompt": "Establish the project vision, core principles, and non-goals to guide future contribution decisions.",
-        "owner": "define-project-vision"
+        "owner": "vision"
       },
       {
         "prompt": "Design the ownership, cleanup, and task supervision lifecycles for these concurrency and memory constraints in Rust.",

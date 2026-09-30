@@ -18,7 +18,7 @@
     "negative": [
       {
         "prompt": "Define the project identity, durable principles, and contribution acceptance policy from repository history.",
-        "owner": "define-project-vision"
+        "owner": "vision"
       },
       {
         "prompt": "Audit whether this proposed component boundary change preserves observable behavior across passing checks.",

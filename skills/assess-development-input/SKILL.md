@@ -39,7 +39,7 @@ Task arrives
 ├─ A candidate direction or business-case hypothesis needs alternatives or MVP scope
 │  └─ external idea-refine
 ├─ A durable project vision, non-goals, or contribution-acceptance policy is unclear
-│  └─ define-project-vision
+│  └─ vision
 ├─ A business case, feasibility commitment, or investment decision needs authority
 │  └─ responsible external product or portfolio process
 ├─ A confirmed direction needs an implementation specification
@@ -146,7 +146,7 @@ external prerequisite.
 |---|---|---|
 | Define | One requester's intended outcome is unclear | External `interview-me` |
 | Define | A candidate direction or business-case hypothesis needs alternatives, assumption testing, or MVP scope | External `idea-refine` |
-| Requirements Analysis | A durable project vision, non-goals, or contribution-acceptance policy is unclear | `define-project-vision` |
+| Requirements Analysis | A durable project vision, non-goals, or contribution-acceptance policy is unclear | `vision` |
 | Define | A confirmed direction needs an implementation specification | External `spec-driven-development` |
 | Requirements Analysis | Actors, goals, system boundary, scenarios, or extensions are unclear | `use-case-modeling` |
 | Requirements Analysis | Measurable quality requirements, binding constraints, cross-cutting special requirements, or acceptance evidence are unclear | `specify-quality-constraints` |
