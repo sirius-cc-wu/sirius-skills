@@ -119,24 +119,49 @@ tags: [vision, governance]
 [Project] exists so that [intended user and outcome].
 It owns [bounded responsibility].
 
+## Intended Users
+
+- [Intended user or collaborating system]: [Role and how it relies on the project]
+
+## Scope
+
+[Project] owns:
+
+- [Bounded capability, contract, or core responsibility];
+- [Explicit artifact or subsystem boundary].
+
 ## Principles
 
-- [Principle]: [Concrete commitment and refusal]
+- **[Principle]**: [Concrete commitment and refusal]
 
 ## Non-Goals
 
 - [Explicit excluded direction]: [Reason]
 
+## Integration Boundary
+
+- **[Collaborator or subsystem boundary]**: [Explicit boundary contracts and responsibilities]
+
 ## Acceptance Policy
 
-- A change aligns when [testable positive criterion].
-- A change should be resisted when [testable negative criterion].
+A change aligns when it:
+
+- [testable positive criterion].
+
+A change should be resisted when it:
+
+- [testable negative criterion].
+
+## Boundary Cases
+
+- **[Concrete boundary case or tempting off-mission feature]**: [Defensible outcome and policy resolution]
 
 ## Authority and Evidence
 
 - Authority and status: [role, decision, and revision]
+- Source revision: [Git commit hash or baseline release]
 - Evidence: [approved artifact, pull request, commit, or source revision]
-- Open questions: [unresolved authority or evidence]
+- Open questions: [unresolved authority, architecture, or evidence questions]
 ```
 
 ## Boundaries
