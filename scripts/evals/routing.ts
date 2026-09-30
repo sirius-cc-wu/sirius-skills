@@ -94,7 +94,8 @@ function isValidStringList(value: unknown, options: { allowEmpty?: boolean } = {
 export function validateBehavioralCases(
   filename: string,
   cases: unknown,
-  report: EvaluationReport
+  report: EvaluationReport,
+  root?: string
 ): void {
   if (!Array.isArray(cases)) {
     report.errors.push(`${filename}: 'evals' must be a list`);
@@ -164,6 +165,11 @@ export function validateBehavioralCases(
           `${filename}: behavioral eval ${JSON.stringify(caseId)} has invalid 'fixture'`
         );
       } else {
+        if (root && !fs.existsSync(path.join(root, "evals", "fixtures", fixture))) {
+          report.errors.push(
+            `${filename}: behavioral eval ${JSON.stringify(caseId)} references missing fixture ${JSON.stringify(fixture)}`
+          );
+        }
         const allowedMutations = c.allowed_mutations;
         if (!isValidStringList(allowedMutations)) {
           report.errors.push(
@@ -588,7 +594,7 @@ export function evaluateRepository(root: string): EvaluationReport {
       checkNegative(filename, expected, negative, descriptions, report);
     }
 
-    validateBehavioralCases(filename, data.evals ?? [], report);
+    validateBehavioralCases(filename, data.evals ?? [], report, root);
 
     const behavioral = data.evals ?? [];
     const behavioralCount = Array.isArray(behavioral) ? behavioral.length : 0;
@@ -606,3 +612,5 @@ export function evaluateRepository(root: string): EvaluationReport {
   checkCollisions(descriptions, report);
   return report;
 }
+
+export const validateEvaluations = validateBehavioralCases;

@@ -29,12 +29,16 @@
   "evals": [
     {
       "id": "type-anchor-rules",
-      "prompt": "Given our approved order flow (Draft -> Validated -> Paid -> Shipped), design a Rust type-layer specification using typestate and phantom types.",
+      "prompt": "Given the approved order flow in docs/approved-business-rules.md (Draft -> Submitted -> Approved -> Fulfilled, with Rejected from Submitted), design a Rust type-layer specification using typestate and phantom types and write it to docs/architecture/typestate-spec.md.",
       "expected_output": "A type-anchored specification template defining state types, consuming transition methods, sealed traits, and closed domain error enums.",
       "expectations": [
         "Uses phantom types or typestate for ordered state transitions",
         "Enforces transitions via consuming methods without public bypass constructors",
         "Keeps application logic out of the spec-layer design"
+      ],
+      "prohibitions": [
+        "Do not implement full runtime application logic",
+        "Do not call unwrap() or expect() in spec definitions"
       ],
       "allowed_mutations": [
         "docs/architecture/**"

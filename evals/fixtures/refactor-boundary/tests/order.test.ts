@@ -11,6 +11,18 @@ describe("OrderCheckoutService", () => {
     expect(order.subtotalCents()).toBe(2500);
   });
 
+  test("calculates total with tax directly via calculateTotalWithTax", () => {
+    const service = new OrderCheckoutService();
+    const order = new Order(
+      "ord-tax",
+      [{ id: "i1", name: "Widget", unitPriceCents: 1000, quantity: 1 }],
+      "SIRIUS10"
+    );
+    // subtotal = 1000, discount = 100 => 900, tax 10% = 90 => 990
+    const total = service.calculateTotalWithTax(order, 0.1);
+    expect(total).toBe(990);
+  });
+
   test("calculates total with tax and discount correctly", () => {
     const service = new OrderCheckoutService();
     const order = new Order(

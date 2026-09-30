@@ -218,7 +218,10 @@ export async function main(argv: string[] = process.argv.slice(2)): Promise<numb
             judge_models: models,
             repeat_count: args.repeat,
           });
-          console.log(JSON.stringify(plan, Object.keys(plan).sort(), 2));
+          const sortedPlan = Object.fromEntries(
+            Object.entries(plan).sort(([a], [b]) => a.localeCompare(b))
+          );
+          console.log(JSON.stringify(sortedPlan, null, 2));
           return 0;
         }
         const matrix = runSemanticCalibrationMatrix(args.root, args.behavioral, args.caseId, {
@@ -236,7 +239,10 @@ export async function main(argv: string[] = process.argv.slice(2)): Promise<numb
             judge_model: judgeModel,
             repeat_count: args.repeat,
           });
-          console.log(JSON.stringify(plan, Object.keys(plan).sort(), 2));
+          const sortedPlan = Object.fromEntries(
+            Object.entries(plan).sort(([a], [b]) => a.localeCompare(b))
+          );
+          console.log(JSON.stringify(sortedPlan, null, 2));
           return 0;
         }
         const calibration = runSemanticCalibration(args.root, args.behavioral, args.caseId, {
@@ -255,7 +261,10 @@ export async function main(argv: string[] = process.argv.slice(2)): Promise<numb
           judge_model: args.judgeModel,
         });
         plan.repeat_count = args.repeat;
-        console.log(JSON.stringify(plan, Object.keys(plan).sort(), 2));
+        const sortedPlan = Object.fromEntries(
+          Object.entries(plan).sort(([a], [b]) => a.localeCompare(b))
+        );
+        console.log(JSON.stringify(sortedPlan, null, 2));
         return 0;
       }
 

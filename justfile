@@ -236,7 +236,7 @@ uninstall-packaged skill_set="workflow": (uninstall-global skill_set)
 
 # Run TypeScript test suite.
 test:
-	bun test
+	bun test tests
 
 # Validate all skills, profiles, catalogs, and collection-specific contracts.
 validate: eval-routing

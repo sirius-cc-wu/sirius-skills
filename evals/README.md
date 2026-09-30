@@ -48,7 +48,7 @@ disposable fixtures under `evals/fixtures/`:
    modifying code.
 2. **Refactor Boundary (`evals/fixtures/refactor-boundary`)**:
    Tests `behavior-preserving-refactoring` on a clean TypeScript/Bun project with green
-   tests (`bun test`). Evaluates relocating an misplaced pricing calculation from a service
+   tests (`bun test`). Evaluates relocating a misplaced pricing calculation from a service
    to an entity domain owner while maintaining 100% test pass rates and zero public API regressions.
 3. **Typestate Workflow (`evals/fixtures/typestate-workflow`)**:
    Tests `type-anchored-spec` on translating an approved order fulfillment state machine

@@ -74,16 +74,21 @@
         {
           "id": "recommends-vertical-re-scoping",
           "criterion": "The response recommends separating the minimal cache fix from the speculative event bus / plugin subsystems."
+        },
+        {
+          "id": "includes-decoupling-diagram",
+          "criterion": "The response includes a Mermaid diagram or clear decoupling representation illustrating the separated vertical slices."
         }
       ],
       "semantic_controls": [
         {
           "id": "ctrl-pass-complete-audit",
-          "response": "Audit of PR #185: The motivating problem is Issue #180 (query cache memory leak on timeout). The delivered PR fixes this in src/cache.ts, but introduces severe over-engineering: an unrequested reactive event bus (src/event_bus.ts) and dynamic plugin manager (src/plugin_manager.ts). I recommend vertical re-scoping: Slice 1 contains only the minimal cache fix, while the speculative event bus and plugin architecture should be decoupled or closed.",
+          "response": "Audit of PR #185: The motivating problem is Issue #180 (query cache memory leak on timeout). The delivered PR fixes this in src/cache.ts, but introduces severe over-engineering: an unrequested reactive event bus (src/event_bus.ts) and dynamic plugin manager (src/plugin_manager.ts). I recommend vertical re-scoping:\n\n```mermaid\ngraph TD\n  PR185[PR #185] --> Slice1[Slice 1: Cache Eviction Fix]\n  PR185 --> Deprecate[Separate Proposal: EventBus & PluginManager]\n```\nSlice 1 contains only the minimal cache fix, while the speculative event bus and plugin architecture should be decoupled or closed.",
           "expected_criteria": [
             { "id": "identifies-motivating-problem", "passed": true },
             { "id": "flags-unrequested-subsystems", "passed": true },
-            { "id": "recommends-vertical-re-scoping", "passed": true }
+            { "id": "recommends-vertical-re-scoping", "passed": true },
+            { "id": "includes-decoupling-diagram", "passed": true }
           ]
         },
         {
@@ -92,7 +97,8 @@
           "expected_criteria": [
             { "id": "identifies-motivating-problem", "passed": false },
             { "id": "flags-unrequested-subsystems", "passed": false },
-            { "id": "recommends-vertical-re-scoping", "passed": false }
+            { "id": "recommends-vertical-re-scoping", "passed": false },
+            { "id": "includes-decoupling-diagram", "passed": false }
           ]
         }
       ]
