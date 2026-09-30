@@ -1,7 +1,7 @@
 ---
 title: "Execution Plan: Slice 01 — Tooling Scaffolding & Script Migration to TypeScript with Bun"
 adr: "ADR-001"
-status: "planned"
+status: "completed"
 date: "2026-10-01"
 ---
 
@@ -63,7 +63,7 @@ Establish repository tooling on TypeScript and Bun (`package.json`, `tsconfig.js
    - Run `just validate` to verify end-to-end green status.
 
 ## 4. Acceptance Criteria
-- [ ] `bun scripts/validate_skills.ts` executes and passes cleanly with 0 errors.
-- [ ] `just validate` completes successfully without invoking bash `validate_skills.sh`.
-- [ ] `just install-local /tmp/test-target workflow` cleanly symlinks skills using `scripts/manage_installed_skills.ts`.
-- [ ] Zero external npm runtime dependencies added.
+- [x] `bun scripts/validate_skills.ts` executes and passes cleanly with 0 errors.
+- [x] `just validate` completes successfully without invoking bash `validate_skills.sh`.
+- [x] `just install-local /tmp/test-target workflow` cleanly symlinks skills using `scripts/manage_installed_skills.ts`.
+- [x] Zero external npm runtime dependencies added.

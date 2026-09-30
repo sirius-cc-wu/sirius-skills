@@ -15,3 +15,5 @@ dist/
 .eggs/
 *.egg-info/
 pip-wheel-metadata/
+node_modules/
+

@@ -7,7 +7,7 @@ import pytest
 
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
-SYNC_REFERENCES = "sirius_skills.commands.sync_shared_references"
+SYNC_REFERENCES = "scripts/sync_shared_references.ts"
 NPX_SKILLS = "npx --yes skills"
 PACKAGED_ADD = f'{NPX_SKILLS} add "'
 PACKAGED_REPO_SOURCE = f'{PACKAGED_ADD}{REPO_ROOT}"'

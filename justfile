@@ -1,6 +1,7 @@
 # justfile for sirius-skills
 
 set shell := ["bash", "-c"]
+export PATH := env_var("HOME") + "/.bun/bin:" + env_var("PATH")
 
 repo_root := justfile_directory()
 agent_flags := "--yes --agent github-copilot --agent codex --agent antigravity --agent antigravity-cli"
@@ -36,7 +37,7 @@ install-local target_dir skill_set="workflow": sync-shared-references
 	target_skills_dir="$target_dir/.agents/skills"
 	just --justfile "{{repo_root}}/justfile" prune-retired-local "$target_dir"
 
-	env PYTHONPATH="{{repo_root}}/src" python3 -m sirius_skills.commands.manage_installed_skills \
+	bun "{{repo_root}}/scripts/manage_installed_skills.ts" \
 		link-profile --profile "$skill_set_file" \
 		--source-dir "{{source_skills_dir}}" --target-dir "$target_skills_dir"
 	if [[ "$skill_set" == "all" ]]; then
@@ -101,16 +102,16 @@ install-global skill_set="workflow": sync-shared-references
 		}
 		install_external_profile "{{addy_source}}" "{{addy_profile}}"
 	fi
-	env PYTHONPATH="{{repo_root}}/src" python3 -m sirius_skills.commands.manage_installed_skills \
+	bun "{{repo_root}}/scripts/manage_installed_skills.ts" \
 		link-profile --profile "$combined_profile"
-	env PYTHONPATH="{{repo_root}}/src" python3 -m sirius_skills.commands.manage_installed_skills \
+	bun "{{repo_root}}/scripts/manage_installed_skills.ts" \
 		record-installed --profile "$combined_profile"
 # Compatibility alias for the packaged global installation.
 install-packaged skill_set="workflow": (install-global skill_set)
 
 # Sync canonical shared references into self-contained skill packages.
 sync-shared-references:
-	env PYTHONPATH="{{repo_root}}/src" python3 -c 'from sirius_skills.commands.sync_shared_references import main; raise SystemExit(main([]))'
+	bun "{{repo_root}}/scripts/sync_shared_references.ts"
 
 # Remove retired target-project links that still point into this checkout.
 prune-retired-local target_dir:
@@ -123,7 +124,7 @@ prune-retired-local target_dir:
 	fi
 	target_dir=$(realpath -e -- "$target_dir")
 	target_skills_dir="$target_dir/.agents/skills"
-	env PYTHONPATH="{{repo_root}}/src" python3 -m sirius_skills.commands.manage_installed_skills \
+	bun "{{repo_root}}/scripts/manage_installed_skills.ts" \
 		unlink-retired --ledger "{{retired_ledger}}" --include-unowned \
 		--source-dir "{{source_skills_dir}}" --target-dir "$target_skills_dir"
 
@@ -132,7 +133,7 @@ prune-retired:
 	#!/usr/bin/env bash
 	set -euo pipefail
 	retired=$(npx --yes skills ls -g --json | \
-		env PYTHONPATH="{{repo_root}}/src" python3 -m sirius_skills.commands.manage_installed_skills \
+		bun "{{repo_root}}/scripts/manage_installed_skills.ts" \
 			select-retired --ledger "{{retired_ledger}}")
 	if [ -n "$retired" ]; then
 		mapfile -t retired_skills <<< "$retired"
@@ -140,9 +141,9 @@ prune-retired:
 	else
 		echo "No owned retired Sirius skills found."
 	fi
-	env PYTHONPATH="{{repo_root}}/src" python3 -m sirius_skills.commands.manage_installed_skills \
+	bun "{{repo_root}}/scripts/manage_installed_skills.ts" \
 		unlink-retired --ledger "{{retired_ledger}}"
-	env PYTHONPATH="{{repo_root}}/src" python3 -m sirius_skills.commands.manage_installed_skills \
+	bun "{{repo_root}}/scripts/manage_installed_skills.ts" \
 		forget-retired --ledger "{{retired_ledger}}"
 
 # Explicit migration for installations created before ownership state existed.
@@ -150,7 +151,7 @@ prune-retired-legacy:
 	#!/usr/bin/env bash
 	set -euo pipefail
 	retired=$(npx --yes skills ls -g --json | \
-		env PYTHONPATH="{{repo_root}}/src" python3 -m sirius_skills.commands.manage_installed_skills \
+		bun "{{repo_root}}/scripts/manage_installed_skills.ts" \
 			select-retired --ledger "{{retired_ledger}}" --include-unowned)
 	if [ -n "$retired" ]; then
 		mapfile -t retired_skills <<< "$retired"
@@ -158,9 +159,9 @@ prune-retired-legacy:
 	else
 		echo "No retired Sirius skill names found."
 	fi
-	env PYTHONPATH="{{repo_root}}/src" python3 -m sirius_skills.commands.manage_installed_skills \
+	bun "{{repo_root}}/scripts/manage_installed_skills.ts" \
 		unlink-retired --ledger "{{retired_ledger}}" --include-unowned
-	env PYTHONPATH="{{repo_root}}/src" python3 -m sirius_skills.commands.manage_installed_skills \
+	bun "{{repo_root}}/scripts/manage_installed_skills.ts" \
 		forget-retired --ledger "{{retired_ledger}}"
 
 # Remove a source-linked profile from a target project by default.
@@ -186,12 +187,12 @@ uninstall-local target_dir skill_set="workflow":
 	just --justfile "{{repo_root}}/justfile" prune-retired-local "$target_dir"
 
 	if [[ "$skill_set" == "all" ]]; then
-		env PYTHONPATH="{{repo_root}}/src" python3 -m sirius_skills.commands.manage_installed_skills \
+		bun "{{repo_root}}/scripts/manage_installed_skills.ts" \
 			remove-locked-profile --profile "{{addy_profile}}" \
 			--lock "$target_dir/skills-lock.json" --skills-dir "$target_skills_dir" \
 			--source "{{addy_lock_source}}"
 	fi
-	env PYTHONPATH="{{repo_root}}/src" python3 -m sirius_skills.commands.manage_installed_skills \
+	bun "{{repo_root}}/scripts/manage_installed_skills.ts" \
 		unlink-profile --profile "$skill_set_file" \
 		--source-dir "{{source_skills_dir}}" --target-dir "$target_skills_dir"
 
@@ -224,16 +225,20 @@ uninstall-global skill_set="workflow":
 	else
 		echo "No installed skills found for profile: $skill_set"
 	fi
-	env PYTHONPATH="{{repo_root}}/src" python3 -m sirius_skills.commands.manage_installed_skills \
+	bun "{{repo_root}}/scripts/manage_installed_skills.ts" \
 		unlink-profile --profile "$combined_profile"
-	env PYTHONPATH="{{repo_root}}/src" python3 -m sirius_skills.commands.manage_installed_skills \
+	bun "{{repo_root}}/scripts/manage_installed_skills.ts" \
 		forget-profile --profile "$combined_profile"
 # Compatibility alias for packaged global removal.
 uninstall-packaged skill_set="workflow": (uninstall-global skill_set)
 
+# Run TypeScript test suite.
+test:
+	bun test
+
 # Validate all skills, profiles, catalogs, and collection-specific contracts.
 validate: eval-routing
-	./scripts/validate_skills.sh
+	bun "{{repo_root}}/scripts/validate_skills.ts"
 
 # Run free, deterministic skill-description routing checks.
 eval-routing:
