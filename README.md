@@ -367,7 +367,7 @@ evals:
 
 ```bash
 just validate
-pytest -q
+just test
 ```
 
 Run only the routing evals while authoring skill descriptions or eval cases:

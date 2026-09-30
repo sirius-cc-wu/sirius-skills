@@ -304,7 +304,7 @@ Use the lower-level command when a model override, timeout, or retained
 workspace is needed:
 
 ```bash
-PYTHONPATH=src python3 -m sirius_skills.commands.run_evals \
+bun scripts/run_evals.ts \
   --behavioral iterative-risk-driven-development \
   --case boundary-sensitive-rust-refactoring \
   --model MODEL \
@@ -316,7 +316,7 @@ PYTHONPATH=src python3 -m sirius_skills.commands.run_evals \
 Inspect a calibration plan without running either model:
 
 ```bash
-PYTHONPATH=src python3 -m sirius_skills.commands.run_evals \
+bun scripts/run_evals.ts \
   --behavioral SKILL \
   --case CASE \
   --calibrate-judge \

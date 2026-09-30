@@ -5,6 +5,7 @@ import * as os from "node:os";
 import {
   readRetirements,
   selectRetiredSkills,
+  selectInstalledSkills,
   recordInstalled,
   recordNames,
   forgetNames,
@@ -360,5 +361,19 @@ describe("manage_installed_skills", () => {
     ]);
     expect(code2).toBe(0);
     expect(fs.readFileSync(statePath, "utf-8")).toBe("test-skill\n");
+  });
+
+  test("selectInstalledSkills filters installed JSON to managed profile skills", () => {
+    const profilePath = path.join(tmpDir, "profile.txt");
+    fs.writeFileSync(profilePath, "skill-a\n# comment\nskill-b\n", "utf-8");
+
+    const json = JSON.stringify([
+      { name: "skill-a" },
+      { name: "skill-c" },
+      { name: "skill-b" },
+    ]);
+
+    const result = selectInstalledSkills(json, profilePath);
+    expect(result).toEqual(["skill-a", "skill-b"]);
   });
 });

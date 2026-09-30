@@ -161,6 +161,21 @@ export function selectRetiredSkills(
   };
 }
 
+export function selectInstalledSkills(
+  installedJson: string,
+  profilePath: string
+): string[] {
+  const installed = parseInstalledSkills(installedJson);
+  const managed = readNameFile(profilePath);
+  const matched: string[] = [];
+  for (const name of installed) {
+    if (managed.has(name)) {
+      matched.push(name);
+    }
+  }
+  return matched.sort();
+}
+
 export function writeNames(filePath: string, names: Iterable<string>): void {
   const normalized = Array.from(new Set(names)).sort();
   const invalid = normalized.filter((name) => !SKILL_NAME_PATTERN.test(name));
@@ -595,6 +610,13 @@ export async function main(argv: string[] = process.argv.slice(2)): Promise<numb
         console.error(
           "Review them, then run `just prune-retired-legacy` to remove those names explicitly."
         );
+      }
+    } else if (args.command === "select-installed") {
+      if (!args.profile) throw new Error("--profile required");
+      const stdinData = await readAllStdin();
+      const selected = selectInstalledSkills(stdinData, args.profile);
+      if (selected.length > 0) {
+        console.log(selected.join("\n"));
       }
     } else if (args.command === "record-installed") {
       if (!args.profile) throw new Error("--profile required");

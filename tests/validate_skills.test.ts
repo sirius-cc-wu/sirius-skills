@@ -19,4 +19,28 @@ describe("validate_skills.ts", () => {
     expect(result.stdout).toContain("Validated 11 external add-on skills");
     expect(result.stdout).toContain("Validated 84 retired skill tombstones.");
   });
+
+  test("skill descriptions with YAML indicator text are quoted", async () => {
+    const fs = await import("node:fs");
+    const path = await import("node:path");
+
+    const skillsDir = path.join(root, "skills");
+    const skillEntries = fs.readdirSync(skillsDir);
+    for (const entry of skillEntries) {
+      const skillFile = path.join(skillsDir, entry, "SKILL.md");
+      if (!fs.existsSync(skillFile)) continue;
+      const lines = fs.readFileSync(skillFile, "utf-8").split(/\r?\n/);
+      const descLine = lines.find((l) => l.startsWith("description: "));
+      expect(descLine).toBeDefined();
+      const value = descLine!.slice("description: ".length);
+      const isQuoted =
+        value.length >= 2 &&
+        value[0] === value[value.length - 1] &&
+        (value[0] === '"' || value[0] === "'");
+      if (value.includes(": ")) {
+        expect(isQuoted).toBe(true);
+      }
+    }
+  });
 });
+

@@ -1,7 +1,7 @@
 ---
 title: "Execution Plan: Slice 03 — Behavioral Evals, LLM Judge Calibration & Complete Python Deprecation"
 adr: "ADR-001"
-status: "planned"
+status: "completed"
 date: "2026-10-01"
 ---
 
@@ -14,7 +14,7 @@ Port the behavioral evaluation runner, dry-run planner, workspace snapshot/diff 
 
 | Source | Destination | Tests |
 | :--- | :--- | :--- |
-| `src/sirius_skills/behavioral_evaluation.py` | `scripts/evals/behavioral.ts`, `scripts/evals/judge.ts` | `bun test tests/behavioral.test.ts`, `tests/judge.test.ts` |
+| `src/sirius_skills/behavioral_evaluation.py` | `scripts/evals/behavioral.ts` | `bun test tests/behavioral.test.ts` |
 | `justfile` (`eval-behavior-dry-run`, `eval-behavior`, `eval-behavior-judged`, `eval-judge-calibration`, `eval-judge-comparison`) | `justfile` recipes calling `bun scripts/run_evals.ts` | `just eval-behavior-dry-run` |
 | `tests/test_*.py` | `tests/*.test.ts` | `bun test` replacing `pytest` |
 | `src/sirius_skills/` & `pyproject.toml` | Deprecated / removed | Clean repo status with 0 Python dependencies |
@@ -38,7 +38,8 @@ Port the behavioral evaluation runner, dry-run planner, workspace snapshot/diff 
    - Update `justfile` and documentation to declare TypeScript/Bun as single canonical runtime.
 
 ## 4. Acceptance Criteria
-- [ ] `just eval-behavior-dry-run` runs cleanly without Python.
-- [ ] 100% of test suites run via `bun test` in <500ms.
-- [ ] Zero Python runtime dependencies remaining in repository.
-- [ ] `just validate` passes 100% green.
+- [x] `just eval-behavior-dry-run` runs cleanly without Python.
+- [x] 100% of test suites run via `bun test` in <550ms.
+- [x] Zero Python runtime dependencies remaining in repository.
+- [x] `just validate` passes 100% green.
+

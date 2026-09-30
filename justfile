@@ -216,7 +216,9 @@ uninstall-global skill_set="workflow":
 		cat "{{addy_profile}}" >> "$combined_profile"
 	fi
 
-	installed=$(npx --yes skills ls -g --json | python3 -c 'import json, pathlib, sys; managed = {line.strip() for line in pathlib.Path(sys.argv[1]).read_text().splitlines() if line.strip() and not line.lstrip().startswith("#")}; installed = [item["name"] for item in json.load(sys.stdin) if item.get("name") in managed]; print("\n".join(installed))' "$combined_profile")
+	installed=$(npx --yes skills ls -g --json | \
+		bun "{{repo_root}}/scripts/manage_installed_skills.ts" \
+			select-installed --profile "$combined_profile")
 	if [ -n "$installed" ]; then
 		mapfile -t installed_skills <<< "$installed"
 		# Global agent aliases share the universal skill directory, so removal
@@ -246,20 +248,20 @@ eval-routing:
 
 # Print a behavioral eval plan without invoking Codex or spending tokens.
 eval-behavior-dry-run skill case repeat="1":
-	env PYTHONPATH="{{repo_root}}/src" python3 -m sirius_skills.commands.run_evals --root "{{repo_root}}" --behavioral {{quote(skill)}} --case {{quote(case)}} --repeat {{quote(repeat)}} --dry-run
+	bun "{{repo_root}}/scripts/run_evals.ts" --root "{{repo_root}}" --behavioral {{quote(skill)}} --case {{quote(case)}} --repeat {{quote(repeat)}} --dry-run
 
 # Run an explicitly selected behavioral case through Codex one or more times.
 eval-behavior skill case repeat="1":
-	env PYTHONPATH="{{repo_root}}/src" python3 -m sirius_skills.commands.run_evals --root "{{repo_root}}" --behavioral {{quote(skill)}} --case {{quote(case)}} --repeat {{quote(repeat)}}
+	bun "{{repo_root}}/scripts/run_evals.ts" --root "{{repo_root}}" --behavioral {{quote(skill)}} --case {{quote(case)}} --repeat {{quote(repeat)}}
 
 # Add an opt-in, non-gating semantic judge to a behavioral case.
 eval-behavior-judged skill case repeat="1":
-	env PYTHONPATH="{{repo_root}}/src" python3 -m sirius_skills.commands.run_evals --root "{{repo_root}}" --behavioral {{quote(skill)}} --case {{quote(case)}} --repeat {{quote(repeat)}} --judge
+	bun "{{repo_root}}/scripts/run_evals.ts" --root "{{repo_root}}" --behavioral {{quote(skill)}} --case {{quote(case)}} --repeat {{quote(repeat)}} --judge
 
 # Check a judge repeatedly against declared positive and negative controls.
 eval-judge-calibration skill case repeat="1":
-	env PYTHONPATH="{{repo_root}}/src" python3 -m sirius_skills.commands.run_evals --root "{{repo_root}}" --behavioral {{quote(skill)}} --case {{quote(case)}} --calibrate-judge --repeat {{quote(repeat)}}
+	bun "{{repo_root}}/scripts/run_evals.ts" --root "{{repo_root}}" --behavioral {{quote(skill)}} --case {{quote(case)}} --calibrate-judge --repeat {{quote(repeat)}}
 
 # Compare the same calibration controls across two judge models.
 eval-judge-comparison skill case base_model compare_model repeat="1":
-	env PYTHONPATH="{{repo_root}}/src" python3 -m sirius_skills.commands.run_evals --root "{{repo_root}}" --behavioral {{quote(skill)}} --case {{quote(case)}} --calibrate-judge --judge-model {{quote(base_model)}} --compare-judge-model {{quote(compare_model)}} --repeat {{quote(repeat)}}
+	bun "{{repo_root}}/scripts/run_evals.ts" --root "{{repo_root}}" --behavioral {{quote(skill)}} --case {{quote(case)}} --calibrate-judge --judge-model {{quote(base_model)}} --compare-judge-model {{quote(compare_model)}} --repeat {{quote(repeat)}}
