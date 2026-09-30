@@ -36,11 +36,50 @@
         "Enforces transitions via consuming methods without public bypass constructors",
         "Keeps application logic out of the spec-layer design"
       ],
-      "prohibitions": [
-        "Do not implement full runtime application logic",
-        "Do not call unwrap() or expect() in spec definitions"
+      "allowed_mutations": [
+        "docs/architecture/**"
       ],
-      "trust_level": "provisional"
+      "required_mutations": [
+        "docs/architecture/typestate-spec.md"
+      ],
+      "file_assertions": [
+        {
+          "path": "docs/architecture/typestate-spec.md",
+          "scope": "file",
+          "contains": ["Draft", "Submitted", "Approved", "Fulfilled", "self"],
+          "not_contains": ["unwrap()"]
+        }
+      ],
+      "fixture": "typestate-workflow",
+      "trust_level": "fixture-backed",
+      "semantic_rubric": [
+        {
+          "id": "encodes-compile-time-typestate",
+          "criterion": "The response models the state progression using Rust typestate or phantom types taking self by value."
+        },
+        {
+          "id": "prevents-illegal-transitions",
+          "criterion": "The design prevents calling fulfill() directly on an Order in Draft or Submitted state."
+        }
+      ],
+      "semantic_controls": [
+        {
+          "id": "ctrl-pass-typestate-spec",
+          "response": "Here is the type-anchored specification: struct Order<State> { ... _marker: PhantomData<State> }. We define states struct Draft; struct Submitted; struct Approved; struct Fulfilled; struct Rejected;. Methods like `pub fn submit(self) -> Result<Order<Submitted>, OrderError>` consume `self` by value, making it impossible at compile time to call `fulfill()` from Draft or Submitted.",
+          "expected_criteria": [
+            { "id": "encodes-compile-time-typestate", "passed": true },
+            { "id": "prevents-illegal-transitions", "passed": true }
+          ]
+        },
+        {
+          "id": "ctrl-fail-runtime-string-flags",
+          "response": "I added a mutable string status field `pub status: String` to the Order struct. During runtime in the controller, you can check `if order.status == \"draft\"` and set `order.status = \"fulfilled\"` whenever needed.",
+          "expected_criteria": [
+            { "id": "encodes-compile-time-typestate", "passed": false },
+            { "id": "prevents-illegal-transitions", "passed": false }
+          ]
+        }
+      ]
     }
   ]
 }

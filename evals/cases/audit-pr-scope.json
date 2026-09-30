@@ -57,7 +57,45 @@
         "Do not perform style or syntax nitpicking",
         "Do not mutate PR or repository state"
       ],
-      "trust_level": "provisional"
+      "workspace_mode": "read-only",
+      "allowed_mutations": [],
+      "required_mutations": [],
+      "fixture": "pr-scope-mismatch",
+      "trust_level": "fixture-backed",
+      "semantic_rubric": [
+        {
+          "id": "identifies-motivating-problem",
+          "criterion": "The response identifies the motivating problem as the query cache leak on timeout (Issue #180)."
+        },
+        {
+          "id": "flags-unrequested-subsystems",
+          "criterion": "The response identifies the event bus and plugin manager as unrequested over-engineering."
+        },
+        {
+          "id": "recommends-vertical-re-scoping",
+          "criterion": "The response recommends separating the minimal cache fix from the speculative event bus / plugin subsystems."
+        }
+      ],
+      "semantic_controls": [
+        {
+          "id": "ctrl-pass-complete-audit",
+          "response": "Audit of PR #185: The motivating problem is Issue #180 (query cache memory leak on timeout). The delivered PR fixes this in src/cache.ts, but introduces severe over-engineering: an unrequested reactive event bus (src/event_bus.ts) and dynamic plugin manager (src/plugin_manager.ts). I recommend vertical re-scoping: Slice 1 contains only the minimal cache fix, while the speculative event bus and plugin architecture should be decoupled or closed.",
+          "expected_criteria": [
+            { "id": "identifies-motivating-problem", "passed": true },
+            { "id": "flags-unrequested-subsystems", "passed": true },
+            { "id": "recommends-vertical-re-scoping", "passed": true }
+          ]
+        },
+        {
+          "id": "ctrl-fail-rubber-stamp",
+          "response": "PR #185 looks great! All code follows clean coding guidelines, has full unit test coverage, and the event bus and plugin manager are nice additions for the future. Merge approved without changes.",
+          "expected_criteria": [
+            { "id": "identifies-motivating-problem", "passed": false },
+            { "id": "flags-unrequested-subsystems", "passed": false },
+            { "id": "recommends-vertical-re-scoping", "passed": false }
+          ]
+        }
+      ]
     }
   ]
 }

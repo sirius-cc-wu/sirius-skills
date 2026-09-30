@@ -47,7 +47,43 @@
         "src/**",
         "tests/**"
       ],
-      "trust_level": "provisional"
+      "required_mutations": [
+        "src/domain.ts",
+        "src/service.ts"
+      ],
+      "checks": [
+        ["bun", "test"]
+      ],
+      "fixture": "refactor-boundary",
+      "trust_level": "fixture-backed",
+      "semantic_rubric": [
+        {
+          "id": "preserves-observable-behavior",
+          "criterion": "The refactoring preserves all existing behavior, tests continue to pass, and no new features are added."
+        },
+        {
+          "id": "relocates-calculation-to-domain-owner",
+          "criterion": "The calculation is relocated to the domain Order entity that owns the item and pricing data."
+        }
+      ],
+      "semantic_controls": [
+        {
+          "id": "ctrl-pass-clean-refactor",
+          "response": "I moved the calculateTotalWithTax calculation from OrderCheckoutService directly onto the Order entity in src/domain.ts, which already owns the items and pricing data. OrderCheckoutService now delegates to order.calculateTotalWithTax. Ran `bun test` and all unit tests remain green with zero behavioral changes.",
+          "expected_criteria": [
+            { "id": "preserves-observable-behavior", "passed": true },
+            { "id": "relocates-calculation-to-domain-owner", "passed": true }
+          ]
+        },
+        {
+          "id": "ctrl-fail-destructive-rewrite",
+          "response": "I completely rewrote the checkout system to use an event-driven Kafka stream and changed the tax calculation formula to add extra service fees. Several tests are currently failing but the architecture is much better.",
+          "expected_criteria": [
+            { "id": "preserves-observable-behavior", "passed": false },
+            { "id": "relocates-calculation-to-domain-owner", "passed": false }
+          ]
+        }
+      ]
     }
   ]
 }
