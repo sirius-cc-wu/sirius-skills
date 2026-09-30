@@ -14,7 +14,7 @@ Default guidance for agents working in `sirius-skills`.
 - `docs/ideas/`: candidate-direction documents and historical iteration
   records; these are not deployable skills
 - `.github/`: GitHub repository guidance
-- `src/` and `tests/`: shared-reference packaging and repository verification
+- `scripts/` and `tests/`: tooling, evals, and repository verification
 - `agents/`: specialist agent personas (such as `fixer.md`) consumed by agent hosts
 - Top-level installation and usage documentation, including `README.md`,
   `PROMPT_GUIDE.md`, and `justfile`

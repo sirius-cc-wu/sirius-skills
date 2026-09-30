@@ -10,5 +10,5 @@
     "allowSyntheticDefaultImports": true,
     "forceConsistentCasingInFileNames": true
   },
-  "include": ["scripts/**/*", "tests/**/*", "src/**/*"]
+  "include": ["scripts/**/*", "tests/**/*"]
 }
