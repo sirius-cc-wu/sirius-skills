@@ -17,6 +17,14 @@
       {
         "prompt": "Define a project vision statement clarifying principles, non-goals, and boundary cases for contributors.",
         "top_k": 3
+      },
+      {
+        "prompt": "Audit this proposed feature specification against VISION.md to determine whether we should accept it or resist it.",
+        "top_k": 3
+      },
+      {
+        "prompt": "Compare this architectural design and ADR against VISION.md to verify it does not violate project non-goals.",
+        "top_k": 3
       }
     ],
     "negative": [
@@ -68,6 +76,24 @@
       "prohibitions": [
         "Do not confuse implementation drift with vision-refining reality checks",
         "Do not modify files or make unapproved policy commitments"
+      ],
+      "workspace_mode": "read-only",
+      "allowed_mutations": [],
+      "required_mutations": [],
+      "trust_level": "provisional"
+    },
+    {
+      "id": "audit-design-conformance-against-vision",
+      "prompt": "Audit this proposed cloud-backup feature specification and architectural decision against our canonical VISION.md. Determine whether the change aligns, should be resisted, or requires a formal vision amendment.",
+      "expected_output": "A structured Vision Conformance Assessment evaluating the proposal against VISION.md scope, non-goals, principles, and accept-or-resist criteria with a definitive ALIGNED, RESIST, or AMENDMENT NEEDED verdict.",
+      "expectations": [
+        "Checks candidate against explicit non-goals and scope boundaries in VISION.md",
+        "Evaluates both positive alignment criteria and negative resistance criteria",
+        "Issues an unambiguous verdict (ALIGNED, RESIST, or AMENDMENT NEEDED) with actionable recommendation"
+      ],
+      "prohibitions": [
+        "Do not silently accept an off-mission feature without checking non-goals",
+        "Do not invent new policy without vision authority approval"
       ],
       "workspace_mode": "read-only",
       "allowed_mutations": [],
