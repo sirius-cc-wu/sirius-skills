@@ -2,7 +2,7 @@
 
 Use these rules when a skill persists an analysis, design, decision, iteration,
 or verification artifact as a standalone Markdown file. They adapt the
-[Open Knowledge Format (OKF) 0.1 draft](https://github.com/GoogleCloudPlatform/knowledge-catalog/blob/main/okf/SPEC.md)
+[Open Knowledge Format (OKF) v0.2](https://github.com/GoogleCloudPlatform/knowledge-catalog/blob/main/okf/SPEC.md)
 to this skill collection.
 
 ## File Rules
@@ -43,14 +43,28 @@ type: "[Descriptive artifact type]"
 title: "[Human-readable display name]"
 description: "[One-sentence summary]"
 id: "[Stable ID when the artifact is cross-referenced]"
-status: "[Lifecycle state when useful]"
+status: "[Lifecycle state: draft | proposed | accepted | stable | superseded | deprecated]"
 tags: ["[short-tag]"]
+generated: { by: "human:sirius", at: "YYYY-MM-DDTHH:MM:SSZ" }
+verified: { by: "human:sirius", at: "YYYY-MM-DDTHH:MM:SSZ" }
 ---
 ```
 
 Only `type` is required by OKF. This collection also defaults to `title` and
 `description` because they make indexes, previews, and searches useful. The
 other fields in the base shape are conditional.
+
+## Actor Attribution & Trust Tiers
+
+Identities in `generated.by` and `verified.by` follow the OKF actor convention:
+- `human:<id>`: Human engineer (e.g. `human:sirius`).
+- `<producer>/<model-or-version>`: Autonomous agent (e.g. `agent/thinker`, `agent/builder`, `copilot-cli/gemini-3.8-flash`).
+- `process:<id>`: Automated pipeline (e.g. `process:ci-qualification`, `process:bun-test`).
+
+Consumers (both agents and humans) derive trust tiers from `verified`:
+- **Unverified**: Concept has no `verified` metadata or is in `draft` status.
+- **Machine-Confirmed**: Verified by automated test suites or compiler checks (`process:*` or agent).
+- **Human-Reviewed**: Explicitly signed off by a human authority (`human:*`).
 
 ## Artifact Types
 
@@ -86,11 +100,12 @@ Use another self-explanatory value when none of these accurately describes the
 artifact. Do not combine unrelated concepts merely to avoid introducing a new
 type.
 
-## Reserved Files
+## Reserved Files & Progressive Disclosure
 
-- Keep directory `index.md` files free of frontmatter. A bundle-root `index.md`
-  may contain frontmatter only when declaring `okf_version: "0.1"`.
-- Keep `log.md` files free of frontmatter and use ISO 8601 `YYYY-MM-DD` date
+- **`index.md` catalogs**: Directory and stage `index.md` files provide progressive
+  disclosure catalogs for knowledge bundles. Root and stage `index.md` files declare
+  `okf_version: "0.2"`, `title`, and `description` in YAML frontmatter and list concept documents.
+- **`log.md` files**: Keep `log.md` files free of frontmatter and use ISO 8601 `YYYY-MM-DD` date
   headings for entries.
 - Do not use `index.md` or `log.md` as names for concept artifacts.
 
