@@ -63,7 +63,7 @@ Discovery ──► Architecture & ADR ──► Detailed Design ──► Work 
 ## Artifact Structure & Numbering
 
 Before creating an ADR, inspect the target project's conventions:
-* **Location**: Store in the target repository's canonical decision directory.
+* **Location**: Store in the target repository's canonical decision directory (e.g. `docs/decisions/`).
 * **Naming**: `adr-XXX-short-kebab-slug.md` using continuous zero-padded three-digit numbers (e.g. `adr-024-background-service-stop-command.md`).
 * **Sequence Integrity**: Always verify the latest ADR number in the target repository to prevent collisions with concurrent branches.
 
@@ -79,11 +79,13 @@ type: "Architecture Decision"
 title: "ADR-XXX: Direct Title of the Decision"
 description: "Concise summary of the accepted architectural choice and its core rationale."
 id: "ADR-XXX"
-status: "accepted"
+status: "accepted" # proposed | accepted | superseded | deprecated
 date: "YYYY-MM-DD"
 tags: [architecture, decision, subsystem-name]
-owner_loop: spec-validate
-phase_profile: design
+generated: { by: "human:sirius", at: "YYYY-MM-DDTHH:MM:SSZ" }
+verified: { by: "human:sirius", at: "YYYY-MM-DDTHH:MM:SSZ" }
+supersedes: "" # optional, e.g. "ADR-001"
+superseded_by: "" # optional, set when superseded
 ---
 
 # ADR-XXX: Direct Title of the Decision
@@ -136,6 +138,7 @@ Detail the concrete results of this decision:
 Before committing any ADR, verify against this checklist:
 - [ ] **Solely Final Decision**: Does the ADR omit debate history, pros/cons tables, and rejected options?
 - [ ] **Upfront Timing**: Is the ADR being authored *before* implementation code is written?
+- [ ] **OKF v0.2 Frontmatter**: Does the ADR include required frontmatter (`type`, `title`, `description`, `status`, `generated`, `verified`)?
 - [ ] **Active Voice**: Are decisions expressed as direct, positive system behaviors?
 - [ ] **Numbering**: Is the sequential ID correct and non-colliding?
 - [ ] **Traceability**: Are bidirectional links to Use Cases, Requirements, and Technical Design included?
