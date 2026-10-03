@@ -15,7 +15,7 @@ describe("validate_skills.ts", () => {
     });
 
     expect(result.status).toBe(0);
-    expect(result.stdout).toContain("Validated 17 skills across 5 profiles.");
+    expect(result.stdout).toContain("Validated 18 skills across 5 profiles.");
     expect(result.stdout).toContain("Validated 11 external add-on skills");
     expect(result.stdout).toContain("Validated 84 retired skill tombstones.");
   });

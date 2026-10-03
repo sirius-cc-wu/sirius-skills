@@ -75,6 +75,8 @@ Task arrives
 │  └─ external git-workflow-and-versioning or repository-native Git workflow
 ├─ Committed work is ready for pull-request publication
 │  └─ create-pr
+├─ An engineering request or task queue needs structured playbook coordination and worktree isolation
+│  └─ tech-lead
 ├─ A consequential decision or durable context needs documentation
 │  └─ external documentation-and-adrs or repository-native documentation
 ├─ Artifact existence or disposition is unclear
@@ -175,6 +177,7 @@ external prerequisite.
 | Review | Protected behavior needs an established responsibility, dependency, variation, or configuration-ownership change | `behavior-preserving-refactoring` |
 | Repository Workflow | A reader needs a paced, read-only change tour | `walkthrough-me` |
 | Repository Workflow | An issue needs filing, duplicate triage, spec linking, mutation proposal, or evidence-based closure | `github-issue-workflow` |
+| Repository Workflow | An engineering request or multi-task queue needs structured playbook coordination and worktree isolation | `tech-lead` |
 | Integrate and ship | Prepared work needs standalone Git, branch, worktree, release, or version guidance | External `git-workflow-and-versioning` or repository-native Git workflow |
 | Integrate and ship | Committed work is ready for pull-request publication | `create-pr` |
 | Integrate and ship | A consequential architecture choice or durable engineering context needs documentation | External `documentation-and-adrs` or repository-native documentation |

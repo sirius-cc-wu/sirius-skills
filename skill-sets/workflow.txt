@@ -5,3 +5,4 @@ review-pr
 spec-qualification
 audit-vestigial-contracts
 audit-pr-scope
+tech-lead

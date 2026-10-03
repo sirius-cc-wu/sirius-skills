@@ -1,0 +1,47 @@
+{
+  "skill_name": "tech-lead",
+  "trigger": {
+    "positive": [
+      {
+        "prompt": "Coordinate this engineering goal through structured playbooks and orchestrate builder agents in isolated worktrees.",
+        "top_k": 3
+      },
+      {
+        "prompt": "Act as Tech Lead Playbook Coordinator to route this incoming feature request and provision an isolated worktree.",
+        "top_k": 3
+      },
+      {
+        "prompt": "Triage this queue of issues into a Fleet Batch and dispatch autonomous worker subagents across worktrees.",
+        "top_k": 3
+      }
+    ],
+    "negative": [
+      {
+        "prompt": "Qualify this implemented task slice against its governing specification and Architecture Decision Record (ADR).",
+        "owner": "spec-qualification"
+      },
+      {
+        "prompt": "Walk me through PR #482 one logical section at a time and wait for me before continuing.",
+        "owner": "walkthrough-me"
+      }
+    ]
+  },
+  "evals": [
+    {
+      "id": "triage-playbook-and-provision-worktree",
+      "prompt": "Triage this request to add cross-crate CAN telemetry streaming into a playbook, enforce the human requirements gate, and plan worktree isolation.",
+      "expected_output": "A Lead Playbook Routing Brief classifying the task as Playbook 1 (Tier 1 Architectural), detailing required Golden Path artifacts, mandatory human sign-off on rules, and worktree provisioning.",
+      "expectations": [
+        "Classifies the request as Playbook 1 (Architectural / Tier 1)",
+        "Outlines required Golden Path pipeline (ADR, SSD, Example Mapping rules)",
+        "Enforces the Mandatory Human Requirements Gate before dispatch",
+        "Specifies isolated worktree provisioning via scripts/worktree.ts"
+      ],
+      "prohibitions": [
+        "Do not write production application code in chat",
+        "Do not execute builds or tests directly"
+      ],
+      "trust_level": "provisional"
+    }
+  ]
+}

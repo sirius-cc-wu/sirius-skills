@@ -61,7 +61,7 @@ This skill operates in two complementary modes:
 1. **Set the vision boundary.** Identify the project or independent initiative, intended users, responsible vision authority, current decision, existing vision status, and non-goals. Do not make a release, component, or completed milestone a project vision unless it has independent authority and scope.
 2. **Check for an existing vision.** Treat an approved `VISION.md` or canonical vision artifact as the baseline. Propose a bounded, evidence-backed delta; do not create a competing vision document.
 3. **Clarify the direction.** Route a vague candidate direction to external `idea-refine`. Route unclear individual intent to external `interview-me`. Preserve their result as candidate input until the responsible authority accepts it.
-4. **Mine proportionate evidence.** Inspect approved artifacts and a relevant range of repository history. Record source revisions and recurring patterns: what the project builds, refuses, fixes at the root, or protects. Keep the evidence sheet conversational or otherwise ephemeral unless it has a justified independent lifecycle.
+4. **Mine proportionate evidence.** Inspect approved artifacts and a relevant range of repository history. Treat history as evidence, not approval. Record source revisions and recurring patterns: what the project builds, refuses, fixes at the root, or protects. Keep the evidence sheet conversational or otherwise ephemeral unless it has a justified independent lifecycle.
 5. **Draft the acceptance policy.** State the project identity, intended users, durable principles, concrete non-goals, and accept-or-resist criteria. Make each claim traceable to approved intent, evidence, or authority-approved reasoning. Use short declarative sentences.
 6. **Stress-test the draft.** Present a small set of concrete boundary cases: tempting off-mission features, principle conflicts, scope expansions, and ambiguous contributions. Explain both defensible outcomes. Replace trivial cases whose answer is already obvious.
 7. **Obtain approval or preserve uncertainty.** Ask the responsible authority to approve, reject, or revise the draft. Record the authority and approved source revision. Return `needs prerequisite` rather than presenting an evidence-mined draft as approved.
@@ -237,6 +237,7 @@ A change should be resisted when it:
 - [ ] The acceptance policy gives concrete positive and negative tests for a proposed change.
 - [ ] Boundary cases exposed non-trivial scope or principle decisions.
 - [ ] Approval status, authority, and source revision are explicit; missing approval returns `needs prerequisite`.
+- [ ] Any standalone vision passes the artifact budget in `skills/select-technical-artifacts/references/artifact-selection-budget.md` and has one `Vision` frontmatter block matching `skills/design-repository-artifact-layout/references/markdown-artifact-frontmatter.md`.
 
 ### Mode B Verification (Conformance Audit)
 - [ ] The audit cites the exact baseline revision of the canonical `VISION.md`.

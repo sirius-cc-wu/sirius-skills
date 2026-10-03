@@ -1,6 +1,6 @@
 ---
 name: spec-qualification
-description: Qualifies an implemented change against its governing behavioral specification (contracts, rules) and Architecture Decision Records (ADRs) to issue a binary Verified or Unverified verdict without executing builds directly.
+description: Qualifies an implemented change, Worker Execution Report, and git diff against its governing behavioral specification (contracts, rules), anti-phantom call paths, and Architecture Decision Records (ADRs) to issue a binary Verified or Unverified verdict without executing builds directly.
 ---
 
 # Spec Qualification
