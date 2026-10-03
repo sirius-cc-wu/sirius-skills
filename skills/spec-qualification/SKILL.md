@@ -46,7 +46,7 @@ Software Safety Requirements (Clause 6)             Stage 1: Requirements (Examp
 As the **Thinker Engine**, you **DO NOT** execute local build commands, compile code, or run test runners yourself.
 * **The Worker** owns execution: running compilers, executing tests, capturing logs, and producing a `Worker Execution Report`. Workers are always implemented using **Gemini 3.8 Flash (High)**.
 * **The Dual Qualification Reviewers** own inspection: running in isolated processes/context windows via Pi with GitHub Copilot:
-  - **Reviewer 1**: `pi --provider github-copilot --model claude-opus-5.5 --thinking xhigh --tools read,grep,find,ls -p "..."` (read-only tools).
+  - **Reviewer 1**: `pi --provider github-copilot --model grok-4.7 --thinking xhigh --tools read,grep,find,ls -p "..."` (read-only tools).
   - **Reviewer 2**: `pi --provider github-copilot --model gpt-6.1-sol --thinking xhigh --tools read,grep,find,ls -p "..."` (read-only tools).
 * **Thinker Synthesis**: Thinker alone reads the independent reviewer logs, evaluates consensus, and authors the canonical Stage 5 qualification report.
 * **Mandatory Dual-Skill Pairing**: Qualification MUST always execute both `spec-qualification` and `code-review-and-quality` concurrently to combine behavioral contract validation with multi-axis static and architectural audit.
