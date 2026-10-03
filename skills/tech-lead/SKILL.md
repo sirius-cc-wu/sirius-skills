@@ -1,6 +1,6 @@
 ---
 name: tech-lead
-description: "Lead Playbook Coordinator. Routes engineering goals through structured playbooks (Golden Path, Streamlined Feature, Scoped Fix, Fleet Batch, Review Remediation, Investigation Spike), enforces the Thinker/Worker boundary, and orchestrates autonomous builders in isolated worktrees."
+description: "Lead Playbook Coordinator. Routes engineering goals through structured playbooks (Golden Path, Streamlined Feature, Scoped Fix, Fleet Batch, Review Remediation, Investigation Spike, Prototype Spike, Visual Parity), enforces the Thinker/Worker boundary, and orchestrates autonomous builders in isolated worktrees."
 ---
 
 # Tech Lead (Playbook Coordinator)
@@ -12,7 +12,7 @@ description: "Lead Playbook Coordinator. Routes engineering goals through struct
 ### Non-Negotiable Invariants
 
 1. **Lead Never Codes in Chat**: The Lead session is strictly dedicated to analysis, planning, boundary definition, and qualification. All functional code implementation, compilation, and test execution are delegated to downstream worker/builder agents.
-2. **Strict Sizing & Playbook Routing**: Every task must be classified via the 3-Tier Sizing Gate (Essence Alphas: *Requirements*, *Software System*, *Work*) into one of the 6 playbooks before work begins.
+2. **Strict Sizing & Playbook Routing**: Every task must be classified via the 3-Tier Sizing Gate (Essence Alphas: *Requirements*, *Software System*, *Work*) into one of the 8 playbooks before work begins.
 3. **Worktree Isolation**: Any implementation, defect reproduction, or fleet batch operates in a dedicated git worktree allocated via `bun scripts/worktree.ts create <branch> [base]`. No multi-agent collision in the root workspace.
 4. **Mandatory Human Requirements Gate**: For Tier 1 (Architectural) and Tier 2 (Feature Slice) tasks, the human operator (e.g., Sirius) must explicitly review and approve journey flows, Example Mapping rules (`R1`, `R2`...), or contracts before advancing to detailed design or worker dispatch.
 5. **Audit, Don't Execute**: Verification of worker deliverables is performed under the non-executing inspector doctrine via `spec-qualification` and `code-review-and-quality`.
@@ -26,7 +26,8 @@ description: "Lead Playbook Coordinator. Routes engineering goals through struct
 - When an incoming engineering request, issue, or PR needs structured routing, sizing, and playbook assignment.
 - When orchestrating autonomous worker agents in isolated worktrees (`bun scripts/worktree.ts`).
 - When managing multi-task queues (Fleet Batch) or remediating code review / Gate 2 findings.
-- When an operator wants a unified coordination interface (`/tech-lead`, `triage`, `fleet`, `remediate`, `spike`).
+- When exploring novel UI interactions via scratch prototypes (Playbook 7) or executing pixel-exact UI migrations (Playbook 8).
+- When an operator wants a unified coordination interface (`/tech-lead`, `triage`, `fleet`, `remediate`, `spike`, `prototype`, `visual-parity`).
 
 ### When NOT to Use
 - Do not use for writing production code or running test/build loops in the current session; delegate to worker subagents.
@@ -37,7 +38,7 @@ description: "Lead Playbook Coordinator. Routes engineering goals through struct
 
 ## Playbook Routing Matrix
 
-When an engineering request or task arrives, match it against one of the six core playbooks:
+When an engineering request or task arrives, match it against one of the eight core playbooks:
 
 ```mermaid
 flowchart TD
@@ -48,6 +49,8 @@ flowchart TD
     Triage -->|Multi-task queue / Batch PRs| PB4["Playbook 4: Fleet Batch"]
     Triage -->|PR Review / Remediation| PB5["Playbook 5: Review Remediation"]
     Triage -->|Read-only analysis / Exploration| PB6["Playbook 6: Investigation Spike"]
+    Triage -->|Novel UI / Interactive design uncertainty| PB7["Playbook 7: Prototype Spike"]
+    Triage -->|UI refactor / Styling migration / Zero visual drift| PB8["Playbook 8: Visual Parity"]
 ```
 
 | Playbook | Trigger & Scope | Key Pipeline Skills | Deliverable & Gate |
@@ -58,6 +61,8 @@ flowchart TD
 | **PB-4: Fleet Batch** | Queue of independent issues, bugs, or parallel feature slices. | `scripts/worktree.ts` → Parallel Worker Subagents → CI Monitoring | Fleet Delivery Board + Merge-ready PRs. |
 | **PB-5: Review Remediation** | Unresolved PR comments, Gate 2 review findings, or audit remediation. | `code-review-and-quality` / `review-pr` → Human Selection Gate → Worker Mode B | Remediation Disposition Report + Verified fix. |
 | **PB-6: Investigation Spike** | Ambiguous question, performance profile, domain discovery without code changes. | `interview-me` → `vision` → `walkthrough-me` | Evidence-based diagnostic report / Architecture note. |
+| **PB-7: Prototype Spike** | Novel UI layout, interaction feel, or stateful workflow with no codebase precedent. | `prototype-spike` in `<appDataDir>/scratch/` | Side-by-side variant switcher + screenshots + trade-off recommendation (Zero production code). |
+| **PB-8: Visual Parity** | UI component refactoring, design token migration, or CSS framework replacement. | Worker Mode C in isolated worktree (`visual-parity` + Playwright) | Frozen baseline screenshots → component refactor → pixel diff = 0 report + Opened PR. |
 
 ---
 
@@ -169,13 +174,41 @@ flowchart TD
 
 ---
 
+### Playbook 7: Prototype Spike (Throwaway Exploration)
+
+1. **Scope the Decision**:
+   - Define the exact layout, interaction feel, or stateful workflow being decided.
+   - Constraint: **Strict scratch isolation** (`<appDataDir>/scratch/prototypes/<name>/` or `scratch/prototypes/`). Zero production code changes.
+2. **Build Competing Sketches**:
+   - Implement 2–3 competing approaches (Option A, Option B, Option C) behind a single on-screen variant switcher using vanilla HTML/CSS/JS or the lightest static setup.
+3. **Observe & Capture Evidence**:
+   - Test interaction feel across target viewports via browser tools. Capture side-by-side screenshots.
+4. **Human Review & Handover**:
+   - Present options to the human operator for decision. Discard scratch code upon sign-off, extract chosen specification and tokens, and transition to **Playbook 2 (Feature Slice)** or **Playbook 1 (Architectural)** for production implementation.
+
+---
+
+### Playbook 8: Visual Parity (Worker Mode C)
+
+1. **Scope the Parity Target**:
+   - Identify UI components undergoing refactoring, design token adoption, or framework modernization with zero intended visual drift.
+2. **Freeze Baseline Screenshots**:
+   - In the target project/worktree, capture golden baseline screenshots across all component states (default, hover, focus, disabled, error) and viewports before altering production code.
+3. **Worker Mode C Dispatch**:
+   - Provision isolated worktree via `bun scripts/worktree.ts create <branch>`.
+   - Dispatch Worker with instructions to refactor components, execute automated image diffs (Playwright/CDP) against frozen baselines, and loop until pixel diff is 0.
+4. **Parity Qualification**:
+   - Verify visual diff report (0 pixel regression) and clean code diff via Gate 2 qualification before merging.
+
+---
+
 ## Workflow
 
 ```text
 Request / Issue ──► Sizing Gate ──► Playbook Route ──► Worktree Provisioning ──► Worker Dispatch ──► Qualification
 ```
 
-1. **Intake & Triage:** Ingest the engineering request, issue, or review finding. Classify via the 3-Tier Sizing Gate and assign to PB-1 through PB-6.
+1. **Intake & Triage:** Ingest the engineering request, issue, or review finding. Classify via the 3-Tier Sizing Gate and assign to PB-1 through PB-8.
 2. **Boundary Definition & Specification:** Author requirements, contracts, or defect briefs in accordance with the selected playbook. Enforce the Human Requirements Gate for Tier 1 and Tier 2.
 3. **Worktree Provisioning:** Allocate an isolated worktree via `bun scripts/worktree.ts create <branch> [base]`. Verify `git status --porcelain` to ensure clean pre-dispatch state.
 4. **Worker Dispatch:** Package the task with unambiguous constraints, governing rules, and explicit file boundaries. Dispatch worker subagent into the allocated worktree.
@@ -192,6 +225,8 @@ When interacting with the Tech Lead, standard directives trigger quick actions:
 - `fleet <queue>`: Trigger Playbook 4 for parallel multi-task execution across worktrees.
 - `remediate <pr|verdict>`: Trigger Playbook 5 for gated PR review or Gate 2 finding remediation.
 - `spike <question>`: Trigger Playbook 6 for zero-code investigation.
+- `prototype <prompt>`: Trigger Playbook 7 for throwaway interactive UI/UX prototyping in scratch space.
+- `visual-parity <component>`: Trigger Playbook 8 for pixel-exact UI refactoring and automated image diff verification.
 - `status`: Show current active playbooks, worktrees, and running worker subagents.
 
 ---
@@ -218,7 +253,7 @@ When interacting with the Tech Lead, standard directives trigger quick actions:
 ## Verification
 
 ### Playbook Coordination Verification
-- [ ] Task is classified via the 3-Tier Sizing Gate and assigned to PB-1..PB-6.
+- [ ] Task is classified via the 3-Tier Sizing Gate and assigned to PB-1..PB-8.
 - [ ] For Tier 1 and Tier 2, human operator sign-off is obtained on rules/flows before worker dispatch.
 - [ ] Worktree isolation is provisioned via `bun scripts/worktree.ts create <branch>` before worker dispatch.
 - [ ] Worker dispatch instructions include governing spec/rules, explicit file paths, and test verification criteria.
