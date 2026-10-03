@@ -1,19 +1,19 @@
 ---
 name: spec-qualification
-description: Qualifies an implemented task slice against its governing normative specification (SSD contracts and Example Mapping rules) and Architecture Decision Record (ADR). Audits Worker Execution Reports and git diffs across behavioral, architectural, and code quality dimensions to issue a Verified or Unverified verdict without executing builds directly.
+description: Qualifies an implemented task slice against its governing normative specification (SSD contracts and Example Mapping rules) and Architecture Decision Record (ADR). Audits implementation execution reports and git diffs across behavioral, architectural, and code quality dimensions to issue a Verified or Unverified verdict without executing builds directly.
 ---
 
-# Spec Qualification (Phase 6 Acceptance Gate)
+# Spec Qualification (Acceptance Gate)
 
 ## Overview & Grounding in ISO 26262-6
 
-`spec-qualification` is the acceptance gate that closes the **Spec–Validate Loop** in `thinker`. It qualifies that an implementation produced by a downstream Worker fulfills the behavioral specification and adheres strictly to architectural invariants.
+`spec-qualification` is the acceptance gate that closes the **Spec–Validate Loop**. It qualifies that an implementation fulfills its governing behavioral specification and adheres strictly to architectural invariants.
 
 ### Grounding in the ISO 26262-6 V-Model
 `spec-qualification` operationalizes the software verification and qualification principles of **ISO 26262-6 (Road vehicles — Functional safety, Part 6: Product development at the software level)**:
 
 ```text
-               ISO 26262-6 V-Model                              Thinker Two-Gate Architecture
+               ISO 26262-6 V-Model                         Two-Gate Verification Architecture
 ─────────────────────────────────────────────────   ────────────────────────────────────────────────────────
 Software Safety Requirements (Clause 6)             Stage 1: Requirements (Example Mapping R1, R2...)
          \                               /                   \                                 /
@@ -23,9 +23,9 @@ Software Safety Requirements (Clause 6)             Stage 1: Requirements (Examp
                 \             /                                 \                         /
             Unit Design (Clause 8)                       Stage 4: Execution Tasks (<module-id>.md)
                      \   /                                         \                     /
-                   Coding                                       Worker (TDD: Red → Green → Clean)
+                   Coding                                       Implementation (TDD: Red → Green → Clean)
                      |                                                     |
-            [Bottom of the V]                                     [Worker Commits & Execution Report]
+            [Bottom of the V]                                     [Commits & Execution Report]
                      |                                                     |
              Unit Verification (Clause 9)                Gate 2 Pillar 3: Code Health & Anti-Phantom Paths
                      /   \                                         \                     /
@@ -40,15 +40,12 @@ Software Safety Requirements (Clause 6)             Stage 1: Requirements (Examp
 2. **Software Integration & Verification (Clause 10) $\longleftrightarrow$ Pillar 2 (Architectural Audit)**: Verifies that software components adhere to defined interfaces, hexagonal layers, and binding ADR invariants.
 3. **Software Unit Verification & Static Analysis (Clause 9) $\longleftrightarrow$ Pillar 3 (Code Health & Quality)**: Static verification auditing anti-phantom call paths (no dead code), memory/resource safety, and simplicity.
 4. **Bidirectional Traceability (Clauses 6.4.3 & 7.4.3)**: Every delivered test case must explicitly trace back to a specific requirement rule ($R_x$) and architecture contract.
-5. **Evaluator Independence (ASIL C/D Mandate)**: ISO 26262 requires organizational and cognitive independence for verification. The Worker who writes code is strictly forbidden from self-qualifying; qualification is executed by independent reviewers in isolated contexts.
+5. **Evaluator Independence (ASIL C/D Mandate)**: ISO 26262 requires organizational and cognitive independence for verification. The author or agent who writes code is strictly forbidden from self-qualifying; qualification must be executed by an independent evaluator in an isolated context.
 
-### Non-Executing Inspector Protocol & Model Mandate
-As the **Thinker Engine**, you **DO NOT** execute local build commands, compile code, or run test runners yourself.
-* **The Worker** owns execution: running compilers, executing tests, capturing logs, and producing a `Worker Execution Report`. Workers are always implemented using **Gemini 3.8 Flash (High)**.
-* **The Dual Qualification Reviewers** own inspection: running in isolated processes/context windows via Pi with GitHub Copilot:
-  - **Reviewer 1**: `pi --provider github-copilot --model grok-4.7 --thinking xhigh --tools read,grep,find,ls -p "..."` (read-only tools).
-  - **Reviewer 2**: `pi --provider github-copilot --model gpt-6.1-sol --thinking xhigh --tools read,grep,find,ls -p "..."` (read-only tools).
-* **Thinker Synthesis**: Thinker alone reads the independent reviewer logs, evaluates consensus, and authors the canonical Stage 5 qualification report.
+### Non-Executing Inspector Protocol
+The qualification evaluator operates as a **non-executing inspector**. It **DOES NOT** execute local build commands, compile code, or run test runners directly.
+* **The Implementer (Author)** owns execution: running compilers, executing test suites, capturing runtime logs, and providing an execution report with verifiable test results.
+* **The Evaluator (Reviewer)** owns inspection: operating with read-only inspection capabilities in an isolated context to objectively audit delivered diffs, test assertion authenticity, and structural coverage. Specific runner harnesses and model assignments are governed by repository orchestration policy (e.g. `AGENTS.md`).
 * **Mandatory Dual-Skill Pairing**: Qualification MUST always execute both `spec-qualification` and `code-review-and-quality` concurrently to combine behavioral contract validation with multi-axis static and architectural audit.
 
 ---
@@ -63,12 +60,12 @@ Before qualifying a slice, obtain and review:
 2. **Governing Architecture Decision Record** (at the target project's canonical decision location):
    - Architectural pattern (e.g., Hexagonal / Ports & Adapters).
    - Forbidden shortcuts, invariants, and accepted trade-offs.
-3. **Worker Execution Report**:
+3. **Implementation Execution Report**:
    - Verification matrix mapping rules to test locations.
    - Exact test runner output with execution times and pass counts.
    - List of atomic commit hashes.
 4. **Git Diff / Revision**:
-   - The actual code changes produced by the Worker across production and test files.
+   - The actual code changes across production and test files.
 
 ---
 
@@ -92,19 +89,19 @@ Verify that the implementation obeys the architectural law established in the AD
   - Are invariants guarded at the Aggregate root?
   - Are there direct mutations across aggregate boundaries that violate transaction isolation?
 - **No Architectural Drift / Forbidden Shortcuts**:
-  - Did the worker introduce unauthorized dependencies, bypass defined adapters, or add unapproved global state?
+  - Were unauthorized dependencies introduced, defined adapters bypassed, or unapproved global state added?
 
 ### 3. Code Health & Unit Audit (ISO 26262-6 Clause 9: Software Unit Verification & Static Analysis)
 Evaluate code structure using `code-review-and-quality` guidelines:
 - **Anti-Phantom Call-Path Verification**: Inspect the call graph of all new methods, types, and configurations. Verify that every newly introduced function has an active, executing caller in production runtime code. Any function or method called solely by unit tests or mocks is dead code / phantom implementation and must be rejected (`UNVERIFIED`).
-- **Simplicity**: Did the worker implement the minimal required logic, or is there speculative generalization?
+- **Simplicity**: Is the implementation the minimal required logic, or is there speculative generalization?
 - **Dead Code Hygiene**: Are there leftover debug statements, unused shims, commented-out code, or unreferenced helpers?
 - **Security & Safety**: Are user inputs validated at boundaries? Are secrets absent from code and logs?
 
 ### 4. Structural Coverage (ISO 26262-6 Table 12 & Table 15 Guidance)
 For software governing real-time motion, actuators, hardware bus communication (e.g., EtherCAT, CANopen), or safety-critical state machines:
 - **Requirement-Based Coverage**: 100% of Example Mapping rules ($R_1, R_2, \dots$) is mandatory across all tiers.
-- **Structural Coverage Evidence**: For safety-critical modules, the Worker Execution Report should supply automated structural coverage metrics (e.g. `llvm-cov`, `cargo-tarpaulin`, `istanbul`/`c8`):
+- **Structural Coverage Evidence**: For safety-critical modules, the execution report should supply automated structural coverage metrics (e.g. `llvm-cov`, `cargo-tarpaulin`, `istanbul`/`c8`):
   - **Statement Coverage**: Proves zero dead code branches in production modules.
   - **Branch / Decision Coverage**: Proves all conditionals evaluate both true and false.
   - **MC/DC (Modified Condition/Decision Coverage)**: Recommended for high-integrity safety logic where multiple boolean conditions govern critical actuations.
@@ -114,7 +111,7 @@ For software governing real-time motion, actuators, hardware bus communication (
 ## Workflow
 
 ```text
-Worker Execution Report + Diff
+Implementation Execution Report + Diff
              │
              ▼
   [Step 1: Ingest & Trace] ──────────► Verify 100% Example Mapping rules covered
@@ -132,7 +129,7 @@ Worker Execution Report + Diff
   [Step 5: Verdict & Routing] ──────► Issue VERIFIED or UNVERIFIED with report
 ```
 
-1. **Ingest & Trace**: Map each rule from the spec's Example Mapping table ($R_1, R_2, \dots$) to the Worker's reported test cases. Flag any missing or skipped rule immediately.
+1. **Ingest & Trace**: Map each rule from the spec's Example Mapping table ($R_1, R_2, \dots$) to the reported test cases. Flag any missing or skipped rule immediately.
 2. **Test Integrity Audit**: Read the test files in the diff. Confirm that:
    - Tests follow RED-GREEN discipline (testing real behavior, not internal implementation details).
    - Mocking is restricted to external ports; domain logic is tested with real domain objects.
@@ -157,10 +154,10 @@ Route findings deterministically to the smallest responsible phase on the left s
 
 | Failure Category | ISO 26262 Defect Source | Root Cause | Return Path | Action Required |
 | :--- | :--- | :--- | :--- | :--- |
-| **Execution Defect** | Clause 8 / 9 (Unit Design & Implementation) | Test failed, assertion flawed, missing edge case test | **Worker (Builder)** | Worker re-enters RED-GREEN cycle to fix implementation or add missing test coverage. |
-| **Architectural Breach** | Clause 7 / 10 (Architectural Design & Integration) | Domain leaks DB/HTTP/transport, violated ADR pattern, unauthorized dependency | **Worker (Builder)** | Worker refactors to comply with governing ADR invariant. |
-| **Specification Gap** | Clause 6 / 11 (Software Safety Requirements) | Spec has contradictory rules, missing error contract, or unrealistic precondition | **Thinker (Phase 1/2)** | Return to `example-mapping` or `system-behavior` to revise the specification. |
-| **Architectural Defect** | Clause 7 (Architectural Design) | ADR decision proves infeasible or conflicts with system constraints | **Thinker (Phase 3)** | Return to `architecture-decision-records` to author an amending ADR. |
+| **Execution Defect** | Clause 8 / 9 (Unit Design & Implementation) | Test failed, assertion flawed, missing edge case test | **Implementation / Unit Design** | Implementer re-enters RED-GREEN cycle to fix implementation or add missing test coverage. |
+| **Architectural Breach** | Clause 7 / 10 (Architectural Design & Integration) | Domain leaks DB/HTTP/transport, violated ADR pattern, unauthorized dependency | **Implementation / Integration** | Implementer refactors to comply with governing ADR invariant. |
+| **Specification Gap** | Clause 6 / 11 (Software Safety Requirements) | Spec has contradictory rules, missing error contract, or unrealistic precondition | **Requirements & Contracts (Stage 1/2)** | Return to `example-mapping` or `system-behavior` to revise the specification. |
+| **Architectural Defect** | Clause 7 (Architectural Design) | ADR decision proves infeasible or conflicts with system constraints | **System Architecture & ADRs (Stage 3)** | Return to `architecture-decision-records` to author an amending ADR. |
 
 ---
 
@@ -173,7 +170,7 @@ Save all qualification reports in the target project's canonical qualification o
 type: Qualification Report
 slice: "[target-project canonical specification path]"
 governing_adr: "[target-project canonical ADR path]"
-worker_revision: "[commit SHA]"
+implementation_revision: "[commit SHA]"
 verdict: "[VERIFIED | UNVERIFIED]"
 date: "YYYY-MM-DD"
 ---
@@ -183,11 +180,11 @@ date: "YYYY-MM-DD"
 ## 1. Executive Summary
 - **Governing Spec**: `[spec path]`
 - **Governing ADR**: `[adr path]`
-- **Worker Revision**: `[commit SHA]`
+- **Implementation Revision**: `[commit SHA]`
 - **Final Verdict**: **[VERIFIED | UNVERIFIED]**
 
 ## 2. Behavioral Compliance Matrix (Example Mapping)
-| Rule # | Rule Description | Worker Test Case | Test Status | Audit Assessment |
+| Rule # | Rule Description | Implementation Test Case | Test Status | Audit Assessment |
 | :--- | :--- | :--- | :--- | :--- |
 | **R1** | [Happy path description] | `tests/...::test_...` | PASS | Valid assertion of postcondition |
 | **R2** | [Edge case description] | `tests/...::test_...` | PASS | Valid rejection handling |
@@ -217,7 +214,7 @@ date: "YYYY-MM-DD"
 ## 7. Findings & Return Path (if UNVERIFIED)
 - **Failure Category**: `[Execution Defect | Architectural Breach | Specification Gap]`
 - **ISO 26262 Defect Source**: `[Clause 6 Requirements | Clause 7 Architecture | Clause 8/9 Unit]`
-- **Return Destination**: `[Worker | Thinker Phase 1/2/3]`
+- **Return Destination**: `[Implementation | Requirements | Architecture]`
 - **Action Items**:
   1. [Specific issue that must be addressed before re-qualification]
 
