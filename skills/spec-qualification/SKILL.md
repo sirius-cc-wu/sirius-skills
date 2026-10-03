@@ -7,13 +7,17 @@ description: Qualifies an implemented change against its governing behavioral sp
 
 ## Overview
 
-`spec-qualification` audits an implemented change to confirm that it fulfills its governing behavioral specifications and preserves architectural invariants.
+`spec-qualification` audits an implemented change to confirm that it strictly fulfills its governing behavioral specifications and preserves architectural invariants.
+
+It is a **contractual acceptance gate**, distinct from general code review (`code-review-and-quality`):
+- `code-review-and-quality` evaluates **code craftsmanship & health** (readability, simplicity, security, maintainability).
+- `spec-qualification` evaluates **contractual conformance** (rule traceability, assertion authenticity, ADR invariants, anti-phantom call paths).
 
 ### The Independent Inspector Rule
 The evaluator operates as a **non-executing inspector**:
 - **Cognitive & Context Isolation**: The evaluator must be independent of the author/implementer and operate with read-only inspection tools.
 - **Evidence-Based Inspection**: The evaluator audits the code diff and execution receipts (test logs, pass/fail counts, coverage evidence). It does not compile or run test runners directly.
-- **Dual Audit Mandate**: Pair with `code-review-and-quality` to concurrently evaluate behavioral compliance, architectural boundaries, and code health.
+- **Dual Audit Pairing**: Run concurrently with `code-review-and-quality` so that contract qualification and code craftsmanship are evaluated together.
 
 ---
 
@@ -27,22 +31,26 @@ Before qualifying a change, obtain and review:
 
 ---
 
-## The Three-Pillar Audit
+## The Four Qualification Criteria
 
-### 1. Behavioral Compliance
-- **100% Rule Coverage**: Every specification rule ($R_1, R_2, \dots$) must have an explicit passing automated test.
-- **Assertion Authenticity**: Tests must verify real state changes, side-effects, or emitted events—reject vacuous, tautological, or mock-only assertions.
-- **Negative & Boundary Paths**: Failure modes (timeouts, bad inputs, invariant violations) must be verified with expected error states.
+### 1. Rule Traceability (100% Coverage)
+- Every specification rule ($R_1, R_2, \dots$) must map to an explicit, passing automated test.
+- Negative edge cases and boundary conditions must be explicitly verified with expected error states.
+- Zero unverified or skipped specification rules allowed.
 
-### 2. Architectural Invariants
-- **Layer Boundaries**: Domain logic must remain decoupled from transport, persistence, and external frameworks.
-- **Aggregate Integrity**: Mutations must be guarded by aggregate roots without cross-boundary leaks.
-- **Zero Architectural Drift**: No unauthorized dependencies, bypassed ports, or unapproved global state.
+### 2. Assertion Authenticity
+- Inspect test source code: tests must prove observable postconditions, state transitions, or domain events.
+- Reject vacuous assertions (e.g. `expect(true).toBe(true)`), tautologies, or assertions that test only mock mechanics rather than domain outcomes.
 
-### 3. Code Health & Anti-Phantom Call Paths
-- **Anti-Phantom Call Paths**: Every new production function, method, or configuration must have an active caller in production runtime code. Functions tested solely by unit mocks with no live production caller are dead code (`UNVERIFIED`).
-- **Simplicity**: Minimal logic to satisfy the specification—reject speculative generalization.
-- **Cleanliness & Security**: Zero debug residue or orphaned shims; boundary inputs must be validated and sanitized.
+### 3. ADR Invariant Fidelity
+- Inspect production code diff against governing ADRs.
+- Verify that declared architectural boundaries (e.g. Hexagonal ports & adapters, domain isolation, aggregate consistency boundaries) are preserved.
+- Reject unauthorized shortcuts, bypassing of defined adapters, or unapproved dependencies.
+
+### 4. Anti-Phantom Call Paths (Live Integration)
+- Trace the static and dynamic call graph of all newly introduced production functions, methods, and configurations.
+- Verify that every new capability has an active caller in production runtime paths.
+- Any function or method called solely by unit tests or test mocks is dead code / a phantom feature and must be rejected (`UNVERIFIED`).
 
 ---
 
@@ -52,16 +60,16 @@ Before qualifying a change, obtain and review:
 Execution Report + Diff
            │
            ▼
-[Step 1: Ingest & Trace] ──────────► Verify 100% specification rules covered
+[Step 1: Rule Traceability] ──────► Map every spec rule (R1, R2...) to tests
            │
            ▼
-[Step 2: Test Integrity Audit] ───► Verify test assertions actually prove behavior
+[Step 2: Assertion Authenticity] ─► Verify tests prove real domain postconditions
            │
            ▼
-[Step 3: ADR Invariant Audit] ────► Verify layering, aggregate boundaries, no drift
+[Step 3: ADR Invariant Audit] ────► Verify declared architectural constraints
            │
            ▼
-[Step 4: Code Quality Review] ────► Verify simplicity, security, dead code hygiene
+[Step 4: Anti-Phantom Audit] ─────► Verify live production callers for all new code
            │
            ▼
 [Step 5: Verdict & Report] ───────► Issue VERIFIED or UNVERIFIED with report
@@ -74,7 +82,7 @@ Execution Report + Diff
 Verdicts are strictly binary: **`VERIFIED`** or **`UNVERIFIED`**.
 
 ### When `VERIFIED`
-All rules have genuine passing test evidence, ADR invariants are preserved, anti-phantom checks pass, and code quality is approved. Mark task as complete and unblock downstream integration.
+All specification rules have authentic passing test evidence, ADR invariants are preserved, and anti-phantom call path checks pass. Mark task as complete and unblock downstream integration.
 
 ### When `UNVERIFIED`
 Route findings deterministically to the responsible phase:
@@ -82,6 +90,7 @@ Route findings deterministically to the responsible phase:
 | Failure Category | Root Cause | Return Destination | Action Required |
 | :--- | :--- | :--- | :--- |
 | **Implementation Defect** | Test failed, vacuous assertion, missing edge case | **Implementation** | Fix implementation or add genuine test assertions. |
+| **Phantom Code** | New production function has no caller outside unit tests | **Implementation** | Connect capability to live execution path or remove dead code. |
 | **Architectural Breach** | Violated ADR pattern, unauthorized dependency | **Implementation** | Refactor code to conform to the governing ADR. |
 | **Specification Gap** | Contradictory rules, missing error contracts | **Requirements / Contracts** | Clarify or amend the specification rules. |
 | **Architectural Defect** | ADR invariant proves infeasible or contradictory | **Architecture / ADR** | Author an amending ADR. |
@@ -117,24 +126,22 @@ date: "YYYY-MM-DD"
 | **R2** | [Edge case description] | `tests/...::test_...` | PASS | Valid rejection handling |
 | **R3** | [Boundary description] | `tests/...::test_...` | PASS | Valid boundary check |
 
-## 3. Test Integrity & Assertion Audit
-- [ ] Test cases verify observable state/events, not mock mechanics.
-- [ ] Test runner evidence is complete and reproducible.
-- [ ] Zero unexecuted or skipped tests without explicit sign-off.
+## 3. Test Integrity & Assertion Authenticity
+- [ ] Every rule maps to a genuine passing automated test.
+- [ ] Assertions verify observable state changes/events, not mock mechanics.
+- [ ] Zero vacuous, tautological, or skipped tests.
 
 ## 4. Architectural Invariant Audit (ADR Compliance)
-- [ ] Layer boundaries respected (domain is pure, ports & adapters decoupled).
-- [ ] Aggregate transaction invariants enforced.
-- [ ] No unauthorized dependencies or forbidden shortcuts.
+- [ ] Governing ADR invariants and boundaries are strictly maintained.
+- [ ] Domain logic remains isolated from transport/persistence.
+- [ ] Zero unauthorized dependencies or bypassed adapters.
 
-## 5. Code Quality & Security Gate
-- [ ] Clean, readable code without speculative complexity.
-- [ ] Anti-phantom call paths verified (zero uncalled production functions).
-- [ ] No dead code, debug statements, or temporary shims.
-- [ ] Inputs validated and sanitized at boundaries.
+## 5. Anti-Phantom Call-Path Audit
+- [ ] Every new production function/method has an active caller in live runtime code.
+- [ ] Zero functions called solely by unit tests or mocks.
 
 ## 6. Findings & Return Path (if UNVERIFIED)
-- **Failure Category**: `[Implementation Defect | Architectural Breach | Specification Gap | Architectural Defect]`
+- **Failure Category**: `[Implementation Defect | Phantom Code | Architectural Breach | Specification Gap | Architectural Defect]`
 - **Return Destination**: `[Implementation | Requirements / Contracts | Architecture / ADR]`
 - **Action Items**:
   1. [Specific issue that must be addressed before re-qualification]
