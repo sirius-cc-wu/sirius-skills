@@ -16,3 +16,6 @@ behavior-preserving-refactoring
 architecture-decision-records
 type-anchored-spec
 tech-lead
+create-verification-harness
+prototype-spike
+visual-parity
