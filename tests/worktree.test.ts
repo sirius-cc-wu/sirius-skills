@@ -1,11 +1,13 @@
 import { describe, it, expect, beforeEach, afterEach } from "bun:test";
-import { mkdtempSync, rmSync, writeFileSync } from "node:fs";
+import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join, resolve } from "node:path";
 import { existsSync } from "node:fs";
 import {
   branchExists,
   createWorktree,
+  ensureCargoPoolConfig,
+  getDiskInfo,
   getRepoRoot,
   getWorktreesDir,
   listWorktrees,
@@ -216,5 +218,52 @@ describe("worktree", () => {
     expect(await main(["remove", "-h"])).toBe(0);
     expect(await main(["list", "--help"])).toBe(0);
     expect(await main(["unknown-cmd"])).toBe(1);
+  });
+
+  it("automatically provisions shared cargo config when Cargo.toml exists", async () => {
+    writeFileSync(join(tempRepo, "Cargo.toml"), '[package]\nname = "test"\nversion = "0.1.0"\n');
+    const worktreesDir = await resolveWorktreesDir(tempRepo);
+    const cargoConfig = join(worktreesDir, ".cargo", "config.toml");
+    expect(existsSync(cargoConfig)).toBe(true);
+    const content = await Bun.file(cargoConfig).text();
+    expect(content).toContain('target-dir = "');
+    expect(content).toContain("jobs =");
+  });
+
+  it("retrieves disk space information for existing directory", async () => {
+    const disk = await getDiskInfo(tempRepo);
+    expect(disk).not.toBeNull();
+    if (disk) {
+      expect(disk.totalGb).toBeGreaterThan(0);
+      expect(disk.availableGb).toBeGreaterThan(0);
+      expect(disk.capacityPercent).toBeGreaterThanOrEqual(0);
+      expect(disk.capacityPercent).toBeLessThanOrEqual(100);
+    }
+  });
+
+  it("fails worktree creation when required disk space exceeds available space", async () => {
+    const res = await createWorktree("disk-fail-test", "main", tempRepo, {
+      minDiskGb: 999999, // Impossibly large requirement
+    });
+    expect(res.status).toBe("error");
+    expect(res.error).toContain("Pre-flight disk check failed");
+  });
+
+  it("removes local target directory during worktree removal", async () => {
+    const res = await createWorktree("target-clean-test", "main", tempRepo);
+    expect(res.status).toBe("created");
+    const localTarget = join(res.path, "target");
+    mkdirSync(localTarget, { recursive: true });
+    writeFileSync(join(localTarget, "dummy.o"), "dummy");
+    expect(existsSync(localTarget)).toBe(true);
+
+    const rem = await removeWorktree("target-clean-test", { repoRoot: tempRepo });
+    expect(rem.status).toBe("removed");
+    expect(existsSync(res.path)).toBe(false);
+  });
+
+  it("executes hygiene and env commands successfully", async () => {
+    expect(await main(["hygiene"])).toBe(0);
+    expect(await main(["env", "2"])).toBe(0);
   });
 });

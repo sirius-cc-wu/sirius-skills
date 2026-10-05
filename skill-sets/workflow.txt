@@ -6,3 +6,4 @@ spec-qualification
 audit-vestigial-contracts
 audit-pr-scope
 tech-lead
+cargo-worktree-hygiene

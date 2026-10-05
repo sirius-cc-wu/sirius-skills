@@ -28,7 +28,7 @@ Autonomous agents frequently suffer from the "blind coder" anti-pattern: they ed
 
 ---
 
-## The 4-Step Harness Workflow
+## Workflow: The 4-Step Harness
 
 ```mermaid
 flowchart TD

@@ -120,7 +120,7 @@ describe("routing", () => {
     const report = evaluateRepository(REPO_ROOT);
 
     expect(report.errors).toEqual([]);
-    expect(report.skillCount).toBe(18);
+    expect(report.skillCount).toBe(22);
     expect(report.caseFiles).toBe(18);
     expect(report.routingChecks).toBe(103);
     expect(report.routingPassed).toBe(103);

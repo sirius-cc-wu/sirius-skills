@@ -19,3 +19,4 @@ tech-lead
 create-verification-harness
 prototype-spike
 visual-parity
+cargo-worktree-hygiene
