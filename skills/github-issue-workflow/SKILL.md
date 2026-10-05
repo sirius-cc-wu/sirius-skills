@@ -62,7 +62,7 @@ When reviewing or working an existing issue:
    - *Problem*: Needs observed and expected behavior with reproduction evidence.
    - *Capability*: Needs rules and concrete examples.
    - *Design decision*: Needs an Architecture Decision Record (ADR).
-   - *Delivery slice*: Needs linked specs/ADRs plus a task-board or Worker-handoff link.
+   - *Delivery slice*: Needs linked specs/ADRs plus a task-board or Builder-handoff link.
    - *Duplicate or superseded*: Link the authoritative record without silently merging scope.
 3. **Route through the Spec–Validate loop.** Use `interview-me` for unclear intent;
    `use-case-slicing` and `example-mapping` for requirements; `system-behavior`, domain,
@@ -71,10 +71,10 @@ When reviewing or working an existing issue:
    the issue body as the specification.
 
    For an EtherCAT hardware issue, require a reproduction strategy in the specification
-   or Worker handoff. Try the affected slave first; otherwise name the closest available
+   or Builder handoff. Try the affected slave first; otherwise name the closest available
    hardware and its fidelity gaps (identity/revision, ESI, PDO/CoE configuration,
    topology, master version, and AL state). If physical hardware is insufficient, the
-   Worker may propose a temporary, reversible code emulation at a controlled seam. It
+   Builder may propose a temporary, reversible code emulation at a controlled seam. It
    must state the emulated fault or behavior, activation boundary, fidelity limits, and
    removal/restore evidence. Mark each result as physical, compatible-hardware,
    emulated, or inferred; unavailable exact hardware alone is never a reproduction verdict.
@@ -95,7 +95,7 @@ When reviewing or working an existing issue:
 
 1. **Close on evidence.** Close or reopen only with explicit authorization. For
    closure, link resolution evidence, verify current traceability and acceptance
-   evidence, and resolve or explicitly waive open questions. A worker claim or
+   evidence, and resolve or explicitly waive open questions. A builder claim or
    merged PR alone is not closure evidence.
 
 ## Report
