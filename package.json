@@ -3,7 +3,8 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "test": "bun test tests"
+    "test": "bun test tests",
+    "okf": "bun scripts/okf.ts"
   },
   "devDependencies": {
     "@types/bun": "latest"

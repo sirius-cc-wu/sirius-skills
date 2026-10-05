@@ -82,7 +82,12 @@ Execution Report + Diff
 Verdicts are strictly binary: **`VERIFIED`** or **`UNVERIFIED`**.
 
 ### When `VERIFIED`
-All specification rules have authentic passing test evidence, ADR invariants are preserved, and anti-phantom call path checks pass. Mark task as complete and unblock downstream integration.
+All specification rules have authentic passing test evidence, ADR invariants are preserved, and anti-phantom call path checks pass.
+* **Action**:
+  1. Update specification frontmatter: set `status: implemented`, and record verification metadata `verified: { by: "human:<id>", at: "<ISO-8601>" }` or `{ by: "process:qualification", at: "<ISO-8601>" }`.
+  2. Author the durable qualification report in `docs/verification/qualification-<module-id>.md`.
+  3. Re-index stage directories using OKF utility (`bun scripts/okf.ts index docs`).
+  4. Unblock downstream integration or trigger pull request publication (`create-pr`).
 
 ### When `UNVERIFIED`
 Route findings deterministically to the responsible phase:
@@ -99,16 +104,22 @@ Route findings deterministically to the responsible phase:
 
 ## Qualification Report Template
 
-Save the qualification report in the target project's canonical verification directory (e.g. `docs/verification/qualification-<module-id>.md`):
+Save all qualification reports to `docs/verification/qualification-<module-id>.md` conforming to [OKF v0.2](https://github.com/GoogleCloudPlatform/knowledge-catalog/blob/main/okf/SPEC.md):
 
 ```markdown
 ---
-type: Qualification Report
-slice: "[spec path]"
-governing_adr: "[adr path]"
+type: "Qualification Report"
+title: "Qualification Report: [Slice / Module Name]"
+description: "Specification qualification audit for [Slice/Module Name] against [Spec ID] and [ADR-XXX]."
+status: "accepted" # accepted if VERIFIED, draft if UNVERIFIED
+date: "YYYY-MM-DD"
+requirements: "[path/to/docs/requirements/<module-id>.md]"
+contract: "[path/to/docs/contracts/<module-id>.md]"
+governing_adr: "[path/to/docs/decisions/adr-XXX-*.md]"
 implementation_revision: "[commit SHA]"
 verdict: "[VERIFIED | UNVERIFIED]"
-date: "YYYY-MM-DD"
+generated: { by: "agent/thinker", at: "YYYY-MM-DDTHH:MM:SSZ" }
+verified: { by: "human:sirius", at: "YYYY-MM-DDTHH:MM:SSZ" }
 ---
 
 # Qualification Report: [Slice Name]
