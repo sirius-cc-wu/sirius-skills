@@ -20,3 +20,5 @@ create-verification-harness
 prototype-spike
 visual-parity
 cargo-worktree-hygiene
+how
+why

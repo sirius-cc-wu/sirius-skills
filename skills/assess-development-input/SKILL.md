@@ -182,6 +182,9 @@ external prerequisite.
 | Prototyping | Novel UI layout, interaction feel, or stateful workflow needs throwaway interactive exploration | `prototype-spike` |
 | Verification | UI component refactoring or style migration requires frozen baseline and pixel-exact diff verification | `visual-parity` |
 | Fleet Coordination | Parallel Rust builders across worktrees need CPU concurrency budgeting and shared target cache hygiene | `cargo-worktree-hygiene` |
+| Exploration and Forensics | Subsystem architecture, runtime call-flow mapping, component boundaries, or onboarding mental models need explanation | `how` |
+| Exploration and Forensics | Historical motivation, commit archaeology, PR rationale, postmortems, or magic constants need evidence-cited discovery | `why` |
+
 | Integrate and ship | Prepared work needs standalone Git, branch, worktree, release, or version guidance | External `git-workflow-and-versioning` or repository-native Git workflow |
 | Integrate and ship | Committed work is ready for pull-request publication | `create-pr` |
 | Integrate and ship | A consequential architecture choice or durable engineering context needs documentation | External `documentation-and-adrs` or repository-native documentation |

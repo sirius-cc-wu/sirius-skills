@@ -60,7 +60,7 @@ flowchart TD
 | **PB-3: Scoped Fix** | Defect fix, compiler/linter error, performance tuning, or local refactor. | Worktree isolation → Builder Mode B (reproduce with failing test → fix → evidence report) | Repro test + Fix commit + Opened PR. |
 | **PB-4: Fleet Batch** | Queue of independent issues, bugs, or parallel feature slices. | `scripts/worktree.ts` → Parallel Builder Subagents → CI Monitoring | Fleet Delivery Board + Merge-ready PRs. |
 | **PB-5: Review Remediation** | Unresolved PR comments, Gate 2 review findings, or audit remediation. | `code-review-and-quality` / `review-pr` → Human Selection Gate → Builder Mode B | Remediation Disposition Report + Verified fix. |
-| **PB-6: Investigation Spike** | Ambiguous question, performance profile, domain discovery without code changes. | `interview-me` → `vision` → `walkthrough-me` | Evidence-based diagnostic report / Architecture note. |
+| **PB-6: Investigation Spike** | Ambiguous question, performance profile, runtime call flow, or historical code intent without code changes. | `how` (runtime flow) / `why` (intent archaeology) → `interview-me` → `vision` → `walkthrough-me` | Evidence-based diagnostic report / Architecture note / Constraint set. |
 | **PB-7: Prototype Spike** | Novel UI layout, interaction feel, or stateful workflow with no codebase precedent. | `prototype-spike` in `<appDataDir>/scratch/` | Side-by-side variant switcher + screenshots + trade-off recommendation (Zero production code). |
 | **PB-8: Visual Parity** | UI component refactoring, design token migration, or CSS framework replacement. | Builder Mode C in isolated worktree (`visual-parity` + Playwright) | Frozen baseline screenshots → component refactor → pixel diff = 0 report + Opened PR. |
 
@@ -164,13 +164,15 @@ flowchart TD
 ### Playbook 6: Investigation & Architectural Spike
 
 1. **Scope the Inquiry**:
-   - Define the question, hypothesis, or performance bottleneck to investigate.
+   - Define the question, hypothesis, performance bottleneck, or unknown boundary to investigate.
    - Constraint: **Zero production code modifications**.
-2. **Evidence Mining**:
-   - Inspect code, traces, logs, and commit history.
-   - Use `walkthrough-me` for guided code tours.
+2. **Select the Diagnostic Practice**:
+   - **Subsystem Runtime & Architecture Flow**: Use `how` to decompose into parallel exploration angles (Gemini Flash / Grok) and synthesize runtime flows and Mermaid sequence diagrams via Claude Opus 5.5.
+   - **Historical Intent & Design Archaeology**: Use `why` to trace code anchors (`git blame`, PRs, commits), search 7 evidence categories, calibrate claims across 5 epistemic confidence tiers (Direct, Supported, Inferred, Speculative, Unknown), and deliver a Preserve/Change/Avoid/Risk constraint set.
+   - **Interactive Code Tour**: Use `walkthrough-me` for paced, section-by-section diff walk.
 3. **Deliverable**:
-   - Provide cited, evidence-backed findings and recommendations. If an architectural decision emerges, recommend transitioning to **Playbook 1**.
+   - Provide cited, evidence-backed findings and recommendations. If an architectural decision or invariant boundary change emerges, recommend transitioning to **Playbook 1 (Architectural)**.
+
 
 ---
 
