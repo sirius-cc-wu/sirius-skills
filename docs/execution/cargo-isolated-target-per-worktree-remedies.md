@@ -1,6 +1,6 @@
 ---
 title: "Execution Plan: Review Remedies for Isolated Cargo Target per Worktree"
-status: "ready"
+status: "completed"
 date: "2026-10-12"
 ---
 
