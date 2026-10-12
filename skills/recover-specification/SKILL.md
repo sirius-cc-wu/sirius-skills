@@ -51,8 +51,9 @@ Do not use it for:
 - A named decision owner for behavior that the evidence does not decide.
 
 The implementation and its tests are evidence of what exists. They are not
-evidence of what is wanted. Only intent evidence or the decision owner can
-make a behavior required.
+evidence of what is wanted. A dependent caller is also part of the
+implementation: it shows the impact of a change, not intent. Only independent
+intent evidence or the decision owner can make a behavior required.
 
 ## Workflow
 
@@ -68,18 +69,23 @@ make a behavior required.
    not commit it as a specification.
 3. **Classify each behavior.** Use the evidence and the classification table
    in [classification.md](references/classification.md):
-   - **Intended**: intent evidence supports it. It becomes a rule.
+   - **Intended**: independent intent evidence supports it. It becomes a
+     rule.
    - **Accidental**: no intent evidence and no dependent caller. Omit it.
    - **Defect**: it breaks stated intent, a standard, or an invariant (for
-     example a crash, silent data loss, or a misrouted response). Write the
-     rule for the correct behavior, and record the gap.
-   - **Undecided**: the evidence does not decide it. It becomes a question for
-     the decision owner.
+     example a crash, silent data loss, or a misrouted response). Record the
+     gap. Write a rule for the remedy only when the cited intent, standard, or
+     invariant determines the remedy. Otherwise the remedy is undecided.
+   - **Undecided**: the evidence does not decide it, or only a dependent
+     caller supports it. It becomes a question for the decision owner.
 
-   Check every dependent caller before you omit or change a behavior. A caller
-   that relies on a behavior is intent evidence.
-4. **Get decisions.** Present each undecided item to the decision owner with
-   the options, the consequences, and a recommendation. Record each decision.
+   Check every dependent caller before you omit or change a behavior. A
+   dependent caller does not prove intent. Present it to the decision owner as
+   a consequence of each option.
+4. **Get decisions.** Present each undecided item, including each defect
+   remedy that the evidence does not determine, to the decision owner. Give
+   the options, the consequences (including dependent callers), and a
+   recommendation. Record each decision.
    Do not write a rule for an undecided item, and do not write the current
    behavior as a rule because it exists.
 5. **Write the normative artifacts.** Use the rule form in
@@ -111,7 +117,10 @@ These signs show that an artifact describes the implementation:
 - Lists of callers, call sites, task lifetimes, build switches, or internal
   type names that are not part of the contract surface.
 - A defect written as behavior ("a late response stops the process").
-- A rule whose only support is that the code does it.
+- A rule whose only support is that the code does it, or that a caller
+  depends on it.
+- A defect remedy that no cited intent, standard, invariant, or decision
+  determines.
 - An acceptance example that cannot fail, or that contradicts another rule.
 - A decision marked "proposed" in an artifact with status "accepted".
 - Implementation status inside a normative artifact instead of in the
@@ -145,9 +154,13 @@ These signs show that an artifact describes the implementation:
       rule is broken.
 - [ ] No rule contradicts another rule, a decision, or an invariant.
 - [ ] No Red Flag appears in a normative artifact.
-- [ ] Every rule traces to intent evidence or to a recorded decision.
+- [ ] Every rule traces to independent intent evidence or to a recorded
+      decision.
+- [ ] Every defect remedy traces to cited intent, a standard, an invariant,
+      or a recorded decision.
 - [ ] No undecided item became a rule.
 - [ ] Every conformance entry matches the code at the baseline and has a
       locator.
 - [ ] Every gap has a follow-up owner.
-- [ ] Every dependent caller of a changed or omitted behavior was checked.
+- [ ] Every dependent caller of a changed or omitted behavior was checked and
+      presented to the decision owner as a consequence.
