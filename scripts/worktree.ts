@@ -198,13 +198,9 @@ export function ensureCargoPoolConfig(repoRoot: string, worktreesDir: string): b
 
     const content = readFileSync(configPath, "utf-8");
     const rawLines = content.split("\n");
-    if (rawLines.length === 0) {
-      return false;
-    }
-
-    const firstLine = rawLines[0].endsWith("\r") ? rawLines[0].slice(0, -1) : rawLines[0];
+    const hasCr = rawLines[0].endsWith("\r");
+    const firstLine = hasCr ? rawLines[0].slice(0, -1) : rawLines[0];
     if (firstLine === legacyHeader) {
-      const hasCr = rawLines[0].endsWith("\r");
       const targetDirRegex = /^\s*(build\.)?target-dir\s*=/;
       const newLines: string[] = [hasCr ? `${r1Header}\r` : r1Header];
 
@@ -233,7 +229,7 @@ export async function getTargetSizeKb(targetPath: string): Promise<number | null
     const res = await Bun.$`du -sk ${targetPath}`.nothrow().quiet();
     if (res.exitCode !== 0) return null;
     const parts = res.text().trim().split(/\s+/);
-    if (parts.length === 0 || !parts[0]) return null;
+    if (!parts[0]) return null;
     const kb = parseInt(parts[0], 10);
     return Number.isFinite(kb) ? kb : null;
   } catch {
@@ -685,7 +681,7 @@ Options:
       if (!existsSync(targetPath)) {
         continue;
       }
-      const isMain = resolve(item.path) === resolvedRoot;
+      const isMain = item === items[0];
       const label = isMain
         ? "(main)"
         : item.branch && item.branch !== "(detached)"
@@ -730,7 +726,7 @@ Options:
     const jobs = Math.max(1, Math.floor(cpuCount / Math.max(1, activeBuilders)));
 
     console.log(`export CARGO_BUILD_JOBS=${jobs}`);
-    console.log(`unset CARGO_TARGET_DIR CARGO_BUILD_TARGET_DIR`);
+    console.log(`unset CARGO_TARGET_DIR CARGO_BUILD_TARGET_DIR CARGO_BUILD_BUILD_DIR`);
     return 0;
   }
 

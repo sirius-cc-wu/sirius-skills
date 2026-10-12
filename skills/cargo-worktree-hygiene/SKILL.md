@@ -37,7 +37,7 @@ flowchart TD
 
 ### 1. Pre-Flight Disk Guard
 Before spawning fleet builders or creating new worktrees, check filesystem headroom:
-- **CLI Inspection**: Run `bun scripts/worktree.ts hygiene` to see active worktrees, available disk space, and cargo pool configuration.
+- **CLI Inspection**: Run `bun scripts/worktree.ts hygiene` to inspect disk space, the worktree pool, Cargo target isolation, and target sizes.
 - **Critical Floor (5 GB)**: Never allow builders to proceed if available disk space is under 5 GB. `worktree create` will halt with an error unless overridden.
 - **Warning Margin (15 GB)**: If disk space is under 15 GB, trigger maintenance:
   - Sweep old build artifacts: `cargo sweep -t 3d` (or `cargo sweep -i` for installed binaries).
@@ -52,16 +52,16 @@ Every worktree must compile into its own isolated `target/` directory:
   [build]
   jobs = 4
   ```
-- **Stale Artifact Risk**: Cargo gives workspace crates the same artifact names across checkouts using paths relative to the workspace root. Cargo determines freshness of local crates by file modification time rather than content hashing. When one worktree builds at time T and another worktree has older sources, Cargo marks the second worktree as fresh and executes stale artifacts from the first. This causes false test failures and incorrect test counts.
+- **Stale Artifact Risk**: When worktrees share one target directory, Cargo gives workspace crates the same artifact names across checkouts using paths relative to the workspace root. Cargo determines freshness of local crates by file modification time rather than content hashing. When one worktree builds at time T and another worktree has older sources, Cargo marks the second worktree as fresh and executes stale artifacts from the first. This causes false test failures and incorrect test counts.
 - **Build Serialization**: Sharing a target directory also does not accelerate parallel builds because Cargo locks `target/<profile>/` for the full duration of a build, serializing concurrent builders.
 - **Dependency Caching**: For shared dependency caching across worktrees, use a content-hashed tool such as `sccache` (`RUSTC_WRAPPER=sccache`).
-- **Target Overrides**: Do not export `CARGO_TARGET_DIR` across checkouts, as an exported path persists across shell directory changes and forces checkouts to share build artifacts.
+- **Target Overrides**: Do not export `CARGO_TARGET_DIR` across checkouts, as an exported path persists across shell directory changes and forces checkouts to share build artifacts. Clear overrides with `unset CARGO_TARGET_DIR CARGO_BUILD_TARGET_DIR CARGO_BUILD_BUILD_DIR`.
 
 ### 3. Concurrency Throttling (`CARGO_BUILD_JOBS`)
 Calculate CPU core budgets before dispatching parallel builders:
 - **Formula**:
   $$\text{CARGO\_BUILD\_JOBS} = \max\left(1, \left\lfloor \frac{\text{nproc}}{\text{active\_builders}} \right\rfloor\right)$$
-- **Helper**: Use `bun scripts/worktree.ts env <active_builders>` to generate exact shell export commands. The command prints `export CARGO_BUILD_JOBS=<n>` and `unset CARGO_TARGET_DIR CARGO_BUILD_TARGET_DIR` to clear shared target overrides.
+- **Helper**: Use `bun scripts/worktree.ts env <active_builders>` to generate exact shell export commands. The command prints `export CARGO_BUILD_JOBS=<n>` and `unset CARGO_TARGET_DIR CARGO_BUILD_TARGET_DIR CARGO_BUILD_BUILD_DIR` to clear shared target overrides.
   - Example (8 physical cores, 2 active builders):
     `export CARGO_BUILD_JOBS=4`
   - Example (8 physical cores, 4 active builders):
