@@ -1,2 +1,3 @@
 select-technical-artifacts
 design-repository-artifact-layout
+recover-specification

@@ -1,0 +1,52 @@
+{
+  "skill_name": "recover-specification",
+  "trigger": {
+    "positive": [
+      {
+        "prompt": "Write the contract and ADR for this backend seam that was implemented last week, but make them prescribe the required behavior instead of describing the code.",
+        "top_k": 3
+      },
+      {
+        "prompt": "These design documents were written after the implementation and read like a code tour. Turn them into normative must-rules with acceptance examples and move the implementation gaps into a conformance record.",
+        "top_k": 3
+      },
+      {
+        "prompt": "Recover the requirements for this existing service from the code and history, and ask me about every behavior that the evidence does not decide.",
+        "top_k": 3
+      }
+    ],
+    "negative": [
+      {
+        "prompt": "Explain how the request flows through this subsystem at runtime and draw the sequence diagram.",
+        "owner": "how"
+      },
+      {
+        "prompt": "Find out why this retry loop was added and whether we can remove it.",
+        "owner": "why"
+      },
+      {
+        "prompt": "Qualify this implemented slice against its contract and issue a VERIFIED or UNVERIFIED verdict.",
+        "owner": "spec-qualification"
+      }
+    ]
+  },
+  "evals": [
+    {
+      "id": "prescribe-existing-seam",
+      "prompt": "Write the requirements and contract for the existing message-routing runtime. The code panics when a late response arrives after a timeout, and nobody decided what should happen to state that exists at startup.",
+      "expected_output": "Normative artifacts with must-rules and failing acceptance examples, a rule for the correct late-response behavior with a matching conformance gap, an open question for the startup state, and a separate conformance record.",
+      "expectations": [
+        "Writes rules with must or must not and an acceptance example for each rule",
+        "Writes the correct behavior for the late-response defect and records the panic as a conformance gap",
+        "Routes the undecided startup behavior to the decision owner as an open question",
+        "Keeps implementation status out of the normative artifacts"
+      ],
+      "prohibitions": [
+        "Do not write the current panic as required behavior",
+        "Do not decide the startup behavior without the decision owner",
+        "Do not change code"
+      ],
+      "trust_level": "provisional"
+    }
+  ]
+}

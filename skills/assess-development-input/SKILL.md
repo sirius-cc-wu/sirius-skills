@@ -46,6 +46,8 @@ Task arrives
 │  └─ external spec-driven-development
 ├─ Current behavior, architecture, deployment, or constraints lack evidence
 │  └─ responsible external current-system recovery process
+├─ Implemented behavior needs a specification that prescribes it
+│  └─ recover-specification
 ├─ Scope, actors, goals, scenarios, quality requirements, or constraints are unclear
 │  └─ Requirements Analysis
 ├─ Domain vocabulary, system events, or state effects are unclear
@@ -184,6 +186,7 @@ external prerequisite.
 | Fleet Coordination | Parallel Rust builders across worktrees need CPU concurrency budgeting and target isolation and disk hygiene | `cargo-worktree-hygiene` |
 | Exploration and Forensics | Subsystem architecture, runtime call-flow mapping, component boundaries, or onboarding mental models need explanation | `how` |
 | Exploration and Forensics | Historical motivation, commit archaeology, PR rationale, postmortems, or magic constants need evidence-cited discovery | `why` |
+| Exploration and Forensics | Implemented behavior needs requirements, contracts, or decision records that prescribe it, with intent decisions and a conformance record | `recover-specification` |
 
 | Integrate and ship | Prepared work needs standalone Git, branch, worktree, release, or version guidance | External `git-workflow-and-versioning` or repository-native Git workflow |
 | Integrate and ship | Committed work is ready for pull-request publication | `create-pr` |

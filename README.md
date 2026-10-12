@@ -38,7 +38,7 @@ Available profiles are defined in [`skill-sets/`](skill-sets/):
 | `workflow` | Interactive change walkthroughs and pull-request publication |
 | `iterative-design` | Entry routing, technical-artifact selection, software architecture design, architecture decision documentation, artifact layout design, question-driven iterations, support-envelope and boundary-sensitive refactoring gates, native responsibility and optional object design, language adaptation, tested implementation, and scoped commits |
 | `applying-uml-and-patterns` | Compatibility alias for `iterative-design` |
-| `reverse-engineering` | Compatibility profile for technical-artifact selection, artifact placement, and recorded-decision discovery; it does not perform system recovery |
+| `reverse-engineering` | Compatibility profile for technical-artifact selection, artifact placement, recorded-decision discovery, and prescriptive specifications for existing behavior; it does not perform system recovery |
 | `all` | Every active Sirius skill in the catalog, plus all pinned external add-ons |
 
 Remove the default or a named profile later:
@@ -250,9 +250,10 @@ and architecture, reconciliation records, and fixed-revision evidence remain
 valid. Use a responsible external process when current-system behavior or
 architecture needs new evidence. Use `assess-development-input` when material
 that depends on current-system claims needs a Sirius readiness decision. The
-`reverse-engineering` compatibility profile now installs only
+`reverse-engineering` compatibility profile installs
 `select-technical-artifacts` and `design-repository-artifact-layout` for
-artifact disposition and placement.
+artifact disposition and placement, and `recover-specification` for
+prescriptive specifications of existing behavior.
 
 Use `walkthrough-me` when a reader needs a paced, read-only tour of a pull
 request, commit, commit range, branch diff, or staged, unstaged, or selected
