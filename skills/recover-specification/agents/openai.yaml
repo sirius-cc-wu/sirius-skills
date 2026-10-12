@@ -1,0 +1,4 @@
+interface:
+  display_name: "Recover Specification"
+  short_description: "Write prescriptive specs for existing behavior"
+  default_prompt: "Use $recover-specification to write prescriptive requirements, contracts, and decision records for this existing behavior, with a separate conformance record and decisions for undecided points."

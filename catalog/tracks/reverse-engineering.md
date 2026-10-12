@@ -7,9 +7,11 @@ models, reconstructed architecture, reconciliation records, and fixed-revision
 evidence remain valid at their recorded revisions.
 
 The `reverse-engineering` installation name remains as a compatibility profile.
-It installs `select-technical-artifacts` and
-`design-repository-artifact-layout`. These skills can manage justified
-artifacts, but they do not recover current-system facts or recorded decisions.
+It installs `select-technical-artifacts`,
+`design-repository-artifact-layout`, and `recover-specification`. These skills
+can manage justified artifacts and write prescriptive specifications from
+validated evidence, but they do not recover current-system facts or recorded
+decisions.
 
 ## New Current-System Evidence
 
@@ -56,9 +58,19 @@ when a justified recovered artifact lacks a canonical home or when migration
 must preserve links, identifiers, indexes, and history. Placement authority does
 not authorize new recovery claims or content changes.
 
+Use
+[`recover-specification`](../../skills/recover-specification/SKILL.md)
+when existing behavior needs requirements, contracts, or decision records. It
+writes them as if they preceded the code: it classifies each observed behavior
+as intended, accidental, defect, or undecided, turns only approved intent into
+must-rules with acceptance examples, routes undecided behavior to the decision
+owner, and records implementation gaps in a separate conformance record. It
+consumes validated evidence. It does not recover current-system facts.
+
 ## Handoff Rule
 
-Feed only externally validated current-system knowledge into the
+Feed only externally validated current-system knowledge, or specifications
+that `recover-specification` produced from it, into the
 [iterative analysis and design track](iterative-analysis-design.md) or the
 [implementation and evolution track](implementation-evolution.md). Preserve the
 source baseline, evidence status, confidence, authority, uncertainty, and
