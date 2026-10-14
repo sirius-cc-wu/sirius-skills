@@ -1,0 +1,52 @@
+{
+  "skill_name": "doubt-driven-development",
+  "trigger": {
+    "positive": [
+      {
+        "prompt": "Subject this non-trivial security-sensitive auth migration plan to a fresh-context adversarial review to cross-examine every assumption and stress-test for hidden failure modes before proceeding.",
+        "top_k": 3
+      },
+      {
+        "prompt": "We are working in unfamiliar code where correctness matters more than speed and stakes are high. Run an adversarial review on this irreversible decision before a confident output stands.",
+        "top_k": 3
+      },
+      {
+        "prompt": "Stress-test our plan for hidden failure modes with a fresh-context adversarial review where every assumption is cross-examined before proceeding.",
+        "top_k": 3
+      }
+    ],
+    "negative": [
+      {
+        "prompt": "Qualify this implemented change, Builder Execution Report, and git diff against its governing behavioral specification and anti-phantom call paths to issue a binary Verified or Unverified verdict.",
+        "owner": "spec-qualification"
+      },
+      {
+        "prompt": "Explores the codebase to explain subsystem architecture, runtime flow, component boundaries, and onboarding mental models. Answers how does X work and which package owns this.",
+        "owner": "how"
+      },
+      {
+        "prompt": "Investigates historical intent, design rationale, regressions, and postmortems behind code across 5 epistemics confidence tiers. Queries git history, PRs, and issues to discover why code was built this way.",
+        "owner": "why"
+      }
+    ]
+  },
+  "evals": [
+    {
+      "id": "adversarial-gate-1-review",
+      "prompt": "Run a doubt-driven adversarial review on our recovered contract and 47-row conformance table before Gate 1 passes.",
+      "expected_output": "A fresh-context adversarial review invocation with ARTIFACT, CONTRACT, and a 47-row CHECKLIST, enforcing command-backed quotes/line citations and post-compaction re-read, followed by orchestrator verification of every citation and checklist item before reconciling findings.",
+      "expectations": [
+        "Passes ARTIFACT, CONTRACT, and CHECKLIST without passing the CLAIM",
+        "Includes mandatory Command-Backed Citations, Post-Compaction Re-Read, and Coverage Checklist rules in the reviewer prompt",
+        "Verifies every cited quote, line number, and checklist coverage claim against the source before merging or classifying findings",
+        "Treats any checklist item without command-backed evidence as unreviewed"
+      ],
+      "prohibitions": [
+        "Do not pass the CLAIM or prior reasoning to the fresh-context reviewer",
+        "Do not accept quotes or coverage claims without command-backed evidence",
+        "Do not let a reviewer edit target repository files"
+      ],
+      "trust_level": "provisional"
+    }
+  ]
+}

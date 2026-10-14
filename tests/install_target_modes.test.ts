@@ -17,7 +17,6 @@ const ADDY_SKILLS = new Set([
   "interview-me",
   "idea-refine",
   "spec-driven-development",
-  "doubt-driven-development",
   "test-driven-development",
   "browser-testing-with-devtools",
   "debugging-and-error-recovery",

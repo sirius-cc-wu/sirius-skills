@@ -116,14 +116,14 @@ describe("routing", () => {
     ).toBe(true);
   });
 
-  test("evaluator runs against real repository with 109/109 passing checks", () => {
+  test("evaluator runs against real repository with 115/115 passing checks", () => {
     const report = evaluateRepository(REPO_ROOT);
 
     expect(report.errors).toEqual([]);
-    expect(report.skillCount).toBe(25);
-    expect(report.caseFiles).toBe(19);
-    expect(report.routingChecks).toBe(109);
-    expect(report.routingPassed).toBe(109);
+    expect(report.skillCount).toBe(26);
+    expect(report.caseFiles).toBe(20);
+    expect(report.routingChecks).toBe(115);
+    expect(report.routingPassed).toBe(115);
     expect(report.rankOneRate).toBeGreaterThanOrEqual(0.95);
   });
 });

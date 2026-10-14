@@ -19,6 +19,13 @@ The evaluator operates as a **non-executing inspector**:
 - **Evidence-Based Inspection**: The evaluator audits the code diff and execution receipts (test logs, pass/fail counts, coverage evidence). It does not compile or run test runners directly.
 - **Dual Audit Pairing**: Run concurrently with `code-review-and-quality` so that contract qualification and code craftsmanship are evaluated together.
 
+### Command-Backed Reviewer Evidence & Coverage Checklists
+To prevent hallucinated quotes, wrong line numbers, or unbacked coverage claims (especially after long sessions or context compaction):
+1. **Command-Backed Citations**: Every reviewer must copy every quote and every line number directly from the output of a command (`grep -n`, `sed -n`) or line-numbered file view executed in the same run, naming the exact file and line number.
+2. **Post-Compaction Re-Read**: After a context compaction, or when resuming from a summary, a reviewer must run its inspection commands again before reporting any quote, line number, status, or structural reference (such as a rule ID `R1..Rn` or a conformance table row). It must never write its report without tool calls after a compaction.
+3. **Checklist-Backed Coverage Evidence**: Every count, breakdown, or coverage claim (e.g., "100% Example Mapping rule coverage" or "all N rows verified") must come from command output of the same run, and the report must list the files and commands inspected. The orchestrator must pass the list of specification rules (`R1, R2, ...`) or conformance rows as an explicit checklist, and the reviewer must answer each checklist item with the command it ran and the result.
+4. **Orchestrator Verification before Verdict**: Before issuing a canonical `VERIFIED` or `UNVERIFIED` verdict, the orchestrator must verify every cited quote, line number, status, structural reference, and coverage count against its source file (and tool trace where available). Any rule or scope without command-backed evidence must be treated as **unreviewed**, and the orchestrator must re-run the reviewer on that unreviewed scope before the gate can pass.
+
 ---
 
 ## Required Ingest Artifacts
@@ -57,22 +64,25 @@ Before qualifying a change, obtain and review:
 ## Workflow
 
 ```text
-Execution Report + Diff
+Execution Report + Diff + Rule Checklist (R1..Rn)
            │
            ▼
-[Step 1: Rule Traceability] ──────► Map every spec rule (R1, R2...) to tests
+[Step 1: Rule Traceability] ──────► Map every spec rule (R1, R2...) to tests with command + result
            │
            ▼
-[Step 2: Assertion Authenticity] ─► Verify tests prove real domain postconditions
+[Step 2: Assertion Authenticity] ─► Verify tests prove real domain postconditions (file:line citations)
            │
            ▼
-[Step 3: ADR Invariant Audit] ────► Verify declared architectural constraints
+[Step 3: ADR Invariant Audit] ────► Verify declared architectural constraints (file:line citations)
            │
            ▼
 [Step 4: Anti-Phantom Audit] ─────► Verify live production callers for all new code
            │
            ▼
-[Step 5: Verdict & Report] ───────► Issue VERIFIED or UNVERIFIED with report
+[Step 5: Citation & Coverage Check]► Orchestrator verifies all quotes, lines, and checklist items
+           │
+           ▼
+[Step 6: Verdict & Report] ───────► Issue VERIFIED or UNVERIFIED with report
 ```
 
 ---

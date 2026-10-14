@@ -50,7 +50,7 @@ flowchart TD
     Q["1. Assess Complexity (Simple vs Complex)"] -->|Simple (Single module / function)| Direct["Step 2b. Direct Explain Pass (Opus 5.5)"]
     Q -->|Complex (Subsystem / Cross-crate flow)| Parallel["Step 2a. Parallel Decompose (2–4 Angles)"]
     Parallel --> Exp["Spawn Parallel Explorers (Flash / Grok)"]
-    Exp --> Synth["Step 3. Synthesize & Diagram (Mermaid via Opus 5.5)"]
+    Exp --> Synth["Step 3. Synthesize and Diagram (Mermaid via Opus 5.5)"]
     Direct --> Present["Step 4. Present / Record Architecture Note"]
     Synth --> Present
 ```

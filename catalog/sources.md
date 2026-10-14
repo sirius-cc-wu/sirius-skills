@@ -18,6 +18,7 @@ may distill concepts from several sources.
 | Kunchenguid's [`vision`](https://github.com/kunchenguid/vision/tree/7a20c38181151ec67efdf8fa2cb03a60123a7b83) at revision `7a20c38181151ec67efdf8fa2cb03a60123a7b83` | `vision` | Evidence-backed vision drafting, explicit non-goals, accept-or-resist criteria, boundary-case stress tests, existing-vision delta mode, and authority approval; adapted without requiring an interactive review-board runtime |
 | Rust ownership conventions and accumulated Sirius Rust design practice | `software-design-language-adaptation`, `design-rust-lifecycles` | Native responsibility realization, ownership and capability transfer, consuming transitions, RAII and explicit shutdown, staged startup, rollback, async cancellation, supervision, vertical verification retention, and evidence-driven abstraction |
 | Sirius specification review practice, Craig Larman's operation contracts, and Gojko Adzic's *Specification by Example* | `recover-specification` | Normative contracts with pre- and postconditions, rules illustrated by concrete examples that can fail, separation of required behavior from observed implementation, and decision-owner approval of intent |
+| Addy Osmani's [`doubt-driven-development`](https://github.com/addyosmani/agent-skills/blob/5a1b82d6445d1e2f0abeea1072851419a50c0e5c/skills/doubt-driven-development/SKILL.md) at revision `5a1b82d` plus Sirius Gate 1 review practice | `doubt-driven-development`, `spec-qualification` | Fresh-context adversarial doubt cycles, command-backed line/quote citations, mandatory post-compaction re-read, checklist-backed coverage verification, and multi-reviewer panel reconciliation |
 
 The detailed concept-to-skill mapping is maintained in the
 [Skill Catalog](skills.md).
@@ -29,7 +30,7 @@ the Sirius active catalog:
 
 | Source | Pinned revision | Installed names | Installation surface |
 |---|---|---|---|
-| Addy Osmani's [`agent-skills`](https://github.com/addyosmani/agent-skills/tree/5a1b82d6445d1e2f0abeea1072851419a50c0e5c) | `5a1b82d6445d1e2f0abeea1072851419a50c0e5c` | `interview-me`, `idea-refine`, `spec-driven-development`, `doubt-driven-development`, `test-driven-development`, `browser-testing-with-devtools`, `debugging-and-error-recovery`, `code-review-and-quality`, `code-simplification`, `git-workflow-and-versioning`, `documentation-and-adrs` | `just install <target-project> all` or `just install-global all` only |
+| Addy Osmani's [`agent-skills`](https://github.com/addyosmani/agent-skills/tree/5a1b82d6445d1e2f0abeea1072851419a50c0e5c) | `5a1b82d6445d1e2f0abeea1072851419a50c0e5c` | `interview-me`, `idea-refine`, `spec-driven-development`, `test-driven-development`, `browser-testing-with-devtools`, `debugging-and-error-recovery`, `code-review-and-quality`, `code-simplification`, `git-workflow-and-versioning`, `documentation-and-adrs` | `just install <target-project> all` or `just install-global all` only |
 
 ## Proposed Sources
 

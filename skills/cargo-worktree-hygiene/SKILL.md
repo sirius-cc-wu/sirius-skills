@@ -32,7 +32,7 @@ flowchart TD
     B -- No --> C["Prune stale worktrees / cargo sweep"]
     B -- Yes --> D["Isolated target/ per worktree (pool config sets jobs only)"]
     D --> E["Throttled Concurrency (CARGO_BUILD_JOBS = nproc / builders)"]
-    E --> F["Post-PR Teardown (remove worktree & scrub residual target)"]
+    E --> F["Post-PR Teardown (remove worktree and scrub residual target)"]
 ```
 
 ### 1. Pre-Flight Disk Guard

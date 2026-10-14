@@ -56,8 +56,8 @@ This skill coordinates parallel source investigators with an authoritative epist
 
 ```mermaid
 flowchart TD
-    Q["1. Understand Target & Question"] --> Anchor["2. Establish Code Anchor (git blame, log, PRs)"]
-    Anchor --> Cat["3. Discover MCPs & Spawn Parallel Investigators"]
+    Q["1. Understand Target and Question"] --> Anchor["2. Establish Code Anchor (git blame, log, PRs)"]
+    Anchor --> Cat["3. Discover MCPs and Spawn Parallel Investigators"]
     Cat --> Inv1["Source Control (git / gh)"]
     Cat --> Inv2["Issues (GitHub / Jira / Linear)"]
     Cat --> Inv3["Docs (Notion / Confluence / Google Docs)"]
@@ -66,7 +66,7 @@ flowchart TD
     Inv2 --> Synth
     Inv3 --> Synth
     Inv4 --> Synth
-    Synth --> Deliver["5. Deliver Findings & Preserve/Change/Avoid/Risk Rules"]
+    Synth --> Deliver["5. Deliver Findings and Preserve/Change/Avoid/Risk Rules"]
 ```
 
 ### Step 1. Understand the Target and Question

@@ -73,7 +73,7 @@ replacing unrelated entries. Global uninstallation and retired-skill cleanup
 remove only links that still point to their expected canonical installation.
 
 `just install <target-project> all` also installs the pinned skills listed in
-[`catalog/external-skill-sets/`](catalog/external-skill-sets/): 11 add-ons from
+[`catalog/external-skill-sets/`](catalog/external-skill-sets/): 10 add-ons from
 Addy Osmani's `agent-skills`. They remain external to the Sirius catalog and
 are not installed by other profiles. The external install uses the target project's scope for
 `just install <target-project> all` and global scope for
@@ -236,8 +236,9 @@ needs coordinated analysis, design, verification, or iteration commits.
 Otherwise, implement the bounded behavior through the consuming repository's
 own workflow.
 
-With the `all` installation, use external `doubt-driven-development` to subject
-a non-trivial in-flight claim to fresh-context adversarial review. It can expose
+Use `doubt-driven-development` to subject
+a non-trivial in-flight claim to fresh-context adversarial review with
+command-backed citations and coverage checklists. It can expose
 unstated assumptions, hidden coupling, missing environment variation, or an
 incomplete contract before the claim stands. Treat those findings as a trigger
 to stop for evidence or authority when needed; the skill does not recover an
