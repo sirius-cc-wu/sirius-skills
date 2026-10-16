@@ -100,6 +100,7 @@ Reviewer Evidence & Coverage Rules (MANDATORY):
 1. Command-Backed Citations: Copy every quote and every line number directly from the output of a command (`grep -n`, `sed -n`) or line-numbered file view run in THIS run. Name the exact file and line number for every finding.
 2. Post-Compaction Re-Read: If your context is compacted or you resume from a summary, you MUST re-run your inspection commands before reporting any quote, line number, status, or structural reference (such as a rule ID or table row). Never write your report from memory or without tool calls after a compaction.
 3. Command-Backed Coverage & Checklists: Every count, breakdown, or coverage claim (e.g., "all N rows verified") must come from command output in this run, and your report must list the files and commands inspected. For every item in the CHECKLIST below, answer each item explicitly with the command you ran and the result.
+4. Class-Once Findings: For every defect you report, state the general invariant that the defect breaks, and list in that same finding every other sibling site in the reviewed artifacts where the same invariant is broken or must hold.
 
 Do NOT validate. Do NOT summarize. Find issues, or state
 explicitly that you cannot find any after thorough examination.
@@ -111,7 +112,7 @@ CHECKLIST (if reviewing a list of rules, conformance rows, or decisions): <paste
 
 **Pass ARTIFACT + CONTRACT (+ CHECKLIST when the scope is a list of rules, conformance rows, or decisions) only. Do NOT pass the CLAIM.** Handing the reviewer your conclusion biases it toward agreement. The reviewer must independently determine whether the artifact satisfies the contract.
 
-When the orchestrator configures a panel of multiple independent reviewers, run each reviewer in its own isolated subagent context so no reviewer sees another reviewer's findings from the same round. Reviewers must never edit files in the target repository; they emit findings only to their runner output or isolated scratch space.
+When the orchestrator configures a panel of multiple independent reviewers, run each reviewer in its own isolated subagent context so no reviewer sees another reviewer's findings from the same round. When the panel has two or more reviewers, the orchestrator may assign each reviewer a focused **review lane** (e.g., full adversarial logic/rules for one reviewer, and conformance/evidence feasibility for another) whose checklists together cover 100% of the round's scope. Reviewers must never edit files in the target repository; they emit findings only to their runner output or isolated scratch space.
 
 In Claude Code, the role-based reviewers in `agents/` start with isolated context by design and are usable here — see `agents/` for the roster and per-domain match.
 
@@ -179,13 +180,18 @@ The reviewer's output is data, not verdict. **You are still the orchestrator.** 
 
 Before merging or classifying any finding:
 1. **Verify Reviewer Evidence**: Check every cited quote, line number, status, and structural reference (such as a rule ID or table row) against its source file. Do not let a finding with unverified evidence enter the merged list until you have verified the finding directly against the source.
-2. **Verify Coverage Evidence**: Check every count, breakdown, and checklist answer against the source and (where available) the reviewer's tool trace. Treat any checklist item or scope without command-backed evidence as **unreviewed**: re-run the reviewer on that unreviewed scope (or ask the operator) before allowing the gate to pass.
-3. **Merge Multi-Reviewer Panels**: When multiple reviewers run in a round, merge their verified findings into one list that preserves each finding's ID and reviewer attribution and marks findings reported by more than one reviewer. Never pass the gate if any configured reviewer failed to deliver a report or left part of its scope unreviewed.
+2. **Verify Coverage Evidence**: Check every count, breakdown, and checklist answer against the source and (where available) the reviewer's tool trace. Treat any checklist item or scope without command-backed evidence as **unreviewed**: re-run the reviewer on that unreviewed scope **at most once**, and then ask the operator if any scope remains unreviewed. Never pass the gate while any scope is unreviewed.
+3. **Merge Multi-Reviewer Panels**: When multiple reviewers run in a round, merge their verified findings into one list that preserves each finding's ID and reviewer attribution and marks findings reported by more than one reviewer. If a reviewer delivers no report, re-run it **at most once**, and then ask the operator; never pass the gate on fewer reports than configured reviewers.
 
 For each verified finding, classify in this **precedence order** (first matching class wins):
 
 1. **Contract misread** — reviewer flagged something specifically because the CONTRACT you provided was unclear or incomplete. Fix the contract first, re-classify on the next cycle.
-2. **Valid + actionable** — real issue requiring a change to the artifact. Change it, re-loop.
+2. **Valid + actionable** — real issue requiring a change to the artifact. Apply an **invariant-complete fix**:
+   - Fix every site listed in the finding **and** sweep the entire artifact set for any other sibling site where the same invariant must hold, recording the sweep (each gap and its fix) in scratch space.
+   - **Self-trace** every changed rule, example, or task against all other rules, decisions, and tasks so the fix does not introduce a contradiction or regression.
+   - **Classify re-review scope**:
+     - Changes to a rule, decision, invariant, or conformance entry require a targeted re-review of the changed scope by every configured reviewer.
+     - Changes only to the clauses/setup of an acceptance example or the text of a Stage 4 task (with no rule change) may pass without another reviewer round when the operator approves the fix.
 3. **Valid trade-off** — issue is real but cost of fixing exceeds cost of accepting. Document the trade-off explicitly so the user sees it.
 4. **Noise** — reviewer flagged something that's actually correct under context the reviewer didn't have. Note it, move on, and ask: would adding that context to the contract have prevented the false flag?
 
@@ -195,11 +201,19 @@ A fresh reviewer can be wrong because it lacks context. Don't defer just because
 
 Stop when:
 
-- Next iteration returns only trivial or already-considered findings, **or**
-- 3 cycles completed (escalate to user, don't grind a fourth alone), **or**
+- Next iteration returns only trivial or already-considered findings (or no findings requiring a change — converged), **or**
+- `review.max_rounds` rounds that required a change completed (default 3): record `converged: false`, the rounds run, and the open findings in scratch space, and escalate to the operator, **or**
+- A finding repeats the same causal theme as a finding fixed in an earlier round (**same-theme escalation**), **or**
 - User explicitly says "ship it"
 
-If after 3 cycles the reviewer still surfaces substantive issues, the artifact may not be ready. Surface this to the user — three unresolved cycles is information about the artifact, not a reason to keep looping.
+When escalating to the operator (either because `review.max_rounds` was reached or because a finding repeats a previously fixed theme), present a single message with these **five elements**:
+1. The original requirement or accepted criterion;
+2. The change that the finding asks for, and whether it adds to the accepted contract;
+3. The smallest change that meets the accepted contract without that addition;
+4. The consequences of accepting and of declining the change;
+5. A recommendation, with the reason.
+
+If after `review.max_rounds` cycles (default 3) the reviewer still surfaces substantive issues, the artifact may not be ready. Surface this to the user — three unresolved cycles is information about the artifact, not a reason to keep looping.
 
 If 3 cycles is "obviously insufficient" because the artifact is large: the artifact is too big — return to Step 2 and decompose. Do not lift the bound.
 
@@ -224,7 +238,9 @@ If 3 cycles is "obviously insufficient" because the artifact is large: the artif
 - Accepting a reviewer's quote, line number, rule ID, or table row without verifying it against the source file (especially after context compaction)
 - Accepting a reviewer's coverage claim (e.g., "all 47 rows verified") when checklist items lack command-backed evidence or the breakdown counts do not match the source
 - Writing a review report from memory after context compaction without re-running inspection commands
-- Looping >3 cycles without escalating to the user
+- Patching only the single cited site of a finding without sweeping the artifact set for sibling sites or self-tracing the edit against other rules
+- Looping beyond `review.max_rounds` (default 3) or starting another fix round on a repeated causal theme without escalating to the user with the 5-element format
+- Retrying a reviewer that delivered no report or incomplete coverage more than once without asking the operator
 - Prompting the reviewer with "is this good?" instead of "find issues"
 - Skipping doubt under time pressure on a high-stakes decision
 - Re-spawning fresh-context on an unchanged artifact (you'll get the same findings; you're stalling)
@@ -251,11 +267,12 @@ After applying doubt-driven development:
 - [ ] Every non-trivial decision (per the definition above) was named explicitly as a CLAIM before standing
 - [ ] At least one fresh-context review per non-trivial artifact (a failing reproduction test satisfies this for behavioral claims, per Interaction with Other Skills)
 - [ ] The reviewer received ARTIFACT + CONTRACT (+ CHECKLIST when reviewing a list) — NOT the CLAIM, NOT your reasoning
-- [ ] The reviewer's prompt was adversarial ("find issues"), not validating ("is it good"), and included the Command-Backed Citations, Post-Compaction Re-Read, and Coverage Checklist rules
+- [ ] The reviewer's prompt was adversarial ("find issues"), not validating ("is it good"), and included the Command-Backed Citations, Post-Compaction Re-Read, Coverage Checklist, and Class-Once Findings rules
 - [ ] Every cited quote, line number, status, structural reference, and coverage count in the reviewer's report was verified against the source before merging/classifying findings
-- [ ] Any unreviewed checklist item or scope lacking command-backed evidence was re-run before passing the gate
+- [ ] Any missing report or unreviewed checklist item/scope was re-run at most once before escalating to the operator
+- [ ] Every actionable finding was fixed across all sibling sites (with class sweep recorded in scratch) and self-traced against other rules/decisions/tasks
 - [ ] Findings were classified against the artifact text (not rubber-stamped) using the precedence: contract misread / actionable / trade-off / noise
-- [ ] A stop condition was met (trivial findings, 3 cycles, or user override)
+- [ ] A stop condition was met (converged, example/task-only fix approved by operator, `review.max_rounds` reached, same-theme escalation, or user override)
 - [ ] In interactive mode, cross-model was **explicitly offered** to the user (regardless of artifact stakes) and the response was acknowledged in the output
 - [ ] In non-interactive mode, cross-model was skipped and the skip was announced
 - [ ] Any external CLI invocation was preceded by a PATH check, a working-binary test, syntax confirmation with the user, and explicit authorization to run
