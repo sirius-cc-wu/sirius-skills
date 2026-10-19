@@ -1,0 +1,52 @@
+{
+  "skill_name": "design-smell",
+  "trigger": {
+    "positive": [
+      {
+        "prompt": "Audit this subsystem across crates for cyclic dependencies, leaky encapsulation, and God modules before we begin refactoring.",
+        "top_k": 3
+      },
+      {
+        "prompt": "Analyze the structural design smells in this multi-module PR and identify architectural pressures across abstraction, encapsulation, and modularization.",
+        "top_k": 3
+      },
+      {
+        "prompt": "Diagnose architectural debt and broken modularization in src/domain where Shotgun Surgery is occurring across multiple directories.",
+        "top_k": 3
+      }
+    ],
+    "negative": [
+      {
+        "prompt": "Move this cohesive calculation to the existing domain module behind green tests to preserve current behavior.",
+        "owner": "behavior-preserving-refactoring"
+      },
+      {
+        "prompt": "Author an Architecture Decision Record (ADR) capturing our accepted persistence model upfront.",
+        "owner": "architecture-decision-records"
+      },
+      {
+        "prompt": "Audit this pull request to check whether the diff signal-to-noise ratio matches the motivating issue.",
+        "owner": "audit-pr-scope"
+      }
+    ]
+  },
+  "evals": [
+    {
+      "id": "diagnose-subsystem-architectural-smells",
+      "prompt": "Perform an architectural design smell audit on the storage and engine modules. Identify any cyclic dependencies, leaky encapsulation, or multifaceted abstractions, and prescribe canonical architectural remedies without modifying code.",
+      "expected_output": "A structured Design Smell Diagnostic categorizing symptoms under Abstraction, Encapsulation, Modularization, or Hierarchy, citing structural evidence, and prescribing concrete architectural remedies.",
+      "expectations": [
+        "Identifies and categorizes smells under the four canonical design smell pillars",
+        "Cites concrete structural evidence such as module import cycles, file sizes, or public exposure of internals",
+        "Pairs each smell with an actionable architectural remedy (e.g., Dependency Inversion, Encapsulate Boundary)",
+        "Separates macro design smells from routine micro-level syntax cleanup"
+      ],
+      "prohibitions": [
+        "Do not modify production code or tests directly",
+        "Do not reduce the audit to localized variable naming or formatting nits",
+        "Do not recommend speculative abstraction hierarchies without demonstrated variance"
+      ],
+      "trust_level": "provisional"
+    }
+  ]
+}

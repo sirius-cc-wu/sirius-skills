@@ -24,3 +24,5 @@ how
 why
 recover-specification
 doubt-driven-development
+design-smell
+code-smell

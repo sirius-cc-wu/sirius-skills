@@ -1,0 +1,52 @@
+{
+  "skill_name": "code-smell",
+  "trigger": {
+    "positive": [
+      {
+        "prompt": "Audit this 80-line function for code smells, primitive obsession, long parameter lists, and nested conditionals before refactoring.",
+        "top_k": 3
+      },
+      {
+        "prompt": "Identify code-level smells like feature envy, data clumps, and arrow anti-patterns in this class and formulate Fowler refactorings.",
+        "top_k": 3
+      },
+      {
+        "prompt": "Conduct a code smell census on this PR diff to detect dead code, temporary fields, and switch statement obsession.",
+        "top_k": 3
+      }
+    ],
+    "negative": [
+      {
+        "prompt": "Audit the whole subsystem for cyclic package dependencies, God modules, and leaky encapsulation across crate boundaries.",
+        "owner": "design-smell"
+      },
+      {
+        "prompt": "Behind current passing tests, move this cohesive calculation to its owning module to preserve observable behavior.",
+        "owner": "behavior-preserving-refactoring"
+      },
+      {
+        "prompt": "Translate these business validation rules into Rust phantom types and compile-time typestates.",
+        "owner": "type-anchored-spec"
+      }
+    ]
+  },
+  "evals": [
+    {
+      "id": "diagnose-function-code-smells",
+      "prompt": "Audit the processOrder method in OrderService for code smells. Identify any primitive obsession, deep nesting, or long parameter lists, and formulate canonical Fowler refactorings without modifying code.",
+      "expected_output": "A structured Code Smell Census categorizing implementation smells, citing exact line numbers, and prescribing specific Fowler refactorings (e.g., Extract Function, Introduce Parameter Object).",
+      "expectations": [
+        "Identifies code-level smells under canonical categories (Bloaters, Couplers, Control-Flow, Dispensables)",
+        "Cites concrete line ranges and code symptoms",
+        "Pairs each smell with a recognized Fowler refactoring technique",
+        "Distinguishes local code smells from broader architectural or boundary issues"
+      ],
+      "prohibitions": [
+        "Do not modify production code or tests directly",
+        "Do not propose sweeping architectural redesigns for local function issues",
+        "Do not reduce the output to cosmetic formatting or linting nits"
+      ],
+      "trust_level": "provisional"
+    }
+  ]
+}

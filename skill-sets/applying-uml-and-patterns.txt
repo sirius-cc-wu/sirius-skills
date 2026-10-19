@@ -8,3 +8,5 @@ design-rust-lifecycles
 behavior-preserving-refactoring
 architecture-decision-records
 type-anchored-spec
+design-smell
+code-smell
