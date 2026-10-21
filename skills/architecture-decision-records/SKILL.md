@@ -17,7 +17,17 @@ In `thinker`, ADRs are **decision-making instruments authored upfront** by the `
 
 > [!IMPORTANT]
 > **An ADR records solely the accepted final decision and its direct rationale.**
-> It does **NOT** contain debate journals, meeting minutes, pros/cons comparison tables, or rejected alternatives matrices.
+> It does **NOT** contain debate journals, meeting minutes, pros/cons comparison tables, rejected alternatives matrices, or visual diagrams.
+
+### Pure Text Policy: Zero Mermaid or Visual Topologies
+An ADR is an immutable legal statute, not a visual blueprint:
+* **ADRs are pure declarative text**: State the context, decisions (`D1..Dn`), consequences, and binding invariants (`I1..In`).
+* **Zero Mermaid or wiring diagrams**: Visual component topologies, box-and-wire flowcharts, and composition matrices belong exclusively in the living architecture document (`docs/architecture/<subsystem>.md`), never in the ADR.
+
+### One-Way Dependency Invariant (ADR ──► Architecture)
+The relationship between ADRs and Architecture documents is strictly one-way:
+* The ADR references the living architecture blueprint that realizes the decision (`Blueprint: docs/architecture/<subsystem>.md`).
+* **The Architecture document must NEVER back-reference ADR numbers or decision IDs.** Architecture documents are living, mutable system models; forcing them to reference historical ADR numbers couples the current system state to an append-only decision ledger and causes architectural rot when ADRs are superseded.
 
 ### Where Do Alternatives and Debates Belong?
 * **Technical Design Specifications (`*-technical-design.md`)**: Explore competing options, trade-off matrices, and deep implementation mechanics.
@@ -114,6 +124,7 @@ Detail the concrete results of this decision:
 
 ## Trace
 
+- Blueprint: [`docs/architecture/<subsystem>.md`](../architecture/subsystem.md)
 - Use case: [`UC-XX`](../features/path/use-cases.md)
 - Requirements: [`FEAT-XX-REQ`](../features/path/feature-requirements.md)
 - Technical design: [`docs/features/path/feature-technical-design.md`](../features/path/feature-technical-design.md)
@@ -125,6 +136,8 @@ Detail the concrete results of this decision:
 
 | Anti-Pattern | Why It Dilutes the Contract | Correct Discipline |
 | :--- | :--- | :--- |
+| **Visual Diagrams & Topologies** | Embedding Mermaid flowcharts, box-and-wire topologies, or composition roots in the ADR. | Keep the ADR purely declarative text. Put structural blueprints and diagrams in `docs/architecture/<subsystem>.md`. |
+| **Bidirectional Coupling** | Expecting the living architecture document to cite ADR numbers. | The ADR links outward to the architecture blueprint (ADR $\to$ Architecture). The living architecture document must never back-reference ADR numbers. |
 | **Alternatives Matrices** | Including full pros/cons tables of rejected tools (e.g., MongoDB vs PostgreSQL). | Keep the ADR focused purely on the selected architecture. Move comparisons to the Technical Design. |
 | **Chronological Journaling** | "On Monday we thought X, then the team lead suggested Y, so on Tuesday we agreed on Z." | Delete the journal. State only the current authoritative decision. Provenance belongs in git commit logs. |
 | **Zombie Comparisons** | Contrasting every single sentence against legacy behavior. | Describe the target state directly as positive invariant behavior. |
@@ -137,8 +150,10 @@ Detail the concrete results of this decision:
 
 Before committing any ADR, verify against this checklist:
 - [ ] **Solely Final Decision**: Does the ADR omit debate history, pros/cons tables, and rejected options?
+- [ ] **Pure Text Policy**: Does the ADR omit Mermaid diagrams, visual topologies, and composition tables?
+- [ ] **One-Way Reference**: Does the ADR point to the architecture blueprint without requiring the architecture document to back-reference ADR IDs?
 - [ ] **Upfront Timing**: Is the ADR being authored *before* implementation code is written?
 - [ ] **OKF v0.2 Frontmatter**: Does the ADR include required frontmatter (`type`, `title`, `description`, `status`, `generated`, `verified`)?
 - [ ] **Active Voice**: Are decisions expressed as direct, positive system behaviors?
 - [ ] **Numbering**: Is the sequential ID correct and non-colliding?
-- [ ] **Traceability**: Are bidirectional links to Use Cases, Requirements, and Technical Design included?
+- [ ] **Traceability**: Are links to Architecture Blueprint, Use Cases, Requirements, and Technical Design included?

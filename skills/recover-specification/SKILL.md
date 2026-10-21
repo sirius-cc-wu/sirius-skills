@@ -88,12 +88,14 @@ intent evidence or the decision owner can make a behavior required.
    recommendation. Record each decision.
    Do not write a rule for an undecided item, and do not write the current
    behavior as a rule because it exists.
-5. **Write the normative artifacts.** Use the rule form in
-   [templates.md](references/templates.md):
+5. **Write the normative artifacts.** Author artifacts in this exact sequence:
+   **Decision records (`docs/decisions/`)** ──► **Behavioral contracts (`docs/contracts/`)** ──► **Integration architecture (`docs/architecture/`)**.
+   Use the rule form in [templates.md](references/templates.md):
    - Write each rule as "must" or "must not".
    - Give each rule at least one acceptance example that fails when the rule
      is broken.
-   - Write decisions as binding. Do not split them into current and target.
+   - Write decisions as binding in `docs/decisions/`. Do not split them into current and target.
+   - Define architectural blueprints in `docs/architecture/` with topologies, composition roots, and native architecture rules (`A1`, `A2`...). **The architecture document must not back-reference ADR numbers or decision IDs in its responsibilities table or text.**
    - Define each term on first use.
    - Name only the elements that are part of the contract surface. Do not
      list callers, internal types, tasks, or build switches.
@@ -125,6 +127,7 @@ These signs show that an artifact describes the implementation:
 - A decision marked "proposed" in an artifact with status "accepted".
 - Implementation status inside a normative artifact instead of in the
   conformance record.
+- An architecture document citing ADR IDs or decision numbers in its responsibilities table or text, turning the living blueprint into an index of historical decision tickets.
 
 ## Output
 

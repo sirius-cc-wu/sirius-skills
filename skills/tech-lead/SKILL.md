@@ -82,7 +82,8 @@ flowchart TD
    - Model aggregates and Ubiquitous Language with `model-discovery`.
 4. **Architecture & Upfront ADR**:
    - Analyze layering and structural dependencies with `architecture`.
-   - Author binding ADR in `docs/decisions/adr-XXX-<slug>.md` capturing invariants upfront with `architecture-decision-records`.
+   - Author binding ADR in `docs/decisions/adr-XXX-<slug>.md` capturing accepted policy and invariants upfront with `architecture-decision-records`. ADRs are pure declarative text (zero Mermaid diagrams).
+   - Author living integration architecture blueprint in `docs/architecture/<subsystem>.md` capturing visual topologies, composition roots, and native architecture rules (`A1..An`). Ensure the architecture document has zero ADR back-references.
 5. **Gate 1: Adversarial Doubt Review**:
    - Execute fresh-context adversarial review using `doubt-driven-development` to audit unstated assumptions, edge cases, and backward compatibility.
 6. **Builder Dispatch**:
