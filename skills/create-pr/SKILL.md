@@ -98,6 +98,30 @@ When no repository rule requires an ID, use a logical scope from the branch or c
 
    Return the PR URL plus base branch, included commits, validation, and draft/ready status.
 
+---
+
+## Stacked Pull Requests Protocol (Multi-PR Slices)
+
+When an architectural change or large feature is broken down into stacked vertical slices (per `audit-pr-scope`), pull requests **MUST be created in strict bottom-up dependency order**:
+
+### 1. Mandatory Root-to-Leaf (Bottom-Up) Publication Order
+- Identify the linear dependency chain:
+  $$S_1 (\text{Root / Specs}) \longrightarrow S_2 (\text{Foundation / Core}) \longrightarrow \dots \longrightarrow S_n (\text{Tip / Integration})$$
+- **Always open PR 1 ($S_1$) FIRST**, targeting the default branch (e.g., `main`).
+- **Open PR 2 ($S_2$) SECOND**, targeting the branch of PR 1 ($S_1$).
+- **Open PR $n$ ($S_n$) LAST**, targeting the branch of PR $n-1$ ($S_{n-1}$).
+- **CRITICAL ANTI-PATTERN**: NEVER publish the terminal slice ($S_n$) first and subsequently backfill intermediate slices. Backfilling causes divergent commit histories, broken merge bases, and artificial three-way git conflicts on GitHub.
+
+### 2. Strict Linear Branch Genealogy
+- Branch $S_1$ is branched from `main`.
+- Branch $S_2$ MUST be branched directly off the commit tip of Branch $S_1$ (`git checkout -b branch-s2 branch-s1`).
+- Branch $S_3$ MUST be branched directly off the commit tip of Branch $S_2$ (`git checkout -b branch-s3 branch-s2`).
+- Each branch's `merge-base` against its base PR branch will match the tip of the base branch, guaranteeing **zero merge conflicts** across the entire stack.
+
+### 3. Stack Navigation & Roadmap
+- Every PR description in the stack MUST include a roadmap linking to all PRs in the stack with their merge targets and status.
+- When an upstream PR is merged into `main`, GitHub automatically retargets the next downstream PR to `main`.
+
 ## Validation
 
 When no project-specific format is defined, the title should generally match `^[^:]+: [A-Z].+[^.]$`.

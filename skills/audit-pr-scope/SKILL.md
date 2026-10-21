@@ -70,6 +70,7 @@ When a PR is oversized or entangled, decompose it into cleanly separated vertica
 - **Slice A (Minimal Viable Solution):** The narrowest, lowest-risk change that directly answers the motivating problem. Keeps writers off critical/real-time paths and strips formatting churn.
 - **Slice B (Decoupled / Hardened Telemetry):** Advanced cyclic monitoring, hardware telemetry, or complex UI, isolated via lock-free buffers (e.g., SPSC queues) and decoupled from the core fix.
 - Provide a Mermaid flowchart illustrating the decoupled architecture.
+- **Ordered Stacked PR Publication**: When preparing PRs for vertical slices, follow the Stacked Pull Requests Protocol in `create-pr` (publish bottom-up from root to leaf to maintain linear branch genealogy and prevent merge conflicts).
 
 ### 5. Report findings
 
