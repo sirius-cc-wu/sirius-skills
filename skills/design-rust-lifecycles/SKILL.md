@@ -78,7 +78,7 @@ than implementation details.
 Before creating a file, apply
 [Artifact Selection Budget](../select-technical-artifacts/references/artifact-selection-budget.md).
 Prefer refining an existing implementation-facing design or detailed design artifact
-(`detailed-design.md` beside `architecture.md` under `## Resource & Memory Lifecycle`)
+(`docs/architecture/<subsystem>.md` or `<subsystem>-detailed-design.md` under `## Resource & Memory Lifecycle`)
 when it owns the same lifecycle. Otherwise, copy and tailor
 [Rust Lifecycle Design Template](assets/rust-lifecycle-design.md).
 
