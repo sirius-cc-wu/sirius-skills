@@ -89,13 +89,16 @@ intent evidence or the decision owner can make a behavior required.
    Do not write a rule for an undecided item, and do not write the current
    behavior as a rule because it exists.
 5. **Write the normative artifacts.** Author artifacts in this exact sequence:
-   **Decision records (`docs/decisions/`)** ──► **Behavioral contracts (`docs/contracts/`)** ──► **Integration architecture (`docs/architecture/`)**.
+   **Decision records (`docs/decisions/`)** ──► **Behavioral contracts (`docs/contracts/` if external) or Integration architecture (`docs/architecture/` if internal seam)**.
    Use the rule form in [templates.md](references/templates.md):
    - Write each rule as "must" or "must not".
    - Give each rule at least one acceptance example that fails when the rule
      is broken.
    - Write decisions as binding in `docs/decisions/`. Do not split them into current and target.
-   - Define architectural blueprints in `docs/architecture/` with topologies, composition roots, and native architecture rules (`A1`, `A2`...). **The architecture document must not back-reference ADR numbers or decision IDs in its responsibilities table or text.**
+   - **External vs. Internal Boundary Separation**:
+     - If recovering **external system behavior** (what outside actors or DoIP clients experience): write `docs/contracts/<module-id>.md` with black-box SSDs and system operation contracts.
+     - If recovering an **internal refactoring seam or subsystem port** (e.g. trait seams, adapter parity, internal IPC): write `docs/architecture/<subsystem>.md` with topologies, composition roots, and native architecture rules (`A1`, `A2`...). Do not place internal port seams in `docs/contracts/`.
+     - The architecture document must not back-reference ADR numbers or decision IDs in its responsibilities table or text.
    - Define each term on first use.
    - Name only the elements that are part of the contract surface. Do not
      list callers, internal types, tasks, or build switches.
@@ -128,6 +131,7 @@ These signs show that an artifact describes the implementation:
 - Implementation status inside a normative artifact instead of in the
   conformance record.
 - An architecture document citing ADR IDs or decision numbers in its responsibilities table or text, turning the living blueprint into an index of historical decision tickets.
+- An internal port seam, trait interface, or refactoring boundary placed in `docs/contracts/` instead of `docs/architecture/`, breaking the black-box system boundary.
 
 ## Output
 

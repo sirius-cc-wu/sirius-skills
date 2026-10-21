@@ -18,6 +18,10 @@ description: "Lead Playbook Coordinator. Routes engineering goals through struct
 5. **Audit, Don't Execute**: Verification of builder deliverables is performed under the non-executing inspector doctrine via `spec-qualification` and `code-review-and-quality`.
 6. **Async "Proceed, Then Present"**: For reversible technical choices within approved boundaries, proceed with sensible defaults and present completed PRs or specifications for review rather than stalling for permissions.
 7. **Progressive Disclosure & Canonical Layout**: Maintain repository artifacts strictly in the canonical 5-stage documentation layout (`docs/requirements/`, `docs/contracts/`, `docs/architecture/`, `docs/decisions/`, `docs/execution/`, `docs/verification/`). Consult directory `index.md` catalogs first rather than ingesting entire directory trees.
+8. **Strict Separation of External Contracts vs. Internal Seams**:
+   - `docs/contracts/` (Stage 2) is strictly reserved for the **External System Boundary** (black-box SSDs, external DoIP/CAN/REST protocols facing outside actors). Zero internal traits or internal seams belong here.
+   - `docs/architecture/` (Stage 3) owns the **Internal System Design**: component topologies, composition roots, native architecture rules (`A1..An`), and **Internal Port Seams** (trait specifications, adapter contracts, and internal seam acceptance rules).
+   - `docs/decisions/` (Stage 3) contains text-only upfront ADRs that explain *why* choices and invariants were enacted.
 
 ---
 
@@ -78,12 +82,13 @@ flowchart TD
    - Surface concrete business rules (`R1`, `R2`, `R3`...) using `example-mapping`.
    - **MANDATORY HUMAN SIGN-OFF**: Present journey flow and rules table to the operator. Obtain explicit approval before proceeding.
 3. **System & Domain Analysis**:
-   - Derive black-box System Sequence Diagrams (SSDs) and operation contracts with `system-behavior`.
+   - If the capability alters an external system boundary (what external actors/testers experience): derive black-box System Sequence Diagrams (SSDs) and system operation contracts in `docs/contracts/` using `system-behavior`.
+   - If the task is an internal refactoring or seam extraction with zero external behavior change: skip `docs/contracts/` and specify internal port seams directly in `docs/architecture/`.
    - Model aggregates and Ubiquitous Language with `model-discovery`.
 4. **Architecture & Upfront ADR**:
-   - Analyze layering and structural dependencies with `architecture`.
+   - Analyze layering, seams, and structural dependencies with `architecture`.
    - Author binding ADR in `docs/decisions/adr-XXX-<slug>.md` capturing accepted policy and invariants upfront with `architecture-decision-records`. ADRs are pure declarative text (zero Mermaid diagrams).
-   - Author living integration architecture blueprint in `docs/architecture/<subsystem>.md` capturing visual topologies, composition roots, and native architecture rules (`A1..An`). Ensure the architecture document has zero ADR back-references.
+   - Author living integration architecture blueprint in `docs/architecture/<subsystem>.md` capturing visual topologies, composition roots, internal port seams (if refactoring), and native architecture rules (`A1..An`). Ensure the architecture document has zero ADR back-references.
 5. **Gate 1: Adversarial Doubt Review**:
    - Execute fresh-context adversarial review using `doubt-driven-development` to audit unstated assumptions, edge cases, and backward compatibility.
 6. **Builder Dispatch**:
