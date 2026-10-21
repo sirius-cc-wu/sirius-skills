@@ -55,7 +55,7 @@ flowchart TD
 
 | Playbook | Trigger & Scope | Key Pipeline Skills | Deliverable & Gate |
 | :--- | :--- | :--- | :--- |
-| **PB-1: Architectural** | Cross-crate/subsystem boundary, wire/network protocol, storage schema, security access. | `feature-mapping` → `example-mapping` → `system-behavior` → `model-discovery` → `architecture` → `architecture-decision-records` | Binding ADR (`docs/decisions/`) + SSD (`docs/contracts/`) + Gate 1 Doubt Review + `spec-qualification` Gate. |
+| **PB-1: Architectural** | Cross-crate/subsystem boundary, wire/network protocol, storage schema, security access. | `feature-mapping` → `example-mapping` → `system-behavior` → `model-discovery` → `architecture` → `architecture-decision-records` | Binding ADR (`docs/decisions/`) + External Contracts (`docs/contracts/`) + Gate 1 Doubt Review + `spec-qualification` Gate. |
 | **PB-2: Feature Slice** | New capabilities, syntax additions, or business rules localized in an established boundary. | `feature-mapping` → `example-mapping` → Builder Mode A (TDD) | Example Mapping rules (`docs/requirements/`) + Passing test matrix. |
 | **PB-3: Scoped Fix** | Defect fix, compiler/linter error, performance tuning, or local refactor. | Worktree isolation → Builder Mode B (reproduce with failing test → fix → evidence report) | Repro test + Fix commit + Opened PR. |
 | **PB-4: Fleet Batch** | Queue of independent issues, bugs, or parallel feature slices. | `scripts/worktree.ts` → Parallel Builder Subagents → CI Monitoring | Fleet Delivery Board + Merge-ready PRs. |
