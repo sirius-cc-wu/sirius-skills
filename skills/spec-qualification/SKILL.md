@@ -59,6 +59,11 @@ Before qualifying a change, obtain and review:
 - Trace the static and dynamic call graph of all newly introduced production functions, methods, and configurations.
 - Verify that every new capability has an active caller in production runtime paths.
 - Any function or method called solely by unit tests or test mocks is dead code / a phantom feature and must be rejected (`UNVERIFIED`).
+- **Stacked PR Scaffolding Exception**: In an intermediate slice of an approved multi-PR stack, uncalled crate-internal items are permitted if:
+  1. Annotated with `#[allow(dead_code)] // Scaffolding: consumed in Slice <N> (PR #<ID>)`.
+  2. Verified by authentic unit tests proving observable state transitions.
+  3. Encapsulated as `pub(crate)` (not leaked to `pub`).
+  4. Obligated to be wired into production callers and stripped of `allow(dead_code)` in the terminal PR.
 
 ---
 
