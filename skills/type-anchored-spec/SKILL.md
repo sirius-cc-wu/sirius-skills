@@ -97,24 +97,13 @@ Do **not** use this skill to:
 
 Before creating a file, apply
 [Artifact Selection Budget](../select-technical-artifacts/references/artifact-selection-budget.md).
-Follow
-[Markdown Artifact Frontmatter](../design-repository-artifact-layout/references/markdown-artifact-frontmatter.md)
-and use STE-style.
 
-Copy and tailor
-[Type-Anchored Spec Template](assets/type-anchored-spec.md) for the capability
-under design.
-
-Use this artifact type in frontmatter:
-
-```yaml
-type: "Type-Anchored Spec"
-language: "rust"
+**Default Disposition: `embed`**.
+Embed type-anchored specifications directly into the governing architecture document (`docs/architecture/<subsystem>.md` or `architecture.md`) under:
+```markdown
+## Type-Anchored Invariants
 ```
-
-Keep state machines, sealed boundaries, opaque wrappers, error enums, and
-agent workflow constraints in one artifact per capability unless a type crosses
-multiple bounded contexts — in that case, split by context and cross-reference.
+Do not create a standalone `detailed-design.md` or detached type-anchored spec file for regular features or compiler additions. A standalone artifact (copying and tailoring [Type-Anchored Spec Template](assets/type-anchored-spec.md)) is reserved strictly for cross-cutting foundational type systems that pass all three tests of the Artifact Selection Budget (Value, Ownership, Lifecycle).
 
 ## Boundaries
 
