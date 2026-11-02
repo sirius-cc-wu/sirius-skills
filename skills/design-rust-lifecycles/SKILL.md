@@ -77,10 +77,13 @@ than implementation details.
 
 Before creating a file, apply
 [Artifact Selection Budget](../select-technical-artifacts/references/artifact-selection-budget.md).
-Prefer refining an existing implementation-facing design or detailed design artifact
-(`docs/architecture/<subsystem>.md` or `<subsystem>-detailed-design.md` under `## Resource & Memory Lifecycle`)
-when it owns the same lifecycle. Otherwise, copy and tailor
-[Rust Lifecycle Design Template](assets/rust-lifecycle-design.md).
+
+**Default Disposition: `embed`**.
+Embed resource and memory lifecycle rules directly into the governing architecture document (`docs/architecture/<subsystem>.md` or `architecture.md`) under:
+```markdown
+## Resource & Memory Lifecycle
+```
+Do not author a separate `detailed-design.md` or standalone lifecycle document unless the architecture document exceeds size limits (>800 lines) or the lifecycle has an independently managed lifecycle that passes the Artifact Selection Budget creation gate. In that rare case, copy and tailor [Rust Lifecycle Design Template](assets/rust-lifecycle-design.md).
 
 For a standalone artifact, follow
 [Markdown Artifact Frontmatter](../design-repository-artifact-layout/references/markdown-artifact-frontmatter.md)
