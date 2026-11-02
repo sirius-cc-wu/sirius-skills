@@ -70,6 +70,31 @@ flowchart TD
 
 ---
 
+### Abstraction-to-Evidence Mapping
+
+For PB-1 and PB-2, before execution planning, use this practice when a
+significant proposed abstraction builds on existing code or a standard. Record
+one concise row per abstraction in the relevant architecture document, not in a
+separate mapping artifact:
+
+| Abstraction | Governing requirement or standard (cite source/section; version if applicable) | Existing types (code citation or `none found` after checking) | Decision (`reuse`, `extend`, `replace`, or `introduce`) | Brief reason |
+| :--- | :--- | :--- | :--- | :--- |
+| [abstraction] | [requirement or standard reference] | [type(s) with citations, or `none found`] | [decision] | [reason] |
+
+Label standard requirements **verified** only after checking the cited source
+directly, and label design decisions **project choice**. Mark inaccessible or
+unchecked standard claims **unverified**. Do not infer compliance, present
+unverified claims as requirements, or invent existing types.
+
+At an applicable Gate 1 that has not been bypassed under existing policy, check
+the mapping against its cited sources and the code baseline for unsupported
+claims and unnecessary duplication. This review does not add a gate or change
+existing human approval or sign-off authority. Stage 4 execution plans link to
+the architecture mapping; they do not duplicate its behavioral rules. Do not
+apply this practice to small scoped fixes.
+
+---
+
 ## Playbook Execution Protocols
 
 ### Playbook 1: Tier 1 Architectural Change (Full Golden Path)
@@ -86,11 +111,13 @@ flowchart TD
    - If the task is an internal refactoring or seam extraction with zero external behavior change: skip `docs/contracts/` and specify internal port seams directly in `docs/architecture/`.
    - Model aggregates and Ubiquitous Language with `model-discovery`.
 4. **Architecture & Upfront ADR**:
+   - Before execution planning, apply the Abstraction-to-Evidence Mapping practice above when its trigger is met, and record the mapping in the living architecture blueprint.
    - Analyze layering, seams, and structural dependencies with `architecture`.
    - Author binding ADR in `docs/decisions/adr-XXX-<slug>.md` capturing accepted policy and invariants upfront with `architecture-decision-records`. ADRs are pure declarative text (zero Mermaid diagrams).
    - Author living integration architecture blueprint in `docs/architecture/<subsystem>.md` capturing visual topologies, composition roots, internal port seams (if refactoring), and native architecture rules (`A1..An`). Ensure the architecture document has zero ADR back-references.
 5. **Gate 1: Adversarial Doubt Review**:
    - Execute fresh-context adversarial review using `doubt-driven-development` to audit unstated assumptions, edge cases, and backward compatibility.
+   - Include any applicable abstraction mapping in this review as described above.
 6. **Builder Dispatch**:
    - Verify worktree status (`git status --porcelain`).
    - Allocate isolated worktree: `bun scripts/worktree.ts create <branch-name> [base]`.
@@ -109,11 +136,14 @@ flowchart TD
    - Map user steps and variations (`feature-mapping`) and extract thin business rules (`R1`, `R2`...) in `docs/requirements/<module-id>.md`.
 2. **MANDATORY HUMAN SIGN-OFF**:
    - Present rules to operator for confirmation.
-3. **Builder Dispatch (Mode A)**:
+3. **Abstraction Mapping (when applicable)**:
+   - Before execution planning, apply the Abstraction-to-Evidence Mapping practice above when its trigger is met, and record the mapping in the relevant architecture document.
+   - At Gate 1, where applicable, include the mapping in the review as described above.
+4. **Builder Dispatch (Mode A)**:
    - Allocate isolated worktree: `bun scripts/worktree.ts create <branch-name> [base]`.
    - Dispatch builder subagent with the Example Mapping rules.
    - Builder executes Red-Green-Refactor TDD, verifies with test runner, and commits atomically via explicit paths.
-4. **Acceptance Verification**:
+5. **Acceptance Verification**:
    - Verify that 100% of defined rules pass in the builder's test matrix.
    - Package completed deliverable or open PR via `create-pr`.
 
