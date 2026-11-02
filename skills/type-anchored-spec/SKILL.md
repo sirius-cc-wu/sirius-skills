@@ -105,6 +105,8 @@ Embed type-anchored specifications directly into the governing architecture docu
 ```
 Do not create a standalone `detailed-design.md` or detached type-anchored spec file for regular features or compiler additions. A standalone artifact (copying and tailoring [Type-Anchored Spec Template](assets/type-anchored-spec.md)) is reserved strictly for cross-cutting foundational type systems that pass all three tests of the Artifact Selection Budget (Value, Ownership, Lifecycle).
 
+For that exceptional standalone file only, follow the shared [Markdown Artifact Frontmatter](../design-repository-artifact-layout/references/markdown-artifact-frontmatter.md) guidance, including its file-level frontmatter. Do not add frontmatter to a section embedded in an architecture document.
+
 ## Boundaries
 
 - This skill owns the **type layer** only. It does not own application logic,
