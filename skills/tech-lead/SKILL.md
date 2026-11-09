@@ -263,6 +263,10 @@ Governed by [ADR-006](file:///home/ccwu/Projects/thinker/docs/decisions/adr-006-
      - **Strict Invariance Mandate:** Emitted outputs and characterization tests must remain 100% identical. Zero behavior drift.
      - Subject every slice to dual Gate 2 qualification (two independent reviewers, e.g. Argon + Opus) with a binary VERIFIED requirement.
      - Bottom-up squash merge into `main`, prune worktree, and advance to next slice.
+4. **Sequencing Doctrine: The Two-Gear Refactoring Engine**:
+   - **Post-Milestone Consolidation (Feature Recently Landed):** Execute **Mode A $\to$ Mode B (Bottom-Up)**. Tidy accidental local clutter (parameter objects, helper extraction) first to clear the brush and reveal true architectural seams safely.
+   - **Pre-Milestone Preparation (Enabling a New Capability):** Execute **Mode B $\to$ Mode A (Top-Down)**. Carve Ports & Adapters, break cycles, and decompose God modules first to avoid polishing code slated for dismantling.
+   - **Localized Debt:** Single-mode execution (Mode A for routine-internal; Mode B for cross-module coupling).
 
 ---
 
