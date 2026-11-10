@@ -64,7 +64,7 @@ flowchart TD
 | **PB-2: Feature Slice** | New capabilities, syntax additions, or business rules localized in an established boundary. | `feature-mapping` → `example-mapping` → Builder Mode A (TDD) | Example Mapping rules (`docs/requirements/`) + Passing test matrix. |
 | **PB-3: Scoped Fix** | Defect fix, compiler/linter error, performance tuning, or local lint fix. | Worktree isolation → Builder Mode B (reproduce with failing test → fix → evidence report) | Repro test + Fix commit + Opened PR. |
 | **PB-4: Fleet Batch** | Queue of independent issues, bugs, or parallel feature slices. | `scripts/worktree.ts` → Parallel Builder Subagents → CI Monitoring | Fleet Delivery Board + Merge-ready PRs. |
-| **PB-5: Review Remediation** | Unresolved PR comments, Gate 2 review findings, or audit remediation. | `code-review-and-quality` / `review-pr` → Human Selection Gate → Builder Mode B | Remediation Disposition Report + Verified fix. |
+| **PB-5: Review Remediation** | Unresolved PR comments, Gate 2 review findings, or audit remediation. | `code-review-and-quality` / `review-pr` → Mandatory Holistic Pattern Sweep → Human Selection Gate → Builder Mode B | Remediation Disposition Report + Verified fix. |
 | **PB-6: Investigation Spike** | Ambiguous question, performance profile, runtime call flow, or historical code intent without code changes. | `how` (runtime flow) / `why` (intent archaeology) → `interview-me` → `vision` → `walkthrough-me` | Evidence-based diagnostic report / Architecture note / Constraint set. |
 | **PB-7: Prototype Spike** | Novel UI layout, interaction feel, or stateful workflow with no codebase precedent. | `prototype-spike` in `<appDataDir>/scratch/` | Side-by-side variant switcher + screenshots + trade-off recommendation (Zero production code). |
 | **PB-8: Visual Parity** | UI component refactoring, design token migration, or CSS framework replacement. | Builder Mode C in isolated worktree (`visual-parity` + Playwright) | Frozen baseline screenshots → component refactor → pixel diff = 0 report + Opened PR. |
@@ -189,13 +189,18 @@ apply this practice to small scoped fixes.
 1. **Review Intake & Audit**:
    - Run multi-axis review using `code-review-and-quality` or `review-pr`, or ingest Gate 2 reviewer findings.
    - Surface findings with stable identifiers (`R1`, `R2`), severities, and locations.
-2. **Human Selection Gate**:
-   - Present findings to the operator. Operator selects authorized must-fix findings.
-3. **Builder Remediation Dispatch**:
+2. **Mandatory Holistic Pattern Sweep**:
+   - When a finding identifies a recurring code smell or anti-pattern (such as test code or test hooks in production files, leaky abstractions, unhandled errors, visibility mismatches, dead code, or compiler warnings), **do not scope the fix to only the cited line or file**.
+   - Execute a changeset-wide pattern sweep (search git diff and touched packages/crates) for all instances of that underlying anti-pattern.
+   - Consolidate all discovered occurrences into a single unified remediation scope (`R1.1`, `R1.2`, etc.) to prevent iterative "whack-a-mole" remediation cycles across review rounds.
+3. **Human Selection Gate**:
+   - Present consolidated findings to the operator. Operator selects authorized must-fix findings.
+4. **Builder Remediation Dispatch**:
    - Dispatch builder subagent in Mode B (Scoped Remediation) with authorized IDs.
-   - Builder reproduces defect with test, applies minimal fix, and generates Remediation Disposition Report.
-4. **Confirm & Re-verify**:
-   - Inspector re-verifies the fix and confirms clean diff and passing tests.
+   - Enforce Pure Production APIs (first-class Dependency Injection seams; zero test hooks or conditional compilation in production code), visibility matching signatures, and live caller wiring.
+   - Builder reproduces defect with test, applies minimal fix, compiles with zero warnings under fatal warning flags (`-D warnings` / `-Werror`), and generates Remediation Disposition Report.
+5. **Confirm & Re-verify**:
+   - Inspector re-verifies the fix, validates zero compiler warnings, and confirms clean diff and passing tests.
 
 ---
 

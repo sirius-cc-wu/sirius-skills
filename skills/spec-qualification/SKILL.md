@@ -39,7 +39,7 @@ Before qualifying a change, obtain and review:
 
 ---
 
-## The Four Qualification Criteria
+## The Core Qualification Criteria
 
 ### 1. Rule Traceability (100% Coverage)
 - Every specification rule ($R_1, R_2, \dots$) must map to an explicit, passing automated test.
@@ -64,6 +64,17 @@ Before qualifying a change, obtain and review:
   2. Verified by authentic unit tests proving observable state transitions.
   3. Encapsulated as `pub(crate)` (not leaked to `pub`).
   4. Obligated to be wired into production callers and stripped of `allow(dead_code)` in the terminal PR.
+
+### 5. Pure Production API & Visibility Audit
+Audit the changeset for encapsulation leaks and test intrusion:
+- **No Test Pollution in Production**: Confirm zero test-only backdoors, test hooks, or `#[cfg(test)]` branches in production code (`src/`). Reject any `#[allow(dead_code)]` unless qualifying an intermediate stacked PR satisfying Pillar 4's *Stacked PR Scaffolding Exception*.
+- **Signature Visibility Matching**: Verify method visibility does not leak private types (reject `pub fn` taking `pub(crate)` types, which cause `private_interfaces` warnings).
+- **Live Seam Wiring**: Verify that newly introduced Dependency Injection seams have active callers in live production paths, rejecting mock-only phantom seams.
+
+### 6. Zero-Warning Compiler & Linter Verification
+Audit Builder evidence for fatal-warning cleanliness:
+- **Fatal Warning Cleanliness**: Inspect Builder Execution Reports to confirm builds ran with fatal warning flags (`-D warnings`, `-Werror`, strict mode).
+- **Zero Escaped Warnings**: Any active compiler or linter warning in touched crates requires an immediate `UNVERIFIED` verdict.
 
 ---
 
@@ -113,6 +124,8 @@ Route findings deterministically to the responsible phase:
 | **Implementation Defect** | Test failed, vacuous assertion, missing edge case | **Implementation** | Fix implementation or add genuine test assertions. |
 | **Phantom Code** | New production function has no caller outside unit tests | **Implementation** | Connect capability to live execution path or remove dead code. |
 | **Architectural Breach** | Violated ADR pattern, unauthorized dependency | **Implementation** | Refactor code to conform to the governing ADR. |
+| **Test Intrusion / Visibility Leak** | Test backdoor, test hook in production, visibility mismatch | **Implementation** | Move test utilities to test modules, expose pure DI seam, match visibility. |
+| **Compiler Warning** | Escaped compiler or linter warning under fatal flags | **Implementation** | Fix warnings with fatal warning flags enabled. |
 | **Specification Gap** | Contradictory rules, missing error contracts | **Requirements / Contracts** | Clarify or amend the specification rules. |
 | **Architectural Defect** | ADR invariant proves infeasible or contradictory | **Architecture / ADR** | Author an amending ADR. |
 
@@ -167,12 +180,19 @@ verified: { by: "human:sirius", at: "YYYY-MM-DDTHH:MM:SSZ" }
 - [ ] Every new production function/method has an active caller in live runtime code.
 - [ ] Zero functions called solely by unit tests or mocks.
 
-## 6. Findings & Return Path (if UNVERIFIED)
-- **Failure Category**: `[Implementation Defect | Phantom Code | Architectural Breach | Specification Gap | Architectural Defect]`
-- **Return Destination**: `[Implementation | Requirements / Contracts | Architecture / ADR]`
+## 6. Pure Production API & Visibility Audit
+- [ ] Zero test backdoors, test hooks, or conditional compilation switches in production files.
+- [ ] Method visibility matches signature types (no `private_interfaces` leaks).
+
+## 7. Zero-Warning Verification Audit
+- [ ] Build succeeds with zero warnings under fatal warning flags (`-D warnings` / `-Werror`).
+
+## 8. Findings & Return Path (if UNVERIFIED)
+- **Failure Category**: `[Execution Defect | Phantom Code | Architectural Breach | Test Intrusion / Visibility Leak | Compiler Warning | Specification Gap | Architectural Defect]`
+- **Return Destination**: `[Builder | Spec Author | Architect / Lead]`
 - **Action Items**:
   1. [Specific issue that must be addressed before re-qualification]
 
-## 7. Conclusion
-[Clear summary explaining why the change is verified or what steps are required next.]
+## 9. Conclusion & Next Steps
+[Detailed conclusion explaining why the slice is verified or what steps are required next.]
 ```
