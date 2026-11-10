@@ -67,7 +67,8 @@ Before qualifying a change, obtain and review:
 
 ### 5. Pure Production API & Visibility Audit
 Audit the changeset for encapsulation leaks and test intrusion:
-- **No Test Pollution in Production**: Confirm zero test-only backdoors, test hooks, or `#[cfg(test)]` branches in production code (`src/`). Reject any `#[allow(dead_code)]` unless qualifying an intermediate stacked PR satisfying Pillar 4's *Stacked PR Scaffolding Exception*.
+- **No Test Pollution in Production**: Confirm zero test-only backdoors, test hooks, or `#[cfg(test)]` branches in production code (`src/`). Check the diff via `git diff origin/main...HEAD -- '**/src/**' | grep -E '^(\+).*#\[cfg\(.*test.*\)\]'`. Reject any newly introduced or retained test conditional compilation in production code. Reject any `#[allow(dead_code)]` unless qualifying an intermediate stacked PR satisfying Pillar 4's *Stacked PR Scaffolding Exception*.
+- **Capability Colocation**: Verify that newly introduced abstraction traits, strategy interfaces, ports, and factories reside in their governing domain capability module rather than being dislocated inside consumer/caller files.
 - **Signature Visibility Matching**: Verify method visibility does not leak private types (reject `pub fn` taking `pub(crate)` types, which cause `private_interfaces` warnings).
 - **Live Seam Wiring**: Verify that newly introduced Dependency Injection seams have active callers in live production paths, rejecting mock-only phantom seams.
 

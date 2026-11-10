@@ -189,9 +189,10 @@ apply this practice to small scoped fixes.
 1. **Review Intake & Audit**:
    - Run multi-axis review using `code-review-and-quality` or `review-pr`, or ingest Gate 2 reviewer findings.
    - Surface findings with stable identifiers (`R1`, `R2`), severities, and locations.
-2. **Mandatory Holistic Pattern Sweep**:
+2. **Mandatory Holistic Pattern Sweep & Sibling Symmetry Audit**:
    - When a finding identifies a recurring code smell or anti-pattern (such as test code or test hooks in production files, leaky abstractions, unhandled errors, visibility mismatches, dead code, or compiler warnings), **do not scope the fix to only the cited line or file**.
    - Execute a changeset-wide pattern sweep (search git diff and touched packages/crates) for all instances of that underlying anti-pattern.
+   - **Sibling Path Symmetry Audit**: When introducing an IoC seam, error boundary, or timeout to a capability (e.g. `DtcPersistence`), audit direct sibling dependencies in the same caller (e.g. `SnapshotPersistence`). If a sibling is intentionally left concrete, explicitly record the architectural rationale in the task brief or ADR to prevent accidental asymmetric debt.
    - Consolidate all discovered occurrences into a single unified remediation scope (`R1.1`, `R1.2`, etc.) to prevent iterative "whack-a-mole" remediation cycles across review rounds.
 3. **Human Selection Gate**:
    - Present consolidated findings to the operator. Operator selects authorized must-fix findings.
