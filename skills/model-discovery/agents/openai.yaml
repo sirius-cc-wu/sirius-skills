@@ -1,0 +1,3 @@
+interface:
+  display_name: "Model Discovery"
+  short_description: "Discover domain concepts through scenarios and language"

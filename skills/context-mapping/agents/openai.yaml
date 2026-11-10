@@ -1,0 +1,3 @@
+interface:
+  display_name: "Context Mapping"
+  short_description: "Map model boundaries and choose integration relationships"

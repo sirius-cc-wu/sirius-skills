@@ -1,0 +1,4 @@
+interface:
+  display_name: "Architecture"
+  short_description: "Connect architecture decisions to requirements"
+  default_prompt: "Use $architecture to analyze the architectural factors and propose a focused design with tradeoffs and executable validation."

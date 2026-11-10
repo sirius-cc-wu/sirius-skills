@@ -1,0 +1,4 @@
+interface:
+  display_name: "System Behavior"
+  short_description: "Derive system events and precise state effects"
+  default_prompt: "Use $system-behavior to derive a black-box system sequence diagram and only the operation contracts needed to clarify state changes."
