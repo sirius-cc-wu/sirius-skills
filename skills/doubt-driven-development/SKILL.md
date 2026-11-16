@@ -128,33 +128,26 @@ A single-model reviewer shares blind spots with the original author — a colder
 
 After the single-model review in Step 3 above, but before RECONCILE, pause and ask:
 
-> *"Single-model review complete. Want a cross-model second opinion? Options: Gemini CLI, Codex CLI, manual external review (you paste it elsewhere), or skip."*
+> *"Single-model review complete. Want an independent goldfish second opinion via Antigravity CLI (`agy`), manual external review (you paste it elsewhere), or skip?"*
 
 This question is mandatory in every interactive doubt cycle — even on artifacts that feel low-stakes. The user — not the agent — decides whether the cost is worth it. The agent's job is to surface the choice.
 
-**Step 2: If the user picks a CLI — verify, then invoke**
+**Step 2: If the user picks `agy` — verify, then invoke**
 
-1. Check the tool is in PATH (`which gemini`, `which codex`).
-2. Test it works (`gemini --version` or equivalent) before passing the full prompt — a stale or broken binary may pass `which` but fail on real input.
-3. Confirm the exact invocation with the user, including required flags, auth, and env vars (e.g., API keys). Implementations vary; never assume.
-4. Pass ARTIFACT + CONTRACT + the adversarial prompt **only**. No session context, no CLAIM.
-5. Mind shell escaping. If the artifact contains quotes, `$(...)`, or backticks, prefer stdin (`echo … | gemini`) or a heredoc over inline `-p "…"`. When in doubt, ask the user to confirm the invocation before running it.
-6. Take the output into Step 4 (RECONCILE).
+1. Check the tool is in PATH (`which agy`) and list models (`agy models`).
+2. Confirm the exact invocation with the user, including the configured reviewer model (`gemini-4-argon` default, `claude-opus-5-5` when Gemini is out of quota).
+3. Pass ARTIFACT + CONTRACT + the adversarial prompt **only**. No session context, no CLAIM.
+4. Mind shell escaping. Write the full prompt to a file and pipe via stdin rather than inline `-p "…"` when the artifact contains quotes, `$(...)`, or backticks.
+5. Take the output into Step 4 (RECONCILE).
 
 **Never interpolate the artifact into a shell-quoted argument.** Code, markdown, and review prompts routinely contain backticks, `$(...)`, and quote characters that will either truncate the prompt or execute embedded shell. Write the full prompt to a file and pipe it through stdin.
 
-Example shapes (verify flags against your installed tool — syntax differs across implementations and versions):
+Example shape:
 
 ```bash
 # Write the adversarial prompt + ARTIFACT + CONTRACT to a temp file first.
 # Then pipe via stdin so shell metacharacters in the artifact stay inert.
-
-# Codex (read-only sandbox keeps the CLI from writing to your workspace):
-codex exec --sandbox read-only -C <repo-path> - < /tmp/doubt-prompt.md
-
-# Gemini ('--approval-mode plan' is read-only; '-p ""' triggers non-interactive
-# mode and the prompt is read from stdin):
-gemini --approval-mode plan -p "" < /tmp/doubt-prompt.md
+agy --sandbox --dangerously-skip-permissions --model gemini-4-argon-high --effort high --print < /tmp/doubt-prompt.md
 ```
 
 A read-only sandbox is the load-bearing detail: a doubt artifact may itself contain instructions (intentional or accidental prompt injection) that the cross-model CLI would otherwise execute against your workspace.

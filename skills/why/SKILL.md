@@ -45,10 +45,10 @@ This skill coordinates parallel source investigators with an authoritative epist
 
 - **Investigators (Parallel Category Gathering)**:
   - Fast, tool-capable subagents specialized in deep query sweeps across single evidence categories.
-  - Runtime: Antigravity native subagent (`invoke_subagent` with `Role: "Archaeology Investigator"`, `Model: "flash"` or `inherit`) or Pi Copilot (`grok-4.7`).
+  - Runtime: Antigravity native subagent (`invoke_subagent` with `Role: "Archaeology Investigator"`, `Model: "flash"` or `inherit`) or `agy` read-only runner.
 - **Synthesizer (Epistemic Synthesis & Spot-Checking)**:
   - High-rigor frontier model specialized in historical analysis, epistemic calibration, and citation spot-checking.
-  - Runtime: Configured in `roles.investigation` in `~/.config/thinker/config.yaml` (default: **Claude Opus 5.5** via Claude Code CLI runner: `claude -p --model opus` or native Antigravity `Model: "pro"`).
+  - Runtime: Configured in `roles.investigation` in `~/.config/thinker/config.yaml` (default: **`gemini-4-argon`** via `agy`; fallback: **`claude-opus-5-5`** via `agy` when Gemini is out of quota).
 
 ---
 
@@ -62,7 +62,7 @@ flowchart TD
     Cat --> Inv2["Issues (GitHub / Jira / Linear)"]
     Cat --> Inv3["Docs (Notion / Confluence / Google Docs)"]
     Cat --> Inv4["Chat / Observability / Telemetry"]
-    Inv1 --> Synth["4. Epistemic Synthesis (Claude Opus 5.5)"]
+    Inv1 --> Synth["4. Epistemic Synthesis (roles.investigation)"]
     Inv2 --> Synth
     Inv3 --> Synth
     Inv4 --> Synth
@@ -114,7 +114,7 @@ Spawn parallel investigators (one per available evidence category):
 
 ### Step 4. Synthesize with Epistemic Discipline
 
-Invoke the synthesizer (Claude Opus 5.5 via `claude -p --model opus` or Antigravity `pro`) with all gathered findings and `references/synthesizer-prompt.md`.
+Invoke the synthesizer (`roles.investigation` via `agy` — `gemini-4-argon` default, `claude-opus-5-5` fallback) with all gathered findings and `references/synthesizer-prompt.md`.
 
 The synthesizer enforces the **Epistemics Framework (`references/epistemics.md`)**:
 - **Confidence Calibration**: Every claim is assigned to one of the 5 tiers:

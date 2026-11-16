@@ -17,7 +17,7 @@ It is a **contractual acceptance gate**, distinct from general code review (`cod
 The evaluator operates as a **non-executing inspector**:
 - **Cognitive & Context Isolation**: The evaluator must be independent of the author/implementer and operate with read-only inspection tools.
 - **Evidence-Based Inspection**: The evaluator audits the code diff and execution receipts (test logs, pass/fail counts, coverage evidence). It does not compile or run test runners directly.
-- **Dual Audit Pairing**: Run concurrently with `code-review-and-quality` so that contract qualification and code craftsmanship are evaluated together.
+- **Two-Lane Goldfish Pairing**: Runs concurrently in **Lane 2** alongside `code-review-and-quality` in **Lane 1**, each executed by a separate fresh-context ("goldfish") `agy` read-only reviewer process so contract qualification and code craftsmanship are audited independently.
 
 ### Command-Backed Reviewer Evidence, Coverage Checklists & Convergence
 To prevent hallucinated quotes, wrong line numbers, unbacked coverage claims, or non-converging review loops:
