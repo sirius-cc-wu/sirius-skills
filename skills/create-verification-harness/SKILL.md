@@ -1,6 +1,6 @@
 ---
 name: create-verification-harness
-description: Generates an agent-drivable verification harness and Glass Surface Map for web, CLI, desktop, or service applications, providing autonomous agents with runtime "eyes" (browser/CDP/Playwright, PTY, HTTP) to navigate, drive, and verify surfaces with concrete runtime evidence.
+description: Generates an agent-drivable verification harness and Glass Surface Map for web, CLI, desktop, Android, or service applications, providing autonomous agents with runtime "eyes" (browser/CDP/Playwright, PTY, HTTP, adb/UIAutomator) to navigate, drive, and verify surfaces with concrete runtime evidence.
 ---
 
 # Create Verification Harness
@@ -39,10 +39,10 @@ flowchart TD
 
 ### Step 1: Interview the Repo, Not the Human
 Discover the project's runtime mechanics from code, configs, and package manifests rather than asking open-ended questions:
-- **Surface**: What does the operator touch? (Web HMI, CLI/TUI, REST/WebSocket API, Electron desktop).
-- **Run**: What exact command starts the app locally? (e.g., `npm start`, `cargo run`, dev server with mock ports). Note environment variables and test credentials.
-- **Drive**: How can an agent interact programmatically? (Existing Playwright/Cypress configs, headless Chromium debug ports `--remote-debugging-port`, PTY helpers).
-- **Observe**: What hard evidence can be captured? (Screenshots, ARIA tree snapshots, terminal transcripts, WebSocket frames, DB records).
+- **Surface**: What does the operator touch? (Web HMI, CLI/TUI, REST/WebSocket API, Electron desktop, Android app/WebView).
+- **Run**: What exact command starts the app locally? (e.g., `npm start`, `cargo run`, `adb shell am start`, dev server with mock ports). Note environment variables and test credentials.
+- **Drive**: How can an agent interact programmatically? (Existing Playwright/Cypress configs, headless Chromium debug ports `--remote-debugging-port`, PTY helpers, or `adb` + `uiautomator dump` + `input tap`/`keyevent`).
+- **Observe**: What hard evidence can be captured? (Screenshots / `adb exec-out screencap -p`, ARIA tree snapshots / `uiautomator dump` XML, terminal transcripts, WebSocket frames, `adb logcat`, DB records).
 - **Isolate**: Can two instances run concurrently without port collisions or data directory corruption?
 
 ### Step 2: Generate the Verification Harness
@@ -75,6 +75,7 @@ Run the newly created harness against at least one mapped surface from start to 
 ## Evidence Standards
 
 A surface is verified only when supported by hard runtime evidence:
-- **UI Proof**: ARIA tree snapshot (`snapshot --aria`) plus visual screenshot (`.png`) showing component state.
+- **UI Proof**: ARIA tree snapshot (`snapshot --aria`) or Android `uiautomator dump` XML, plus visual screenshot (`.png`) showing component state.
 - **CLI Proof**: Exact command, exit code, stdout, and stderr.
+- **Android Lifecycle Proof**: For mobile apps, `adb logcat` excerpt and post-resume `uiautomator` / `screencap` evidence proving state progression and interactive responsiveness survive `onPause` → `onResume`.
 - **State Proof**: Verification of side-effects (files written, database records updated, WebSocket JSON-RPC frames dispatched). Mocks are permitted only where production architectural boundaries already isolate external systems.
