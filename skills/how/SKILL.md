@@ -39,7 +39,7 @@ This skill leverages a dual-role pattern balancing high-speed parallel explorati
   - Runtime: Antigravity native subagent (`invoke_subagent` with `Role: "Subsystem Explorer"`, `Model: "flash"` or `inherit`) or `agy` read-only runner.
 - **Explainer / Synthesizer (Synthesis & Diagramming)**:
   - High-rigor frontier model specialized in architectural synthesis.
-  - Runtime: Read from `roles.investigation` in `~/.config/thinker/config.yaml` (default: **`gemini-4-argon`** via `agy`; fallback: **`claude-opus-5-5`** via `agy` when Gemini is out of quota).
+  - Runtime: Reviewer model derived from `mode` and `budget` in `~/.config/thinker/config.yaml` (default: **`gemini-4-neon-<budget>`** via `agy`; fallback: **`claude-opus-5-5-<min(budget, high)>`** in `claude` mode).
 
 ---
 
@@ -47,10 +47,10 @@ This skill leverages a dual-role pattern balancing high-speed parallel explorati
 
 ```mermaid
 flowchart TD
-    Q["1. Assess Complexity (Simple vs Complex)"] -->|Simple (Single module / function)| Direct["Step 2b. Direct Explain Pass (roles.investigation)"]
+    Q["1. Assess Complexity (Simple vs Complex)"] -->|Simple (Single module / function)| Direct["Step 2b. Direct Explain Pass (Reviewer model)"]
     Q -->|Complex (Subsystem / Cross-crate flow)| Parallel["Step 2a. Parallel Decompose (2–4 Angles)"]
     Parallel --> Exp["Spawn Parallel Explorers (Flash / agy)"]
-    Exp --> Synth["Step 3. Synthesize and Diagram (Mermaid via roles.investigation)"]
+    Exp --> Synth["Step 3. Synthesize and Diagram (Mermaid via Reviewer model)"]
     Direct --> Present["Step 4. Present / Record Architecture Note"]
     Synth --> Present
 ```
@@ -79,7 +79,7 @@ Run a single exploration and explanation pass using the synthesizer runner:
 
 ### Step 3. Synthesize (Complex Questions)
 
-Once all explorer subagents return, invoke the synthesizer (`roles.investigation` via `agy` — `gemini-4-argon` default, `claude-opus-5-5` fallback):
+Once all explorer subagents return, invoke the synthesizer (Reviewer model via `agy` — `gemini-4-neon-<budget>` in `gemini` mode, `claude-opus-5-5-<min(budget, high)>` in `claude` mode):
 - Inject all explorer findings into `references/explainer-prompt.md`.
 - Reconcile overlapping areas, verify key files directly, and generate structured Mermaid flow/sequence diagrams.
 

@@ -48,7 +48,7 @@ This skill coordinates parallel source investigators with an authoritative epist
   - Runtime: Antigravity native subagent (`invoke_subagent` with `Role: "Archaeology Investigator"`, `Model: "flash"` or `inherit`) or `agy` read-only runner.
 - **Synthesizer (Epistemic Synthesis & Spot-Checking)**:
   - High-rigor frontier model specialized in historical analysis, epistemic calibration, and citation spot-checking.
-  - Runtime: Configured in `roles.investigation` in `~/.config/thinker/config.yaml` (default: **`gemini-4-argon`** via `agy`; fallback: **`claude-opus-5-5`** via `agy` when Gemini is out of quota).
+  - Runtime: Reviewer model derived from `mode` and `budget` in `~/.config/thinker/config.yaml` (default: **`gemini-4-neon-<budget>`** via `agy`; fallback: **`claude-opus-5-5-<min(budget, high)>`** in `claude` mode).
 
 ---
 
@@ -62,7 +62,7 @@ flowchart TD
     Cat --> Inv2["Issues (GitHub / Jira / Linear)"]
     Cat --> Inv3["Docs (Notion / Confluence / Google Docs)"]
     Cat --> Inv4["Chat / Observability / Telemetry"]
-    Inv1 --> Synth["4. Epistemic Synthesis (roles.investigation)"]
+    Inv1 --> Synth["4. Epistemic Synthesis (Reviewer model)"]
     Inv2 --> Synth
     Inv3 --> Synth
     Inv4 --> Synth
@@ -114,7 +114,7 @@ Spawn parallel investigators (one per available evidence category):
 
 ### Step 4. Synthesize with Epistemic Discipline
 
-Invoke the synthesizer (`roles.investigation` via `agy` — `gemini-4-argon` default, `claude-opus-5-5` fallback) with all gathered findings and `references/synthesizer-prompt.md`.
+Invoke the synthesizer (Reviewer model via `agy` — `gemini-4-neon-<budget>` in `gemini` mode, `claude-opus-5-5-<min(budget, high)>` in `claude` mode) with all gathered findings and `references/synthesizer-prompt.md`.
 
 The synthesizer enforces the **Epistemics Framework (`references/epistemics.md`)**:
 - **Confidence Calibration**: Every claim is assigned to one of the 5 tiers:

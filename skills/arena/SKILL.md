@@ -14,9 +14,9 @@ Open a checklist with one entry per phase (**Frame**, **Fan out**, **Cross-judge
 
 ## Model & Runtime Integration (`~/.config/thinker/config.yaml`)
 
-- **Candidates & Cross-Judge**: Run via `agy` using `roles.investigation` / `roles.design_review` from `~/.config/thinker/config.yaml` (default: `gemini-4-argon-high`; fallback: `claude-opus-5-5` when Gemini is out of quota).
+- **Candidates & Cross-Judge**: Run via `agy` using the Reviewer model derived from `mode` and `budget` in `~/.config/thinker/config.yaml` (`gemini-4-neon-<budget>` in `gemini` mode; `claude-opus-5-5-<min(budget, high)>` in `claude` mode).
 - **Zero-Context ("Goldfish") Isolation**: Each candidate runs in its own `agy` process and never reads another candidate's output.
-- **Cross-Judge Independence**: The Phase C judge reads only the rubric and the candidate outputs (by path label), never the parent coordinator's preference. When available, prefer a judge from the opposite quota family (`claude-opus-5-5` when candidates use `gemini-4-argon-high`, or vice versa).
+- **Cross-Judge Independence**: The Phase C judge reads only the rubric and the candidate outputs (by path label), never the parent coordinator's preference. When available, prefer a judge from the opposite quota family (`claude-opus-5-5-high` when candidates use `gemini-4-neon-high`, or vice versa).
 
 ---
 
@@ -60,7 +60,7 @@ Walk each losing candidate once more for 1–2 concrete ideas worth porting into
 ## Phase F: Verify & Hand Off
 
 - Verify the synthesized design against the rubric and repo invariants (zero-warning builds, Pure Production API, CI compatibility).
-- For **Playbook 1 / Playbook 2**: Record the chosen architecture in `docs/decisions/` (ADR) and `docs/execution/`, then run **Gate 1 (`scripts/goldfish-runner.ts --stage gate1 --all`)** before dispatching a Builder.
+- For **Playbook 1 / Playbook 2**: Record the chosen architecture in `docs/decisions/` (ADR) and `docs/execution/`, then run **Gate 1 (`bun /home/ccwu/thinker/scripts/goldfish-runner.ts --stage gate1 <target_files...>`)** before dispatching a Builder.
 
 ## Outputs
 

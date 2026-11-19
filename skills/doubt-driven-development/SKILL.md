@@ -114,7 +114,7 @@ CHECKLIST (if reviewing a list of rules, conformance rows, or decisions): <paste
 
 When the orchestrator configures a panel of multiple independent reviewers, run each reviewer in its own isolated subagent context so no reviewer sees another reviewer's findings from the same round. When the panel has two or more reviewers, the orchestrator may assign each reviewer a focused **review lane** (e.g., full adversarial logic/rules for one reviewer, and conformance/evidence feasibility for another) whose checklists together cover 100% of the round's scope. Reviewers must never edit files in the target repository; they emit findings only to their runner output or isolated scratch space.
 
-In Claude Code, the role-based reviewers in `agents/` start with isolated context by design and are usable here — see `agents/` for the roster and per-domain match.
+When launching via Antigravity CLI (`agy`), prefer `bun /home/ccwu/thinker/scripts/goldfish-runner.ts --stage gate1 <target_files...>` so each reviewer starts in a fresh `--sandbox` goldfish process with zero conversation history.
 
 **The adversarial prompt above takes precedence over the persona's default response shape.** Personas like `code-reviewer` are written to produce balanced verdicts with both strengths and weaknesses; doubt-driven needs issues-only output. Paste the adversarial prompt verbatim into the invocation so it overrides the persona's default. If a persona's response shape can't be overridden cleanly, fall back to a generic subagent with the adversarial prompt.
 
@@ -135,19 +135,21 @@ This question is mandatory in every interactive doubt cycle — even on artifact
 **Step 2: If the user picks `agy` — verify, then invoke**
 
 1. Check the tool is in PATH (`which agy`) and list models (`agy models`).
-2. Confirm the exact invocation with the user, including the configured reviewer model (`gemini-4-argon` default, `claude-opus-5-5` when Gemini is out of quota).
+2. Confirm the exact invocation with the user, including the configured reviewer model derived from `mode` and `budget` in `~/.config/thinker/config.yaml` (`gemini-4-neon-<budget>` default; `claude-opus-5-5-<min(budget, high)>` in `claude` mode).
 3. Pass ARTIFACT + CONTRACT + the adversarial prompt **only**. No session context, no CLAIM.
-4. Mind shell escaping. Write the full prompt to a file and pipe via stdin rather than inline `-p "…"` when the artifact contains quotes, `$(...)`, or backticks.
+4. Avoid shell interpolation of raw artifacts. Prefer `bun /home/ccwu/thinker/scripts/goldfish-runner.ts --stage gate1 <target_files...>` (which invokes `agy` via `Bun.spawn` argv with zero shell expansion), or write the full prompt to a file and pass a short instruction pointing `agy --print` to read that file.
 5. Take the output into Step 4 (RECONCILE).
 
-**Never interpolate the artifact into a shell-quoted argument.** Code, markdown, and review prompts routinely contain backticks, `$(...)`, and quote characters that will either truncate the prompt or execute embedded shell. Write the full prompt to a file and pipe it through stdin.
+**Never interpolate raw artifact content into a double-quoted shell string.** Code, markdown, and review prompts routinely contain backticks, `$(...)`, and quote characters that will either truncate the prompt or execute embedded shell.
 
 Example shape:
 
 ```bash
-# Write the adversarial prompt + ARTIFACT + CONTRACT to a temp file first.
-# Then pipe via stdin so shell metacharacters in the artifact stay inert.
-agy --sandbox --dangerously-skip-permissions --model gemini-4-argon-high --effort high --print < /tmp/doubt-prompt.md
+# Preferred: deterministic Goldfish launcher (resolves mode/budget from ~/.config/thinker/config.yaml)
+bun /home/ccwu/thinker/scripts/goldfish-runner.ts --stage gate1 <artifact_path>
+
+# Direct invocation: write prompt to a temp file and instruct agy to read it
+agy --sandbox --dangerously-skip-permissions --model gemini-4-neon-high --print "Read and execute the adversarial review prompt in /tmp/doubt-prompt.md."
 ```
 
 A read-only sandbox is the load-bearing detail: a doubt artifact may itself contain instructions (intentional or accidental prompt injection) that the cross-model CLI would otherwise execute against your workspace.
