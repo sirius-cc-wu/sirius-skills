@@ -36,7 +36,7 @@ This skill leverages a dual-role pattern balancing high-speed parallel explorati
 
 - **Explorers (Parallel Gathering)**:
   - Fast, read-only subagents with large context windows.
-  - Runtime: Antigravity native subagent (`invoke_subagent` with `Role: "Subsystem Explorer"`, `Model: "flash"` or `inherit`) or `agy` read-only runner.
+  - Runtime: Antigravity read-only subagent (`invoke_subagent` with `TypeName: "research"`, `Role: "Subsystem Explorer"`, omitting `Model`) or `agy` read-only runner.
 - **Explainer / Synthesizer (Synthesis & Diagramming)**:
   - High-rigor frontier model specialized in architectural synthesis.
   - Runtime: Reviewer model derived from `mode` and `budget` in `~/.config/thinker/config.yaml` (default: **`gemini-4-neon-<budget>`** via `agy`; fallback: **`claude-opus-5-5-<min(budget, high)>`** in `claude` mode).
@@ -49,7 +49,7 @@ This skill leverages a dual-role pattern balancing high-speed parallel explorati
 flowchart TD
     Q["1. Assess Complexity (Simple vs Complex)"] -->|Simple (Single module / function)| Direct["Step 2b. Direct Explain Pass (Reviewer model)"]
     Q -->|Complex (Subsystem / Cross-crate flow)| Parallel["Step 2a. Parallel Decompose (2–4 Angles)"]
-    Parallel --> Exp["Spawn Parallel Explorers (Flash / agy)"]
+    Parallel --> Exp["Spawn Parallel Explorers (research subagent / agy)"]
     Exp --> Synth["Step 3. Synthesize and Diagram (Mermaid via Reviewer model)"]
     Direct --> Present["Step 4. Present / Record Architecture Note"]
     Synth --> Present

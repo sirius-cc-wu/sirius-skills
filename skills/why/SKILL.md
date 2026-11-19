@@ -45,7 +45,7 @@ This skill coordinates parallel source investigators with an authoritative epist
 
 - **Investigators (Parallel Category Gathering)**:
   - Fast, tool-capable subagents specialized in deep query sweeps across single evidence categories.
-  - Runtime: Antigravity native subagent (`invoke_subagent` with `Role: "Archaeology Investigator"`, `Model: "flash"` or `inherit`) or `agy` read-only runner.
+  - Runtime: Antigravity read-only subagent (`invoke_subagent` with `TypeName: "research"`, `Role: "Archaeology Investigator"`, omitting `Model`) or `agy` read-only runner.
 - **Synthesizer (Epistemic Synthesis & Spot-Checking)**:
   - High-rigor frontier model specialized in historical analysis, epistemic calibration, and citation spot-checking.
   - Runtime: Reviewer model derived from `mode` and `budget` in `~/.config/thinker/config.yaml` (default: **`gemini-4-neon-<budget>`** via `agy`; fallback: **`claude-opus-5-5-<min(budget, high)>`** in `claude` mode).
