@@ -1,0 +1,5 @@
+interface:
+  display_name: "Reflect"
+  short_description: "Run 3-lens transcript reflection to route durable learnings into skill edits."
+policy:
+  allow_implicit_invocation: false

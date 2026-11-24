@@ -1,0 +1,5 @@
+interface:
+  display_name: "Correct"
+  short_description: "Eliminate repeating repo mistake classes via architecture, types, lint/CI, then tests."
+policy:
+  allow_implicit_invocation: false
