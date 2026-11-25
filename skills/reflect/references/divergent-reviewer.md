@@ -17,6 +17,7 @@ Scan for:
 - Architectural or workflow smells the immediate fix papered over
 - Skills or target harnesses that should have been invoked but were not, or were invoked too late
 - Implicit assumptions about scope, boundaries, or what the operator actually wanted
+- Steering/skill bloat and no-ops: lines in opened skills or `<TARGET_REPO_PATH>/AGENTS.md` that duplicate environment facts (`package.json`, `--help`, directory tree) or do not change default agent behavior—propose deleting the whole sentence rather than trimming words
 
 ## Scope to skills and target-repo harness surfaces the session actually used
 

@@ -23,6 +23,7 @@ Scan for:
 - Test commands, CI flags, and local repro steps
 - Debugging entry points: log paths, transcripts, harness drivers
 - Sandbox, quoting, or package-manager surprises that wasted turns
+- Tool economy: token-expensive tool calls, noisy unfiltered command output, or chatty CLIs/MCPs that burned context for little signal
 
 ## Scope to skills and target-repo harness surfaces the session actually used
 

@@ -28,6 +28,8 @@ Inspect `<TARGET_REPO_PATH>`'s recent commits, reverts, PR review comments (`git
 
 Group recurring failures into **mistake classes**. A class counts once it has happened **at least twice** (or when the operator explicitly targets a known repeat mistake). Cite the exact commits, PRs, or reports for every class (ADR-005 evidence discipline).
 
+**Baseline guardrail exception (Day 1):** Always inspect `<TARGET_REPO_PATH>`'s build/lint/test manifests and CI workflows first. An existing check that sits unwired or silently broken—or a repository with **no automated guardrail at all** (neither pre-commit hook nor CI running lint, typecheck, and tests)—counts as a standing Level 2 finding immediately without waiting for two incidents.
+
 ## 2. Fix each class at the highest level that works
 
 Evaluate each class strictly top-down—never stop at prose when a higher level can enforce the invariant:

@@ -38,6 +38,8 @@ Write each filled prompt template (substituting `<TRANSCRIPT_PATH>`, `<TRANSCRIP
 
 Reviewers must never modify files, edit skills, or commit. Each lens sees only the transcript, `<TARGET_REPO_PATH>`, and its own prompt—never another lens's output.
 
+**Quick mode (`--quick`):** When the operator explicitly asks for a quick reflection on a small session, skip the 3-lens fan-out and run a single Reviewer-model Goldfish pass combining all three lenses directly into the Step 3 `Accepted` / `Rejected` / `Backlog` format (keeping all 9 Synthesizer gates and ADR-005 citation verification intact).
+
 ## 3. Synthesize
 
 Once all three lenses complete, launch one fresh Reviewer-model Goldfish process with `references/synthesizer.md` (passing `<TRANSCRIPT_PATH>`, `<TARGET_REPO_PATH>`, and the three lens output paths via a scratch prompt file).
